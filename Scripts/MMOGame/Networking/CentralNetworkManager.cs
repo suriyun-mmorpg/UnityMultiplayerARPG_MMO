@@ -12,11 +12,19 @@ namespace Insthync.MMOG
         protected override void RegisterServerMessages()
         {
             base.RegisterServerMessages();
+            // Receiving:
+            // - Login Server Request To Store Information (Machine Address/Port)
+            // - Chat Server Request To Store Information (Machine Address/Port)
+            // - Map Servers Request To Store Information (Machine Address/Port)
+            // - Login Server Request For Map Server Information
         }
 
         protected override void RegisterClientMessages()
         {
             base.RegisterClientMessages();
+            // Receiving:
+            // - Chat Server Information
+            // - Map Server Information
         }
     }
 }

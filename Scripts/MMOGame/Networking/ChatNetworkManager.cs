@@ -12,11 +12,15 @@ namespace Insthync.MMOG
         protected override void RegisterServerMessages()
         {
             base.RegisterServerMessages();
+            // Receiving:
+            // - Player Enter Chat Message
         }
 
         protected override void RegisterClientMessages()
         {
             base.RegisterClientMessages();
+            // Receiving:
+            // - Receives Chat Messages
         }
     }
 }
