@@ -8,6 +8,7 @@ namespace Insthync.MMOG
     public class MySQLRowsReader
     {
         private readonly List<List<object>> data = new List<List<object>>();
+        private readonly List<Dictionary<string, object>> dataDict = new List<Dictionary<string, object>>();
         private int currentRow = -1;
         public int FieldCount { get; private set; }
         public int VisibleFieldCount { get; private set; }
@@ -16,15 +17,24 @@ namespace Insthync.MMOG
 
         public void Init(MySqlDataReader dataReader)
         {
+            data.Clear();
+            dataDict.Clear();
             FieldCount = dataReader.FieldCount;
             VisibleFieldCount = dataReader.VisibleFieldCount;
             while (dataReader.Read())
             {
-                var buffer = new object[dataReader.FieldCount];
-                dataReader.GetValues(buffer);
-                data.Add(new List<object>(buffer));
+                var row = new List<object>();
+                var rowDict = new Dictionary<string, object>();
+                for (var i = 0; i < FieldCount; ++i)
+                {
+                    var fieldName = dataReader.GetName(i);
+                    var value = dataReader.GetValue(i);
+                    row.Add(value);
+                    rowDict.Add(fieldName, value);
+                }
+                data.Add(row);
+                dataDict.Add(rowDict);
             }
-            ResetReader();
         }
 
         public bool Read()
@@ -40,9 +50,24 @@ namespace Insthync.MMOG
             return (System.DateTime)data[currentRow][index];
         }
 
+        public byte GetByte(int index)
+        {
+            return (byte)data[currentRow][index];
+        }
+
+        public byte GetByte(string columnName)
+        {
+            return (byte)dataDict[currentRow][columnName];
+        }
+
         public char GetChar(int index)
         {
             return (char)data[currentRow][index];
+        }
+
+        public char GetChar(string columnName)
+        {
+            return (char)dataDict[currentRow][columnName];
         }
 
         public string GetString(int index)
@@ -50,19 +75,39 @@ namespace Insthync.MMOG
             return (string)data[currentRow][index];
         }
 
+        public string GetString(string columnName)
+        {
+            return (string)dataDict[currentRow][columnName];
+        }
+
         public bool GetBoolean(int index)
         {
             return (bool)data[currentRow][index];
         }
 
+        public bool GetBoolean(string columnName)
+        {
+            return (bool)dataDict[currentRow][columnName];
+        }
+
         public short GetInt16(int index)
         {
-            return (short)((long)data[currentRow][index]);
+            return (short)data[currentRow][index];
+        }
+
+        public short GetInt16(string columnName)
+        {
+            return (short)dataDict[currentRow][columnName];
         }
 
         public int GetInt32(int index)
         {
-            return (int)((long)data[currentRow][index]);
+            return (int)data[currentRow][index];
+        }
+
+        public int GetInt32(string columnName)
+        {
+            return (int)dataDict[currentRow][columnName];
         }
 
         public long GetInt64(int index)
@@ -70,19 +115,69 @@ namespace Insthync.MMOG
             return (long)data[currentRow][index];
         }
 
+        public long GetInt64(string columnName)
+        {
+            return (long)dataDict[currentRow][columnName];
+        }
+
+        public ushort GetUInt16(int index)
+        {
+            return (ushort)data[currentRow][index];
+        }
+
+        public ushort GetUInt16(string columnName)
+        {
+            return (ushort)dataDict[currentRow][columnName];
+        }
+
+        public uint GetUInt32(int index)
+        {
+            return (uint)data[currentRow][index];
+        }
+
+        public uint GetUInt32(string columnName)
+        {
+            return (uint)dataDict[currentRow][columnName];
+        }
+
+        public ulong GetUInt64(int index)
+        {
+            return (ulong)data[currentRow][index];
+        }
+
+        public ulong GetUInt64(string columnName)
+        {
+            return (ulong)dataDict[currentRow][columnName];
+        }
+
         public decimal GetDecimal(int index)
         {
-            return (decimal)((double)data[currentRow][index]);
+            return (decimal)data[currentRow][index];
+        }
+
+        public decimal GetDecimal(string columnName)
+        {
+            return (decimal)dataDict[currentRow][columnName];
         }
 
         public float GetFloat(int index)
         {
-            return (float)((double)data[currentRow][index]);
+            return (float)data[currentRow][index];
+        }
+
+        public float GetFloat(string columnName)
+        {
+            return (float)dataDict[currentRow][columnName];
         }
 
         public double GetDouble(int index)
         {
             return (double)data[currentRow][index];
+        }
+
+        public double GetDouble(string columnName)
+        {
+            return (double)dataDict[currentRow][columnName];
         }
 
         public void ResetReader()
@@ -91,8 +186,15 @@ namespace Insthync.MMOG
         }
     }
 
-    public class MySQLDatabase : BaseDatabase
+    public partial class MySQLDatabase : BaseDatabase
     {
+        public enum InventoryType : byte
+        {
+            NonEquipItems,
+            EquipItems,
+            EquipWeaponRight,
+            EquipWeaponLeft,
+        }
         public string address = "localhost";
         public int port = 3306;
         public string username = "root";
@@ -205,104 +307,131 @@ namespace Insthync.MMOG
             return result != null ? (long)result : 0;
         }
 
-        public override void CreateCharacter(string userId, PlayerCharacterData characterData)
+        public override CharacterAttribute ReadCharacterAttribute(string characterId, string attributeId)
         {
-            ExecuteInsertData("INSERT INTO character " +
-                "(userId, databaseId, characterName, level, exp, currentHp, currentMp, currentStamina, currentFood, currentWater, statPoint, skillPoint, gold, currentMapName, currentPositionX, currentPositionY, currentPositionZ, respawnMapName, respawnPositionX, respawnPositionY, respawnPositionZ) VALUES " +
-                "(@userId, @databaseId, @characterName, @level, @exp, @currentHp, @currentMp, @currentStamina, @currentFood, @currentWater, @statPoint, @skillPoint, @gold, @currentMapName, @currentPositionX, @currentPositionY, @currentPositionZ, @respawnMapName, @respawnPositionX, @respawnPositionY, @respawnPositionZ)",
-                new MySqlParameter("@userId", userId),
-                new MySqlParameter("@databaseId", characterData.DatabaseId),
-                new MySqlParameter("@characterName", characterData.CharacterName),
-                new MySqlParameter("@level", characterData.Level),
-                new MySqlParameter("@exp", characterData.Exp),
-                new MySqlParameter("@currentHp", characterData.CurrentHp),
-                new MySqlParameter("@currentMp", characterData.CurrentMp),
-                new MySqlParameter("@currentStamina", characterData.CurrentStamina),
-                new MySqlParameter("@currentFood", characterData.CurrentFood),
-                new MySqlParameter("@currentWater", characterData.CurrentWater),
-                new MySqlParameter("@statPoint", characterData.StatPoint),
-                new MySqlParameter("@skillPoint", characterData.SkillPoint),
-                new MySqlParameter("@gold", characterData.Gold),
-                new MySqlParameter("@currentMapName", characterData.CurrentMapName),
-                new MySqlParameter("@currentPositionX", characterData.CurrentPosition.x),
-                new MySqlParameter("@currentPositionY", characterData.CurrentPosition.y),
-                new MySqlParameter("@currentPositionZ", characterData.CurrentPosition.z),
-                new MySqlParameter("@respawnMapName", characterData.RespawnMapName),
-                new MySqlParameter("@respawnPositionX", characterData.RespawnPosition.x),
-                new MySqlParameter("@respawnPositionY", characterData.RespawnPosition.y),
-                new MySqlParameter("@respawnPositionZ", characterData.RespawnPosition.z));
-        }
-
-        public override PlayerCharacterData ReadCharacter(string characterId,
-            bool withEquipWeapons = true,
-            bool withAttributes = true,
-            bool withSkills = true,
-            bool withBuffs = true,
-            bool withEquipItems = true,
-            bool withNonEquipItems = true,
-            bool withHotkeys = true,
-            bool withQuests = true)
-        {
-            var readerCharacter = ExecuteReader("SELECT * FROM character WHERE characterId=@characterId LIMIT 1", new MySqlParameter("@characterId", characterId));
-            if (readerCharacter.Read())
+            var reader = ExecuteReader("SELECT amount FROM characterAttribute WHERE characterId=@characterId AND attributeId=@attributeId LIMIT 1",
+                new MySqlParameter("@characterId", characterId),
+                new MySqlParameter("@attributeId", attributeId));
+            if (reader.Read())
             {
-                var result = new PlayerCharacterData();
-                result.Id = readerCharacter.GetInt64(0).ToString();
-                result.DatabaseId = readerCharacter.GetString(1);
-                result.CharacterName = readerCharacter.GetString(2);
-                result.Level = readerCharacter.GetInt32(3);
-                result.Exp = readerCharacter.GetInt32(4);
-                result.CurrentHp = readerCharacter.GetInt32(5);
-                result.CurrentMp = readerCharacter.GetInt32(6);
-                result.CurrentStamina = readerCharacter.GetInt32(7);
-                result.CurrentFood = readerCharacter.GetInt32(8);
-                result.CurrentWater = readerCharacter.GetInt32(9);
-                result.StatPoint = readerCharacter.GetInt32(10);
-                result.SkillPoint = readerCharacter.GetInt32(11);
-                result.Gold = readerCharacter.GetInt32(12);
-                result.CurrentMapName = readerCharacter.GetString(13);
-                result.CurrentPosition = new Vector3(readerCharacter.GetFloat(14), readerCharacter.GetFloat(15), readerCharacter.GetFloat(16));
-                result.RespawnMapName = readerCharacter.GetString(17);
-                result.RespawnPosition = new Vector3(readerCharacter.GetFloat(18), readerCharacter.GetFloat(19), readerCharacter.GetFloat(20));
-                result.LastUpdate = readerCharacter.GetInt32(21);
+                var result = new CharacterAttribute();
+                result.attributeId = attributeId;
+                result.amount = reader.GetInt32(0);
                 return result;
             }
-            return null;
+            return CharacterAttribute.Empty;
         }
 
-        public override List<PlayerCharacterData> ReadCharacters(string userId)
-        {
-            var result = new List<PlayerCharacterData>();
-            var readerCharacter = ExecuteReader("SELECT characterId FROM character WHERE userId=@userId ORDER BY lastUpdate DESC", new MySqlParameter("@userId", userId));
-            if (readerCharacter.Read())
-            {
-                var characterId = readerCharacter.GetInt64(0).ToString();
-                result.Add(ReadCharacter(characterId, true, true, true, false, true, false, false, false));
-            }
-            return result;
-        }
-
-        public override void UpdateCharacter(PlayerCharacterData characterData)
+        public override List<CharacterAttribute> ReadCharacterAttributes(string characterId)
         {
             throw new System.NotImplementedException();
         }
 
-        public override void DeleteCharacter(string characterId)
+        public override CharacterSkill ReadCharacterSkill(string characterId, string skillId)
         {
-            ExecuteNonQuery("DELETE FROM character WHERE id=@characterId", new MySqlParameter("@characterId", characterId));
-            ExecuteNonQuery("DELETE FROM characterInventory WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
-            ExecuteNonQuery("DELETE FROM characterAttribute WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
-            ExecuteNonQuery("DELETE FROM characterSkill WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
-            ExecuteNonQuery("DELETE FROM characterBuff WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
-            ExecuteNonQuery("DELETE FROM characterHotkey WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
-            ExecuteNonQuery("DELETE FROM characterQuest WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
+            var reader = ExecuteReader("SELECT level, coolDownRemainsDuration FROM characterSkill WHERE characterId=@characterId AND skillId=@skillId LIMIT 1",
+                new MySqlParameter("@characterId", characterId),
+                new MySqlParameter("@skillId", skillId));
+            if (reader.Read())
+            {
+                var result = new CharacterSkill();
+                result.skillId = skillId;
+                result.level = reader.GetInt32(0);
+                result.coolDownRemainsDuration = reader.GetFloat(1);
+                return result;
+            }
+            return CharacterSkill.Empty;
         }
 
-        public override long FindCharacterName(string characterName)
+        public override List<CharacterSkill> ReadCharacterSkills(string characterId)
         {
-            var result = ExecuteScalar("SELECT COUNT(*) FROM character WHERE characterName=@characterName",
-                new MySqlParameter("@characterName", characterName));
-            return result != null ? (long)result : 0;
+            throw new System.NotImplementedException();
+        }
+
+        public override CharacterBuff ReadCharacterBuff(string id)
+        {
+            var reader = ExecuteReader("SELECT characterId, dataId, type, level, buffRemainsDuration FROM characterBuff WHERE id=@id LIMIT 1",
+                new MySqlParameter("@id", id));
+            if (reader.Read())
+            {
+                var result = new CharacterBuff();
+                result.characterId = reader.GetInt64(0).ToString();
+                result.dataId = reader.GetString(1);
+                result.type = (BuffType)reader.GetByte(2);
+                result.level = reader.GetInt32(3);
+                result.buffRemainsDuration = reader.GetFloat(4);
+                return result;
+            }
+            return CharacterBuff.Empty;
+        }
+
+        public override List<CharacterBuff> ReadCharacterBuffs(string characterId)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override CharacterHotkey ReadCharacterHotkey(string characterId, string hotkeyId)
+        {
+            var reader = ExecuteReader("SELECT type, dataId FROM characterHotkey WHERE characterId=@characterId AND hotkeyId=@hotkeyId LIMIT 1",
+                new MySqlParameter("@characterId", characterId),
+                new MySqlParameter("@hotkeyId", hotkeyId));
+            if (reader.Read())
+            {
+                var result = new CharacterHotkey();
+                result.hotkeyId = hotkeyId;
+                result.type = (HotkeyType)reader.GetByte(0);
+                result.dataId = reader.GetString(1);
+                return result;
+            }
+            return CharacterHotkey.Empty;
+        }
+
+        public override List<CharacterHotkey> ReadCharacterHotkeys(string characterId)
+        {
+            var result = new List<CharacterHotkey>();
+            var reader = ExecuteReader("SELECT hotkeyId FROM characterHotkey WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
+            while (reader.Read())
+            {
+                var hotkeyId = reader.GetString(0);
+                result.Add(ReadCharacterHotkey(characterId, hotkeyId));
+            }
+            return result;
+        }
+
+        public override CharacterQuest ReadCharacterQuest(string characterId, string questId)
+        {
+            var reader = ExecuteReader("SELECT isComplete, killMonsters FROM characterQuest WHERE characterId=@characterId AND questId=@questId LIMIT 1",
+                new MySqlParameter("@characterId", characterId),
+                new MySqlParameter("@questId", questId));
+            if (reader.Read())
+            {
+                var result = new CharacterQuest();
+                result.questId = questId;
+                result.isComplete = reader.GetBoolean(0);
+                var killMonsters = reader.GetString(1);
+                var killMonstersDict = new Dictionary<string, int>();
+                var splitSets = killMonsters.Split(';');
+                foreach (var set in splitSets)
+                {
+                    var splitData = set.Split(':');
+                    killMonstersDict[splitData[0]] = int.Parse(splitData[1]);
+                }
+                result.killedMonsters = killMonstersDict;
+                return result;
+            }
+            return CharacterQuest.Empty;
+        }
+
+        public override List<CharacterQuest> ReadCharacterQuests(string characterId)
+        {
+            var result = new List<CharacterQuest>();
+            var reader = ExecuteReader("SELECT questId FROM characterQuest WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
+            while (reader.Read())
+            {
+                var questId = reader.GetString(0);
+                result.Add(ReadCharacterQuest(characterId, questId));
+            }
+            return result;
         }
     }
 }
