@@ -6,14 +6,22 @@ namespace Insthync.MMOG
 {
     public abstract class BaseDatabase : MonoBehaviour
     {
-        public abstract bool ValidateLogin(string username, string password);
-        public abstract UserLoginData Register(string username, string password);
+        public abstract bool ValidateUserLogin(string username, string password);
+        public abstract void CreateUserLogin(string username, string password);
         public abstract long FindUsername(string username);
-        public abstract bool CreateCharacter(string userId, PlayerCharacterData characterData);
-        public abstract PlayerCharacterData ReadCharacter(string characterId);
-        public abstract List<LitePlayerCharacterData> ReadCharacters(string userId);
-        public abstract bool UpdateCharacter(PlayerCharacterData characterData);
-        public abstract bool DeleteCharacter(string characterId);
+        public abstract void CreateCharacter(string userId, PlayerCharacterData characterData);
+        public abstract PlayerCharacterData ReadCharacter(string characterId, 
+            bool withEquipWeapons = true, 
+            bool withAttributes = true, 
+            bool withSkills = true, 
+            bool withBuffs = true, 
+            bool withEquipItems = true, 
+            bool withNonEquipItems = true, 
+            bool withHotkeys = true, 
+            bool withQuests = true);
+        public abstract List<PlayerCharacterData> ReadCharacters(string userId);
+        public abstract void UpdateCharacter(PlayerCharacterData characterData);
+        public abstract void DeleteCharacter(string characterId);
         public abstract long FindCharacterName(string characterName);
     }
 }

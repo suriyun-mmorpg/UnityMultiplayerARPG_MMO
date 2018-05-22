@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Insthync.MMOG
 {
-    public class UserLoginData
+    public struct UserLoginData
     {
         public string id;
         public string username;

@@ -100,7 +100,7 @@ namespace Insthync.MMOG
         public string dbName = "MMORPGTemplate";
         private MySqlConnection connection;
 
-        private void Awake()
+        private void SetupConnection()
         {
             var connectionString = "Server=" + address + ";" +
                 "Port=" + port + ";" +
@@ -108,6 +108,33 @@ namespace Insthync.MMOG
                 (string.IsNullOrEmpty(password) ? "" : "Pwd=\"" + password + "\";") +
                 "Database=" + dbName + ";";
             connection = new MySqlConnection(connectionString);
+        }
+
+        public void SetupConnection(string address, int port, string username, string password, string dbName)
+        {
+            this.address = address;
+            this.port = port;
+            this.username = username;
+            this.password = password;
+            this.dbName = dbName;
+            SetupConnection();
+        }
+
+        public long ExecuteInsertData(string sql, params MySqlParameter[] args)
+        {
+            long result = 0;
+            connection.Open();
+            using (var cmd = new MySqlCommand(sql, connection))
+            {
+                foreach (var arg in args)
+                {
+                    cmd.Parameters.Add(arg);
+                }
+                cmd.ExecuteNonQuery();
+                result = cmd.LastInsertedId;
+            }
+            connection.Close();
+            return result;
         }
 
         public void ExecuteNonQuery(string sql, params MySqlParameter[] args)
@@ -156,49 +183,126 @@ namespace Insthync.MMOG
             return result;
         }
 
-        public override bool ValidateLogin(string username, string password)
+        public override bool ValidateUserLogin(string username, string password)
         {
-            throw new System.NotImplementedException();
+            var result = ExecuteScalar("SELECT COUNT(*) FROM userLogin WHERE username=@username AND password=@password",
+                new MySqlParameter("@username", username),
+                new MySqlParameter("@password", password));
+            return result != null && (long)result > 0;
         }
 
-        public override UserLoginData Register(string username, string password)
+        public override void CreateUserLogin(string username, string password)
         {
-            throw new System.NotImplementedException();
+            ExecuteNonQuery("INSERT INTO userLogin (username, password) VALUES (@username, @password)",
+                new MySqlParameter("@username", username),
+                new MySqlParameter("@password", password));
         }
 
         public override long FindUsername(string username)
         {
-            throw new System.NotImplementedException();
+            var result = ExecuteScalar("SELECT COUNT(*) FROM userLogin WHERE username=@username", 
+                new MySqlParameter("@username", username));
+            return result != null ? (long)result : 0;
         }
 
-        public override bool CreateCharacter(string userId, PlayerCharacterData characterData)
+        public override void CreateCharacter(string userId, PlayerCharacterData characterData)
+        {
+            ExecuteInsertData("INSERT INTO character " +
+                "(userId, databaseId, characterName, level, exp, currentHp, currentMp, currentStamina, currentFood, currentWater, statPoint, skillPoint, gold, currentMapName, currentPositionX, currentPositionY, currentPositionZ, respawnMapName, respawnPositionX, respawnPositionY, respawnPositionZ) VALUES " +
+                "(@userId, @databaseId, @characterName, @level, @exp, @currentHp, @currentMp, @currentStamina, @currentFood, @currentWater, @statPoint, @skillPoint, @gold, @currentMapName, @currentPositionX, @currentPositionY, @currentPositionZ, @respawnMapName, @respawnPositionX, @respawnPositionY, @respawnPositionZ)",
+                new MySqlParameter("@userId", userId),
+                new MySqlParameter("@databaseId", characterData.DatabaseId),
+                new MySqlParameter("@characterName", characterData.CharacterName),
+                new MySqlParameter("@level", characterData.Level),
+                new MySqlParameter("@exp", characterData.Exp),
+                new MySqlParameter("@currentHp", characterData.CurrentHp),
+                new MySqlParameter("@currentMp", characterData.CurrentMp),
+                new MySqlParameter("@currentStamina", characterData.CurrentStamina),
+                new MySqlParameter("@currentFood", characterData.CurrentFood),
+                new MySqlParameter("@currentWater", characterData.CurrentWater),
+                new MySqlParameter("@statPoint", characterData.StatPoint),
+                new MySqlParameter("@skillPoint", characterData.SkillPoint),
+                new MySqlParameter("@gold", characterData.Gold),
+                new MySqlParameter("@currentMapName", characterData.CurrentMapName),
+                new MySqlParameter("@currentPositionX", characterData.CurrentPosition.x),
+                new MySqlParameter("@currentPositionY", characterData.CurrentPosition.y),
+                new MySqlParameter("@currentPositionZ", characterData.CurrentPosition.z),
+                new MySqlParameter("@respawnMapName", characterData.RespawnMapName),
+                new MySqlParameter("@respawnPositionX", characterData.RespawnPosition.x),
+                new MySqlParameter("@respawnPositionY", characterData.RespawnPosition.y),
+                new MySqlParameter("@respawnPositionZ", characterData.RespawnPosition.z));
+        }
+
+        public override PlayerCharacterData ReadCharacter(string characterId,
+            bool withEquipWeapons = true,
+            bool withAttributes = true,
+            bool withSkills = true,
+            bool withBuffs = true,
+            bool withEquipItems = true,
+            bool withNonEquipItems = true,
+            bool withHotkeys = true,
+            bool withQuests = true)
+        {
+            var readerCharacter = ExecuteReader("SELECT * FROM character WHERE characterId=@characterId LIMIT 1", new MySqlParameter("@characterId", characterId));
+            if (readerCharacter.Read())
+            {
+                var result = new PlayerCharacterData();
+                result.Id = readerCharacter.GetInt64(0).ToString();
+                result.DatabaseId = readerCharacter.GetString(1);
+                result.CharacterName = readerCharacter.GetString(2);
+                result.Level = readerCharacter.GetInt32(3);
+                result.Exp = readerCharacter.GetInt32(4);
+                result.CurrentHp = readerCharacter.GetInt32(5);
+                result.CurrentMp = readerCharacter.GetInt32(6);
+                result.CurrentStamina = readerCharacter.GetInt32(7);
+                result.CurrentFood = readerCharacter.GetInt32(8);
+                result.CurrentWater = readerCharacter.GetInt32(9);
+                result.StatPoint = readerCharacter.GetInt32(10);
+                result.SkillPoint = readerCharacter.GetInt32(11);
+                result.Gold = readerCharacter.GetInt32(12);
+                result.CurrentMapName = readerCharacter.GetString(13);
+                result.CurrentPosition = new Vector3(readerCharacter.GetFloat(14), readerCharacter.GetFloat(15), readerCharacter.GetFloat(16));
+                result.RespawnMapName = readerCharacter.GetString(17);
+                result.RespawnPosition = new Vector3(readerCharacter.GetFloat(18), readerCharacter.GetFloat(19), readerCharacter.GetFloat(20));
+                result.LastUpdate = readerCharacter.GetInt32(21);
+                return result;
+            }
+            return null;
+        }
+
+        public override List<PlayerCharacterData> ReadCharacters(string userId)
+        {
+            var result = new List<PlayerCharacterData>();
+            var readerCharacter = ExecuteReader("SELECT characterId FROM character WHERE userId=@userId ORDER BY lastUpdate DESC", new MySqlParameter("@userId", userId));
+            if (readerCharacter.Read())
+            {
+                var characterId = readerCharacter.GetInt64(0).ToString();
+                result.Add(ReadCharacter(characterId, true, true, true, false, true, false, false, false));
+            }
+            return result;
+        }
+
+        public override void UpdateCharacter(PlayerCharacterData characterData)
         {
             throw new System.NotImplementedException();
         }
 
-        public override PlayerCharacterData ReadCharacter(string characterId)
+        public override void DeleteCharacter(string characterId)
         {
-            throw new System.NotImplementedException();
-        }
-
-        public override List<LitePlayerCharacterData> ReadCharacters(string userId)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public override bool UpdateCharacter(PlayerCharacterData characterData)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public override bool DeleteCharacter(string characterId)
-        {
-            throw new System.NotImplementedException();
+            ExecuteNonQuery("DELETE FROM character WHERE id=@characterId", new MySqlParameter("@characterId", characterId));
+            ExecuteNonQuery("DELETE FROM characterInventory WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
+            ExecuteNonQuery("DELETE FROM characterAttribute WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
+            ExecuteNonQuery("DELETE FROM characterSkill WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
+            ExecuteNonQuery("DELETE FROM characterBuff WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
+            ExecuteNonQuery("DELETE FROM characterHotkey WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
+            ExecuteNonQuery("DELETE FROM characterQuest WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
         }
 
         public override long FindCharacterName(string characterName)
         {
-            throw new System.NotImplementedException();
+            var result = ExecuteScalar("SELECT COUNT(*) FROM character WHERE characterName=@characterName",
+                new MySqlParameter("@characterName", characterName));
+            return result != null ? (long)result : 0;
         }
     }
 }
