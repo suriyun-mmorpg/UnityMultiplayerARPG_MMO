@@ -15,7 +15,7 @@ namespace Insthync.MMOG
             if (reader.Read())
             {
                 result = new CharacterItem();
-                result.id = reader.GetInt64("id").ToString();
+                result.id = reader.GetString("id");
                 result.itemId = reader.GetString("itemId");
                 result.level = reader.GetInt32("level");
                 result.amount = reader.GetInt32("amount");
@@ -27,10 +27,8 @@ namespace Insthync.MMOG
 
         public override CharacterItem ReadCharacterEquipWeapon(string id)
         {
-            var reader = ExecuteReader("SELECT * FROM characterInventory WHERE id=@id AND (inventoryType=@inventoryTypeRight OR inventoryType=@inventoryTypeLeft) LIMIT 1",
-                new MySqlParameter("@id", id),
-                new MySqlParameter("@inventoryTypeRight", InventoryType.EquipWeaponRight),
-                new MySqlParameter("@inventoryTypeLeft", InventoryType.EquipWeaponLeft));
+            var reader = ExecuteReader("SELECT * FROM characterInventory WHERE id=@id LIMIT 1",
+                new MySqlParameter("@id", id));
             CharacterItem result;
             ReadCharacterInventory(reader, out result);
             return result;
@@ -56,11 +54,10 @@ namespace Insthync.MMOG
             return result;
         }
 
-        public override CharacterItem ReadCharacterEquipItem(string inventoryId)
+        public override CharacterItem ReadCharacterEquipItem(string id)
         {
-            var reader = ExecuteReader("SELECT * FROM characterInventory WHERE inventoryId=@inventoryId AND inventoryType=@inventoryType LIMIT 1",
-                new MySqlParameter("@inventoryId", inventoryId),
-                new MySqlParameter("@inventoryType", InventoryType.EquipItems));
+            var reader = ExecuteReader("SELECT * FROM characterInventory WHERE id=@id LIMIT 1",
+                new MySqlParameter("@id", id));
             CharacterItem result;
             ReadCharacterInventory(reader, out result);
             return result;
@@ -82,9 +79,8 @@ namespace Insthync.MMOG
 
         public override CharacterItem ReadCharacterNonEquipItem(string id)
         {
-            var reader = ExecuteReader("SELECT * FROM characterInventory WHERE id=@id AND inventoryType=@inventoryType LIMIT 1",
-                new MySqlParameter("@id", id),
-                new MySqlParameter("@inventoryType", InventoryType.NonEquipItems));
+            var reader = ExecuteReader("SELECT * FROM characterInventory WHERE id=@id LIMIT 1",
+                new MySqlParameter("@id", id));
             CharacterItem result;
             ReadCharacterInventory(reader, out result);
             return result;

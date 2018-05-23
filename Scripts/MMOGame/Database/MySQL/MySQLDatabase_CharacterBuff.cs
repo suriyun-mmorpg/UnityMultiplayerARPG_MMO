@@ -7,27 +7,46 @@ namespace Insthync.MMOG
 {
     public partial class MySQLDatabase
     {
+        private bool ReadCharacterBuff(MySQLRowsReader reader, out CharacterBuff result, bool resetReader = true)
+        {
+            if (resetReader)
+                reader.ResetReader();
+
+            if (reader.Read())
+            {
+                result = new CharacterBuff();
+                result.id = reader.GetString("id");
+                result.characterId = reader.GetInt64("characterId").ToString();
+                result.dataId = reader.GetString("dataId");
+                result.type = (BuffType)reader.GetByte("type");
+                result.level = reader.GetInt32("level");
+                result.buffRemainsDuration = reader.GetFloat("buffRemainsDuration");
+                return true;
+            }
+            result = CharacterBuff.Empty;
+            return false;
+        }
 
         public override CharacterBuff ReadCharacterBuff(string id)
         {
-            var reader = ExecuteReader("SELECT characterId, dataId, type, level, buffRemainsDuration FROM characterBuff WHERE id=@id LIMIT 1",
+            var reader = ExecuteReader("SELECT * FROM characterBuff WHERE id=@id LIMIT 1",
                 new MySqlParameter("@id", id));
-            if (reader.Read())
-            {
-                var result = new CharacterBuff();
-                result.characterId = reader.GetInt64(0).ToString();
-                result.dataId = reader.GetString(1);
-                result.type = (BuffType)reader.GetByte(2);
-                result.level = reader.GetInt32(3);
-                result.buffRemainsDuration = reader.GetFloat(4);
-                return result;
-            }
-            return CharacterBuff.Empty;
+            CharacterBuff result;
+            ReadCharacterBuff(reader, out result);
+            return result;
         }
 
         public override List<CharacterBuff> ReadCharacterBuffs(string characterId)
         {
-            throw new System.NotImplementedException();
+            var result = new List<CharacterBuff>();
+            var reader = ExecuteReader("SELECT * FROM characterBuff WHERE applyingCharacterId=@characterId",
+                new MySqlParameter("@characterId", characterId));
+            CharacterBuff tempBuff;
+            while (ReadCharacterBuff(reader, out tempBuff, false))
+            {
+                result.Add(tempBuff);
+            }
+            return result;
         }
     }
 }

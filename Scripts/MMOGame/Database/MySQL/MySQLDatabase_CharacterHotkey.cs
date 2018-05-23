@@ -7,31 +7,42 @@ namespace Insthync.MMOG
 {
     public partial class MySQLDatabase
     {
+        private bool ReadCharacterHotkey(MySQLRowsReader reader, out CharacterHotkey result, bool resetReader = true)
+        {
+            if (resetReader)
+                reader.ResetReader();
+
+            if (reader.Read())
+            {
+                result = new CharacterHotkey();
+                result.hotkeyId = reader.GetString("hotkeyId");
+                result.type = (HotkeyType)reader.GetByte("type");
+                result.dataId = reader.GetString("dataId");
+                return true;
+            }
+            result = CharacterHotkey.Empty;
+            return false;
+        }
 
         public override CharacterHotkey ReadCharacterHotkey(string characterId, string hotkeyId)
         {
-            var reader = ExecuteReader("SELECT type, dataId FROM characterHotkey WHERE characterId=@characterId AND hotkeyId=@hotkeyId LIMIT 1",
+            var reader = ExecuteReader("SELECT * FROM characterHotkey WHERE characterId=@characterId AND hotkeyId=@hotkeyId LIMIT 1",
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@hotkeyId", hotkeyId));
-            if (reader.Read())
-            {
-                var result = new CharacterHotkey();
-                result.hotkeyId = hotkeyId;
-                result.type = (HotkeyType)reader.GetByte(0);
-                result.dataId = reader.GetString(1);
-                return result;
-            }
-            return CharacterHotkey.Empty;
+            CharacterHotkey result;
+            ReadCharacterHotkey(reader, out result);
+            return result;
         }
 
         public override List<CharacterHotkey> ReadCharacterHotkeys(string characterId)
         {
             var result = new List<CharacterHotkey>();
-            var reader = ExecuteReader("SELECT hotkeyId FROM characterHotkey WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
-            while (reader.Read())
+            var reader = ExecuteReader("SELECT * FROM characterHotkey WHERE characterId=@characterId",
+                new MySqlParameter("@characterId", characterId));
+            CharacterHotkey tempHotkey;
+            while (ReadCharacterHotkey(reader, out tempHotkey, false))
             {
-                var hotkeyId = reader.GetString(0);
-                result.Add(ReadCharacterHotkey(characterId, hotkeyId));
+                result.Add(tempHotkey);
             }
             return result;
         }

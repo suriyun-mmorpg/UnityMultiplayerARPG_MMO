@@ -7,18 +7,17 @@ namespace Insthync.MMOG
 {
     public partial class MySQLDatabase
     {
-
-        public override CharacterQuest ReadCharacterQuest(string characterId, string questId)
+        private bool ReadCharacterQuest(MySQLRowsReader reader, out CharacterQuest result, bool resetReader = true)
         {
-            var reader = ExecuteReader("SELECT isComplete, killMonsters FROM characterQuest WHERE characterId=@characterId AND questId=@questId LIMIT 1",
-                new MySqlParameter("@characterId", characterId),
-                new MySqlParameter("@questId", questId));
+            if (resetReader)
+                reader.ResetReader();
+
             if (reader.Read())
             {
-                var result = new CharacterQuest();
-                result.questId = questId;
-                result.isComplete = reader.GetBoolean(0);
-                var killMonsters = reader.GetString(1);
+                result = new CharacterQuest();
+                result.questId = reader.GetString("questId");
+                result.isComplete = reader.GetBoolean("isComplete");
+                var killMonsters = reader.GetString("killMonsters");
                 var killMonstersDict = new Dictionary<string, int>();
                 var splitSets = killMonsters.Split(';');
                 foreach (var set in splitSets)
@@ -27,19 +26,31 @@ namespace Insthync.MMOG
                     killMonstersDict[splitData[0]] = int.Parse(splitData[1]);
                 }
                 result.killedMonsters = killMonstersDict;
-                return result;
+                return true;
             }
-            return CharacterQuest.Empty;
+            result = CharacterQuest.Empty;
+            return false;
+        }
+
+        public override CharacterQuest ReadCharacterQuest(string characterId, string questId)
+        {
+            var reader = ExecuteReader("SELECT * FROM characterQuest WHERE characterId=@characterId AND questId=@questId LIMIT 1",
+                new MySqlParameter("@characterId", characterId),
+                new MySqlParameter("@questId", questId));
+            CharacterQuest result;
+            ReadCharacterQuest(reader, out result);
+            return result;
         }
 
         public override List<CharacterQuest> ReadCharacterQuests(string characterId)
         {
             var result = new List<CharacterQuest>();
-            var reader = ExecuteReader("SELECT questId FROM characterQuest WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
-            while (reader.Read())
+            var reader = ExecuteReader("SELECT * FROM characterQuest WHERE characterId=@characterId",
+                new MySqlParameter("@characterId", characterId));
+            CharacterQuest tempQuest;
+            while (ReadCharacterQuest(reader, out tempQuest, false))
             {
-                var questId = reader.GetString(0);
-                result.Add(ReadCharacterQuest(characterId, questId));
+                result.Add(tempQuest);
             }
             return result;
         }
