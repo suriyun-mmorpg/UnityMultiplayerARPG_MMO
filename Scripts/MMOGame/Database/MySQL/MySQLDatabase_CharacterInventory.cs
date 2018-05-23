@@ -97,16 +97,24 @@ namespace Insthync.MMOG
             return result;
         }
 
+        public override void CreateCharacterEquipWeapons(string characterId, EquipWeapons equipWeapons)
+        {
+            CreateCharacterItem(characterId, InventoryType.EquipWeaponRight, equipWeapons.rightHand);
+            CreateCharacterItem(characterId, InventoryType.EquipWeaponLeft, equipWeapons.leftHand);
+        }
+
         public override void UpdateCharacterEquipWeapons(string characterId, EquipWeapons equipWeapons)
+        {
+            DeleteCharacterEquipWeapons(characterId);
+            CreateCharacterEquipWeapons(characterId, equipWeapons);
+        }
+
+        public override void DeleteCharacterEquipWeapons(string characterId)
         {
             ExecuteNonQuery("DELETE FROM characterInventory WHERE characterId=@characterId AND (inventoryType=@inventoryTypeRight OR inventoryType=@inventoryTypeLeft)",
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@inventoryTypeRight", InventoryType.EquipWeaponRight),
                 new MySqlParameter("@inventoryTypeLeft", InventoryType.EquipWeaponLeft));
-            if (!equipWeapons.rightHand.IsEmpty())
-                CreateCharacterItem(characterId, InventoryType.EquipWeaponRight, equipWeapons.rightHand);
-            if (!equipWeapons.leftHand.IsEmpty())
-                CreateCharacterItem(characterId, InventoryType.EquipWeaponLeft, equipWeapons.leftHand);
         }
 
         public override void CreateCharacterEquipItem(string characterId, CharacterItem characterItem)

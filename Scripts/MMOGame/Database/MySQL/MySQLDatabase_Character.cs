@@ -7,12 +7,54 @@ namespace Insthync.MMOG
 {
     public partial class MySQLDatabase
     {
+        private void FillCharacterRelatesData(IPlayerCharacterData characterData)
+        {
+            // Delete all character then add all of them
+            var characterId = characterData.Id;
+            ExecuteNonQuery("DELETE FROM characterInventory WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
+            ExecuteNonQuery("DELETE FROM characterAttribute WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
+            ExecuteNonQuery("DELETE FROM characterSkill WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
+            ExecuteNonQuery("DELETE FROM characterBuff WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
+            ExecuteNonQuery("DELETE FROM characterHotkey WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
+            ExecuteNonQuery("DELETE FROM characterQuest WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
+
+            CreateCharacterEquipWeapons(characterId, characterData.EquipWeapons);
+            foreach (var equipItem in characterData.EquipItems)
+            {
+                CreateCharacterEquipItem(characterId, equipItem);
+            }
+            foreach (var nonEquipItem in characterData.NonEquipItems)
+            {
+                CreateCharacterEquipItem(characterId, nonEquipItem);
+            }
+            foreach (var attribute in characterData.Attributes)
+            {
+                CreateCharacterAttribute(characterId, attribute);
+            }
+            foreach (var skill in characterData.Skills)
+            {
+                CreateCharacterSkill(characterId, skill);
+            }
+            foreach (var buff in characterData.Buffs)
+            {
+                CreateCharacterBuff(characterId, buff);
+            }
+            foreach (var hotkey in characterData.Hotkeys)
+            {
+                CreateCharacterHotkey(characterId, hotkey);
+            }
+            foreach (var quest in characterData.Quests)
+            {
+                CreateCharacterQuest(characterId, quest);
+            }
+        }
 
         public override void CreateCharacter(string userId, PlayerCharacterData characterData)
         {
             ExecuteInsertData("INSERT INTO character " +
-                "(userId, databaseId, characterName, level, exp, currentHp, currentMp, currentStamina, currentFood, currentWater, statPoint, skillPoint, gold, currentMapName, currentPositionX, currentPositionY, currentPositionZ, respawnMapName, respawnPositionX, respawnPositionY, respawnPositionZ) VALUES " +
-                "(@userId, @databaseId, @characterName, @level, @exp, @currentHp, @currentMp, @currentStamina, @currentFood, @currentWater, @statPoint, @skillPoint, @gold, @currentMapName, @currentPositionX, @currentPositionY, @currentPositionZ, @respawnMapName, @respawnPositionX, @respawnPositionY, @respawnPositionZ)",
+                "(id, userId, databaseId, characterName, level, exp, currentHp, currentMp, currentStamina, currentFood, currentWater, statPoint, skillPoint, gold, currentMapName, currentPositionX, currentPositionY, currentPositionZ, respawnMapName, respawnPositionX, respawnPositionY, respawnPositionZ) VALUES " +
+                "(@id, @userId, @databaseId, @characterName, @level, @exp, @currentHp, @currentMp, @currentStamina, @currentFood, @currentWater, @statPoint, @skillPoint, @gold, @currentMapName, @currentPositionX, @currentPositionY, @currentPositionZ, @respawnMapName, @respawnPositionX, @respawnPositionY, @respawnPositionZ)",
+                new MySqlParameter("@id", characterData.Id),
                 new MySqlParameter("@userId", userId),
                 new MySqlParameter("@databaseId", characterData.DatabaseId),
                 new MySqlParameter("@characterName", characterData.CharacterName),
@@ -34,6 +76,7 @@ namespace Insthync.MMOG
                 new MySqlParameter("@respawnPositionX", characterData.RespawnPosition.x),
                 new MySqlParameter("@respawnPositionY", characterData.RespawnPosition.y),
                 new MySqlParameter("@respawnPositionZ", characterData.RespawnPosition.z));
+            FillCharacterRelatesData(characterData);
         }
 
         private bool ReadCharacter(MySQLRowsReader reader, out PlayerCharacterData result, bool resetReader = true)
@@ -44,7 +87,7 @@ namespace Insthync.MMOG
             if (reader.Read())
             {
                 result = new PlayerCharacterData();
-                result.Id = reader.GetInt64("id").ToString();
+                result.Id = reader.GetString("id");
                 result.DatabaseId = reader.GetString("databaseId");
                 result.CharacterName = reader.GetString("characterName");
                 result.Level = reader.GetInt32("level");
@@ -118,7 +161,50 @@ namespace Insthync.MMOG
 
         public override void UpdateCharacter(PlayerCharacterData characterData)
         {
-            throw new System.NotImplementedException();
+            ExecuteInsertData("UPDATE character SET " +
+                "databaseId=@databaseId, " +
+                "characterName=@characterName, " +
+                "level=@level, " +
+                "exp=@exp, " +
+                "currentHp=@currentHp, " +
+                "currentMp=@currentMp, " +
+                "currentStamina=@currentStamina, " +
+                "currentFood=@currentFood, " +
+                "currentWater=@currentWater, " +
+                "statPoint=@statPoint, " +
+                "skillPoint=@skillPoint, " +
+                "gold=@gold, " +
+                "currentMapName=@currentMapName, " +
+                "currentPositionX=@currentPositionX, " +
+                "currentPositionY=@currentPositionY, " +
+                "currentPositionZ=@currentPositionZ, " +
+                "respawnMapName=@respawnMapName, " +
+                "respawnPositionX=@respawnPositionX, " +
+                "respawnPositionY=@respawnPositionY, " +
+                "respawnPositionZ=@respawnPositionZ " +
+                "WHERE id=@id",
+                new MySqlParameter("@databaseId", characterData.DatabaseId),
+                new MySqlParameter("@characterName", characterData.CharacterName),
+                new MySqlParameter("@level", characterData.Level),
+                new MySqlParameter("@exp", characterData.Exp),
+                new MySqlParameter("@currentHp", characterData.CurrentHp),
+                new MySqlParameter("@currentMp", characterData.CurrentMp),
+                new MySqlParameter("@currentStamina", characterData.CurrentStamina),
+                new MySqlParameter("@currentFood", characterData.CurrentFood),
+                new MySqlParameter("@currentWater", characterData.CurrentWater),
+                new MySqlParameter("@statPoint", characterData.StatPoint),
+                new MySqlParameter("@skillPoint", characterData.SkillPoint),
+                new MySqlParameter("@gold", characterData.Gold),
+                new MySqlParameter("@currentMapName", characterData.CurrentMapName),
+                new MySqlParameter("@currentPositionX", characterData.CurrentPosition.x),
+                new MySqlParameter("@currentPositionY", characterData.CurrentPosition.y),
+                new MySqlParameter("@currentPositionZ", characterData.CurrentPosition.z),
+                new MySqlParameter("@respawnMapName", characterData.RespawnMapName),
+                new MySqlParameter("@respawnPositionX", characterData.RespawnPosition.x),
+                new MySqlParameter("@respawnPositionY", characterData.RespawnPosition.y),
+                new MySqlParameter("@respawnPositionZ", characterData.RespawnPosition.z),
+                new MySqlParameter("@id", characterData.Id));
+            FillCharacterRelatesData(characterData);
         }
 
         public override void DeleteCharacter(string characterId)

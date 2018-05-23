@@ -24,9 +24,11 @@ namespace Insthync.MMOG
         public abstract void UpdateCharacter(PlayerCharacterData characterData);
         public abstract void DeleteCharacter(string id);
         public abstract long FindCharacterName(string characterName);
-        
+
+        public abstract void CreateCharacterEquipWeapons(string characterId, EquipWeapons equipWeapons);
         public abstract EquipWeapons ReadCharacterEquipWeapons(string characterId);
         public abstract void UpdateCharacterEquipWeapons(string characterId, EquipWeapons equipWeapons);
+        public abstract void DeleteCharacterEquipWeapons(string characterId);
 
         public abstract void CreateCharacterAttribute(string characterId, CharacterAttribute characterAttribute);
         public abstract CharacterAttribute ReadCharacterAttribute(string characterId, string attributeId);
