@@ -24,6 +24,15 @@ namespace Insthync.MMOG
             return false;
         }
 
+        public override void CreateCharacterSkill(string characterId, CharacterSkill characterSkill)
+        {
+            ExecuteNonQuery("INSERT INTO characterSkill (characterId, skillId, level, coolDownRemainsDuration) VALUES (@characterId, @skillId, @level, @coolDownRemainsDuration)",
+                new MySqlParameter("@characterId", characterId),
+                new MySqlParameter("@skillId", characterSkill.skillId),
+                new MySqlParameter("@level", characterSkill.level),
+                new MySqlParameter("@coolDownRemainsDuration", characterSkill.coolDownRemainsDuration));
+        }
+
         public override CharacterSkill ReadCharacterSkill(string characterId, string skillId)
         {
             var reader = ExecuteReader("SELECT * FROM characterSkill WHERE characterId=@characterId AND skillId=@skillId LIMIT 1",
@@ -45,6 +54,22 @@ namespace Insthync.MMOG
                 result.Add(tempSkill);
             }
             return result;
+        }
+
+        public override void UpdateCharacterSkill(string characterId, CharacterSkill characterSkill)
+        {
+            ExecuteNonQuery("UPDATE characterSkill SET level=@level, coolDownRemainsDuration=@coolDownRemainsDuration WHERE characterId=@characterId AND skillId=@skillId",
+                new MySqlParameter("@level", characterSkill.level),
+                new MySqlParameter("@coolDownRemainsDuration", characterSkill.coolDownRemainsDuration),
+                new MySqlParameter("@characterId", characterId),
+                new MySqlParameter("@skillId", characterSkill.skillId));
+        }
+
+        public override void DeleteCharacterSkill(string characterId, string skillId)
+        {
+            ExecuteNonQuery("DELETE FROM characterSkill WHERE characterId=@characterId AND skillId=@skillId",
+                new MySqlParameter("@characterId", characterId),
+                new MySqlParameter("@skillId", skillId));
         }
     }
 }

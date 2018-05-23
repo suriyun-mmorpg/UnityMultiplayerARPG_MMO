@@ -7,7 +7,18 @@ namespace Insthync.MMOG
 {
     public partial class MySQLDatabase
     {
-        private bool ReadCharacterInventory(MySQLRowsReader reader, out CharacterItem result, bool resetReader = true)
+        private void CreateCharacterItem(string characterId, InventoryType inventoryType, CharacterItem characterItem)
+        {
+            ExecuteNonQuery("INSERT INTO characterInventory (id, inventoryType, characterId, itemId, level, amount) VALUES (@id, @inventoryType, @characterId, @itemId, @level, @amount)",
+                new MySqlParameter("@id", characterItem.id),
+                new MySqlParameter("@inventoryType", inventoryType),
+                new MySqlParameter("@characterId", characterId),
+                new MySqlParameter("@itemId", characterItem.itemId),
+                new MySqlParameter("@level", characterItem.level),
+                new MySqlParameter("@amount", characterItem.amount));
+        }
+
+        private bool ReadCharacterItem(MySQLRowsReader reader, out CharacterItem result, bool resetReader = true)
         {
             if (resetReader)
                 reader.ResetReader();
@@ -25,13 +36,45 @@ namespace Insthync.MMOG
             return false;
         }
 
-        public override CharacterItem ReadCharacterEquipWeapon(string id)
+        private CharacterItem ReadCharacterItem(string characterId, string id)
         {
-            var reader = ExecuteReader("SELECT * FROM characterInventory WHERE id=@id LIMIT 1",
+            var reader = ExecuteReader("SELECT * FROM characterInventory WHERE characterId=@characterId AND id=@id LIMIT 1",
+                new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@id", id));
             CharacterItem result;
-            ReadCharacterInventory(reader, out result);
+            ReadCharacterItem(reader, out result);
             return result;
+        }
+
+        private List<CharacterItem> ReadCharacterItems(string characterId, InventoryType inventoryType)
+        {
+            var result = new List<CharacterItem>();
+            var reader = ExecuteReader("SELECT * FROM characterInventory WHERE characterId=@characterId AND inventoryType=@inventoryType",
+                new MySqlParameter("@characterId", characterId),
+                new MySqlParameter("@inventoryType", inventoryType));
+            CharacterItem tempInventory;
+            while (ReadCharacterItem(reader, out tempInventory, false))
+            {
+                result.Add(tempInventory);
+            }
+            return result;
+        }
+
+        private void UpdateCharacterItem(string characterId, CharacterItem characterItem)
+        {
+            ExecuteNonQuery("UPDATE characterInventory SET itemId=@itemId, level=@level, amount=@amount WHERE id=@id AND characterId=@characterId",
+                new MySqlParameter("@itemId", characterItem.itemId),
+                new MySqlParameter("@level", characterItem.level),
+                new MySqlParameter("@amount", characterItem.amount),
+                new MySqlParameter("@id", characterItem.id),
+                new MySqlParameter("@characterId", characterId));
+        }
+
+        private void DeleteCharacterItem(string characterId, string id)
+        {
+            ExecuteNonQuery("DELETE FROM characterInventory WHERE id=@id AND characterId=@characterId)",
+                new MySqlParameter("@id", id),
+                new MySqlParameter("@characterId", characterId));
         }
 
         public override EquipWeapons ReadCharacterEquipWeapons(string characterId)
@@ -42,62 +85,78 @@ namespace Insthync.MMOG
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@inventoryType", InventoryType.EquipWeaponRight));
             CharacterItem rightWeapon;
-            if (ReadCharacterInventory(reader, out rightWeapon))
+            if (ReadCharacterItem(reader, out rightWeapon))
                 result.rightHand = rightWeapon;
             // Left hand weapon
             reader = ExecuteReader("SELECT * FROM characterInventory WHERE characterId=@characterId AND inventoryType=@inventoryType LIMIT 1",
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@inventoryType", InventoryType.EquipWeaponLeft));
             CharacterItem leftWeapon;
-            if (ReadCharacterInventory(reader, out leftWeapon))
+            if (ReadCharacterItem(reader, out leftWeapon))
                 result.leftHand = leftWeapon;
             return result;
         }
 
-        public override CharacterItem ReadCharacterEquipItem(string id)
+        public override void UpdateCharacterEquipWeapons(string characterId, EquipWeapons equipWeapons)
         {
-            var reader = ExecuteReader("SELECT * FROM characterInventory WHERE id=@id LIMIT 1",
-                new MySqlParameter("@id", id));
-            CharacterItem result;
-            ReadCharacterInventory(reader, out result);
-            return result;
+            ExecuteNonQuery("DELETE FROM characterInventory WHERE characterId=@characterId AND (inventoryType=@inventoryTypeRight OR inventoryType=@inventoryTypeLeft)",
+                new MySqlParameter("@characterId", characterId),
+                new MySqlParameter("@inventoryTypeRight", InventoryType.EquipWeaponRight),
+                new MySqlParameter("@inventoryTypeLeft", InventoryType.EquipWeaponLeft));
+            if (!equipWeapons.rightHand.IsEmpty())
+                CreateCharacterItem(characterId, InventoryType.EquipWeaponRight, equipWeapons.rightHand);
+            if (!equipWeapons.leftHand.IsEmpty())
+                CreateCharacterItem(characterId, InventoryType.EquipWeaponLeft, equipWeapons.leftHand);
+        }
+
+        public override void CreateCharacterEquipItem(string characterId, CharacterItem characterItem)
+        {
+            CreateCharacterItem(characterId, InventoryType.EquipItems, characterItem);
+        }
+
+        public override CharacterItem ReadCharacterEquipItem(string characterId, string id)
+        {
+            return ReadCharacterItem(characterId, id);
         }
 
         public override List<CharacterItem> ReadCharacterEquipItems(string characterId)
         {
-            var result = new List<CharacterItem>();
-            var reader = ExecuteReader("SELECT * FROM characterInventory WHERE characterId=@characterId AND inventoryType=@inventoryType",
-                new MySqlParameter("@characterId", characterId),
-                new MySqlParameter("@inventoryType", InventoryType.EquipItems));
-            CharacterItem tempInventory;
-            while (ReadCharacterInventory(reader, out tempInventory, false))
-            {
-                result.Add(tempInventory);
-            }
-            return result;
+            return ReadCharacterItems(characterId, InventoryType.EquipItems);
         }
 
-        public override CharacterItem ReadCharacterNonEquipItem(string id)
+        public override void UpdateCharacterEquipItem(string characterId, CharacterItem characterItem)
         {
-            var reader = ExecuteReader("SELECT * FROM characterInventory WHERE id=@id LIMIT 1",
-                new MySqlParameter("@id", id));
-            CharacterItem result;
-            ReadCharacterInventory(reader, out result);
-            return result;
+            UpdateCharacterItem(characterId, characterItem);
+        }
+
+        public override void DeleteCharacterEquipItem(string characterId, string id)
+        {
+            DeleteCharacterItem(characterId, id);
+        }
+
+        public override void CreateCharacterNonEquipItem(string characterId, CharacterItem characterItem)
+        {
+            CreateCharacterItem(characterId, InventoryType.NonEquipItems, characterItem);
+        }
+
+        public override CharacterItem ReadCharacterNonEquipItem(string characterId, string id)
+        {
+            return ReadCharacterItem(characterId, id);
         }
 
         public override List<CharacterItem> ReadCharacterNonEquipItems(string characterId)
         {
-            var result = new List<CharacterItem>();
-            var reader = ExecuteReader("SELECT * FROM characterInventory WHERE characterId=@characterId AND inventoryType=@inventoryType",
-                new MySqlParameter("@characterId", characterId),
-                new MySqlParameter("@inventoryType", InventoryType.NonEquipItems));
-            CharacterItem tempInventory;
-            while (ReadCharacterInventory(reader, out tempInventory, false))
-            {
-                result.Add(tempInventory);
-            }
-            return result;
+            return ReadCharacterItems(characterId, InventoryType.NonEquipItems);
+        }
+
+        public override void UpdateCharacterNonEquipItem(string characterId, CharacterItem characterItem)
+        {
+            UpdateCharacterItem(characterId, characterItem);
+        }
+
+        public override void DeleteCharacterNonEquipItem(string characterId, string id)
+        {
+            DeleteCharacterItem(characterId, id);
         }
     }
 }

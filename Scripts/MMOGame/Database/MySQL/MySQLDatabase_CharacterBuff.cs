@@ -27,10 +27,22 @@ namespace Insthync.MMOG
             return false;
         }
 
-        public override CharacterBuff ReadCharacterBuff(string id)
+        public override void CreateCharacterBuff(string characterId, CharacterBuff characterBuff)
         {
-            var reader = ExecuteReader("SELECT * FROM characterBuff WHERE id=@id LIMIT 1",
-                new MySqlParameter("@id", id));
+            ExecuteNonQuery("INSERT INTO characterBuff (id, characterId, type, dataId, level, buffRemainsDuration) VALUES (@id, @characterId, @type, @dataId, @level, @buffRemainsDuration)",
+                new MySqlParameter("@id", characterBuff.id),
+                new MySqlParameter("@characterId", characterId),
+                new MySqlParameter("@type", characterBuff.type),
+                new MySqlParameter("@dataId", characterBuff.dataId),
+                new MySqlParameter("@level", characterBuff.level),
+                new MySqlParameter("@buffRemainsDuration", characterBuff.buffRemainsDuration));
+        }
+
+        public override CharacterBuff ReadCharacterBuff(string characterId, string id)
+        {
+            var reader = ExecuteReader("SELECT * FROM characterBuff WHERE id=@id AND characterId=@characterId LIMIT 1",
+                new MySqlParameter("@id", id),
+                new MySqlParameter("@characterId", characterId));
             CharacterBuff result;
             ReadCharacterBuff(reader, out result);
             return result;
@@ -47,6 +59,24 @@ namespace Insthync.MMOG
                 result.Add(tempBuff);
             }
             return result;
+        }
+
+        public override void UpdateCharacterBuff(string characterId, CharacterBuff characterBuff)
+        {
+            ExecuteNonQuery("UPDATE characterBuff SET type=@type, dataId=@dataId, level=@level, buffRemainsDuration=@buffRemainsDuration WHERE id=@id AND characterId=@characterId",
+                new MySqlParameter("@type", characterBuff.type),
+                new MySqlParameter("@dataId", characterBuff.dataId),
+                new MySqlParameter("@level", characterBuff.level),
+                new MySqlParameter("@buffRemainsDuration", characterBuff.buffRemainsDuration),
+                new MySqlParameter("@characterId", characterId),
+                new MySqlParameter("@id", characterBuff.id));
+        }
+
+        public override void DeleteCharacterBuff(string characterId, string id)
+        {
+            ExecuteNonQuery("DELETE FROM characterBuff WHERE id=@id AND characterId=@characterId",
+                new MySqlParameter("@id", id),
+                new MySqlParameter("@characterId", characterId));
         }
     }
 }

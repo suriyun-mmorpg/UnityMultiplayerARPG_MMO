@@ -15,12 +15,20 @@ namespace Insthync.MMOG
             if (reader.Read())
             {
                 result = new CharacterAttribute();
-                result.attributeId = reader.GetString("itemId");
+                result.attributeId = reader.GetString("attributeId");
                 result.amount = reader.GetInt32("amount");
                 return true;
             }
             result = CharacterAttribute.Empty;
             return false;
+        }
+
+        public override void CreateCharacterAttribute(string characterId, CharacterAttribute characterAttribute)
+        {
+            ExecuteNonQuery("INSERT INTO characterAttribute (characterId, attributeId, amount) VALUES (@characterId, @attributeId, @amount)",
+                new MySqlParameter("@characterId", characterId),
+                new MySqlParameter("@attributeId", characterAttribute.attributeId),
+                new MySqlParameter("@amount", characterAttribute.amount));
         }
 
         public override CharacterAttribute ReadCharacterAttribute(string characterId, string attributeId)
@@ -44,6 +52,21 @@ namespace Insthync.MMOG
                 result.Add(tempAttribute);
             }
             return result;
+        }
+
+        public override void UpdateCharacterAttribute(string characterId, CharacterAttribute characterAttribute)
+        {
+            ExecuteNonQuery("UPDATE characterAttribute SET amount=@amount WHERE characterId=@characterId AND attributeId=@attributeId",
+                new MySqlParameter("@amount", characterAttribute.amount),
+                new MySqlParameter("@characterId", characterId),
+                new MySqlParameter("@attributeId", characterAttribute.attributeId));
+        }
+
+        public override void DeleteCharacterAttribute(string characterId, string attributeId)
+        {
+            ExecuteNonQuery("DELETE FROM characterAttribute WHERE characterId=@characterId AND attributeId=@attributeId",
+                new MySqlParameter("@characterId", characterId),
+                new MySqlParameter("@attributeId", attributeId));
         }
     }
 }

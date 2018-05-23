@@ -7,6 +7,28 @@ namespace Insthync.MMOG
 {
     public partial class MySQLDatabase
     {
+        private Dictionary<string, int> ReadKillMonsters(string killMonsters)
+        {
+            var result = new Dictionary<string, int>();
+            var splitSets = killMonsters.Split(';');
+            foreach (var set in splitSets)
+            {
+                var splitData = set.Split(':');
+                result[splitData[0]] = int.Parse(splitData[1]);
+            }
+            return result;
+        }
+
+        private string WriteKillMonsters(Dictionary<string, int> killMonsters)
+        {
+            var result = "";
+            foreach (var keyValue in killMonsters)
+            {
+                result += keyValue.Key + ":" + keyValue.Value + ";";
+            }
+            return result;
+        }
+
         private bool ReadCharacterQuest(MySQLRowsReader reader, out CharacterQuest result, bool resetReader = true)
         {
             if (resetReader)
@@ -17,19 +39,20 @@ namespace Insthync.MMOG
                 result = new CharacterQuest();
                 result.questId = reader.GetString("questId");
                 result.isComplete = reader.GetBoolean("isComplete");
-                var killMonsters = reader.GetString("killMonsters");
-                var killMonstersDict = new Dictionary<string, int>();
-                var splitSets = killMonsters.Split(';');
-                foreach (var set in splitSets)
-                {
-                    var splitData = set.Split(':');
-                    killMonstersDict[splitData[0]] = int.Parse(splitData[1]);
-                }
-                result.killedMonsters = killMonstersDict;
+                result.killedMonsters = ReadKillMonsters(reader.GetString("killMonsters"));
                 return true;
             }
             result = CharacterQuest.Empty;
             return false;
+        }
+
+        public override void CreateCharacterQuest(string characterId, CharacterQuest characterQuest)
+        {
+            ExecuteNonQuery("INSERT INTO characterQuest (characterId, questId, isComplete, killedMonsters) VALUES (@characterId, @questId, @isComplete, @killedMonsters)",
+                new MySqlParameter("@characterId", characterId),
+                new MySqlParameter("@questId", characterQuest.questId),
+                new MySqlParameter("@isComplete", characterQuest.isComplete),
+                new MySqlParameter("@killedMonsters", WriteKillMonsters(characterQuest.killedMonsters)));
         }
 
         public override CharacterQuest ReadCharacterQuest(string characterId, string questId)
@@ -53,6 +76,22 @@ namespace Insthync.MMOG
                 result.Add(tempQuest);
             }
             return result;
+        }
+
+        public override void UpdateCharacterQuest(string characterId, CharacterQuest characterQuest)
+        {
+            ExecuteNonQuery("UPDATE characterQuest SET isComplete=@isComplete, killedMonsters=@killedMonsters WHERE characterId=@characterId AND questId=@questId",
+                new MySqlParameter("@isComplete", characterQuest.isComplete),
+                new MySqlParameter("@killedMonsters", WriteKillMonsters(characterQuest.killedMonsters)),
+                new MySqlParameter("@characterId", characterId),
+                new MySqlParameter("@questId", characterQuest.questId));
+        }
+
+        public override void DeleteCharacterQuest(string characterId, string questId)
+        {
+            ExecuteNonQuery("DELETE FROM characterQuest WHERE characterId=@characterId AND questId=@questId",
+                new MySqlParameter("@characterId", characterId),
+                new MySqlParameter("@questId", questId));
         }
     }
 }

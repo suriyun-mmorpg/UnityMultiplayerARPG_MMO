@@ -9,6 +9,7 @@ namespace Insthync.MMOG
         public abstract bool ValidateUserLogin(string username, string password);
         public abstract void CreateUserLogin(string username, string password);
         public abstract long FindUsername(string username);
+
         public abstract void CreateCharacter(string userId, PlayerCharacterData characterData);
         public abstract PlayerCharacterData ReadCharacter(string id, 
             bool withEquipWeapons = true, 
@@ -23,21 +24,50 @@ namespace Insthync.MMOG
         public abstract void UpdateCharacter(PlayerCharacterData characterData);
         public abstract void DeleteCharacter(string id);
         public abstract long FindCharacterName(string characterName);
-        public abstract CharacterItem ReadCharacterEquipWeapon(string id);
+        
         public abstract EquipWeapons ReadCharacterEquipWeapons(string characterId);
+        public abstract void UpdateCharacterEquipWeapons(string characterId, EquipWeapons equipWeapons);
+
+        public abstract void CreateCharacterAttribute(string characterId, CharacterAttribute characterAttribute);
         public abstract CharacterAttribute ReadCharacterAttribute(string characterId, string attributeId);
         public abstract List<CharacterAttribute> ReadCharacterAttributes(string characterId);
+        public abstract void UpdateCharacterAttribute(string characterId, CharacterAttribute characterAttribute);
+        public abstract void DeleteCharacterAttribute(string characterId, string attributeId);
+
+        public abstract void CreateCharacterSkill(string characterId, CharacterSkill characterSkill);
         public abstract CharacterSkill ReadCharacterSkill(string characterId, string skillId);
         public abstract List<CharacterSkill> ReadCharacterSkills(string characterId);
-        public abstract CharacterBuff ReadCharacterBuff(string id);
+        public abstract void UpdateCharacterSkill(string characterId, CharacterSkill characterSkill);
+        public abstract void DeleteCharacterSkill(string characterId, string skillId);
+
+        public abstract void CreateCharacterBuff(string characterId, CharacterBuff characterBuff);
+        public abstract CharacterBuff ReadCharacterBuff(string characterId, string id);
         public abstract List<CharacterBuff> ReadCharacterBuffs(string characterId);
-        public abstract CharacterItem ReadCharacterEquipItem(string id);
+        public abstract void UpdateCharacterBuff(string characterId, CharacterBuff characterBuff);
+        public abstract void DeleteCharacterBuff(string characterId, string id);
+
+        public abstract void CreateCharacterEquipItem(string characterId, CharacterItem characterItem);
+        public abstract CharacterItem ReadCharacterEquipItem(string characterId, string id);
         public abstract List<CharacterItem> ReadCharacterEquipItems(string characterId);
-        public abstract CharacterItem ReadCharacterNonEquipItem(string id);
+        public abstract void UpdateCharacterEquipItem(string characterId, CharacterItem characterItem);
+        public abstract void DeleteCharacterEquipItem(string characterId, string id);
+
+        public abstract void CreateCharacterNonEquipItem(string characterId, CharacterItem characterItem);
+        public abstract CharacterItem ReadCharacterNonEquipItem(string characterId, string id);
         public abstract List<CharacterItem> ReadCharacterNonEquipItems(string characterId);
+        public abstract void UpdateCharacterNonEquipItem(string characterId, CharacterItem characterItem);
+        public abstract void DeleteCharacterNonEquipItem(string characterId, string id);
+
+        public abstract void CreateCharacterHotkey(string characterId, CharacterHotkey characterHotkey);
         public abstract CharacterHotkey ReadCharacterHotkey(string characterId, string hotkeyId);
         public abstract List<CharacterHotkey> ReadCharacterHotkeys(string characterId);
+        public abstract void UpdateCharacterHotkey(string characterId, CharacterHotkey characterHotkey);
+        public abstract void DeleteCharacterHotkey(string characterId, string hotkeyId);
+
+        public abstract void CreateCharacterQuest(string characterId, CharacterQuest characterQuest);
         public abstract CharacterQuest ReadCharacterQuest(string characterId, string questId);
         public abstract List<CharacterQuest> ReadCharacterQuests(string characterId);
+        public abstract void UpdateCharacterQuest(string characterId, CharacterQuest characterQuest);
+        public abstract void DeleteCharacterQuest(string characterId, string questId);
     }
 }
