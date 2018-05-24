@@ -6,21 +6,10 @@ using LiteNetLibManager;
 
 namespace Insthync.MMOG
 {
-    public class LoginNetworkManager : LiteNetLibManager.LiteNetLibManager
+    public class LoginNetworkManager : BaseAppServerNetworkManager
     {
-        public string publicMachineAddress = "127.0.0.1";
-        public string centralServerAddress = "127.0.0.1";
-        public int centralServerPort = 6000;
-        private CentralNetworkManager cacheCentralNetworkManager;
-        public CentralNetworkManager CacheCentralNetworkManager
-        {
-            get
-            {
-                if (cacheCentralNetworkManager == null)
-                    cacheCentralNetworkManager = gameObject.AddComponent<CentralNetworkManager>();
-                return cacheCentralNetworkManager;
-            }
-        }
+        public override CentralServerPeerType PeerType { get { return CentralServerPeerType.LoginServer; } }
+
         // This server will connect to central server to receive following data:
         // Map servers addresses, Database server configuration
         protected override void RegisterServerMessages()
@@ -44,24 +33,6 @@ namespace Insthync.MMOG
             // - Delete Character Status
             // - Start Game Status
             // - Another Player Try To Login Messages
-        }
-
-        public override void OnStartServer()
-        {
-            base.OnStartServer();
-            CacheCentralNetworkManager.onClientConnected = OnCentralClientConnected;
-            CacheCentralNetworkManager.onClientDisconnected = OnCentralClientDisconnected;
-            CacheCentralNetworkManager.StartClient(centralServerAddress, centralServerPort);
-        }
-
-        private void OnCentralClientConnected(NetPeer netPeer)
-        {
-            // 
-        }
-
-        private void OnCentralClientDisconnected(NetPeer netPeer, DisconnectInfo disconnectInfo)
-        {
-
         }
     }
 }
