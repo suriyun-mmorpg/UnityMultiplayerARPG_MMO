@@ -119,7 +119,7 @@ public class UIMmoCharacterList : UIBase
         var playerCharacter = selectedUI.Data as IPlayerCharacterData;
         playerCharacter.CloneTo(characterData);
         LanRpgNetworkManager.SelectedCharacter = characterData;
-        UISceneLoading.Singleton.LoadScene(GameInstance.Singleton.startScene);
+        UISceneLoading.Singleton.LoadScene(characterData.CurrentMapName);
     }
 
     public virtual void OnClickDelete()

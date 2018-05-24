@@ -6,7 +6,7 @@ using LiteNetLibManager;
 
 namespace Insthync.MMOG
 {
-    public class MapNetworkManager : LiteNetLibManager.LiteNetLibManager
+    public class MapNetworkManager : BaseRpgNetworkManager
     {
         public LiteNetLibScene hostingScene;
         public string publicMachineAddress = "127.0.0.1";
