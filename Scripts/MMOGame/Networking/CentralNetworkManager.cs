@@ -73,6 +73,21 @@ namespace Insthync.MMOG
                 onClientDisconnected(peer, disconnectInfo);
         }
 
+        public void RequestAppServerRegistration(CentralServerPeerInfo peerInfo)
+        {
+            var message = new RequestAppServerRegistrationMessage();
+            message.peerInfo = peerInfo;
+            SendPacket(SendOptions.ReliableUnordered, Client.Peer, CentralMsgTypes.RequestAppServerRegistration, message);
+        }
+
+        public void RequestAppServerAddress(CentralServerPeerType peerType, string extra)
+        {
+            var message = new RequestAppServerAddressMessage();
+            message.peerType = peerType;
+            message.extra = extra;
+            SendPacket(SendOptions.ReliableUnordered, Client.Peer, CentralMsgTypes.RequestAppServerAddress, message);
+        }
+
         #region Message Handlers
         protected virtual void HandleRequestAppServerRegistration(LiteNetLibMessageHandler messageHandler)
         {

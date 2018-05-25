@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Insthync.MMOG
 {
@@ -18,6 +18,11 @@ namespace Insthync.MMOG
         protected override void RegisterClientMessages()
         {
             base.RegisterClientMessages();
+        }
+
+        public override string GetExtra()
+        {
+            return SceneManager.GetActiveScene().name;
         }
     }
 }

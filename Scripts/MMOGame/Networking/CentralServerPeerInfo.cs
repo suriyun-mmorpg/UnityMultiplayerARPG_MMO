@@ -9,23 +9,23 @@ namespace Insthync.MMOG
     public class CentralServerPeerInfo : ILiteNetLibMessage
     {
         public CentralServerPeerType peerType;
-        public string machineAddress;
-        public int port;
+        public string networkAddress;
+        public int networkPort;
         public string extra;
 
         public void Deserialize(NetDataReader reader)
         {
             peerType = (CentralServerPeerType)reader.GetByte();
-            machineAddress = reader.GetString();
-            port = reader.GetInt();
+            networkAddress = reader.GetString();
+            networkPort = reader.GetInt();
             extra = reader.GetString();
         }
 
         public void Serialize(NetDataWriter writer)
         {
             writer.Put((byte)peerType);
-            writer.Put(machineAddress);
-            writer.Put(port);
+            writer.Put(networkAddress);
+            writer.Put(networkPort);
             writer.Put(extra);
         }
     }
