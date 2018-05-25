@@ -27,6 +27,8 @@ namespace Insthync.MMOG
 
         public System.Action<NetPeer> onClientConnected;
         public System.Action<NetPeer, DisconnectInfo> onClientDisconnected;
+        public System.Action<ResponseAppServerRegistrationMessage> onAppServerRegistrationResponded;
+        public System.Action<ResponseAppServerAddressMessage> onAppServerAddressResponded;
         // This server will collect servers data
         // All Map servers addresses, Login server address, Chat server address, Database server configs
         protected override void RegisterServerMessages()
@@ -154,14 +156,16 @@ namespace Insthync.MMOG
         {
             var peer = messageHandler.peer;
             var message = messageHandler.ReadMessage<ResponseAppServerRegistrationMessage>();
-
+            if (onAppServerRegistrationResponded != null)
+                onAppServerRegistrationResponded(message);
         }
 
         protected virtual void HandleResponseAppServerAddress(LiteNetLibMessageHandler messageHandler)
         {
             var peer = messageHandler.peer;
             var message = messageHandler.ReadMessage<ResponseAppServerAddressMessage>();
-
+            if (onAppServerAddressResponded != null)
+                onAppServerAddressResponded(message);
         }
         #endregion
 
