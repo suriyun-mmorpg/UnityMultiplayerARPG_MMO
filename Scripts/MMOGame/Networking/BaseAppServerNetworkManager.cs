@@ -8,6 +8,7 @@ namespace Insthync.MMOG
     public abstract class BaseAppServerNetworkManager : LiteNetLibManager.LiteNetLibManager
     {
         public abstract CentralServerPeerType PeerType { get; }
+        [Header("App Server Configs")]
         public string machineAddress = "127.0.0.1";
         public string centralServerAddress = "127.0.0.1";
         public int centralServerPort = 6000;
@@ -47,8 +48,10 @@ namespace Insthync.MMOG
             peerInfo.networkAddress = machineAddress;
             peerInfo.networkPort = networkPort;
             peerInfo.extra = GetExtra();
-            CacheCentralNetworkManager.RequestAppServerRegistration(peerInfo);
+            CacheCentralNetworkManager.RequestAppServerRegistration(peerInfo, OnAppServerRegistered);
         }
+
+        public virtual void OnAppServerRegistered(ResponseAppServerRegistrationMessage response) { }
 
         public virtual void OnCentralServerDisconnected(NetPeer netPeer, DisconnectInfo disconnectInfo) { }
 

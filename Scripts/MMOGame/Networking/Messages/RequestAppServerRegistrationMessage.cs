@@ -7,12 +7,14 @@ namespace Insthync.MMOG
 {
     public class RequestAppServerRegistrationMessage : ILiteNetLibMessage
     {
+        public uint ackId;
         public CentralServerPeerInfo peerInfo;
         public int time { get; private set; }
         public string hash { get; private set; }
 
         public void Deserialize(NetDataReader reader)
         {
+            ackId = reader.GetUInt();
             peerInfo = new CentralServerPeerInfo();
             peerInfo.Deserialize(reader);
             time = reader.GetInt();
@@ -21,6 +23,7 @@ namespace Insthync.MMOG
 
         public void Serialize(NetDataWriter writer)
         {
+            writer.Put(ackId);
             if (peerInfo == null)
                 peerInfo = new CentralServerPeerInfo();
             time = (int)(System.DateTime.Now.Ticks / System.TimeSpan.TicksPerMillisecond);
