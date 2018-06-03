@@ -1,28 +1,125 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.SceneManagement;
+using LiteNetLib;
+using LiteNetLibManager;
 
 namespace Insthync.MMOG
 {
-    public class MapNetworkManager : BaseAppServerNetworkManager
+    [RequireComponent(typeof(RpgGameManager))]
+    public class MapNetworkManager : LiteNetLibGameManager
     {
-        public override CentralServerPeerType PeerType { get { return CentralServerPeerType.MapServer; } }
-
-        // This server will connect to central server to receive following data:
-        // Chat server address, Database server configuration
-        protected override void RegisterServerMessages()
+        public static MapNetworkManager Singleton { get; protected set; }
+        public const float RECONNECT_DELAY = 5f;
+        public CentralServerPeerType PeerType { get { return CentralServerPeerType.MapServer; } }
+        [Header("App Server Configs")]
+        public string machineAddress = "127.0.0.1";
+        public string centralServerAddress = "127.0.0.1";
+        public int centralServerPort = 6000;
+        private CentralNetworkManager cacheCentralNetworkManager;
+        public CentralNetworkManager CacheCentralNetworkManager
         {
-            base.RegisterServerMessages();
+            get
+            {
+                if (cacheCentralNetworkManager == null)
+                    cacheCentralNetworkManager = gameObject.AddComponent<CentralNetworkManager>();
+                return cacheCentralNetworkManager;
+            }
         }
 
-        protected override void RegisterClientMessages()
+        private RpgGameManager cacheGameManager;
+        public RpgGameManager CacheGameManager
         {
-            base.RegisterClientMessages();
+            get
+            {
+                if (cacheGameManager == null)
+                    cacheGameManager = GetComponent<RpgGameManager>();
+                return cacheGameManager;
+            }
         }
 
-        public override string GetExtra()
+        protected override void Awake()
         {
-            return SceneManager.GetActiveScene().name;
+            Singleton = this;
+            doNotDestroyOnSceneChanges = true;
+            base.Awake();
+        }
+
+        public override bool StartServer()
+        {
+            CacheGameManager.Init(this);
+            return base.StartServer();
+        }
+
+        public override LiteNetLibClient StartClient()
+        {
+            CacheGameManager.Init(this);
+            return base.StartClient();
+        }
+
+        public override void OnClientDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
+        {
+            base.OnClientDisconnected(peer, disconnectInfo);
+            CacheGameManager.OnClientDisconnected(peer, disconnectInfo);
+        }
+
+        public override void OnServerOnlineSceneLoaded()
+        {
+            base.OnServerOnlineSceneLoaded();
+            CacheGameManager.OnServerOnlineSceneLoaded();
+        }
+
+        public override void OnStartServer()
+        {
+            Debug.Log("[" + PeerType + "] Starting server");
+            base.OnStartServer();
+            ConnectToCentralServer();
+        }
+
+        public void ConnectToCentralServer()
+        {
+            Debug.Log("[" + PeerType + "] Connecting to Central Server");
+            CacheCentralNetworkManager.onClientConnected = OnCentralServerConnected;
+            CacheCentralNetworkManager.onClientDisconnected = OnCentralServerDisconnected;
+            CacheCentralNetworkManager.StartClient(centralServerAddress, centralServerPort);
+        }
+
+        public void DisconnectFromCentralServer()
+        {
+            Debug.Log("[" + PeerType + "] Starting server");
+            CacheCentralNetworkManager.StopClient();
+        }
+
+        public virtual void OnCentralServerConnected(NetPeer netPeer)
+        {
+            Debug.Log("[" + PeerType + "] Connected from Central Server");
+            var peerInfo = new CentralServerPeerInfo();
+            peerInfo.peerType = PeerType;
+            peerInfo.networkAddress = machineAddress;
+            peerInfo.networkPort = networkPort;
+            peerInfo.extra = GetExtra();
+            CacheCentralNetworkManager.RequestAppServerRegistration(peerInfo, OnAppServerRegistered);
+        }
+
+        public virtual void OnCentralServerDisconnected(NetPeer netPeer, DisconnectInfo disconnectInfo)
+        {
+            Debug.Log("[" + PeerType + "] Disconnected from Central Server");
+            StartCoroutine(CentralServerReconnectRoutine());
+        }
+
+        IEnumerator CentralServerReconnectRoutine()
+        {
+            Debug.Log("[" + PeerType + "] Reconnect to central in " + RECONNECT_DELAY + " seconds");
+            yield return new WaitForSeconds(RECONNECT_DELAY);
+            ConnectToCentralServer();
+        }
+
+        public virtual void OnAppServerRegistered(ResponseAppServerRegistrationMessage response) { }
+
+        public virtual string GetExtra()
+        {
+            return Assets.onlineScene;
         }
     }
 }

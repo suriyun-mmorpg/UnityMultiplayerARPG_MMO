@@ -4,18 +4,9 @@ using UnityEngine;
 
 namespace Insthync.MMOG
 {
-    public class MMOGameInstance : MonoBehaviour
+    public class MMOClientInstance : MonoBehaviour
     {
-        public static MMOGameInstance Singleton { get; protected set; }
-
-        #region Server components
-        [Header("Server Components")]
-        public CentralNetworkManager centralServerNetworkManager;
-        public LoginNetworkManager loginServerNetworkManager;
-        public ChatNetworkManager chatServerNetworkManager;
-        public MapSpawnNetworkManager mapSpawnServerNetworkManager;
-        public MapNetworkManager mapServerNetworkManager;
-        #endregion
+        public static MMOClientInstance Singleton { get; protected set; }
 
         #region Client components
         [Header("Client Components")]
@@ -36,33 +27,6 @@ namespace Insthync.MMOG
             DontDestroyOnLoad(gameObject);
             Singleton = this;
         }
-
-        #region Server functions
-        public void StartCentralServer()
-        {
-            centralServerNetworkManager.StartServer();
-        }
-
-        public void StartLoginServer()
-        {
-            loginServerNetworkManager.StartServer();
-        }
-
-        public void StartChatServer()
-        {
-            chatServerNetworkManager.StartServer();
-        }
-
-        public void StartMapSpawnServer()
-        {
-            mapSpawnServerNetworkManager.StartServer();
-        }
-
-        public void StartMapServer()
-        {
-            mapServerNetworkManager.StartServer();
-        }
-        #endregion
 
         #region Client functions
         public void StartCentralClient()

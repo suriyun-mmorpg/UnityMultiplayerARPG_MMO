@@ -8,6 +8,14 @@ namespace Insthync.MMOG
     public class MapSpawnNetworkManager : BaseAppServerNetworkManager
     {
         public override CentralServerPeerType PeerType { get { return CentralServerPeerType.MapSpawnServer; } }
+        
+        [Header("Map Spawn Settings")]
+        public string exePath = "./Build.exe";
+        public bool spawnInBatchMode = false;
+
+        [Header("Running In Editor")]
+        public bool isOverrideExePath;
+        public string overrideExePath = "./Build.exe";
 
         // This server will connect to central server to receive following data:
         // Database server configuration

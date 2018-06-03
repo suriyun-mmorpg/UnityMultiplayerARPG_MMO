@@ -1,11 +1,10 @@
-﻿using System.Collections;
+﻿using LiteNetLib;
+using LiteNetLibManager;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using UnityEngine;
-using LiteNetLibManager;
-using LiteNetLib;
 
 namespace Insthync.MMOG
 {
@@ -117,12 +116,15 @@ namespace Insthync.MMOG
                 {
                     case CentralServerPeerType.LoginServer:
                         loginServerPeers[peer.ConnectId] = peerInfo;
+                        Debug.Log("[Central] Register Login Server: [" + peer.ConnectId + "]");
                         break;
                     case CentralServerPeerType.ChatServer:
                         chatServerPeers[peer.ConnectId] = peerInfo;
+                        Debug.Log("[Central] Register Chat Server: [" + peer.ConnectId + "]");
                         break;
                     case CentralServerPeerType.MapSpawnServer:
                         mapSpawnServerPeers[peer.ConnectId] = peerInfo;
+                        Debug.Log("[Central] Register Map Spawn Server: [" + peer.ConnectId + "]");
                         break;
                     case CentralServerPeerType.MapServer:
                         var mapName = peerInfo.extra;
@@ -130,14 +132,21 @@ namespace Insthync.MMOG
                         {
                             mapServerPeersByMapName[mapName] = peerInfo;
                             mapServerPeers[peer.ConnectId] = peerInfo;
+                            Debug.Log("[Central] Register Map Server: [" + peer.ConnectId + "] [" + mapName + "]");
                         }
                         else
+                        {
                             error = "MAP_ALREADY_EXISTED";
+                            Debug.Log("[Central] Register Map Server Failed: [" + peer.ConnectId + "] [" + mapName + "] [" + error + "]");
+                        }
                         break;
                 }
             }
             else
+            {
                 error = "INVALID_HASH";
+                Debug.Log("[Central] Register Server Failed: [" + peer.ConnectId + "] [" + error + "]");
+            }
 
             var responseMessage = new ResponseAppServerRegistrationMessage();
             responseMessage.ackId = message.ackId;
@@ -156,26 +165,47 @@ namespace Insthync.MMOG
                 // TODO: Balancing servers
                 case CentralServerPeerType.LoginServer:
                     if (loginServerPeers.Count > 0)
+                    {
                         peerInfo = loginServerPeers.Values.First();
+                        Debug.Log("[Central] Request Login Address: [" + peer.ConnectId + "]");
+                    }
                     else
+                    {
                         error = "SERVER_NOT_FOUND";
+                        Debug.Log("[Central] Request Login Address: [" + peer.ConnectId + "] [" + error + "]");
+                    }
                     break;
                 case CentralServerPeerType.ChatServer:
                     if (chatServerPeers.Count > 0)
+                    {
                         peerInfo = chatServerPeers.Values.First();
+                        Debug.Log("[Central] Request Chat Address: [" + peer.ConnectId + "]");
+                    }
                     else
+                    {
                         error = "SERVER_NOT_FOUND";
+                        Debug.Log("[Central] Request Chat Address: [" + peer.ConnectId + "] [" + error + "]");
+                    }
                     break;
                 case CentralServerPeerType.MapSpawnServer:
                     if (mapSpawnServerPeers.Count > 0)
+                    {
                         peerInfo = mapSpawnServerPeers.Values.First();
+                        Debug.Log("[Central] Request Map Spawn Address: [" + peer.ConnectId + "]");
+                    }
                     else
+                    {
                         error = "SERVER_NOT_FOUND";
+                        Debug.Log("[Central] Request Map Spawn Address: [" + peer.ConnectId + "] [" + error + "]");
+                    }
                     break;
                 case CentralServerPeerType.MapServer:
                     var mapName = message.extra;
                     if (!mapServerPeersByMapName.TryGetValue(mapName, out peerInfo))
+                    {
                         error = "SERVER_NOT_FOUND";
+                        Debug.Log("[Central] Request Map Address: [" + peer.ConnectId + "] [" + mapName + "] [" + error + "]");
+                    }
                     break;
             }
             var responseMessage = new ResponseAppServerAddressMessage();
