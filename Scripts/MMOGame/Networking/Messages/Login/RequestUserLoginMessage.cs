@@ -5,7 +5,7 @@ using LiteNetLib.Utils;
 
 namespace Insthync.MMOG
 {
-    public class RequestLoginMessage : BaseAckMessage
+    public class RequestUserLoginMessage : BaseAckMessage
     {
         public string username;
         public string password;

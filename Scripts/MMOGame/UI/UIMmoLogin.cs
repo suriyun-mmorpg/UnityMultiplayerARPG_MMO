@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
+using LiteNetLibManager;
 
 namespace Insthync.MMOG
 {
@@ -27,7 +28,12 @@ namespace Insthync.MMOG
                 return;
             }
 
-            MMOClientInstance.Singleton.loginClientNetworkManager.Login(Username, Password);
+            MMOClientInstance.Singleton.centralNetworkManager.RequestUserLogin(Username, Password, OnLogin);
+        }
+
+        public void OnLogin(AckResponseCode responseCode, BaseAckMessage message)
+        {
+
         }
     }
 }

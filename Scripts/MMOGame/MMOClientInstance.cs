@@ -10,11 +10,9 @@ namespace Insthync.MMOG
 
         #region Client components
         [Header("Client Components")]
-        public CentralNetworkManager centralClientNetworkManager;
-        public LoginNetworkManager loginClientNetworkManager;
-        public ChatNetworkManager chatClientNetworkManager;
-        public MapSpawnNetworkManager mapSpawnClientNetworkManager;
-        public MapNetworkManager mapClientNetworkManager;
+        public CentralNetworkManager centralNetworkManager;
+        public MapSpawnNetworkManager mapSpawnNetworkManager;
+        public MapNetworkManager mapNetworkManager;
         #endregion
 
         private void Awake()
@@ -31,27 +29,17 @@ namespace Insthync.MMOG
         #region Client functions
         public void StartCentralClient()
         {
-            centralClientNetworkManager.StartClient();
-        }
-
-        public void StartLoginClient()
-        {
-            loginClientNetworkManager.StartClient();
-        }
-
-        public void StartChatClient()
-        {
-            chatClientNetworkManager.StartClient();
+            centralNetworkManager.StartClient();
         }
 
         public void StartMapSpawnClient()
         {
-            mapSpawnClientNetworkManager.StartClient();
+            mapSpawnNetworkManager.StartClient();
         }
 
         public void StartMapClient()
         {
-            mapClientNetworkManager.StartClient();
+            mapNetworkManager.StartClient();
         }
         #endregion
     }

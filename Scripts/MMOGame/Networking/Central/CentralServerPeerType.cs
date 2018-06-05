@@ -6,8 +6,6 @@ namespace Insthync.MMOG
 {
     public enum CentralServerPeerType : byte
     {
-        LoginServer,
-        ChatServer,
         MapSpawnServer,
         MapServer,
     }

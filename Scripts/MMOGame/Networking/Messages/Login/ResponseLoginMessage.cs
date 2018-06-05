@@ -5,7 +5,7 @@ using LiteNetLib.Utils;
 
 namespace Insthync.MMOG
 {
-    public class ResponseLoginMessage : BaseAckMessage
+    public class ResponseUserLoginMessage : BaseAckMessage
     {
         public override void DeserializeData(NetDataReader reader)
         {

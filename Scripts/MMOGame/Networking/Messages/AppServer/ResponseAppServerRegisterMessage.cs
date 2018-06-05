@@ -5,18 +5,24 @@ using LiteNetLib.Utils;
 
 namespace Insthync.MMOG
 {
-    public class ResponseAppServerRegistrationMessage : BaseAckMessage
+    public class ResponseAppServerRegisterMessage : BaseAckMessage
     {
-        public string error;
+        public enum Error : byte
+        {
+            None,
+            InvalidHash,
+            MapAlreadyExist,
+        }
+        public Error error;
 
         public override void DeserializeData(NetDataReader reader)
         {
-            error = reader.GetString();
+            error = (Error)reader.GetByte();
         }
 
         public override void SerializeData(NetDataWriter writer)
         {
-            writer.Put(error);
+            writer.Put((byte)error);
         }
     }
 }

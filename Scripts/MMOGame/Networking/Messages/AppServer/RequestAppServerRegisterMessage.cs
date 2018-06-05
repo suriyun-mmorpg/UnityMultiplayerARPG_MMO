@@ -5,7 +5,7 @@ using LiteNetLib.Utils;
 
 namespace Insthync.MMOG
 {
-    public class RequestAppServerRegistrationMessage : BaseAckMessage
+    public class RequestAppServerRegisterMessage : BaseAckMessage
     {
         public CentralServerPeerInfo peerInfo;
         public int time { get; private set; }
@@ -24,7 +24,7 @@ namespace Insthync.MMOG
             if (peerInfo == null)
                 peerInfo = new CentralServerPeerInfo();
             time = (int)(System.DateTime.Now.Ticks / System.TimeSpan.TicksPerMillisecond);
-            hash = CentralNetworkManager.GetAppServerRegistrationHash(peerInfo.peerType, time);
+            hash = CentralNetworkManager.GetAppServerRegisterHash(peerInfo.peerType, time);
             peerInfo.Serialize(writer);
             writer.Put(time);
             writer.Put(hash);
@@ -34,7 +34,7 @@ namespace Insthync.MMOG
         {
             if (string.IsNullOrEmpty(hash) || peerInfo == null)
                 return false;
-            return hash.Equals(CentralNetworkManager.GetAppServerRegistrationHash(peerInfo.peerType, time));
+            return hash.Equals(CentralNetworkManager.GetAppServerRegisterHash(peerInfo.peerType, time));
         }
     }
 }

@@ -54,7 +54,7 @@ namespace Insthync.MMOG
             peerInfo.networkAddress = machineAddress;
             peerInfo.networkPort = networkPort;
             peerInfo.extra = GetExtra();
-            CacheCentralNetworkManager.RequestAppServerRegistration(peerInfo, OnAppServerRegistered);
+            CacheCentralNetworkManager.RequestAppServerRegister(peerInfo, OnAppServerRegistered);
         }
 
         public virtual void OnCentralServerDisconnected(NetPeer netPeer, DisconnectInfo disconnectInfo)
