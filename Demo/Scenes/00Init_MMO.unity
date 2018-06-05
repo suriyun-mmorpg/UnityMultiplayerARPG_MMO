@@ -140,11 +140,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6562084915e6c5749b275e15b0e66cdf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  centralServerNetworkManager: {fileID: 1219189832}
-  loginServerNetworkManager: {fileID: 564596577}
-  chatServerNetworkManager: {fileID: 1637649903}
-  mapSpawnServerNetworkManager: {fileID: 1977110980}
-  mapServerNetworkManager: {fileID: 1127565838}
+  centralNetworkManager: {fileID: 1219189832}
+  mapSpawnNetworkManager: {fileID: 1977110980}
+  mapNetworkManager: {fileID: 1127565838}
 --- !u!4 &33785792
 Transform:
   m_ObjectHideFlags: 0
@@ -156,8 +154,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1219189830}
-  - {fileID: 564596575}
-  - {fileID: 1637649901}
   - {fileID: 1977110978}
   m_Father: {fileID: 0}
   m_RootOrder: 5
@@ -258,11 +254,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f440aab4ea66ec841b0ed504477d0d11, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  centralClientNetworkManager: {fileID: 1639971799}
-  loginClientNetworkManager: {fileID: 1006335977}
-  chatClientNetworkManager: {fileID: 280089752}
-  mapSpawnClientNetworkManager: {fileID: 1176809329}
-  mapClientNetworkManager: {fileID: 1127565838}
+  centralNetworkManager: {fileID: 1639971799}
+  mapSpawnNetworkManager: {fileID: 1176809329}
+  mapNetworkManager: {fileID: 1127565838}
 --- !u!4 &254052523
 Transform:
   m_ObjectHideFlags: 0
@@ -274,164 +268,10 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1639971801}
-  - {fileID: 1006335979}
-  - {fileID: 280089754}
   - {fileID: 1176809331}
   m_Father: {fileID: 0}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &280089751
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 5
-  m_Component:
-  - component: {fileID: 280089754}
-  - component: {fileID: 280089753}
-  - component: {fileID: 280089752}
-  m_Layer: 0
-  m_Name: ChatNetworkManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &280089752
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 280089751}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8379054dbc89df543864dc7afe6acbff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  currentLogLevel: 2
-  connectKey: SampleConnectKey
-  networkAddress: localhost
-  networkPort: 6002
-  unconnectedMessagesEnabled: 0
-  natPunchEnabled: 0
-  updateTime: 15
-  pingInterval: 1000
-  disconnectTimeout: 5000
-  mergeEnabled: 0
-  simulatePacketLoss: 0
-  simulateLatency: 0
-  simulationPacketLossChance: 10
-  simulationMinLatency: 30
-  simulationMaxLatency: 100
-  discoveryEnabled: 0
-  discoveryRequestData: 
-  discoveryResponseData: 
-  maxConnections: 4
-  reconnectDelay: 500
-  maxConnectAttempts: 10
-  machineAddress: 127.0.0.1
-  centralServerAddress: 127.0.0.1
-  centralServerPort: 6000
---- !u!114 &280089753
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 280089751}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1ba8c646936b90145b286ff293ca75c3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!4 &280089754
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 280089751}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 3}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 254052523}
-  m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &564596574
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 5
-  m_Component:
-  - component: {fileID: 564596575}
-  - component: {fileID: 564596576}
-  - component: {fileID: 564596577}
-  m_Layer: 0
-  m_Name: LoginNetworkManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &564596575
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 564596574}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 3}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 33785792}
-  m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &564596576
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 564596574}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1ba8c646936b90145b286ff293ca75c3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &564596577
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 564596574}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b8f8234db3437c64eb6e278f63e16cf8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  currentLogLevel: 2
-  connectKey: SampleConnectKey
-  networkAddress: localhost
-  networkPort: 6001
-  unconnectedMessagesEnabled: 0
-  natPunchEnabled: 0
-  updateTime: 15
-  pingInterval: 1000
-  disconnectTimeout: 5000
-  mergeEnabled: 0
-  simulatePacketLoss: 0
-  simulateLatency: 0
-  simulationPacketLossChance: 10
-  simulationMinLatency: 30
-  simulationMaxLatency: 100
-  discoveryEnabled: 0
-  discoveryRequestData: 
-  discoveryResponseData: 
-  maxConnections: 4
-  reconnectDelay: 500
-  maxConnectAttempts: 10
-  machineAddress: 127.0.0.1
-  centralServerAddress: 127.0.0.1
-  centralServerPort: 6000
 --- !u!1 &660141364
 GameObject:
   m_ObjectHideFlags: 0
@@ -559,82 +399,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
---- !u!1 &1006335976
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 5
-  m_Component:
-  - component: {fileID: 1006335979}
-  - component: {fileID: 1006335978}
-  - component: {fileID: 1006335977}
-  m_Layer: 0
-  m_Name: LoginNetworkManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1006335977
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1006335976}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b8f8234db3437c64eb6e278f63e16cf8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  currentLogLevel: 2
-  connectKey: SampleConnectKey
-  networkAddress: localhost
-  networkPort: 6001
-  unconnectedMessagesEnabled: 0
-  natPunchEnabled: 0
-  updateTime: 15
-  pingInterval: 1000
-  disconnectTimeout: 5000
-  mergeEnabled: 0
-  simulatePacketLoss: 0
-  simulateLatency: 0
-  simulationPacketLossChance: 10
-  simulationMinLatency: 30
-  simulationMaxLatency: 100
-  discoveryEnabled: 0
-  discoveryRequestData: 
-  discoveryResponseData: 
-  maxConnections: 4
-  reconnectDelay: 500
-  maxConnectAttempts: 10
-  machineAddress: 127.0.0.1
-  centralServerAddress: 127.0.0.1
-  centralServerPort: 6000
---- !u!114 &1006335978
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1006335976}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1ba8c646936b90145b286ff293ca75c3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!4 &1006335979
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1006335976}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 3}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 254052523}
-  m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1127565837
 GameObject:
   m_ObjectHideFlags: 0
@@ -872,7 +636,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 254052523}
-  m_RootOrder: 3
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1219189829
 GameObject:
@@ -1394,82 +1158,6 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1634037794}
---- !u!1 &1637649900
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 5
-  m_Component:
-  - component: {fileID: 1637649901}
-  - component: {fileID: 1637649902}
-  - component: {fileID: 1637649903}
-  m_Layer: 0
-  m_Name: ChatNetworkManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1637649901
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1637649900}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 3}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 33785792}
-  m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1637649902
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1637649900}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1ba8c646936b90145b286ff293ca75c3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &1637649903
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1637649900}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8379054dbc89df543864dc7afe6acbff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  currentLogLevel: 2
-  connectKey: SampleConnectKey
-  networkAddress: localhost
-  networkPort: 6002
-  unconnectedMessagesEnabled: 0
-  natPunchEnabled: 0
-  updateTime: 15
-  pingInterval: 1000
-  disconnectTimeout: 5000
-  mergeEnabled: 0
-  simulatePacketLoss: 0
-  simulateLatency: 0
-  simulationPacketLossChance: 10
-  simulationMinLatency: 30
-  simulationMaxLatency: 100
-  discoveryEnabled: 0
-  discoveryRequestData: 
-  discoveryResponseData: 
-  maxConnections: 4
-  reconnectDelay: 500
-  maxConnectAttempts: 10
-  machineAddress: 127.0.0.1
-  centralServerAddress: 127.0.0.1
-  centralServerPort: 6000
 --- !u!1 &1639971798
 GameObject:
   m_ObjectHideFlags: 0
@@ -1695,7 +1383,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 33785792}
-  m_RootOrder: 3
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1977110979
 MonoBehaviour:
