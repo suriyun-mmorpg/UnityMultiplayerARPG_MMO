@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using LiteNetLib;
+using LiteNetLibManager;
 
 namespace Insthync.MMOG
 {
@@ -69,8 +70,8 @@ namespace Insthync.MMOG
             ConnectToCentralServer();
         }
 
-        public virtual void OnAppServerRegistered(ResponseAppServerRegistrationMessage response) { }
-        
+        public virtual void OnAppServerRegistered(AckResponseCode responseCode, BaseAckMessage message) { }
+
         public virtual string GetExtra()
         {
             return string.Empty;

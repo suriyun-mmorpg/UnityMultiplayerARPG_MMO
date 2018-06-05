@@ -5,20 +5,17 @@ using LiteNetLib.Utils;
 
 namespace Insthync.MMOG
 {
-    public class ResponseAppServerRegistrationMessage : ILiteNetLibMessage
+    public class ResponseAppServerRegistrationMessage : BaseAckMessage
     {
-        public uint ackId;
         public string error;
 
-        public void Deserialize(NetDataReader reader)
+        public override void DeserializeData(NetDataReader reader)
         {
-            ackId = reader.GetUInt();
             error = reader.GetString();
         }
 
-        public void Serialize(NetDataWriter writer)
+        public override void SerializeData(NetDataWriter writer)
         {
-            writer.Put(ackId);
             writer.Put(error);
         }
     }

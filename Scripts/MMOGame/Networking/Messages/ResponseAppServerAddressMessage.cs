@@ -5,23 +5,20 @@ using LiteNetLib.Utils;
 
 namespace Insthync.MMOG
 {
-    public class ResponseAppServerAddressMessage : ILiteNetLibMessage
+    public class ResponseAppServerAddressMessage : BaseAckMessage
     {
-        public uint ackId;
         public string error;
         public CentralServerPeerInfo peerInfo;
 
-        public void Deserialize(NetDataReader reader)
+        public override void DeserializeData(NetDataReader reader)
         {
-            ackId = reader.GetUInt();
             error = reader.GetString();
             peerInfo = new CentralServerPeerInfo();
             peerInfo.Deserialize(reader);
         }
 
-        public void Serialize(NetDataWriter writer)
+        public override void SerializeData(NetDataWriter writer)
         {
-            writer.Put(ackId);
             writer.Put(error);
             if (peerInfo == null)
                 peerInfo = new CentralServerPeerInfo();

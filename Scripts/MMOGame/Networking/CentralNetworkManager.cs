@@ -17,10 +17,7 @@ namespace Insthync.MMOG
             public const short RequestAppServerAddress = 2;
             public const short ResponseAppServerAddress = 3;
         }
-
-        public delegate void ResponseAppServerRegistrationCallback(ResponseAppServerRegistrationMessage response);
-        public delegate void ResponseAppServerAddressCallback(ResponseAppServerAddressMessage response);
-
+        
         public readonly Dictionary<long, CentralServerPeerInfo> loginServerPeers = new Dictionary<long, CentralServerPeerInfo>();
         public readonly Dictionary<long, CentralServerPeerInfo> chatServerPeers = new Dictionary<long, CentralServerPeerInfo>();
         public readonly Dictionary<long, CentralServerPeerInfo> mapSpawnServerPeers = new Dictionary<long, CentralServerPeerInfo>();
@@ -29,11 +26,7 @@ namespace Insthync.MMOG
 
         public System.Action<NetPeer> onClientConnected;
         public System.Action<NetPeer, DisconnectInfo> onClientDisconnected;
-
-        private readonly Dictionary<uint, ResponseAppServerRegistrationCallback> appServerRegistrationAcks = new Dictionary<uint, ResponseAppServerRegistrationCallback>();
-        private readonly Dictionary<uint, ResponseAppServerAddressCallback> appServerAddressAcks = new Dictionary<uint, ResponseAppServerAddressCallback>();
-        private uint nextAppServerRegistrationAckId = 1;
-        private uint nextAppServerAddressAckId = 1;
+        
         // This server will collect servers data
         // All Map servers addresses, Login server address, Chat server address, Database server configs
         protected override void RegisterServerMessages()
@@ -78,29 +71,19 @@ namespace Insthync.MMOG
                 onClientDisconnected(peer, disconnectInfo);
         }
 
-        public uint RequestAppServerRegistration(CentralServerPeerInfo peerInfo, ResponseAppServerRegistrationCallback responseCallback)
+        public uint RequestAppServerRegistration(CentralServerPeerInfo peerInfo, AckMessageCallback callback)
         {
             var message = new RequestAppServerRegistrationMessage();
-            var ackId = nextAppServerRegistrationAckId++;
-            lock (appServerRegistrationAcks)
-                appServerRegistrationAcks.Add(ackId, responseCallback);
-            message.ackId = ackId;
             message.peerInfo = peerInfo;
-            SendPacket(SendOptions.ReliableUnordered, Client.Peer, CentralMsgTypes.RequestAppServerRegistration, message);
-            return ackId;
+            return SendAckPacket(SendOptions.ReliableUnordered, Client.Peer, CentralMsgTypes.RequestAppServerRegistration, message, callback);
         }
 
-        public uint RequestAppServerAddress(CentralServerPeerType peerType, string extra, ResponseAppServerAddressCallback responseCallback)
+        public uint RequestAppServerAddress(CentralServerPeerType peerType, string extra, AckMessageCallback callback)
         {
             var message = new RequestAppServerAddressMessage();
-            var ackId = nextAppServerAddressAckId++;
-            lock (appServerAddressAcks)
-                appServerAddressAcks.Add(ackId, responseCallback);
-            message.ackId = ackId;
             message.peerType = peerType;
             message.extra = extra;
-            SendPacket(SendOptions.ReliableUnordered, Client.Peer, CentralMsgTypes.RequestAppServerAddress, message);
-            return ackId;
+            return SendAckPacket(SendOptions.ReliableUnordered, Client.Peer, CentralMsgTypes.RequestAppServerAddress, message, callback);
         }
 
         #region Message Handlers
@@ -220,14 +203,7 @@ namespace Insthync.MMOG
             var peer = messageHandler.peer;
             var message = messageHandler.ReadMessage<ResponseAppServerRegistrationMessage>();
             var ackId = message.ackId;
-            lock (appServerRegistrationAcks)
-            {
-                if (appServerRegistrationAcks.ContainsKey(ackId))
-                {
-                    appServerRegistrationAcks[ackId](message);
-                    appServerRegistrationAcks.Remove(ackId);
-                }
-            }
+            TriggerAck(ackId, message.responseCode, message);
         }
 
         protected virtual void HandleResponseAppServerAddress(LiteNetLibMessageHandler messageHandler)
@@ -235,14 +211,7 @@ namespace Insthync.MMOG
             var peer = messageHandler.peer;
             var message = messageHandler.ReadMessage<ResponseAppServerAddressMessage>();
             var ackId = message.ackId;
-            lock (appServerAddressAcks)
-            {
-                if (appServerAddressAcks.ContainsKey(ackId))
-                {
-                    appServerAddressAcks[ackId](message);
-                    appServerAddressAcks.Remove(ackId);
-                }
-            }
+            TriggerAck(ackId, message.responseCode, message);
         }
         #endregion
 

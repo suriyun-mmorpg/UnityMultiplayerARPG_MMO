@@ -5,22 +5,19 @@ using LiteNetLib.Utils;
 
 namespace Insthync.MMOG
 {
-    public class RequestAppServerAddressMessage : ILiteNetLibMessage
+    public class RequestAppServerAddressMessage : BaseAckMessage
     {
-        public uint ackId;
         public CentralServerPeerType peerType;
         public string extra;
 
-        public void Deserialize(NetDataReader reader)
+        public override void DeserializeData(NetDataReader reader)
         {
-            ackId = reader.GetUInt();
             peerType = (CentralServerPeerType)reader.GetByte();
             extra = reader.GetString();
         }
 
-        public void Serialize(NetDataWriter writer)
+        public override void SerializeData(NetDataWriter writer)
         {
-            writer.Put(ackId);
             writer.Put((byte)peerType);
             writer.Put(extra);
         }
