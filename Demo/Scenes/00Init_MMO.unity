@@ -1127,8 +1127,8 @@ MonoBehaviour:
   - item: {fileID: 11400000, guid: 0df782e70d43dc54d8a6bc2d6a212f89, type: 2}
     amount: 99
   homeScene:
-    sceneAsset: {fileID: 102900000, guid: ade6fa5747c04c54b99f067a5ed7f2f1, type: 3}
-    sceneName: 01Home
+    sceneAsset: {fileID: 102900000, guid: d529c814bb9fcd14289ac4141b27e951, type: 3}
+    sceneName: 01Home_MMO
   startScene:
     sceneAsset: {fileID: 102900000, guid: 5ff0e5fbbdc3a214d87be31915d46cd5, type: 3}
     sceneName: Map001
