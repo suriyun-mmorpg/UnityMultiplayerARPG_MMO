@@ -34,5 +34,15 @@ namespace Insthync.MMOG
             // - Start Game Status
             // - Another Player Try To Login Messages
         }
+
+        public void Register(string username, string password)
+        {
+
+        }
+
+        public void Login(string username, string password)
+        {
+
+        }
     }
 }
