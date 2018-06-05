@@ -1,16 +1,25 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
+using LiteNetLibManager;
+using LiteNetLib.Utils;
 
-public class RequestRegisterMessage : MonoBehaviour {
+namespace Insthync.MMOG
+{
+    public class RequestRegisterMessage : BaseAckMessage
+    {
+        public string username;
+        public string password;
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+        public override void DeserializeData(NetDataReader reader)
+        {
+            username = reader.GetString();
+            password = reader.GetString();
+        }
+
+        public override void SerializeData(NetDataWriter writer)
+        {
+            writer.Put(username);
+            writer.Put(password);
+        }
+    }
 }

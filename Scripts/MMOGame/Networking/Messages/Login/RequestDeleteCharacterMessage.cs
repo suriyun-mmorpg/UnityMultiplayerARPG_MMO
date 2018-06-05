@@ -1,16 +1,22 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
+using LiteNetLibManager;
+using LiteNetLib.Utils;
 
-public class RequestDeleteCharacterMessage : MonoBehaviour {
+namespace Insthync.MMOG
+{
+    public class RequestDeleteCharacterMessage : BaseAckMessage
+    {
+        public string characterId;
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+        public override void DeserializeData(NetDataReader reader)
+        {
+            characterId = reader.GetString();
+        }
+
+        public override void SerializeData(NetDataWriter writer)
+        {
+            writer.Put(characterId);
+        }
+    }
 }

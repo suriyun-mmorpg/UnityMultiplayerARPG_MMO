@@ -1,16 +1,20 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
+using LiteNetLibManager;
+using LiteNetLib.Utils;
 
-public class ResponseRegisterMessage : MonoBehaviour {
+namespace Insthync.MMOG
+{
+    public class ResponseRegisterMessage : BaseAckMessage
+    {
+        public override void DeserializeData(NetDataReader reader)
+        {
+            throw new System.NotImplementedException();
+        }
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+        public override void SerializeData(NetDataWriter writer)
+        {
+            throw new System.NotImplementedException();
+        }
+    }
 }

@@ -1,16 +1,18 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
+using LiteNetLibManager;
+using LiteNetLib.Utils;
 
-public class RequestCharactersMessage : MonoBehaviour {
+namespace Insthync.MMOG
+{
+    public class RequestCharactersMessage : BaseAckMessage
+    {
+        public override void DeserializeData(NetDataReader reader)
+        {
+        }
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+        public override void SerializeData(NetDataWriter writer)
+        {
+        }
+    }
 }
