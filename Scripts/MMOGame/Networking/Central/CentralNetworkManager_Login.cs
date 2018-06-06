@@ -24,6 +24,12 @@ namespace Insthync.MMOG
             return SendAckPacket(SendOptions.ReliableUnordered, Client.Peer, CentralMsgTypes.RequestUserRegister, message, callback);
         }
 
+        public uint RequestUserLogout(AckMessageCallback callback)
+        {
+            var message = new BaseAckMessage();
+            return SendAckPacket(SendOptions.ReliableUnordered, Client.Peer, CentralMsgTypes.RequestUserLogout, message, callback);
+        }
+
         protected void HandleRequestUserLogin(LiteNetLibMessageHandler messageHandler)
         {
             var peer = messageHandler.peer;
@@ -72,6 +78,22 @@ namespace Insthync.MMOG
             SendPacket(SendOptions.ReliableUnordered, peer, CentralMsgTypes.ResponseUserRegister, responseMessage);
         }
 
+        protected void HandleRequestUserLogout(LiteNetLibMessageHandler messageHandler)
+        {
+            var peer = messageHandler.peer;
+            var message = messageHandler.ReadMessage<BaseAckMessage>();
+            var responseMessage = new BaseAckMessage();
+            CentralUserPeerInfo userPeerInfo;
+            if (userPeers.TryGetValue(peer.ConnectId, out userPeerInfo))
+            {
+                userPeersByUserId.Remove(userPeerInfo.userId);
+                userPeers.Remove(peer.ConnectId);
+            }
+            responseMessage.ackId = message.ackId;
+            responseMessage.responseCode = AckResponseCode.Success;
+            SendPacket(SendOptions.ReliableUnordered, peer, CentralMsgTypes.ResponseUserLogout, responseMessage);
+        }
+
         protected void HandleResponseUserLogin(LiteNetLibMessageHandler messageHandler)
         {
             var peer = messageHandler.peer;
@@ -84,6 +106,14 @@ namespace Insthync.MMOG
         {
             var peer = messageHandler.peer;
             var message = messageHandler.ReadMessage<ResponseUserRegisterMessage>();
+            var ackId = message.ackId;
+            TriggerAck(ackId, message.responseCode, message);
+        }
+
+        protected void HandleResponseUserLogout(LiteNetLibMessageHandler messageHandler)
+        {
+            var peer = messageHandler.peer;
+            var message = messageHandler.ReadMessage<BaseAckMessage>();
             var ackId = message.ackId;
             TriggerAck(ackId, message.responseCode, message);
         }

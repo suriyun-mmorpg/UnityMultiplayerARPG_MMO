@@ -16,6 +16,8 @@ namespace Insthync.MMOG
             public const short ResponseUserLogin = 5;
             public const short RequestUserRegister = 6;
             public const short ResponseUserRegister = 7;
+            public const short RequestUserLogout = 8;
+            public const short ResponseUserLogout = 9;
         }
 
         public readonly Dictionary<long, CentralServerPeerInfo> mapSpawnServerPeers = new Dictionary<long, CentralServerPeerInfo>();
@@ -43,6 +45,7 @@ namespace Insthync.MMOG
             RegisterServerMessage(CentralMsgTypes.RequestAppServerAddress, HandleRequestAppServerAddress);
             RegisterServerMessage(CentralMsgTypes.RequestUserLogin, HandleRequestUserLogin);
             RegisterServerMessage(CentralMsgTypes.RequestUserRegister, HandleRequestUserRegister);
+            RegisterServerMessage(CentralMsgTypes.RequestUserLogout, HandleRequestUserLogout);
         }
 
         protected override void RegisterClientMessages()
@@ -52,6 +55,7 @@ namespace Insthync.MMOG
             RegisterClientMessage(CentralMsgTypes.ResponseAppServerAddress, HandleResponseAppServerAddress);
             RegisterClientMessage(CentralMsgTypes.ResponseUserLogin, HandleResponseUserLogin);
             RegisterClientMessage(CentralMsgTypes.ResponseUserRegister, HandleResponseUserRegister);
+            RegisterClientMessage(CentralMsgTypes.ResponseUserLogout, HandleResponseUserLogout);
         }
 
         public override void OnPeerDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
