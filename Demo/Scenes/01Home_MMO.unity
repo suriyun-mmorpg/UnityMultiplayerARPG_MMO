@@ -1228,7 +1228,7 @@ RectTransform:
   - {fileID: 1979356301}
   - {fileID: 1616698437}
   m_Father: {fileID: 2105905778}
-  m_RootOrder: 4
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -1521,12 +1521,12 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_MethodName: OnClickCreateCharacter
-        m_Mode: 1
+      - m_Target: {fileID: 2105905779}
+        m_MethodName: Next
+        m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_ObjectArgument: {fileID: 1844824177}
+          m_ObjectArgumentAssemblyTypeName: UIBase, Assembly-CSharp
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -9391,7 +9391,7 @@ RectTransform:
   - {fileID: 195990}
   - {fileID: 259296658}
   m_Father: {fileID: 2105905778}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -9430,7 +9430,18 @@ MonoBehaviour:
   buttonCreate: {fileID: 259296659}
   eventOnCreateCharacter:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 2105905779}
+        m_MethodName: Back
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &1844824181
@@ -10553,8 +10564,8 @@ RectTransform:
   - {fileID: 2066728147}
   - {fileID: 849804233}
   - {fileID: 1171727558}
-  - {fileID: 1844824176}
   - {fileID: 186974757}
+  - {fileID: 1844824176}
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -10576,8 +10587,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   firstUI: {fileID: 2066728145}
   uiLogin: {fileID: 849804232}
-  uiCharacterCreate: {fileID: 1844824177}
   uiCharacterList: {fileID: 186974758}
+  uiCharacterCreate: {fileID: 1844824177}
 --- !u!1 &2124010297
 GameObject:
   m_ObjectHideFlags: 0
