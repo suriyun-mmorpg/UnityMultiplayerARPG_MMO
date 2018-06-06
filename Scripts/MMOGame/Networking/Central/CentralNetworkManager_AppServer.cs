@@ -50,7 +50,7 @@ namespace Insthync.MMOG
                         }
                         else
                         {
-                            error = ResponseAppServerRegisterMessage.Error.MapAlreadyExist;
+                            error = ResponseAppServerRegisterMessage.Error.MapAlreadyExisted;
                             Debug.Log("[Central] Register Map Server Failed: [" + peer.ConnectId + "] [" + mapName + "] [" + error + "]");
                         }
                         break;

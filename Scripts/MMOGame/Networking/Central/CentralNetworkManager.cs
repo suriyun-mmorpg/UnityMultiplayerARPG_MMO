@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
 using LiteNetLib;
 
 namespace Insthync.MMOG
@@ -20,6 +21,15 @@ namespace Insthync.MMOG
         public readonly Dictionary<long, CentralServerPeerInfo> mapSpawnServerPeers = new Dictionary<long, CentralServerPeerInfo>();
         public readonly Dictionary<long, CentralServerPeerInfo> mapServerPeers = new Dictionary<long, CentralServerPeerInfo>();
         public readonly Dictionary<string, CentralServerPeerInfo> mapServerPeersByMapName = new Dictionary<string, CentralServerPeerInfo>();
+        public readonly Dictionary<long, CentralUserPeerInfo> userPeers = new Dictionary<long, CentralUserPeerInfo>();
+        public readonly Dictionary<string, CentralUserPeerInfo> userPeersByUserId = new Dictionary<string, CentralUserPeerInfo>();
+
+        [Header("Server configuration")]
+        public BaseDatabase database;
+        [Header("Account configuration")]
+        public int minUsernameLength;
+        public int maxUsernameLength;
+        public int minPasswordLength;
 
         public System.Action<NetPeer> onClientConnected;
         public System.Action<NetPeer, DisconnectInfo> onClientDisconnected;
@@ -54,6 +64,12 @@ namespace Insthync.MMOG
                 mapServerPeersByMapName.Remove(mapServerPeerInfo.extra);
                 mapServerPeers.Remove(peer.ConnectId);
             }
+            CentralUserPeerInfo userPeerInfo;
+            if (userPeers.TryGetValue(peer.ConnectId, out userPeerInfo))
+            {
+                userPeersByUserId.Remove(userPeerInfo.userId);
+                userPeers.Remove(peer.ConnectId);
+            }
         }
 
         public override void OnClientConnected(NetPeer peer)
@@ -68,6 +84,18 @@ namespace Insthync.MMOG
             base.OnClientDisconnected(peer, disconnectInfo);
             if (onClientDisconnected != null)
                 onClientDisconnected(peer, disconnectInfo);
+        }
+
+        public override void OnStartServer()
+        {
+            base.OnStartServer();
+            database.Connect();
+        }
+
+        public override void OnStopServer()
+        {
+            base.OnStopServer();
+            database.Disconnect();
         }
     }
 }

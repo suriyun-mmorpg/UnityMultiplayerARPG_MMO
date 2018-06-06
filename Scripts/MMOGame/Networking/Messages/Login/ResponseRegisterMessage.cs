@@ -7,14 +7,24 @@ namespace Insthync.MMOG
 {
     public class ResponseUserRegisterMessage : BaseAckMessage
     {
+        public enum Error : byte
+        {
+            None,
+            TooShortUsername,
+            TooShortPassword,
+            TooLongUsername,
+            UsernameAlreadyExisted,
+        }
+        public Error error;
+
         public override void DeserializeData(NetDataReader reader)
         {
-            throw new System.NotImplementedException();
+            error = (Error)reader.GetByte();
         }
 
         public override void SerializeData(NetDataWriter writer)
         {
-            throw new System.NotImplementedException();
+            writer.Put((byte)error);
         }
     }
 }

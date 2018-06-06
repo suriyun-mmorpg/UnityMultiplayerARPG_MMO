@@ -11,7 +11,7 @@ namespace Insthync.MMOG
         {
             None,
             InvalidHash,
-            MapAlreadyExist,
+            MapAlreadyExisted,
         }
         public Error error;
 
