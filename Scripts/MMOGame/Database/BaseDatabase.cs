@@ -8,7 +8,7 @@ namespace Insthync.MMOG
     {
         public abstract void Connect();
         public abstract void Disconnect();
-        public abstract bool ValidateUserLogin(string username, string password, out string userId);
+        public abstract bool ValidateUserLogin(string username, string password, out string id);
         public abstract void CreateUserLogin(string username, string password);
         public abstract long FindUsername(string username);
 

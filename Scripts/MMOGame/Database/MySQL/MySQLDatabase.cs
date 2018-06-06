@@ -117,16 +117,16 @@ namespace Insthync.MMOG
             return result;
         }
 
-        public override bool ValidateUserLogin(string username, string password, out string userId)
+        public override bool ValidateUserLogin(string username, string password, out string id)
         {
-            userId = string.Empty;
+            id = string.Empty;
             var reader = ExecuteReader("SELECT id FROM userLogin WHERE username=@username AND password=@password LIMIT 1",
                 new MySqlParameter("@username", username),
                 new MySqlParameter("@password", password));
 
             if (reader.Read())
             {
-                userId = reader.GetString("userId");
+                id = reader.GetString("id");
                 return true;
             }
 
@@ -135,7 +135,8 @@ namespace Insthync.MMOG
 
         public override void CreateUserLogin(string username, string password)
         {
-            ExecuteNonQuery("INSERT INTO userLogin (username, password) VALUES (@username, @password)",
+            ExecuteNonQuery("INSERT INTO userLogin (id, username, password) VALUES (@id, @username, @password)",
+                new MySqlParameter("@id", System.Guid.NewGuid().ToString()),
                 new MySqlParameter("@username", username),
                 new MySqlParameter("@password", password));
         }
