@@ -27,9 +27,9 @@ namespace Insthync.MMOG
         [Header("Server configuration")]
         public BaseDatabase database;
         [Header("Account configuration")]
-        public int minUsernameLength;
-        public int maxUsernameLength;
-        public int minPasswordLength;
+        public int minUsernameLength = 2;
+        public int maxUsernameLength = 24;
+        public int minPasswordLength = 2;
 
         public System.Action<NetPeer> onClientConnected;
         public System.Action<NetPeer, DisconnectInfo> onClientDisconnected;

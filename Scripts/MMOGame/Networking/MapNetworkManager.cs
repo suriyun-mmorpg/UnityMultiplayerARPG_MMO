@@ -25,6 +25,7 @@ namespace Insthync.MMOG
             {
                 if (cacheCentralNetworkManager == null)
                     cacheCentralNetworkManager = gameObject.AddComponent<CentralNetworkManager>();
+                cacheCentralNetworkManager.currentLogLevel = currentLogLevel;
                 return cacheCentralNetworkManager;
             }
         }
@@ -104,7 +105,7 @@ namespace Insthync.MMOG
 
         public virtual void OnCentralServerConnected(NetPeer netPeer)
         {
-            Debug.Log("[" + PeerType + "] Connected from Central Server");
+            Debug.Log("[" + PeerType + "] Connected to Central Server");
             var peerInfo = new CentralServerPeerInfo();
             peerInfo.peerType = PeerType;
             peerInfo.networkAddress = machineAddress;
