@@ -143,6 +143,8 @@ MonoBehaviour:
   centralNetworkManager: {fileID: 1219189832}
   mapSpawnNetworkManager: {fileID: 1977110980}
   mapNetworkManager: {fileID: 1127565838}
+  startCentralOnAwake: 1
+  startMapSpawnOnAwake: 1
 --- !u!4 &33785792
 Transform:
   m_ObjectHideFlags: 0
@@ -255,8 +257,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   centralNetworkManager: {fileID: 1639971799}
-  mapSpawnNetworkManager: {fileID: 1176809329}
   mapNetworkManager: {fileID: 1127565838}
+  networkSettings:
+  - {fileID: 11400000, guid: 6a3edb1361db33b45b656cf8376a2229, type: 2}
 --- !u!4 &254052523
 Transform:
   m_ObjectHideFlags: 0
@@ -455,6 +458,7 @@ MonoBehaviour:
   machineAddress: 127.0.0.1
   centralServerAddress: 127.0.0.1
   centralServerPort: 6000
+  centralServerConnectKey: SampleConnectKey
 --- !u!114 &1127565839
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -610,6 +614,7 @@ MonoBehaviour:
   machineAddress: 127.0.0.1
   centralServerAddress: 127.0.0.1
   centralServerPort: 6000
+  centralServerConnectKey: SampleConnectKey
   exePath: ./Build.exe
   spawnInBatchMode: 0
   isOverrideExePath: 0
@@ -648,6 +653,7 @@ GameObject:
   - component: {fileID: 1219189830}
   - component: {fileID: 1219189831}
   - component: {fileID: 1219189832}
+  - component: {fileID: 1219189833}
   m_Layer: 0
   m_Name: CentralNetworkManager
   m_TagString: Untagged
@@ -690,7 +696,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 74d920f2df3608f4aa394880f7198146, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentLogLevel: 2
+  currentLogLevel: 0
   connectKey: SampleConnectKey
   networkAddress: localhost
   networkPort: 6000
@@ -708,9 +714,29 @@ MonoBehaviour:
   discoveryEnabled: 0
   discoveryRequestData: 
   discoveryResponseData: 
-  maxConnections: 4
+  maxConnections: 1100
   reconnectDelay: 500
   maxConnectAttempts: 10
+  database: {fileID: 1219189833}
+  minUsernameLength: 2
+  maxUsernameLength: 24
+  minPasswordLength: 2
+--- !u!114 &1219189833
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1219189829}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b07a9b1ffbc177946b89cbdae179403d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  address: localhost
+  port: 3306
+  username: root
+  password: 
+  dbName: mmorpgtemplate
 --- !u!1 &1232480984
 GameObject:
   m_ObjectHideFlags: 0
@@ -1207,6 +1233,10 @@ MonoBehaviour:
   maxConnections: 4
   reconnectDelay: 500
   maxConnectAttempts: 10
+  database: {fileID: 0}
+  minUsernameLength: 0
+  maxUsernameLength: 0
+  minPasswordLength: 0
 --- !u!114 &1639971800
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1407,10 +1437,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 711495ce9cd78fc4a8d39358f3e0d2ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentLogLevel: 2
+  currentLogLevel: 0
   connectKey: SampleConnectKey
   networkAddress: localhost
-  networkPort: 6003
+  networkPort: 6001
   unconnectedMessagesEnabled: 0
   natPunchEnabled: 0
   updateTime: 15
@@ -1431,6 +1461,7 @@ MonoBehaviour:
   machineAddress: 127.0.0.1
   centralServerAddress: 127.0.0.1
   centralServerPort: 6000
+  centralServerConnectKey: SampleConnectKey
   exePath: ./Build.exe
   spawnInBatchMode: 0
   isOverrideExePath: 0
