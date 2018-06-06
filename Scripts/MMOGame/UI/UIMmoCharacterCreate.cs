@@ -13,8 +13,9 @@ namespace Insthync.MMOG
         public UICharacter uiCharacterPrefab;
         public Transform uiCharacterContainer;
         public Transform characterModelContainer;
-        [Header("Input")]
+        [Header("UI Elements")]
         public InputField inputCharacterName;
+        public Button buttonCreate;
         [Header("Event")]
         public UnityEvent eventOnCreateCharacter;
 
@@ -45,17 +46,19 @@ namespace Insthync.MMOG
             }
         }
 
-        protected readonly Dictionary<string, CharacterModel> CharacterModels = new Dictionary<string, CharacterModel>();
+        private readonly Dictionary<string, CharacterModel> CharacterModels = new Dictionary<string, CharacterModel>();
 
         public override void Show()
         {
+            buttonCreate.onClick.RemoveListener(OnClickCreate);
+            buttonCreate.onClick.AddListener(OnClickCreate);
             SelectionManager.eventOnSelect.RemoveListener(OnSelectCharacter);
             SelectionManager.eventOnSelect.AddListener(OnSelectCharacter);
             LoadCharacters();
             base.Show();
         }
 
-        protected void LoadCharacters()
+        private void LoadCharacters()
         {
             SelectionManager.Clear();
             // Show list of characters that can be create
@@ -83,13 +86,13 @@ namespace Insthync.MMOG
             base.Hide();
         }
 
-        protected void OnSelectCharacter(UICharacter ui)
+        private void OnSelectCharacter(UICharacter ui)
         {
             characterModelContainer.SetChildrenActive(false);
             ShowCharacter(ui.databaseId);
         }
 
-        protected void ShowCharacter(string id)
+        private void ShowCharacter(string id)
         {
             CharacterModel characterModel;
             if (string.IsNullOrEmpty(id) || !CharacterModels.TryGetValue(id, out characterModel))
@@ -97,7 +100,7 @@ namespace Insthync.MMOG
             characterModel.gameObject.SetActive(true);
         }
 
-        public virtual void OnClickCreate()
+        private void OnClickCreate()
         {
             var gameInstance = GameInstance.Singleton;
             var selectedUI = SelectionManager.SelectedUI;

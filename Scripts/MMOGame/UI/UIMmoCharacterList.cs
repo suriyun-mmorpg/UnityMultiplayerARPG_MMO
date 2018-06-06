@@ -43,9 +43,9 @@ namespace Insthync.MMOG
             }
         }
 
-        protected readonly Dictionary<string, CharacterModel> CharacterModels = new Dictionary<string, CharacterModel>();
+        private readonly Dictionary<string, CharacterModel> CharacterModels = new Dictionary<string, CharacterModel>();
 
-        protected void LoadCharacters()
+        private void LoadCharacters()
         {
             SelectionManager.Clear();
             // Unenabled buttons
@@ -89,7 +89,7 @@ namespace Insthync.MMOG
             base.Hide();
         }
 
-        protected void OnSelectCharacter(UICharacter ui)
+        private void OnSelectCharacter(UICharacter ui)
         {
             buttonStart.gameObject.SetActive(true);
             buttonDelete.gameObject.SetActive(true);
@@ -98,7 +98,7 @@ namespace Insthync.MMOG
             ShowCharacter(playerCharacter.Id);
         }
 
-        protected void ShowCharacter(string id)
+        private void ShowCharacter(string id)
         {
             CharacterModel characterModel;
             if (string.IsNullOrEmpty(id) || !CharacterModels.TryGetValue(id, out characterModel))
@@ -106,7 +106,7 @@ namespace Insthync.MMOG
             characterModel.gameObject.SetActive(true);
         }
 
-        public virtual void OnClickStart()
+        private void OnClickStart()
         {
             var selectedUI = SelectionManager.SelectedUI;
             if (selectedUI == null)
@@ -128,7 +128,7 @@ namespace Insthync.MMOG
             networkManager.StartGame();
         }
 
-        public virtual void OnClickDelete()
+        private void OnClickDelete()
         {
             if (SelectionManager.SelectedUI == null)
             {
