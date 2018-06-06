@@ -48,10 +48,10 @@ namespace Insthync.MMOG
         protected override void RegisterClientMessages()
         {
             base.RegisterClientMessages();
-            RegisterServerMessage(CentralMsgTypes.ResponseAppServerRegister, HandleResponseAppServerRegister);
-            RegisterServerMessage(CentralMsgTypes.ResponseAppServerAddress, HandleResponseAppServerAddress);
-            RegisterServerMessage(CentralMsgTypes.ResponseUserLogin, HandleResponseUserLogin);
-            RegisterServerMessage(CentralMsgTypes.ResponseUserRegister, HandleResponseUserRegister);
+            RegisterClientMessage(CentralMsgTypes.ResponseAppServerRegister, HandleResponseAppServerRegister);
+            RegisterClientMessage(CentralMsgTypes.ResponseAppServerAddress, HandleResponseAppServerAddress);
+            RegisterClientMessage(CentralMsgTypes.ResponseUserLogin, HandleResponseUserLogin);
+            RegisterClientMessage(CentralMsgTypes.ResponseUserRegister, HandleResponseUserRegister);
         }
 
         public override void OnPeerDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
