@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.Events;
 using UnityEngine.UI;
 using LiteNetLibManager;
 
@@ -9,6 +10,8 @@ namespace Insthync.MMOG
     {
         public InputField textUsername;
         public InputField textPassword;
+        public UnityEvent onLoginSuccess;
+        public UnityEvent onLoginFail;
 
         public string Username { get { return textUsername == null ? string.Empty : textUsername.text; } }
         public string Password { get { return textPassword == null ? string.Empty : textPassword.text; } }
@@ -48,12 +51,17 @@ namespace Insthync.MMOG
                             break;
                     }
                     UISceneGlobal.Singleton.ShowMessageDialog("Cannot Login", errorMessage);
+                    if (onLoginFail != null)
+                        onLoginFail.Invoke();
                     break;
                 case AckResponseCode.Timeout:
                     UISceneGlobal.Singleton.ShowMessageDialog("Cannot Login", "Connection timeout");
+                    if (onLoginFail != null)
+                        onLoginFail.Invoke();
                     break;
                 default:
-                    Hide();
+                    if (onLoginSuccess != null)
+                        onLoginSuccess.Invoke();
                     break;
             }
         }

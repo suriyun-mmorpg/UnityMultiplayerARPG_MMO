@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.Events;
 using UnityEngine.UI;
 using LiteNetLibManager;
 
@@ -10,6 +11,8 @@ namespace Insthync.MMOG
         public InputField textUsername;
         public InputField textPassword;
         public InputField textConfirmPassword;
+        public UnityEvent onRegisterSuccess;
+        public UnityEvent onRegisterFail;
 
         public string Username { get { return textUsername == null ? string.Empty : textUsername.text; } }
         public string Password { get { return textPassword == null ? string.Empty : textPassword.text; } }
@@ -71,12 +74,17 @@ namespace Insthync.MMOG
                             break;
                     }
                     UISceneGlobal.Singleton.ShowMessageDialog("Cannot Register", errorMessage);
+                    if (onRegisterFail != null)
+                        onRegisterFail.Invoke();
                     break;
                 case AckResponseCode.Timeout:
                     UISceneGlobal.Singleton.ShowMessageDialog("Cannot Register", "Connection timeout");
+                    if (onRegisterFail != null)
+                        onRegisterFail.Invoke();
                     break;
                 default:
-                    Hide();
+                    if (onRegisterSuccess != null)
+                        onRegisterSuccess.Invoke();
                     break;
             }
         }
