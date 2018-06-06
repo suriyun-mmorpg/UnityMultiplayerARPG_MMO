@@ -75,6 +75,11 @@ namespace Insthync.MMOG
             mapNetworkManager.StartClient();
         }
 
+        public bool IsConnectedToCentralServer()
+        {
+            return centralNetworkManager.IsClientConnected;
+        }
+
         public void RequestUserLogin(string username, string password, AckMessageCallback callback)
         {
             centralNetworkManager.RequestUserLogin(username, password, callback);
@@ -83,6 +88,11 @@ namespace Insthync.MMOG
         public void RequestUserRegister(string username, string password, AckMessageCallback callback)
         {
             centralNetworkManager.RequestUserRegister(username, password, callback);
+        }
+
+        public void RequestUserLogout(AckMessageCallback callback)
+        {
+            centralNetworkManager.RequestUserLogout(callback);
         }
         #endregion
     }
