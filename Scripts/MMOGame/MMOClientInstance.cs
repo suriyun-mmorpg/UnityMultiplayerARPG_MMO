@@ -54,7 +54,7 @@ namespace Insthync.MMOG
         public void OnCentralServerDisconnected(NetPeer netPeer, DisconnectInfo disconnectInfo)
         {
             if (onClientDisconnected != null)
-                onClientDisconnected.Invoke(netPeer);
+                onClientDisconnected.Invoke(netPeer, disconnectInfo);
         }
 
         #region Client functions
