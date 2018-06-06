@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 using LiteNetLib;
+using LiteNetLibManager;
 
 namespace Insthync.MMOG
 {
     public class UIMmoSceneHome : UIHistory
     {
-        public UIMmoServerList uiServerList;
-        public UIBase uiConnectedToServer;
+        public UIMmoLogin uiLogin;
         public UIMmoCharacterCreate uiCharacterCreate;
         public UIMmoCharacterList uiCharacterList;
 
@@ -16,6 +16,11 @@ namespace Insthync.MMOG
         {
             MMOClientInstance.Singleton.onClientConnected += OnCentralServerConnected;
             MMOClientInstance.Singleton.onClientDisconnected += OnCentralServerDisconnected;
+            if (MMOClientInstance.Singleton.IsConnectedToCentralServer())
+            {
+                ClearHistory();
+                Next(uiLogin);
+            }
         }
 
         private void OnDisable()
@@ -26,12 +31,24 @@ namespace Insthync.MMOG
 
         public void OnCentralServerConnected(NetPeer netPeer)
         {
-            Next(uiConnectedToServer);
+            ClearHistory();
+            Next(uiLogin);
         }
 
         public void OnCentralServerDisconnected(NetPeer netPeer, DisconnectInfo disconnectInfo)
         {
             ClearHistory();
+        }
+
+        public void OnUserLogout(AckResponseCode responseCode, BaseAckMessage messageData)
+        {
+            ClearHistory();
+            Next(uiLogin);
+        }
+
+        public void OnClickLogout()
+        {
+            MMOClientInstance.Singleton.RequestUserLogout(OnUserLogout);
         }
 
         public void OnClickExit()
