@@ -45,12 +45,39 @@ namespace Insthync.MMOG
                 return;
             }
 
-            MMOClientInstance.Singleton.centralNetworkManager.RequestUserRegister(Username, Password, OnRegister);
+            MMOClientInstance.Singleton.RequestUserRegister(Username, Password, OnRegister);
         }
 
         public void OnRegister(AckResponseCode responseCode, BaseAckMessage message)
         {
-
+            var castedMessage = (ResponseUserRegisterMessage)message;
+            switch (responseCode)
+            {
+                case AckResponseCode.Error:
+                    var errorMessage = string.Empty;
+                    switch (castedMessage.error)
+                    {
+                        case ResponseUserRegisterMessage.Error.TooShortUsername:
+                            errorMessage = "Username is too short";
+                            break;
+                        case ResponseUserRegisterMessage.Error.TooLongUsername:
+                            errorMessage = "Username is too long";
+                            break;
+                        case ResponseUserRegisterMessage.Error.TooShortPassword:
+                            errorMessage = "Password is too short";
+                            break;
+                        case ResponseUserRegisterMessage.Error.UsernameAlreadyExisted:
+                            errorMessage = "Username is already existed";
+                            break;
+                    }
+                    UISceneGlobal.Singleton.ShowMessageDialog("Cannot Register", errorMessage);
+                    break;
+                case AckResponseCode.Timeout:
+                    UISceneGlobal.Singleton.ShowMessageDialog("Cannot Register", "Connection timeout");
+                    break;
+                default:
+                    break;
+            }
         }
     }
 }

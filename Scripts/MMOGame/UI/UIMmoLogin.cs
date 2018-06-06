@@ -28,12 +28,33 @@ namespace Insthync.MMOG
                 return;
             }
 
-            MMOClientInstance.Singleton.centralNetworkManager.RequestUserLogin(Username, Password, OnLogin);
+            MMOClientInstance.Singleton.RequestUserLogin(Username, Password, OnLogin);
         }
 
         public void OnLogin(AckResponseCode responseCode, BaseAckMessage message)
         {
-
+            var castedMessage = (ResponseUserLoginMessage)message;
+            switch (responseCode)
+            {
+                case AckResponseCode.Error:
+                    var errorMessage = string.Empty;
+                    switch (castedMessage.error)
+                    {
+                        case ResponseUserLoginMessage.Error.AlreadyLogin:
+                            errorMessage = "User already loggedin";
+                            break;
+                        case ResponseUserLoginMessage.Error.InvalidUsernameOrPassword:
+                            errorMessage = "Invalid username or password";
+                            break;
+                    }
+                    UISceneGlobal.Singleton.ShowMessageDialog("Cannot Login", errorMessage);
+                    break;
+                case AckResponseCode.Timeout:
+                    UISceneGlobal.Singleton.ShowMessageDialog("Cannot Login", "Connection timeout");
+                    break;
+                default:
+                    break;
+            }
         }
     }
 }

@@ -20,13 +20,18 @@ namespace Insthync.MMOG
         public const string ARG_MAP_ADDRESS = "-mapAddress";
         public const string ARG_MAP_PORT = "-mapPort";
         public const string ARG_MAP_SCENE_NAME = "-mapSceneName";
-
-        #region Server components
+        
         [Header("Server Components")]
-        public CentralNetworkManager centralNetworkManager;
-        public MapSpawnNetworkManager mapSpawnNetworkManager;
-        public MapNetworkManager mapNetworkManager;
-        #endregion
+        [SerializeField]
+        private CentralNetworkManager centralNetworkManager;
+        [SerializeField]
+        private MapSpawnNetworkManager mapSpawnNetworkManager;
+        [SerializeField]
+        private MapNetworkManager mapNetworkManager;
+
+        [Header("Running In Editor")]
+        public bool startCentralOnAwake;
+        public bool startMapSpawnOnAwake;
 
         private void Awake()
         {
@@ -101,10 +106,10 @@ namespace Insthync.MMOG
                 mapNetworkManager.Assets.onlineScene.SceneName = sceneName;
             }
 
-            if (IsArgsProvided(args, ARG_START_CENTRAL_SERVER))
+            if (IsArgsProvided(args, ARG_START_CENTRAL_SERVER) || (Application.isEditor && startCentralOnAwake))
                 StartCentralServer();
 
-            if (IsArgsProvided(args, ARG_START_MAP_SPAWN_SERVER))
+            if (IsArgsProvided(args, ARG_START_MAP_SPAWN_SERVER) || (Application.isEditor && startMapSpawnOnAwake))
                 StartMapSpawnServer();
 
             if (IsArgsProvided(args, ARG_START_MAP_SERVER))

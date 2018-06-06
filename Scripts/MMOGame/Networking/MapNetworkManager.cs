@@ -70,6 +70,18 @@ namespace Insthync.MMOG
             CacheGameManager.OnServerOnlineSceneLoaded();
         }
 
+        protected void OnEnable()
+        {
+            CacheCentralNetworkManager.onClientConnected += OnCentralServerConnected;
+            CacheCentralNetworkManager.onClientDisconnected += OnCentralServerDisconnected;
+        }
+
+        protected void OnDisable()
+        {
+            CacheCentralNetworkManager.onClientConnected -= OnCentralServerConnected;
+            CacheCentralNetworkManager.onClientDisconnected -= OnCentralServerDisconnected;
+        }
+
         public override void OnStartServer()
         {
             Debug.Log("[" + PeerType + "] Starting server");
@@ -80,8 +92,6 @@ namespace Insthync.MMOG
         public void ConnectToCentralServer()
         {
             Debug.Log("[" + PeerType + "] Connecting to Central Server");
-            CacheCentralNetworkManager.onClientConnected = OnCentralServerConnected;
-            CacheCentralNetworkManager.onClientDisconnected = OnCentralServerDisconnected;
             CacheCentralNetworkManager.StartClient(centralServerAddress, centralServerPort);
         }
 
