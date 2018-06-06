@@ -26,7 +26,7 @@ namespace Insthync.MMOG
 
         public override void CreateCharacterHotkey(string characterId, CharacterHotkey characterHotkey)
         {
-            ExecuteNonQuery("INSERT INTO characterHotkey (characterId, hotkeyId, type, dataId) VALUES (@characterId, @hotkeyId, @type, @dataId)",
+            ExecuteNonQuery("INSERT INTO characterhotkey (characterId, hotkeyId, type, dataId) VALUES (@characterId, @hotkeyId, @type, @dataId)",
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@hotkeyId", characterHotkey.hotkeyId),
                 new MySqlParameter("@type", characterHotkey.type),
@@ -35,7 +35,7 @@ namespace Insthync.MMOG
 
         public override CharacterHotkey ReadCharacterHotkey(string characterId, string hotkeyId)
         {
-            var reader = ExecuteReader("SELECT * FROM characterHotkey WHERE characterId=@characterId AND hotkeyId=@hotkeyId LIMIT 1",
+            var reader = ExecuteReader("SELECT * FROM characterhotkey WHERE characterId=@characterId AND hotkeyId=@hotkeyId LIMIT 1",
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@hotkeyId", hotkeyId));
             CharacterHotkey result;
@@ -46,7 +46,7 @@ namespace Insthync.MMOG
         public override List<CharacterHotkey> ReadCharacterHotkeys(string characterId)
         {
             var result = new List<CharacterHotkey>();
-            var reader = ExecuteReader("SELECT * FROM characterHotkey WHERE characterId=@characterId",
+            var reader = ExecuteReader("SELECT * FROM characterhotkey WHERE characterId=@characterId",
                 new MySqlParameter("@characterId", characterId));
             CharacterHotkey tempHotkey;
             while (ReadCharacterHotkey(reader, out tempHotkey, false))
@@ -58,7 +58,7 @@ namespace Insthync.MMOG
 
         public override void UpdateCharacterHotkey(string characterId, CharacterHotkey characterHotkey)
         {
-            ExecuteNonQuery("UPDATE characterHotkey SET type=@type, dataId=@dataId WHERE characterId=@characterId AND hotkeyId=@hotkeyId",
+            ExecuteNonQuery("UPDATE characterhotkey SET type=@type, dataId=@dataId WHERE characterId=@characterId AND hotkeyId=@hotkeyId",
                 new MySqlParameter("@type", characterHotkey.type),
                 new MySqlParameter("@dataId", characterHotkey.dataId),
                 new MySqlParameter("@characterId", characterId),
@@ -67,7 +67,7 @@ namespace Insthync.MMOG
 
         public override void DeleteCharacterHotkey(string characterId, string hotkeyId)
         {
-            ExecuteNonQuery("DELETE FROM characterHotkey WHERE characterId=@characterId AND hotkeyId=@hotkeyId",
+            ExecuteNonQuery("DELETE FROM characterhotkey WHERE characterId=@characterId AND hotkeyId=@hotkeyId",
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@hotkeyId", hotkeyId));
         }

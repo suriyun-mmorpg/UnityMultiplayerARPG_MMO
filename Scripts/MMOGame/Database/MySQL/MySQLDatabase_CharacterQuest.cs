@@ -48,7 +48,7 @@ namespace Insthync.MMOG
 
         public override void CreateCharacterQuest(string characterId, CharacterQuest characterQuest)
         {
-            ExecuteNonQuery("INSERT INTO characterQuest (characterId, questId, isComplete, killedMonsters) VALUES (@characterId, @questId, @isComplete, @killedMonsters)",
+            ExecuteNonQuery("INSERT INTO characterquest (characterId, questId, isComplete, killedMonsters) VALUES (@characterId, @questId, @isComplete, @killedMonsters)",
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@questId", characterQuest.questId),
                 new MySqlParameter("@isComplete", characterQuest.isComplete),
@@ -57,7 +57,7 @@ namespace Insthync.MMOG
 
         public override CharacterQuest ReadCharacterQuest(string characterId, string questId)
         {
-            var reader = ExecuteReader("SELECT * FROM characterQuest WHERE characterId=@characterId AND questId=@questId LIMIT 1",
+            var reader = ExecuteReader("SELECT * FROM characterquest WHERE characterId=@characterId AND questId=@questId LIMIT 1",
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@questId", questId));
             CharacterQuest result;
@@ -68,7 +68,7 @@ namespace Insthync.MMOG
         public override List<CharacterQuest> ReadCharacterQuests(string characterId)
         {
             var result = new List<CharacterQuest>();
-            var reader = ExecuteReader("SELECT * FROM characterQuest WHERE characterId=@characterId",
+            var reader = ExecuteReader("SELECT * FROM characterquest WHERE characterId=@characterId",
                 new MySqlParameter("@characterId", characterId));
             CharacterQuest tempQuest;
             while (ReadCharacterQuest(reader, out tempQuest, false))
@@ -80,7 +80,7 @@ namespace Insthync.MMOG
 
         public override void UpdateCharacterQuest(string characterId, CharacterQuest characterQuest)
         {
-            ExecuteNonQuery("UPDATE characterQuest SET isComplete=@isComplete, killedMonsters=@killedMonsters WHERE characterId=@characterId AND questId=@questId",
+            ExecuteNonQuery("UPDATE characterquest SET isComplete=@isComplete, killedMonsters=@killedMonsters WHERE characterId=@characterId AND questId=@questId",
                 new MySqlParameter("@isComplete", characterQuest.isComplete),
                 new MySqlParameter("@killedMonsters", WriteKillMonsters(characterQuest.killedMonsters)),
                 new MySqlParameter("@characterId", characterId),
@@ -89,7 +89,7 @@ namespace Insthync.MMOG
 
         public override void DeleteCharacterQuest(string characterId, string questId)
         {
-            ExecuteNonQuery("DELETE FROM characterQuest WHERE characterId=@characterId AND questId=@questId",
+            ExecuteNonQuery("DELETE FROM characterquest WHERE characterId=@characterId AND questId=@questId",
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@questId", questId));
         }

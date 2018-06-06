@@ -6,7 +6,9 @@ namespace Insthync.MMOG
 {
     public abstract class BaseDatabase : MonoBehaviour
     {
-        public abstract bool ValidateUserLogin(string username, string password);
+        public abstract void Connect();
+        public abstract void Disconnect();
+        public abstract bool ValidateUserLogin(string username, string password, out string userId);
         public abstract void CreateUserLogin(string username, string password);
         public abstract long FindUsername(string username);
 

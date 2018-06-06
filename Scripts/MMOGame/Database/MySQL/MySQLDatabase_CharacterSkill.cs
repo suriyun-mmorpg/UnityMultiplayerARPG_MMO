@@ -26,7 +26,7 @@ namespace Insthync.MMOG
 
         public override void CreateCharacterSkill(string characterId, CharacterSkill characterSkill)
         {
-            ExecuteNonQuery("INSERT INTO characterSkill (characterId, skillId, level, coolDownRemainsDuration) VALUES (@characterId, @skillId, @level, @coolDownRemainsDuration)",
+            ExecuteNonQuery("INSERT INTO characterskill (characterId, skillId, level, coolDownRemainsDuration) VALUES (@characterId, @skillId, @level, @coolDownRemainsDuration)",
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@skillId", characterSkill.skillId),
                 new MySqlParameter("@level", characterSkill.level),
@@ -35,7 +35,7 @@ namespace Insthync.MMOG
 
         public override CharacterSkill ReadCharacterSkill(string characterId, string skillId)
         {
-            var reader = ExecuteReader("SELECT * FROM characterSkill WHERE characterId=@characterId AND skillId=@skillId LIMIT 1",
+            var reader = ExecuteReader("SELECT * FROM characterskill WHERE characterId=@characterId AND skillId=@skillId LIMIT 1",
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@skillId", skillId));
             CharacterSkill result;
@@ -46,7 +46,7 @@ namespace Insthync.MMOG
         public override List<CharacterSkill> ReadCharacterSkills(string characterId)
         {
             var result = new List<CharacterSkill>();
-            var reader = ExecuteReader("SELECT * FROM characterSkill WHERE characterId=@characterId",
+            var reader = ExecuteReader("SELECT * FROM characterskill WHERE characterId=@characterId",
                 new MySqlParameter("@characterId", characterId));
             CharacterSkill tempSkill;
             while (ReadCharacterSkill(reader, out tempSkill, false))
@@ -58,7 +58,7 @@ namespace Insthync.MMOG
 
         public override void UpdateCharacterSkill(string characterId, CharacterSkill characterSkill)
         {
-            ExecuteNonQuery("UPDATE characterSkill SET level=@level, coolDownRemainsDuration=@coolDownRemainsDuration WHERE characterId=@characterId AND skillId=@skillId",
+            ExecuteNonQuery("UPDATE characterskill SET level=@level, coolDownRemainsDuration=@coolDownRemainsDuration WHERE characterId=@characterId AND skillId=@skillId",
                 new MySqlParameter("@level", characterSkill.level),
                 new MySqlParameter("@coolDownRemainsDuration", characterSkill.coolDownRemainsDuration),
                 new MySqlParameter("@characterId", characterId),
@@ -67,7 +67,7 @@ namespace Insthync.MMOG
 
         public override void DeleteCharacterSkill(string characterId, string skillId)
         {
-            ExecuteNonQuery("DELETE FROM characterSkill WHERE characterId=@characterId AND skillId=@skillId",
+            ExecuteNonQuery("DELETE FROM characterskill WHERE characterId=@characterId AND skillId=@skillId",
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@skillId", skillId));
         }

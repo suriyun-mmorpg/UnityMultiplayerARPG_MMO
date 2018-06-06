@@ -17,8 +17,8 @@ namespace Insthync.MMOG
                 result = new CharacterBuff();
                 result.id = reader.GetString("id");
                 result.characterId = reader.GetInt64("characterId").ToString();
-                result.dataId = reader.GetString("dataId");
                 result.type = (BuffType)reader.GetByte("type");
+                result.dataId = reader.GetString("dataId");
                 result.level = reader.GetInt32("level");
                 result.buffRemainsDuration = reader.GetFloat("buffRemainsDuration");
                 return true;
@@ -29,10 +29,10 @@ namespace Insthync.MMOG
 
         public override void CreateCharacterBuff(string characterId, CharacterBuff characterBuff)
         {
-            ExecuteNonQuery("INSERT INTO characterBuff (id, characterId, type, dataId, level, buffRemainsDuration) VALUES (@id, @characterId, @type, @dataId, @level, @buffRemainsDuration)",
+            ExecuteNonQuery("INSERT INTO characterbuff (id, characterId, type, dataId, level, buffRemainsDuration) VALUES (@id, @characterId, @type, @dataId, @level, @buffRemainsDuration)",
                 new MySqlParameter("@id", characterBuff.id),
                 new MySqlParameter("@characterId", characterId),
-                new MySqlParameter("@type", characterBuff.type),
+                new MySqlParameter("@type", (byte)characterBuff.type),
                 new MySqlParameter("@dataId", characterBuff.dataId),
                 new MySqlParameter("@level", characterBuff.level),
                 new MySqlParameter("@buffRemainsDuration", characterBuff.buffRemainsDuration));
@@ -40,7 +40,7 @@ namespace Insthync.MMOG
 
         public override CharacterBuff ReadCharacterBuff(string characterId, string id)
         {
-            var reader = ExecuteReader("SELECT * FROM characterBuff WHERE id=@id AND characterId=@characterId LIMIT 1",
+            var reader = ExecuteReader("SELECT * FROM characterbuff WHERE id=@id AND characterId=@characterId LIMIT 1",
                 new MySqlParameter("@id", id),
                 new MySqlParameter("@characterId", characterId));
             CharacterBuff result;
@@ -51,7 +51,7 @@ namespace Insthync.MMOG
         public override List<CharacterBuff> ReadCharacterBuffs(string characterId)
         {
             var result = new List<CharacterBuff>();
-            var reader = ExecuteReader("SELECT * FROM characterBuff WHERE applyingCharacterId=@characterId",
+            var reader = ExecuteReader("SELECT * FROM characterbuff WHERE applyingCharacterId=@characterId",
                 new MySqlParameter("@characterId", characterId));
             CharacterBuff tempBuff;
             while (ReadCharacterBuff(reader, out tempBuff, false))
@@ -63,8 +63,8 @@ namespace Insthync.MMOG
 
         public override void UpdateCharacterBuff(string characterId, CharacterBuff characterBuff)
         {
-            ExecuteNonQuery("UPDATE characterBuff SET type=@type, dataId=@dataId, level=@level, buffRemainsDuration=@buffRemainsDuration WHERE id=@id AND characterId=@characterId",
-                new MySqlParameter("@type", characterBuff.type),
+            ExecuteNonQuery("UPDATE characterbuff SET type=@type, dataId=@dataId, level=@level, buffRemainsDuration=@buffRemainsDuration WHERE id=@id AND characterId=@characterId",
+                new MySqlParameter("@type", (byte)characterBuff.type),
                 new MySqlParameter("@dataId", characterBuff.dataId),
                 new MySqlParameter("@level", characterBuff.level),
                 new MySqlParameter("@buffRemainsDuration", characterBuff.buffRemainsDuration),
@@ -74,7 +74,7 @@ namespace Insthync.MMOG
 
         public override void DeleteCharacterBuff(string characterId, string id)
         {
-            ExecuteNonQuery("DELETE FROM characterBuff WHERE id=@id AND characterId=@characterId",
+            ExecuteNonQuery("DELETE FROM characterbuff WHERE id=@id AND characterId=@characterId",
                 new MySqlParameter("@id", id),
                 new MySqlParameter("@characterId", characterId));
         }

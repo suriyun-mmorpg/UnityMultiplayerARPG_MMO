@@ -11,12 +11,12 @@ namespace Insthync.MMOG
         {
             // Delete all character then add all of them
             var characterId = characterData.Id;
-            ExecuteNonQuery("DELETE FROM characterInventory WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
-            ExecuteNonQuery("DELETE FROM characterAttribute WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
-            ExecuteNonQuery("DELETE FROM characterSkill WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
-            ExecuteNonQuery("DELETE FROM characterBuff WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
-            ExecuteNonQuery("DELETE FROM characterHotkey WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
-            ExecuteNonQuery("DELETE FROM characterQuest WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
+            ExecuteNonQuery("DELETE FROM characterinventory WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
+            ExecuteNonQuery("DELETE FROM characterattribute WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
+            ExecuteNonQuery("DELETE FROM characterskill WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
+            ExecuteNonQuery("DELETE FROM characterbuff WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
+            ExecuteNonQuery("DELETE FROM characterhotkey WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
+            ExecuteNonQuery("DELETE FROM characterquest WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
 
             CreateCharacterEquipWeapons(characterId, characterData.EquipWeapons);
             foreach (var equipItem in characterData.EquipItems)
@@ -51,7 +51,7 @@ namespace Insthync.MMOG
 
         public override void CreateCharacter(string userId, PlayerCharacterData characterData)
         {
-            ExecuteInsertData("INSERT INTO character " +
+            ExecuteInsertData("INSERT INTO characters " +
                 "(id, userId, databaseId, characterName, level, exp, currentHp, currentMp, currentStamina, currentFood, currentWater, statPoint, skillPoint, gold, currentMapName, currentPositionX, currentPositionY, currentPositionZ, respawnMapName, respawnPositionX, respawnPositionY, respawnPositionZ) VALUES " +
                 "(@id, @userId, @databaseId, @characterName, @level, @exp, @currentHp, @currentMp, @currentStamina, @currentFood, @currentWater, @statPoint, @skillPoint, @gold, @currentMapName, @currentPositionX, @currentPositionY, @currentPositionZ, @respawnMapName, @respawnPositionX, @respawnPositionY, @respawnPositionZ)",
                 new MySqlParameter("@id", characterData.Id),
@@ -122,7 +122,7 @@ namespace Insthync.MMOG
             bool withHotkeys = true,
             bool withQuests = true)
         {
-            var reader = ExecuteReader("SELECT * FROM character WHERE id=@id LIMIT 1", new MySqlParameter("@id", id));
+            var reader = ExecuteReader("SELECT * FROM characters WHERE id=@id LIMIT 1", new MySqlParameter("@id", id));
             var result = new PlayerCharacterData();
             if (ReadCharacter(reader, out result))
             {
@@ -150,7 +150,7 @@ namespace Insthync.MMOG
         public override List<PlayerCharacterData> ReadCharacters(string userId)
         {
             var result = new List<PlayerCharacterData>();
-            var reader = ExecuteReader("SELECT id FROM character WHERE userId=@userId ORDER BY lastUpdate DESC", new MySqlParameter("@userId", userId));
+            var reader = ExecuteReader("SELECT id FROM characters WHERE userId=@userId ORDER BY lastUpdate DESC", new MySqlParameter("@userId", userId));
             if (reader.Read())
             {
                 var characterId = reader.GetInt64(0).ToString();
@@ -161,7 +161,7 @@ namespace Insthync.MMOG
 
         public override void UpdateCharacter(PlayerCharacterData characterData)
         {
-            ExecuteInsertData("UPDATE character SET " +
+            ExecuteInsertData("UPDATE characters SET " +
                 "databaseId=@databaseId, " +
                 "characterName=@characterName, " +
                 "level=@level, " +
@@ -209,7 +209,7 @@ namespace Insthync.MMOG
 
         public override void DeleteCharacter(string characterId)
         {
-            ExecuteNonQuery("DELETE FROM character WHERE id=@characterId", new MySqlParameter("@characterId", characterId));
+            ExecuteNonQuery("DELETE FROM characters WHERE id=@characterId", new MySqlParameter("@characterId", characterId));
             ExecuteNonQuery("DELETE FROM characterInventory WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
             ExecuteNonQuery("DELETE FROM characterAttribute WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
             ExecuteNonQuery("DELETE FROM characterSkill WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
@@ -220,7 +220,7 @@ namespace Insthync.MMOG
 
         public override long FindCharacterName(string characterName)
         {
-            var result = ExecuteScalar("SELECT COUNT(*) FROM character WHERE characterName=@characterName",
+            var result = ExecuteScalar("SELECT COUNT(*) FROM characters WHERE characterName=@characterName",
                 new MySqlParameter("@characterName", characterName));
             return result != null ? (long)result : 0;
         }

@@ -9,7 +9,7 @@ namespace Insthync.MMOG
     {
         private void CreateCharacterItem(string characterId, InventoryType inventoryType, CharacterItem characterItem)
         {
-            ExecuteNonQuery("INSERT INTO characterInventory (id, inventoryType, characterId, itemId, level, amount) VALUES (@id, @inventoryType, @characterId, @itemId, @level, @amount)",
+            ExecuteNonQuery("INSERT INTO characterinventory (id, inventoryType, characterId, itemId, level, amount) VALUES (@id, @inventoryType, @characterId, @itemId, @level, @amount)",
                 new MySqlParameter("@id", characterItem.id),
                 new MySqlParameter("@inventoryType", inventoryType),
                 new MySqlParameter("@characterId", characterId),
@@ -38,7 +38,7 @@ namespace Insthync.MMOG
 
         private CharacterItem ReadCharacterItem(string characterId, string id)
         {
-            var reader = ExecuteReader("SELECT * FROM characterInventory WHERE characterId=@characterId AND id=@id LIMIT 1",
+            var reader = ExecuteReader("SELECT * FROM characterinventory WHERE characterId=@characterId AND id=@id LIMIT 1",
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@id", id));
             CharacterItem result;
@@ -49,7 +49,7 @@ namespace Insthync.MMOG
         private List<CharacterItem> ReadCharacterItems(string characterId, InventoryType inventoryType)
         {
             var result = new List<CharacterItem>();
-            var reader = ExecuteReader("SELECT * FROM characterInventory WHERE characterId=@characterId AND inventoryType=@inventoryType",
+            var reader = ExecuteReader("SELECT * FROM characterinventory WHERE characterId=@characterId AND inventoryType=@inventoryType",
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@inventoryType", inventoryType));
             CharacterItem tempInventory;
@@ -62,7 +62,7 @@ namespace Insthync.MMOG
 
         private void UpdateCharacterItem(string characterId, CharacterItem characterItem)
         {
-            ExecuteNonQuery("UPDATE characterInventory SET itemId=@itemId, level=@level, amount=@amount WHERE id=@id AND characterId=@characterId",
+            ExecuteNonQuery("UPDATE characterinventory SET itemId=@itemId, level=@level, amount=@amount WHERE id=@id AND characterId=@characterId",
                 new MySqlParameter("@itemId", characterItem.itemId),
                 new MySqlParameter("@level", characterItem.level),
                 new MySqlParameter("@amount", characterItem.amount),
@@ -72,7 +72,7 @@ namespace Insthync.MMOG
 
         private void DeleteCharacterItem(string characterId, string id)
         {
-            ExecuteNonQuery("DELETE FROM characterInventory WHERE id=@id AND characterId=@characterId)",
+            ExecuteNonQuery("DELETE FROM characterinventory WHERE id=@id AND characterId=@characterId)",
                 new MySqlParameter("@id", id),
                 new MySqlParameter("@characterId", characterId));
         }
@@ -81,14 +81,14 @@ namespace Insthync.MMOG
         {
             var result = new EquipWeapons();
             // Right hand weapon
-            var reader = ExecuteReader("SELECT * FROM characterInventory WHERE characterId=@characterId AND inventoryType=@inventoryType LIMIT 1",
+            var reader = ExecuteReader("SELECT * FROM characterinventory WHERE characterId=@characterId AND inventoryType=@inventoryType LIMIT 1",
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@inventoryType", InventoryType.EquipWeaponRight));
             CharacterItem rightWeapon;
             if (ReadCharacterItem(reader, out rightWeapon))
                 result.rightHand = rightWeapon;
             // Left hand weapon
-            reader = ExecuteReader("SELECT * FROM characterInventory WHERE characterId=@characterId AND inventoryType=@inventoryType LIMIT 1",
+            reader = ExecuteReader("SELECT * FROM characterinventory WHERE characterId=@characterId AND inventoryType=@inventoryType LIMIT 1",
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@inventoryType", InventoryType.EquipWeaponLeft));
             CharacterItem leftWeapon;
@@ -111,7 +111,7 @@ namespace Insthync.MMOG
 
         public override void DeleteCharacterEquipWeapons(string characterId)
         {
-            ExecuteNonQuery("DELETE FROM characterInventory WHERE characterId=@characterId AND (inventoryType=@inventoryTypeRight OR inventoryType=@inventoryTypeLeft)",
+            ExecuteNonQuery("DELETE FROM characterinventory WHERE characterId=@characterId AND (inventoryType=@inventoryTypeRight OR inventoryType=@inventoryTypeLeft)",
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@inventoryTypeRight", InventoryType.EquipWeaponRight),
                 new MySqlParameter("@inventoryTypeLeft", InventoryType.EquipWeaponLeft));

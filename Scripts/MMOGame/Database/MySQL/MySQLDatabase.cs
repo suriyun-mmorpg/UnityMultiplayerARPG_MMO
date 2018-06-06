@@ -15,17 +15,33 @@ namespace Insthync.MMOG
         public int port = 3306;
         public string username = "root";
         public string password = "";
-        public string dbName = "MMORPGTemplate";
+        public string dbName = "mmorpgtemplate";
         private MySqlConnection connection;
 
-        private void SetupConnection()
+        public void SetupConnection()
         {
             var connectionString = "Server=" + address + ";" +
                 "Port=" + port + ";" +
                 "Uid=" + username + ";" +
                 (string.IsNullOrEmpty(password) ? "" : "Pwd=\"" + password + "\";") +
                 "Database=" + dbName + ";";
+            if (connection != null)
+                connection.Dispose();
             connection = new MySqlConnection(connectionString);
+        }
+
+        public override void Connect()
+        {
+            SetupConnection();
+        }
+
+        public override void Disconnect()
+        {
+            if (connection != null)
+            {
+                connection.Dispose();
+                connection = null;
+            }
         }
 
         public void SetupConnection(string address, int port, string username, string password, string dbName)
@@ -101,12 +117,20 @@ namespace Insthync.MMOG
             return result;
         }
 
-        public override bool ValidateUserLogin(string username, string password)
+        public override bool ValidateUserLogin(string username, string password, out string userId)
         {
-            var result = ExecuteScalar("SELECT COUNT(*) FROM userLogin WHERE username=@username AND password=@password",
+            userId = string.Empty;
+            var reader = ExecuteReader("SELECT id FROM userLogin WHERE username=@username AND password=@password LIMIT 1",
                 new MySqlParameter("@username", username),
                 new MySqlParameter("@password", password));
-            return result != null && (long)result > 0;
+
+            if (reader.Read())
+            {
+                userId = reader.GetString("userId");
+                return true;
+            }
+
+            return false;
         }
 
         public override void CreateUserLogin(string username, string password)
