@@ -32,7 +32,7 @@ namespace Insthync.MMOG
             {
                 if (selectionManager == null)
                     selectionManager = GetComponent<UIMmoServerEntrySelectionManager>();
-                selectionManager.selectionMode = UISelectionMode.SelectSingle;
+                selectionManager.selectionMode = UISelectionMode.Toggle;
                 return selectionManager;
             }
         }
