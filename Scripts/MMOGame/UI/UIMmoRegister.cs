@@ -76,6 +76,7 @@ namespace Insthync.MMOG
                     UISceneGlobal.Singleton.ShowMessageDialog("Cannot Register", "Connection timeout");
                     break;
                 default:
+                    Hide();
                     break;
             }
         }

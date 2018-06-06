@@ -53,6 +53,7 @@ namespace Insthync.MMOG
                     UISceneGlobal.Singleton.ShowMessageDialog("Cannot Login", "Connection timeout");
                     break;
                 default:
+                    Hide();
                     break;
             }
         }
