@@ -14,6 +14,7 @@ namespace Insthync.MMOG
         public string machineAddress = "127.0.0.1";
         public string centralServerAddress = "127.0.0.1";
         public int centralServerPort = 6000;
+        public string centralServerConnectKey = "SampleConnectKey";
         private CentralNetworkManager cacheCentralNetworkManager;
         public CentralNetworkManager CacheCentralNetworkManager
         {
@@ -47,7 +48,8 @@ namespace Insthync.MMOG
         public void ConnectToCentralServer()
         {
             Debug.Log("[" + PeerType + "] Connecting to Central Server");
-            CacheCentralNetworkManager.StartClient(centralServerAddress, centralServerPort);
+            Debug.Log(centralServerAddress + " " + centralServerPort + " " + centralServerConnectKey);
+            CacheCentralNetworkManager.StartClient(centralServerAddress, centralServerPort, centralServerConnectKey);
         }
 
         public void DisconnectFromCentralServer()
