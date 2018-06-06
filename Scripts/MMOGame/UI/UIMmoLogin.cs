@@ -44,7 +44,7 @@ namespace Insthync.MMOG
                     switch (castedMessage.error)
                     {
                         case ResponseUserLoginMessage.Error.AlreadyLogin:
-                            errorMessage = "User already loggedin";
+                            errorMessage = "User already logged in";
                             break;
                         case ResponseUserLoginMessage.Error.InvalidUsernameOrPassword:
                             errorMessage = "Invalid username or password";

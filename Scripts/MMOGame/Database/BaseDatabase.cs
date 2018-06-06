@@ -24,7 +24,7 @@ namespace Insthync.MMOG
             bool withQuests = true);
         public abstract List<PlayerCharacterData> ReadCharacters(string userId);
         public abstract void UpdateCharacter(PlayerCharacterData characterData);
-        public abstract void DeleteCharacter(string id);
+        public abstract void DeleteCharacter(string userId, string id);
         public abstract long FindCharacterName(string characterName);
 
         public abstract void CreateCharacterEquipWeapons(string characterId, EquipWeapons equipWeapons);

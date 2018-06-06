@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement;
+using LiteNetLibManager;
 
 namespace Insthync.MMOG
 {
@@ -47,6 +47,12 @@ namespace Insthync.MMOG
 
         private void LoadCharacters()
         {
+            MMOClientInstance.Singleton.RequestCharacters(OnLoadCharacters);
+        }
+
+        private void OnLoadCharacters(AckResponseCode responseCode, BaseAckMessage message)
+        {
+            var castedMessage = (ResponseCharactersMessage)message;
             SelectionManager.Clear();
             // Unenabled buttons
             buttonStart.gameObject.SetActive(false);
@@ -54,15 +60,37 @@ namespace Insthync.MMOG
             // Remove all models
             characterModelContainer.RemoveChildren();
             CharacterModels.Clear();
+
+            var selectableCharacters = new List<PlayerCharacterData>();
+
+            switch (responseCode)
+            {
+                case AckResponseCode.Error:
+                    var errorMessage = string.Empty;
+                    switch (castedMessage.error)
+                    {
+                        case ResponseCharactersMessage.Error.NotLoggedin:
+                            errorMessage = "User not logged in";
+                            break;
+                    }
+                    UISceneGlobal.Singleton.ShowMessageDialog("Cannot Load Characters", errorMessage);
+                    break;
+                case AckResponseCode.Timeout:
+                    UISceneGlobal.Singleton.ShowMessageDialog("Cannot Load Characters", "Connection timeout");
+                    break;
+                default:
+                    selectableCharacters = castedMessage.characters;
+                    break;
+            }
+
             // Show list of created characters
-            var selectableCharacters = PlayerCharacterDataExtension.LoadAllPersistentCharacterData();
             selectableCharacters.Sort(new PlayerCharacterDataLastUpdateComparer().Desc());
             CacheList.Generate(selectableCharacters, (index, character, ui) =>
             {
                 var uiCharacter = ui.GetComponent<UICharacter>();
                 uiCharacter.Data = character;
-            // Select trigger when add first entry so deactivate all models is okay beacause first model will active
-            var characterModel = character.InstantiateModel(characterModelContainer);
+                // Select trigger when add first entry so deactivate all models is okay beacause first model will active
+                var characterModel = character.InstantiateModel(characterModelContainer);
                 CharacterModels[character.Id] = characterModel;
                 characterModel.gameObject.SetActive(false);
                 characterModel.SetEquipWeapons(character.EquipWeapons);
@@ -79,6 +107,13 @@ namespace Insthync.MMOG
             buttonDelete.onClick.AddListener(OnClickDelete);
             SelectionManager.eventOnSelect.RemoveListener(OnSelectCharacter);
             SelectionManager.eventOnSelect.AddListener(OnSelectCharacter);
+            SelectionManager.Clear();
+            // Unenabled buttons
+            buttonStart.gameObject.SetActive(false);
+            buttonDelete.gameObject.SetActive(false);
+            // Remove all models
+            characterModelContainer.RemoveChildren();
+            CharacterModels.Clear();
             LoadCharacters();
             base.Show();
         }
@@ -138,9 +173,35 @@ namespace Insthync.MMOG
             }
 
             var playerCharacter = SelectionManager.SelectedUI.Data as IPlayerCharacterData;
-            playerCharacter.DeletePersistentCharacterData();
-            // Reload characters
-            LoadCharacters();
+            MMOClientInstance.Singleton.RequestDeleteCharacter(playerCharacter.Id, OnDeleteCharacter);
+        }
+
+        private void OnDeleteCharacter(AckResponseCode responseCode, BaseAckMessage message)
+        {
+            var castedMessage = (ResponseDeleteCharacterMessage)message;
+
+            var selectableCharacters = new List<PlayerCharacterData>();
+
+            switch (responseCode)
+            {
+                case AckResponseCode.Error:
+                    var errorMessage = string.Empty;
+                    switch (castedMessage.error)
+                    {
+                        case ResponseDeleteCharacterMessage.Error.NotLoggedin:
+                            errorMessage = "User not logged in";
+                            break;
+                    }
+                    UISceneGlobal.Singleton.ShowMessageDialog("Cannot Delete Character", errorMessage);
+                    break;
+                case AckResponseCode.Timeout:
+                    UISceneGlobal.Singleton.ShowMessageDialog("Cannot Delete Character", "Connection timeout");
+                    break;
+                default:
+                    // Reload characters
+                    LoadCharacters();
+                    break;
+            }
         }
     }
 }

@@ -18,6 +18,12 @@ namespace Insthync.MMOG
             public const short ResponseUserRegister = 7;
             public const short RequestUserLogout = 8;
             public const short ResponseUserLogout = 9;
+            public const short RequestCharacters = 10;
+            public const short ResponseCharacters = 11;
+            public const short RequestCreateCharacter = 12;
+            public const short ResponseCreateCharacter = 13;
+            public const short RequestDeleteCharacter = 14;
+            public const short ResponseDeleteCharacter = 15;
         }
 
         public readonly Dictionary<long, CentralServerPeerInfo> mapSpawnServerPeers = new Dictionary<long, CentralServerPeerInfo>();
@@ -32,6 +38,8 @@ namespace Insthync.MMOG
         public int minUsernameLength = 2;
         public int maxUsernameLength = 24;
         public int minPasswordLength = 2;
+        public int minCharacterNameLength = 2;
+        public int maxCharacterNameLength = 16;
 
         public System.Action<NetPeer> onClientConnected;
         public System.Action<NetPeer, DisconnectInfo> onClientDisconnected;
@@ -46,6 +54,9 @@ namespace Insthync.MMOG
             RegisterServerMessage(CentralMsgTypes.RequestUserLogin, HandleRequestUserLogin);
             RegisterServerMessage(CentralMsgTypes.RequestUserRegister, HandleRequestUserRegister);
             RegisterServerMessage(CentralMsgTypes.RequestUserLogout, HandleRequestUserLogout);
+            RegisterServerMessage(CentralMsgTypes.RequestCharacters, HandleRequestCharacters);
+            RegisterServerMessage(CentralMsgTypes.RequestCreateCharacter, HandleRequestCreateCharacter);
+            RegisterServerMessage(CentralMsgTypes.RequestDeleteCharacter, HandleRequestDeleteCharacter);
         }
 
         protected override void RegisterClientMessages()
@@ -56,6 +67,9 @@ namespace Insthync.MMOG
             RegisterClientMessage(CentralMsgTypes.ResponseUserLogin, HandleResponseUserLogin);
             RegisterClientMessage(CentralMsgTypes.ResponseUserRegister, HandleResponseUserRegister);
             RegisterClientMessage(CentralMsgTypes.ResponseUserLogout, HandleResponseUserLogout);
+            RegisterClientMessage(CentralMsgTypes.ResponseCharacters, HandleResponseCharacters);
+            RegisterClientMessage(CentralMsgTypes.ResponseCreateCharacter, HandleResponseCreateCharacter);
+            RegisterClientMessage(CentralMsgTypes.ResponseDeleteCharacter, HandleResponseDeleteCharacter);
         }
 
         public override void OnPeerDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)

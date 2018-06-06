@@ -48,6 +48,11 @@ namespace Insthync.MMOG
             return (System.DateTime)data[currentRow][index];
         }
 
+        public System.DateTime GetDateTime(string columnName)
+        {
+            return (System.DateTime)dataDict[currentRow][columnName];
+        }
+
         public byte GetByte(int index)
         {
             return (byte)data[currentRow][index];

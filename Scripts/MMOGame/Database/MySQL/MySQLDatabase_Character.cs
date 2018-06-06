@@ -104,7 +104,7 @@ namespace Insthync.MMOG
                 result.CurrentPosition = new Vector3(reader.GetFloat("currentPositionX"), reader.GetFloat("currentPositionY"), reader.GetFloat("currentPositionZ"));
                 result.RespawnMapName = reader.GetString("respawnMapName");
                 result.RespawnPosition = new Vector3(reader.GetFloat("respawnPositionX"), reader.GetFloat("respawnPositionY"), reader.GetFloat("respawnPositionZ"));
-                result.LastUpdate = reader.GetInt32("lastUpdate");
+                result.LastUpdate = (int)(reader.GetDateTime("updateAt").Ticks / System.TimeSpan.TicksPerMillisecond);
                 return true;
             }
             result = null;
@@ -150,10 +150,10 @@ namespace Insthync.MMOG
         public override List<PlayerCharacterData> ReadCharacters(string userId)
         {
             var result = new List<PlayerCharacterData>();
-            var reader = ExecuteReader("SELECT id FROM characters WHERE userId=@userId ORDER BY lastUpdate DESC", new MySqlParameter("@userId", userId));
+            var reader = ExecuteReader("SELECT id FROM characters WHERE userId=@userId ORDER BY updateAt DESC", new MySqlParameter("@userId", userId));
             if (reader.Read())
             {
-                var characterId = reader.GetInt64(0).ToString();
+                var characterId = reader.GetString("id");
                 result.Add(ReadCharacter(characterId, true, true, true, false, true, false, false, false));
             }
             return result;
@@ -207,20 +207,27 @@ namespace Insthync.MMOG
             FillCharacterRelatesData(characterData);
         }
 
-        public override void DeleteCharacter(string characterId)
+        public override void DeleteCharacter(string userId, string id)
         {
-            ExecuteNonQuery("DELETE FROM characters WHERE id=@characterId", new MySqlParameter("@characterId", characterId));
-            ExecuteNonQuery("DELETE FROM characterInventory WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
-            ExecuteNonQuery("DELETE FROM characterAttribute WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
-            ExecuteNonQuery("DELETE FROM characterSkill WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
-            ExecuteNonQuery("DELETE FROM characterBuff WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
-            ExecuteNonQuery("DELETE FROM characterHotkey WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
-            ExecuteNonQuery("DELETE FROM characterQuest WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
+            var result = ExecuteScalar("SELECT COUNT(*) FROM characters WHERE id=@id AND userId=@userId",
+                new MySqlParameter("@id", id),
+                new MySqlParameter("@userId", userId));
+            var count = result != null ? (long)result : 0;
+            if (count > 0)
+            {
+                ExecuteNonQuery("DELETE FROM characters WHERE id=@characterId", new MySqlParameter("@characterId", id));
+                ExecuteNonQuery("DELETE FROM characterInventory WHERE characterId=@characterId", new MySqlParameter("@characterId", id));
+                ExecuteNonQuery("DELETE FROM characterAttribute WHERE characterId=@characterId", new MySqlParameter("@characterId", id));
+                ExecuteNonQuery("DELETE FROM characterSkill WHERE characterId=@characterId", new MySqlParameter("@characterId", id));
+                ExecuteNonQuery("DELETE FROM characterBuff WHERE characterId=@characterId", new MySqlParameter("@characterId", id));
+                ExecuteNonQuery("DELETE FROM characterHotkey WHERE characterId=@characterId", new MySqlParameter("@characterId", id));
+                ExecuteNonQuery("DELETE FROM characterQuest WHERE characterId=@characterId", new MySqlParameter("@characterId", id));
+            }
         }
 
         public override long FindCharacterName(string characterName)
         {
-            var result = ExecuteScalar("SELECT COUNT(*) FROM characters WHERE characterName=@characterName",
+            var result = ExecuteScalar("SELECT COUNT(*) FROM characters WHERE characterName LIKE @characterName",
                 new MySqlParameter("@characterName", characterName));
             return result != null ? (long)result : 0;
         }

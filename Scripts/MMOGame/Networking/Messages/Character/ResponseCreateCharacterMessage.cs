@@ -7,14 +7,25 @@ namespace Insthync.MMOG
 {
     public class ResponseCreateCharacterMessage : BaseAckMessage
     {
+        public enum Error : byte
+        {
+            None,
+            NotLoggedin,
+            InvalidData,
+            TooShortCharacterName,
+            TooLongCharacterName,
+            CharacterNameAlreadyExisted,
+        }
+        public Error error;
+
         public override void DeserializeData(NetDataReader reader)
         {
-            throw new System.NotImplementedException();
+            error = (Error)reader.GetByte();
         }
 
         public override void SerializeData(NetDataWriter writer)
         {
-            throw new System.NotImplementedException();
+            writer.Put((byte)error);
         }
     }
 }

@@ -9,8 +9,8 @@ namespace Insthync.MMOG
     public class UIMmoSceneHome : UIHistory
     {
         public UIMmoLogin uiLogin;
-        public UIMmoCharacterCreate uiCharacterCreate;
         public UIMmoCharacterList uiCharacterList;
+        public UIMmoCharacterCreate uiCharacterCreate;
 
         private void OnEnable()
         {

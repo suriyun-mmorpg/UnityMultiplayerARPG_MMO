@@ -94,6 +94,21 @@ namespace Insthync.MMOG
         {
             centralNetworkManager.RequestUserLogout(callback);
         }
+
+        public void RequestCharacters(AckMessageCallback callback)
+        {
+            centralNetworkManager.RequestCharacters(callback);
+        }
+
+        public void RequestCreateCharacter(string characterName, string databaseId, AckMessageCallback callback)
+        {
+            centralNetworkManager.RequestCreateCharacter(characterName, databaseId, callback);
+        }
+
+        public void RequestDeleteCharacter(string characterId, AckMessageCallback callback)
+        {
+            centralNetworkManager.RequestDeleteCharacter(characterId, callback);
+        }
         #endregion
     }
 }

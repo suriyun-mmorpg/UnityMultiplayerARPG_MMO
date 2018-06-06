@@ -143,7 +143,7 @@ namespace Insthync.MMOG
 
         public override long FindUsername(string username)
         {
-            var result = ExecuteScalar("SELECT COUNT(*) FROM userLogin WHERE username=@username", 
+            var result = ExecuteScalar("SELECT COUNT(*) FROM userLogin WHERE username LIKE @username", 
                 new MySqlParameter("@username", username));
             return result != null ? (long)result : 0;
         }

@@ -11,8 +11,8 @@ namespace Insthync.MMOG
         {
             None,
             TooShortUsername,
-            TooShortPassword,
             TooLongUsername,
+            TooShortPassword,
             UsernameAlreadyExisted,
         }
         public Error error;

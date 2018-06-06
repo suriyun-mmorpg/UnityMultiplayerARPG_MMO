@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using LiteNetLibManager;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -71,8 +72,8 @@ namespace Insthync.MMOG
                 characterData.SetNewCharacterData(character.title, character.Id);
                 var uiCharacter = ui.GetComponent<UICharacter>();
                 uiCharacter.Setup(characterData, databaseId);
-            // Select trigger when add first entry so deactivate all models is okay beacause first model will active
-            var characterModel = characterData.InstantiateModel(characterModelContainer);
+                // Select trigger when add first entry so deactivate all models is okay beacause first model will active
+                var characterModel = characterData.InstantiateModel(characterModelContainer);
                 CharacterModels[characterData.Id] = characterModel;
                 characterModel.gameObject.SetActive(false);
                 SelectionManager.Add(uiCharacter);
@@ -110,31 +111,48 @@ namespace Insthync.MMOG
                 Debug.LogWarning("Cannot create character, did not selected character class");
                 return;
             }
-            var prototypeId = selectedUI.databaseId;
+            var databaseId = selectedUI.databaseId;
             var characterName = inputCharacterName.text.Trim();
-            var minCharacterNameLength = gameInstance.minCharacterNameLength;
-            var maxCharacterNameLength = gameInstance.maxCharacterNameLength;
-            if (characterName.Length < minCharacterNameLength)
-            {
-                UISceneGlobal.Singleton.ShowMessageDialog("Cannot create character", "Character name is too short");
-                Debug.LogWarning("Cannot create character, character name is too short");
-                return;
-            }
-            if (characterName.Length > maxCharacterNameLength)
-            {
-                UISceneGlobal.Singleton.ShowMessageDialog("Cannot create character", "Character name is too long");
-                Debug.LogWarning("Cannot create character, character name is too long");
-                return;
-            }
 
-            var characterId = System.Guid.NewGuid().ToString();
-            var characterData = new PlayerCharacterData();
-            characterData.Id = characterId;
-            characterData.SetNewCharacterData(characterName, prototypeId);
-            characterData.SavePersistentCharacterData();
+            MMOClientInstance.Singleton.RequestCreateCharacter(characterName, databaseId, OnCreateCharacter);
+        }
 
-            if (eventOnCreateCharacter != null)
-                eventOnCreateCharacter.Invoke();
+        private void OnCreateCharacter(AckResponseCode responseCode, BaseAckMessage message)
+        {
+            var castedMessage = (ResponseCreateCharacterMessage)message;
+
+            switch (responseCode)
+            {
+                case AckResponseCode.Error:
+                    var errorMessage = string.Empty;
+                    switch (castedMessage.error)
+                    {
+                        case ResponseCreateCharacterMessage.Error.NotLoggedin:
+                            errorMessage = "User not logged in";
+                            break;
+                        case ResponseCreateCharacterMessage.Error.InvalidData:
+                            errorMessage = "Invalid data";
+                            break;
+                        case ResponseCreateCharacterMessage.Error.TooShortCharacterName:
+                            errorMessage = "Character name is too short";
+                            break;
+                        case ResponseCreateCharacterMessage.Error.TooLongCharacterName:
+                            errorMessage = "Character name is too long";
+                            break;
+                        case ResponseCreateCharacterMessage.Error.CharacterNameAlreadyExisted:
+                            errorMessage = "Character name is already existed";
+                            break;
+                    }
+                    UISceneGlobal.Singleton.ShowMessageDialog("Cannot Create Characters", errorMessage);
+                    break;
+                case AckResponseCode.Timeout:
+                    UISceneGlobal.Singleton.ShowMessageDialog("Cannot Create Characters", "Connection timeout");
+                    break;
+                default:
+                    if (eventOnCreateCharacter != null)
+                        eventOnCreateCharacter.Invoke();
+                    break;
+            }
         }
     }
 }
