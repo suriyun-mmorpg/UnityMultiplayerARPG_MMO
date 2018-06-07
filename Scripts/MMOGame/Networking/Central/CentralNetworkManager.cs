@@ -6,26 +6,6 @@ namespace Insthync.MMOG
 {
     public partial class CentralNetworkManager : LiteNetLibManager.LiteNetLibManager
     {
-        public class CentralMsgTypes
-        {
-            public const short RequestAppServerRegister = 0;
-            public const short ResponseAppServerRegister = 1;
-            public const short RequestAppServerAddress = 2;
-            public const short ResponseAppServerAddress = 3;
-            public const short RequestUserLogin = 4;
-            public const short ResponseUserLogin = 5;
-            public const short RequestUserRegister = 6;
-            public const short ResponseUserRegister = 7;
-            public const short RequestUserLogout = 8;
-            public const short ResponseUserLogout = 9;
-            public const short RequestCharacters = 10;
-            public const short ResponseCharacters = 11;
-            public const short RequestCreateCharacter = 12;
-            public const short ResponseCreateCharacter = 13;
-            public const short RequestDeleteCharacter = 14;
-            public const short ResponseDeleteCharacter = 15;
-        }
-
         public readonly Dictionary<long, CentralServerPeerInfo> mapSpawnServerPeers = new Dictionary<long, CentralServerPeerInfo>();
         public readonly Dictionary<long, CentralServerPeerInfo> mapServerPeers = new Dictionary<long, CentralServerPeerInfo>();
         public readonly Dictionary<string, CentralServerPeerInfo> mapServerPeersByMapName = new Dictionary<string, CentralServerPeerInfo>();
@@ -49,27 +29,29 @@ namespace Insthync.MMOG
         protected override void RegisterServerMessages()
         {
             base.RegisterServerMessages();
-            RegisterServerMessage(CentralMsgTypes.RequestAppServerRegister, HandleRequestAppServerRegister);
-            RegisterServerMessage(CentralMsgTypes.RequestAppServerAddress, HandleRequestAppServerAddress);
-            RegisterServerMessage(CentralMsgTypes.RequestUserLogin, HandleRequestUserLogin);
-            RegisterServerMessage(CentralMsgTypes.RequestUserRegister, HandleRequestUserRegister);
-            RegisterServerMessage(CentralMsgTypes.RequestUserLogout, HandleRequestUserLogout);
-            RegisterServerMessage(CentralMsgTypes.RequestCharacters, HandleRequestCharacters);
-            RegisterServerMessage(CentralMsgTypes.RequestCreateCharacter, HandleRequestCreateCharacter);
-            RegisterServerMessage(CentralMsgTypes.RequestDeleteCharacter, HandleRequestDeleteCharacter);
+            RegisterServerMessage(MessageTypes.RequestAppServerRegister, HandleRequestAppServerRegister);
+            RegisterServerMessage(MessageTypes.RequestAppServerAddress, HandleRequestAppServerAddress);
+            RegisterServerMessage(MessageTypes.RequestUserLogin, HandleRequestUserLogin);
+            RegisterServerMessage(MessageTypes.RequestUserRegister, HandleRequestUserRegister);
+            RegisterServerMessage(MessageTypes.RequestUserLogout, HandleRequestUserLogout);
+            RegisterServerMessage(MessageTypes.RequestCharacters, HandleRequestCharacters);
+            RegisterServerMessage(MessageTypes.RequestCreateCharacter, HandleRequestCreateCharacter);
+            RegisterServerMessage(MessageTypes.RequestDeleteCharacter, HandleRequestDeleteCharacter);
+            RegisterServerMessage(MessageTypes.RequestSelectCharacter, HandleRequestSelectCharacter);
         }
 
         protected override void RegisterClientMessages()
         {
             base.RegisterClientMessages();
-            RegisterClientMessage(CentralMsgTypes.ResponseAppServerRegister, HandleResponseAppServerRegister);
-            RegisterClientMessage(CentralMsgTypes.ResponseAppServerAddress, HandleResponseAppServerAddress);
-            RegisterClientMessage(CentralMsgTypes.ResponseUserLogin, HandleResponseUserLogin);
-            RegisterClientMessage(CentralMsgTypes.ResponseUserRegister, HandleResponseUserRegister);
-            RegisterClientMessage(CentralMsgTypes.ResponseUserLogout, HandleResponseUserLogout);
-            RegisterClientMessage(CentralMsgTypes.ResponseCharacters, HandleResponseCharacters);
-            RegisterClientMessage(CentralMsgTypes.ResponseCreateCharacter, HandleResponseCreateCharacter);
-            RegisterClientMessage(CentralMsgTypes.ResponseDeleteCharacter, HandleResponseDeleteCharacter);
+            RegisterClientMessage(MessageTypes.ResponseAppServerRegister, HandleResponseAppServerRegister);
+            RegisterClientMessage(MessageTypes.ResponseAppServerAddress, HandleResponseAppServerAddress);
+            RegisterClientMessage(MessageTypes.ResponseUserLogin, HandleResponseUserLogin);
+            RegisterClientMessage(MessageTypes.ResponseUserRegister, HandleResponseUserRegister);
+            RegisterClientMessage(MessageTypes.ResponseUserLogout, HandleResponseUserLogout);
+            RegisterClientMessage(MessageTypes.ResponseCharacters, HandleResponseCharacters);
+            RegisterClientMessage(MessageTypes.ResponseCreateCharacter, HandleResponseCreateCharacter);
+            RegisterClientMessage(MessageTypes.ResponseDeleteCharacter, HandleResponseDeleteCharacter);
+            RegisterClientMessage(MessageTypes.ResponseSelectCharacter, HandleResponseSelectCharacter);
         }
 
         public override void OnPeerDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)

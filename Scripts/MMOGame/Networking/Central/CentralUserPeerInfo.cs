@@ -10,20 +10,17 @@ namespace Insthync.MMOG
     {
         public string userId;
         public string selectCharacterId;
-        public string currentMap;
 
         public void Deserialize(NetDataReader reader)
         {
             userId = reader.GetString();
             selectCharacterId = reader.GetString();
-            currentMap = reader.GetString();
         }
 
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(userId);
             writer.Put(selectCharacterId);
-            writer.Put(currentMap);
         }
     }
 }

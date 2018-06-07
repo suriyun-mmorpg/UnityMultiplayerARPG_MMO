@@ -15,7 +15,7 @@ namespace Insthync.MMOG
         {
             var message = new RequestAppServerRegisterMessage();
             message.peerInfo = peerInfo;
-            return SendAckPacket(SendOptions.ReliableUnordered, Client.Peer, CentralMsgTypes.RequestAppServerRegister, message, callback);
+            return SendAckPacket(SendOptions.ReliableUnordered, Client.Peer, MessageTypes.RequestAppServerRegister, message, callback);
         }
 
         public uint RequestAppServerAddress(CentralServerPeerType peerType, string extra, AckMessageCallback callback)
@@ -23,7 +23,7 @@ namespace Insthync.MMOG
             var message = new RequestAppServerAddressMessage();
             message.peerType = peerType;
             message.extra = extra;
-            return SendAckPacket(SendOptions.ReliableUnordered, Client.Peer, CentralMsgTypes.RequestAppServerAddress, message, callback);
+            return SendAckPacket(SendOptions.ReliableUnordered, Client.Peer, MessageTypes.RequestAppServerAddress, message, callback);
         }
 
         protected void HandleRequestAppServerRegister(LiteNetLibMessageHandler messageHandler)
@@ -66,7 +66,7 @@ namespace Insthync.MMOG
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = error == ResponseAppServerRegisterMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
             responseMessage.error = error;
-            SendPacket(SendOptions.ReliableUnordered, peer, CentralMsgTypes.ResponseAppServerRegister, responseMessage);
+            SendPacket(SendOptions.ReliableUnordered, peer, MessageTypes.ResponseAppServerRegister, responseMessage);
         }
 
         protected void HandleRequestAppServerAddress(LiteNetLibMessageHandler messageHandler)
@@ -104,7 +104,7 @@ namespace Insthync.MMOG
             responseMessage.responseCode = error == ResponseAppServerAddressMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
             responseMessage.error = error;
             responseMessage.peerInfo = peerInfo;
-            SendPacket(SendOptions.ReliableUnordered, peer, CentralMsgTypes.ResponseAppServerAddress, responseMessage);
+            SendPacket(SendOptions.ReliableUnordered, peer, MessageTypes.ResponseAppServerAddress, responseMessage);
         }
 
         protected void HandleResponseAppServerRegister(LiteNetLibMessageHandler messageHandler)
