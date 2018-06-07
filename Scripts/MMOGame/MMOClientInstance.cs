@@ -70,9 +70,10 @@ namespace Insthync.MMOG
             StartCentralClient();
         }
 
-        public void StartMapClient()
+        public void StartMapClient(string sceneName, string address, int port, string connectKey)
         {
-            mapNetworkManager.StartClient();
+            mapNetworkManager.Assets.onlineScene.SceneName = sceneName;
+            mapNetworkManager.StartClient(address, port, connectKey);
         }
 
         public bool IsConnectedToCentralServer()
@@ -108,6 +109,11 @@ namespace Insthync.MMOG
         public void RequestDeleteCharacter(string characterId, AckMessageCallback callback)
         {
             centralNetworkManager.RequestDeleteCharacter(characterId, callback);
+        }
+
+        public void RequestSelectCharacter(string characterId, AckMessageCallback callback)
+        {
+            centralNetworkManager.RequestSelectCharacter(characterId, callback);
         }
         #endregion
     }
