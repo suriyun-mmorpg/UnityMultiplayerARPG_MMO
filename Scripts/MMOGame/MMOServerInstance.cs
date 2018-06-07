@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using LiteNetLibManager;
 
 namespace Insthync.MMOG
 {
@@ -35,6 +36,9 @@ namespace Insthync.MMOG
         public MapSpawnNetworkManager MapSpawnNetworkManager { get { return mapSpawnNetworkManager; } }
         public MapNetworkManager MapNetworkManager { get { return mapNetworkManager; } }
         public BaseDatabase Database { get { return database; } }
+
+        [Header("Gameplay Configs")]
+        public LiteNetLibScene[] scenes;
 
         [Header("Running In Editor")]
         public bool startCentralOnAwake;
