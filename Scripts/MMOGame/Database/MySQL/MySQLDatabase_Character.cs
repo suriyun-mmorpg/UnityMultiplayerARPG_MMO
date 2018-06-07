@@ -54,7 +54,7 @@ namespace Insthync.MMOG
 
         public override async Task CreateCharacter(string userId, PlayerCharacterData characterData)
         {
-            await ExecuteInsertData("INSERT INTO characters " +
+            await ExecuteNonQuery("INSERT INTO characters " +
                 "(id, userId, databaseId, characterName, level, exp, currentHp, currentMp, currentStamina, currentFood, currentWater, statPoint, skillPoint, gold, currentMapName, currentPositionX, currentPositionY, currentPositionZ, respawnMapName, respawnPositionX, respawnPositionY, respawnPositionZ) VALUES " +
                 "(@id, @userId, @databaseId, @characterName, @level, @exp, @currentHp, @currentMp, @currentStamina, @currentFood, @currentWater, @statPoint, @skillPoint, @gold, @currentMapName, @currentPositionX, @currentPositionY, @currentPositionZ, @respawnMapName, @respawnPositionX, @respawnPositionY, @respawnPositionZ)",
                 new MySqlParameter("@id", characterData.Id),
@@ -164,7 +164,7 @@ namespace Insthync.MMOG
 
         public override async Task UpdateCharacter(PlayerCharacterData characterData)
         {
-            await ExecuteInsertData("UPDATE characters SET " +
+            await ExecuteNonQuery("UPDATE characters SET " +
                 "databaseId=@databaseId, " +
                 "characterName=@characterName, " +
                 "level=@level, " +
