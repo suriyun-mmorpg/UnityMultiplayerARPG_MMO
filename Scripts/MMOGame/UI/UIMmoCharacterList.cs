@@ -105,9 +105,11 @@ namespace Insthync.MMOG
             buttonStart.onClick.AddListener(OnClickStart);
             buttonDelete.onClick.RemoveListener(OnClickDelete);
             buttonDelete.onClick.AddListener(OnClickDelete);
+            // Clear selection
             SelectionManager.eventOnSelect.RemoveListener(OnSelectCharacter);
             SelectionManager.eventOnSelect.AddListener(OnSelectCharacter);
             SelectionManager.Clear();
+            CacheList.HideAll();
             // Unenabled buttons
             buttonStart.gameObject.SetActive(false);
             buttonDelete.gameObject.SetActive(false);
