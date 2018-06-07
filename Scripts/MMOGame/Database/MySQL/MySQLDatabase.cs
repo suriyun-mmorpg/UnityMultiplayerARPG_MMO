@@ -24,8 +24,6 @@ namespace Insthync.MMOG
         [SerializeField]
         private string dbName = "mmorpgtemplate";
         private MySqlConnection connection;
-        private bool doingTransaction;
-        private string transactionCommand;
 
         private void Awake()
         {

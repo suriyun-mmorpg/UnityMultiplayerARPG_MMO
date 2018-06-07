@@ -12,7 +12,8 @@ namespace Insthync.MMOG
         public abstract Task<long> FindUsername(string username);
 
         public abstract Task CreateCharacter(string userId, PlayerCharacterData characterData);
-        public abstract Task<PlayerCharacterData> ReadCharacter(string id, 
+        public abstract Task<PlayerCharacterData> ReadCharacter(string userId, 
+            string id,
             bool withEquipWeapons = true, 
             bool withAttributes = true, 
             bool withSkills = true, 

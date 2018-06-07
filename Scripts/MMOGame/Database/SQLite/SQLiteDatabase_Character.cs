@@ -115,6 +115,7 @@ namespace Insthync.MMOG
         }
 
         public override async Task<PlayerCharacterData> ReadCharacter(
+            string userId,
             string id,
             bool withEquipWeapons = true,
             bool withAttributes = true,
@@ -125,7 +126,9 @@ namespace Insthync.MMOG
             bool withHotkeys = true,
             bool withQuests = true)
         {
-            var reader = await ExecuteReader("SELECT * FROM characters WHERE id=@id LIMIT 1", new SqliteParameter("@id", id));
+            var reader = await ExecuteReader("SELECT * FROM characters WHERE id=@id AND userId=@userId LIMIT 1",
+                new SqliteParameter("@id", id),
+                new SqliteParameter("@userId", userId));
             var result = new PlayerCharacterData();
             if (ReadCharacter(reader, out result))
             {
@@ -157,7 +160,7 @@ namespace Insthync.MMOG
             while (reader.Read())
             {
                 var characterId = reader.GetString("id");
-                result.Add(await ReadCharacter(characterId, true, true, true, false, true, false, false, false));
+                result.Add(await ReadCharacter(characterId, userId, true, true, true, false, true, false, false, false));
             }
             return result;
         }
