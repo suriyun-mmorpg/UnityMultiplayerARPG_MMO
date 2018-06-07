@@ -1,6 +1,7 @@
 ﻿using Mono.Data.Sqlite;
-using System;
+using System.IO;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace Insthync.MMOG
 {
@@ -13,49 +14,28 @@ namespace Insthync.MMOG
             EquipWeaponRight,
             EquipWeaponLeft,
         }
-        public string address = "127.0.0.1";
-        public int port = 3306;
-        public string username = "root";
-        public string password = "";
-        public string dbName = "mmorpgtemplate";
+        public string dbPath = "./mmorpgtemplate.sqlite3";
 
         public string GetConnectionString()
         {
-            var connectionString = "Server=" + address + ";" +
-                "Port=" + port + ";" +
-                "Uid=" + username + ";" +
-                (string.IsNullOrEmpty(password) ? "" : "Pwd=\"" + password + "\";") +
-                "Database=" + dbName + ";";
-            return connectionString;
-        }
-
-        public void SetupConnection(string address, int port, string username, string password, string dbName)
-        {
-            this.address = address;
-            this.port = port;
-            this.username = username;
-            this.password = password;
-            this.dbName = dbName;
-        }
-
-        public async Task<long> ExecuteInsertData(string sql, params SqliteParameter[] args)
-        {
-            long result = 0;
-            using (var connection = new SqliteConnection(GetConnectionString()))
+            if (Application.isMobilePlatform)
             {
-                connection.Open();
-                using (var cmd = new SqliteCommand(sql, connection))
-                {
-                    foreach (var arg in args)
-                    {
-                        cmd.Parameters.Add(arg);
-                    }
-                    var task = await cmd.ExecuteNonQueryAsync();
-                    result = cmd.LastInsertedId;
-                }
-                connection.Close();
+                if (dbPath.StartsWith("./"))
+                    dbPath = dbPath.Substring(1);
+                if (!dbPath.StartsWith("/"))
+                    dbPath = "/" + dbPath;
+                dbPath = Application.persistentDataPath + dbPath;
             }
-            return result;
+
+            if (!File.Exists(dbPath))
+                SqliteConnection.CreateFile(dbPath);
+            
+            return "URI=file:" + dbPath;
+        }
+
+        public void SetupConnection(string dbPath)
+        {
+            this.dbPath = dbPath;
         }
 
         public async Task ExecuteNonQuery(string sql, params SqliteParameter[] args)
