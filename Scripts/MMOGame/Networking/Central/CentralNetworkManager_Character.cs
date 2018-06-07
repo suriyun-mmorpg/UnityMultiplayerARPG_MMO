@@ -108,7 +108,7 @@ namespace Insthync.MMOG
         protected async void HandleRequestSelectCharacter(LiteNetLibMessageHandler messageHandler)
         {
             var peer = messageHandler.peer;
-            var message = messageHandler.ReadMessage<RequestDeleteCharacterMessage>();
+            var message = messageHandler.ReadMessage<RequestSelectCharacterMessage>();
             var error = ResponseSelectCharacterMessage.Error.None;
             CentralServerPeerInfo mapServerPeerInfo = null;
             CentralUserPeerInfo userPeerInfo;
@@ -141,7 +141,7 @@ namespace Insthync.MMOG
                 responseMessage.networkPort = mapServerPeerInfo.networkPort;
                 responseMessage.connectKey = mapServerPeerInfo.connectKey;
             }
-            SendPacket(SendOptions.ReliableUnordered, peer, MessageTypes.ResponseDeleteCharacter, responseMessage);
+            SendPacket(SendOptions.ReliableUnordered, peer, MessageTypes.ResponseSelectCharacter, responseMessage);
         }
 
         protected void HandleResponseCharacters(LiteNetLibMessageHandler messageHandler)
