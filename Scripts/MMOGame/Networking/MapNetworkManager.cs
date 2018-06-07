@@ -11,27 +11,20 @@ namespace Insthync.MMOG
     public class MapNetworkManager : LiteNetLibGameManager
     {
         public static MapNetworkManager Singleton { get; protected set; }
-        public const float RECONNECT_DELAY = 5f;
-        public CentralServerPeerType PeerType { get { return CentralServerPeerType.MapServer; } }
-        [Header("App Server Configs")]
-        public string machineAddress = "127.0.0.1";
-        public string centralServerAddress = "127.0.0.1";
-        public int centralServerPort = 6000;
-        public string centralServerConnectKey = "SampleConnectKey";
-        private CentralNetworkManager cacheCentralNetworkManager;
-        public CentralNetworkManager CacheCentralNetworkManager
+
+        private CentralAppServerConnector cacheCentralAppServerConnector;
+        public CentralAppServerConnector CentralAppServerConnector
         {
             get
             {
-                if (cacheCentralNetworkManager == null)
-                    cacheCentralNetworkManager = gameObject.AddComponent<CentralNetworkManager>();
-                cacheCentralNetworkManager.currentLogLevel = currentLogLevel;
-                return cacheCentralNetworkManager;
+                if (cacheCentralAppServerConnector == null)
+                    cacheCentralAppServerConnector = gameObject.AddComponent<CentralAppServerConnector>();
+                return cacheCentralAppServerConnector;
             }
         }
 
         private RpgGameManager cacheGameManager;
-        public RpgGameManager CacheGameManager
+        public RpgGameManager GameManager
         {
             get
             {
@@ -50,88 +43,39 @@ namespace Insthync.MMOG
 
         public override bool StartServer()
         {
-            CacheGameManager.Init(this);
+            GameManager.Init(this);
             return base.StartServer();
         }
 
         public override LiteNetLibClient StartClient()
         {
-            CacheGameManager.Init(this);
+            GameManager.Init(this);
             return base.StartClient();
         }
 
         public override void OnClientDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
         {
             base.OnClientDisconnected(peer, disconnectInfo);
-            CacheGameManager.OnClientDisconnected(peer, disconnectInfo);
+            GameManager.OnClientDisconnected(peer, disconnectInfo);
         }
 
         public override void OnServerOnlineSceneLoaded()
         {
             base.OnServerOnlineSceneLoaded();
-            CacheGameManager.OnServerOnlineSceneLoaded();
-        }
-
-        protected void OnEnable()
-        {
-            CacheCentralNetworkManager.onClientConnected += OnCentralServerConnected;
-            CacheCentralNetworkManager.onClientDisconnected += OnCentralServerDisconnected;
-        }
-
-        protected void OnDisable()
-        {
-            CacheCentralNetworkManager.onClientConnected -= OnCentralServerConnected;
-            CacheCentralNetworkManager.onClientDisconnected -= OnCentralServerDisconnected;
+            GameManager.OnServerOnlineSceneLoaded();
         }
 
         public override void OnStartServer()
         {
-            Debug.Log("[" + PeerType + "] Starting server");
             base.OnStartServer();
-            ConnectToCentralServer();
+            var extra = !string.IsNullOrEmpty(Assets.onlineScene.SceneName) ? Assets.onlineScene.SceneName : SceneManager.GetActiveScene().name;
+            CentralAppServerConnector.OnStartServer(CentralServerPeerType.MapSpawnServer, networkPort, extra);
         }
 
-        public void ConnectToCentralServer()
+        public override void OnStopServer()
         {
-            Debug.Log("[" + PeerType + "] Connecting to Central Server");
-            CacheCentralNetworkManager.StartClient(centralServerAddress, centralServerPort, centralServerConnectKey);
-        }
-
-        public void DisconnectFromCentralServer()
-        {
-            Debug.Log("[" + PeerType + "] Starting server");
-            CacheCentralNetworkManager.StopClient();
-        }
-
-        public virtual void OnCentralServerConnected(NetPeer netPeer)
-        {
-            Debug.Log("[" + PeerType + "] Connected to Central Server");
-            var peerInfo = new CentralServerPeerInfo();
-            peerInfo.peerType = PeerType;
-            peerInfo.networkAddress = machineAddress;
-            peerInfo.networkPort = networkPort;
-            peerInfo.extra = GetExtra();
-            CacheCentralNetworkManager.RequestAppServerRegister(peerInfo, OnAppServerRegistered);
-        }
-
-        public virtual void OnCentralServerDisconnected(NetPeer netPeer, DisconnectInfo disconnectInfo)
-        {
-            Debug.Log("[" + PeerType + "] Disconnected from Central Server");
-            StartCoroutine(CentralServerReconnectRoutine());
-        }
-
-        IEnumerator CentralServerReconnectRoutine()
-        {
-            Debug.Log("[" + PeerType + "] Reconnect to central in " + RECONNECT_DELAY + " seconds");
-            yield return new WaitForSeconds(RECONNECT_DELAY);
-            ConnectToCentralServer();
-        }
-
-        public virtual void OnAppServerRegistered(AckResponseCode responseCode, BaseAckMessage message) { }
-
-        public virtual string GetExtra()
-        {
-            return Assets.onlineScene;
+            base.OnStopServer();
+            CentralAppServerConnector.OnStopServer();
         }
     }
 }

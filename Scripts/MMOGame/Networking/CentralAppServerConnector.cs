@@ -6,15 +6,20 @@ using LiteNetLibManager;
 
 namespace Insthync.MMOG
 {
-    public abstract class BaseAppServerNetworkManager : LiteNetLibManager.LiteNetLibManager
+    public class CentralAppServerConnector : MonoBehaviour
     {
         public const float RECONNECT_DELAY = 5f;
-        public abstract CentralServerPeerType PeerType { get; }
-        [Header("App Server Configs")]
+
+        [Header("Connection")]
         public string machineAddress = "127.0.0.1";
         public string centralServerAddress = "127.0.0.1";
         public int centralServerPort = 6000;
         public string centralServerConnectKey = "SampleConnectKey";
+        public bool RegisteredToCentralServer { get; private set; }
+        private CentralServerPeerType peerType;
+        private int networkPort;
+        private string extra;
+
         private CentralNetworkManager cacheCentralNetworkManager;
         public CentralNetworkManager CacheCentralNetworkManager
         {
@@ -22,10 +27,10 @@ namespace Insthync.MMOG
             {
                 if (cacheCentralNetworkManager == null)
                     cacheCentralNetworkManager = gameObject.AddComponent<CentralNetworkManager>();
-                cacheCentralNetworkManager.currentLogLevel = currentLogLevel;
                 return cacheCentralNetworkManager;
             }
         }
+        public System.Action<AckResponseCode, BaseAckMessage> onAppServerRegistered;
 
         protected void OnEnable()
         {
@@ -39,54 +44,64 @@ namespace Insthync.MMOG
             CacheCentralNetworkManager.onClientDisconnected -= OnCentralServerDisconnected;
         }
 
-        public override void OnStartServer()
+        public void OnStartServer(CentralServerPeerType peerType, int networkPort, string extra)
         {
-            Debug.Log("[" + PeerType + "] Starting server");
-            base.OnStartServer();
+            this.peerType = peerType;
+            this.networkPort = networkPort;
+            this.extra = extra;
+            Debug.Log("[" + peerType + "] Starting server");
             ConnectToCentralServer();
+        }
+
+        public void OnStopServer()
+        {
+            Debug.Log("[" + peerType + "] Stopping server");
+            DisconnectFromCentralServer();
         }
 
         public void ConnectToCentralServer()
         {
-            Debug.Log("[" + PeerType + "] Connecting to Central Server");
+            Debug.Log("[" + peerType + "] Connecting to Central Server");
             CacheCentralNetworkManager.StartClient(centralServerAddress, centralServerPort, centralServerConnectKey);
         }
 
         public void DisconnectFromCentralServer()
         {
-            Debug.Log("[" + PeerType + "] Disconnecting from Central Server");
+            Debug.Log("[" + peerType + "] Disconnecting from Central Server");
             CacheCentralNetworkManager.StopClient();
         }
 
-        public virtual void OnCentralServerConnected(NetPeer netPeer)
+        public void OnCentralServerConnected(NetPeer netPeer)
         {
-            Debug.Log("[" + PeerType + "] Connected to Central Server");
+            Debug.Log("[" + peerType + "] Connected to Central Server");
             var peerInfo = new CentralServerPeerInfo();
-            peerInfo.peerType = PeerType;
+            peerInfo.peerType = peerType;
             peerInfo.networkAddress = machineAddress;
             peerInfo.networkPort = networkPort;
-            peerInfo.extra = GetExtra();
+            peerInfo.extra = extra;
             CacheCentralNetworkManager.RequestAppServerRegister(peerInfo, OnAppServerRegistered);
         }
 
-        public virtual void OnCentralServerDisconnected(NetPeer netPeer, DisconnectInfo disconnectInfo)
+        public void OnCentralServerDisconnected(NetPeer netPeer, DisconnectInfo disconnectInfo)
         {
-            Debug.Log("[" + PeerType + "] Disconnected from Central Server");
+            Debug.Log("[" + peerType + "] Disconnected from Central Server");
+            RegisteredToCentralServer = false;
             StartCoroutine(CentralServerReconnectRoutine());
         }
 
         IEnumerator CentralServerReconnectRoutine()
         {
-            Debug.Log("[" + PeerType + "] Reconnect to central in " + RECONNECT_DELAY + " seconds");
+            Debug.Log("[" + peerType + "] Reconnect to central in " + RECONNECT_DELAY + " seconds");
             yield return new WaitForSeconds(RECONNECT_DELAY);
             ConnectToCentralServer();
         }
 
-        public virtual void OnAppServerRegistered(AckResponseCode responseCode, BaseAckMessage message) { }
-
-        public virtual string GetExtra()
+        public void OnAppServerRegistered(AckResponseCode responseCode, BaseAckMessage message)
         {
-            return string.Empty;
+            if (responseCode == AckResponseCode.Success)
+                RegisteredToCentralServer = true;
+            if (onAppServerRegistered != null)
+                onAppServerRegistered(responseCode, message);
         }
     }
 }

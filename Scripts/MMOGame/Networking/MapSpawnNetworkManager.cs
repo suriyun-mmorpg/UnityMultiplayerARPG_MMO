@@ -5,10 +5,8 @@ using LiteNetLibManager;
 
 namespace Insthync.MMOG
 {
-    public class MapSpawnNetworkManager : BaseAppServerNetworkManager
+    public class MapSpawnNetworkManager : LiteNetLibManager.LiteNetLibManager
     {
-        public override CentralServerPeerType PeerType { get { return CentralServerPeerType.MapSpawnServer; } }
-        
         [Header("Map Spawn Settings")]
         public string exePath = "./Build.exe";
         public bool spawnInBatchMode = false;
@@ -17,8 +15,17 @@ namespace Insthync.MMOG
         public bool isOverrideExePath;
         public string overrideExePath = "./Build.exe";
 
-        // This server will connect to central server to receive following data:
-        // Database server configuration
+        private CentralAppServerConnector cacheCentralAppServerConnector;
+        public CentralAppServerConnector CentralAppServerConnector
+        {
+            get
+            {
+                if (cacheCentralAppServerConnector == null)
+                    cacheCentralAppServerConnector = gameObject.AddComponent<CentralAppServerConnector>();
+                return cacheCentralAppServerConnector;
+            }
+        }
+        
         protected override void RegisterServerMessages()
         {
             base.RegisterServerMessages();
@@ -27,6 +34,18 @@ namespace Insthync.MMOG
         protected override void RegisterClientMessages()
         {
             base.RegisterClientMessages();
+        }
+
+        public override void OnStartServer()
+        {
+            base.OnStartServer();
+            CentralAppServerConnector.OnStartServer(CentralServerPeerType.MapSpawnServer, networkPort, string.Empty);
+        }
+
+        public override void OnStopServer()
+        {
+            base.OnStopServer();
+            CentralAppServerConnector.OnStopServer();
         }
     }
 }
