@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using MySql.Data.MySqlClient;
+using System.Threading.Tasks;
 
 namespace Insthync.MMOG
 {
@@ -46,18 +47,18 @@ namespace Insthync.MMOG
             return false;
         }
 
-        public override void CreateCharacterQuest(string characterId, CharacterQuest characterQuest)
+        public override async Task CreateCharacterQuest(string characterId, CharacterQuest characterQuest)
         {
-            ExecuteNonQuery("INSERT INTO characterquest (characterId, questId, isComplete, killedMonsters) VALUES (@characterId, @questId, @isComplete, @killedMonsters)",
+            await ExecuteNonQuery("INSERT INTO characterquest (characterId, questId, isComplete, killedMonsters) VALUES (@characterId, @questId, @isComplete, @killedMonsters)",
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@questId", characterQuest.questId),
                 new MySqlParameter("@isComplete", characterQuest.isComplete),
                 new MySqlParameter("@killedMonsters", WriteKillMonsters(characterQuest.killedMonsters)));
         }
 
-        public override CharacterQuest ReadCharacterQuest(string characterId, string questId)
+        public override async Task<CharacterQuest> ReadCharacterQuest(string characterId, string questId)
         {
-            var reader = ExecuteReader("SELECT * FROM characterquest WHERE characterId=@characterId AND questId=@questId LIMIT 1",
+            var reader = await ExecuteReader("SELECT * FROM characterquest WHERE characterId=@characterId AND questId=@questId LIMIT 1",
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@questId", questId));
             CharacterQuest result;
@@ -65,10 +66,10 @@ namespace Insthync.MMOG
             return result;
         }
 
-        public override List<CharacterQuest> ReadCharacterQuests(string characterId)
+        public override async Task<List<CharacterQuest>> ReadCharacterQuests(string characterId)
         {
             var result = new List<CharacterQuest>();
-            var reader = ExecuteReader("SELECT * FROM characterquest WHERE characterId=@characterId",
+            var reader = await ExecuteReader("SELECT * FROM characterquest WHERE characterId=@characterId",
                 new MySqlParameter("@characterId", characterId));
             CharacterQuest tempQuest;
             while (ReadCharacterQuest(reader, out tempQuest, false))
@@ -78,18 +79,18 @@ namespace Insthync.MMOG
             return result;
         }
 
-        public override void UpdateCharacterQuest(string characterId, CharacterQuest characterQuest)
+        public override async Task UpdateCharacterQuest(string characterId, CharacterQuest characterQuest)
         {
-            ExecuteNonQuery("UPDATE characterquest SET isComplete=@isComplete, killedMonsters=@killedMonsters WHERE characterId=@characterId AND questId=@questId",
+            await ExecuteNonQuery("UPDATE characterquest SET isComplete=@isComplete, killedMonsters=@killedMonsters WHERE characterId=@characterId AND questId=@questId",
                 new MySqlParameter("@isComplete", characterQuest.isComplete),
                 new MySqlParameter("@killedMonsters", WriteKillMonsters(characterQuest.killedMonsters)),
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@questId", characterQuest.questId));
         }
 
-        public override void DeleteCharacterQuest(string characterId, string questId)
+        public override async Task DeleteCharacterQuest(string characterId, string questId)
         {
-            ExecuteNonQuery("DELETE FROM characterquest WHERE characterId=@characterId AND questId=@questId",
+            await ExecuteNonQuery("DELETE FROM characterquest WHERE characterId=@characterId AND questId=@questId",
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@questId", questId));
         }

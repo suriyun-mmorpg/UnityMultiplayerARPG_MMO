@@ -2,14 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 using MySql.Data.MySqlClient;
+using System.Threading.Tasks;
 
 namespace Insthync.MMOG
 {
     public partial class MySQLDatabase
     {
-        private void CreateCharacterItem(string characterId, InventoryType inventoryType, CharacterItem characterItem)
+        private async Task CreateCharacterItem(string characterId, InventoryType inventoryType, CharacterItem characterItem)
         {
-            ExecuteNonQuery("INSERT INTO characterinventory (id, inventoryType, characterId, itemId, level, amount) VALUES (@id, @inventoryType, @characterId, @itemId, @level, @amount)",
+            await ExecuteNonQuery("INSERT INTO characterinventory (id, inventoryType, characterId, itemId, level, amount) VALUES (@id, @inventoryType, @characterId, @itemId, @level, @amount)",
                 new MySqlParameter("@id", characterItem.id),
                 new MySqlParameter("@inventoryType", inventoryType),
                 new MySqlParameter("@characterId", characterId),
@@ -36,9 +37,9 @@ namespace Insthync.MMOG
             return false;
         }
 
-        private CharacterItem ReadCharacterItem(string characterId, string id)
+        private async Task<CharacterItem> ReadCharacterItem(string characterId, string id)
         {
-            var reader = ExecuteReader("SELECT * FROM characterinventory WHERE characterId=@characterId AND id=@id LIMIT 1",
+            var reader = await ExecuteReader("SELECT * FROM characterinventory WHERE characterId=@characterId AND id=@id LIMIT 1",
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@id", id));
             CharacterItem result;
@@ -46,10 +47,10 @@ namespace Insthync.MMOG
             return result;
         }
 
-        private List<CharacterItem> ReadCharacterItems(string characterId, InventoryType inventoryType)
+        private async Task<List<CharacterItem>> ReadCharacterItems(string characterId, InventoryType inventoryType)
         {
             var result = new List<CharacterItem>();
-            var reader = ExecuteReader("SELECT * FROM characterinventory WHERE characterId=@characterId AND inventoryType=@inventoryType",
+            var reader = await ExecuteReader("SELECT * FROM characterinventory WHERE characterId=@characterId AND inventoryType=@inventoryType",
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@inventoryType", inventoryType));
             CharacterItem tempInventory;
@@ -60,9 +61,9 @@ namespace Insthync.MMOG
             return result;
         }
 
-        private void UpdateCharacterItem(string characterId, CharacterItem characterItem)
+        private async Task UpdateCharacterItem(string characterId, CharacterItem characterItem)
         {
-            ExecuteNonQuery("UPDATE characterinventory SET itemId=@itemId, level=@level, amount=@amount WHERE id=@id AND characterId=@characterId",
+            await ExecuteNonQuery("UPDATE characterinventory SET itemId=@itemId, level=@level, amount=@amount WHERE id=@id AND characterId=@characterId",
                 new MySqlParameter("@itemId", characterItem.itemId),
                 new MySqlParameter("@level", characterItem.level),
                 new MySqlParameter("@amount", characterItem.amount),
@@ -70,25 +71,25 @@ namespace Insthync.MMOG
                 new MySqlParameter("@characterId", characterId));
         }
 
-        private void DeleteCharacterItem(string characterId, string id)
+        private async Task DeleteCharacterItem(string characterId, string id)
         {
-            ExecuteNonQuery("DELETE FROM characterinventory WHERE id=@id AND characterId=@characterId)",
+            await ExecuteNonQuery("DELETE FROM characterinventory WHERE id=@id AND characterId=@characterId)",
                 new MySqlParameter("@id", id),
                 new MySqlParameter("@characterId", characterId));
         }
 
-        public override EquipWeapons ReadCharacterEquipWeapons(string characterId)
+        public override async Task<EquipWeapons> ReadCharacterEquipWeapons(string characterId)
         {
             var result = new EquipWeapons();
             // Right hand weapon
-            var reader = ExecuteReader("SELECT * FROM characterinventory WHERE characterId=@characterId AND inventoryType=@inventoryType LIMIT 1",
+            var reader = await ExecuteReader("SELECT * FROM characterinventory WHERE characterId=@characterId AND inventoryType=@inventoryType LIMIT 1",
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@inventoryType", InventoryType.EquipWeaponRight));
             CharacterItem rightWeapon;
             if (ReadCharacterItem(reader, out rightWeapon))
                 result.rightHand = rightWeapon;
             // Left hand weapon
-            reader = ExecuteReader("SELECT * FROM characterinventory WHERE characterId=@characterId AND inventoryType=@inventoryType LIMIT 1",
+            reader = await ExecuteReader("SELECT * FROM characterinventory WHERE characterId=@characterId AND inventoryType=@inventoryType LIMIT 1",
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@inventoryType", InventoryType.EquipWeaponLeft));
             CharacterItem leftWeapon;
@@ -97,74 +98,74 @@ namespace Insthync.MMOG
             return result;
         }
 
-        public override void CreateCharacterEquipWeapons(string characterId, EquipWeapons equipWeapons)
+        public override async Task CreateCharacterEquipWeapons(string characterId, EquipWeapons equipWeapons)
         {
-            CreateCharacterItem(characterId, InventoryType.EquipWeaponRight, equipWeapons.rightHand);
-            CreateCharacterItem(characterId, InventoryType.EquipWeaponLeft, equipWeapons.leftHand);
+            await Task.WhenAll(CreateCharacterItem(characterId, InventoryType.EquipWeaponRight, equipWeapons.rightHand),
+                CreateCharacterItem(characterId, InventoryType.EquipWeaponLeft, equipWeapons.leftHand));
         }
 
-        public override void UpdateCharacterEquipWeapons(string characterId, EquipWeapons equipWeapons)
+        public override async Task UpdateCharacterEquipWeapons(string characterId, EquipWeapons equipWeapons)
         {
-            DeleteCharacterEquipWeapons(characterId);
-            CreateCharacterEquipWeapons(characterId, equipWeapons);
+            await Task.WhenAll(DeleteCharacterEquipWeapons(characterId),
+                CreateCharacterEquipWeapons(characterId, equipWeapons));
         }
 
-        public override void DeleteCharacterEquipWeapons(string characterId)
+        public override async Task DeleteCharacterEquipWeapons(string characterId)
         {
-            ExecuteNonQuery("DELETE FROM characterinventory WHERE characterId=@characterId AND (inventoryType=@inventoryTypeRight OR inventoryType=@inventoryTypeLeft)",
+            await ExecuteNonQuery("DELETE FROM characterinventory WHERE characterId=@characterId AND (inventoryType=@inventoryTypeRight OR inventoryType=@inventoryTypeLeft)",
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@inventoryTypeRight", InventoryType.EquipWeaponRight),
                 new MySqlParameter("@inventoryTypeLeft", InventoryType.EquipWeaponLeft));
         }
 
-        public override void CreateCharacterEquipItem(string characterId, CharacterItem characterItem)
+        public override async Task CreateCharacterEquipItem(string characterId, CharacterItem characterItem)
         {
-            CreateCharacterItem(characterId, InventoryType.EquipItems, characterItem);
+            await CreateCharacterItem(characterId, InventoryType.EquipItems, characterItem);
         }
 
-        public override CharacterItem ReadCharacterEquipItem(string characterId, string id)
+        public override async Task<CharacterItem> ReadCharacterEquipItem(string characterId, string id)
         {
-            return ReadCharacterItem(characterId, id);
+            return await ReadCharacterItem(characterId, id);
         }
 
-        public override List<CharacterItem> ReadCharacterEquipItems(string characterId)
+        public override async Task<List<CharacterItem>> ReadCharacterEquipItems(string characterId)
         {
-            return ReadCharacterItems(characterId, InventoryType.EquipItems);
+            return await ReadCharacterItems(characterId, InventoryType.EquipItems);
         }
 
-        public override void UpdateCharacterEquipItem(string characterId, CharacterItem characterItem)
+        public override async Task UpdateCharacterEquipItem(string characterId, CharacterItem characterItem)
         {
-            UpdateCharacterItem(characterId, characterItem);
+            await UpdateCharacterItem(characterId, characterItem);
         }
 
-        public override void DeleteCharacterEquipItem(string characterId, string id)
+        public override async Task DeleteCharacterEquipItem(string characterId, string id)
         {
-            DeleteCharacterItem(characterId, id);
+            await DeleteCharacterItem(characterId, id);
         }
 
-        public override void CreateCharacterNonEquipItem(string characterId, CharacterItem characterItem)
+        public override async Task CreateCharacterNonEquipItem(string characterId, CharacterItem characterItem)
         {
-            CreateCharacterItem(characterId, InventoryType.NonEquipItems, characterItem);
+            await CreateCharacterItem(characterId, InventoryType.NonEquipItems, characterItem);
         }
 
-        public override CharacterItem ReadCharacterNonEquipItem(string characterId, string id)
+        public override async Task<CharacterItem> ReadCharacterNonEquipItem(string characterId, string id)
         {
-            return ReadCharacterItem(characterId, id);
+            return await ReadCharacterItem(characterId, id);
         }
 
-        public override List<CharacterItem> ReadCharacterNonEquipItems(string characterId)
+        public override async Task<List<CharacterItem>> ReadCharacterNonEquipItems(string characterId)
         {
-            return ReadCharacterItems(characterId, InventoryType.NonEquipItems);
+            return await ReadCharacterItems(characterId, InventoryType.NonEquipItems);
         }
 
-        public override void UpdateCharacterNonEquipItem(string characterId, CharacterItem characterItem)
+        public override async Task UpdateCharacterNonEquipItem(string characterId, CharacterItem characterItem)
         {
-            UpdateCharacterItem(characterId, characterItem);
+            await UpdateCharacterItem(characterId, characterItem);
         }
 
-        public override void DeleteCharacterNonEquipItem(string characterId, string id)
+        public override async Task DeleteCharacterNonEquipItem(string characterId, string id)
         {
-            DeleteCharacterItem(characterId, id);
+            await DeleteCharacterItem(characterId, id);
         }
     }
 }

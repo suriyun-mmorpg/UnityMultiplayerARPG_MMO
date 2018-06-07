@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using MySql.Data.MySqlClient;
+using System.Threading.Tasks;
 
 namespace Insthync.MMOG
 {
@@ -24,18 +25,18 @@ namespace Insthync.MMOG
             return false;
         }
 
-        public override void CreateCharacterHotkey(string characterId, CharacterHotkey characterHotkey)
+        public override async Task CreateCharacterHotkey(string characterId, CharacterHotkey characterHotkey)
         {
-            ExecuteNonQuery("INSERT INTO characterhotkey (characterId, hotkeyId, type, dataId) VALUES (@characterId, @hotkeyId, @type, @dataId)",
+            await ExecuteNonQuery("INSERT INTO characterhotkey (characterId, hotkeyId, type, dataId) VALUES (@characterId, @hotkeyId, @type, @dataId)",
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@hotkeyId", characterHotkey.hotkeyId),
                 new MySqlParameter("@type", characterHotkey.type),
                 new MySqlParameter("@dataId", characterHotkey.dataId));
         }
 
-        public override CharacterHotkey ReadCharacterHotkey(string characterId, string hotkeyId)
+        public override async Task<CharacterHotkey> ReadCharacterHotkey(string characterId, string hotkeyId)
         {
-            var reader = ExecuteReader("SELECT * FROM characterhotkey WHERE characterId=@characterId AND hotkeyId=@hotkeyId LIMIT 1",
+            var reader = await ExecuteReader("SELECT * FROM characterhotkey WHERE characterId=@characterId AND hotkeyId=@hotkeyId LIMIT 1",
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@hotkeyId", hotkeyId));
             CharacterHotkey result;
@@ -43,10 +44,10 @@ namespace Insthync.MMOG
             return result;
         }
 
-        public override List<CharacterHotkey> ReadCharacterHotkeys(string characterId)
+        public override async Task<List<CharacterHotkey>> ReadCharacterHotkeys(string characterId)
         {
             var result = new List<CharacterHotkey>();
-            var reader = ExecuteReader("SELECT * FROM characterhotkey WHERE characterId=@characterId",
+            var reader = await ExecuteReader("SELECT * FROM characterhotkey WHERE characterId=@characterId",
                 new MySqlParameter("@characterId", characterId));
             CharacterHotkey tempHotkey;
             while (ReadCharacterHotkey(reader, out tempHotkey, false))
@@ -56,18 +57,18 @@ namespace Insthync.MMOG
             return result;
         }
 
-        public override void UpdateCharacterHotkey(string characterId, CharacterHotkey characterHotkey)
+        public override async Task UpdateCharacterHotkey(string characterId, CharacterHotkey characterHotkey)
         {
-            ExecuteNonQuery("UPDATE characterhotkey SET type=@type, dataId=@dataId WHERE characterId=@characterId AND hotkeyId=@hotkeyId",
+            await ExecuteNonQuery("UPDATE characterhotkey SET type=@type, dataId=@dataId WHERE characterId=@characterId AND hotkeyId=@hotkeyId",
                 new MySqlParameter("@type", characterHotkey.type),
                 new MySqlParameter("@dataId", characterHotkey.dataId),
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@hotkeyId", characterHotkey.hotkeyId));
         }
 
-        public override void DeleteCharacterHotkey(string characterId, string hotkeyId)
+        public override async Task DeleteCharacterHotkey(string characterId, string hotkeyId)
         {
-            ExecuteNonQuery("DELETE FROM characterhotkey WHERE characterId=@characterId AND hotkeyId=@hotkeyId",
+            await ExecuteNonQuery("DELETE FROM characterhotkey WHERE characterId=@characterId AND hotkeyId=@hotkeyId",
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@hotkeyId", hotkeyId));
         }
