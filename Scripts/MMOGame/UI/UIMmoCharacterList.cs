@@ -175,19 +175,19 @@ namespace Insthync.MMOG
                             errorMessage = "User not logged in";
                             break;
                         case ResponseSelectCharacterMessage.Error.AlreadySelectCharacter:
-                            UISceneGlobal.Singleton.ShowMessageDialog("Cannot Select Character", "Already select character");
+                            errorMessage = "Already select character";
                             break;
                         case ResponseSelectCharacterMessage.Error.InvalidCharacterData:
-                            UISceneGlobal.Singleton.ShowMessageDialog("Cannot Select Character", "Invalid character data");
+                            errorMessage = "Invalid character data";
                             break;
                         case ResponseSelectCharacterMessage.Error.MapNotReady:
-                            UISceneGlobal.Singleton.ShowMessageDialog("Cannot Select Character", "Map server is not ready");
+                            errorMessage = "Map server is not ready";
                             break;
                     }
-                    UISceneGlobal.Singleton.ShowMessageDialog("Cannot Delete Character", errorMessage);
+                    UISceneGlobal.Singleton.ShowMessageDialog("Cannot Select Character", errorMessage);
                     break;
                 case AckResponseCode.Timeout:
-                    UISceneGlobal.Singleton.ShowMessageDialog("Cannot Delete Character", "Connection timeout");
+                    UISceneGlobal.Singleton.ShowMessageDialog("Cannot Select Character", "Connection timeout");
                     break;
                 default:
                     MMOClientInstance.Singleton.StartMapClient(castedMessage.sceneName, castedMessage.networkAddress, castedMessage.networkPort, castedMessage.connectKey);
