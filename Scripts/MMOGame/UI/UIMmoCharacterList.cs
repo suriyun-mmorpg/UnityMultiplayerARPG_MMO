@@ -156,25 +156,56 @@ namespace Insthync.MMOG
             // So we can add gameplay UI just once in gameplay scene
             var characterData = new PlayerCharacterData();
             var playerCharacter = selectedUI.Data as IPlayerCharacterData;
-            playerCharacter.CloneTo(characterData);
-            var gameInstance = GameInstance.Singleton;
-            var networkManager = LanRpgNetworkManager.Singleton;
-            networkManager.selectedCharacter = characterData;
-            networkManager.Assets.offlineScene.SceneName = gameInstance.homeScene;
-            networkManager.Assets.onlineScene.SceneName = characterData.CurrentMapName;
-            networkManager.StartGame();
+            MMOClientInstance.Singleton.RequestSelectCharacter(playerCharacter.Id, OnSelectCharacter);
+        }
+
+        private void OnSelectCharacter(AckResponseCode responseCode, BaseAckMessage message)
+        {
+            var castedMessage = (ResponseSelectCharacterMessage)message;
+
+            var selectableCharacters = new List<PlayerCharacterData>();
+
+            switch (responseCode)
+            {
+                case AckResponseCode.Error:
+                    var errorMessage = string.Empty;
+                    switch (castedMessage.error)
+                    {
+                        case ResponseSelectCharacterMessage.Error.NotLoggedin:
+                            errorMessage = "User not logged in";
+                            break;
+                        case ResponseSelectCharacterMessage.Error.AlreadySelectCharacter:
+                            UISceneGlobal.Singleton.ShowMessageDialog("Cannot Select Character", "Already select character");
+                            break;
+                        case ResponseSelectCharacterMessage.Error.InvalidCharacterData:
+                            UISceneGlobal.Singleton.ShowMessageDialog("Cannot Select Character", "Invalid character data");
+                            break;
+                        case ResponseSelectCharacterMessage.Error.MapNotReady:
+                            UISceneGlobal.Singleton.ShowMessageDialog("Cannot Select Character", "Map server is not ready");
+                            break;
+                    }
+                    UISceneGlobal.Singleton.ShowMessageDialog("Cannot Delete Character", errorMessage);
+                    break;
+                case AckResponseCode.Timeout:
+                    UISceneGlobal.Singleton.ShowMessageDialog("Cannot Delete Character", "Connection timeout");
+                    break;
+                default:
+                    MMOClientInstance.Singleton.StartMapClient(castedMessage.sceneName, castedMessage.networkAddress, castedMessage.networkPort, castedMessage.connectKey);
+                    break;
+            }
         }
 
         private void OnClickDelete()
         {
-            if (SelectionManager.SelectedUI == null)
+            var selectedUI = SelectionManager.SelectedUI;
+            if (selectedUI == null)
             {
                 UISceneGlobal.Singleton.ShowMessageDialog("Cannot delete character", "Please choose character to delete");
                 Debug.LogWarning("Cannot delete character, No chosen character");
                 return;
             }
 
-            var playerCharacter = SelectionManager.SelectedUI.Data as IPlayerCharacterData;
+            var playerCharacter = selectedUI.Data as IPlayerCharacterData;
             MMOClientInstance.Singleton.RequestDeleteCharacter(playerCharacter.Id, OnDeleteCharacter);
         }
 
