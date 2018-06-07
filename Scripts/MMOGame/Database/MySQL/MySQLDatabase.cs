@@ -1,6 +1,6 @@
 ﻿using MySql.Data.MySqlClient;
-using System;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace Insthync.MMOG
 {
@@ -13,11 +13,31 @@ namespace Insthync.MMOG
             EquipWeaponRight,
             EquipWeaponLeft,
         }
-        public string address = "127.0.0.1";
-        public int port = 3306;
-        public string username = "root";
-        public string password = "";
-        public string dbName = "mmorpgtemplate";
+        [SerializeField]
+        private string address = "127.0.0.1";
+        [SerializeField]
+        private int port = 3306;
+        [SerializeField]
+        private string username = "root";
+        [SerializeField]
+        private string password = "";
+        [SerializeField]
+        private string dbName = "mmorpgtemplate";
+        private MySqlConnection connection;
+        private bool doingTransaction;
+        private string transactionCommand;
+
+        private void Awake()
+        {
+            connection = new MySqlConnection(GetConnectionString());
+            connection.Open();
+        }
+
+        private void OnDestroy()
+        {
+            if (connection != null)
+                connection.Close();
+        }
 
         public string GetConnectionString()
         {
@@ -29,67 +49,45 @@ namespace Insthync.MMOG
             return connectionString;
         }
 
-        public void SetupConnection(string address, int port, string username, string password, string dbName)
-        {
-            this.address = address;
-            this.port = port;
-            this.username = username;
-            this.password = password;
-            this.dbName = dbName;
-        }
-
         public async Task<long> ExecuteInsertData(string sql, params MySqlParameter[] args)
         {
             long result = 0;
-            using (var connection = new MySqlConnection(GetConnectionString()))
+            using (var cmd = new MySqlCommand(sql, connection))
             {
-                connection.Open();
-                using (var cmd = new MySqlCommand(sql, connection))
+                foreach (var arg in args)
                 {
-                    foreach (var arg in args)
-                    {
-                        cmd.Parameters.Add(arg);
-                    }
-                    var task = await cmd.ExecuteNonQueryAsync();
-                    result = cmd.LastInsertedId;
+                    cmd.Parameters.Add(arg);
                 }
-                connection.Close();
+                var task = await cmd.ExecuteNonQueryAsync();
+                result = cmd.LastInsertedId;
             }
             return result;
         }
 
-        public async Task ExecuteNonQuery(string sql, params MySqlParameter[] args)
+        public async Task<int> ExecuteNonQuery(string sql, params MySqlParameter[] args)
         {
-            using (var connection = new MySqlConnection(GetConnectionString()))
+            var numRows = 0;
+            using (var cmd = new MySqlCommand(sql, connection))
             {
-                connection.Open();
-                using (var cmd = new MySqlCommand(sql, connection))
+                foreach (var arg in args)
                 {
-                    foreach (var arg in args)
-                    {
-                        cmd.Parameters.Add(arg);
-                    }
-                    var task = await cmd.ExecuteNonQueryAsync();
+                    cmd.Parameters.Add(arg);
                 }
-                connection.Close();
+                numRows = await cmd.ExecuteNonQueryAsync();
             }
+            return numRows;
         }
 
         public async Task<object> ExecuteScalar(string sql, params MySqlParameter[] args)
         {
             object result;
-            using (var connection = new MySqlConnection(GetConnectionString()))
+            using (var cmd = new MySqlCommand(sql, connection))
             {
-                connection.Open();
-                using (var cmd = new MySqlCommand(sql, connection))
+                foreach (var arg in args)
                 {
-                    foreach (var arg in args)
-                    {
-                        cmd.Parameters.Add(arg);
-                    }
-                    result = await cmd.ExecuteScalarAsync();
+                    cmd.Parameters.Add(arg);
                 }
-                connection.Close();
+                result = await cmd.ExecuteScalarAsync();
             }
             return result;
         }
@@ -97,18 +95,15 @@ namespace Insthync.MMOG
         public async Task<MySQLRowsReader> ExecuteReader(string sql, params MySqlParameter[] args)
         {
             MySQLRowsReader result = new MySQLRowsReader();
-            using (var connection = new MySqlConnection(GetConnectionString()))
+            using (var cmd = new MySqlCommand(sql, connection))
             {
-                connection.Open();
-                using (var cmd = new MySqlCommand(sql, connection))
+                foreach (var arg in args)
                 {
-                    foreach (var arg in args)
-                    {
-                        cmd.Parameters.Add(arg);
-                    }
-                    result.Init(await cmd.ExecuteReaderAsync());
+                    cmd.Parameters.Add(arg);
                 }
-                connection.Close();
+                var dataReader = await cmd.ExecuteReaderAsync();
+                result.Init(dataReader);
+                dataReader.Close();
             }
             return result;
         }
@@ -136,7 +131,7 @@ namespace Insthync.MMOG
 
         public override async Task<long> FindUsername(string username)
         {
-            var result = await ExecuteScalar("SELECT COUNT(*) FROM userLogin WHERE username LIKE @username", 
+            var result = await ExecuteScalar("SELECT COUNT(*) FROM userLogin WHERE username LIKE @username",
                 new MySqlParameter("@username", username));
             return result != null ? (long)result : 0;
         }

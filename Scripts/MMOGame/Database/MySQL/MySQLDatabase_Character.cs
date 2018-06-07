@@ -8,52 +8,51 @@ namespace Insthync.MMOG
 {
     public partial class MySQLDatabase
     {
-        private async void FillCharacterRelatesData(IPlayerCharacterData characterData)
+        private async Task FillCharacterRelatesData(IPlayerCharacterData characterData)
         {
             // Delete all character then add all of them
             var characterId = characterData.Id;
-            await Task.WhenAll(ExecuteNonQuery("DELETE FROM characterinventory WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId)),
-                ExecuteNonQuery("DELETE FROM characterattribute WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId)),
-                ExecuteNonQuery("DELETE FROM characterskill WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId)),
-                ExecuteNonQuery("DELETE FROM characterbuff WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId)),
-                ExecuteNonQuery("DELETE FROM characterhotkey WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId)),
-                ExecuteNonQuery("DELETE FROM characterquest WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId)));
+            await ExecuteNonQuery("DELETE FROM characterinventory WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
+            await ExecuteNonQuery("DELETE FROM characterattribute WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
+            await ExecuteNonQuery("DELETE FROM characterskill WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
+            await ExecuteNonQuery("DELETE FROM characterbuff WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
+            await ExecuteNonQuery("DELETE FROM characterhotkey WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
+            await ExecuteNonQuery("DELETE FROM characterquest WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
 
-            var tasks = new List<Task>();
-            tasks.Add(CreateCharacterEquipWeapons(characterId, characterData.EquipWeapons));
+            await CreateCharacterEquipWeapons(characterId, characterData.EquipWeapons);
             foreach (var equipItem in characterData.EquipItems)
             {
-                tasks.Add(CreateCharacterEquipItem(characterId, equipItem));
+                await CreateCharacterEquipItem(characterId, equipItem);
             }
             foreach (var nonEquipItem in characterData.NonEquipItems)
             {
-                tasks.Add(CreateCharacterEquipItem(characterId, nonEquipItem));
+                await CreateCharacterEquipItem(characterId, nonEquipItem);
             }
             foreach (var attribute in characterData.Attributes)
             {
-                tasks.Add(CreateCharacterAttribute(characterId, attribute));
+                await CreateCharacterAttribute(characterId, attribute);
             }
             foreach (var skill in characterData.Skills)
             {
-                tasks.Add(CreateCharacterSkill(characterId, skill));
+                await CreateCharacterSkill(characterId, skill);
             }
             foreach (var buff in characterData.Buffs)
             {
-                tasks.Add(CreateCharacterBuff(characterId, buff));
+                await CreateCharacterBuff(characterId, buff);
             }
             foreach (var hotkey in characterData.Hotkeys)
             {
-                tasks.Add(CreateCharacterHotkey(characterId, hotkey));
+                await CreateCharacterHotkey(characterId, hotkey);
             }
             foreach (var quest in characterData.Quests)
             {
-                tasks.Add(CreateCharacterQuest(characterId, quest));
+                await CreateCharacterQuest(characterId, quest);
             }
-            await Task.WhenAll(tasks);
         }
 
         public override async Task CreateCharacter(string userId, PlayerCharacterData characterData)
         {
+            await ExecuteNonQuery("START TRANSACTION");
             await ExecuteNonQuery("INSERT INTO characters " +
                 "(id, userId, databaseId, characterName, level, exp, currentHp, currentMp, currentStamina, currentFood, currentWater, statPoint, skillPoint, gold, currentMapName, currentPositionX, currentPositionY, currentPositionZ, respawnMapName, respawnPositionX, respawnPositionY, respawnPositionZ) VALUES " +
                 "(@id, @userId, @databaseId, @characterName, @level, @exp, @currentHp, @currentMp, @currentStamina, @currentFood, @currentWater, @statPoint, @skillPoint, @gold, @currentMapName, @currentPositionX, @currentPositionY, @currentPositionZ, @respawnMapName, @respawnPositionX, @respawnPositionY, @respawnPositionZ)",
@@ -79,7 +78,8 @@ namespace Insthync.MMOG
                 new MySqlParameter("@respawnPositionX", characterData.RespawnPosition.x),
                 new MySqlParameter("@respawnPositionY", characterData.RespawnPosition.y),
                 new MySqlParameter("@respawnPositionZ", characterData.RespawnPosition.z));
-            FillCharacterRelatesData(characterData);
+            await FillCharacterRelatesData(characterData);
+            await ExecuteNonQuery("COMMIT");
         }
 
         private bool ReadCharacter(MySQLRowsReader reader, out PlayerCharacterData result, bool resetReader = true)
@@ -164,6 +164,7 @@ namespace Insthync.MMOG
 
         public override async Task UpdateCharacter(PlayerCharacterData characterData)
         {
+            await ExecuteNonQuery("START TRANSACTION");
             await ExecuteNonQuery("UPDATE characters SET " +
                 "databaseId=@databaseId, " +
                 "characterName=@characterName, " +
@@ -207,7 +208,8 @@ namespace Insthync.MMOG
                 new MySqlParameter("@respawnPositionY", characterData.RespawnPosition.y),
                 new MySqlParameter("@respawnPositionZ", characterData.RespawnPosition.z),
                 new MySqlParameter("@id", characterData.Id));
-            FillCharacterRelatesData(characterData);
+            await FillCharacterRelatesData(characterData);
+            await ExecuteNonQuery("COMMIT");
         }
 
         public override async Task DeleteCharacter(string userId, string id)
@@ -218,13 +220,15 @@ namespace Insthync.MMOG
             var count = result != null ? (long)result : 0;
             if (count > 0)
             {
-                await Task.WhenAll(ExecuteNonQuery("DELETE FROM characters WHERE id=@characterId", new MySqlParameter("@characterId", id)),
-                    ExecuteNonQuery("DELETE FROM characterInventory WHERE characterId=@characterId", new MySqlParameter("@characterId", id)),
-                    ExecuteNonQuery("DELETE FROM characterAttribute WHERE characterId=@characterId", new MySqlParameter("@characterId", id)),
-                    ExecuteNonQuery("DELETE FROM characterSkill WHERE characterId=@characterId", new MySqlParameter("@characterId", id)),
-                    ExecuteNonQuery("DELETE FROM characterBuff WHERE characterId=@characterId", new MySqlParameter("@characterId", id)),
-                    ExecuteNonQuery("DELETE FROM characterHotkey WHERE characterId=@characterId", new MySqlParameter("@characterId", id)),
-                    ExecuteNonQuery("DELETE FROM characterQuest WHERE characterId=@characterId", new MySqlParameter("@characterId", id)));
+                await ExecuteNonQuery("START TRANSACTION");
+                await ExecuteNonQuery("DELETE FROM characters WHERE id=@characterId", new MySqlParameter("@characterId", id));
+                await ExecuteNonQuery("DELETE FROM characterInventory WHERE characterId=@characterId", new MySqlParameter("@characterId", id));
+                await ExecuteNonQuery("DELETE FROM characterAttribute WHERE characterId=@characterId", new MySqlParameter("@characterId", id));
+                await ExecuteNonQuery("DELETE FROM characterSkill WHERE characterId=@characterId", new MySqlParameter("@characterId", id));
+                await ExecuteNonQuery("DELETE FROM characterBuff WHERE characterId=@characterId", new MySqlParameter("@characterId", id));
+                await ExecuteNonQuery("DELETE FROM characterHotkey WHERE characterId=@characterId", new MySqlParameter("@characterId", id));
+                await ExecuteNonQuery("DELETE FROM characterQuest WHERE characterId=@characterId", new MySqlParameter("@characterId", id));
+                await ExecuteNonQuery("COMMIT");
             }
         }
 

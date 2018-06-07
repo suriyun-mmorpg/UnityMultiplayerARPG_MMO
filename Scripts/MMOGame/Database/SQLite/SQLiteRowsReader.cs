@@ -95,22 +95,22 @@ namespace Insthync.MMOG
 
         public short GetInt16(int index)
         {
-            return (short)data[currentRow][index];
+            return (short)(long)data[currentRow][index];
         }
 
         public short GetInt16(string columnName)
         {
-            return (short)dataDict[currentRow][columnName];
+            return (short)(long)dataDict[currentRow][columnName];
         }
 
         public int GetInt32(int index)
         {
-            return (int)data[currentRow][index];
+            return (int)(long)data[currentRow][index];
         }
 
         public int GetInt32(string columnName)
         {
-            return (int)dataDict[currentRow][columnName];
+            return (int)(long)dataDict[currentRow][columnName];
         }
 
         public long GetInt64(int index)
@@ -125,42 +125,42 @@ namespace Insthync.MMOG
 
         public ushort GetUInt16(int index)
         {
-            return (ushort)data[currentRow][index];
+            return (ushort)(long)data[currentRow][index];
         }
 
         public ushort GetUInt16(string columnName)
         {
-            return (ushort)dataDict[currentRow][columnName];
+            return (ushort)(long)dataDict[currentRow][columnName];
         }
 
         public uint GetUInt32(int index)
         {
-            return (uint)data[currentRow][index];
+            return (uint)(long)data[currentRow][index];
         }
 
         public uint GetUInt32(string columnName)
         {
-            return (uint)dataDict[currentRow][columnName];
+            return (uint)(long)dataDict[currentRow][columnName];
         }
 
         public ulong GetUInt64(int index)
         {
-            return (ulong)data[currentRow][index];
+            return (ulong)(long)data[currentRow][index];
         }
 
         public ulong GetUInt64(string columnName)
         {
-            return (ulong)dataDict[currentRow][columnName];
+            return (ulong)(long)dataDict[currentRow][columnName];
         }
 
         public decimal GetDecimal(int index)
         {
-            return (decimal)data[currentRow][index];
+            return (decimal)(float)data[currentRow][index];
         }
 
         public decimal GetDecimal(string columnName)
         {
-            return (decimal)dataDict[currentRow][columnName];
+            return (decimal)(float)dataDict[currentRow][columnName];
         }
 
         public float GetFloat(int index)
@@ -175,12 +175,12 @@ namespace Insthync.MMOG
 
         public double GetDouble(int index)
         {
-            return (double)data[currentRow][index];
+            return (float)data[currentRow][index];
         }
 
         public double GetDouble(string columnName)
         {
-            return (double)dataDict[currentRow][columnName];
+            return (float)dataDict[currentRow][columnName];
         }
 
         public void ResetReader()

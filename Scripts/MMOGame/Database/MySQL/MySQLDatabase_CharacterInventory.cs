@@ -100,14 +100,14 @@ namespace Insthync.MMOG
 
         public override async Task CreateCharacterEquipWeapons(string characterId, EquipWeapons equipWeapons)
         {
-            await Task.WhenAll(CreateCharacterItem(characterId, InventoryType.EquipWeaponRight, equipWeapons.rightHand),
-                CreateCharacterItem(characterId, InventoryType.EquipWeaponLeft, equipWeapons.leftHand));
+            await CreateCharacterItem(characterId, InventoryType.EquipWeaponRight, equipWeapons.rightHand);
+            await CreateCharacterItem(characterId, InventoryType.EquipWeaponLeft, equipWeapons.leftHand);
         }
 
         public override async Task UpdateCharacterEquipWeapons(string characterId, EquipWeapons equipWeapons)
         {
-            await Task.WhenAll(DeleteCharacterEquipWeapons(characterId),
-                CreateCharacterEquipWeapons(characterId, equipWeapons));
+            await DeleteCharacterEquipWeapons(characterId);
+            await CreateCharacterEquipWeapons(characterId, equipWeapons);
         }
 
         public override async Task DeleteCharacterEquipWeapons(string characterId)
