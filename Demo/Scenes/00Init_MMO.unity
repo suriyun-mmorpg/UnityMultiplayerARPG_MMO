@@ -654,6 +654,7 @@ GameObject:
   - component: {fileID: 1219189831}
   - component: {fileID: 1219189832}
   - component: {fileID: 1219189833}
+  - component: {fileID: 1219189834}
   m_Layer: 0
   m_Name: CentralNetworkManager
   m_TagString: Untagged
@@ -717,13 +718,25 @@ MonoBehaviour:
   maxConnections: 1100
   reconnectDelay: 500
   maxConnectAttempts: 10
-  database: {fileID: 1219189833}
+  database: {fileID: 1219189834}
   minUsernameLength: 2
   maxUsernameLength: 24
   minPasswordLength: 2
   minCharacterNameLength: 2
   maxCharacterNameLength: 16
 --- !u!114 &1219189833
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1219189829}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f9248d29a5c4ce4285c1e7d937629bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dbPath: ./mmorpgtemplate.sqlite3
+--- !u!114 &1219189834
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
