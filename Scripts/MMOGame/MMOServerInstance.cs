@@ -52,22 +52,22 @@ namespace Insthync.MMOG
             if (IsArgsProvided(args, ARG_CENTRAL_ADDRESS))
             {
                 var address = ReadArgs(args, ARG_CENTRAL_ADDRESS, "localhost");
-                mapSpawnNetworkManager.centralServerAddress = address;
-                mapNetworkManager.centralServerAddress = address;
+                mapSpawnNetworkManager.CentralAppServerConnector.centralServerAddress = address;
+                mapNetworkManager.CentralAppServerConnector.centralServerAddress = address;
             }
 
             if (IsArgsProvided(args, ARG_CENTRAL_PORT))
             {
                 var port = ReadArgsInt(args, ARG_CENTRAL_PORT, 6000);
                 centralNetworkManager.networkPort = port;
-                mapSpawnNetworkManager.centralServerPort = port;
-                mapNetworkManager.centralServerPort = port;
+                mapSpawnNetworkManager.CentralAppServerConnector.centralServerPort = port;
+                mapNetworkManager.CentralAppServerConnector.centralServerPort = port;
             }
 
             if (IsArgsProvided(args, ARG_MAP_SPAWN_ADDRESS))
             {
                 var address = ReadArgs(args, ARG_MAP_SPAWN_ADDRESS, "localhost");
-                mapSpawnNetworkManager.machineAddress = address;
+                mapSpawnNetworkManager.CentralAppServerConnector.machineAddress = address;
             }
 
             if (IsArgsProvided(args, ARG_MAP_SPAWN_PORT))
@@ -91,7 +91,7 @@ namespace Insthync.MMOG
             if (IsArgsProvided(args, ARG_MAP_ADDRESS))
             {
                 var address = ReadArgs(args, ARG_MAP_ADDRESS, "localhost");
-                mapNetworkManager.machineAddress = address;
+                mapNetworkManager.CentralAppServerConnector.machineAddress = address;
             }
 
             if (IsArgsProvided(args, ARG_MAP_PORT))
