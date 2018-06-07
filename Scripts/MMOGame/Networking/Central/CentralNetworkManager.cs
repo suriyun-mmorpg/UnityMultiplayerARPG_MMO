@@ -103,17 +103,5 @@ namespace Insthync.MMOG
             if (onClientDisconnected != null)
                 onClientDisconnected(peer, disconnectInfo);
         }
-
-        public override void OnStartServer()
-        {
-            base.OnStartServer();
-            database.Connect();
-        }
-
-        public override void OnStopServer()
-        {
-            base.OnStopServer();
-            database.Disconnect();
-        }
     }
 }

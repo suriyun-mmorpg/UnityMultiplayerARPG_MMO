@@ -29,7 +29,7 @@ namespace Insthync.MMOG
             return SendAckPacket(SendOptions.ReliableUnordered, Client.Peer, CentralMsgTypes.RequestDeleteCharacter, message, callback);
         }
 
-        protected void HandleRequestCharacters(LiteNetLibMessageHandler messageHandler)
+        protected async void HandleRequestCharacters(LiteNetLibMessageHandler messageHandler)
         {
             var peer = messageHandler.peer;
             var message = messageHandler.ReadMessage<RequestCharactersMessage>();
@@ -39,7 +39,7 @@ namespace Insthync.MMOG
             if (!userPeers.TryGetValue(peer.ConnectId, out userPeerInfo))
                 error = ResponseCharactersMessage.Error.NotLoggedin;
             else
-                characters = database.ReadCharacters(userPeerInfo.userId);
+                characters = await database.ReadCharacters(userPeerInfo.userId);
             var responseMessage = new ResponseCharactersMessage();
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = error == ResponseCharactersMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
@@ -48,7 +48,7 @@ namespace Insthync.MMOG
             SendPacket(SendOptions.ReliableUnordered, peer, CentralMsgTypes.ResponseCharacters, responseMessage);
         }
 
-        protected void HandleRequestCreateCharacter(LiteNetLibMessageHandler messageHandler)
+        protected async void HandleRequestCreateCharacter(LiteNetLibMessageHandler messageHandler)
         {
             var peer = messageHandler.peer;
             var message = messageHandler.ReadMessage<RequestCreateCharacterMessage>();
@@ -64,7 +64,7 @@ namespace Insthync.MMOG
                 error = ResponseCreateCharacterMessage.Error.TooLongCharacterName;
             else if (!GameInstance.PlayerCharacters.ContainsKey(databaseId))
                 error = ResponseCreateCharacterMessage.Error.InvalidData;
-            else if (database.FindCharacterName(characterName) > 0)
+            else if (await database.FindCharacterName(characterName) > 0)
                 error = ResponseCreateCharacterMessage.Error.CharacterNameAlreadyExisted;
             else
             {
@@ -72,7 +72,7 @@ namespace Insthync.MMOG
                 var characterData = new PlayerCharacterData();
                 characterData.Id = characterId;
                 characterData.SetNewCharacterData(characterName, databaseId);
-                database.CreateCharacter(userPeerInfo.userId, characterData);
+                await database.CreateCharacter(userPeerInfo.userId, characterData);
             }
             var responseMessage = new ResponseCreateCharacterMessage();
             responseMessage.ackId = message.ackId;
@@ -81,7 +81,7 @@ namespace Insthync.MMOG
             SendPacket(SendOptions.ReliableUnordered, peer, CentralMsgTypes.ResponseCreateCharacter, responseMessage);
         }
 
-        protected void HandleRequestDeleteCharacter(LiteNetLibMessageHandler messageHandler)
+        protected async void HandleRequestDeleteCharacter(LiteNetLibMessageHandler messageHandler)
         {
             var peer = messageHandler.peer;
             var message = messageHandler.ReadMessage<RequestDeleteCharacterMessage>();
@@ -90,7 +90,7 @@ namespace Insthync.MMOG
             if (!userPeers.TryGetValue(peer.ConnectId, out userPeerInfo))
                 error = ResponseDeleteCharacterMessage.Error.NotLoggedin;
             else
-                database.DeleteCharacter(userPeerInfo.userId, message.characterId);
+                await database.DeleteCharacter(userPeerInfo.userId, message.characterId);
             var responseMessage = new ResponseDeleteCharacterMessage();
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = error == ResponseDeleteCharacterMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
