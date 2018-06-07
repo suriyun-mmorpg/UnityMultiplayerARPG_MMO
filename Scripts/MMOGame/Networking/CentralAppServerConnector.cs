@@ -16,9 +16,10 @@ namespace Insthync.MMOG
         public int centralServerPort = 6000;
         public string centralServerConnectKey = "SampleConnectKey";
         public bool RegisteredToCentralServer { get; private set; }
-        private CentralServerPeerType peerType;
-        private int networkPort;
-        private string extra;
+        private CentralServerPeerType registerPeerType;
+        private int registerNetworkPort;
+        private string registerConnectKey;
+        private string registerExtra;
 
         private CentralNetworkManager cacheCentralNetworkManager;
         public CentralNetworkManager CacheCentralNetworkManager
@@ -44,54 +45,56 @@ namespace Insthync.MMOG
             CacheCentralNetworkManager.onClientDisconnected -= OnCentralServerDisconnected;
         }
 
-        public void OnStartServer(CentralServerPeerType peerType, int networkPort, string extra)
+        public void OnStartServer(CentralServerPeerType peerType, int networkPort, string connectKey, string extra)
         {
-            this.peerType = peerType;
-            this.networkPort = networkPort;
-            this.extra = extra;
+            registerPeerType = peerType;
+            registerNetworkPort = networkPort;
+            registerConnectKey = connectKey;
+            registerExtra = extra;
             Debug.Log("[" + peerType + "] Starting server");
             ConnectToCentralServer();
         }
 
         public void OnStopServer()
         {
-            Debug.Log("[" + peerType + "] Stopping server");
+            Debug.Log("[" + registerPeerType + "] Stopping server");
             DisconnectFromCentralServer();
         }
 
         public void ConnectToCentralServer()
         {
-            Debug.Log("[" + peerType + "] Connecting to Central Server");
+            Debug.Log("[" + registerPeerType + "] Connecting to Central Server");
             CacheCentralNetworkManager.StartClient(centralServerAddress, centralServerPort, centralServerConnectKey);
         }
 
         public void DisconnectFromCentralServer()
         {
-            Debug.Log("[" + peerType + "] Disconnecting from Central Server");
+            Debug.Log("[" + registerPeerType + "] Disconnecting from Central Server");
             CacheCentralNetworkManager.StopClient();
         }
 
         public void OnCentralServerConnected(NetPeer netPeer)
         {
-            Debug.Log("[" + peerType + "] Connected to Central Server");
+            Debug.Log("[" + registerPeerType + "] Connected to Central Server");
             var peerInfo = new CentralServerPeerInfo();
-            peerInfo.peerType = peerType;
+            peerInfo.peerType = registerPeerType;
             peerInfo.networkAddress = machineAddress;
-            peerInfo.networkPort = networkPort;
-            peerInfo.extra = extra;
+            peerInfo.networkPort = registerNetworkPort;
+            peerInfo.connectKey = registerConnectKey;
+            peerInfo.extra = registerExtra;
             CacheCentralNetworkManager.RequestAppServerRegister(peerInfo, OnAppServerRegistered);
         }
 
         public void OnCentralServerDisconnected(NetPeer netPeer, DisconnectInfo disconnectInfo)
         {
-            Debug.Log("[" + peerType + "] Disconnected from Central Server");
+            Debug.Log("[" + registerPeerType + "] Disconnected from Central Server");
             RegisteredToCentralServer = false;
             StartCoroutine(CentralServerReconnectRoutine());
         }
 
         IEnumerator CentralServerReconnectRoutine()
         {
-            Debug.Log("[" + peerType + "] Reconnect to central in " + RECONNECT_DELAY + " seconds");
+            Debug.Log("[" + registerPeerType + "] Reconnect to central in " + RECONNECT_DELAY + " seconds");
             yield return new WaitForSeconds(RECONNECT_DELAY);
             ConnectToCentralServer();
         }

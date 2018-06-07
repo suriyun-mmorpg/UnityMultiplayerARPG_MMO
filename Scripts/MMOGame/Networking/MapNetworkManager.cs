@@ -69,7 +69,7 @@ namespace Insthync.MMOG
         {
             base.OnStartServer();
             var extra = !string.IsNullOrEmpty(Assets.onlineScene.SceneName) ? Assets.onlineScene.SceneName : SceneManager.GetActiveScene().name;
-            CentralAppServerConnector.OnStartServer(CentralServerPeerType.MapSpawnServer, networkPort, extra);
+            CentralAppServerConnector.OnStartServer(CentralServerPeerType.MapSpawnServer, networkPort, connectKey, extra);
         }
 
         public override void OnStopServer()

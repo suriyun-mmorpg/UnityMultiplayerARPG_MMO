@@ -11,6 +11,7 @@ namespace Insthync.MMOG
         public CentralServerPeerType peerType;
         public string networkAddress;
         public int networkPort;
+        public string connectKey;
         public string extra;
 
         public void Deserialize(NetDataReader reader)
@@ -18,6 +19,7 @@ namespace Insthync.MMOG
             peerType = (CentralServerPeerType)reader.GetByte();
             networkAddress = reader.GetString();
             networkPort = reader.GetInt();
+            connectKey = reader.GetString();
             extra = reader.GetString();
         }
 
@@ -26,6 +28,7 @@ namespace Insthync.MMOG
             writer.Put((byte)peerType);
             writer.Put(networkAddress);
             writer.Put(networkPort);
+            writer.Put(connectKey);
             writer.Put(extra);
         }
     }

@@ -39,7 +39,7 @@ namespace Insthync.MMOG
         public override void OnStartServer()
         {
             base.OnStartServer();
-            CentralAppServerConnector.OnStartServer(CentralServerPeerType.MapSpawnServer, networkPort, string.Empty);
+            CentralAppServerConnector.OnStartServer(CentralServerPeerType.MapSpawnServer, networkPort, connectKey, string.Empty);
         }
 
         public override void OnStopServer()
