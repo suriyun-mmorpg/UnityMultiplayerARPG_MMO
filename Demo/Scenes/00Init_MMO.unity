@@ -721,6 +721,8 @@ MonoBehaviour:
   minUsernameLength: 2
   maxUsernameLength: 24
   minPasswordLength: 2
+  minCharacterNameLength: 2
+  maxCharacterNameLength: 16
 --- !u!114 &1219189833
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -732,7 +734,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b07a9b1ffbc177946b89cbdae179403d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  address: localhost
+  address: 127.0.0.1
   port: 3306
   username: root
   password: 
@@ -1237,6 +1239,8 @@ MonoBehaviour:
   minUsernameLength: 0
   maxUsernameLength: 0
   minPasswordLength: 0
+  minCharacterNameLength: 2
+  maxCharacterNameLength: 16
 --- !u!114 &1639971800
 MonoBehaviour:
   m_ObjectHideFlags: 0
