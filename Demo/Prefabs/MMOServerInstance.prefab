@@ -289,6 +289,9 @@ MonoBehaviour:
   mapSpawnNetworkManager: {fileID: 114788248445432888}
   mapNetworkManager: {fileID: 0}
   database: {fileID: 114414512406587944}
+  scenes:
+  - sceneAsset: {fileID: 102900000, guid: 5ff0e5fbbdc3a214d87be31915d46cd5, type: 3}
+    sceneName: Map001
   startCentralOnAwake: 1
   startMapSpawnOnAwake: 1
 --- !u!114 &114987958427267012
