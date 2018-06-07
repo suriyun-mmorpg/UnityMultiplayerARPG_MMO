@@ -110,25 +110,37 @@ namespace Insthync.MMOG
             var peer = messageHandler.peer;
             var message = messageHandler.ReadMessage<RequestDeleteCharacterMessage>();
             var error = ResponseSelectCharacterMessage.Error.None;
+            CentralServerPeerInfo mapServerPeerInfo = null;
             CentralUserPeerInfo userPeerInfo;
             if (!userPeers.TryGetValue(peer.ConnectId, out userPeerInfo))
                 error = ResponseSelectCharacterMessage.Error.NotLoggedin;
             else if (!string.IsNullOrEmpty(userPeerInfo.selectCharacterId))
-                error = ResponseSelectCharacterMessage.Error.InvalidCharacterId;
+                error = ResponseSelectCharacterMessage.Error.InvalidCharacterData;
             else
             {
                 var character = await database.ReadCharacter(userPeerInfo.userId, message.characterId, false, false, false, false, false, false, false, false);
                 if (character == null)
-                    error = ResponseSelectCharacterMessage.Error.InvalidCharacterId;
-                else if (!mapServerPeersByMapName.ContainsKey(character.CurrentMapName))
+                    error = ResponseSelectCharacterMessage.Error.InvalidCharacterData;
+                else if (!mapServerPeersByMapName.TryGetValue(character.CurrentMapName, out mapServerPeerInfo))
                     error = ResponseSelectCharacterMessage.Error.MapNotReady;
                 else
+                {
                     userPeerInfo.selectCharacterId = message.characterId;
+                    userPeers[peer.ConnectId] = userPeerInfo;
+                    userPeersByUserId[userPeerInfo.userId] = userPeerInfo;
+                }
             }
             var responseMessage = new ResponseSelectCharacterMessage();
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = error == ResponseSelectCharacterMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
             responseMessage.error = error;
+            if (mapServerPeerInfo != null)
+            {
+                responseMessage.sceneName = mapServerPeerInfo.extra;
+                responseMessage.networkAddress = mapServerPeerInfo.networkAddress;
+                responseMessage.networkPort = mapServerPeerInfo.networkPort;
+                responseMessage.connectKey = mapServerPeerInfo.connectKey;
+            }
             SendPacket(SendOptions.ReliableUnordered, peer, MessageTypes.ResponseDeleteCharacter, responseMessage);
         }
 
