@@ -160,7 +160,7 @@ namespace Insthync.MMOG
             while (reader.Read())
             {
                 var characterId = reader.GetString("id");
-                result.Add(await ReadCharacter(characterId, userId, true, true, true, false, true, false, false, false));
+                result.Add(await ReadCharacter(userId, characterId, true, true, true, false, true, false, false, false));
             }
             return result;
         }
