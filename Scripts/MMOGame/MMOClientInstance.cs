@@ -16,6 +16,9 @@ namespace Insthync.MMOG
         [SerializeField]
         private MapNetworkManager mapNetworkManager;
 
+        public CentralNetworkManager CentralNetworkManager { get { return centralNetworkManager; } }
+        public MapNetworkManager MapNetworkManager { get { return mapNetworkManager; } }
+
         [Header("Settings")]
         public MmoNetworkSetting[] networkSettings;
 

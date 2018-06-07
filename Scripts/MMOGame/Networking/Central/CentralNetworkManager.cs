@@ -12,8 +12,6 @@ namespace Insthync.MMOG
         public readonly Dictionary<long, CentralUserPeerInfo> userPeers = new Dictionary<long, CentralUserPeerInfo>();
         public readonly Dictionary<string, CentralUserPeerInfo> userPeersByUserId = new Dictionary<string, CentralUserPeerInfo>();
 
-        [Header("Server configuration")]
-        public BaseDatabase database;
         [Header("Account configuration")]
         public int minUsernameLength = 2;
         public int maxUsernameLength = 24;
@@ -23,6 +21,11 @@ namespace Insthync.MMOG
 
         public System.Action<NetPeer> onClientConnected;
         public System.Action<NetPeer, DisconnectInfo> onClientDisconnected;
+
+        public BaseDatabase database
+        {
+            get { return MMOServerInstance.Singleton.Database; }
+        }
         
         // This server will collect servers data
         // All Map servers addresses, Login server address, Chat server address, Database server configs

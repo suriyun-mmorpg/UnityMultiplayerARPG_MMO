@@ -28,6 +28,13 @@ namespace Insthync.MMOG
         private MapSpawnNetworkManager mapSpawnNetworkManager;
         [SerializeField]
         private MapNetworkManager mapNetworkManager;
+        [SerializeField]
+        private BaseDatabase database;
+
+        public CentralNetworkManager CentralNetworkManager { get { return centralNetworkManager; } }
+        public MapSpawnNetworkManager MapSpawnNetworkManager { get { return mapSpawnNetworkManager; } }
+        public MapNetworkManager MapNetworkManager { get { return mapNetworkManager; } }
+        public BaseDatabase Database { get { return database; } }
 
         [Header("Running In Editor")]
         public bool startCentralOnAwake;
