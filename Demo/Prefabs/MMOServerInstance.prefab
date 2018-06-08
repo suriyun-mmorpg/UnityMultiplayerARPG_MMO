@@ -257,11 +257,15 @@ MonoBehaviour:
   maxConnections: 4
   reconnectDelay: 500
   maxConnectAttempts: 10
+  centralConnectKey: SampleConnectKey
+  centralNetworkAddress: 127.0.0.1
+  centralNetworkPort: 6000
+  machineAddress: 127.0.0.1
   exePath: ./Build.exe
-  notSpawnInBatchMode: 0
+  notSpawnInBatchMode: 1
   startPort: 8000
   isOverrideExePath: 1
-  overrideExePath: C:/Users/ITTIPON/Desktop/UnityBuilds/MultiplayerARPG/MultiplayerARPG.exe
+  overrideExePath: C:\Users\ITTIPON\Desktop\UnityBuilds\MultiplayerARPG\MultiplayerARPG.exe
 --- !u!114 &114946005600446132
 MonoBehaviour:
   m_ObjectHideFlags: 1

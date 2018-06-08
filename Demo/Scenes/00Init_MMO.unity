@@ -408,6 +408,10 @@ MonoBehaviour:
   maxConnectAttempts: 10
   doNotEnterGameOnConnect: 0
   doNotDestroyOnSceneChanges: 0
+  centralConnectKey: SampleConnectKey
+  centralNetworkAddress: 127.0.0.1
+  centralNetworkPort: 6000
+  machineAddress: 127.0.0.1
 --- !u!4 &1127565840
 Transform:
   m_ObjectHideFlags: 0
@@ -688,6 +692,7 @@ MonoBehaviour:
   startPosition: {x: 0, y: 0, z: 0}
   minCharacterNameLength: 2
   maxCharacterNameLength: 16
+  doNotLoadHomeSceneOnStart: 0
   useMobileInEditor: 0
 --- !u!4 &1379718503
 Transform:
