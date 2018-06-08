@@ -38,21 +38,25 @@ namespace Insthync.MMOG
                 {
                     case CentralServerPeerType.MapSpawnServer:
                         mapSpawnServerPeers[peer.ConnectId] = peerInfo;
-                        SetupMapSpawn(peerInfo);
+                        foreach (var scene in MMOServerInstance.Singleton.scenes)
+                        {
+                            if (!spawningMapAcks.ContainsKey(scene) && !mapServerPeersBySceneName.ContainsKey(scene))
+                                spawningMapAcks[scene] = RequestSpawnMap(peer, scene.SceneName, OnRequestSpawnMap);
+                        }
                         Debug.Log("[Central] Register Map Spawn Server: [" + peer.ConnectId + "]");
                         break;
                     case CentralServerPeerType.MapServer:
-                        var mapName = peerInfo.extra;
-                        if (!mapServerPeersByMapName.ContainsKey(mapName))
+                        var sceneName = peerInfo.extra;
+                        if (!mapServerPeersBySceneName.ContainsKey(sceneName))
                         {
-                            mapServerPeersByMapName[mapName] = peerInfo;
+                            mapServerPeersBySceneName[sceneName] = peerInfo;
                             mapServerPeers[peer.ConnectId] = peerInfo;
-                            Debug.Log("[Central] Register Map Server: [" + peer.ConnectId + "] [" + mapName + "]");
+                            Debug.Log("[Central] Register Map Server: [" + peer.ConnectId + "] [" + sceneName + "]");
                         }
                         else
                         {
                             error = ResponseAppServerRegisterMessage.Error.MapAlreadyExisted;
-                            Debug.Log("[Central] Register Map Server Failed: [" + peer.ConnectId + "] [" + mapName + "] [" + error + "]");
+                            Debug.Log("[Central] Register Map Server Failed: [" + peer.ConnectId + "] [" + sceneName + "] [" + error + "]");
                         }
                         break;
                 }
@@ -93,7 +97,7 @@ namespace Insthync.MMOG
                     break;
                 case CentralServerPeerType.MapServer:
                     var mapName = message.extra;
-                    if (!mapServerPeersByMapName.TryGetValue(mapName, out peerInfo))
+                    if (!mapServerPeersBySceneName.TryGetValue(mapName, out peerInfo))
                     {
                         error = ResponseAppServerAddressMessage.Error.ServerNotFound;
                         Debug.Log("[Central] Request Map Address: [" + peer.ConnectId + "] [" + mapName + "] [" + error + "]");
