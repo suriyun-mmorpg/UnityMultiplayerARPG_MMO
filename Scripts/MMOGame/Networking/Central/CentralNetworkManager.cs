@@ -6,11 +6,12 @@ namespace Insthync.MMOG
 {
     public partial class CentralNetworkManager : LiteNetLibManager.LiteNetLibManager
     {
-        public readonly Dictionary<long, CentralServerPeerInfo> mapSpawnServerPeers = new Dictionary<long, CentralServerPeerInfo>();
-        public readonly Dictionary<long, CentralServerPeerInfo> mapServerPeers = new Dictionary<long, CentralServerPeerInfo>();
-        public readonly Dictionary<string, CentralServerPeerInfo> mapServerPeersByMapName = new Dictionary<string, CentralServerPeerInfo>();
-        public readonly Dictionary<long, CentralUserPeerInfo> userPeers = new Dictionary<long, CentralUserPeerInfo>();
-        public readonly Dictionary<string, CentralUserPeerInfo> userPeersByUserId = new Dictionary<string, CentralUserPeerInfo>();
+        protected readonly Dictionary<long, CentralServerPeerInfo> mapSpawnServerPeers = new Dictionary<long, CentralServerPeerInfo>();
+        protected readonly Dictionary<string, uint> spawningMapAcks = new Dictionary<string, uint>();
+        protected readonly Dictionary<long, CentralServerPeerInfo> mapServerPeers = new Dictionary<long, CentralServerPeerInfo>();
+        protected readonly Dictionary<string, CentralServerPeerInfo> mapServerPeersBySceneName = new Dictionary<string, CentralServerPeerInfo>();
+        protected readonly Dictionary<long, CentralUserPeerInfo> userPeers = new Dictionary<long, CentralUserPeerInfo>();
+        protected readonly Dictionary<string, CentralUserPeerInfo> userPeersByUserId = new Dictionary<string, CentralUserPeerInfo>();
 
         [Header("Account configuration")]
         public int minUsernameLength = 2;
@@ -18,7 +19,7 @@ namespace Insthync.MMOG
         public int minPasswordLength = 2;
         public int minCharacterNameLength = 2;
         public int maxCharacterNameLength = 16;
-
+        
         public System.Action<NetPeer> onClientConnected;
         public System.Action<NetPeer, DisconnectInfo> onClientDisconnected;
 
@@ -41,6 +42,7 @@ namespace Insthync.MMOG
             RegisterServerMessage(MessageTypes.RequestCreateCharacter, HandleRequestCreateCharacter);
             RegisterServerMessage(MessageTypes.RequestDeleteCharacter, HandleRequestDeleteCharacter);
             RegisterServerMessage(MessageTypes.RequestSelectCharacter, HandleRequestSelectCharacter);
+            RegisterServerMessage(MessageTypes.ResponseSpawnMap, HandleResponseSpawnMap);
         }
 
         protected override void RegisterClientMessages()
@@ -64,7 +66,7 @@ namespace Insthync.MMOG
             CentralServerPeerInfo mapServerPeerInfo;
             if (mapServerPeers.TryGetValue(peer.ConnectId, out mapServerPeerInfo))
             {
-                mapServerPeersByMapName.Remove(mapServerPeerInfo.extra);
+                mapServerPeersBySceneName.Remove(mapServerPeerInfo.extra);
                 mapServerPeers.Remove(peer.ConnectId);
             }
             CentralUserPeerInfo userPeerInfo;

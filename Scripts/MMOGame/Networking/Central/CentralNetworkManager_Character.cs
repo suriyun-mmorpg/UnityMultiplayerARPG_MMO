@@ -121,7 +121,7 @@ namespace Insthync.MMOG
                 var character = await database.ReadCharacter(userPeerInfo.userId, message.characterId, false, false, false, false, false, false, false, false);
                 if (character == null)
                     error = ResponseSelectCharacterMessage.Error.InvalidCharacterData;
-                else if (!mapServerPeersByMapName.TryGetValue(character.CurrentMapName, out mapServerPeerInfo))
+                else if (!mapServerPeersBySceneName.TryGetValue(character.CurrentMapName, out mapServerPeerInfo))
                     error = ResponseSelectCharacterMessage.Error.MapNotReady;
                 else
                 {
