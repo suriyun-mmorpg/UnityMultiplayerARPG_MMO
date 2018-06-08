@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Insthync.MMOG
 {
-    public abstract class BaseDatabase : MonoBehaviour
+    public abstract partial class BaseDatabase : MonoBehaviour
     {
         public abstract Task<string> ValidateUserLogin(string username, string password);
         public abstract Task CreateUserLogin(string username, string password);
