@@ -13,9 +13,9 @@ namespace Insthync.MMOG
         public static MapNetworkManager Singleton { get; protected set; }
 
         [Header("Central Network Connection")]
+        public string centralConnectKey = "SampleConnectKey";
         public string centralNetworkAddress = "127.0.0.1";
         public int centralNetworkPort = 6000;
-        public string centralConnectKey = "SampleConnectKey";
         public string machineAddress = "127.0.0.1";
 
         private CentralAppServerRegister cacheCentralAppServerRegister;
@@ -69,10 +69,10 @@ namespace Insthync.MMOG
             return base.StartServer();
         }
 
-        public override LiteNetLibClient StartClient()
+        public override LiteNetLibClient StartClient(string networkAddress, int networkPort, string connectKey)
         {
             GameManager.Init(this);
-            return base.StartClient();
+            return base.StartClient(networkAddress, networkPort, connectKey);
         }
 
         public override void OnClientDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
