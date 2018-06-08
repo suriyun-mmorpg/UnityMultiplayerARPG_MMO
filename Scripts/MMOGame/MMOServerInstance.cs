@@ -43,6 +43,10 @@ namespace Insthync.MMOG
         public bool startCentralOnAwake;
         public bool startMapSpawnOnAwake;
 
+        private bool startingCentralServer;
+        private bool startingMapSpawnServer;
+        private bool startingMapServer;
+
         private void Awake()
         {
             if (Singleton != null)
@@ -53,8 +57,9 @@ namespace Insthync.MMOG
             DontDestroyOnLoad(gameObject);
             Singleton = this;
 
+            // Prepare data
             var args = Environment.GetCommandLineArgs();
-            
+
             // Android fix
             if (args == null)
                 args = new string[0];
@@ -92,7 +97,10 @@ namespace Insthync.MMOG
                 mapSpawnNetworkManager.exePath = exePath;
             }
 
-            mapSpawnNetworkManager.notSpawnInBatchMode = IsArgsProvided(args, ARG_NOT_SPAWN_IN_BATCH_MODE);
+            /*
+            if (IsArgsProvided(args, ARG_NOT_SPAWN_IN_BATCH_MODE))
+                mapSpawnNetworkManager.notSpawnInBatchMode = true;
+                */
 
             if (IsArgsProvided(args, ARG_MACHINE_ADDRESS))
             {
@@ -113,12 +121,27 @@ namespace Insthync.MMOG
             }
 
             if (IsArgsProvided(args, ARG_START_CENTRAL_SERVER) || (Application.isEditor && startCentralOnAwake))
-                StartCentralServer();
+                startingCentralServer = true;
 
             if (IsArgsProvided(args, ARG_START_MAP_SPAWN_SERVER) || (Application.isEditor && startMapSpawnOnAwake))
-                StartMapSpawnServer();
+                startingMapSpawnServer = true;
 
             if (IsArgsProvided(args, ARG_START_MAP_SERVER))
+            {
+                FindObjectOfType<GameInstance>().doNotLoadHomeSceneOnStart = true;
+                startingMapServer = true;
+            }
+        }
+
+        private void Start()
+        {
+            if (startingCentralServer)
+                StartCentralServer();
+
+            if (startingMapSpawnServer)
+                StartMapSpawnServer();
+
+            if (startingMapServer)
                 StartMapServer();
         }
 
