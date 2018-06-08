@@ -35,7 +35,6 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4689870637795574}
-  - component: {fileID: 114675380552929158}
   - component: {fileID: 114543387092495668}
   m_Layer: 0
   m_Name: CentralNetworkManager
@@ -84,7 +83,6 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4281435147628774}
-  - component: {fileID: 114987958427267012}
   - component: {fileID: 114788248445432888}
   m_Layer: 0
   m_Name: MapSpawnNetworkManager
@@ -215,17 +213,6 @@ MonoBehaviour:
   minPasswordLength: 2
   minCharacterNameLength: 2
   maxCharacterNameLength: 16
---- !u!114 &114675380552929158
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1250662783992638}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1ba8c646936b90145b286ff293ca75c3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &114715813743394434
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -271,9 +258,10 @@ MonoBehaviour:
   reconnectDelay: 500
   maxConnectAttempts: 10
   exePath: ./Build.exe
-  spawnInBatchMode: 0
-  isOverrideExePath: 0
-  overrideExePath: ./Build.exe
+  notSpawnInBatchMode: 0
+  startPort: 8000
+  isOverrideExePath: 1
+  overrideExePath: C:/Users/ITTIPON/Desktop/UnityBuilds/MultiplayerARPG/MultiplayerARPG.exe
 --- !u!114 &114946005600446132
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -294,14 +282,3 @@ MonoBehaviour:
     sceneName: Map001
   startCentralOnAwake: 1
   startMapSpawnOnAwake: 1
---- !u!114 &114987958427267012
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1773992668051484}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1ba8c646936b90145b286ff293ca75c3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

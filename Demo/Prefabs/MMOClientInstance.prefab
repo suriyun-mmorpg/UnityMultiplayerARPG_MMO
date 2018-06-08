@@ -35,7 +35,6 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4130352481101320}
-  - component: {fileID: 114141236124867230}
   - component: {fileID: 114986665195614126}
   m_Layer: 0
   m_Name: MapSpawnNetworkManager
@@ -52,7 +51,6 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4727550104018028}
-  - component: {fileID: 114276329676286344}
   - component: {fileID: 114125661795290440}
   m_Layer: 0
   m_Name: CentralNetworkManager
@@ -139,17 +137,6 @@ MonoBehaviour:
   minPasswordLength: 0
   minCharacterNameLength: 2
   maxCharacterNameLength: 16
---- !u!114 &114141236124867230
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1556934102727664}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1ba8c646936b90145b286ff293ca75c3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &114218027599039394
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -165,17 +152,6 @@ MonoBehaviour:
   mapNetworkManager: {fileID: 0}
   networkSettings:
   - {fileID: 11400000, guid: 6a3edb1361db33b45b656cf8376a2229, type: 2}
---- !u!114 &114276329676286344
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1820522765887506}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1ba8c646936b90145b286ff293ca75c3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &114986665195614126
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -209,6 +185,7 @@ MonoBehaviour:
   reconnectDelay: 500
   maxConnectAttempts: 10
   exePath: ./Build.exe
-  spawnInBatchMode: 0
+  notSpawnInBatchMode: 0
+  startPort: 8000
   isOverrideExePath: 0
   overrideExePath: ./Build.exe
