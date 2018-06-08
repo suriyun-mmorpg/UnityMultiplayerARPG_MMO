@@ -1,8 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using LiteNetLib;
+﻿using LiteNetLib;
 using LiteNetLibManager;
+using System;
+using System.Text.RegularExpressions;
 
 namespace Insthync.MMOG
 {
@@ -36,14 +35,22 @@ namespace Insthync.MMOG
             var message = messageHandler.ReadMessage<RequestUserLoginMessage>();
             var error = ResponseUserLoginMessage.Error.None;
             var userId = await database.ValidateUserLogin(message.username, message.password);
+            var accessToken = string.Empty;
             if (string.IsNullOrEmpty(userId))
+            {
                 error = ResponseUserLoginMessage.Error.InvalidUsernameOrPassword;
+                userId = string.Empty;
+            }
             else if (userPeersByUserId.ContainsKey(userId))
+            {
                 error = ResponseUserLoginMessage.Error.AlreadyLogin;
+                userId = string.Empty;
+            }
             else
             {
                 var userPeerInfo = new CentralUserPeerInfo();
                 userPeerInfo.userId = userId;
+                userPeerInfo.accessToken = accessToken = Regex.Replace(Convert.ToBase64String(Guid.NewGuid().ToByteArray()), "[/+=]", "");
                 userPeersByUserId[userId] = userPeerInfo;
                 userPeers[peer.ConnectId] = userPeerInfo;
             }
@@ -51,6 +58,8 @@ namespace Insthync.MMOG
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = error == ResponseUserLoginMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
             responseMessage.error = error;
+            responseMessage.userId = userId;
+            responseMessage.accessToken = accessToken;
             LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MessageTypes.ResponseUserLogin, responseMessage);
         }
 
