@@ -13,9 +13,9 @@ namespace Insthync.MMOG
     public class MapSpawnNetworkManager : LiteNetLibManager.LiteNetLibManager, IAppServer
     {
         [Header("Central Network Connection")]
+        public string centralConnectKey = "SampleConnectKey";
         public string centralNetworkAddress = "127.0.0.1";
         public int centralNetworkPort = 6000;
-        public string centralConnectKey = "SampleConnectKey";
         public string machineAddress = "127.0.0.1";
 
         [Header("Map Spawn Settings")]
@@ -33,7 +33,7 @@ namespace Insthync.MMOG
         private readonly object mainThreadLock = new object();
         private readonly List<Action> mainThreadActions = new List<Action>();
         private static object processLock = new object();
-        private static Dictionary<int, Process> processes = new Dictionary<int, Process>();
+        private static Dictionary<uint, Process> processes = new Dictionary<uint, Process>();
 
         public string ExePath
         {
@@ -52,7 +52,10 @@ namespace Insthync.MMOG
             get
             {
                 if (cacheCentralAppServerRegister == null)
+                {
                     cacheCentralAppServerRegister = new CentralAppServerRegister(this);
+                    cacheCentralAppServerRegister.RegisterMessage(MessageTypes.RequestSpawnMap, HandleRequestSpawnMap);
+                }
                 return cacheCentralAppServerRegister;
             }
         }
@@ -66,12 +69,6 @@ namespace Insthync.MMOG
         public string AppExtra { get { return string.Empty; } }
         public CentralServerPeerType PeerType { get { return CentralServerPeerType.MapSpawnServer; } }
 
-        protected override void RegisterServerMessages()
-        {
-            base.RegisterServerMessages();
-            RegisterServerMessage(MessageTypes.RequestSpawnMap, HandleRequestSpawnMap);
-        }
-
         protected override void RegisterClientMessages()
         {
             base.RegisterClientMessages();
@@ -79,14 +76,16 @@ namespace Insthync.MMOG
 
         public override void OnStartServer()
         {
-            base.OnStartServer();
             CentralAppServerRegister.OnStartServer();
+            spawningPort = startPort;
+            portCounter = startPort;
+            base.OnStartServer();
         }
 
         public override void OnStopServer()
         {
-            base.OnStopServer();
             CentralAppServerRegister.OnStopServer();
+            base.OnStopServer();
         }
 
         protected override void Update()
@@ -163,7 +162,8 @@ namespace Insthync.MMOG
                     string.Format("{0} {1} ", MMOServerInstance.ARG_CENTRAL_ADDRESS, centralNetworkAddress) +
                     string.Format("{0} {1} ", MMOServerInstance.ARG_CENTRAL_PORT, centralNetworkPort) +
                     string.Format("{0} {1} ", MMOServerInstance.ARG_MACHINE_ADDRESS, machineAddress) +
-                    string.Format("{0} {1} ", MMOServerInstance.ARG_MAP_PORT, port),
+                    string.Format("{0} {1} ", MMOServerInstance.ARG_MAP_PORT, port) + 
+                    " " + MMOServerInstance.ARG_START_MAP_SERVER,
             };
 
             UnityEngine.Debug.Log("Starting process with args: " + startProcessInfo.Arguments);
@@ -179,13 +179,13 @@ namespace Insthync.MMOG
 
                         using (var process = Process.Start(startProcessInfo))
                         {
-                            UnityEngine.Debug.Log("Process started. Spawn Id: " + message.spawnId + ", pid: " + process.Id);
+                            UnityEngine.Debug.Log("Process started. Spawn Id: " + message.ackId + ", pid: " + process.Id);
                             processStarted = true;
 
                             lock (processLock)
                             {
                                 // Save the process
-                                processes[message.spawnId] = process;
+                                processes[message.ackId] = process;
                             }
 
                             // Notify server that we've successfully handled the request
@@ -214,7 +214,7 @@ namespace Insthync.MMOG
                         lock (processLock)
                         {
                             // Remove the process
-                            processes.Remove(message.spawnId);
+                            processes.Remove(message.ackId);
                         }
 
                         ExecuteOnMainThread(() =>
@@ -222,7 +222,7 @@ namespace Insthync.MMOG
                             // Release the port number
                             FreePort(port);
 
-                            UnityEngine.Debug.Log("Process spawn id: " + message.spawnId + " killed.");
+                            UnityEngine.Debug.Log("Process spawn id: " + message.ackId + " killed.");
                         });
                     }
 
