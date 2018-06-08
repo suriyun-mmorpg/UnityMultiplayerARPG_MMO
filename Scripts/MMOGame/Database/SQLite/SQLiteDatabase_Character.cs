@@ -26,7 +26,7 @@ namespace Insthync.MMOG
             }
             foreach (var nonEquipItem in characterData.NonEquipItems)
             {
-                await CreateCharacterEquipItem(characterId, nonEquipItem);
+                await CreateCharacterNonEquipItem(characterId, nonEquipItem);
             }
             foreach (var attribute in characterData.Attributes)
             {
