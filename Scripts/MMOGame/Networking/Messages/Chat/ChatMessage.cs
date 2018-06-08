@@ -1,16 +1,38 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
+using LiteNetLibManager;
+using LiteNetLib.Utils;
 
-public class ChatMessage : MonoBehaviour {
+namespace Insthync.MMOG
+{
+    public class ChatMessage : BaseAckMessage
+    {
+        public enum Type : byte
+        {
+            Global,
+            Whisper,
+            Party,
+            Guild,
+        }
+        public Type type;
+        public string receiver;
+        public string sender;
+        public string message;
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+        public override void DeserializeData(NetDataReader reader)
+        {
+            type = (Type)reader.GetByte();
+            receiver = reader.GetString();
+            sender = reader.GetString();
+            message = reader.GetString();
+        }
+
+        public override void SerializeData(NetDataWriter writer)
+        {
+            writer.Put((byte)type);
+            writer.Put(receiver);
+            writer.Put(sender);
+            writer.Put(message);
+        }
+    }
 }
