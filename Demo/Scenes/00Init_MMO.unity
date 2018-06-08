@@ -441,7 +441,7 @@ MonoBehaviour:
   spawnablePrefabs: []
   offlineScene:
     sceneAsset: {fileID: 0}
-    sceneName: 
+    sceneName: 01Home_MMO
   onlineScene:
     sceneAsset: {fileID: 0}
     sceneName: 
