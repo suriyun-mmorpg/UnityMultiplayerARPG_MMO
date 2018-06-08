@@ -9,19 +9,18 @@ namespace Insthync.MMOG
     {
         public static MMOServerInstance Singleton { get; protected set; }
 
+        public const string ARG_CENTRAL_ADDRESS = "-centralAddress";
+        public const string ARG_CENTRAL_PORT = "-centralPort";
+        public const string ARG_MACHINE_ADDRESS = "-machineAddress";
+        public const string ARG_MAP_SPAWN_PORT = "-mapSpawnPort";
+        public const string ARG_SPAWN_EXE_PATH = "-spawnExePath";
+        public const string ARG_NOT_SPAWN_IN_BATCH_MODE = "-notSpawnInBatchMode";
+        public const string ARG_MAP_PORT = "-mapPort";
+        public const string ARG_SCENE_NAME = "-sceneName";
         public const string ARG_START_CENTRAL_SERVER = "-startCentralServer";
         public const string ARG_START_MAP_SPAWN_SERVER = "-startMapSpawnServer";
         public const string ARG_START_MAP_SERVER = "-startMapServer";
-        public const string ARG_CENTRAL_ADDRESS = "-centralAddress";
-        public const string ARG_CENTRAL_PORT = "-centralPort";
-        public const string ARG_MAP_SPAWN_ADDRESS = "-mapSpawnAddress";
-        public const string ARG_MAP_SPAWN_PORT = "-mapSpawnPort";
-        public const string ARG_MAP_SPAWN_EXE_PATH = "-mapSpawnExePath";
-        public const string ARG_MAP_SPAWN_IN_BATCH_MODE = "-mapSpawnInBatchMode";
-        public const string ARG_MAP_ADDRESS = "-mapAddress";
-        public const string ARG_MAP_PORT = "-mapPort";
-        public const string ARG_MAP_SCENE_NAME = "-mapSceneName";
-        
+
         [Header("Server Components")]
         [SerializeField]
         private CentralNetworkManager centralNetworkManager;
@@ -63,22 +62,22 @@ namespace Insthync.MMOG
             if (IsArgsProvided(args, ARG_CENTRAL_ADDRESS))
             {
                 var address = ReadArgs(args, ARG_CENTRAL_ADDRESS, "localhost");
-                mapSpawnNetworkManager.CentralAppServerConnector.centralServerAddress = address;
-                mapNetworkManager.CentralAppServerConnector.centralServerAddress = address;
+                mapSpawnNetworkManager.centralNetworkAddress = address;
+                mapNetworkManager.centralNetworkAddress = address;
             }
 
             if (IsArgsProvided(args, ARG_CENTRAL_PORT))
             {
                 var port = ReadArgsInt(args, ARG_CENTRAL_PORT, 6000);
                 centralNetworkManager.networkPort = port;
-                mapSpawnNetworkManager.CentralAppServerConnector.centralServerPort = port;
-                mapNetworkManager.CentralAppServerConnector.centralServerPort = port;
+                mapSpawnNetworkManager.centralNetworkPort = port;
+                mapNetworkManager.centralNetworkPort = port;
             }
 
-            if (IsArgsProvided(args, ARG_MAP_SPAWN_ADDRESS))
+            if (IsArgsProvided(args, ARG_MACHINE_ADDRESS))
             {
-                var address = ReadArgs(args, ARG_MAP_SPAWN_ADDRESS, "localhost");
-                mapSpawnNetworkManager.CentralAppServerConnector.machineAddress = address;
+                var address = ReadArgs(args, ARG_MACHINE_ADDRESS, "127.0.0.1");
+                mapSpawnNetworkManager.machineAddress = address;
             }
 
             if (IsArgsProvided(args, ARG_MAP_SPAWN_PORT))
@@ -87,22 +86,18 @@ namespace Insthync.MMOG
                 mapSpawnNetworkManager.networkPort = port;
             }
 
-            if (IsArgsProvided(args, ARG_MAP_SPAWN_EXE_PATH))
+            if (IsArgsProvided(args, ARG_SPAWN_EXE_PATH))
             {
-                var exePath = ReadArgs(args, ARG_MAP_SPAWN_EXE_PATH, "./Build.exe");
+                var exePath = ReadArgs(args, ARG_SPAWN_EXE_PATH, "./Build.exe");
                 mapSpawnNetworkManager.exePath = exePath;
             }
 
-            if (IsArgsProvided(args, ARG_MAP_SPAWN_IN_BATCH_MODE))
-            {
-                var spawnInBatchMode = ReadArgsInt(args, ARG_MAP_SPAWN_IN_BATCH_MODE, 1) > 0;
-                mapSpawnNetworkManager.spawnInBatchMode = spawnInBatchMode;
-            }
+            mapSpawnNetworkManager.notSpawnInBatchMode = IsArgsProvided(args, ARG_NOT_SPAWN_IN_BATCH_MODE);
 
-            if (IsArgsProvided(args, ARG_MAP_ADDRESS))
+            if (IsArgsProvided(args, ARG_MACHINE_ADDRESS))
             {
-                var address = ReadArgs(args, ARG_MAP_ADDRESS, "localhost");
-                mapNetworkManager.CentralAppServerConnector.machineAddress = address;
+                var address = ReadArgs(args, ARG_MACHINE_ADDRESS, "127.0.0.1");
+                mapNetworkManager.machineAddress = address;
             }
 
             if (IsArgsProvided(args, ARG_MAP_PORT))
@@ -111,9 +106,9 @@ namespace Insthync.MMOG
                 mapNetworkManager.networkPort = port;
             }
 
-            if (IsArgsProvided(args, ARG_MAP_SCENE_NAME))
+            if (IsArgsProvided(args, ARG_SCENE_NAME))
             {
-                var sceneName = ReadArgs(args, ARG_MAP_SCENE_NAME);
+                var sceneName = ReadArgs(args, ARG_SCENE_NAME);
                 mapNetworkManager.Assets.onlineScene.SceneName = sceneName;
             }
 
