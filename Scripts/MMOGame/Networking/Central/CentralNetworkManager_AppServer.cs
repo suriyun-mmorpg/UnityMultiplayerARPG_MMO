@@ -15,7 +15,7 @@ namespace Insthync.MMOG
         {
             var message = new RequestAppServerRegisterMessage();
             message.peerInfo = peerInfo;
-            return SendAckPacket(SendOptions.ReliableUnordered, Client.Peer, MessageTypes.RequestAppServerRegister, message, callback);
+            return Client.SendAckPacket(SendOptions.ReliableUnordered, Client.Peer, MessageTypes.RequestAppServerRegister, message, callback);
         }
 
         public uint RequestAppServerAddress(CentralServerPeerType peerType, string extra, AckMessageCallback callback)
@@ -23,7 +23,7 @@ namespace Insthync.MMOG
             var message = new RequestAppServerAddressMessage();
             message.peerType = peerType;
             message.extra = extra;
-            return SendAckPacket(SendOptions.ReliableUnordered, Client.Peer, MessageTypes.RequestAppServerAddress, message, callback);
+            return Client.SendAckPacket(SendOptions.ReliableUnordered, Client.Peer, MessageTypes.RequestAppServerAddress, message, callback);
         }
 
         protected void HandleRequestAppServerRegister(LiteNetLibMessageHandler messageHandler)
@@ -38,6 +38,7 @@ namespace Insthync.MMOG
                 {
                     case CentralServerPeerType.MapSpawnServer:
                         mapSpawnServerPeers[peer.ConnectId] = peerInfo;
+                        SetupMapSpawn(peerInfo);
                         Debug.Log("[Central] Register Map Spawn Server: [" + peer.ConnectId + "]");
                         break;
                     case CentralServerPeerType.MapServer:
@@ -66,7 +67,7 @@ namespace Insthync.MMOG
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = error == ResponseAppServerRegisterMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
             responseMessage.error = error;
-            SendPacket(SendOptions.ReliableUnordered, peer, MessageTypes.ResponseAppServerRegister, responseMessage);
+            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MessageTypes.ResponseAppServerRegister, responseMessage);
         }
 
         protected void HandleRequestAppServerAddress(LiteNetLibMessageHandler messageHandler)
@@ -104,23 +105,25 @@ namespace Insthync.MMOG
             responseMessage.responseCode = error == ResponseAppServerAddressMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
             responseMessage.error = error;
             responseMessage.peerInfo = peerInfo;
-            SendPacket(SendOptions.ReliableUnordered, peer, MessageTypes.ResponseAppServerAddress, responseMessage);
+            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MessageTypes.ResponseAppServerAddress, responseMessage);
         }
 
         protected void HandleResponseAppServerRegister(LiteNetLibMessageHandler messageHandler)
         {
+            var peerHandler = messageHandler.peerHandler;
             var peer = messageHandler.peer;
             var message = messageHandler.ReadMessage<ResponseAppServerRegisterMessage>();
             var ackId = message.ackId;
-            TriggerAck(ackId, message.responseCode, message);
+            peerHandler.TriggerAck(ackId, message.responseCode, message);
         }
 
         protected virtual void HandleResponseAppServerAddress(LiteNetLibMessageHandler messageHandler)
         {
+            var peerHandler = messageHandler.peerHandler;
             var peer = messageHandler.peer;
             var message = messageHandler.ReadMessage<ResponseAppServerAddressMessage>();
             var ackId = message.ackId;
-            TriggerAck(ackId, message.responseCode, message);
+            peerHandler.TriggerAck(ackId, message.responseCode, message);
         }
 
         public static string GetAppServerRegisterHash(CentralServerPeerType peerType, int time)

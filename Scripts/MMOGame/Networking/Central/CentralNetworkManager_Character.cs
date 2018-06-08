@@ -11,7 +11,7 @@ namespace Insthync.MMOG
         public uint RequestCharacters(AckMessageCallback callback)
         {
             var message = new RequestCharactersMessage();
-            return SendAckPacket(SendOptions.ReliableUnordered, Client.Peer, MessageTypes.RequestCharacters, message, callback);
+            return Client.SendAckPacket(SendOptions.ReliableUnordered, Client.Peer, MessageTypes.RequestCharacters, message, callback);
         }
 
         public uint RequestCreateCharacter(string characterName, string databaseId, AckMessageCallback callback)
@@ -19,21 +19,21 @@ namespace Insthync.MMOG
             var message = new RequestCreateCharacterMessage();
             message.characterName = characterName;
             message.databaseId = databaseId;
-            return SendAckPacket(SendOptions.ReliableUnordered, Client.Peer, MessageTypes.RequestCreateCharacter, message, callback);
+            return Client.SendAckPacket(SendOptions.ReliableUnordered, Client.Peer, MessageTypes.RequestCreateCharacter, message, callback);
         }
 
         public uint RequestDeleteCharacter(string characterId, AckMessageCallback callback)
         {
             var message = new RequestDeleteCharacterMessage();
             message.characterId = characterId;
-            return SendAckPacket(SendOptions.ReliableUnordered, Client.Peer, MessageTypes.RequestDeleteCharacter, message, callback);
+            return Client.SendAckPacket(SendOptions.ReliableUnordered, Client.Peer, MessageTypes.RequestDeleteCharacter, message, callback);
         }
 
         public uint RequestSelectCharacter(string characterId, AckMessageCallback callback)
         {
             var message = new RequestSelectCharacterMessage();
             message.characterId = characterId;
-            return SendAckPacket(SendOptions.ReliableUnordered, Client.Peer, MessageTypes.RequestSelectCharacter, message, callback);
+            return Client.SendAckPacket(SendOptions.ReliableUnordered, Client.Peer, MessageTypes.RequestSelectCharacter, message, callback);
         }
 
         protected async void HandleRequestCharacters(LiteNetLibMessageHandler messageHandler)
@@ -52,7 +52,7 @@ namespace Insthync.MMOG
             responseMessage.responseCode = error == ResponseCharactersMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
             responseMessage.error = error;
             responseMessage.characters = characters;
-            SendPacket(SendOptions.ReliableUnordered, peer, MessageTypes.ResponseCharacters, responseMessage);
+            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MessageTypes.ResponseCharacters, responseMessage);
         }
 
         protected async void HandleRequestCreateCharacter(LiteNetLibMessageHandler messageHandler)
@@ -85,7 +85,7 @@ namespace Insthync.MMOG
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = error == ResponseCreateCharacterMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
             responseMessage.error = error;
-            SendPacket(SendOptions.ReliableUnordered, peer, MessageTypes.ResponseCreateCharacter, responseMessage);
+            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MessageTypes.ResponseCreateCharacter, responseMessage);
         }
 
         protected async void HandleRequestDeleteCharacter(LiteNetLibMessageHandler messageHandler)
@@ -102,7 +102,7 @@ namespace Insthync.MMOG
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = error == ResponseDeleteCharacterMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
             responseMessage.error = error;
-            SendPacket(SendOptions.ReliableUnordered, peer, MessageTypes.ResponseDeleteCharacter, responseMessage);
+            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MessageTypes.ResponseDeleteCharacter, responseMessage);
         }
 
         protected async void HandleRequestSelectCharacter(LiteNetLibMessageHandler messageHandler)
@@ -125,7 +125,9 @@ namespace Insthync.MMOG
                     error = ResponseSelectCharacterMessage.Error.MapNotReady;
                 else
                 {
-                    userPeerInfo.selectCharacterId = message.characterId;
+                    userPeerInfo.selectCharacterId = character.Id;
+                    userPeerInfo.selectCharacterName = character.CharacterName;
+                    userPeerInfo.selectCharacterCurrentMap = character.CurrentMapName;
                     userPeers[peer.ConnectId] = userPeerInfo;
                     userPeersByUserId[userPeerInfo.userId] = userPeerInfo;
                 }
@@ -141,39 +143,43 @@ namespace Insthync.MMOG
                 responseMessage.networkPort = mapServerPeerInfo.networkPort;
                 responseMessage.connectKey = mapServerPeerInfo.connectKey;
             }
-            SendPacket(SendOptions.ReliableUnordered, peer, MessageTypes.ResponseSelectCharacter, responseMessage);
+            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MessageTypes.ResponseSelectCharacter, responseMessage);
         }
 
         protected void HandleResponseCharacters(LiteNetLibMessageHandler messageHandler)
         {
+            var peerHandler = messageHandler.peerHandler;
             var peer = messageHandler.peer;
             var message = messageHandler.ReadMessage<ResponseCharactersMessage>();
             var ackId = message.ackId;
-            TriggerAck(ackId, message.responseCode, message);
+            peerHandler.TriggerAck(ackId, message.responseCode, message);
         }
 
         protected void HandleResponseCreateCharacter(LiteNetLibMessageHandler messageHandler)
         {
+            var peerHandler = messageHandler.peerHandler;
             var peer = messageHandler.peer;
             var message = messageHandler.ReadMessage<ResponseCreateCharacterMessage>();
             var ackId = message.ackId;
-            TriggerAck(ackId, message.responseCode, message);
+            peerHandler.TriggerAck(ackId, message.responseCode, message);
         }
 
         protected void HandleResponseDeleteCharacter(LiteNetLibMessageHandler messageHandler)
         {
+            var peerHandler = messageHandler.peerHandler;
             var peer = messageHandler.peer;
             var message = messageHandler.ReadMessage<ResponseDeleteCharacterMessage>();
             var ackId = message.ackId;
-            TriggerAck(ackId, message.responseCode, message);
+            peerHandler.TriggerAck(ackId, message.responseCode, message);
         }
 
         protected void HandleResponseSelectCharacter(LiteNetLibMessageHandler messageHandler)
         {
+            var peerHandler = messageHandler.peerHandler;
             var peer = messageHandler.peer;
             var message = messageHandler.ReadMessage<ResponseSelectCharacterMessage>();
             var ackId = message.ackId;
-            TriggerAck(ackId, message.responseCode, message);
+            peerHandler.TriggerAck(ackId, message.responseCode, message);
         }
     }
 }
