@@ -8,18 +8,24 @@ using LiteNetLibManager;
 namespace Insthync.MMOG
 {
     [RequireComponent(typeof(RpgGameManager))]
-    public class MapNetworkManager : LiteNetLibGameManager
+    public class MapNetworkManager : LiteNetLibGameManager, IAppServer
     {
         public static MapNetworkManager Singleton { get; protected set; }
 
-        private CentralAppServerConnector cacheCentralAppServerConnector;
-        public CentralAppServerConnector CentralAppServerConnector
+        [Header("Central Network Connection")]
+        public string centralNetworkAddress = "127.0.0.1";
+        public int centralNetworkPort = 6000;
+        public string centralConnectKey = "SampleConnectKey";
+        public string machineAddress = "127.0.0.1";
+
+        private CentralAppServerRegister cacheCentralAppServerRegister;
+        public CentralAppServerRegister CentralAppServerRegister
         {
             get
             {
-                if (cacheCentralAppServerConnector == null)
-                    cacheCentralAppServerConnector = gameObject.AddComponent<CentralAppServerConnector>();
-                return cacheCentralAppServerConnector;
+                if (cacheCentralAppServerRegister == null)
+                    cacheCentralAppServerRegister = new CentralAppServerRegister(this);
+                return cacheCentralAppServerRegister;
             }
         }
 
@@ -34,11 +40,27 @@ namespace Insthync.MMOG
             }
         }
 
+        public string CentralNetworkAddress { get { return centralNetworkAddress; } }
+        public int CentralNetworkPort { get { return centralNetworkPort; } }
+        public string CentralConnectKey { get { return centralConnectKey; } }
+        public string AppAddress { get { return machineAddress; } }
+        public int AppPort { get { return networkPort; } }
+        public string AppConnectKey { get { return connectKey; } }
+        public string AppExtra { get { return !string.IsNullOrEmpty(Assets.onlineScene.SceneName) ? Assets.onlineScene.SceneName : SceneManager.GetActiveScene().name; } }
+        public CentralServerPeerType PeerType { get { return CentralServerPeerType.MapServer; } }
+
         protected override void Awake()
         {
             Singleton = this;
             doNotDestroyOnSceneChanges = true;
             base.Awake();
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            if (IsServer)
+                CentralAppServerRegister.PollEvents();
         }
 
         public override bool StartServer()
@@ -68,14 +90,13 @@ namespace Insthync.MMOG
         public override void OnStartServer()
         {
             base.OnStartServer();
-            var extra = !string.IsNullOrEmpty(Assets.onlineScene.SceneName) ? Assets.onlineScene.SceneName : SceneManager.GetActiveScene().name;
-            CentralAppServerConnector.OnStartServer(CentralServerPeerType.MapSpawnServer, networkPort, connectKey, extra);
+            CentralAppServerRegister.OnStartServer();
         }
 
         public override void OnStopServer()
         {
             base.OnStopServer();
-            CentralAppServerConnector.OnStopServer();
+            CentralAppServerRegister.OnStopServer();
         }
     }
 }
