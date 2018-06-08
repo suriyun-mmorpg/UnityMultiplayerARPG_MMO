@@ -52,7 +52,7 @@ namespace Insthync.MMOG
         public override async Task<List<CharacterBuff>> ReadCharacterBuffs(string characterId)
         {
             var result = new List<CharacterBuff>();
-            var reader = await ExecuteReader("SELECT * FROM characterbuff WHERE applyingCharacterId=@characterId",
+            var reader = await ExecuteReader("SELECT * FROM characterbuff WHERE characterId=@characterId",
                 new MySqlParameter("@characterId", characterId));
             CharacterBuff tempBuff;
             while (ReadCharacterBuff(reader, out tempBuff, false))
