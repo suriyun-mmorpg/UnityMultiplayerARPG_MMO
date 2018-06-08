@@ -20,5 +20,7 @@
         public const short ResponseDeleteCharacter = 15;
         public const short RequestSelectCharacter = 16;
         public const short ResponseSelectCharacter = 17;
+        public const short RequestSpawnMap = 18;
+        public const short ResponseSpawnMap = 19;
     }
 }
