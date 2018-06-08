@@ -9,6 +9,9 @@ namespace Insthync.MMOG
     public class MMOClientInstance : MonoBehaviour
     {
         public static MMOClientInstance Singleton { get; protected set; }
+        public static string UserId { get; private set; }
+        public static string AccessToken { get; private set; }
+        public static string SelectCharacterId { get; private set; }
 
         [Header("Client Components")]
         [SerializeField]
@@ -86,7 +89,7 @@ namespace Insthync.MMOG
 
         public void RequestUserLogin(string username, string password, AckMessageCallback callback)
         {
-            centralNetworkManager.RequestUserLogin(username, password, callback);
+            centralNetworkManager.RequestUserLogin(username, password, (responseCode, messageData) => OnRequestUserLogin(responseCode, messageData, callback));
         }
 
         public void RequestUserRegister(string username, string password, AckMessageCallback callback)
@@ -96,7 +99,7 @@ namespace Insthync.MMOG
 
         public void RequestUserLogout(AckMessageCallback callback)
         {
-            centralNetworkManager.RequestUserLogout(callback);
+            centralNetworkManager.RequestUserLogout((responseCode, messageData) => OnRequestUserLogout(responseCode, messageData, callback));
         }
 
         public void RequestCharacters(AckMessageCallback callback)
@@ -116,7 +119,45 @@ namespace Insthync.MMOG
 
         public void RequestSelectCharacter(string characterId, AckMessageCallback callback)
         {
-            centralNetworkManager.RequestSelectCharacter(characterId, callback);
+            centralNetworkManager.RequestSelectCharacter(characterId, (responseCode, messageData) => OnRequestSelectCharacter(responseCode, messageData, characterId, callback));
+        }
+
+        private void OnRequestUserLogin(AckResponseCode responseCode, BaseAckMessage messageData, AckMessageCallback callback)
+        {
+            if (callback != null)
+                callback(responseCode, messageData);
+
+            UserId = string.Empty;
+            AccessToken = string.Empty;
+            SelectCharacterId = string.Empty;
+            var castedMessage = messageData as ResponseUserLoginMessage;
+            if (castedMessage.responseCode == AckResponseCode.Success)
+            {
+                UserId = castedMessage.userId;
+                AccessToken = castedMessage.accessToken;
+                SelectCharacterId = string.Empty;
+            }
+        }
+
+        private void OnRequestUserLogout(AckResponseCode responseCode, BaseAckMessage messageData, AckMessageCallback callback)
+        {
+            if (callback != null)
+                callback(responseCode, messageData);
+
+            UserId = string.Empty;
+            AccessToken = string.Empty;
+            SelectCharacterId = string.Empty;
+        }
+
+        private void OnRequestSelectCharacter(AckResponseCode responseCode, BaseAckMessage messageData, string characterId, AckMessageCallback callback)
+        {
+            if (callback != null)
+                callback(responseCode, messageData);
+
+            SelectCharacterId = string.Empty;
+            var castedMessage = messageData as ResponseSelectCharacterMessage;
+            if (castedMessage.responseCode == AckResponseCode.Success)
+                SelectCharacterId = characterId;
         }
         #endregion
     }

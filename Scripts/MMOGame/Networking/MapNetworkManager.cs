@@ -1,8 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 using LiteNetLib;
+using LiteNetLib.Utils;
 using LiteNetLibManager;
 
 namespace Insthync.MMOG
@@ -97,6 +96,38 @@ namespace Insthync.MMOG
         {
             base.OnStopServer();
             CentralAppServerRegister.OnStopServer();
+        }
+
+        public override void SerializeClientReadyExtra(NetDataWriter writer)
+        {
+            writer.Put(MMOClientInstance.UserId);
+            writer.Put(MMOClientInstance.AccessToken);
+            writer.Put(MMOClientInstance.SelectCharacterId);
+        }
+
+        public override async void DeserializeClientReadyExtra(LiteNetLibIdentity playerIdentity, NetDataReader reader)
+        {
+            if (playerIdentity == null)
+                return;
+
+            var playerCharacterEntity = playerIdentity.GetComponent<PlayerCharacterEntity>();
+            var userId = reader.GetString();
+            var accessToken = reader.GetString();
+            var selectCharacterId = reader.GetString();
+            // TODO: Validate access token
+            var playerCharacterData = await MMOServerInstance.Singleton.Database.ReadCharacter(userId, selectCharacterId);
+            if (playerCharacterData == null)
+            {
+                Debug.LogError("[Map Server] Cannot find select character " + selectCharacterId);
+                Assets.NetworkDestroy(playerIdentity.ObjectId, DestroyObjectReasons.RequestedToDestroy);
+                return;
+            }
+            playerCharacterData.CloneTo(playerCharacterEntity);
+            // Notify clients that this character is spawn or dead
+            if (playerCharacterEntity.CurrentHp > 0)
+                playerCharacterEntity.RequestOnRespawn(true);
+            else
+                playerCharacterEntity.RequestOnDead(true);
         }
     }
 }
