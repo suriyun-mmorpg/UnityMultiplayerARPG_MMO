@@ -127,6 +127,7 @@ namespace Insthync.MMOG
               id TEXT NOT NULL PRIMARY KEY,
               username TEXT NOT NULL UNIQUE,
               password TEXT NOT NULL,
+              accessToken TEXT NOT NULL,
               createAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
               updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
@@ -206,6 +207,21 @@ namespace Insthync.MMOG
                 id = reader.GetString("id");
 
             return id;
+        }
+
+        public override async Task<bool> ValidateAccessToken(string userId, string accessToken)
+        {
+            var result = await ExecuteScalar("SELECT COUNT(*) FROM userLogin WHERE id=@id AND accessToken=@accessToken",
+                new SqliteParameter("@id", userId),
+                new SqliteParameter("@accessToken", accessToken));
+            return (result != null ? (long)result : 0) > 0;
+        }
+
+        public override async Task UpdateAccessToken(string userId, string accessToken)
+        {
+            await ExecuteNonQuery("UPDATE userLogin SET accessToken=@accessToken WHERE id=@id",
+                new SqliteParameter("@id", userId),
+                new SqliteParameter("@accessToken", accessToken));
         }
 
         public override async Task CreateUserLogin(string username, string password)

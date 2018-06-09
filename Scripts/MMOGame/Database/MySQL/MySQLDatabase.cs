@@ -119,6 +119,21 @@ namespace Insthync.MMOG
             return id;
         }
 
+        public override async Task<bool> ValidateAccessToken(string userId, string accessToken)
+        {
+            var result = await ExecuteScalar("SELECT COUNT(*) FROM userLogin WHERE id=@id AND accessToken=@accessToken",
+                new MySqlParameter("@id", userId),
+                new MySqlParameter("@accessToken", accessToken));
+            return (result != null ? (long)result : 0) > 0;
+        }
+
+        public override async Task UpdateAccessToken(string userId, string accessToken)
+        {
+            await ExecuteNonQuery("UPDATE userLogin SET accessToken=@accessToken WHERE id=@id",
+                new MySqlParameter("@id", userId),
+                new MySqlParameter("@accessToken", accessToken));
+        }
+
         public override async Task CreateUserLogin(string username, string password)
         {
             await ExecuteNonQuery("INSERT INTO userLogin (id, username, password) VALUES (@id, @username, @password)",

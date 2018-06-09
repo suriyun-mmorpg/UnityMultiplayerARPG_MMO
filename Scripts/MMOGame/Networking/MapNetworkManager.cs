@@ -39,6 +39,11 @@ namespace Insthync.MMOG
             }
         }
 
+        public BaseDatabase Database
+        {
+            get { return MMOServerInstance.Singleton.Database; }
+        }
+
         public string CentralNetworkAddress { get { return centralNetworkAddress; } }
         public int CentralNetworkPort { get { return centralNetworkPort; } }
         public string CentralConnectKey { get { return centralConnectKey; } }
@@ -115,19 +120,28 @@ namespace Insthync.MMOG
             var accessToken = reader.GetString();
             var selectCharacterId = reader.GetString();
             // TODO: Validate access token
-            var playerCharacterData = await MMOServerInstance.Singleton.Database.ReadCharacter(userId, selectCharacterId);
-            if (playerCharacterData == null)
+            if (await Database.ValidateAccessToken(userId, accessToken))
             {
-                Debug.LogError("[Map Server] Cannot find select character " + selectCharacterId);
+                var playerCharacterData = await Database.ReadCharacter(userId, selectCharacterId);
+                if (playerCharacterData == null)
+                {
+                    Debug.LogError("[Map Server] Cannot find select character: " + selectCharacterId + " for user: " + userId);
+                    Assets.NetworkDestroy(playerIdentity.ObjectId, DestroyObjectReasons.RequestedToDestroy);
+                    return;
+                }
+                playerCharacterData.CloneTo(playerCharacterEntity);
+                // Notify clients that this character is spawn or dead
+                if (playerCharacterEntity.CurrentHp > 0)
+                    playerCharacterEntity.RequestOnRespawn(true);
+                else
+                    playerCharacterEntity.RequestOnDead(true);
+            }
+            else
+            {
+                Debug.LogError("[Map Server] Invalid access token for user: " + userId);
                 Assets.NetworkDestroy(playerIdentity.ObjectId, DestroyObjectReasons.RequestedToDestroy);
                 return;
             }
-            playerCharacterData.CloneTo(playerCharacterEntity);
-            // Notify clients that this character is spawn or dead
-            if (playerCharacterEntity.CurrentHp > 0)
-                playerCharacterEntity.RequestOnRespawn(true);
-            else
-                playerCharacterEntity.RequestOnDead(true);
         }
     }
 }

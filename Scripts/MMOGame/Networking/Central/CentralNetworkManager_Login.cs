@@ -34,7 +34,7 @@ namespace Insthync.MMOG
             var peer = messageHandler.peer;
             var message = messageHandler.ReadMessage<RequestUserLoginMessage>();
             var error = ResponseUserLoginMessage.Error.None;
-            var userId = await database.ValidateUserLogin(message.username, message.password);
+            var userId = await Database.ValidateUserLogin(message.username, message.password);
             var accessToken = string.Empty;
             if (string.IsNullOrEmpty(userId))
             {
@@ -53,6 +53,7 @@ namespace Insthync.MMOG
                 userPeerInfo.accessToken = accessToken = Regex.Replace(Convert.ToBase64String(Guid.NewGuid().ToByteArray()), "[/+=]", "");
                 userPeersByUserId[userId] = userPeerInfo;
                 userPeers[peer.ConnectId] = userPeerInfo;
+                await Database.UpdateAccessToken(userId, accessToken);
             }
             var responseMessage = new ResponseUserLoginMessage();
             responseMessage.ackId = message.ackId;
@@ -76,10 +77,10 @@ namespace Insthync.MMOG
                 error = ResponseUserRegisterMessage.Error.TooLongUsername;
             else if (string.IsNullOrEmpty(password) || password.Length < minPasswordLength)
                 error = ResponseUserRegisterMessage.Error.TooShortPassword;
-            else if (await database.FindUsername(username) > 0)
+            else if (await Database.FindUsername(username) > 0)
                 error = ResponseUserRegisterMessage.Error.UsernameAlreadyExisted;
             else
-                await database.CreateUserLogin(username, password);
+                await Database.CreateUserLogin(username, password);
             var responseMessage = new ResponseUserRegisterMessage();
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = error == ResponseUserRegisterMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;

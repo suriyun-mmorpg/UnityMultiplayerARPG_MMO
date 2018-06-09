@@ -23,7 +23,7 @@ namespace Insthync.MMOG
         public System.Action<NetPeer> onClientConnected;
         public System.Action<NetPeer, DisconnectInfo> onClientDisconnected;
 
-        public BaseDatabase database
+        public BaseDatabase Database
         {
             get { return MMOServerInstance.Singleton.Database; }
         }

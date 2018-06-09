@@ -46,7 +46,7 @@ namespace Insthync.MMOG
             if (!userPeers.TryGetValue(peer.ConnectId, out userPeerInfo))
                 error = ResponseCharactersMessage.Error.NotLoggedin;
             else
-                characters = await database.ReadCharacters(userPeerInfo.userId);
+                characters = await Database.ReadCharacters(userPeerInfo.userId);
             var responseMessage = new ResponseCharactersMessage();
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = error == ResponseCharactersMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
@@ -71,7 +71,7 @@ namespace Insthync.MMOG
                 error = ResponseCreateCharacterMessage.Error.TooLongCharacterName;
             else if (!GameInstance.PlayerCharacters.ContainsKey(databaseId))
                 error = ResponseCreateCharacterMessage.Error.InvalidData;
-            else if (await database.FindCharacterName(characterName) > 0)
+            else if (await Database.FindCharacterName(characterName) > 0)
                 error = ResponseCreateCharacterMessage.Error.CharacterNameAlreadyExisted;
             else
             {
@@ -79,7 +79,7 @@ namespace Insthync.MMOG
                 var characterData = new PlayerCharacterData();
                 characterData.Id = characterId;
                 characterData.SetNewCharacterData(characterName, databaseId);
-                await database.CreateCharacter(userPeerInfo.userId, characterData);
+                await Database.CreateCharacter(userPeerInfo.userId, characterData);
             }
             var responseMessage = new ResponseCreateCharacterMessage();
             responseMessage.ackId = message.ackId;
@@ -97,7 +97,7 @@ namespace Insthync.MMOG
             if (!userPeers.TryGetValue(peer.ConnectId, out userPeerInfo))
                 error = ResponseDeleteCharacterMessage.Error.NotLoggedin;
             else
-                await database.DeleteCharacter(userPeerInfo.userId, message.characterId);
+                await Database.DeleteCharacter(userPeerInfo.userId, message.characterId);
             var responseMessage = new ResponseDeleteCharacterMessage();
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = error == ResponseDeleteCharacterMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
@@ -118,7 +118,7 @@ namespace Insthync.MMOG
                 error = ResponseSelectCharacterMessage.Error.InvalidCharacterData;
             else
             {
-                var character = await database.ReadCharacter(userPeerInfo.userId, message.characterId, false, false, false, false, false, false, false, false);
+                var character = await Database.ReadCharacter(userPeerInfo.userId, message.characterId, false, false, false, false, false, false, false, false);
                 if (character == null)
                     error = ResponseSelectCharacterMessage.Error.InvalidCharacterData;
                 else if (!mapServerPeersBySceneName.TryGetValue(character.CurrentMapName, out mapServerPeerInfo))

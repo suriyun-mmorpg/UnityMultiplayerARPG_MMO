@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Jun 07, 2018 at 11:16 AM
+-- Generation Time: Jun 09, 2018 at 11:32 AM
 -- Server version: 10.1.28-MariaDB
 -- PHP Version: 7.1.11
 
@@ -162,6 +162,7 @@ CREATE TABLE `userlogin` (
   `id` varchar(36) COLLATE utf8_unicode_ci NOT NULL,
   `username` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
   `password` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
+  `accessToken` varchar(36) COLLATE utf8_unicode_ci NOT NULL,
   `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -171,82 +172,11 @@ CREATE TABLE `userlogin` (
 --
 
 --
--- Indexes for table `characterattribute`
---
-ALTER TABLE `characterattribute`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `characterbuff`
---
-ALTER TABLE `characterbuff`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `characterhotkey`
---
-ALTER TABLE `characterhotkey`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `characterinventory`
---
-ALTER TABLE `characterinventory`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `characterquest`
---
-ALTER TABLE `characterquest`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `characters`
---
-ALTER TABLE `characters`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `characterName` (`characterName`);
-
---
--- Indexes for table `characterskill`
---
-ALTER TABLE `characterskill`
-  ADD PRIMARY KEY (`id`);
-
---
 -- Indexes for table `userlogin`
 --
 ALTER TABLE `userlogin`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `username` (`username`);
-
---
--- AUTO_INCREMENT for dumped tables
---
-
---
--- AUTO_INCREMENT for table `characterattribute`
---
-ALTER TABLE `characterattribute`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `characterhotkey`
---
-ALTER TABLE `characterhotkey`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `characterquest`
---
-ALTER TABLE `characterquest`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `characterskill`
---
-ALTER TABLE `characterskill`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
