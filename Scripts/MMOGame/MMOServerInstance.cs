@@ -59,6 +59,8 @@ namespace Insthync.MMOG
 
             if (!Application.isEditor)
             {
+                var gameInstance = FindObjectOfType<GameInstance>();
+
                 // Prepare data
                 var args = Environment.GetCommandLineArgs();
 
@@ -121,14 +123,20 @@ namespace Insthync.MMOG
                 }
 
                 if (IsArgsProvided(args, ARG_START_CENTRAL_SERVER))
+                {
+                    gameInstance.doNotLoadHomeSceneOnStart = true;
                     startingCentralServer = true;
+                }
 
                 if (IsArgsProvided(args, ARG_START_MAP_SPAWN_SERVER))
+                {
+                    gameInstance.doNotLoadHomeSceneOnStart = true;
                     startingMapSpawnServer = true;
+                }
 
                 if (IsArgsProvided(args, ARG_START_MAP_SERVER))
                 {
-                    FindObjectOfType<GameInstance>().doNotLoadHomeSceneOnStart = true;
+                    gameInstance.doNotLoadHomeSceneOnStart = true;
                     startingMapServer = true;
                 }
             }
