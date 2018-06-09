@@ -262,10 +262,11 @@ MonoBehaviour:
   centralNetworkPort: 6000
   machineAddress: 127.0.0.1
   exePath: ./Build.exe
-  notSpawnInBatchMode: 1
+  notSpawnInBatchMode: 0
   startPort: 8000
   isOverrideExePath: 1
   overrideExePath: C:\Users\ITTIPON\Desktop\UnityBuilds\MultiplayerARPG\MultiplayerARPG.exe
+  editorNotSpawnInBatchMode: 1
 --- !u!114 &114946005600446132
 MonoBehaviour:
   m_ObjectHideFlags: 1
