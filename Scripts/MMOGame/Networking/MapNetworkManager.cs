@@ -110,7 +110,7 @@ namespace Insthync.MMOG
             writer.Put(MMOClientInstance.SelectCharacterId);
         }
 
-        public override async void DeserializeClientReadyExtra(LiteNetLibIdentity playerIdentity, NetDataReader reader)
+        public override async void DeserializeClientReadyExtra(LiteNetLibIdentity playerIdentity, NetPeer peer, NetDataReader reader)
         {
             if (playerIdentity == null)
                 return;
@@ -127,6 +127,7 @@ namespace Insthync.MMOG
                 {
                     Debug.LogError("[Map Server] Cannot find select character: " + selectCharacterId + " for user: " + userId);
                     Assets.NetworkDestroy(playerIdentity.ObjectId, DestroyObjectReasons.RequestedToDestroy);
+                    Server.NetManager.DisconnectPeer(peer);
                     return;
                 }
                 playerCharacterData.CloneTo(playerCharacterEntity);
@@ -140,6 +141,7 @@ namespace Insthync.MMOG
             {
                 Debug.LogError("[Map Server] Invalid access token for user: " + userId);
                 Assets.NetworkDestroy(playerIdentity.ObjectId, DestroyObjectReasons.RequestedToDestroy);
+                Server.NetManager.DisconnectPeer(peer);
                 return;
             }
         }
