@@ -2,12 +2,23 @@
 using LiteNetLibManager;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Insthync.MMOG
 {
     public partial class CentralNetworkManager
     {
+        public async void SpawnPublicMaps(NetPeer peer)
+        {
+            // Await 5 seconds before spawn maps
+            await Task.Delay(5050);
+            foreach (var scene in MMOServerInstance.Singleton.scenes)
+            {
+                if (!spawningMapAcks.ContainsKey(scene) && !mapServerPeersBySceneName.ContainsKey(scene))
+                    spawningMapAcks[scene] = RequestSpawnMap(peer, scene.SceneName, OnRequestSpawnMap);
+            }
+        }
 
         public uint RequestSpawnMap(NetPeer peer, string sceneName, AckMessageCallback callback)
         {
@@ -27,7 +38,8 @@ namespace Insthync.MMOG
 
         protected void OnRequestSpawnMap(AckResponseCode responseCode, BaseAckMessage messageData)
         {
-            Debug.Log("Spawn Map Ack Id: " + messageData.ackId + "  Status " + responseCode);
+            var castedMessage = messageData as ResponseSpawnMapMessage;
+            Debug.Log("Spawn Map Ack Id: " + messageData.ackId + "  Status: " + responseCode + " Error: " + castedMessage.error);
         }
     }
 }

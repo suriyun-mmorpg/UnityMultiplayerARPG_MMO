@@ -38,11 +38,7 @@ namespace Insthync.MMOG
                 {
                     case CentralServerPeerType.MapSpawnServer:
                         mapSpawnServerPeers[peer.ConnectId] = peerInfo;
-                        foreach (var scene in MMOServerInstance.Singleton.scenes)
-                        {
-                            if (!spawningMapAcks.ContainsKey(scene) && !mapServerPeersBySceneName.ContainsKey(scene))
-                                spawningMapAcks[scene] = RequestSpawnMap(peer, scene.SceneName, OnRequestSpawnMap);
-                        }
+                        SpawnPublicMaps(peer);
                         Debug.Log("[Central] Register Map Spawn Server: [" + peer.ConnectId + "]");
                         break;
                     case CentralServerPeerType.MapServer:

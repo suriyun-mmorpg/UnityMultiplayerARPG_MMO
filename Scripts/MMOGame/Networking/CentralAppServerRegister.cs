@@ -10,8 +10,6 @@ namespace Insthync.MMOG
 {
     public class CentralAppServerRegister : LiteNetLibPeerHandler
     {
-        public const float RECONNECT_DELAY = 5f;
-
         private IAppServer appServer;
 
         public bool IsRegisteredToCentralServer { get; private set; }
@@ -108,8 +106,8 @@ namespace Insthync.MMOG
         {
             Debug.Log("[" + appServer.PeerType + "] Disconnected from Central Server");
             IsRegisteredToCentralServer = false;
-            Debug.Log("[" + appServer.PeerType + "] Reconnect to central in " + RECONNECT_DELAY + " seconds");
-            await Task.Delay((int)(RECONNECT_DELAY * 1000));
+            Debug.Log("[" + appServer.PeerType + "] Reconnect to central in 5 seconds");
+            await Task.Delay(5000);
             ConnectToCentralServer();
         }
 
