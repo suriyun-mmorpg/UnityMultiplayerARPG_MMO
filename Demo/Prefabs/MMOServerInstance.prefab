@@ -187,7 +187,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 74d920f2df3608f4aa394880f7198146, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentLogLevel: 0
+  currentLogLevel: 2
   connectKey: SampleConnectKey
   networkAddress: localhost
   networkPort: 6000
@@ -236,7 +236,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 711495ce9cd78fc4a8d39358f3e0d2ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentLogLevel: 0
+  currentLogLevel: 2
   connectKey: SampleConnectKey
   networkAddress: localhost
   networkPort: 6001
