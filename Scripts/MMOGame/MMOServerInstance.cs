@@ -57,79 +57,88 @@ namespace Insthync.MMOG
             DontDestroyOnLoad(gameObject);
             Singleton = this;
 
-            // Prepare data
-            var args = Environment.GetCommandLineArgs();
-
-            // Android fix
-            if (args == null)
-                args = new string[0];
-
-            if (IsArgsProvided(args, ARG_CENTRAL_ADDRESS))
+            if (!Application.isEditor)
             {
-                var address = ReadArgs(args, ARG_CENTRAL_ADDRESS, "localhost");
-                mapSpawnNetworkManager.centralNetworkAddress = address;
-                mapNetworkManager.centralNetworkAddress = address;
+                // Prepare data
+                var args = Environment.GetCommandLineArgs();
+
+                // Android fix
+                if (args == null)
+                    args = new string[0];
+
+                if (IsArgsProvided(args, ARG_CENTRAL_ADDRESS))
+                {
+                    var address = ReadArgs(args, ARG_CENTRAL_ADDRESS, "localhost");
+                    mapSpawnNetworkManager.centralNetworkAddress = address;
+                    mapNetworkManager.centralNetworkAddress = address;
+                }
+
+                if (IsArgsProvided(args, ARG_CENTRAL_PORT))
+                {
+                    var port = ReadArgsInt(args, ARG_CENTRAL_PORT, 6000);
+                    centralNetworkManager.networkPort = port;
+                    mapSpawnNetworkManager.centralNetworkPort = port;
+                    mapNetworkManager.centralNetworkPort = port;
+                }
+
+                if (IsArgsProvided(args, ARG_MACHINE_ADDRESS))
+                {
+                    var address = ReadArgs(args, ARG_MACHINE_ADDRESS, "127.0.0.1");
+                    mapSpawnNetworkManager.machineAddress = address;
+                }
+
+                if (IsArgsProvided(args, ARG_MAP_SPAWN_PORT))
+                {
+                    var port = ReadArgsInt(args, ARG_MAP_SPAWN_PORT, 6003);
+                    mapSpawnNetworkManager.networkPort = port;
+                }
+
+                if (IsArgsProvided(args, ARG_SPAWN_EXE_PATH))
+                {
+                    var exePath = ReadArgs(args, ARG_SPAWN_EXE_PATH, "./Build.exe");
+                    mapSpawnNetworkManager.exePath = exePath;
+                }
+
+                if (IsArgsProvided(args, ARG_NOT_SPAWN_IN_BATCH_MODE))
+                    mapSpawnNetworkManager.notSpawnInBatchMode = true;
+
+                if (IsArgsProvided(args, ARG_MACHINE_ADDRESS))
+                {
+                    var address = ReadArgs(args, ARG_MACHINE_ADDRESS, "127.0.0.1");
+                    mapNetworkManager.machineAddress = address;
+                }
+
+                if (IsArgsProvided(args, ARG_MAP_PORT))
+                {
+                    var port = ReadArgsInt(args, ARG_MAP_PORT, 6004);
+                    mapNetworkManager.networkPort = port;
+                }
+
+                if (IsArgsProvided(args, ARG_SCENE_NAME))
+                {
+                    var sceneName = ReadArgs(args, ARG_SCENE_NAME);
+                    mapNetworkManager.Assets.onlineScene.SceneName = sceneName;
+                }
+
+                if (IsArgsProvided(args, ARG_START_CENTRAL_SERVER))
+                    startingCentralServer = true;
+
+                if (IsArgsProvided(args, ARG_START_MAP_SPAWN_SERVER))
+                    startingMapSpawnServer = true;
+
+                if (IsArgsProvided(args, ARG_START_MAP_SERVER))
+                {
+                    FindObjectOfType<GameInstance>().doNotLoadHomeSceneOnStart = true;
+                    startingMapServer = true;
+                }
             }
-
-            if (IsArgsProvided(args, ARG_CENTRAL_PORT))
+            else
             {
-                var port = ReadArgsInt(args, ARG_CENTRAL_PORT, 6000);
-                centralNetworkManager.networkPort = port;
-                mapSpawnNetworkManager.centralNetworkPort = port;
-                mapNetworkManager.centralNetworkPort = port;
-            }
+                if (startCentralOnAwake)
+                    startingCentralServer = true;
 
-            if (IsArgsProvided(args, ARG_MACHINE_ADDRESS))
-            {
-                var address = ReadArgs(args, ARG_MACHINE_ADDRESS, "127.0.0.1");
-                mapSpawnNetworkManager.machineAddress = address;
-            }
-
-            if (IsArgsProvided(args, ARG_MAP_SPAWN_PORT))
-            {
-                var port = ReadArgsInt(args, ARG_MAP_SPAWN_PORT, 6003);
-                mapSpawnNetworkManager.networkPort = port;
-            }
-
-            if (IsArgsProvided(args, ARG_SPAWN_EXE_PATH))
-            {
-                var exePath = ReadArgs(args, ARG_SPAWN_EXE_PATH, "./Build.exe");
-                mapSpawnNetworkManager.exePath = exePath;
-            }
-
-            /*
-            if (IsArgsProvided(args, ARG_NOT_SPAWN_IN_BATCH_MODE))
-                mapSpawnNetworkManager.notSpawnInBatchMode = true;
-                */
-
-            if (IsArgsProvided(args, ARG_MACHINE_ADDRESS))
-            {
-                var address = ReadArgs(args, ARG_MACHINE_ADDRESS, "127.0.0.1");
-                mapNetworkManager.machineAddress = address;
-            }
-
-            if (IsArgsProvided(args, ARG_MAP_PORT))
-            {
-                var port = ReadArgsInt(args, ARG_MAP_PORT, 6004);
-                mapNetworkManager.networkPort = port;
-            }
-
-            if (IsArgsProvided(args, ARG_SCENE_NAME))
-            {
-                var sceneName = ReadArgs(args, ARG_SCENE_NAME);
-                mapNetworkManager.Assets.onlineScene.SceneName = sceneName;
-            }
-
-            if (IsArgsProvided(args, ARG_START_CENTRAL_SERVER) || (Application.isEditor && startCentralOnAwake))
-                startingCentralServer = true;
-
-            if (IsArgsProvided(args, ARG_START_MAP_SPAWN_SERVER) || (Application.isEditor && startMapSpawnOnAwake))
-                startingMapSpawnServer = true;
-
-            if (IsArgsProvided(args, ARG_START_MAP_SERVER))
-            {
-                FindObjectOfType<GameInstance>().doNotLoadHomeSceneOnStart = true;
-                startingMapServer = true;
+                if (startMapSpawnOnAwake)
+                    startingMapSpawnServer = true;
             }
         }
 

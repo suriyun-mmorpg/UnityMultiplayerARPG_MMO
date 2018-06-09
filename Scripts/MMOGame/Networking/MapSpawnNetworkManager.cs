@@ -26,6 +26,7 @@ namespace Insthync.MMOG
         [Header("Running In Editor")]
         public bool isOverrideExePath;
         public string overrideExePath = "./Build.exe";
+        public bool editorNotSpawnInBatchMode;
 
         private int spawningPort = -1;
         private int portCounter = -1;
@@ -43,6 +44,17 @@ namespace Insthync.MMOG
                     return overrideExePath;
                 else
                     return exePath;
+            }
+        }
+
+        public bool NotSpawnInBatchMode
+        {
+            get
+            {
+                if (Application.isEditor)
+                    return editorNotSpawnInBatchMode;
+                else
+                    return notSpawnInBatchMode;
             }
         }
 
@@ -157,7 +169,7 @@ namespace Insthync.MMOG
                 CreateNoWindow = false,
                 UseShellExecute = false,
                 Arguments = " " +
-                    (!notSpawnInBatchMode ? "-batchmode -nographics " : "") +
+                    (!NotSpawnInBatchMode ? "-batchmode -nographics " : "") +
                     string.Format("{0} {1} ", MMOServerInstance.ARG_SCENE_NAME, message.sceneName) +
                     string.Format("{0} {1} ", MMOServerInstance.ARG_CENTRAL_ADDRESS, centralNetworkAddress) +
                     string.Format("{0} {1} ", MMOServerInstance.ARG_CENTRAL_PORT, centralNetworkPort) +
