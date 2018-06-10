@@ -364,7 +364,6 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 1127565840}
-  - component: {fileID: 1127565842}
   - component: {fileID: 1127565841}
   - component: {fileID: 1127565838}
   m_Layer: 0
@@ -494,17 +493,6 @@ MonoBehaviour:
         m_CallState: 2
     m_TypeName: LiteNetLibLoadSceneEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
---- !u!114 &1127565842
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1127565837}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 402976c409a606f4cb4ca7faf7936bab, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1232480984
 GameObject:
   m_ObjectHideFlags: 0
