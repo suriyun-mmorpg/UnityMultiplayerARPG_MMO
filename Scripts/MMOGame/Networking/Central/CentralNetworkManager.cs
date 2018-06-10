@@ -43,6 +43,7 @@ namespace Insthync.MMOG
             RegisterServerMessage(MessageTypes.RequestDeleteCharacter, HandleRequestDeleteCharacter);
             RegisterServerMessage(MessageTypes.RequestSelectCharacter, HandleRequestSelectCharacter);
             RegisterServerMessage(MessageTypes.ResponseSpawnMap, HandleResponseSpawnMap);
+            RegisterServerMessage(MessageTypes.RequestValidateAccessToken, HandleRequestValidateAccessToken);
         }
 
         protected override void RegisterClientMessages()
@@ -57,6 +58,7 @@ namespace Insthync.MMOG
             RegisterClientMessage(MessageTypes.ResponseCreateCharacter, HandleResponseCreateCharacter);
             RegisterClientMessage(MessageTypes.ResponseDeleteCharacter, HandleResponseDeleteCharacter);
             RegisterClientMessage(MessageTypes.ResponseSelectCharacter, HandleResponseSelectCharacter);
+            RegisterClientMessage(MessageTypes.ResponseValidateAccessToken, HandleResponseValidateAccessToken);
         }
 
         public override void OnPeerDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)

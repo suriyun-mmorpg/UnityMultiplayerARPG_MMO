@@ -91,6 +91,7 @@ namespace Insthync.MMOG
         {
             Debug.Log("[" + appServer.PeerType + "] Connected to Central Server");
             var peerInfo = new CentralServerPeerInfo();
+            peerInfo.peer = netPeer;
             peerInfo.peerType = appServer.PeerType;
             peerInfo.networkAddress = appServer.AppAddress;
             peerInfo.networkPort = appServer.AppPort;

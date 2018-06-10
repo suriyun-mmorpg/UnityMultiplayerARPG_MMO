@@ -29,6 +29,14 @@ namespace Insthync.MMOG
             return Client.SendAckPacket(SendOptions.ReliableUnordered, Client.Peer, MessageTypes.RequestUserLogout, message, callback);
         }
 
+        public uint RequestValidateAccessToken(string userId, string accessToken, AckMessageCallback callback)
+        {
+            var message = new RequestValidateAccessToken();
+            message.userId = userId;
+            message.accessToken = accessToken;
+            return Client.SendAckPacket(SendOptions.ReliableUnordered, Client.Peer, MessageTypes.RequestValidateAccessToken, message, callback);
+        }
+
         protected async void HandleRequestUserLogin(LiteNetLibMessageHandler messageHandler)
         {
             var peer = messageHandler.peer;
@@ -49,6 +57,7 @@ namespace Insthync.MMOG
             else
             {
                 var userPeerInfo = new CentralUserPeerInfo();
+                userPeerInfo.peer = peer;
                 userPeerInfo.userId = userId;
                 userPeerInfo.accessToken = accessToken = Regex.Replace(Convert.ToBase64String(Guid.NewGuid().ToByteArray()), "[/+=]", "");
                 userPeersByUserId[userId] = userPeerInfo;
@@ -88,20 +97,59 @@ namespace Insthync.MMOG
             LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MessageTypes.ResponseUserRegister, responseMessage);
         }
 
-        protected void HandleRequestUserLogout(LiteNetLibMessageHandler messageHandler)
+        protected async void HandleRequestUserLogout(LiteNetLibMessageHandler messageHandler)
         {
             var peer = messageHandler.peer;
             var message = messageHandler.ReadMessage<BaseAckMessage>();
-            var responseMessage = new BaseAckMessage();
             CentralUserPeerInfo userPeerInfo;
             if (userPeers.TryGetValue(peer.ConnectId, out userPeerInfo))
             {
                 userPeersByUserId.Remove(userPeerInfo.userId);
                 userPeers.Remove(peer.ConnectId);
+                await Database.UpdateAccessToken(userPeerInfo.userId, string.Empty);
             }
+            var responseMessage = new BaseAckMessage();
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = AckResponseCode.Success;
             LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MessageTypes.ResponseUserLogout, responseMessage);
+        }
+
+        protected async void HandleRequestValidateAccessToken(LiteNetLibMessageHandler messageHandler)
+        {
+            var peer = messageHandler.peer;
+            var message = messageHandler.ReadMessage<RequestValidateAccessToken>();
+            var error = ResponseValidateAccessToken.Error.None;
+            var userId = message.userId;
+            var accessToken = message.accessToken;
+            if (!await Database.ValidateAccessToken(userId, accessToken))
+            {
+                error = ResponseValidateAccessToken.Error.InvalidAccessToken;
+                userId = string.Empty;
+                accessToken = string.Empty;
+            }
+            else
+            {
+                CentralUserPeerInfo userPeerInfo;
+                if (userPeersByUserId.TryGetValue(userId, out userPeerInfo))
+                {
+                    userPeersByUserId.Remove(userPeerInfo.userId);
+                    userPeers.Remove(userPeerInfo.peer.ConnectId);
+                }
+                userPeerInfo = new CentralUserPeerInfo();
+                userPeerInfo.peer = peer;
+                userPeerInfo.userId = userId;
+                userPeerInfo.accessToken = accessToken = Regex.Replace(Convert.ToBase64String(Guid.NewGuid().ToByteArray()), "[/+=]", "");
+                userPeersByUserId[userId] = userPeerInfo;
+                userPeers[peer.ConnectId] = userPeerInfo;
+                await Database.UpdateAccessToken(userId, accessToken);
+            }
+            var responseMessage = new ResponseValidateAccessToken();
+            responseMessage.ackId = message.ackId;
+            responseMessage.responseCode = error == ResponseValidateAccessToken.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
+            responseMessage.error = error;
+            responseMessage.userId = userId;
+            responseMessage.accessToken = accessToken;
+            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MessageTypes.ResponseValidateAccessToken, responseMessage);
         }
 
         protected void HandleResponseUserLogin(LiteNetLibMessageHandler messageHandler)
@@ -127,6 +175,15 @@ namespace Insthync.MMOG
             var peerHandler = messageHandler.peerHandler;
             var peer = messageHandler.peer;
             var message = messageHandler.ReadMessage<BaseAckMessage>();
+            var ackId = message.ackId;
+            peerHandler.TriggerAck(ackId, message.responseCode, message);
+        }
+
+        protected void HandleResponseValidateAccessToken(LiteNetLibMessageHandler messageHandler)
+        {
+            var peerHandler = messageHandler.peerHandler;
+            var peer = messageHandler.peer;
+            var message = messageHandler.ReadMessage<ResponseValidateAccessToken>();
             var ackId = message.ackId;
             peerHandler.TriggerAck(ackId, message.responseCode, message);
         }

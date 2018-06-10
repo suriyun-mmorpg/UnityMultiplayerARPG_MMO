@@ -22,5 +22,7 @@
         public const short ResponseSelectCharacter = 17;
         public const short RequestSpawnMap = 18;
         public const short ResponseSpawnMap = 19;
+        public const short RequestValidateAccessToken = 20;
+        public const short ResponseValidateAccessToken = 21;
     }
 }

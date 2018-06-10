@@ -1,13 +1,12 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using LiteNetLibManager;
+﻿using LiteNetLibManager;
+using LiteNetLib;
 using LiteNetLib.Utils;
 
 namespace Insthync.MMOG
 {
     public class CentralServerPeerInfo : ILiteNetLibMessage
     {
+        public NetPeer peer;
         public CentralServerPeerType peerType;
         public string networkAddress;
         public int networkPort;

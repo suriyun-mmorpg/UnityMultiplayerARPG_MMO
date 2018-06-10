@@ -126,8 +126,6 @@ namespace Insthync.MMOG
                 else
                 {
                     userPeerInfo.selectCharacterId = character.Id;
-                    userPeerInfo.selectCharacterName = character.CharacterName;
-                    userPeerInfo.selectCharacterCurrentMap = character.CurrentMapName;
                     userPeers[peer.ConnectId] = userPeerInfo;
                     userPeersByUserId[userPeerInfo.userId] = userPeerInfo;
                 }
