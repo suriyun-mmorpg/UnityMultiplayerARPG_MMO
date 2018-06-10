@@ -172,6 +172,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5e08d8ccbfded44bb2400909f8f4376, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  logFileName: log
+  logAreaHeight: 100
   openLogDir: 1
   showLogSize: 20
 --- !u!114 &114414512406587944
@@ -239,6 +241,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dbPath: ./mmorpgtemplate.sqlite3
+  editorDbPath: C:\Users\ITTIPON\Desktop\UnityBuilds\MultiplayerARPG\mmorpgtemplate.sqlite3
 --- !u!114 &114788248445432888
 MonoBehaviour:
   m_ObjectHideFlags: 1
