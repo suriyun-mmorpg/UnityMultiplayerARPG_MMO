@@ -54,7 +54,7 @@ namespace Insthync.MMOG
         {
             var connection = NewConnection();
             connection.Open();
-            await ExecuteNonQuery(connection, "START TRANSACTION");
+            await ExecuteNonQuery(connection, "BEGIN");
             await ExecuteNonQuery(connection, "INSERT INTO characters " +
                 "(id, userId, databaseId, characterName, level, exp, currentHp, currentMp, currentStamina, currentFood, currentWater, statPoint, skillPoint, gold, currentMapName, currentPositionX, currentPositionY, currentPositionZ, respawnMapName, respawnPositionX, respawnPositionY, respawnPositionZ) VALUES " +
                 "(@id, @userId, @databaseId, @characterName, @level, @exp, @currentHp, @currentMp, @currentStamina, @currentFood, @currentWater, @statPoint, @skillPoint, @gold, @currentMapName, @currentPositionX, @currentPositionY, @currentPositionZ, @respawnMapName, @respawnPositionX, @respawnPositionY, @respawnPositionZ)",
@@ -81,7 +81,7 @@ namespace Insthync.MMOG
                 new SqliteParameter("@respawnPositionY", characterData.RespawnPosition.y),
                 new SqliteParameter("@respawnPositionZ", characterData.RespawnPosition.z));
             await FillCharacterRelatesData(connection, characterData);
-            await ExecuteNonQuery(connection, "COMMIT");
+            await ExecuteNonQuery(connection, "END");
             connection.Close();
         }
 
@@ -172,7 +172,7 @@ namespace Insthync.MMOG
         {
             var connection = NewConnection();
             connection.Open();
-            await ExecuteNonQuery(connection, "START TRANSACTION");
+            await ExecuteNonQuery(connection, "BEGIN");
             await ExecuteNonQuery(connection, "UPDATE characters SET " +
                 "databaseId=@databaseId, " +
                 "characterName=@characterName, " +
@@ -217,7 +217,7 @@ namespace Insthync.MMOG
                 new SqliteParameter("@respawnPositionZ", characterData.RespawnPosition.z),
                 new SqliteParameter("@id", characterData.Id));
             await FillCharacterRelatesData(connection, characterData);
-            await ExecuteNonQuery(connection, "COMMIT");
+            await ExecuteNonQuery(connection, "END");
             connection.Close();
         }
 
