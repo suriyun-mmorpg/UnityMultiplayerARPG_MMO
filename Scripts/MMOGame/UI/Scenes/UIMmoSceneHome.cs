@@ -19,12 +19,7 @@ namespace Insthync.MMOG
             MMOClientInstance.Singleton.onClientConnected += OnCentralServerConnected;
             MMOClientInstance.Singleton.onClientDisconnected += OnCentralServerDisconnected;
             if (MMOClientInstance.Singleton.IsConnectedToCentralServer())
-            {
-                ClearHistory();
-                Next(uiLogin);
-            }
-            if (!string.IsNullOrEmpty(MMOClientInstance.UserId) && !string.IsNullOrEmpty(MMOClientInstance.AccessToken))
-                MMOClientInstance.Singleton.RequestValidateAccessToken(MMOClientInstance.UserId, MMOClientInstance.AccessToken, OnValidateAccessToken);
+                OnCentralServerConnected(MMOClientInstance.Singleton.GetCentralClientPeer());
         }
 
         private void OnDisable()
@@ -37,6 +32,8 @@ namespace Insthync.MMOG
         {
             ClearHistory();
             Next(uiLogin);
+            if (!string.IsNullOrEmpty(MMOClientInstance.UserId) && !string.IsNullOrEmpty(MMOClientInstance.AccessToken))
+                MMOClientInstance.Singleton.RequestValidateAccessToken(MMOClientInstance.UserId, MMOClientInstance.AccessToken, OnValidateAccessToken);
         }
 
         public void OnCentralServerDisconnected(NetPeer netPeer, DisconnectInfo disconnectInfo)

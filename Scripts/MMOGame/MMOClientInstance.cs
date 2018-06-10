@@ -87,6 +87,11 @@ namespace Insthync.MMOG
             return centralNetworkManager.IsClientConnected;
         }
 
+        public NetPeer GetCentralClientPeer()
+        {
+            return centralNetworkManager.Client.Peer;
+        }
+
         public void RequestUserLogin(string username, string password, AckMessageCallback callback)
         {
             centralNetworkManager.RequestUserLogin(username, password, (responseCode, messageData) => OnRequestUserLogin(responseCode, messageData, callback));
