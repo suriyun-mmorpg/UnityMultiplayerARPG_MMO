@@ -25,9 +25,14 @@ namespace Insthync.MMOG
             return false;
         }
 
-        public override async Task CreateCharacterHotkey(string characterId, CharacterHotkey characterHotkey)
+        public override Task CreateCharacterHotkey(string characterId, CharacterHotkey characterHotkey)
         {
-            await ExecuteNonQuery("INSERT INTO characterhotkey (characterId, hotkeyId, type, dataId) VALUES (@characterId, @hotkeyId, @type, @dataId)",
+            return CreateCharacterHotkey(connection, characterId, characterHotkey);
+        }
+
+        public async Task CreateCharacterHotkey(MySqlConnection connection, string characterId, CharacterHotkey characterHotkey)
+        {
+            await ExecuteNonQuery(connection, "INSERT INTO characterhotkey (characterId, hotkeyId, type, dataId) VALUES (@characterId, @hotkeyId, @type, @dataId)",
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@hotkeyId", characterHotkey.hotkeyId),
                 new MySqlParameter("@type", characterHotkey.type),

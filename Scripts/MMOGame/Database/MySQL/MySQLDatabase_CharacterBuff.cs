@@ -28,9 +28,14 @@ namespace Insthync.MMOG
             return false;
         }
 
-        public override async Task CreateCharacterBuff(string characterId, CharacterBuff characterBuff)
+        public override Task CreateCharacterBuff(string characterId, CharacterBuff characterBuff)
         {
-            await ExecuteNonQuery("INSERT INTO characterbuff (id, characterId, type, dataId, level, buffRemainsDuration) VALUES (@id, @characterId, @type, @dataId, @level, @buffRemainsDuration)",
+            return CreateCharacterBuff(connection, characterId, characterBuff);
+        }
+
+        public async Task CreateCharacterBuff(MySqlConnection connection, string characterId, CharacterBuff characterBuff)
+        {
+            await ExecuteNonQuery(connection, "INSERT INTO characterbuff (id, characterId, type, dataId, level, buffRemainsDuration) VALUES (@id, @characterId, @type, @dataId, @level, @buffRemainsDuration)",
                 new MySqlParameter("@id", characterBuff.id),
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@type", (byte)characterBuff.type),

@@ -25,9 +25,14 @@ namespace Insthync.MMOG
             return false;
         }
 
-        public override async Task CreateCharacterSkill(string characterId, CharacterSkill characterSkill)
+        public override Task CreateCharacterSkill(string characterId, CharacterSkill characterSkill)
         {
-            await ExecuteNonQuery("INSERT INTO characterskill (characterId, skillId, level, coolDownRemainsDuration) VALUES (@characterId, @skillId, @level, @coolDownRemainsDuration)",
+            return CreateCharacterSkill(connection, characterId, characterSkill);
+        }
+
+        public async Task CreateCharacterSkill(MySqlConnection connection, string characterId, CharacterSkill characterSkill)
+        {
+            await ExecuteNonQuery(connection, "INSERT INTO characterskill (characterId, skillId, level, coolDownRemainsDuration) VALUES (@characterId, @skillId, @level, @coolDownRemainsDuration)",
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@skillId", characterSkill.skillId),
                 new MySqlParameter("@level", characterSkill.level),

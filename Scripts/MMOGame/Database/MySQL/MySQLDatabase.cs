@@ -27,7 +27,7 @@ namespace Insthync.MMOG
 
         private void Awake()
         {
-            connection = new MySqlConnection(GetConnectionString());
+            connection = NewConnection();
             connection.Open();
         }
 
@@ -47,7 +47,17 @@ namespace Insthync.MMOG
             return connectionString;
         }
 
-        public async Task<long> ExecuteInsertData(string sql, params MySqlParameter[] args)
+        public MySqlConnection NewConnection()
+        {
+            return new MySqlConnection(GetConnectionString());
+        }
+
+        public Task<long> ExecuteInsertData(string sql, params MySqlParameter[] args)
+        {
+            return ExecuteInsertData(connection, sql, args);
+        }
+
+        public async Task<long> ExecuteInsertData(MySqlConnection connection, string sql, params MySqlParameter[] args)
         {
             long result = 0;
             using (var cmd = new MySqlCommand(sql, connection))
@@ -62,7 +72,12 @@ namespace Insthync.MMOG
             return result;
         }
 
-        public async Task<int> ExecuteNonQuery(string sql, params MySqlParameter[] args)
+        public Task<int> ExecuteNonQuery(string sql, params MySqlParameter[] args)
+        {
+            return ExecuteNonQuery(connection, sql, args);
+        }
+
+        public async Task<int> ExecuteNonQuery(MySqlConnection connection, string sql, params MySqlParameter[] args)
         {
             var numRows = 0;
             using (var cmd = new MySqlCommand(sql, connection))
@@ -76,7 +91,12 @@ namespace Insthync.MMOG
             return numRows;
         }
 
-        public async Task<object> ExecuteScalar(string sql, params MySqlParameter[] args)
+        public Task<object> ExecuteScalar(string sql, params MySqlParameter[] args)
+        {
+            return ExecuteScalar(connection, sql, args);
+        }
+
+        public async Task<object> ExecuteScalar(MySqlConnection connection, string sql, params MySqlParameter[] args)
         {
             object result;
             using (var cmd = new MySqlCommand(sql, connection))
@@ -90,7 +110,12 @@ namespace Insthync.MMOG
             return result;
         }
 
-        public async Task<MySQLRowsReader> ExecuteReader(string sql, params MySqlParameter[] args)
+        public Task<MySQLRowsReader> ExecuteReader(string sql, params MySqlParameter[] args)
+        {
+            return ExecuteReader(connection, sql, args);
+        }
+
+        public async Task<MySQLRowsReader> ExecuteReader(MySqlConnection connection, string sql, params MySqlParameter[] args)
         {
             MySQLRowsReader result = new MySQLRowsReader();
             using (var cmd = new MySqlCommand(sql, connection))

@@ -47,9 +47,14 @@ namespace Insthync.MMOG
             return false;
         }
 
-        public override async Task CreateCharacterQuest(string characterId, CharacterQuest characterQuest)
+        public override Task CreateCharacterQuest(string characterId, CharacterQuest characterQuest)
         {
-            await ExecuteNonQuery("INSERT INTO characterquest (characterId, questId, isComplete, killedMonsters) VALUES (@characterId, @questId, @isComplete, @killedMonsters)",
+            return CreateCharacterQuest(connection, characterId, characterQuest);
+        }
+
+        public async Task CreateCharacterQuest(MySqlConnection connection, string characterId, CharacterQuest characterQuest)
+        {
+            await ExecuteNonQuery(connection, "INSERT INTO characterquest (characterId, questId, isComplete, killedMonsters) VALUES (@characterId, @questId, @isComplete, @killedMonsters)",
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@questId", characterQuest.questId),
                 new MySqlParameter("@isComplete", characterQuest.isComplete),
