@@ -80,7 +80,6 @@ namespace Insthync.MMOG
                 new SqliteParameter("@respawnPositionZ", characterData.RespawnPosition.z));
             await FillCharacterRelatesData(characterData);
             await ExecuteNonQuery("END");
-            connection.Close();
         }
 
         private bool ReadCharacter(SQLiteRowsReader reader, out PlayerCharacterData result, bool resetReader = true)
@@ -214,7 +213,6 @@ namespace Insthync.MMOG
                 new SqliteParameter("@id", characterData.Id));
             await FillCharacterRelatesData(characterData);
             await ExecuteNonQuery("END");
-            connection.Close();
         }
 
         public override async Task DeleteCharacter(string userId, string id)

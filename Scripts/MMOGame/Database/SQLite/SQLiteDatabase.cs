@@ -195,7 +195,6 @@ namespace Insthync.MMOG
                 }
                 var dataReader = await cmd.ExecuteReaderAsync();
                 result.Init(dataReader);
-                dataReader.Close();
             }
             return result;
         }
