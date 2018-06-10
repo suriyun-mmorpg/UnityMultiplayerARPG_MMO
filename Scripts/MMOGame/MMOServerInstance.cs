@@ -5,6 +5,7 @@ using LiteNetLibManager;
 
 namespace Insthync.MMOG
 {
+    [RequireComponent(typeof(LogGUI))]
     public class MMOServerInstance : MonoBehaviour
     {
         public static MMOServerInstance Singleton { get; protected set; }
@@ -35,6 +36,16 @@ namespace Insthync.MMOG
         public MapSpawnNetworkManager MapSpawnNetworkManager { get { return mapSpawnNetworkManager; } }
         public MapNetworkManager MapNetworkManager { get { return mapNetworkManager; } }
         public BaseDatabase Database { get { return database; } }
+        private LogGUI cacheLogGUI;
+        public LogGUI CacheLogGUI
+        {
+            get
+            {
+                if (cacheLogGUI == null)
+                    cacheLogGUI = GetComponent<LogGUI>();
+                return cacheLogGUI;
+            }
+        }
 
         [Header("Running In Editor")]
         public bool startCentralOnAwake;
@@ -55,6 +66,7 @@ namespace Insthync.MMOG
             DontDestroyOnLoad(gameObject);
             Singleton = this;
 
+            CacheLogGUI.enabled = false;
             if (!Application.isEditor)
             {
                 var gameInstance = FindObjectOfType<GameInstance>();
@@ -120,22 +132,43 @@ namespace Insthync.MMOG
                     mapNetworkManager.Assets.onlineScene.SceneName = sceneName;
                 }
 
+                var logFileName = "Log";
+                var startLog = false;
+
                 if (IsArgsProvided(args, ARG_START_CENTRAL_SERVER))
                 {
+                    if (!string.IsNullOrEmpty(logFileName))
+                        logFileName += "_";
+                    logFileName += "Central";
+                    startLog = true;
                     gameInstance.doNotLoadHomeSceneOnStart = true;
                     startingCentralServer = true;
                 }
 
                 if (IsArgsProvided(args, ARG_START_MAP_SPAWN_SERVER))
                 {
+                    if (!string.IsNullOrEmpty(logFileName))
+                        logFileName += "_";
+                    logFileName += "MapSpawn";
+                    startLog = true;
                     gameInstance.doNotLoadHomeSceneOnStart = true;
                     startingMapSpawnServer = true;
                 }
 
                 if (IsArgsProvided(args, ARG_START_MAP_SERVER))
                 {
+                    if (!string.IsNullOrEmpty(logFileName))
+                        logFileName += "_";
+                    logFileName += "Map";
+                    startLog = true;
                     gameInstance.doNotLoadHomeSceneOnStart = true;
                     startingMapServer = true;
+                }
+
+                if (startLog)
+                {
+                    CacheLogGUI.logFileName = logFileName;
+                    CacheLogGUI.enabled = true;
                 }
             }
             else
