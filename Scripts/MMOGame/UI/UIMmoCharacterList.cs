@@ -190,6 +190,8 @@ namespace Insthync.MMOG
                     UISceneGlobal.Singleton.ShowMessageDialog("Cannot Select Character", "Connection timeout");
                     break;
                 default:
+                    // Disconnect from central server then connect to map server
+                    MMOClientInstance.Singleton.StopCentralClient();
                     MMOClientInstance.Singleton.StartMapClient(castedMessage.sceneName, castedMessage.networkAddress, castedMessage.networkPort, castedMessage.connectKey);
                     break;
             }

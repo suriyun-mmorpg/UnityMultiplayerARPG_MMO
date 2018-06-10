@@ -13,10 +13,10 @@ namespace Insthync.MMOG
         {
             // Await 5 seconds before spawn maps
             await Task.Delay(5050);
-            foreach (var scene in MMOServerInstance.Singleton.scenes)
+            foreach (var scene in MMOServerInstance.Singleton.GetScenes())
             {
                 if (!spawningMapAcks.ContainsKey(scene) && !mapServerPeersBySceneName.ContainsKey(scene))
-                    spawningMapAcks[scene] = RequestSpawnMap(peer, scene.SceneName, OnRequestSpawnMap);
+                    spawningMapAcks[scene] = RequestSpawnMap(peer, scene, OnRequestSpawnMap);
             }
         }
 

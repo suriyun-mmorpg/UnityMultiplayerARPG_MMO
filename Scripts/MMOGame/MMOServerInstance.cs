@@ -36,9 +36,6 @@ namespace Insthync.MMOG
         public MapNetworkManager MapNetworkManager { get { return mapNetworkManager; } }
         public BaseDatabase Database { get { return database; } }
 
-        [Header("Gameplay Configs")]
-        public LiteNetLibScene[] scenes;
-
         [Header("Running In Editor")]
         public bool startCentralOnAwake;
         public bool startMapSpawnOnAwake;
@@ -46,6 +43,7 @@ namespace Insthync.MMOG
         private bool startingCentralServer;
         private bool startingMapSpawnServer;
         private bool startingMapServer;
+        private readonly List<string> scenes = new List<string>();
 
         private void Awake()
         {
@@ -152,6 +150,19 @@ namespace Insthync.MMOG
 
         private void Start()
         {
+            scenes.Clear();
+            if (GameInstance.Singleton.startScene != null &&
+                !string.IsNullOrEmpty(GameInstance.Singleton.startScene.SceneName))
+                scenes.Add(GameInstance.Singleton.startScene.SceneName);
+
+            foreach (var scene in GameInstance.Singleton.otherScenes)
+            {
+                if (scene != null &&
+                    !string.IsNullOrEmpty(scene.SceneName) &&
+                    !scenes.Contains(scene.SceneName))
+                    scenes.Add(scene.SceneName);
+            }
+
             if (startingCentralServer)
                 StartCentralServer();
 
@@ -176,6 +187,11 @@ namespace Insthync.MMOG
         public void StartMapServer()
         {
             mapNetworkManager.StartServer();
+        }
+
+        public List<string> GetScenes()
+        {
+            return scenes;
         }
         #endregion
         
