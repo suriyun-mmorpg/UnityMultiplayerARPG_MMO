@@ -107,8 +107,17 @@ namespace Insthync.MMOG
         {
             Debug.Log("[" + appServer.PeerType + "] Disconnected from Central Server");
             IsRegisteredToCentralServer = false;
-            Debug.Log("[" + appServer.PeerType + "] Reconnect to central in 5 seconds");
-            await Task.Delay(5000);
+            await Task.Delay(500);
+            Debug.Log("[" + appServer.PeerType + "] Reconnect to central in 5 seconds...");
+            await Task.Delay(1000);
+            Debug.Log("[" + appServer.PeerType + "] Reconnect to central in 4 seconds...");
+            await Task.Delay(1000);
+            Debug.Log("[" + appServer.PeerType + "] Reconnect to central in 3 seconds...");
+            await Task.Delay(1000);
+            Debug.Log("[" + appServer.PeerType + "] Reconnect to central in 2 seconds...");
+            await Task.Delay(1000);
+            Debug.Log("[" + appServer.PeerType + "] Reconnect to central in 1 seconds...");
+            await Task.Delay(1000);
             ConnectToCentralServer();
         }
 
