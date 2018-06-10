@@ -8,7 +8,7 @@ using LiteNetLibManager;
 
 namespace Insthync.MMOG
 {
-    public class MapNetworkManager : LiteNetLibGameManager, IAppServer
+    public class MapNetworkManager : BaseGameNetworkManager, IAppServer
     {
         public static MapNetworkManager Singleton { get; protected set; }
 
