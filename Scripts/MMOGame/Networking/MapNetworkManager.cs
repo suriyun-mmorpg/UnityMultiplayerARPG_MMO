@@ -8,7 +8,6 @@ using LiteNetLibManager;
 
 namespace Insthync.MMOG
 {
-    [RequireComponent(typeof(RpgGameManager))]
     public class MapNetworkManager : LiteNetLibGameManager, IAppServer
     {
         public static MapNetworkManager Singleton { get; protected set; }
@@ -32,17 +31,6 @@ namespace Insthync.MMOG
                     cacheCentralAppServerRegister.onAppServerRegistered = OnAppServerRegistered;
                 }
                 return cacheCentralAppServerRegister;
-            }
-        }
-
-        private RpgGameManager cacheGameManager;
-        public RpgGameManager GameManager
-        {
-            get
-            {
-                if (cacheGameManager == null)
-                    cacheGameManager = GetComponent<RpgGameManager>();
-                return cacheGameManager;
             }
         }
 
@@ -135,30 +123,6 @@ namespace Insthync.MMOG
                 tasks.Add(Database.UpdateCharacter(playerCharacterEntity.CloneTo(new PlayerCharacterData())));
             }
             await Task.WhenAll(tasks);
-        }
-
-        public override bool StartServer()
-        {
-            GameManager.Init(this);
-            return base.StartServer();
-        }
-
-        public override LiteNetLibClient StartClient(string networkAddress, int networkPort, string connectKey)
-        {
-            GameManager.Init(this);
-            return base.StartClient(networkAddress, networkPort, connectKey);
-        }
-
-        public override void OnClientDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
-        {
-            base.OnClientDisconnected(peer, disconnectInfo);
-            GameManager.OnClientDisconnected(peer, disconnectInfo);
-        }
-
-        public override void OnServerOnlineSceneLoaded()
-        {
-            base.OnServerOnlineSceneLoaded();
-            GameManager.OnServerOnlineSceneLoaded();
         }
 
         public override void OnStartServer()
