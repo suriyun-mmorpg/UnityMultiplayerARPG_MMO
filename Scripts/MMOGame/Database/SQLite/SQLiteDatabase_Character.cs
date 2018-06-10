@@ -8,52 +8,54 @@ namespace Insthync.MMOG
 {
     public partial class SQLiteDatabase
     {
-        private async Task FillCharacterRelatesData(IPlayerCharacterData characterData)
+        private async Task FillCharacterRelatesData(SqliteConnection connection, IPlayerCharacterData characterData)
         {
             // Delete all character then add all of them
             var characterId = characterData.Id;
-            await ExecuteNonQuery("DELETE FROM characterinventory WHERE characterId=@characterId", new SqliteParameter("@characterId", characterId));
-            await ExecuteNonQuery("DELETE FROM characterattribute WHERE characterId=@characterId", new SqliteParameter("@characterId", characterId));
-            await ExecuteNonQuery("DELETE FROM characterskill WHERE characterId=@characterId", new SqliteParameter("@characterId", characterId));
-            await ExecuteNonQuery("DELETE FROM characterbuff WHERE characterId=@characterId", new SqliteParameter("@characterId", characterId));
-            await ExecuteNonQuery("DELETE FROM characterhotkey WHERE characterId=@characterId", new SqliteParameter("@characterId", characterId));
-            await ExecuteNonQuery("DELETE FROM characterquest WHERE characterId=@characterId", new SqliteParameter("@characterId", characterId));
+            await ExecuteNonQuery(connection, "DELETE FROM characterinventory WHERE characterId=@characterId", new SqliteParameter("@characterId", characterId));
+            await ExecuteNonQuery(connection, "DELETE FROM characterattribute WHERE characterId=@characterId", new SqliteParameter("@characterId", characterId));
+            await ExecuteNonQuery(connection, "DELETE FROM characterskill WHERE characterId=@characterId", new SqliteParameter("@characterId", characterId));
+            await ExecuteNonQuery(connection, "DELETE FROM characterbuff WHERE characterId=@characterId", new SqliteParameter("@characterId", characterId));
+            await ExecuteNonQuery(connection, "DELETE FROM characterhotkey WHERE characterId=@characterId", new SqliteParameter("@characterId", characterId));
+            await ExecuteNonQuery(connection, "DELETE FROM characterquest WHERE characterId=@characterId", new SqliteParameter("@characterId", characterId));
 
-            await CreateCharacterEquipWeapons(characterId, characterData.EquipWeapons);
+            await CreateCharacterEquipWeapons(connection, characterId, characterData.EquipWeapons);
             foreach (var equipItem in characterData.EquipItems)
             {
-                await CreateCharacterEquipItem(characterId, equipItem);
+                await CreateCharacterEquipItem(connection, characterId, equipItem);
             }
             foreach (var nonEquipItem in characterData.NonEquipItems)
             {
-                await CreateCharacterNonEquipItem(characterId, nonEquipItem);
+                await CreateCharacterNonEquipItem(connection, characterId, nonEquipItem);
             }
             foreach (var attribute in characterData.Attributes)
             {
-                await CreateCharacterAttribute(characterId, attribute);
+                await CreateCharacterAttribute(connection, characterId, attribute);
             }
             foreach (var skill in characterData.Skills)
             {
-                await CreateCharacterSkill(characterId, skill);
+                await CreateCharacterSkill(connection, characterId, skill);
             }
             foreach (var buff in characterData.Buffs)
             {
-                await CreateCharacterBuff(characterId, buff);
+                await CreateCharacterBuff(connection, characterId, buff);
             }
             foreach (var hotkey in characterData.Hotkeys)
             {
-                await CreateCharacterHotkey(characterId, hotkey);
+                await CreateCharacterHotkey(connection, characterId, hotkey);
             }
             foreach (var quest in characterData.Quests)
             {
-                await CreateCharacterQuest(characterId, quest);
+                await CreateCharacterQuest(connection, characterId, quest);
             }
         }
 
         public override async Task CreateCharacter(string userId, PlayerCharacterData characterData)
         {
-            await ExecuteNonQuery("BEGIN");
-            await ExecuteNonQuery("INSERT INTO characters " +
+            var connection = NewConnection();
+            connection.Open();
+            await ExecuteNonQuery(connection, "START TRANSACTION");
+            await ExecuteNonQuery(connection, "INSERT INTO characters " +
                 "(id, userId, databaseId, characterName, level, exp, currentHp, currentMp, currentStamina, currentFood, currentWater, statPoint, skillPoint, gold, currentMapName, currentPositionX, currentPositionY, currentPositionZ, respawnMapName, respawnPositionX, respawnPositionY, respawnPositionZ) VALUES " +
                 "(@id, @userId, @databaseId, @characterName, @level, @exp, @currentHp, @currentMp, @currentStamina, @currentFood, @currentWater, @statPoint, @skillPoint, @gold, @currentMapName, @currentPositionX, @currentPositionY, @currentPositionZ, @respawnMapName, @respawnPositionX, @respawnPositionY, @respawnPositionZ)",
                 new SqliteParameter("@id", characterData.Id),
@@ -78,8 +80,9 @@ namespace Insthync.MMOG
                 new SqliteParameter("@respawnPositionX", characterData.RespawnPosition.x),
                 new SqliteParameter("@respawnPositionY", characterData.RespawnPosition.y),
                 new SqliteParameter("@respawnPositionZ", characterData.RespawnPosition.z));
-            await FillCharacterRelatesData(characterData);
-            await ExecuteNonQuery("END");
+            await FillCharacterRelatesData(connection, characterData);
+            await ExecuteNonQuery(connection, "COMMIT");
+            connection.Close();
         }
 
         private bool ReadCharacter(SQLiteRowsReader reader, out PlayerCharacterData result, bool resetReader = true)
@@ -167,8 +170,10 @@ namespace Insthync.MMOG
 
         public override async Task UpdateCharacter(IPlayerCharacterData characterData)
         {
-            await ExecuteNonQuery("BEGIN");
-            await ExecuteNonQuery("UPDATE characters SET " +
+            var connection = NewConnection();
+            connection.Open();
+            await ExecuteNonQuery(connection, "START TRANSACTION");
+            await ExecuteNonQuery(connection, "UPDATE characters SET " +
                 "databaseId=@databaseId, " +
                 "characterName=@characterName, " +
                 "level=@level, " +
@@ -211,8 +216,9 @@ namespace Insthync.MMOG
                 new SqliteParameter("@respawnPositionY", characterData.RespawnPosition.y),
                 new SqliteParameter("@respawnPositionZ", characterData.RespawnPosition.z),
                 new SqliteParameter("@id", characterData.Id));
-            await FillCharacterRelatesData(characterData);
-            await ExecuteNonQuery("END");
+            await FillCharacterRelatesData(connection, characterData);
+            await ExecuteNonQuery(connection, "COMMIT");
+            connection.Close();
         }
 
         public override async Task DeleteCharacter(string userId, string id)
@@ -223,7 +229,7 @@ namespace Insthync.MMOG
             var count = result != null ? (long)result : 0;
             if (count > 0)
             {
-                await ExecuteNonQuery("BEGIN");
+                await ExecuteNonQuery("START TRANSACTION");
                 await ExecuteNonQuery("DELETE FROM characters WHERE id=@characterId", new SqliteParameter("@characterId", id));
                 await ExecuteNonQuery("DELETE FROM characterInventory WHERE characterId=@characterId", new SqliteParameter("@characterId", id));
                 await ExecuteNonQuery("DELETE FROM characterAttribute WHERE characterId=@characterId", new SqliteParameter("@characterId", id));
@@ -231,7 +237,7 @@ namespace Insthync.MMOG
                 await ExecuteNonQuery("DELETE FROM characterBuff WHERE characterId=@characterId", new SqliteParameter("@characterId", id));
                 await ExecuteNonQuery("DELETE FROM characterHotkey WHERE characterId=@characterId", new SqliteParameter("@characterId", id));
                 await ExecuteNonQuery("DELETE FROM characterQuest WHERE characterId=@characterId", new SqliteParameter("@characterId", id));
-                await ExecuteNonQuery("END");
+                await ExecuteNonQuery("COMMIT");
             }
         }
 

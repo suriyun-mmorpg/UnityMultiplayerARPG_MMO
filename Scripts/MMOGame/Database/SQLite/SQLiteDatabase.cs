@@ -16,26 +16,20 @@ namespace Insthync.MMOG
         }
         [SerializeField]
         private string dbPath = "./mmorpgtemplate.sqlite3";
-        private SqliteConnection connection;
 
         private void Awake()
         {
-            connection = new SqliteConnection(GetConnectionString());
-            connection.Open();
             Init();
-        }
-
-        private void OnDestroy()
-        {
-            if (connection != null)
-                connection.Close();
         }
 
         private async void Init()
         {
-            await ExecuteNonQuery("BEGIN");
+            var connection = new SqliteConnection(GetConnectionString());
+            connection.Open();
 
-            await ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characterattribute (
+            await ExecuteNonQuery(connection, "BEGIN");
+
+            await ExecuteNonQuery(connection, @"CREATE TABLE IF NOT EXISTS characterattribute (
               id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
               characterId TEXT NOT NULL,
               attributeId TEXT NOT NULL,
@@ -44,7 +38,7 @@ namespace Insthync.MMOG
               updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
 
-            await ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characterbuff (
+            await ExecuteNonQuery(connection, @"CREATE TABLE IF NOT EXISTS characterbuff (
               id TEXT NOT NULL PRIMARY KEY,
               characterId TEXT NOT NULL,
               type INTEGER NOT NULL,
@@ -55,7 +49,7 @@ namespace Insthync.MMOG
               updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
 
-            await ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characterhotkey (
+            await ExecuteNonQuery(connection, @"CREATE TABLE IF NOT EXISTS characterhotkey (
               id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
               characterId TEXT NOT NULL,
               hotkeyId TEXT NOT NULL,
@@ -65,7 +59,7 @@ namespace Insthync.MMOG
               updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
 
-            await ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characterinventory (
+            await ExecuteNonQuery(connection, @"CREATE TABLE IF NOT EXISTS characterinventory (
               id TEXT NOT NULL PRIMARY KEY,
               inventoryType INTEGER NOT NULL,
               characterId TEXT NOT NULL,
@@ -76,7 +70,7 @@ namespace Insthync.MMOG
               updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
 
-            await ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characterquest (
+            await ExecuteNonQuery(connection, @"CREATE TABLE IF NOT EXISTS characterquest (
               id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
               characterId TEXT NOT NULL,
               questId TEXT NOT NULL,
@@ -86,7 +80,7 @@ namespace Insthync.MMOG
               updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
 
-            await ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characters (
+            await ExecuteNonQuery(connection, @"CREATE TABLE IF NOT EXISTS characters (
               id TEXT NOT NULL PRIMARY KEY,
               userId TEXT NOT NULL,
               databaseId TEXT NOT NULL,
@@ -113,7 +107,7 @@ namespace Insthync.MMOG
               updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
 
-            await ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characterskill (
+            await ExecuteNonQuery(connection, @"CREATE TABLE IF NOT EXISTS characterskill (
               id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
               characterId TEXT NOT NULL,
               skillId TEXT NOT NULL,
@@ -123,7 +117,7 @@ namespace Insthync.MMOG
               updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
 
-            await ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS userlogin (
+            await ExecuteNonQuery(connection, @"CREATE TABLE IF NOT EXISTS userlogin (
               id TEXT NOT NULL PRIMARY KEY,
               username TEXT NOT NULL UNIQUE,
               password TEXT NOT NULL,
@@ -132,7 +126,9 @@ namespace Insthync.MMOG
               updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
 
-            await ExecuteNonQuery("END");
+            await ExecuteNonQuery(connection, "END");
+
+            connection.Close();
         }
 
         public string GetConnectionString()
@@ -152,7 +148,21 @@ namespace Insthync.MMOG
             return "URI=file:" + dbPath;
         }
 
+        public SqliteConnection NewConnection()
+        {
+            return new SqliteConnection(GetConnectionString());
+        }
+        
         public async Task<int> ExecuteNonQuery(string sql, params SqliteParameter[] args)
+        {
+            var connection = NewConnection();
+            connection.Open();
+            var result = await ExecuteNonQuery(connection, sql, args);
+            connection.Close();
+            return result;
+        }
+
+        public async Task<int> ExecuteNonQuery(SqliteConnection connection, string sql, params SqliteParameter[] args)
         {
             var numRows = 0;
             using (var cmd = new SqliteCommand(sql, connection))
@@ -168,6 +178,15 @@ namespace Insthync.MMOG
 
         public async Task<object> ExecuteScalar(string sql, params SqliteParameter[] args)
         {
+            var connection = NewConnection();
+            connection.Open();
+            var result = await ExecuteScalar(connection, sql, args);
+            connection.Close();
+            return result;
+        }
+
+        public async Task<object> ExecuteScalar(SqliteConnection connection, string sql, params SqliteParameter[] args)
+        {
             object result;
             using (var cmd = new SqliteCommand(sql, connection))
             {
@@ -181,6 +200,15 @@ namespace Insthync.MMOG
         }
 
         public async Task<SQLiteRowsReader> ExecuteReader(string sql, params SqliteParameter[] args)
+        {
+            var connection = NewConnection();
+            connection.Open();
+            var result = await ExecuteReader(connection, sql, args);
+            connection.Close();
+            return result;
+        }
+
+        public async Task<SQLiteRowsReader> ExecuteReader(SqliteConnection connection, string sql, params SqliteParameter[] args)
         {
             SQLiteRowsReader result = new SQLiteRowsReader();
             using (var cmd = new SqliteCommand(sql, connection))

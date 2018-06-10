@@ -10,7 +10,15 @@ namespace Insthync.MMOG
     {
         private async Task CreateCharacterItem(string characterId, InventoryType inventoryType, CharacterItem characterItem)
         {
-            await ExecuteNonQuery("INSERT INTO characterinventory (id, inventoryType, characterId, itemId, level, amount) VALUES (@id, @inventoryType, @characterId, @itemId, @level, @amount)",
+            var connection = NewConnection();
+            connection.Open();
+            await CreateCharacterItem(connection, characterId, inventoryType, characterItem);
+            connection.Close();
+        }
+
+        private async Task CreateCharacterItem(SqliteConnection connection, string characterId, InventoryType inventoryType, CharacterItem characterItem)
+        {
+            await ExecuteNonQuery(connection, "INSERT INTO characterinventory (id, inventoryType, characterId, itemId, level, amount) VALUES (@id, @inventoryType, @characterId, @itemId, @level, @amount)",
                 new SqliteParameter("@id", characterItem.id),
                 new SqliteParameter("@inventoryType", inventoryType),
                 new SqliteParameter("@characterId", characterId),
@@ -100,19 +108,43 @@ namespace Insthync.MMOG
 
         public override async Task CreateCharacterEquipWeapons(string characterId, EquipWeapons equipWeapons)
         {
-            await CreateCharacterItem(characterId, InventoryType.EquipWeaponRight, equipWeapons.rightHand);
-            await CreateCharacterItem(characterId, InventoryType.EquipWeaponLeft, equipWeapons.leftHand);
+            var connection = NewConnection();
+            connection.Open();
+            await CreateCharacterEquipWeapons(connection, characterId, equipWeapons);
+            connection.Close();
+        }
+
+        public async Task CreateCharacterEquipWeapons(SqliteConnection connection, string characterId, EquipWeapons equipWeapons)
+        {
+            await CreateCharacterItem(connection, characterId, InventoryType.EquipWeaponRight, equipWeapons.rightHand);
+            await CreateCharacterItem(connection, characterId, InventoryType.EquipWeaponLeft, equipWeapons.leftHand);
         }
 
         public override async Task UpdateCharacterEquipWeapons(string characterId, EquipWeapons equipWeapons)
         {
-            await DeleteCharacterEquipWeapons(characterId);
-            await CreateCharacterEquipWeapons(characterId, equipWeapons);
+            var connection = NewConnection();
+            connection.Open();
+            await UpdateCharacterEquipWeapons(connection, characterId, equipWeapons);
+            connection.Close();
+        }
+
+        public async Task UpdateCharacterEquipWeapons(SqliteConnection connection, string characterId, EquipWeapons equipWeapons)
+        {
+            await DeleteCharacterEquipWeapons(connection, characterId);
+            await CreateCharacterEquipWeapons(connection, characterId, equipWeapons);
         }
 
         public override async Task DeleteCharacterEquipWeapons(string characterId)
         {
-            await ExecuteNonQuery("DELETE FROM characterinventory WHERE characterId=@characterId AND (inventoryType=@inventoryTypeRight OR inventoryType=@inventoryTypeLeft)",
+            var connection = NewConnection();
+            connection.Open();
+            await ExecuteNonQuery(connection, characterId);
+            connection.Close();
+        }
+
+        public async Task DeleteCharacterEquipWeapons(SqliteConnection connection, string characterId)
+        {
+            await ExecuteNonQuery(connection, "DELETE FROM characterinventory WHERE characterId=@characterId AND (inventoryType=@inventoryTypeRight OR inventoryType=@inventoryTypeLeft)",
                 new SqliteParameter("@characterId", characterId),
                 new SqliteParameter("@inventoryTypeRight", InventoryType.EquipWeaponRight),
                 new SqliteParameter("@inventoryTypeLeft", InventoryType.EquipWeaponLeft));
@@ -123,14 +155,19 @@ namespace Insthync.MMOG
             await CreateCharacterItem(characterId, InventoryType.EquipItems, characterItem);
         }
 
-        public override async Task<CharacterItem> ReadCharacterEquipItem(string characterId, string id)
+        public Task CreateCharacterEquipItem(SqliteConnection connection, string characterId, CharacterItem characterItem)
         {
-            return await ReadCharacterItem(characterId, id);
+            return CreateCharacterItem(connection, characterId, InventoryType.EquipItems, characterItem);
         }
 
-        public override async Task<List<CharacterItem>> ReadCharacterEquipItems(string characterId)
+        public override Task<CharacterItem> ReadCharacterEquipItem(string characterId, string id)
         {
-            return await ReadCharacterItems(characterId, InventoryType.EquipItems);
+            return ReadCharacterItem(characterId, id);
+        }
+
+        public override Task<List<CharacterItem>> ReadCharacterEquipItems(string characterId)
+        {
+            return ReadCharacterItems(characterId, InventoryType.EquipItems);
         }
 
         public override async Task UpdateCharacterEquipItem(string characterId, CharacterItem characterItem)
@@ -143,19 +180,24 @@ namespace Insthync.MMOG
             await DeleteCharacterItem(characterId, id);
         }
 
-        public override async Task CreateCharacterNonEquipItem(string characterId, CharacterItem characterItem)
+        public override Task CreateCharacterNonEquipItem(string characterId, CharacterItem characterItem)
         {
-            await CreateCharacterItem(characterId, InventoryType.NonEquipItems, characterItem);
+            return CreateCharacterItem(characterId, InventoryType.NonEquipItems, characterItem);
         }
 
-        public override async Task<CharacterItem> ReadCharacterNonEquipItem(string characterId, string id)
+        public Task CreateCharacterNonEquipItem(SqliteConnection connection, string characterId, CharacterItem characterItem)
         {
-            return await ReadCharacterItem(characterId, id);
+            return CreateCharacterItem(connection, characterId, InventoryType.NonEquipItems, characterItem);
         }
 
-        public override async Task<List<CharacterItem>> ReadCharacterNonEquipItems(string characterId)
+        public override Task<CharacterItem> ReadCharacterNonEquipItem(string characterId, string id)
         {
-            return await ReadCharacterItems(characterId, InventoryType.NonEquipItems);
+            return ReadCharacterItem(characterId, id);
+        }
+
+        public override Task<List<CharacterItem>> ReadCharacterNonEquipItems(string characterId)
+        {
+            return ReadCharacterItems(characterId, InventoryType.NonEquipItems);
         }
 
         public override async Task UpdateCharacterNonEquipItem(string characterId, CharacterItem characterItem)

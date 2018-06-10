@@ -26,7 +26,15 @@ namespace Insthync.MMOG
 
         public override async Task CreateCharacterAttribute(string characterId, CharacterAttribute characterAttribute)
         {
-            await ExecuteNonQuery("INSERT INTO characterattribute (characterId, attributeId, amount) VALUES (@characterId, @attributeId, @amount)",
+            var connection = NewConnection();
+            connection.Open();
+            await CreateCharacterAttribute(connection, characterId, characterAttribute);
+            connection.Close();
+        }
+
+        public async Task CreateCharacterAttribute(SqliteConnection connection, string characterId, CharacterAttribute characterAttribute)
+        {
+            await ExecuteNonQuery(connection, "INSERT INTO characterattribute (characterId, attributeId, amount) VALUES (@characterId, @attributeId, @amount)",
                 new SqliteParameter("@characterId", characterId),
                 new SqliteParameter("@attributeId", characterAttribute.attributeId),
                 new SqliteParameter("@amount", characterAttribute.amount));

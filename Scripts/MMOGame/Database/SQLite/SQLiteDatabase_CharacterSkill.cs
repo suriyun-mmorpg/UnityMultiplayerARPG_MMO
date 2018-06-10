@@ -27,7 +27,15 @@ namespace Insthync.MMOG
 
         public override async Task CreateCharacterSkill(string characterId, CharacterSkill characterSkill)
         {
-            await ExecuteNonQuery("INSERT INTO characterskill (characterId, skillId, level, coolDownRemainsDuration) VALUES (@characterId, @skillId, @level, @coolDownRemainsDuration)",
+            var connection = NewConnection();
+            connection.Open();
+            await CreateCharacterSkill(connection, characterId, characterSkill);
+            connection.Close();
+        }
+
+        public async Task CreateCharacterSkill(SqliteConnection connection, string characterId, CharacterSkill characterSkill)
+        {
+            await ExecuteNonQuery(connection, "INSERT INTO characterskill (characterId, skillId, level, coolDownRemainsDuration) VALUES (@characterId, @skillId, @level, @coolDownRemainsDuration)",
                 new SqliteParameter("@characterId", characterId),
                 new SqliteParameter("@skillId", characterSkill.skillId),
                 new SqliteParameter("@level", characterSkill.level),

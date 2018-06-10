@@ -30,7 +30,15 @@ namespace Insthync.MMOG
 
         public override async Task CreateCharacterBuff(string characterId, CharacterBuff characterBuff)
         {
-            await ExecuteNonQuery("INSERT INTO characterbuff (id, characterId, type, dataId, level, buffRemainsDuration) VALUES (@id, @characterId, @type, @dataId, @level, @buffRemainsDuration)",
+            var connection = NewConnection();
+            connection.Open();
+            await CreateCharacterBuff(connection, characterId, characterBuff);
+            connection.Close();
+        }
+
+        public async Task CreateCharacterBuff(SqliteConnection connection, string characterId, CharacterBuff characterBuff)
+        {
+            await ExecuteNonQuery(connection, "INSERT INTO characterbuff (id, characterId, type, dataId, level, buffRemainsDuration) VALUES (@id, @characterId, @type, @dataId, @level, @buffRemainsDuration)",
                 new SqliteParameter("@id", characterBuff.id),
                 new SqliteParameter("@characterId", characterId),
                 new SqliteParameter("@type", (byte)characterBuff.type),
