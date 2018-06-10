@@ -25,7 +25,7 @@ namespace Insthync.MMOG
             bool withHotkeys = true, 
             bool withQuests = true);
         public abstract Task<List<PlayerCharacterData>> ReadCharacters(string userId);
-        public abstract Task UpdateCharacter(PlayerCharacterData characterData);
+        public abstract Task UpdateCharacter(IPlayerCharacterData characterData);
         public abstract Task DeleteCharacter(string userId, string id);
         public abstract Task<long> FindCharacterName(string characterName);
 
