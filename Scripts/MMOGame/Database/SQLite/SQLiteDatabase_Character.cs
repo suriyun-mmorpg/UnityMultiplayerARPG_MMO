@@ -165,7 +165,7 @@ namespace Insthync.MMOG
             return result;
         }
 
-        public override async Task UpdateCharacter(PlayerCharacterData characterData)
+        public override async Task UpdateCharacter(IPlayerCharacterData characterData)
         {
             await ExecuteNonQuery("BEGIN");
             await ExecuteNonQuery("UPDATE characters SET " +
