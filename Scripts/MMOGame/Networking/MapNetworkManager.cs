@@ -27,7 +27,10 @@ namespace Insthync.MMOG
             get
             {
                 if (cacheCentralAppServerRegister == null)
+                {
                     cacheCentralAppServerRegister = new CentralAppServerRegister(this);
+                    cacheCentralAppServerRegister.onAppServerRegistered = OnAppServerRegistered;
+                }
                 return cacheCentralAppServerRegister;
             }
         }
@@ -59,6 +62,7 @@ namespace Insthync.MMOG
         private float lastSaveTime;
         private Task saveCharactersTask;
         private Dictionary<long, PlayerCharacterEntity> PlayerCharacterEntities = new Dictionary<long, PlayerCharacterEntity>();
+        private Dictionary<long, string> UserIds = new Dictionary<long, string>();
 
         protected override void Awake()
         {
@@ -101,6 +105,15 @@ namespace Insthync.MMOG
             {
                 saveCharactersTask = SaveCharacter(playerCharacterEntity.CloneTo(new PlayerCharacterData()));
                 PlayerCharacterEntities.Remove(peer.ConnectId);
+            }
+            string userId;
+            if (UserIds.TryGetValue(peer.ConnectId, out userId))
+            {
+                var updateMapUserMessage = new RequestUpdateMapUserMessage();
+                updateMapUserMessage.type = RequestUpdateMapUserMessage.UpdateType.Remove;
+                updateMapUserMessage.userId = userId;
+                LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, CentralAppServerRegister.Peer, MessageTypes.RequestUpdateMapUser, updateMapUserMessage);
+                UserIds.Remove(peer.ConnectId);
             }
             base.OnPeerDisconnected(peer, disconnectInfo);
         }
@@ -205,7 +218,27 @@ namespace Insthync.MMOG
                     playerCharacterEntity.RequestOnRespawn(true);
                 else
                     playerCharacterEntity.RequestOnDead(true);
-                PlayerCharacterEntities.Add(peer.ConnectId, playerCharacterEntity);
+                PlayerCharacterEntities[peer.ConnectId] = playerCharacterEntity;
+                UserIds[peer.ConnectId] = userId;
+                // Send update map user message to central server
+                var updateMapUserMessage = new RequestUpdateMapUserMessage();
+                updateMapUserMessage.type = RequestUpdateMapUserMessage.UpdateType.Add;
+                updateMapUserMessage.userId = userId;
+                LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, CentralAppServerRegister.Peer, MessageTypes.RequestUpdateMapUser, updateMapUserMessage);
+            }
+        }
+
+        private void OnAppServerRegistered(AckResponseCode responseCode, BaseAckMessage message)
+        {
+            if (responseCode == AckResponseCode.Success)
+            {
+                foreach (var userId in UserIds.Values)
+                {
+                    var updateMapUserMessage = new RequestUpdateMapUserMessage();
+                    updateMapUserMessage.type = RequestUpdateMapUserMessage.UpdateType.Add;
+                    updateMapUserMessage.userId = userId;
+                    LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, CentralAppServerRegister.Peer, MessageTypes.RequestUpdateMapUser, updateMapUserMessage);
+                }
             }
         }
     }

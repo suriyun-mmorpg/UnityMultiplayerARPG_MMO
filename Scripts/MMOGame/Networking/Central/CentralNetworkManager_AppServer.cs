@@ -47,6 +47,7 @@ namespace Insthync.MMOG
                         {
                             mapServerPeersBySceneName[sceneName] = peerInfo;
                             mapServerPeers[peer.ConnectId] = peerInfo;
+                            mapUsers[peer.ConnectId] = new HashSet<string>();
                             Debug.Log("[Central] Register Map Server: [" + peer.ConnectId + "] [" + sceneName + "]");
                         }
                         else
@@ -117,13 +118,36 @@ namespace Insthync.MMOG
             peerHandler.TriggerAck(ackId, message.responseCode, message);
         }
 
-        protected virtual void HandleResponseAppServerAddress(LiteNetLibMessageHandler messageHandler)
+        protected void HandleResponseAppServerAddress(LiteNetLibMessageHandler messageHandler)
         {
             var peerHandler = messageHandler.peerHandler;
             var peer = messageHandler.peer;
             var message = messageHandler.ReadMessage<ResponseAppServerAddressMessage>();
             var ackId = message.ackId;
             peerHandler.TriggerAck(ackId, message.responseCode, message);
+        }
+
+        protected void HandleRequestUpdateMapUser(LiteNetLibMessageHandler messageHandler)
+        {
+            var peer = messageHandler.peer;
+            var message = messageHandler.ReadMessage<RequestUpdateMapUserMessage>();
+            if (mapUsers.ContainsKey(peer.ConnectId))
+            {
+                switch (message.type)
+                {
+                    case RequestUpdateMapUserMessage.UpdateType.Add:
+                        if (!mapUsers[peer.ConnectId].Contains(message.userId))
+                        {
+                            mapUsers[peer.ConnectId].Add(message.userId);
+                            Debug.Log("[Central] Add map user: " + message.userId + " by " + peer.ConnectId);
+                        }
+                        break;
+                    case RequestUpdateMapUserMessage.UpdateType.Remove:
+                        mapUsers[peer.ConnectId].Remove(message.userId);
+                        Debug.Log("[Central] Remove map user: " + message.userId + " by " + peer.ConnectId);
+                        break;
+                }
+            }
         }
 
         public static string GetAppServerRegisterHash(CentralServerPeerType peerType, int time)

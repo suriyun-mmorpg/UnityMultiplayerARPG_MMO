@@ -12,6 +12,7 @@ namespace Insthync.MMOG
         protected readonly Dictionary<string, CentralServerPeerInfo> mapServerPeersBySceneName = new Dictionary<string, CentralServerPeerInfo>();
         protected readonly Dictionary<long, CentralUserPeerInfo> userPeers = new Dictionary<long, CentralUserPeerInfo>();
         protected readonly Dictionary<string, CentralUserPeerInfo> userPeersByUserId = new Dictionary<string, CentralUserPeerInfo>();
+        protected readonly Dictionary<long, HashSet<string>> mapUsers = new Dictionary<long, HashSet<string>>();
 
         [Header("Account configuration")]
         public int minUsernameLength = 2;
@@ -44,6 +45,7 @@ namespace Insthync.MMOG
             RegisterServerMessage(MessageTypes.RequestSelectCharacter, HandleRequestSelectCharacter);
             RegisterServerMessage(MessageTypes.ResponseSpawnMap, HandleResponseSpawnMap);
             RegisterServerMessage(MessageTypes.RequestValidateAccessToken, HandleRequestValidateAccessToken);
+            RegisterServerMessage(MessageTypes.RequestUpdateMapUser, HandleRequestUpdateMapUser);
         }
 
         protected override void RegisterClientMessages()
@@ -70,6 +72,7 @@ namespace Insthync.MMOG
             {
                 mapServerPeersBySceneName.Remove(mapServerPeerInfo.extra);
                 mapServerPeers.Remove(peer.ConnectId);
+                mapUsers.Remove(peer.ConnectId);
             }
             CentralUserPeerInfo userPeerInfo;
             if (userPeers.TryGetValue(peer.ConnectId, out userPeerInfo))
@@ -91,6 +94,16 @@ namespace Insthync.MMOG
             base.OnClientDisconnected(peer, disconnectInfo);
             if (onClientDisconnected != null)
                 onClientDisconnected(peer, disconnectInfo);
+        }
+
+        public bool MapContainsUser(string userId)
+        {
+            foreach (var mapUser in mapUsers.Values)
+            {
+                if (mapUser.Contains(userId))
+                    return true;
+            }
+            return false;
         }
     }
 }

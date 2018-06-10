@@ -24,5 +24,6 @@
         public const short ResponseSpawnMap = 19;
         public const short RequestValidateAccessToken = 20;
         public const short ResponseValidateAccessToken = 21;
+        public const short RequestUpdateMapUser = 22;
     }
 }

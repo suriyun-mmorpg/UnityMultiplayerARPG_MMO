@@ -49,7 +49,7 @@ namespace Insthync.MMOG
                 error = ResponseUserLoginMessage.Error.InvalidUsernameOrPassword;
                 userId = string.Empty;
             }
-            else if (userPeersByUserId.ContainsKey(userId))
+            else if (userPeersByUserId.ContainsKey(userId) || MapContainsUser(userId))
             {
                 error = ResponseUserLoginMessage.Error.AlreadyLogin;
                 userId = string.Empty;
