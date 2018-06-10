@@ -20,6 +20,8 @@ namespace Insthync.MMOG
             MMOClientInstance.Singleton.onClientDisconnected += OnCentralServerDisconnected;
             if (MMOClientInstance.Singleton.IsConnectedToCentralServer())
                 OnCentralServerConnected(MMOClientInstance.Singleton.GetCentralClientPeer());
+            else if (!string.IsNullOrEmpty(MMOClientInstance.UserId) && !string.IsNullOrEmpty(MMOClientInstance.AccessToken))
+                MMOClientInstance.Singleton.StartCentralClient();
         }
 
         private void OnDisable()
