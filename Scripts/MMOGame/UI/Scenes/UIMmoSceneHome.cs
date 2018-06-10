@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using LiteNetLib;
 using LiteNetLibManager;
 
@@ -11,6 +12,7 @@ namespace Insthync.MMOG
         public UIMmoLogin uiLogin;
         public UIMmoCharacterList uiCharacterList;
         public UIMmoCharacterCreate uiCharacterCreate;
+        public UnityEvent onValidateAccessTokenSuccess;
 
         private void OnEnable()
         {
@@ -21,6 +23,8 @@ namespace Insthync.MMOG
                 ClearHistory();
                 Next(uiLogin);
             }
+            if (!string.IsNullOrEmpty(MMOClientInstance.UserId) && !string.IsNullOrEmpty(MMOClientInstance.AccessToken))
+                MMOClientInstance.Singleton.RequestValidateAccessToken(MMOClientInstance.UserId, MMOClientInstance.AccessToken, OnValidateAccessToken);
         }
 
         private void OnDisable()
@@ -40,12 +44,6 @@ namespace Insthync.MMOG
             ClearHistory();
         }
 
-        public void OnUserLogout(AckResponseCode responseCode, BaseAckMessage messageData)
-        {
-            ClearHistory();
-            Next(uiLogin);
-        }
-
         public void OnClickLogout()
         {
             MMOClientInstance.Singleton.RequestUserLogout(OnUserLogout);
@@ -54,6 +52,21 @@ namespace Insthync.MMOG
         public void OnClickExit()
         {
             Application.Quit();
+        }
+
+        private void OnUserLogout(AckResponseCode responseCode, BaseAckMessage messageData)
+        {
+            ClearHistory();
+            Next(uiLogin);
+        }
+
+        private void OnValidateAccessToken(AckResponseCode responseCode, BaseAckMessage messageData)
+        {
+            if (responseCode == AckResponseCode.Success)
+            {
+                if (onValidateAccessTokenSuccess != null)
+                    onValidateAccessTokenSuccess.Invoke();
+            }
         }
     }
 }

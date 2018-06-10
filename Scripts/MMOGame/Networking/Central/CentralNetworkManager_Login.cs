@@ -31,7 +31,7 @@ namespace Insthync.MMOG
 
         public uint RequestValidateAccessToken(string userId, string accessToken, AckMessageCallback callback)
         {
-            var message = new RequestValidateAccessToken();
+            var message = new RequestValidateAccessTokenMessage();
             message.userId = userId;
             message.accessToken = accessToken;
             return Client.SendAckPacket(SendOptions.ReliableUnordered, Client.Peer, MessageTypes.RequestValidateAccessToken, message, callback);
@@ -117,13 +117,13 @@ namespace Insthync.MMOG
         protected async void HandleRequestValidateAccessToken(LiteNetLibMessageHandler messageHandler)
         {
             var peer = messageHandler.peer;
-            var message = messageHandler.ReadMessage<RequestValidateAccessToken>();
-            var error = ResponseValidateAccessToken.Error.None;
+            var message = messageHandler.ReadMessage<RequestValidateAccessTokenMessage>();
+            var error = ResponseValidateAccessTokenMessage.Error.None;
             var userId = message.userId;
             var accessToken = message.accessToken;
             if (!await Database.ValidateAccessToken(userId, accessToken))
             {
-                error = ResponseValidateAccessToken.Error.InvalidAccessToken;
+                error = ResponseValidateAccessTokenMessage.Error.InvalidAccessToken;
                 userId = string.Empty;
                 accessToken = string.Empty;
             }
@@ -143,9 +143,9 @@ namespace Insthync.MMOG
                 userPeers[peer.ConnectId] = userPeerInfo;
                 await Database.UpdateAccessToken(userId, accessToken);
             }
-            var responseMessage = new ResponseValidateAccessToken();
+            var responseMessage = new ResponseValidateAccessTokenMessage();
             responseMessage.ackId = message.ackId;
-            responseMessage.responseCode = error == ResponseValidateAccessToken.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
+            responseMessage.responseCode = error == ResponseValidateAccessTokenMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
             responseMessage.error = error;
             responseMessage.userId = userId;
             responseMessage.accessToken = accessToken;
@@ -183,7 +183,7 @@ namespace Insthync.MMOG
         {
             var peerHandler = messageHandler.peerHandler;
             var peer = messageHandler.peer;
-            var message = messageHandler.ReadMessage<ResponseValidateAccessToken>();
+            var message = messageHandler.ReadMessage<ResponseValidateAccessTokenMessage>();
             var ackId = message.ackId;
             peerHandler.TriggerAck(ackId, message.responseCode, message);
         }

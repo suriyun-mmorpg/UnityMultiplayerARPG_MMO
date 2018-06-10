@@ -102,6 +102,11 @@ namespace Insthync.MMOG
             centralNetworkManager.RequestUserLogout((responseCode, messageData) => OnRequestUserLogout(responseCode, messageData, callback));
         }
 
+        public void RequestValidateAccessToken(string userId, string accessToken, AckMessageCallback callback)
+        {
+            centralNetworkManager.RequestValidateAccessToken(userId, accessToken, (responseCode, messageData) => OnRequestValidateAccessToken(responseCode, messageData, callback));
+        }
+
         public void RequestCharacters(AckMessageCallback callback)
         {
             centralNetworkManager.RequestCharacters(callback);
@@ -147,6 +152,21 @@ namespace Insthync.MMOG
             UserId = string.Empty;
             AccessToken = string.Empty;
             SelectCharacterId = string.Empty;
+        }
+
+        private void OnRequestValidateAccessToken(AckResponseCode responseCode, BaseAckMessage messageData, AckMessageCallback callback)
+        {
+            if (callback != null)
+                callback(responseCode, messageData);
+
+            UserId = string.Empty;
+            AccessToken = string.Empty;
+            var castedMessage = messageData as ResponseValidateAccessTokenMessage;
+            if (castedMessage.responseCode == AckResponseCode.Success)
+            {
+                UserId = castedMessage.userId;
+                AccessToken = castedMessage.accessToken;
+            }
         }
 
         private void OnRequestSelectCharacter(AckResponseCode responseCode, BaseAckMessage messageData, string characterId, AckMessageCallback callback)

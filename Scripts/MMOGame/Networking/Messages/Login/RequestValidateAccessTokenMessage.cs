@@ -5,7 +5,7 @@ using LiteNetLib.Utils;
 
 namespace Insthync.MMOG
 {
-    public class RequestValidateAccessToken : BaseAckMessage
+    public class RequestValidateAccessTokenMessage : BaseAckMessage
     {
         public string userId;
         public string accessToken;

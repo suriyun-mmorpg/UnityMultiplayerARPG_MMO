@@ -5,7 +5,7 @@ using LiteNetLib.Utils;
 
 namespace Insthync.MMOG
 {
-    public class ResponseValidateAccessToken : BaseAckMessage
+    public class ResponseValidateAccessTokenMessage : BaseAckMessage
     {
         public enum Error : byte
         {
