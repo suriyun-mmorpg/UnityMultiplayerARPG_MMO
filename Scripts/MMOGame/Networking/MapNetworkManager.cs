@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 using LiteNetLib;
 using LiteNetLib.Utils;
@@ -16,6 +18,8 @@ namespace Insthync.MMOG
         public string centralNetworkAddress = "127.0.0.1";
         public int centralNetworkPort = 6000;
         public string machineAddress = "127.0.0.1";
+        [Header("Database")]
+        public float autoSaveDuration = 2f;
 
         private CentralAppServerRegister cacheCentralAppServerRegister;
         public CentralAppServerRegister CentralAppServerRegister
@@ -52,6 +56,9 @@ namespace Insthync.MMOG
         public string AppConnectKey { get { return connectKey; } }
         public string AppExtra { get { return !string.IsNullOrEmpty(Assets.onlineScene.SceneName) ? Assets.onlineScene.SceneName : SceneManager.GetActiveScene().name; } }
         public CentralServerPeerType PeerType { get { return CentralServerPeerType.MapServer; } }
+        private float lastSaveTime;
+        private Task saveCharactersTask;
+        private Dictionary<long, PlayerCharacterEntity> PlayerCharacterEntities = new Dictionary<long, PlayerCharacterEntity>();
 
         protected override void Awake()
         {
@@ -64,7 +71,57 @@ namespace Insthync.MMOG
         {
             base.Update();
             if (IsServer)
+            {
                 CentralAppServerRegister.PollEvents();
+                if (Time.unscaledTime - lastSaveTime > autoSaveDuration)
+                {
+                    if (saveCharactersTask == null || saveCharactersTask.IsCompleted)
+                    {
+                        saveCharactersTask = SaveCharacters();
+                        lastSaveTime = Time.unscaledTime;
+                    }
+                }
+            }
+        }
+
+        protected override async void OnDestroy()
+        {
+            base.OnDestroy();
+            // Wait old save character task to be completed
+            if (saveCharactersTask != null && !saveCharactersTask.IsCompleted)
+                await Task.WhenAll(saveCharactersTask, SaveCharacters());
+            else
+                await SaveCharacters();
+        }
+
+        public override void OnPeerDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
+        {
+            PlayerCharacterEntity playerCharacterEntity;
+            if (PlayerCharacterEntities.TryGetValue(peer.ConnectId, out playerCharacterEntity))
+            {
+                saveCharactersTask = SaveCharacter(playerCharacterEntity.CloneTo(new PlayerCharacterData()));
+                PlayerCharacterEntities.Remove(peer.ConnectId);
+            }
+            base.OnPeerDisconnected(peer, disconnectInfo);
+        }
+
+        private async Task SaveCharacter(IPlayerCharacterData playerCharacterData)
+        {
+            if (saveCharactersTask != null && !saveCharactersTask.IsCompleted)
+                await saveCharactersTask;
+            await Database.UpdateCharacter(playerCharacterData);
+        }
+
+        private async Task SaveCharacters()
+        {
+            if (saveCharactersTask != null && !saveCharactersTask.IsCompleted)
+                await saveCharactersTask;
+            var tasks = new List<Task>();
+            foreach (var playerCharacterEntity in PlayerCharacterEntities.Values)
+            {
+                tasks.Add(Database.UpdateCharacter(playerCharacterEntity.CloneTo(new PlayerCharacterData())));
+            }
+            await Task.WhenAll(tasks);
         }
 
         public override bool StartServer()
@@ -119,8 +176,20 @@ namespace Insthync.MMOG
             var userId = reader.GetString();
             var accessToken = reader.GetString();
             var selectCharacterId = reader.GetString();
-            // TODO: Validate access token
-            if (await Database.ValidateAccessToken(userId, accessToken))
+            // Validate access token
+            if (PlayerCharacterEntities.ContainsKey(peer.ConnectId))
+            {
+                Debug.LogError("[Map Server] User trying to hack: " + userId);
+                Assets.NetworkDestroy(playerIdentity.ObjectId, DestroyObjectReasons.RequestedToDestroy);
+                Server.NetManager.DisconnectPeer(peer);
+            }
+            else if (!await Database.ValidateAccessToken(userId, accessToken))
+            {
+                Debug.LogError("[Map Server] Invalid access token for user: " + userId);
+                Assets.NetworkDestroy(playerIdentity.ObjectId, DestroyObjectReasons.RequestedToDestroy);
+                Server.NetManager.DisconnectPeer(peer);
+            }
+            else
             {
                 var playerCharacterData = await Database.ReadCharacter(userId, selectCharacterId);
                 if (playerCharacterData == null)
@@ -136,13 +205,7 @@ namespace Insthync.MMOG
                     playerCharacterEntity.RequestOnRespawn(true);
                 else
                     playerCharacterEntity.RequestOnDead(true);
-            }
-            else
-            {
-                Debug.LogError("[Map Server] Invalid access token for user: " + userId);
-                Assets.NetworkDestroy(playerIdentity.ObjectId, DestroyObjectReasons.RequestedToDestroy);
-                Server.NetManager.DisconnectPeer(peer);
-                return;
+                PlayerCharacterEntities.Add(peer.ConnectId, playerCharacterEntity);
             }
         }
     }
