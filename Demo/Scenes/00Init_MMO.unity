@@ -412,7 +412,7 @@ MonoBehaviour:
   centralNetworkAddress: 127.0.0.1
   centralNetworkPort: 6000
   machineAddress: 127.0.0.1
-  autoSaveDuration: 0
+  autoSaveDuration: 5
 --- !u!4 &1127565840
 Transform:
   m_ObjectHideFlags: 0
