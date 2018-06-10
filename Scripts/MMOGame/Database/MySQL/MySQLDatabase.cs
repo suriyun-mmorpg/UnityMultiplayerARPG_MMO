@@ -23,19 +23,6 @@ namespace Insthync.MMOG
         private string password = "";
         [SerializeField]
         private string dbName = "mmorpgtemplate";
-        private MySqlConnection connection;
-
-        private void Awake()
-        {
-            connection = NewConnection();
-            connection.Open();
-        }
-
-        private void OnDestroy()
-        {
-            if (connection != null)
-                connection.Close();
-        }
 
         public string GetConnectionString()
         {
@@ -52,9 +39,13 @@ namespace Insthync.MMOG
             return new MySqlConnection(GetConnectionString());
         }
 
-        public Task<long> ExecuteInsertData(string sql, params MySqlParameter[] args)
+        public async Task<long> ExecuteInsertData(string sql, params MySqlParameter[] args)
         {
-            return ExecuteInsertData(connection, sql, args);
+            var connection = NewConnection();
+            connection.Open();
+            var result = await ExecuteInsertData(connection, sql, args);
+            connection.Close();
+            return result;
         }
 
         public async Task<long> ExecuteInsertData(MySqlConnection connection, string sql, params MySqlParameter[] args)
@@ -72,9 +63,13 @@ namespace Insthync.MMOG
             return result;
         }
 
-        public Task<int> ExecuteNonQuery(string sql, params MySqlParameter[] args)
+        public async Task<int> ExecuteNonQuery(string sql, params MySqlParameter[] args)
         {
-            return ExecuteNonQuery(connection, sql, args);
+            var connection = NewConnection();
+            connection.Open();
+            var result = await ExecuteNonQuery(connection, sql, args);
+            connection.Close();
+            return result;
         }
 
         public async Task<int> ExecuteNonQuery(MySqlConnection connection, string sql, params MySqlParameter[] args)
@@ -91,9 +86,13 @@ namespace Insthync.MMOG
             return numRows;
         }
 
-        public Task<object> ExecuteScalar(string sql, params MySqlParameter[] args)
+        public async Task<object> ExecuteScalar(string sql, params MySqlParameter[] args)
         {
-            return ExecuteScalar(connection, sql, args);
+            var connection = NewConnection();
+            connection.Open();
+            var result = await ExecuteScalar(connection, sql, args);
+            connection.Close();
+            return result;
         }
 
         public async Task<object> ExecuteScalar(MySqlConnection connection, string sql, params MySqlParameter[] args)
@@ -110,9 +109,13 @@ namespace Insthync.MMOG
             return result;
         }
 
-        public Task<MySQLRowsReader> ExecuteReader(string sql, params MySqlParameter[] args)
+        public async Task<MySQLRowsReader> ExecuteReader(string sql, params MySqlParameter[] args)
         {
-            return ExecuteReader(connection, sql, args);
+            var connection = NewConnection();
+            connection.Open();
+            var result = await ExecuteReader(connection, sql, args);
+            connection.Close();
+            return result;
         }
 
         public async Task<MySQLRowsReader> ExecuteReader(MySqlConnection connection, string sql, params MySqlParameter[] args)

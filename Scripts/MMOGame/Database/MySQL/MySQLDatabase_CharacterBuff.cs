@@ -28,9 +28,12 @@ namespace Insthync.MMOG
             return false;
         }
 
-        public override Task CreateCharacterBuff(string characterId, CharacterBuff characterBuff)
+        public override async Task CreateCharacterBuff(string characterId, CharacterBuff characterBuff)
         {
-            return CreateCharacterBuff(connection, characterId, characterBuff);
+            var connection = NewConnection();
+            connection.Open();
+            await CreateCharacterBuff(connection, characterId, characterBuff);
+            connection.Close();
         }
 
         public async Task CreateCharacterBuff(MySqlConnection connection, string characterId, CharacterBuff characterBuff)

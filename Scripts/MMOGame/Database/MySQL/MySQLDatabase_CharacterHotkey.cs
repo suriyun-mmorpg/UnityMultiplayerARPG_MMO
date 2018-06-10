@@ -25,9 +25,12 @@ namespace Insthync.MMOG
             return false;
         }
 
-        public override Task CreateCharacterHotkey(string characterId, CharacterHotkey characterHotkey)
+        public override async Task CreateCharacterHotkey(string characterId, CharacterHotkey characterHotkey)
         {
-            return CreateCharacterHotkey(connection, characterId, characterHotkey);
+            var connection = NewConnection();
+            connection.Open();
+            await CreateCharacterHotkey(connection, characterId, characterHotkey);
+            connection.Close();
         }
 
         public async Task CreateCharacterHotkey(MySqlConnection connection, string characterId, CharacterHotkey characterHotkey)

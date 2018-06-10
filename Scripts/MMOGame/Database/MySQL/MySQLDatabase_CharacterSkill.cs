@@ -25,9 +25,12 @@ namespace Insthync.MMOG
             return false;
         }
 
-        public override Task CreateCharacterSkill(string characterId, CharacterSkill characterSkill)
+        public override async Task CreateCharacterSkill(string characterId, CharacterSkill characterSkill)
         {
-            return CreateCharacterSkill(connection, characterId, characterSkill);
+            var connection = NewConnection();
+            connection.Open();
+            await CreateCharacterSkill(connection, characterId, characterSkill);
+            connection.Close();
         }
 
         public async Task CreateCharacterSkill(MySqlConnection connection, string characterId, CharacterSkill characterSkill)

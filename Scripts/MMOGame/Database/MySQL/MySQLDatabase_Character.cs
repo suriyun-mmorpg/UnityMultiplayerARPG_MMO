@@ -52,8 +52,10 @@ namespace Insthync.MMOG
 
         public override async Task CreateCharacter(string userId, PlayerCharacterData characterData)
         {
-            await ExecuteNonQuery("START TRANSACTION");
-            await ExecuteNonQuery("INSERT INTO characters " +
+            var connection = NewConnection();
+            connection.Open();
+            await ExecuteNonQuery(connection, "START TRANSACTION");
+            await ExecuteNonQuery(connection, "INSERT INTO characters " +
                 "(id, userId, databaseId, characterName, level, exp, currentHp, currentMp, currentStamina, currentFood, currentWater, statPoint, skillPoint, gold, currentMapName, currentPositionX, currentPositionY, currentPositionZ, respawnMapName, respawnPositionX, respawnPositionY, respawnPositionZ) VALUES " +
                 "(@id, @userId, @databaseId, @characterName, @level, @exp, @currentHp, @currentMp, @currentStamina, @currentFood, @currentWater, @statPoint, @skillPoint, @gold, @currentMapName, @currentPositionX, @currentPositionY, @currentPositionZ, @respawnMapName, @respawnPositionX, @respawnPositionY, @respawnPositionZ)",
                 new MySqlParameter("@id", characterData.Id),
@@ -79,7 +81,8 @@ namespace Insthync.MMOG
                 new MySqlParameter("@respawnPositionY", characterData.RespawnPosition.y),
                 new MySqlParameter("@respawnPositionZ", characterData.RespawnPosition.z));
             await FillCharacterRelatesData(connection, characterData);
-            await ExecuteNonQuery("COMMIT");
+            await ExecuteNonQuery(connection, "COMMIT");
+            connection.Close();
         }
 
         private bool ReadCharacter(MySQLRowsReader reader, out PlayerCharacterData result, bool resetReader = true)

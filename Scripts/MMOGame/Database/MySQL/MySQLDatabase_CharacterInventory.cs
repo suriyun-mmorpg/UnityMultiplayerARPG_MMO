@@ -8,9 +8,12 @@ namespace Insthync.MMOG
 {
     public partial class MySQLDatabase
     {
-        private Task CreateCharacterItem(string characterId, InventoryType inventoryType, CharacterItem characterItem)
+        private async Task CreateCharacterItem(string characterId, InventoryType inventoryType, CharacterItem characterItem)
         {
-            return CreateCharacterItem(connection, characterId, inventoryType, characterItem);
+            var connection = NewConnection();
+            connection.Open();
+            await CreateCharacterItem(connection, characterId, inventoryType, characterItem);
+            connection.Close();
         }
 
         private async Task CreateCharacterItem(MySqlConnection connection, string characterId, InventoryType inventoryType, CharacterItem characterItem)
@@ -103,9 +106,12 @@ namespace Insthync.MMOG
             return result;
         }
 
-        public override Task CreateCharacterEquipWeapons(string characterId, EquipWeapons equipWeapons)
+        public override async Task CreateCharacterEquipWeapons(string characterId, EquipWeapons equipWeapons)
         {
-            return CreateCharacterEquipWeapons(connection, characterId, equipWeapons);
+            var connection = NewConnection();
+            connection.Open();
+            await CreateCharacterEquipWeapons(connection, characterId, equipWeapons);
+            connection.Close();
         }
 
         public async Task CreateCharacterEquipWeapons(MySqlConnection connection, string characterId, EquipWeapons equipWeapons)
@@ -114,9 +120,12 @@ namespace Insthync.MMOG
             await CreateCharacterItem(connection, characterId, InventoryType.EquipWeaponLeft, equipWeapons.leftHand);
         }
 
-        public override Task UpdateCharacterEquipWeapons(string characterId, EquipWeapons equipWeapons)
+        public override async Task UpdateCharacterEquipWeapons(string characterId, EquipWeapons equipWeapons)
         {
-            return UpdateCharacterEquipWeapons(connection, characterId, equipWeapons);
+            var connection = NewConnection();
+            connection.Open();
+            await UpdateCharacterEquipWeapons(connection, characterId, equipWeapons);
+            connection.Close();
         }
 
         public async Task UpdateCharacterEquipWeapons(MySqlConnection connection, string characterId, EquipWeapons equipWeapons)
@@ -127,7 +136,10 @@ namespace Insthync.MMOG
 
         public override async Task DeleteCharacterEquipWeapons(string characterId)
         {
+            var connection = NewConnection();
+            connection.Open();
             await ExecuteNonQuery(connection, characterId);
+            connection.Close();
         }
 
         public async Task DeleteCharacterEquipWeapons(MySqlConnection connection, string characterId)

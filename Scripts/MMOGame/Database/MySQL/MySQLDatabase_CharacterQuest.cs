@@ -47,9 +47,12 @@ namespace Insthync.MMOG
             return false;
         }
 
-        public override Task CreateCharacterQuest(string characterId, CharacterQuest characterQuest)
+        public override async Task CreateCharacterQuest(string characterId, CharacterQuest characterQuest)
         {
-            return CreateCharacterQuest(connection, characterId, characterQuest);
+            var connection = NewConnection();
+            connection.Open();
+            await CreateCharacterQuest(connection, characterId, characterQuest);
+            connection.Close();
         }
 
         public async Task CreateCharacterQuest(MySqlConnection connection, string characterId, CharacterQuest characterQuest)
