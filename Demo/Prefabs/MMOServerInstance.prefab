@@ -26,7 +26,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!1 &1250662783992638
 GameObject:
   m_ObjectHideFlags: 0
@@ -58,7 +58,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!1 &1650234716345238
 GameObject:
   m_ObjectHideFlags: 0
@@ -281,9 +281,9 @@ MonoBehaviour:
   centralNetworkManager: {fileID: 114543387092495668}
   mapSpawnNetworkManager: {fileID: 114788248445432888}
   mapNetworkManager: {fileID: 0}
-  database: {fileID: 114414512406587944}
+  database: {fileID: 114715813743394434}
   scenes:
   - sceneAsset: {fileID: 102900000, guid: 5ff0e5fbbdc3a214d87be31915d46cd5, type: 3}
     sceneName: Map001
-  startCentralOnAwake: 1
-  startMapSpawnOnAwake: 1
+  startCentralOnAwake: 0
+  startMapSpawnOnAwake: 0
