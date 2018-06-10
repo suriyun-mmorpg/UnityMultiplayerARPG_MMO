@@ -67,6 +67,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4009622383931608}
+  - component: {fileID: 114227780437250376}
   - component: {fileID: 114946005600446132}
   m_Layer: 0
   m_Name: MMOServerInstance
@@ -160,6 +161,19 @@ Transform:
   m_Father: {fileID: 4009622383931608}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &114227780437250376
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1650234716345238}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5e08d8ccbfded44bb2400909f8f4376, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  openLogDir: 1
+  showLogSize: 20
 --- !u!114 &114414512406587944
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -282,8 +296,5 @@ MonoBehaviour:
   mapSpawnNetworkManager: {fileID: 114788248445432888}
   mapNetworkManager: {fileID: 0}
   database: {fileID: 114715813743394434}
-  scenes:
-  - sceneAsset: {fileID: 102900000, guid: 5ff0e5fbbdc3a214d87be31915d46cd5, type: 3}
-    sceneName: Map001
   startCentralOnAwake: 0
   startMapSpawnOnAwake: 0
