@@ -20,8 +20,8 @@ namespace Insthync.MMOG
             MMOClientInstance.Singleton.onClientDisconnected += OnCentralServerDisconnected;
             if (MMOClientInstance.Singleton.IsConnectedToCentralServer())
                 OnCentralServerConnected(MMOClientInstance.Singleton.GetCentralClientPeer());
-            else if (!string.IsNullOrEmpty(MMOClientInstance.UserId) && !string.IsNullOrEmpty(MMOClientInstance.AccessToken))
-                MMOClientInstance.Singleton.StartCentralClient();
+            else if (!string.IsNullOrEmpty(MMOClientInstance.SelectedCentralAddress) && MMOClientInstance.SelectedCentralPort > 0)
+                MMOClientInstance.Singleton.StartCentralClient(MMOClientInstance.SelectedCentralAddress, MMOClientInstance.SelectedCentralPort);
         }
 
         private void OnDisable()
@@ -46,6 +46,12 @@ namespace Insthync.MMOG
         public void OnClickLogout()
         {
             MMOClientInstance.Singleton.RequestUserLogout(OnUserLogout);
+        }
+
+        public void OnClickDisconnect()
+        {
+            MMOClientInstance.Singleton.ClearClientData();
+            MMOClientInstance.Singleton.StopCentralClient();
         }
 
         public void OnClickExit()

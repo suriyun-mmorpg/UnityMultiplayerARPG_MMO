@@ -9,6 +9,9 @@ namespace Insthync.MMOG
     public class MMOClientInstance : MonoBehaviour
     {
         public static MMOClientInstance Singleton { get; protected set; }
+        // Client data, May keep these data in player prefs to do auto login system
+        public static string SelectedCentralAddress { get; private set; }
+        public static int SelectedCentralPort { get; private set; }
         public static string UserId { get; private set; }
         public static string AccessToken { get; private set; }
         public static string SelectCharacterId { get; private set; }
@@ -71,15 +74,25 @@ namespace Insthync.MMOG
 
         public void StartCentralClient(string address, int port)
         {
-            centralNetworkManager.networkAddress = address;
-            centralNetworkManager.networkPort = port;
+            centralNetworkManager.networkAddress = SelectedCentralAddress = address;
+            centralNetworkManager.networkPort = SelectedCentralPort = port;
             StartCentralClient();
+        }
+
+        public void StopCentralClient()
+        {
+            centralNetworkManager.StopClient();
         }
 
         public void StartMapClient(string sceneName, string address, int port, string connectKey)
         {
             mapNetworkManager.Assets.onlineScene.SceneName = sceneName;
             mapNetworkManager.StartClient(address, port, connectKey);
+        }
+
+        public void StopMapClient()
+        {
+            mapNetworkManager.StopClient();
         }
 
         public bool IsConnectedToCentralServer()
@@ -90,6 +103,15 @@ namespace Insthync.MMOG
         public NetPeer GetCentralClientPeer()
         {
             return centralNetworkManager.Client.Peer;
+        }
+
+        public void ClearClientData()
+        {
+            SelectedCentralAddress = string.Empty;
+            SelectedCentralPort = 0;
+            UserId = string.Empty;
+            AccessToken = string.Empty;
+            SelectCharacterId = string.Empty;
         }
 
         public void RequestUserLogin(string username, string password, AckMessageCallback callback)
