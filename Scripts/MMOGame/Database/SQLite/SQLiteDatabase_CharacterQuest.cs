@@ -49,15 +49,7 @@ namespace Insthync.MMOG
 
         public override async Task CreateCharacterQuest(string characterId, CharacterQuest characterQuest)
         {
-            var connection = NewConnection();
-            connection.Open();
-            await CreateCharacterQuest(connection, characterId, characterQuest);
-            connection.Close();
-        }
-
-        public async Task CreateCharacterQuest(SqliteConnection connection, string characterId, CharacterQuest characterQuest)
-        {
-            await ExecuteNonQuery(connection, "INSERT INTO characterquest (characterId, questId, isComplete, killedMonsters) VALUES (@characterId, @questId, @isComplete, @killedMonsters)",
+            await ExecuteNonQuery("INSERT INTO characterquest (characterId, questId, isComplete, killedMonsters) VALUES (@characterId, @questId, @isComplete, @killedMonsters)",
                 new SqliteParameter("@characterId", characterId),
                 new SqliteParameter("@questId", characterQuest.questId),
                 new SqliteParameter("@isComplete", characterQuest.isComplete),

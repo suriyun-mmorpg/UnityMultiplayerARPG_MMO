@@ -27,15 +27,7 @@ namespace Insthync.MMOG
 
         public override async Task CreateCharacterHotkey(string characterId, CharacterHotkey characterHotkey)
         {
-            var connection = NewConnection();
-            connection.Open();
-            await CreateCharacterHotkey(connection, characterId, characterHotkey);
-            connection.Close();
-        }
-
-        public async Task CreateCharacterHotkey(SqliteConnection connection, string characterId, CharacterHotkey characterHotkey)
-        {
-            await ExecuteNonQuery(connection, "INSERT INTO characterhotkey (characterId, hotkeyId, type, dataId) VALUES (@characterId, @hotkeyId, @type, @dataId)",
+            await ExecuteNonQuery("INSERT INTO characterhotkey (characterId, hotkeyId, type, dataId) VALUES (@characterId, @hotkeyId, @type, @dataId)",
                 new SqliteParameter("@characterId", characterId),
                 new SqliteParameter("@hotkeyId", characterHotkey.hotkeyId),
                 new SqliteParameter("@type", characterHotkey.type),
