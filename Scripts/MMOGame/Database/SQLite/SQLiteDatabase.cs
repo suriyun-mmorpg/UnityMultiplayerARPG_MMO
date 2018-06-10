@@ -16,6 +16,10 @@ namespace Insthync.MMOG
         }
         [SerializeField]
         private string dbPath = "./mmorpgtemplate.sqlite3";
+        [Header("Running In Editor")]
+        [SerializeField]
+        [Tooltip("You should set this to where you build app to make database path as same as map server")]
+        private string editorDbPath = "./mmorpgtemplate.sqlite3";
         private SqliteConnection connection;
 
         private void Awake()
@@ -136,19 +140,23 @@ namespace Insthync.MMOG
 
         public string GetConnectionString()
         {
+            var path = dbPath;
             if (Application.isMobilePlatform)
             {
-                if (dbPath.StartsWith("./"))
-                    dbPath = dbPath.Substring(1);
-                if (!dbPath.StartsWith("/"))
-                    dbPath = "/" + dbPath;
-                dbPath = Application.persistentDataPath + dbPath;
+                if (path.StartsWith("./"))
+                    path = path.Substring(1);
+                if (!path.StartsWith("/"))
+                    path = "/" + path;
+                path = Application.persistentDataPath + path;
             }
 
-            if (!File.Exists(dbPath))
-                SqliteConnection.CreateFile(dbPath);
+            if (Application.isEditor)
+                path = editorDbPath;
 
-            return "URI=file:" + dbPath;
+            if (!File.Exists(path))
+                SqliteConnection.CreateFile(path);
+
+            return "URI=file:" + path;
         }
 
         public SqliteConnection NewConnection()
