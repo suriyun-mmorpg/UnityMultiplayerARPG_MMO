@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Jun 11, 2018 at 09:59 PM
+-- Generation Time: Jun 12, 2018 at 12:19 AM
 -- Server version: 10.1.28-MariaDB
 -- PHP Version: 7.1.11
 
@@ -30,8 +30,9 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `characterattribute` (
   `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `idx` int(11) NOT NULL,
   `characterId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-  `attributeId` int(11) NOT NULL,
+  `dataId` int(11) NOT NULL,
   `amount` int(11) NOT NULL,
   `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -78,6 +79,7 @@ CREATE TABLE `characterhotkey` (
 
 CREATE TABLE `characteritem` (
   `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `idx` int(11) NOT NULL,
   `inventoryType` tinyint(4) NOT NULL,
   `characterId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `dataId` int(11) NOT NULL,
@@ -95,6 +97,7 @@ CREATE TABLE `characteritem` (
 
 CREATE TABLE `characterquest` (
   `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `idx` int(11) NOT NULL,
   `characterId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `dataId` int(11) NOT NULL,
   `isComplete` tinyint(1) NOT NULL,
@@ -144,6 +147,7 @@ CREATE TABLE `characters` (
 
 CREATE TABLE `characterskill` (
   `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `idx` int(11) NOT NULL,
   `characterId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `dataId` int(11) NOT NULL,
   `level` int(11) NOT NULL,
