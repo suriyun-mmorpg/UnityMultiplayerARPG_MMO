@@ -40,6 +40,7 @@ namespace Insthync.MMOG
 
             await ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characterattribute (
               id TEXT NOT NULL PRIMARY KEY,
+              idx INTEGER NOT NULL,
               characterId TEXT NOT NULL,
               dataId INTEGER NOT NULL,
               amount INTEGER NOT NULL,
@@ -70,6 +71,7 @@ namespace Insthync.MMOG
 
             await ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characteritem (
               id TEXT NOT NULL PRIMARY KEY,
+              idx INTEGER NOT NULL,
               inventoryType INTEGER NOT NULL,
               characterId TEXT NOT NULL,
               dataId INTERGER NOT NULL,
@@ -81,6 +83,7 @@ namespace Insthync.MMOG
 
             await ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characterquest (
               id TEXT NOT NULL PRIMARY KEY,
+              idx INTEGER NOT NULL,
               characterId TEXT NOT NULL,
               dataId INTEGER NOT NULL,
               isComplete INTEGER NOT NULL,
@@ -118,6 +121,7 @@ namespace Insthync.MMOG
 
             await ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characterskill (
               id TEXT NOT NULL PRIMARY KEY,
+              idx INTEGER NOT NULL,
               characterId TEXT NOT NULL,
               dataId INTEGER NOT NULL,
               level INTEGER NOT NULL,

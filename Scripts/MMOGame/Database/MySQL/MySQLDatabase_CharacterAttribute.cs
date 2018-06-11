@@ -24,10 +24,11 @@ namespace Insthync.MMOG
             return false;
         }
 
-        public async Task CreateCharacterAttribute(MySqlConnection connection, string characterId, CharacterAttribute characterAttribute)
+        public async Task CreateCharacterAttribute(MySqlConnection connection, int idx, string characterId, CharacterAttribute characterAttribute)
         {
-            await ExecuteNonQuery(connection, "INSERT INTO characterattribute (id, characterId, dataId, amount) VALUES (@id, @characterId, @dataId, @amount)",
-                new MySqlParameter("@id", characterId + "_" + characterAttribute.dataId),
+            await ExecuteNonQuery(connection, "INSERT INTO characterattribute (id, idx, characterId, dataId, amount) VALUES (@id, @idx, @characterId, @dataId, @amount)",
+                new MySqlParameter("@id", characterId + "_" + idx),
+                new MySqlParameter("@idx", idx),
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@dataId", characterAttribute.dataId),
                 new MySqlParameter("@amount", characterAttribute.amount));
@@ -36,7 +37,7 @@ namespace Insthync.MMOG
         public async Task<List<CharacterAttribute>> ReadCharacterAttributes(string characterId)
         {
             var result = new List<CharacterAttribute>();
-            var reader = await ExecuteReader("SELECT * FROM characterattribute WHERE characterId=@characterId",
+            var reader = await ExecuteReader("SELECT * FROM characterattribute WHERE characterId=@characterId ORDER BY idx ASC",
                 new MySqlParameter("@characterId", characterId));
             CharacterAttribute tempAttribute;
             while (ReadCharacterAttribute(reader, out tempAttribute, false))

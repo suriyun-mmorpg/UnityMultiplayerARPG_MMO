@@ -47,10 +47,11 @@ namespace Insthync.MMOG
             return false;
         }
 
-        public async Task CreateCharacterQuest(MySqlConnection connection, string characterId, CharacterQuest characterQuest)
+        public async Task CreateCharacterQuest(MySqlConnection connection, int idx, string characterId, CharacterQuest characterQuest)
         {
-            await ExecuteNonQuery(connection, "INSERT INTO characterquest (id, characterId, dataId, isComplete, killedMonsters) VALUES (@id, @characterId, @dataId, @isComplete, @killedMonsters)",
-                new MySqlParameter("@id", characterId + "_" + characterQuest.dataId),
+            await ExecuteNonQuery(connection, "INSERT INTO characterquest (id, idx, characterId, dataId, isComplete, killedMonsters) VALUES (@id, @idx, @characterId, @dataId, @isComplete, @killedMonsters)",
+                new MySqlParameter("@id", characterId + "_" + idx),
+                new MySqlParameter("@idx", idx),
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@dataId", characterQuest.dataId),
                 new MySqlParameter("@isComplete", characterQuest.isComplete),
@@ -60,7 +61,7 @@ namespace Insthync.MMOG
         public async Task<List<CharacterQuest>> ReadCharacterQuests(string characterId)
         {
             var result = new List<CharacterQuest>();
-            var reader = await ExecuteReader("SELECT * FROM characterquest WHERE characterId=@characterId",
+            var reader = await ExecuteReader("SELECT * FROM characterquest WHERE characterId=@characterId ORDER BY idx ASC",
                 new MySqlParameter("@characterId", characterId));
             CharacterQuest tempQuest;
             while (ReadCharacterQuest(reader, out tempQuest, false))

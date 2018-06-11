@@ -20,21 +20,30 @@ namespace Insthync.MMOG
             await DeleteCharacterSkills(characterId);
 
             await CreateCharacterEquipWeapons(characterId, characterData.EquipWeapons);
+            var i = 0;
             foreach (var equipItem in characterData.EquipItems)
             {
-                await CreateCharacterEquipItem(characterId, equipItem);
+                await CreateCharacterEquipItem(i++, characterId, equipItem);
             }
+            i = 0;
             foreach (var nonEquipItem in characterData.NonEquipItems)
             {
-                await CreateCharacterNonEquipItem(characterId, nonEquipItem);
+                await CreateCharacterNonEquipItem(i++, characterId, nonEquipItem);
             }
+            i = 0;
             foreach (var attribute in characterData.Attributes)
             {
-                await CreateCharacterAttribute(characterId, attribute);
+                await CreateCharacterAttribute(i++, characterId, attribute);
             }
+            i = 0;
             foreach (var skill in characterData.Skills)
             {
-                await CreateCharacterSkill(characterId, skill);
+                await CreateCharacterSkill(i++, characterId, skill);
+            }
+            i = 0;
+            foreach (var quest in characterData.Quests)
+            {
+                await CreateCharacterQuest(i++, characterId, quest);
             }
             foreach (var buff in characterData.Buffs)
             {
@@ -43,10 +52,6 @@ namespace Insthync.MMOG
             foreach (var hotkey in characterData.Hotkeys)
             {
                 await CreateCharacterHotkey(characterId, hotkey);
-            }
-            foreach (var quest in characterData.Quests)
-            {
-                await CreateCharacterQuest(characterId, quest);
             }
         }
 

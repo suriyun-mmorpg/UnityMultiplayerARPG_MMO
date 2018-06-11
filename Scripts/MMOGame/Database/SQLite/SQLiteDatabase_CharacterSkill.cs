@@ -25,10 +25,11 @@ namespace Insthync.MMOG
             return false;
         }
 
-        public async Task CreateCharacterSkill(string characterId, CharacterSkill characterSkill)
+        public async Task CreateCharacterSkill(int idx, string characterId, CharacterSkill characterSkill)
         {
-            await ExecuteNonQuery("INSERT INTO characterskill (id, characterId, dataId, level, coolDownRemainsDuration) VALUES (@id, @characterId, @dataId, @level, @coolDownRemainsDuration)",
-                new SqliteParameter("@id", characterId + "_" + characterSkill.dataId),
+            await ExecuteNonQuery("INSERT INTO characterskill (id, idx, characterId, dataId, level, coolDownRemainsDuration) VALUES (@id, @idx, @characterId, @dataId, @level, @coolDownRemainsDuration)",
+                new SqliteParameter("@id", characterId + "_" + idx),
+                new SqliteParameter("@idx", idx),
                 new SqliteParameter("@characterId", characterId),
                 new SqliteParameter("@dataId", characterSkill.dataId),
                 new SqliteParameter("@level", characterSkill.level),
@@ -38,7 +39,7 @@ namespace Insthync.MMOG
         public async Task<List<CharacterSkill>> ReadCharacterSkills(string characterId)
         {
             var result = new List<CharacterSkill>();
-            var reader = await ExecuteReader("SELECT * FROM characterskill WHERE characterId=@characterId",
+            var reader = await ExecuteReader("SELECT * FROM characterskill WHERE characterId=@characterId ORDER BY idx ASC",
                 new SqliteParameter("@characterId", characterId));
             CharacterSkill tempSkill;
             while (ReadCharacterSkill(reader, out tempSkill, false))

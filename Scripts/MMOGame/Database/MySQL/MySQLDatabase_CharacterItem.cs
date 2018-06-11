@@ -8,19 +8,12 @@ namespace Insthync.MMOG
 {
     public partial class MySQLDatabase
     {
-        private async Task CreateCharacterItem(string characterId, InventoryType inventoryType, CharacterItem characterItem)
+        private async Task CreateCharacterItem(MySqlConnection connection, int idx, string characterId, InventoryType inventoryType, CharacterItem characterItem)
         {
-            var connection = NewConnection();
-            connection.Open();
-            await CreateCharacterItem(connection, characterId, inventoryType, characterItem);
-            connection.Close();
-        }
-
-        private async Task CreateCharacterItem(MySqlConnection connection, string characterId, InventoryType inventoryType, CharacterItem characterItem)
-        {
-            await ExecuteNonQuery(connection, "INSERT INTO characteritem (id, inventoryType, characterId, dataId, level, amount) VALUES (@id, @inventoryType, @characterId, @dataId, @level, @amount)",
-                new MySqlParameter("@id", characterItem.id),
-                new MySqlParameter("@inventoryType", inventoryType),
+            await ExecuteNonQuery(connection, "INSERT INTO characteritem (id, idx, inventoryType, characterId, dataId, level, amount) VALUES (@id, @idx, @inventoryType, @characterId, @dataId, @level, @amount)",
+                new MySqlParameter("@id", characterId + "_" + (byte)inventoryType + "_" + idx),
+                new MySqlParameter("@idx", idx),
+                new MySqlParameter("@inventoryType", (byte)inventoryType),
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@dataId", characterItem.dataId),
                 new MySqlParameter("@level", characterItem.level),
@@ -35,7 +28,6 @@ namespace Insthync.MMOG
             if (reader.Read())
             {
                 result = new CharacterItem();
-                result.id = reader.GetString("id");
                 result.dataId = reader.GetInt32("dataId");
                 result.level = reader.GetInt32("level");
                 result.amount = reader.GetInt32("amount");
@@ -48,7 +40,7 @@ namespace Insthync.MMOG
         private async Task<List<CharacterItem>> ReadCharacterItems(string characterId, InventoryType inventoryType)
         {
             var result = new List<CharacterItem>();
-            var reader = await ExecuteReader("SELECT * FROM characteritem WHERE characterId=@characterId AND inventoryType=@inventoryType",
+            var reader = await ExecuteReader("SELECT * FROM characteritem WHERE characterId=@characterId AND inventoryType=@inventoryType ORDER BY idx ASC",
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@inventoryType", inventoryType));
             CharacterItem tempInventory;
@@ -81,13 +73,13 @@ namespace Insthync.MMOG
 
         public async Task CreateCharacterEquipWeapons(MySqlConnection connection, string characterId, EquipWeapons equipWeapons)
         {
-            await CreateCharacterItem(connection, characterId, InventoryType.EquipWeaponRight, equipWeapons.rightHand);
-            await CreateCharacterItem(connection, characterId, InventoryType.EquipWeaponLeft, equipWeapons.leftHand);
+            await CreateCharacterItem(connection, 0, characterId, InventoryType.EquipWeaponRight, equipWeapons.rightHand);
+            await CreateCharacterItem(connection, 0, characterId, InventoryType.EquipWeaponLeft, equipWeapons.leftHand);
         }
 
-        public Task CreateCharacterEquipItem(MySqlConnection connection, string characterId, CharacterItem characterItem)
+        public Task CreateCharacterEquipItem(MySqlConnection connection, int idx, string characterId, CharacterItem characterItem)
         {
-            return CreateCharacterItem(connection, characterId, InventoryType.EquipItems, characterItem);
+            return CreateCharacterItem(connection, idx, characterId, InventoryType.EquipItems, characterItem);
         }
 
         public Task<List<CharacterItem>> ReadCharacterEquipItems(string characterId)
@@ -95,9 +87,9 @@ namespace Insthync.MMOG
             return ReadCharacterItems(characterId, InventoryType.EquipItems);
         }
 
-        public Task CreateCharacterNonEquipItem(MySqlConnection connection, string characterId, CharacterItem characterItem)
+        public Task CreateCharacterNonEquipItem(MySqlConnection connection, int idx, string characterId, CharacterItem characterItem)
         {
-            return CreateCharacterItem(connection, characterId, InventoryType.NonEquipItems, characterItem);
+            return CreateCharacterItem(connection, idx, characterId, InventoryType.NonEquipItems, characterItem);
         }
 
         public Task<List<CharacterItem>> ReadCharacterNonEquipItems(string characterId)

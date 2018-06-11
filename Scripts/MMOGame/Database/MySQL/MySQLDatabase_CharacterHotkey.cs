@@ -27,7 +27,8 @@ namespace Insthync.MMOG
 
         public async Task CreateCharacterHotkey(MySqlConnection connection, string characterId, CharacterHotkey characterHotkey)
         {
-            await ExecuteNonQuery(connection, "INSERT INTO characterhotkey (characterId, hotkeyId, type, dataId) VALUES (@characterId, @hotkeyId, @type, @dataId)",
+            await ExecuteNonQuery(connection, "INSERT INTO characterhotkey (id, characterId, hotkeyId, type, dataId) VALUES (@id, @characterId, @hotkeyId, @type, @dataId)",
+                new MySqlParameter("@id", characterId + "_" + characterHotkey.hotkeyId),
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@hotkeyId", characterHotkey.hotkeyId),
                 new MySqlParameter("@type", characterHotkey.type),

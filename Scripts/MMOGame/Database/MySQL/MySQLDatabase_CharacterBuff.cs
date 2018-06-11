@@ -42,7 +42,7 @@ namespace Insthync.MMOG
         public async Task<List<CharacterBuff>> ReadCharacterBuffs(string characterId)
         {
             var result = new List<CharacterBuff>();
-            var reader = await ExecuteReader("SELECT * FROM characterbuff WHERE characterId=@characterId",
+            var reader = await ExecuteReader("SELECT * FROM characterbuff WHERE characterId=@characterId ORDER BY buffRemainsDuration ASC",
                 new MySqlParameter("@characterId", characterId));
             CharacterBuff tempBuff;
             while (ReadCharacterBuff(reader, out tempBuff, false))

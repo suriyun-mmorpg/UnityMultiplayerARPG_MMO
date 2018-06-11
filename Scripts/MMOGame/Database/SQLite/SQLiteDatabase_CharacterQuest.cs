@@ -47,20 +47,21 @@ namespace Insthync.MMOG
             return false;
         }
 
-        public async Task CreateCharacterQuest(string characterId, CharacterQuest characterQuest)
+        public async Task CreateCharacterQuest(int idx, string characterId, CharacterQuest characterQuest)
         {
-            await ExecuteNonQuery("INSERT INTO characterquest (id, characterId, dataId, isComplete, killedMonsters) VALUES (@id, @characterId, @dataId, @isComplete, @killedMonsters)",
-                new SqliteParameter("@id", characterId + "_" + characterQuest.dataId),
+            await ExecuteNonQuery("INSERT INTO characterquest (id, idx, characterId, dataId, isComplete, killedMonsters) VALUES (@id, @idx, @characterId, @dataId, @isComplete, @killedMonsters)",
+                new SqliteParameter("@id", characterId + "_" + idx),
+                new SqliteParameter("@idx", idx),
                 new SqliteParameter("@characterId", characterId),
                 new SqliteParameter("@dataId", characterQuest.dataId),
-                new SqliteParameter("@isComplete", characterQuest.isComplete),
+                new SqliteParameter("@isComplete", characterQuest.isComplete ? 1 : 0),
                 new SqliteParameter("@killedMonsters", WriteKillMonsters(characterQuest.killedMonsters)));
         }
 
         public async Task<List<CharacterQuest>> ReadCharacterQuests(string characterId)
         {
             var result = new List<CharacterQuest>();
-            var reader = await ExecuteReader("SELECT * FROM characterquest WHERE characterId=@characterId",
+            var reader = await ExecuteReader("SELECT * FROM characterquest WHERE characterId=@characterId ORDER BY idx ASC",
                 new SqliteParameter("@characterId", characterId));
             CharacterQuest tempQuest;
             while (ReadCharacterQuest(reader, out tempQuest, false))

@@ -8,11 +8,12 @@ namespace Insthync.MMOG
 {
     public partial class SQLiteDatabase
     {
-        private async Task CreateCharacterItem(string characterId, InventoryType inventoryType, CharacterItem characterItem)
+        private async Task CreateCharacterItem(int idx, string characterId, InventoryType inventoryType, CharacterItem characterItem)
         {
-            await ExecuteNonQuery("INSERT INTO characteritem (id, inventoryType, characterId, dataId, level, amount) VALUES (@id, @inventoryType, @characterId, @dataId, @level, @amount)",
-                new SqliteParameter("@id", characterItem.id),
-                new SqliteParameter("@inventoryType", inventoryType),
+            await ExecuteNonQuery("INSERT INTO characteritem (id, idx, inventoryType, characterId, dataId, level, amount) VALUES (@id, @idx, @inventoryType, @characterId, @dataId, @level, @amount)",
+                new SqliteParameter("@id", characterId + "_" + (byte)inventoryType + "_" + idx),
+                new SqliteParameter("@idx", idx),
+                new SqliteParameter("@inventoryType", (byte)inventoryType),
                 new SqliteParameter("@characterId", characterId),
                 new SqliteParameter("@dataId", characterItem.dataId),
                 new SqliteParameter("@level", characterItem.level),
@@ -27,7 +28,6 @@ namespace Insthync.MMOG
             if (reader.Read())
             {
                 result = new CharacterItem();
-                result.id = reader.GetString("id");
                 result.dataId = reader.GetInt32("dataId");
                 result.level = reader.GetInt32("level");
                 result.amount = reader.GetInt32("amount");
@@ -40,7 +40,7 @@ namespace Insthync.MMOG
         private async Task<List<CharacterItem>> ReadCharacterItems(string characterId, InventoryType inventoryType)
         {
             var result = new List<CharacterItem>();
-            var reader = await ExecuteReader("SELECT * FROM characteritem WHERE characterId=@characterId AND inventoryType=@inventoryType",
+            var reader = await ExecuteReader("SELECT * FROM characteritem WHERE characterId=@characterId AND inventoryType=@inventoryType ORDER BY idx ASC",
                 new SqliteParameter("@characterId", characterId),
                 new SqliteParameter("@inventoryType", inventoryType));
             CharacterItem tempInventory;
@@ -73,13 +73,13 @@ namespace Insthync.MMOG
 
         public async Task CreateCharacterEquipWeapons(string characterId, EquipWeapons equipWeapons)
         {
-            await CreateCharacterItem(characterId, InventoryType.EquipWeaponRight, equipWeapons.rightHand);
-            await CreateCharacterItem(characterId, InventoryType.EquipWeaponLeft, equipWeapons.leftHand);
+            await CreateCharacterItem(0, characterId, InventoryType.EquipWeaponRight, equipWeapons.rightHand);
+            await CreateCharacterItem(0, characterId, InventoryType.EquipWeaponLeft, equipWeapons.leftHand);
         }
 
-        public async Task CreateCharacterEquipItem(string characterId, CharacterItem characterItem)
+        public async Task CreateCharacterEquipItem(int idx, string characterId, CharacterItem characterItem)
         {
-            await CreateCharacterItem(characterId, InventoryType.EquipItems, characterItem);
+            await CreateCharacterItem(idx, characterId, InventoryType.EquipItems, characterItem);
         }
 
         public Task<List<CharacterItem>> ReadCharacterEquipItems(string characterId)
@@ -87,9 +87,9 @@ namespace Insthync.MMOG
             return ReadCharacterItems(characterId, InventoryType.EquipItems);
         }
 
-        public Task CreateCharacterNonEquipItem(string characterId, CharacterItem characterItem)
+        public Task CreateCharacterNonEquipItem(int idx, string characterId, CharacterItem characterItem)
         {
-            return CreateCharacterItem(characterId, InventoryType.NonEquipItems, characterItem);
+            return CreateCharacterItem(idx, characterId, InventoryType.NonEquipItems, characterItem);
         }
 
         public Task<List<CharacterItem>> ReadCharacterNonEquipItems(string characterId)
