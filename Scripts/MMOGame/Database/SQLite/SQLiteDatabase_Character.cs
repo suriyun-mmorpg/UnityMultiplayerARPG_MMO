@@ -12,12 +12,12 @@ namespace Insthync.MMOG
         {
             // Delete all character then add all of them
             var characterId = characterData.Id;
-            await ExecuteNonQuery("DELETE FROM characterinventory WHERE characterId=@characterId", new SqliteParameter("@characterId", characterId));
-            await ExecuteNonQuery("DELETE FROM characterattribute WHERE characterId=@characterId", new SqliteParameter("@characterId", characterId));
-            await ExecuteNonQuery("DELETE FROM characterskill WHERE characterId=@characterId", new SqliteParameter("@characterId", characterId));
-            await ExecuteNonQuery("DELETE FROM characterbuff WHERE characterId=@characterId", new SqliteParameter("@characterId", characterId));
-            await ExecuteNonQuery("DELETE FROM characterhotkey WHERE characterId=@characterId", new SqliteParameter("@characterId", characterId));
-            await ExecuteNonQuery("DELETE FROM characterquest WHERE characterId=@characterId", new SqliteParameter("@characterId", characterId));
+            await DeleteCharacterAttributes(characterId);
+            await DeleteCharacterBuffs(characterId);
+            await DeleteCharacterHotkeys(characterId);
+            await DeleteCharacterItems(characterId);
+            await DeleteCharacterQuests(characterId);
+            await DeleteCharacterSkills(characterId);
 
             await CreateCharacterEquipWeapons(characterId, characterData.EquipWeapons);
             foreach (var equipItem in characterData.EquipItems)
@@ -54,11 +54,11 @@ namespace Insthync.MMOG
         {
             await ExecuteNonQuery("BEGIN");
             await ExecuteNonQuery("INSERT INTO characters " +
-                "(id, userId, databaseId, characterName, level, exp, currentHp, currentMp, currentStamina, currentFood, currentWater, statPoint, skillPoint, gold, currentMapName, currentPositionX, currentPositionY, currentPositionZ, respawnMapName, respawnPositionX, respawnPositionY, respawnPositionZ) VALUES " +
-                "(@id, @userId, @databaseId, @characterName, @level, @exp, @currentHp, @currentMp, @currentStamina, @currentFood, @currentWater, @statPoint, @skillPoint, @gold, @currentMapName, @currentPositionX, @currentPositionY, @currentPositionZ, @respawnMapName, @respawnPositionX, @respawnPositionY, @respawnPositionZ)",
+                "(id, userId, dataId, characterName, level, exp, currentHp, currentMp, currentStamina, currentFood, currentWater, statPoint, skillPoint, gold, currentMapName, currentPositionX, currentPositionY, currentPositionZ, respawnMapName, respawnPositionX, respawnPositionY, respawnPositionZ) VALUES " +
+                "(@id, @userId, @dataId, @characterName, @level, @exp, @currentHp, @currentMp, @currentStamina, @currentFood, @currentWater, @statPoint, @skillPoint, @gold, @currentMapName, @currentPositionX, @currentPositionY, @currentPositionZ, @respawnMapName, @respawnPositionX, @respawnPositionY, @respawnPositionZ)",
                 new SqliteParameter("@id", characterData.Id),
                 new SqliteParameter("@userId", userId),
-                new SqliteParameter("@databaseId", characterData.DatabaseId),
+                new SqliteParameter("@dataId", characterData.DataId),
                 new SqliteParameter("@characterName", characterData.CharacterName),
                 new SqliteParameter("@level", characterData.Level),
                 new SqliteParameter("@exp", characterData.Exp),
@@ -91,7 +91,7 @@ namespace Insthync.MMOG
             {
                 result = new PlayerCharacterData();
                 result.Id = reader.GetString("id");
-                result.DatabaseId = reader.GetString("databaseId");
+                result.DataId = reader.GetInt32("dataId");
                 result.CharacterName = reader.GetString("characterName");
                 result.Level = reader.GetInt32("level");
                 result.Exp = reader.GetInt32("exp");
@@ -169,7 +169,7 @@ namespace Insthync.MMOG
         {
             await ExecuteNonQuery("BEGIN");
             await ExecuteNonQuery("UPDATE characters SET " +
-                "databaseId=@databaseId, " +
+                "dataId=@dataId, " +
                 "characterName=@characterName, " +
                 "level=@level, " +
                 "exp=@exp, " +
@@ -190,7 +190,7 @@ namespace Insthync.MMOG
                 "respawnPositionY=@respawnPositionY, " +
                 "respawnPositionZ=@respawnPositionZ " +
                 "WHERE id=@id",
-                new SqliteParameter("@databaseId", characterData.DatabaseId),
+                new SqliteParameter("@dataId", characterData.DataId),
                 new SqliteParameter("@characterName", characterData.CharacterName),
                 new SqliteParameter("@level", characterData.Level),
                 new SqliteParameter("@exp", characterData.Exp),
@@ -223,15 +223,15 @@ namespace Insthync.MMOG
             var count = result != null ? (long)result : 0;
             if (count > 0)
             {
-                await ExecuteNonQuery("START TRANSACTION");
+                await ExecuteNonQuery("BEGIN");
                 await ExecuteNonQuery("DELETE FROM characters WHERE id=@characterId", new SqliteParameter("@characterId", id));
-                await ExecuteNonQuery("DELETE FROM characterInventory WHERE characterId=@characterId", new SqliteParameter("@characterId", id));
-                await ExecuteNonQuery("DELETE FROM characterAttribute WHERE characterId=@characterId", new SqliteParameter("@characterId", id));
-                await ExecuteNonQuery("DELETE FROM characterSkill WHERE characterId=@characterId", new SqliteParameter("@characterId", id));
-                await ExecuteNonQuery("DELETE FROM characterBuff WHERE characterId=@characterId", new SqliteParameter("@characterId", id));
-                await ExecuteNonQuery("DELETE FROM characterHotkey WHERE characterId=@characterId", new SqliteParameter("@characterId", id));
-                await ExecuteNonQuery("DELETE FROM characterQuest WHERE characterId=@characterId", new SqliteParameter("@characterId", id));
-                await ExecuteNonQuery("COMMIT");
+                await DeleteCharacterAttributes(id);
+                await DeleteCharacterBuffs(id);
+                await DeleteCharacterHotkeys(id);
+                await DeleteCharacterItems(id);
+                await DeleteCharacterQuests(id);
+                await DeleteCharacterSkills(id);
+                await ExecuteNonQuery("END");
             }
         }
 

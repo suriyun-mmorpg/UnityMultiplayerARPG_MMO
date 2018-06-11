@@ -18,19 +18,11 @@ namespace Insthync.MMOG
                 result = new CharacterHotkey();
                 result.hotkeyId = reader.GetString("hotkeyId");
                 result.type = (HotkeyType)reader.GetByte("type");
-                result.dataId = reader.GetString("dataId");
+                result.dataId = reader.GetInt32("dataId");
                 return true;
             }
             result = CharacterHotkey.Empty;
             return false;
-        }
-
-        public override async Task CreateCharacterHotkey(string characterId, CharacterHotkey characterHotkey)
-        {
-            var connection = NewConnection();
-            connection.Open();
-            await CreateCharacterHotkey(connection, characterId, characterHotkey);
-            connection.Close();
         }
 
         public async Task CreateCharacterHotkey(MySqlConnection connection, string characterId, CharacterHotkey characterHotkey)
@@ -42,17 +34,7 @@ namespace Insthync.MMOG
                 new MySqlParameter("@dataId", characterHotkey.dataId));
         }
 
-        public override async Task<CharacterHotkey> ReadCharacterHotkey(string characterId, string hotkeyId)
-        {
-            var reader = await ExecuteReader("SELECT * FROM characterhotkey WHERE characterId=@characterId AND hotkeyId=@hotkeyId LIMIT 1",
-                new MySqlParameter("@characterId", characterId),
-                new MySqlParameter("@hotkeyId", hotkeyId));
-            CharacterHotkey result;
-            ReadCharacterHotkey(reader, out result);
-            return result;
-        }
-
-        public override async Task<List<CharacterHotkey>> ReadCharacterHotkeys(string characterId)
+        public async Task<List<CharacterHotkey>> ReadCharacterHotkeys(string characterId)
         {
             var result = new List<CharacterHotkey>();
             var reader = await ExecuteReader("SELECT * FROM characterhotkey WHERE characterId=@characterId",
@@ -65,20 +47,9 @@ namespace Insthync.MMOG
             return result;
         }
 
-        public override async Task UpdateCharacterHotkey(string characterId, CharacterHotkey characterHotkey)
+        public async Task DeleteCharacterHotkeys(MySqlConnection connection, string characterId)
         {
-            await ExecuteNonQuery("UPDATE characterhotkey SET type=@type, dataId=@dataId WHERE characterId=@characterId AND hotkeyId=@hotkeyId",
-                new MySqlParameter("@type", characterHotkey.type),
-                new MySqlParameter("@dataId", characterHotkey.dataId),
-                new MySqlParameter("@characterId", characterId),
-                new MySqlParameter("@hotkeyId", characterHotkey.hotkeyId));
-        }
-
-        public override async Task DeleteCharacterHotkey(string characterId, string hotkeyId)
-        {
-            await ExecuteNonQuery("DELETE FROM characterhotkey WHERE characterId=@characterId AND hotkeyId=@hotkeyId",
-                new MySqlParameter("@characterId", characterId),
-                new MySqlParameter("@hotkeyId", hotkeyId));
+            await ExecuteNonQuery(connection, "DELETE FROM characterhotkey WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
         }
     }
 }

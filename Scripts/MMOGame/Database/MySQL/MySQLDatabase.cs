@@ -137,9 +137,9 @@ namespace Insthync.MMOG
         public override async Task<string> ValidateUserLogin(string username, string password)
         {
             var id = string.Empty;
-            var reader = await ExecuteReader("SELECT id FROM userLogin WHERE username=@username AND password=@password LIMIT 1",
+            var reader = await ExecuteReader("SELECT id FROM userlogin WHERE username=@username AND password=@password LIMIT 1",
                 new MySqlParameter("@username", username),
-                new MySqlParameter("@password", password));
+                new MySqlParameter("@password", GenericUtils.GetMD5(password)));
 
             if (reader.Read())
                 id = reader.GetString("id");
@@ -149,7 +149,7 @@ namespace Insthync.MMOG
 
         public override async Task<bool> ValidateAccessToken(string userId, string accessToken)
         {
-            var result = await ExecuteScalar("SELECT COUNT(*) FROM userLogin WHERE id=@id AND accessToken=@accessToken",
+            var result = await ExecuteScalar("SELECT COUNT(*) FROM userlogin WHERE id=@id AND accessToken=@accessToken",
                 new MySqlParameter("@id", userId),
                 new MySqlParameter("@accessToken", accessToken));
             return (result != null ? (long)result : 0) > 0;
@@ -157,22 +157,22 @@ namespace Insthync.MMOG
 
         public override async Task UpdateAccessToken(string userId, string accessToken)
         {
-            await ExecuteNonQuery("UPDATE userLogin SET accessToken=@accessToken WHERE id=@id",
+            await ExecuteNonQuery("UPDATE userlogin SET accessToken=@accessToken WHERE id=@id",
                 new MySqlParameter("@id", userId),
                 new MySqlParameter("@accessToken", accessToken));
         }
 
         public override async Task CreateUserLogin(string username, string password)
         {
-            await ExecuteNonQuery("INSERT INTO userLogin (id, username, password) VALUES (@id, @username, @password)",
-                new MySqlParameter("@id", System.Guid.NewGuid().ToString()),
+            await ExecuteNonQuery("INSERT INTO userlogin (id, username, password) VALUES (@id, @username, @password)",
+                new MySqlParameter("@id", GenericUtils.GetUniqueId()),
                 new MySqlParameter("@username", username),
-                new MySqlParameter("@password", password));
+                new MySqlParameter("@password", GenericUtils.GetMD5(password)));
         }
 
         public override async Task<long> FindUsername(string username)
         {
-            var result = await ExecuteScalar("SELECT COUNT(*) FROM userLogin WHERE username LIKE @username",
+            var result = await ExecuteScalar("SELECT COUNT(*) FROM userlogin WHERE username LIKE @username",
                 new MySqlParameter("@username", username));
             return result != null ? (long)result : 0;
         }

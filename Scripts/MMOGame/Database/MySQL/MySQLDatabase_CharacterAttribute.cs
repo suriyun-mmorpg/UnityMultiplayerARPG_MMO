@@ -16,7 +16,7 @@ namespace Insthync.MMOG
             if (reader.Read())
             {
                 result = new CharacterAttribute();
-                result.attributeId = reader.GetString("attributeId");
+                result.dataId = reader.GetInt32("dataId");
                 result.amount = reader.GetInt32("amount");
                 return true;
             }
@@ -24,33 +24,16 @@ namespace Insthync.MMOG
             return false;
         }
 
-        public override async Task CreateCharacterAttribute(string characterId, CharacterAttribute characterAttribute)
-        {
-            var connection = NewConnection();
-            connection.Open();
-            await CreateCharacterAttribute(connection, characterId, characterAttribute);
-            connection.Close();
-        }
-
         public async Task CreateCharacterAttribute(MySqlConnection connection, string characterId, CharacterAttribute characterAttribute)
         {
-            await ExecuteNonQuery(connection, "INSERT INTO characterattribute (characterId, attributeId, amount) VALUES (@characterId, @attributeId, @amount)",
+            await ExecuteNonQuery(connection, "INSERT INTO characterattribute (id, characterId, dataId, amount) VALUES (@id, @characterId, @dataId, @amount)",
+                new MySqlParameter("@id", characterId + "_" + characterAttribute.dataId),
                 new MySqlParameter("@characterId", characterId),
-                new MySqlParameter("@attributeId", characterAttribute.attributeId),
+                new MySqlParameter("@dataId", characterAttribute.dataId),
                 new MySqlParameter("@amount", characterAttribute.amount));
         }
 
-        public override async Task<CharacterAttribute> ReadCharacterAttribute(string characterId, string attributeId)
-        {
-            var reader = await ExecuteReader("SELECT * FROM characterattribute WHERE characterId=@characterId AND attributeId=@attributeId LIMIT 1",
-                new MySqlParameter("@characterId", characterId),
-                new MySqlParameter("@attributeId", attributeId));
-            CharacterAttribute result;
-            ReadCharacterAttribute(reader, out result);
-            return result;
-        }
-
-        public override async Task<List<CharacterAttribute>> ReadCharacterAttributes(string characterId)
+        public async Task<List<CharacterAttribute>> ReadCharacterAttributes(string characterId)
         {
             var result = new List<CharacterAttribute>();
             var reader = await ExecuteReader("SELECT * FROM characterattribute WHERE characterId=@characterId",
@@ -63,19 +46,9 @@ namespace Insthync.MMOG
             return result;
         }
 
-        public override async Task UpdateCharacterAttribute(string characterId, CharacterAttribute characterAttribute)
+        public async Task DeleteCharacterAttributes(MySqlConnection connection, string characterId)
         {
-            await ExecuteNonQuery("UPDATE characterattribute SET amount=@amount WHERE characterId=@characterId AND attributeId=@attributeId",
-                new MySqlParameter("@amount", characterAttribute.amount),
-                new MySqlParameter("@characterId", characterId),
-                new MySqlParameter("@attributeId", characterAttribute.attributeId));
-        }
-
-        public override async Task DeleteCharacterAttribute(string characterId, string attributeId)
-        {
-            await ExecuteNonQuery("DELETE FROM characterattribute WHERE characterId=@characterId AND attributeId=@attributeId",
-                new MySqlParameter("@characterId", characterId),
-                new MySqlParameter("@attributeId", attributeId));
+            await ExecuteNonQuery(connection, "DELETE FROM characterattribute WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
         }
     }
 }

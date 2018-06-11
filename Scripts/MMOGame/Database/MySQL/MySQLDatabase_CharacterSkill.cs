@@ -16,7 +16,7 @@ namespace Insthync.MMOG
             if (reader.Read())
             {
                 result = new CharacterSkill();
-                result.skillId = reader.GetString("skillId");
+                result.dataId = reader.GetInt32("dataId");
                 result.level = reader.GetInt32("level");
                 result.coolDownRemainsDuration = reader.GetFloat("coolDownRemainsDuration");
                 return true;
@@ -25,34 +25,17 @@ namespace Insthync.MMOG
             return false;
         }
 
-        public override async Task CreateCharacterSkill(string characterId, CharacterSkill characterSkill)
-        {
-            var connection = NewConnection();
-            connection.Open();
-            await CreateCharacterSkill(connection, characterId, characterSkill);
-            connection.Close();
-        }
-
         public async Task CreateCharacterSkill(MySqlConnection connection, string characterId, CharacterSkill characterSkill)
         {
-            await ExecuteNonQuery(connection, "INSERT INTO characterskill (characterId, skillId, level, coolDownRemainsDuration) VALUES (@characterId, @skillId, @level, @coolDownRemainsDuration)",
+            await ExecuteNonQuery(connection, "INSERT INTO characterskill (id, characterId, dataId, level, coolDownRemainsDuration) VALUES (@id, @characterId, @dataId, @level, @coolDownRemainsDuration)",
+                new MySqlParameter("@id", characterId + "_" + characterSkill.dataId),
                 new MySqlParameter("@characterId", characterId),
-                new MySqlParameter("@skillId", characterSkill.skillId),
+                new MySqlParameter("@dataId", characterSkill.dataId),
                 new MySqlParameter("@level", characterSkill.level),
                 new MySqlParameter("@coolDownRemainsDuration", characterSkill.coolDownRemainsDuration));
         }
 
-        public override async Task<CharacterSkill> ReadCharacterSkill(string characterId, string skillId)
-        {
-            var reader = await ExecuteReader("SELECT * FROM characterskill WHERE characterId=@characterId AND skillId=@skillId LIMIT 1",
-                new MySqlParameter("@characterId", characterId),
-                new MySqlParameter("@skillId", skillId));
-            CharacterSkill result;
-            ReadCharacterSkill(reader, out result);
-            return result;
-        }
-
-        public override async Task<List<CharacterSkill>> ReadCharacterSkills(string characterId)
+        public async Task<List<CharacterSkill>> ReadCharacterSkills(string characterId)
         {
             var result = new List<CharacterSkill>();
             var reader = await ExecuteReader("SELECT * FROM characterskill WHERE characterId=@characterId",
@@ -65,20 +48,9 @@ namespace Insthync.MMOG
             return result;
         }
 
-        public override async Task UpdateCharacterSkill(string characterId, CharacterSkill characterSkill)
+        public async Task DeleteCharacterSkills(MySqlConnection connection, string characterId)
         {
-            await ExecuteNonQuery("UPDATE characterskill SET level=@level, coolDownRemainsDuration=@coolDownRemainsDuration WHERE characterId=@characterId AND skillId=@skillId",
-                new MySqlParameter("@level", characterSkill.level),
-                new MySqlParameter("@coolDownRemainsDuration", characterSkill.coolDownRemainsDuration),
-                new MySqlParameter("@characterId", characterId),
-                new MySqlParameter("@skillId", characterSkill.skillId));
-        }
-
-        public override async Task DeleteCharacterSkill(string characterId, string skillId)
-        {
-            await ExecuteNonQuery("DELETE FROM characterskill WHERE characterId=@characterId AND skillId=@skillId",
-                new MySqlParameter("@characterId", characterId),
-                new MySqlParameter("@skillId", skillId));
+            await ExecuteNonQuery(connection, "DELETE FROM characterskill WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
         }
     }
 }

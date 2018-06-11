@@ -139,9 +139,9 @@ namespace Insthync.MMOG
             centralNetworkManager.RequestCharacters(callback);
         }
 
-        public void RequestCreateCharacter(string characterName, string databaseId, AckMessageCallback callback)
+        public void RequestCreateCharacter(string characterName, int dataId, AckMessageCallback callback)
         {
-            centralNetworkManager.RequestCreateCharacter(characterName, databaseId, callback);
+            centralNetworkManager.RequestCreateCharacter(characterName, dataId, callback);
         }
 
         public void RequestDeleteCharacter(string characterId, AckMessageCallback callback)

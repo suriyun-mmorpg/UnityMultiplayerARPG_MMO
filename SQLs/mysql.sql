@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Jun 09, 2018 at 11:32 AM
+-- Generation Time: Jun 11, 2018 at 09:59 PM
 -- Server version: 10.1.28-MariaDB
 -- PHP Version: 7.1.11
 
@@ -29,9 +29,9 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `characterattribute` (
-  `id` int(11) NOT NULL,
-  `characterId` varchar(36) COLLATE utf8_unicode_ci NOT NULL,
-  `attributeId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `characterId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `attributeId` int(11) NOT NULL,
   `amount` int(11) NOT NULL,
   `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -44,10 +44,10 @@ CREATE TABLE `characterattribute` (
 --
 
 CREATE TABLE `characterbuff` (
-  `id` varchar(36) COLLATE utf8_unicode_ci NOT NULL,
-  `characterId` varchar(36) COLLATE utf8_unicode_ci NOT NULL,
+  `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `characterId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `type` tinyint(4) NOT NULL,
-  `dataId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `dataId` int(11) NOT NULL,
   `level` int(11) NOT NULL,
   `buffRemainsDuration` float NOT NULL,
   `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -61,11 +61,11 @@ CREATE TABLE `characterbuff` (
 --
 
 CREATE TABLE `characterhotkey` (
-  `id` int(11) NOT NULL,
-  `characterId` varchar(36) COLLATE utf8_unicode_ci NOT NULL,
+  `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `characterId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `hotkeyId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `type` tinyint(4) NOT NULL,
-  `dataId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `dataId` int(11) NOT NULL,
   `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -73,14 +73,14 @@ CREATE TABLE `characterhotkey` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `characterinventory`
+-- Table structure for table `characteritem`
 --
 
-CREATE TABLE `characterinventory` (
-  `id` varchar(36) COLLATE utf8_unicode_ci NOT NULL,
+CREATE TABLE `characteritem` (
+  `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `inventoryType` tinyint(4) NOT NULL,
-  `characterId` varchar(36) COLLATE utf8_unicode_ci NOT NULL,
-  `itemId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `characterId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `dataId` int(11) NOT NULL,
   `level` int(11) NOT NULL,
   `amount` int(11) NOT NULL,
   `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -94,9 +94,9 @@ CREATE TABLE `characterinventory` (
 --
 
 CREATE TABLE `characterquest` (
-  `id` int(11) NOT NULL,
-  `characterId` varchar(36) COLLATE utf8_unicode_ci NOT NULL,
-  `questId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `characterId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `dataId` int(11) NOT NULL,
   `isComplete` tinyint(1) NOT NULL,
   `killedMonsters` text COLLATE utf8_unicode_ci NOT NULL,
   `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -110,9 +110,9 @@ CREATE TABLE `characterquest` (
 --
 
 CREATE TABLE `characters` (
-  `id` varchar(36) COLLATE utf8_unicode_ci NOT NULL,
-  `userId` varchar(36) COLLATE utf8_unicode_ci NOT NULL,
-  `databaseId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `userId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `dataId` int(11) NOT NULL,
   `characterName` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
   `level` int(11) NOT NULL,
   `exp` int(11) NOT NULL,
@@ -143,9 +143,9 @@ CREATE TABLE `characters` (
 --
 
 CREATE TABLE `characterskill` (
-  `id` int(11) NOT NULL,
-  `characterId` varchar(36) COLLATE utf8_unicode_ci NOT NULL,
-  `skillId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `characterId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `dataId` int(11) NOT NULL,
   `level` int(11) NOT NULL,
   `coolDownRemainsDuration` float NOT NULL,
   `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -159,7 +159,7 @@ CREATE TABLE `characterskill` (
 --
 
 CREATE TABLE `userlogin` (
-  `id` varchar(36) COLLATE utf8_unicode_ci NOT NULL,
+  `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `username` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
   `password` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
   `accessToken` varchar(36) COLLATE utf8_unicode_ci NOT NULL,
@@ -170,6 +170,48 @@ CREATE TABLE `userlogin` (
 --
 -- Indexes for dumped tables
 --
+
+--
+-- Indexes for table `characterattribute`
+--
+ALTER TABLE `characterattribute`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `characterbuff`
+--
+ALTER TABLE `characterbuff`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `characterhotkey`
+--
+ALTER TABLE `characterhotkey`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `characteritem`
+--
+ALTER TABLE `characteritem`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `characterquest`
+--
+ALTER TABLE `characterquest`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `characters`
+--
+ALTER TABLE `characters`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `characterskill`
+--
+ALTER TABLE `characterskill`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `userlogin`

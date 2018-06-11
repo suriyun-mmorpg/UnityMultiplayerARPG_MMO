@@ -8,18 +8,18 @@ namespace Insthync.MMOG
     public class RequestCreateCharacterMessage : BaseAckMessage
     {
         public string characterName;
-        public string databaseId;
+        public int dataId;
 
         public override void DeserializeData(NetDataReader reader)
         {
             characterName = reader.GetString();
-            databaseId = reader.GetString();
+            dataId = reader.GetInt();
         }
 
         public override void SerializeData(NetDataWriter writer)
         {
             writer.Put(characterName);
-            writer.Put(databaseId);
+            writer.Put(dataId);
         }
     }
 }

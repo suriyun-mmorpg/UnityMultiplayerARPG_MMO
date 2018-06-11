@@ -12,13 +12,13 @@ namespace Insthync.MMOG
         {
             // Delete all character then add all of them
             var characterId = characterData.Id;
-            await ExecuteNonQuery(connection, "DELETE FROM characterinventory WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
-            await ExecuteNonQuery(connection, "DELETE FROM characterattribute WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
-            await ExecuteNonQuery(connection, "DELETE FROM characterskill WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
-            await ExecuteNonQuery(connection, "DELETE FROM characterbuff WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
-            await ExecuteNonQuery(connection, "DELETE FROM characterhotkey WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
-            await ExecuteNonQuery(connection, "DELETE FROM characterquest WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
-            
+            await DeleteCharacterAttributes(connection, characterId);
+            await DeleteCharacterBuffs(connection, characterId);
+            await DeleteCharacterHotkeys(connection, characterId);
+            await DeleteCharacterItems(connection, characterId);
+            await DeleteCharacterQuests(connection, characterId);
+            await DeleteCharacterSkills(connection, characterId);
+
             await CreateCharacterEquipWeapons(connection, characterId, characterData.EquipWeapons);
             foreach (var equipItem in characterData.EquipItems)
             {
@@ -56,11 +56,11 @@ namespace Insthync.MMOG
             connection.Open();
             await ExecuteNonQuery(connection, "START TRANSACTION");
             await ExecuteNonQuery(connection, "INSERT INTO characters " +
-                "(id, userId, databaseId, characterName, level, exp, currentHp, currentMp, currentStamina, currentFood, currentWater, statPoint, skillPoint, gold, currentMapName, currentPositionX, currentPositionY, currentPositionZ, respawnMapName, respawnPositionX, respawnPositionY, respawnPositionZ) VALUES " +
-                "(@id, @userId, @databaseId, @characterName, @level, @exp, @currentHp, @currentMp, @currentStamina, @currentFood, @currentWater, @statPoint, @skillPoint, @gold, @currentMapName, @currentPositionX, @currentPositionY, @currentPositionZ, @respawnMapName, @respawnPositionX, @respawnPositionY, @respawnPositionZ)",
+                "(id, userId, dataId, characterName, level, exp, currentHp, currentMp, currentStamina, currentFood, currentWater, statPoint, skillPoint, gold, currentMapName, currentPositionX, currentPositionY, currentPositionZ, respawnMapName, respawnPositionX, respawnPositionY, respawnPositionZ) VALUES " +
+                "(@id, @userId, @dataId, @characterName, @level, @exp, @currentHp, @currentMp, @currentStamina, @currentFood, @currentWater, @statPoint, @skillPoint, @gold, @currentMapName, @currentPositionX, @currentPositionY, @currentPositionZ, @respawnMapName, @respawnPositionX, @respawnPositionY, @respawnPositionZ)",
                 new MySqlParameter("@id", characterData.Id),
                 new MySqlParameter("@userId", userId),
-                new MySqlParameter("@databaseId", characterData.DatabaseId),
+                new MySqlParameter("@dataId", characterData.DataId),
                 new MySqlParameter("@characterName", characterData.CharacterName),
                 new MySqlParameter("@level", characterData.Level),
                 new MySqlParameter("@exp", characterData.Exp),
@@ -94,7 +94,7 @@ namespace Insthync.MMOG
             {
                 result = new PlayerCharacterData();
                 result.Id = reader.GetString("id");
-                result.DatabaseId = reader.GetString("databaseId");
+                result.DataId = reader.GetInt32("dataId");
                 result.CharacterName = reader.GetString("characterName");
                 result.Level = reader.GetInt32("level");
                 result.Exp = reader.GetInt32("exp");
@@ -174,7 +174,7 @@ namespace Insthync.MMOG
             connection.Open();
             await ExecuteNonQuery(connection, "START TRANSACTION");
             await ExecuteNonQuery(connection, "UPDATE characters SET " +
-                "databaseId=@databaseId, " +
+                "dataId=@dataId, " +
                 "characterName=@characterName, " +
                 "level=@level, " +
                 "exp=@exp, " +
@@ -195,7 +195,7 @@ namespace Insthync.MMOG
                 "respawnPositionY=@respawnPositionY, " +
                 "respawnPositionZ=@respawnPositionZ " +
                 "WHERE id=@id",
-                new MySqlParameter("@databaseId", characterData.DatabaseId),
+                new MySqlParameter("@dataId", characterData.DataId),
                 new MySqlParameter("@characterName", characterData.CharacterName),
                 new MySqlParameter("@level", characterData.Level),
                 new MySqlParameter("@exp", characterData.Exp),
@@ -229,15 +229,18 @@ namespace Insthync.MMOG
             var count = result != null ? (long)result : 0;
             if (count > 0)
             {
-                await ExecuteNonQuery("START TRANSACTION");
-                await ExecuteNonQuery("DELETE FROM characters WHERE id=@characterId", new MySqlParameter("@characterId", id));
-                await ExecuteNonQuery("DELETE FROM characterInventory WHERE characterId=@characterId", new MySqlParameter("@characterId", id));
-                await ExecuteNonQuery("DELETE FROM characterAttribute WHERE characterId=@characterId", new MySqlParameter("@characterId", id));
-                await ExecuteNonQuery("DELETE FROM characterSkill WHERE characterId=@characterId", new MySqlParameter("@characterId", id));
-                await ExecuteNonQuery("DELETE FROM characterBuff WHERE characterId=@characterId", new MySqlParameter("@characterId", id));
-                await ExecuteNonQuery("DELETE FROM characterHotkey WHERE characterId=@characterId", new MySqlParameter("@characterId", id));
-                await ExecuteNonQuery("DELETE FROM characterQuest WHERE characterId=@characterId", new MySqlParameter("@characterId", id));
-                await ExecuteNonQuery("COMMIT");
+                var connection = NewConnection();
+                connection.Open();
+                await ExecuteNonQuery(connection, "START TRANSACTION");
+                await ExecuteNonQuery(connection, "DELETE FROM characters WHERE id=@characterId", new MySqlParameter("@characterId", id));
+                await DeleteCharacterAttributes(connection, id);
+                await DeleteCharacterBuffs(connection, id);
+                await DeleteCharacterHotkeys(connection, id);
+                await DeleteCharacterItems(connection, id);
+                await DeleteCharacterQuests(connection, id);
+                await DeleteCharacterSkills(connection, id);
+                await ExecuteNonQuery(connection, "COMMIT");
+                connection.Close();
             }
         }
 

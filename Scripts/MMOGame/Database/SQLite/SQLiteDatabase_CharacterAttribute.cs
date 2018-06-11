@@ -16,7 +16,7 @@ namespace Insthync.MMOG
             if (reader.Read())
             {
                 result = new CharacterAttribute();
-                result.attributeId = reader.GetString("attributeId");
+                result.dataId = reader.GetInt32("dataId");
                 result.amount = reader.GetInt32("amount");
                 return true;
             }
@@ -24,25 +24,16 @@ namespace Insthync.MMOG
             return false;
         }
 
-        public override async Task CreateCharacterAttribute(string characterId, CharacterAttribute characterAttribute)
+        public async Task CreateCharacterAttribute(string characterId, CharacterAttribute characterAttribute)
         {
-            await ExecuteNonQuery("INSERT INTO characterattribute (characterId, attributeId, amount) VALUES (@characterId, @attributeId, @amount)",
+            await ExecuteNonQuery("INSERT INTO characterattribute (id, characterId, dataId, amount) VALUES (@id, @characterId, @dataId, @amount)",
+                new SqliteParameter("@id", characterId + "_" + characterAttribute.dataId),
                 new SqliteParameter("@characterId", characterId),
-                new SqliteParameter("@attributeId", characterAttribute.attributeId),
+                new SqliteParameter("@dataId", characterAttribute.dataId),
                 new SqliteParameter("@amount", characterAttribute.amount));
         }
 
-        public override async Task<CharacterAttribute> ReadCharacterAttribute(string characterId, string attributeId)
-        {
-            var reader = await ExecuteReader("SELECT * FROM characterattribute WHERE characterId=@characterId AND attributeId=@attributeId LIMIT 1",
-                new SqliteParameter("@characterId", characterId),
-                new SqliteParameter("@attributeId", attributeId));
-            CharacterAttribute result;
-            ReadCharacterAttribute(reader, out result);
-            return result;
-        }
-
-        public override async Task<List<CharacterAttribute>> ReadCharacterAttributes(string characterId)
+        public async Task<List<CharacterAttribute>> ReadCharacterAttributes(string characterId)
         {
             var result = new List<CharacterAttribute>();
             var reader = await ExecuteReader("SELECT * FROM characterattribute WHERE characterId=@characterId",
@@ -55,19 +46,9 @@ namespace Insthync.MMOG
             return result;
         }
 
-        public override async Task UpdateCharacterAttribute(string characterId, CharacterAttribute characterAttribute)
+        public async Task DeleteCharacterAttributes(string characterId)
         {
-            await ExecuteNonQuery("UPDATE characterattribute SET amount=@amount WHERE characterId=@characterId AND attributeId=@attributeId",
-                new SqliteParameter("@amount", characterAttribute.amount),
-                new SqliteParameter("@characterId", characterId),
-                new SqliteParameter("@attributeId", characterAttribute.attributeId));
-        }
-
-        public override async Task DeleteCharacterAttribute(string characterId, string attributeId)
-        {
-            await ExecuteNonQuery("DELETE FROM characterattribute WHERE characterId=@characterId AND attributeId=@attributeId",
-                new SqliteParameter("@characterId", characterId),
-                new SqliteParameter("@attributeId", attributeId));
+            await ExecuteNonQuery("DELETE FROM characterattribute WHERE characterId=@characterId", new SqliteParameter("@characterId", characterId));
         }
     }
 }

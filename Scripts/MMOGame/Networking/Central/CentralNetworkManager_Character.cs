@@ -14,11 +14,11 @@ namespace Insthync.MMOG
             return Client.SendAckPacket(SendOptions.ReliableUnordered, Client.Peer, MessageTypes.RequestCharacters, message, callback);
         }
 
-        public uint RequestCreateCharacter(string characterName, string databaseId, AckMessageCallback callback)
+        public uint RequestCreateCharacter(string characterName, int dataId, AckMessageCallback callback)
         {
             var message = new RequestCreateCharacterMessage();
             message.characterName = characterName;
-            message.databaseId = databaseId;
+            message.dataId = dataId;
             return Client.SendAckPacket(SendOptions.ReliableUnordered, Client.Peer, MessageTypes.RequestCreateCharacter, message, callback);
         }
 
@@ -61,7 +61,7 @@ namespace Insthync.MMOG
             var message = messageHandler.ReadMessage<RequestCreateCharacterMessage>();
             var error = ResponseCreateCharacterMessage.Error.None;
             var characterName = message.characterName;
-            var databaseId = message.databaseId;
+            var databaseId = message.dataId;
             CentralUserPeerInfo userPeerInfo;
             if (!userPeers.TryGetValue(peer.ConnectId, out userPeerInfo))
                 error = ResponseCreateCharacterMessage.Error.NotLoggedin;
@@ -75,7 +75,7 @@ namespace Insthync.MMOG
                 error = ResponseCreateCharacterMessage.Error.CharacterNameAlreadyExisted;
             else
             {
-                var characterId = System.Guid.NewGuid().ToString();
+                var characterId = GenericUtils.GetUniqueId();
                 var characterData = new PlayerCharacterData();
                 characterData.Id = characterId;
                 characterData.SetNewCharacterData(characterName, databaseId);

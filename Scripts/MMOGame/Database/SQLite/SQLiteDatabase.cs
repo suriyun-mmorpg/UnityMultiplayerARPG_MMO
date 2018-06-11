@@ -39,9 +39,9 @@ namespace Insthync.MMOG
             await ExecuteNonQuery("BEGIN");
 
             await ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characterattribute (
-              id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+              id TEXT NOT NULL PRIMARY KEY,
               characterId TEXT NOT NULL,
-              attributeId TEXT NOT NULL,
+              dataId INTEGER NOT NULL,
               amount INTEGER NOT NULL,
               createAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
               updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -51,7 +51,7 @@ namespace Insthync.MMOG
               id TEXT NOT NULL PRIMARY KEY,
               characterId TEXT NOT NULL,
               type INTEGER NOT NULL,
-              dataId TEXT NOT NULL,
+              dataId INTEGER NOT NULL,
               level INTEGER NOT NULL,
               buffRemainsDuration REAL NOT NULL,
               createAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -59,20 +59,20 @@ namespace Insthync.MMOG
             )");
 
             await ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characterhotkey (
-              id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+              id TEXT NOT NULL PRIMARY KEY,
               characterId TEXT NOT NULL,
               hotkeyId TEXT NOT NULL,
               type INTEGER NOT NULL,
-              dataId TEXT NOT NULL,
+              dataId INTEGER NOT NULL,
               createAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
               updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
 
-            await ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characterinventory (
+            await ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characteritem (
               id TEXT NOT NULL PRIMARY KEY,
               inventoryType INTEGER NOT NULL,
               characterId TEXT NOT NULL,
-              itemId TEXT NOT NULL,
+              dataId INTERGER NOT NULL,
               level INTEGER NOT NULL,
               amount INTEGER NOT NULL,
               createAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -80,9 +80,9 @@ namespace Insthync.MMOG
             )");
 
             await ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characterquest (
-              id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+              id TEXT NOT NULL PRIMARY KEY,
               characterId TEXT NOT NULL,
-              questId TEXT NOT NULL,
+              dataId INTEGER NOT NULL,
               isComplete INTEGER NOT NULL,
               killedMonsters TEXT NOT NULL,
               createAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -92,7 +92,7 @@ namespace Insthync.MMOG
             await ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characters (
               id TEXT NOT NULL PRIMARY KEY,
               userId TEXT NOT NULL,
-              databaseId TEXT NOT NULL,
+              dataId INGETER NOT NULL,
               characterName TEXT NOT NULL UNIQUE,
               level INTEGER NOT NULL,
               exp INTEGER NOT NULL,
@@ -117,9 +117,9 @@ namespace Insthync.MMOG
             )");
 
             await ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characterskill (
-              id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+              id TEXT NOT NULL PRIMARY KEY,
               characterId TEXT NOT NULL,
-              skillId TEXT NOT NULL,
+              dataId INTEGER NOT NULL,
               level INTEGER NOT NULL,
               coolDownRemainsDuration REAL NOT NULL,
               createAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -210,9 +210,9 @@ namespace Insthync.MMOG
         public override async Task<string> ValidateUserLogin(string username, string password)
         {
             var id = string.Empty;
-            var reader = await ExecuteReader("SELECT id FROM userLogin WHERE username=@username AND password=@password LIMIT 1",
+            var reader = await ExecuteReader("SELECT id FROM userlogin WHERE username=@username AND password=@password LIMIT 1",
                 new SqliteParameter("@username", username),
-                new SqliteParameter("@password", password));
+                new SqliteParameter("@password", GenericUtils.GetMD5(password)));
 
             if (reader.Read())
                 id = reader.GetString("id");
@@ -222,7 +222,7 @@ namespace Insthync.MMOG
 
         public override async Task<bool> ValidateAccessToken(string userId, string accessToken)
         {
-            var result = await ExecuteScalar("SELECT COUNT(*) FROM userLogin WHERE id=@id AND accessToken=@accessToken",
+            var result = await ExecuteScalar("SELECT COUNT(*) FROM userlogin WHERE id=@id AND accessToken=@accessToken",
                 new SqliteParameter("@id", userId),
                 new SqliteParameter("@accessToken", accessToken));
             return (result != null ? (long)result : 0) > 0;
@@ -230,22 +230,22 @@ namespace Insthync.MMOG
 
         public override async Task UpdateAccessToken(string userId, string accessToken)
         {
-            await ExecuteNonQuery("UPDATE userLogin SET accessToken=@accessToken WHERE id=@id",
+            await ExecuteNonQuery("UPDATE userlogin SET accessToken=@accessToken WHERE id=@id",
                 new SqliteParameter("@id", userId),
                 new SqliteParameter("@accessToken", accessToken));
         }
 
         public override async Task CreateUserLogin(string username, string password)
         {
-            await ExecuteNonQuery("INSERT INTO userLogin (id, username, password) VALUES (@id, @username, @password)",
-                new SqliteParameter("@id", System.Guid.NewGuid().ToString()),
+            await ExecuteNonQuery("INSERT INTO userlogin (id, username, password) VALUES (@id, @username, @password)",
+                new SqliteParameter("@id", GenericUtils.GetUniqueId()),
                 new SqliteParameter("@username", username),
-                new SqliteParameter("@password", password));
+                new SqliteParameter("@password", GenericUtils.GetMD5(password)));
         }
 
         public override async Task<long> FindUsername(string username)
         {
-            var result = await ExecuteScalar("SELECT COUNT(*) FROM userLogin WHERE username LIKE @username",
+            var result = await ExecuteScalar("SELECT COUNT(*) FROM userlogin WHERE username LIKE @username",
                 new SqliteParameter("@username", username));
             return result != null ? (long)result : 0;
         }

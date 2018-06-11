@@ -79,6 +79,7 @@ namespace Insthync.MMOG
         protected override async void OnDestroy()
         {
             base.OnDestroy();
+            CentralAppServerRegister.Stop();
             // Wait old save character task to be completed
             if (saveCharactersTask != null && !saveCharactersTask.IsCompleted)
                 await Task.WhenAll(saveCharactersTask, SaveCharacters());
@@ -91,7 +92,7 @@ namespace Insthync.MMOG
             PlayerCharacterEntity playerCharacterEntity;
             if (PlayerCharacterEntities.TryGetValue(peer.ConnectId, out playerCharacterEntity))
             {
-                saveCharactersTask = SaveCharacter(playerCharacterEntity.CloneTo(new PlayerCharacterData()));
+                saveCharactersTask = SaveCharacter(playerCharacterEntity);
                 PlayerCharacterEntities.Remove(peer.ConnectId);
             }
             string userId;
@@ -111,6 +112,7 @@ namespace Insthync.MMOG
             if (saveCharactersTask != null && !saveCharactersTask.IsCompleted)
                 await saveCharactersTask;
             await Database.UpdateCharacter(playerCharacterData);
+            Debug.Log("Character [" + playerCharacterData.Id + "] Saved");
         }
 
         private async Task SaveCharacters()
@@ -123,6 +125,7 @@ namespace Insthync.MMOG
                 tasks.Add(Database.UpdateCharacter(playerCharacterEntity.CloneTo(new PlayerCharacterData())));
             }
             await Task.WhenAll(tasks);
+            Debug.Log("Characters Saved");
         }
 
         public override void OnStartServer()

@@ -33,8 +33,8 @@ namespace Insthync.MMOG
         private readonly Queue<int> freePorts = new Queue<int>();
         private readonly object mainThreadLock = new object();
         private readonly List<Action> mainThreadActions = new List<Action>();
-        private static object processLock = new object();
-        private static Dictionary<uint, Process> processes = new Dictionary<uint, Process>();
+        private object processLock = new object();
+        private Dictionary<uint, Process> processes = new Dictionary<uint, Process>();
 
         public string ExePath
         {
@@ -120,6 +120,17 @@ namespace Insthync.MMOG
             }
             if (IsServer)
                 CentralAppServerRegister.PollEvents();
+        }
+
+        protected override void OnDestroy()
+        {
+            foreach (var process in processes.Values)
+            {
+                process.Kill();
+            }
+            processes.Clear();
+            CentralAppServerRegister.Stop();
+            base.OnDestroy();
         }
 
         private void HandleRequestSpawnMap(LiteNetLibMessageHandler messageHandler)

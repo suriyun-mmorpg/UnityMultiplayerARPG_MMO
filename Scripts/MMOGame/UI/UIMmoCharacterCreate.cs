@@ -47,7 +47,7 @@ namespace Insthync.MMOG
             }
         }
 
-        private readonly Dictionary<string, CharacterModel> CharacterModels = new Dictionary<string, CharacterModel>();
+        private readonly Dictionary<int, CharacterModel> CharacterModels = new Dictionary<int, CharacterModel>();
 
         public override void Show()
         {
@@ -66,15 +66,15 @@ namespace Insthync.MMOG
             var selectableCharacters = GameInstance.PlayerCharacters.Values.ToList();
             CacheList.Generate(selectableCharacters, (index, character, ui) =>
             {
-                var databaseId = character.Id;
+                var dataId = character.HashId;
                 var characterData = new PlayerCharacterData();
-                characterData.Id = databaseId;
-                characterData.SetNewCharacterData(character.title, character.Id);
+                characterData.DataId = dataId;
+                characterData.SetNewCharacterData(character.title, character.HashId);
                 var uiCharacter = ui.GetComponent<UICharacter>();
-                uiCharacter.Setup(characterData, databaseId);
+                uiCharacter.Setup(characterData, dataId);
                 // Select trigger when add first entry so deactivate all models is okay beacause first model will active
                 var characterModel = characterData.InstantiateModel(characterModelContainer);
-                CharacterModels[characterData.Id] = characterModel;
+                CharacterModels[characterData.DataId] = characterModel;
                 characterModel.gameObject.SetActive(false);
                 SelectionManager.Add(uiCharacter);
             });
@@ -90,13 +90,13 @@ namespace Insthync.MMOG
         private void OnSelectCharacter(UICharacter ui)
         {
             characterModelContainer.SetChildrenActive(false);
-            ShowCharacter(ui.databaseId);
+            ShowCharacter(ui.dataId);
         }
 
-        private void ShowCharacter(string id)
+        private void ShowCharacter(int id)
         {
             CharacterModel characterModel;
-            if (string.IsNullOrEmpty(id) || !CharacterModels.TryGetValue(id, out characterModel))
+            if (!CharacterModels.TryGetValue(id, out characterModel))
                 return;
             characterModel.gameObject.SetActive(true);
         }
@@ -111,10 +111,10 @@ namespace Insthync.MMOG
                 Debug.LogWarning("Cannot create character, did not selected character class");
                 return;
             }
-            var databaseId = selectedUI.databaseId;
+            var dataId = selectedUI.dataId;
             var characterName = inputCharacterName.text.Trim();
 
-            MMOClientInstance.Singleton.RequestCreateCharacter(characterName, databaseId, OnCreateCharacter);
+            MMOClientInstance.Singleton.RequestCreateCharacter(characterName, dataId, OnCreateCharacter);
         }
 
         private void OnCreateCharacter(AckResponseCode responseCode, BaseAckMessage message)
