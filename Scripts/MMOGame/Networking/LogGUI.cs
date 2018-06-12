@@ -31,7 +31,7 @@ public class LogGUI : MonoBehaviour
         Application.logMessageReceived += HandleLog;
         if (string.IsNullOrEmpty(logSavePath))
         {
-            logSavePath = Application.persistentDataPath + "/" + logFileName + "_" + System.DateTime.Now.Ticks + ".txt";
+            logSavePath = Application.persistentDataPath + "/" + logFileName + ".txt";
             if (openLogDir)
                 Application.OpenURL(Application.persistentDataPath);
             // Write log file header
