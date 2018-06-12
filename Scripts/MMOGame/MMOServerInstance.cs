@@ -159,7 +159,7 @@ namespace Insthync.MMOG
                 {
                     if (!string.IsNullOrEmpty(logFileName))
                         logFileName += "_";
-                    logFileName += "Map";
+                    logFileName += "Map(" + mapNetworkManager.Assets.onlineScene.SceneName + ")";
                     startLog = true;
                     gameInstance.doNotLoadHomeSceneOnStart = true;
                     startingMapServer = true;
