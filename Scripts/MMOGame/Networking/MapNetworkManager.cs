@@ -20,6 +20,8 @@ namespace Insthync.MMOG
         [Header("Database")]
         public float autoSaveDuration = 2f;
 
+        private readonly Dictionary<string, CentralServerPeerInfo> mapServerPeersBySceneName = new Dictionary<string, CentralServerPeerInfo>();
+
         private CentralAppServerRegister cacheCentralAppServerRegister;
         public CentralAppServerRegister CentralAppServerRegister
         {
@@ -29,6 +31,7 @@ namespace Insthync.MMOG
                 {
                     cacheCentralAppServerRegister = new CentralAppServerRegister(this);
                     cacheCentralAppServerRegister.onAppServerRegistered = OnAppServerRegistered;
+                    cacheCentralAppServerRegister.RegisterMessage(MessageTypes.ResponseAppServerAddress, HandleResponseAppServerAddress);
                 }
                 return cacheCentralAppServerRegister;
             }
@@ -138,6 +141,38 @@ namespace Insthync.MMOG
         {
             base.OnStopServer();
             CentralAppServerRegister.OnStopServer();
+            mapServerPeersBySceneName.Clear();
+        }
+
+        public override async void WarpCharacter(PlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position)
+        {
+            if (playerCharacterEntity == null || !IsServer)
+                return;
+            base.WarpCharacter(playerCharacterEntity, mapName, position);
+            long connectId = playerCharacterEntity.ConnectId;
+            NetPeer peer;
+            CentralServerPeerInfo peerInfo;
+            if (!string.IsNullOrEmpty(mapName) &&
+                !mapName.Equals(playerCharacterEntity.CurrentMapName) &&
+                PlayerCharacterEntities.ContainsKey(connectId) &&
+                Peers.TryGetValue(connectId, out peer) &&
+                mapServerPeersBySceneName.TryGetValue(mapName, out peerInfo))
+            {
+                PlayerCharacterEntities.Remove(connectId);
+                var message = new MMOResponseWarpMessage();
+                message.sceneName = mapName;
+                message.networkAddress = peerInfo.networkAddress;
+                message.networkPort = peerInfo.networkPort;
+                message.connectKey = peerInfo.connectKey;
+                LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MsgTypes.ResponseWarp, message);
+                var savingCharacterData = new PlayerCharacterData();
+                playerCharacterEntity.CloneTo(savingCharacterData);
+                savingCharacterData.CurrentMapName = mapName;
+                savingCharacterData.CurrentPosition = position;
+                saveCharactersTask = SaveCharacter(savingCharacterData);
+                await saveCharactersTask;
+                playerCharacterEntity.NetworkDestroy();
+            }
         }
 
         public override void SerializeClientReadyExtra(NetDataWriter writer)
@@ -160,13 +195,13 @@ namespace Insthync.MMOG
             if (PlayerCharacterEntities.ContainsKey(peer.ConnectId))
             {
                 Debug.LogError("[Map Server] User trying to hack: " + userId);
-                Assets.NetworkDestroy(playerIdentity.ObjectId, DestroyObjectReasons.RequestedToDestroy);
+                playerIdentity.NetworkDestroy();
                 Server.NetManager.DisconnectPeer(peer);
             }
             else if (!await Database.ValidateAccessToken(userId, accessToken))
             {
                 Debug.LogError("[Map Server] Invalid access token for user: " + userId);
-                Assets.NetworkDestroy(playerIdentity.ObjectId, DestroyObjectReasons.RequestedToDestroy);
+                playerIdentity.NetworkDestroy();
                 Server.NetManager.DisconnectPeer(peer);
             }
             else
@@ -175,7 +210,7 @@ namespace Insthync.MMOG
                 if (playerCharacterData == null)
                 {
                     Debug.LogError("[Map Server] Cannot find select character: " + selectCharacterId + " for user: " + userId);
-                    Assets.NetworkDestroy(playerIdentity.ObjectId, DestroyObjectReasons.RequestedToDestroy);
+                    playerIdentity.NetworkDestroy();
                     Server.NetManager.DisconnectPeer(peer);
                     return;
                 }
@@ -193,6 +228,28 @@ namespace Insthync.MMOG
                 updateMapUserMessage.userId = userId;
                 LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, CentralAppServerRegister.Peer, MessageTypes.RequestUpdateMapUser, updateMapUserMessage);
             }
+        }
+
+        protected override void HandleResponseWarp(LiteNetLibMessageHandler messageHandler)
+        {
+            base.HandleResponseWarp(messageHandler);
+            var peerHandler = messageHandler.peerHandler;
+            var message = messageHandler.ReadMessage<MMOResponseWarpMessage>();
+            Assets.offlineScene.SceneName = string.Empty;
+            StopClient();
+            Assets.onlineScene.SceneName = message.sceneName;
+            StartClient(message.networkAddress, message.networkPort, message.connectKey);
+        }
+
+        private void HandleResponseAppServerAddress(LiteNetLibMessageHandler messageHandler)
+        {
+            var peerHandler = messageHandler.peerHandler;
+            var peer = messageHandler.peer;
+            var message = messageHandler.ReadMessage<ResponseAppServerAddressMessage>();
+            if (message.responseCode == AckResponseCode.Success &&
+                message.peerInfo.peerType == CentralServerPeerType.MapServer &&
+                !string.IsNullOrEmpty(message.peerInfo.extra))
+                mapServerPeersBySceneName[message.peerInfo.extra] = message.peerInfo;
         }
 
         private void OnAppServerRegistered(AckResponseCode responseCode, BaseAckMessage message)

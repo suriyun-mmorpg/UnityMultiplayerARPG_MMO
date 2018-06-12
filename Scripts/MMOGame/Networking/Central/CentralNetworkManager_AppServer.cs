@@ -34,6 +34,7 @@ namespace Insthync.MMOG
             if (message.ValidateHash())
             {
                 var peerInfo = message.peerInfo;
+                peerInfo.peer = peer;
                 switch (message.peerInfo.peerType)
                 {
                     case CentralServerPeerType.MapSpawnServer:
@@ -45,6 +46,21 @@ namespace Insthync.MMOG
                         var sceneName = peerInfo.extra;
                         if (!mapServerPeersBySceneName.ContainsKey(sceneName))
                         {
+                            foreach (var mapServerPeer in mapServerPeers.Values)
+                            {
+                                // Send other info to current peer
+                                var responseMapAddressMessage = new ResponseAppServerAddressMessage();
+                                responseMapAddressMessage.responseCode = AckResponseCode.Success;
+                                responseMapAddressMessage.error = ResponseAppServerAddressMessage.Error.None;
+                                responseMapAddressMessage.peerInfo = mapServerPeer;
+                                LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MessageTypes.ResponseAppServerAddress, responseMapAddressMessage);
+                                // Send current info to other peer
+                                responseMapAddressMessage = new ResponseAppServerAddressMessage();
+                                responseMapAddressMessage.responseCode = AckResponseCode.Success;
+                                responseMapAddressMessage.error = ResponseAppServerAddressMessage.Error.None;
+                                responseMapAddressMessage.peerInfo = peerInfo;
+                                LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, mapServerPeer.peer, MessageTypes.ResponseAppServerAddress, responseMapAddressMessage);
+                            }
                             mapServerPeersBySceneName[sceneName] = peerInfo;
                             mapServerPeers[peer.ConnectId] = peerInfo;
                             mapUsers[peer.ConnectId] = new HashSet<string>();
