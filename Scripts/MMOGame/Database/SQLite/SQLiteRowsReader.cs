@@ -85,12 +85,12 @@ namespace Insthync.MMOG
 
         public bool GetBoolean(int index)
         {
-            return ((int)data[currentRow][index]) != 0;
+            return ((long)data[currentRow][index]) != 0;
         }
 
         public bool GetBoolean(string columnName)
         {
-            return ((int)dataDict[currentRow][columnName]) != 0;
+            return ((long)dataDict[currentRow][columnName]) != 0;
         }
 
         public short GetInt16(int index)

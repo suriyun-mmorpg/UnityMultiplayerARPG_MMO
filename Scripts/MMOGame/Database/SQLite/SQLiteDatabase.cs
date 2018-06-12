@@ -134,6 +134,8 @@ namespace Insthync.MMOG
               id TEXT NOT NULL PRIMARY KEY,
               username TEXT NOT NULL UNIQUE,
               password TEXT NOT NULL,
+              email TEXT NOT NULL,
+              authType INTEGER NOT NULL,
               accessToken TEXT,
               createAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
               updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP

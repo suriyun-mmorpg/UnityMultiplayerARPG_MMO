@@ -40,7 +40,7 @@ namespace Insthync.MMOG
                 result = new CharacterQuest();
                 result.dataId = reader.GetInt32("dataId");
                 result.isComplete = reader.GetBoolean("isComplete");
-                result.killedMonsters = ReadKillMonsters(reader.GetString("killMonsters"));
+                result.killedMonsters = ReadKillMonsters(reader.GetString("killedMonsters"));
                 return true;
             }
             result = CharacterQuest.Empty;
