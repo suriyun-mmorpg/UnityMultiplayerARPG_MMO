@@ -14,7 +14,11 @@ namespace Insthync.MMOG
             var splitSets = killMonsters.Split(';');
             foreach (var set in splitSets)
             {
+                if (string.IsNullOrEmpty(set))
+                    continue;
                 var splitData = set.Split(':');
+                if (splitData.Length != 2)
+                    continue;
                 result[int.Parse(splitData[0])] = int.Parse(splitData[1]);
             }
             return result;
