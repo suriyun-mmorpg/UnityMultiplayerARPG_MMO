@@ -193,3 +193,4 @@ MonoBehaviour:
   startPort: 8000
   isOverrideExePath: 0
   overrideExePath: ./Build.exe
+  editorNotSpawnInBatchMode: 0

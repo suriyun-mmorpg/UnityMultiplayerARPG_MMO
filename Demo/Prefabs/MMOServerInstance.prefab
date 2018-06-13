@@ -43,6 +43,22 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!1 &1316728034786570
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 4906125570589406}
+  - component: {fileID: 114785914675753794}
+  m_Layer: 0
+  m_Name: ChatNetworkManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
 --- !u!1 &1454126604845530
 GameObject:
   m_ObjectHideFlags: 0
@@ -104,6 +120,7 @@ Transform:
   m_Children:
   - {fileID: 4689870637795574}
   - {fileID: 4281435147628774}
+  - {fileID: 4906125570589406}
   - {fileID: 4765183370109292}
   - {fileID: 4889244740642296}
   m_Father: {fileID: 0}
@@ -146,7 +163,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4009622383931608}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4889244740642296
 Transform:
@@ -159,7 +176,20 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4009622383931608}
-  m_RootOrder: 3
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &4906125570589406
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1316728034786570}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 4009622383931608}
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &114227780437250376
 MonoBehaviour:
@@ -242,6 +272,42 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dbPath: ./mmorpgtemplate.sqlite3
   editorDbPath: C:\Users\ITTIPON\Desktop\UnityBuilds\MultiplayerARPG\mmorpgtemplate.sqlite3
+--- !u!114 &114785914675753794
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1316728034786570}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 35d258770a98cc247aaae1ac37702d58, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentLogLevel: 2
+  connectKey: SampleConnectKey
+  networkAddress: localhost
+  networkPort: 6002
+  unconnectedMessagesEnabled: 0
+  natPunchEnabled: 0
+  updateTime: 15
+  pingInterval: 1000
+  disconnectTimeout: 5000
+  mergeEnabled: 0
+  simulatePacketLoss: 0
+  simulateLatency: 0
+  simulationPacketLossChance: 10
+  simulationMinLatency: 30
+  simulationMaxLatency: 100
+  discoveryEnabled: 0
+  discoveryRequestData: 
+  discoveryResponseData: 
+  maxConnections: 1100
+  reconnectDelay: 500
+  maxConnectAttempts: 10
+  centralConnectKey: SampleConnectKey
+  centralNetworkAddress: 127.0.0.1
+  centralNetworkPort: 6000
+  machineAddress: 127.0.0.1
 --- !u!114 &114788248445432888
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -271,7 +337,7 @@ MonoBehaviour:
   discoveryEnabled: 0
   discoveryRequestData: 
   discoveryResponseData: 
-  maxConnections: 4
+  maxConnections: 1100
   reconnectDelay: 500
   maxConnectAttempts: 10
   centralConnectKey: SampleConnectKey
@@ -298,6 +364,8 @@ MonoBehaviour:
   centralNetworkManager: {fileID: 114543387092495668}
   mapSpawnNetworkManager: {fileID: 114788248445432888}
   mapNetworkManager: {fileID: 0}
+  chatNetworkManager: {fileID: 114785914675753794}
   database: {fileID: 114715813743394434}
   startCentralOnAwake: 0
   startMapSpawnOnAwake: 0
+  startChatOnAwake: 0
