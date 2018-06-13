@@ -249,11 +249,17 @@ namespace Insthync.MMOG
                 {
                     case CentralServerPeerType.MapServer:
                         if (!string.IsNullOrEmpty(peerInfo.extra))
+                        {
+                            Debug.Log("Register map server: " + peerInfo.extra);
                             mapServerPeersBySceneName[peerInfo.extra] = peerInfo;
+                        }
                         break;
                     case CentralServerPeerType.Chat:
                         if (!ChatNetworkManager.IsClientConnected)
+                        {
+                            Debug.Log("Connecting to chat server");
                             ChatNetworkManager.StartClient(this, peerInfo.networkAddress, peerInfo.networkPort, peerInfo.connectKey);
+                        }
                         break;
                 }
             }
@@ -269,17 +275,19 @@ namespace Insthync.MMOG
         #region Connect to chat server
         public void OnChatServerConnected()
         {
+            Debug.Log("Connected to chat server");
             UpdateMapUsers(ChatNetworkManager.Client.Peer, UpdateMapUserMessage.UpdateType.Add);
         }
 
         public void OnChatMessageReceive(ChatMessage message)
         {
+            Debug.Log("Chat message receive");
             // Filtering chat messages
             switch (message.channel)
             {
                 case ChatChannel.Global:
                     // Send message to all clients
-                    SendPacketToAllPeers(SendOptions.ReliableOrdered, MMOMessageTypes.Chat, message);
+                    SendPacketToAllPeers(SendOptions.ReliableOrdered, MsgTypes.Chat, message);
                     break;
                 case ChatChannel.Whisper:
                     // Send message to client which have the character
