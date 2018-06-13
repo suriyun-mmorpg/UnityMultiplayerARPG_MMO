@@ -281,28 +281,7 @@ namespace Insthync.MMOG
 
         public void OnChatMessageReceive(ChatMessage message)
         {
-            Debug.Log("Chat message receive");
-            // Filtering chat messages
-            switch (message.channel)
-            {
-                case ChatChannel.Global:
-                    // Send message to all clients
-                    SendPacketToAllPeers(SendOptions.ReliableOrdered, MsgTypes.Chat, message);
-                    break;
-                case ChatChannel.Whisper:
-                    // Send message to client which have the character
-                    NetPeer receiverPeer;
-                    if (!string.IsNullOrEmpty(message.receiver) &&
-                        peersByCharacterName.TryGetValue(message.receiver, out receiverPeer))
-                        LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, receiverPeer, MsgTypes.Chat, message);
-                    break;
-                case ChatChannel.Party:
-                    // TODO: Implement this later when party system ready
-                    break;
-                case ChatChannel.Guild:
-                    // TODO: Implement this later when guild system ready
-                    break;
-            }
+            HandleChatAtServer(message);
         }
         #endregion
 

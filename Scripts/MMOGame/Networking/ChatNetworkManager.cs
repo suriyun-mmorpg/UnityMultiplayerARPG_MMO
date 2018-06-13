@@ -76,6 +76,12 @@ namespace Insthync.MMOG
             base.OnDestroy();
         }
 
+        public override void OnPeerConnected(NetPeer peer)
+        {
+            base.OnPeerConnected(peer);
+            mapCharacterNames[peer.ConnectId] = new HashSet<string>();
+        }
+
         public override void OnPeerDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
         {
             base.OnPeerDisconnected(peer, disconnectInfo);
@@ -102,6 +108,7 @@ namespace Insthync.MMOG
         {
             var peer = messageHandler.peer;
             var message = messageHandler.ReadMessage<ChatMessage>();
+            Debug.Log("Handle chat: " + message.channel + " sender: " + message.sender + " receiver: " + message.receiver + " message: " + message.message);
             switch (message.channel)
             {
                 case ChatChannel.Global:
@@ -111,10 +118,15 @@ namespace Insthync.MMOG
                     SendPacketToAllPeers(SendOptions.ReliableOrdered, MMOMessageTypes.Chat, message);
                     break;
                 case ChatChannel.Whisper:
-                    NetPeer receiverPeer;
+                    NetPeer senderPeer = null;
+                    NetPeer receiverPeer = null;
                     // Send message to map server which have the character
+                    if (!string.IsNullOrEmpty(message.sender) &&
+                        peersByCharacterName.TryGetValue(message.sender, out senderPeer))
+                        LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, senderPeer, MMOMessageTypes.Chat, message);
                     if (!string.IsNullOrEmpty(message.receiver) &&
-                        peersByCharacterName.TryGetValue(message.receiver, out receiverPeer))
+                        peersByCharacterName.TryGetValue(message.receiver, out receiverPeer) &&
+                        (senderPeer == null || receiverPeer != senderPeer))
                         LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, receiverPeer, MMOMessageTypes.Chat, message);
                     break;
             }
