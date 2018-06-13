@@ -722,7 +722,7 @@ MonoBehaviour:
   - keyName: CameraRotate
     keyCode: 324
   - keyName: Attack
-    keyCode: 13
+    keyCode: 118
   - keyName: Jump
     keyCode: 32
 --- !u!114 &1379718505
