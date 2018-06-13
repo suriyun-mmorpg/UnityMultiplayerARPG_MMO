@@ -18,9 +18,11 @@ namespace Insthync.MMOG
         public const string ARG_NOT_SPAWN_IN_BATCH_MODE = "-notSpawnInBatchMode";
         public const string ARG_MAP_PORT = "-mapPort";
         public const string ARG_SCENE_NAME = "-sceneName";
+        public const string ARG_CHAT_PORT = "-chatPort";
         public const string ARG_START_CENTRAL_SERVER = "-startCentralServer";
         public const string ARG_START_MAP_SPAWN_SERVER = "-startMapSpawnServer";
         public const string ARG_START_MAP_SERVER = "-startMapServer";
+        public const string ARG_START_CHAT_SERVER = "-startChatServer";
 
         [Header("Server Components")]
         [SerializeField]
@@ -30,11 +32,14 @@ namespace Insthync.MMOG
         [SerializeField]
         private MapNetworkManager mapNetworkManager;
         [SerializeField]
+        private ChatNetworkManager chatNetworkManager;
+        [SerializeField]
         private BaseDatabase database;
 
         public CentralNetworkManager CentralNetworkManager { get { return centralNetworkManager; } }
         public MapSpawnNetworkManager MapSpawnNetworkManager { get { return mapSpawnNetworkManager; } }
         public MapNetworkManager MapNetworkManager { get { return mapNetworkManager; } }
+        public ChatNetworkManager ChatNetworkManager { get { return chatNetworkManager; } }
         public BaseDatabase Database { get { return database; } }
         private LogGUI cacheLogGUI;
         public LogGUI CacheLogGUI
@@ -50,10 +55,12 @@ namespace Insthync.MMOG
         [Header("Running In Editor")]
         public bool startCentralOnAwake;
         public bool startMapSpawnOnAwake;
+        public bool startChatOnAwake;
 
         private bool startingCentralServer;
         private bool startingMapSpawnServer;
         private bool startingMapServer;
+        private bool startingChatServer;
         private readonly List<string> scenes = new List<string>();
 
         private void Awake()
@@ -101,7 +108,7 @@ namespace Insthync.MMOG
 
                 if (IsArgsProvided(args, ARG_MAP_SPAWN_PORT))
                 {
-                    var port = ReadArgsInt(args, ARG_MAP_SPAWN_PORT, 6003);
+                    var port = ReadArgsInt(args, ARG_MAP_SPAWN_PORT, 6001);
                     mapSpawnNetworkManager.networkPort = port;
                 }
 
@@ -122,7 +129,7 @@ namespace Insthync.MMOG
 
                 if (IsArgsProvided(args, ARG_MAP_PORT))
                 {
-                    var port = ReadArgsInt(args, ARG_MAP_PORT, 6004);
+                    var port = ReadArgsInt(args, ARG_MAP_PORT, 6002);
                     mapNetworkManager.networkPort = port;
                 }
 
@@ -130,6 +137,12 @@ namespace Insthync.MMOG
                 {
                     var sceneName = ReadArgs(args, ARG_SCENE_NAME);
                     mapNetworkManager.Assets.onlineScene.SceneName = sceneName;
+                }
+
+                if (IsArgsProvided(args, ARG_CHAT_PORT))
+                {
+                    var port = ReadArgsInt(args, ARG_CHAT_PORT, 6003);
+                    chatNetworkManager.networkPort = port;
                 }
 
                 var logFileName = "Log";
@@ -165,6 +178,16 @@ namespace Insthync.MMOG
                     startingMapServer = true;
                 }
 
+                if (IsArgsProvided(args, ARG_START_CHAT_SERVER))
+                {
+                    if (!string.IsNullOrEmpty(logFileName))
+                        logFileName += "_";
+                    logFileName += "Chat";
+                    startLog = true;
+                    gameInstance.doNotLoadHomeSceneOnStart = true;
+                    startingChatServer = true;
+                }
+
                 if (startLog)
                 {
                     CacheLogGUI.logFileName = logFileName;
@@ -178,6 +201,9 @@ namespace Insthync.MMOG
 
                 if (startMapSpawnOnAwake)
                     startingMapSpawnServer = true;
+
+                if (startChatOnAwake)
+                    startingChatServer = true;
             }
         }
 
@@ -204,6 +230,9 @@ namespace Insthync.MMOG
 
             if (startingMapServer)
                 StartMapServer();
+
+            if (startingChatServer)
+                StartChatServer();
         }
 
         #region Server functions
@@ -220,6 +249,11 @@ namespace Insthync.MMOG
         public void StartMapServer()
         {
             mapNetworkManager.StartServer();
+        }
+
+        public void StartChatServer()
+        {
+            chatNetworkManager.StartServer();
         }
 
         public List<string> GetScenes()

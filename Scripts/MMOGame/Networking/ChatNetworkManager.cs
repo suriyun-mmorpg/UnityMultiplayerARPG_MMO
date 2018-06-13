@@ -138,7 +138,7 @@ namespace Insthync.MMOG
             }
         }
 
-        public void EnterChat(ChatChannel channel, string message, string senderName, string receiverName = "")
+        public void EnterChat(ChatChannel channel, string message, string senderName, string receiverName)
         {
             if (!IsClientConnected)
                 return;
