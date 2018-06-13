@@ -12,7 +12,7 @@ namespace Insthync.MMOG
             var message = new RequestUserLoginMessage();
             message.username = username;
             message.password = password;
-            return Client.SendAckPacket(SendOptions.ReliableUnordered, Client.Peer, MessageTypes.RequestUserLogin, message, callback);
+            return Client.SendAckPacket(SendOptions.ReliableUnordered, Client.Peer, MMOMessageTypes.RequestUserLogin, message, callback);
         }
 
         public uint RequestUserRegister(string username, string password, AckMessageCallback callback)
@@ -20,13 +20,13 @@ namespace Insthync.MMOG
             var message = new RequestUserRegisterMessage();
             message.username = username;
             message.password = password;
-            return Client.SendAckPacket(SendOptions.ReliableUnordered, Client.Peer, MessageTypes.RequestUserRegister, message, callback);
+            return Client.SendAckPacket(SendOptions.ReliableUnordered, Client.Peer, MMOMessageTypes.RequestUserRegister, message, callback);
         }
 
         public uint RequestUserLogout(AckMessageCallback callback)
         {
             var message = new BaseAckMessage();
-            return Client.SendAckPacket(SendOptions.ReliableUnordered, Client.Peer, MessageTypes.RequestUserLogout, message, callback);
+            return Client.SendAckPacket(SendOptions.ReliableUnordered, Client.Peer, MMOMessageTypes.RequestUserLogout, message, callback);
         }
 
         public uint RequestValidateAccessToken(string userId, string accessToken, AckMessageCallback callback)
@@ -34,7 +34,7 @@ namespace Insthync.MMOG
             var message = new RequestValidateAccessTokenMessage();
             message.userId = userId;
             message.accessToken = accessToken;
-            return Client.SendAckPacket(SendOptions.ReliableUnordered, Client.Peer, MessageTypes.RequestValidateAccessToken, message, callback);
+            return Client.SendAckPacket(SendOptions.ReliableUnordered, Client.Peer, MMOMessageTypes.RequestValidateAccessToken, message, callback);
         }
 
         protected async void HandleRequestUserLogin(LiteNetLibMessageHandler messageHandler)
@@ -70,7 +70,7 @@ namespace Insthync.MMOG
             responseMessage.error = error;
             responseMessage.userId = userId;
             responseMessage.accessToken = accessToken;
-            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MessageTypes.ResponseUserLogin, responseMessage);
+            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MMOMessageTypes.ResponseUserLogin, responseMessage);
         }
 
         protected async void HandleRequestUserRegister(LiteNetLibMessageHandler messageHandler)
@@ -94,7 +94,7 @@ namespace Insthync.MMOG
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = error == ResponseUserRegisterMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
             responseMessage.error = error;
-            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MessageTypes.ResponseUserRegister, responseMessage);
+            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MMOMessageTypes.ResponseUserRegister, responseMessage);
         }
 
         protected async void HandleRequestUserLogout(LiteNetLibMessageHandler messageHandler)
@@ -111,7 +111,7 @@ namespace Insthync.MMOG
             var responseMessage = new BaseAckMessage();
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = AckResponseCode.Success;
-            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MessageTypes.ResponseUserLogout, responseMessage);
+            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MMOMessageTypes.ResponseUserLogout, responseMessage);
         }
 
         protected async void HandleRequestValidateAccessToken(LiteNetLibMessageHandler messageHandler)
@@ -149,7 +149,7 @@ namespace Insthync.MMOG
             responseMessage.error = error;
             responseMessage.userId = userId;
             responseMessage.accessToken = accessToken;
-            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MessageTypes.ResponseValidateAccessToken, responseMessage);
+            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MMOMessageTypes.ResponseValidateAccessToken, responseMessage);
         }
 
         protected void HandleResponseUserLogin(LiteNetLibMessageHandler messageHandler)

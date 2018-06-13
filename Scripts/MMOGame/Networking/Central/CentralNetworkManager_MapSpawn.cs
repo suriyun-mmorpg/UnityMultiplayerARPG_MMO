@@ -34,7 +34,7 @@ namespace Insthync.MMOG
         {
             var message = new RequestSpawnMapMessage();
             message.sceneName = sceneName;
-            return Server.SendAckPacket(SendOptions.ReliableUnordered, peer, MessageTypes.RequestSpawnMap, message, callback);
+            return Server.SendAckPacket(SendOptions.ReliableUnordered, peer, MMOMessageTypes.RequestSpawnMap, message, callback);
         }
 
         protected void HandleResponseSpawnMap(LiteNetLibMessageHandler messageHandler)

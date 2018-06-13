@@ -66,7 +66,7 @@ namespace Insthync.MMOG
                 if (cacheCentralAppServerRegister == null)
                 {
                     cacheCentralAppServerRegister = new CentralAppServerRegister(this);
-                    cacheCentralAppServerRegister.RegisterMessage(MessageTypes.RequestSpawnMap, HandleRequestSpawnMap);
+                    cacheCentralAppServerRegister.RegisterMessage(MMOMessageTypes.RequestSpawnMap, HandleRequestSpawnMap);
                 }
                 return cacheCentralAppServerRegister;
             }
@@ -80,11 +80,6 @@ namespace Insthync.MMOG
         public string AppConnectKey { get { return connectKey; } }
         public string AppExtra { get { return string.Empty; } }
         public CentralServerPeerType PeerType { get { return CentralServerPeerType.MapSpawnServer; } }
-
-        protected override void RegisterClientMessages()
-        {
-            base.RegisterClientMessages();
-        }
 
         public override void OnStartServer()
         {
@@ -264,7 +259,7 @@ namespace Insthync.MMOG
             responseMessage.ackId = ackId;
             responseMessage.responseCode = error == ResponseSpawnMapMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
             responseMessage.error = error;
-            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, peer, MessageTypes.ResponseSpawnMap, responseMessage);
+            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, peer, MMOMessageTypes.ResponseSpawnMap, responseMessage);
         }
 
         private void ExecuteOnMainThread(Action action)

@@ -8,5 +8,6 @@ namespace Insthync.MMOG
     {
         MapSpawnServer,
         MapServer,
+        Chat,
     }
 }

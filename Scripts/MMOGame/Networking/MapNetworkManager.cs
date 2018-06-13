@@ -20,8 +20,6 @@ namespace Insthync.MMOG
         [Header("Database")]
         public float autoSaveDuration = 2f;
 
-        private readonly Dictionary<string, CentralServerPeerInfo> mapServerPeersBySceneName = new Dictionary<string, CentralServerPeerInfo>();
-
         private CentralAppServerRegister cacheCentralAppServerRegister;
         public CentralAppServerRegister CentralAppServerRegister
         {
@@ -31,9 +29,20 @@ namespace Insthync.MMOG
                 {
                     cacheCentralAppServerRegister = new CentralAppServerRegister(this);
                     cacheCentralAppServerRegister.onAppServerRegistered = OnAppServerRegistered;
-                    cacheCentralAppServerRegister.RegisterMessage(MessageTypes.ResponseAppServerAddress, HandleResponseAppServerAddress);
+                    cacheCentralAppServerRegister.RegisterMessage(MMOMessageTypes.ResponseAppServerAddress, HandleResponseAppServerAddress);
                 }
                 return cacheCentralAppServerRegister;
+            }
+        }
+
+        private ChatNetworkManager cacheChatNetworkManager;
+        public ChatNetworkManager ChatNetworkManager
+        {
+            get
+            {
+                if (cacheChatNetworkManager == null)
+                    cacheChatNetworkManager = gameObject.AddComponent<ChatNetworkManager>();
+                return cacheChatNetworkManager;
             }
         }
 
@@ -52,8 +61,9 @@ namespace Insthync.MMOG
         public CentralServerPeerType PeerType { get { return CentralServerPeerType.MapServer; } }
         private float lastSaveTime;
         private Task saveCharactersTask;
-        private Dictionary<long, PlayerCharacterEntity> PlayerCharacterEntities = new Dictionary<long, PlayerCharacterEntity>();
-        private Dictionary<long, string> UserIds = new Dictionary<long, string>();
+        // Listing
+        private readonly Dictionary<string, CentralServerPeerInfo> mapServerPeersBySceneName = new Dictionary<string, CentralServerPeerInfo>();
+        private readonly Dictionary<long, SimpleUserCharacterData> users = new Dictionary<long, SimpleUserCharacterData>();
 
         protected override void Awake()
         {
@@ -81,54 +91,28 @@ namespace Insthync.MMOG
 
         protected override async void OnDestroy()
         {
-            base.OnDestroy();
             CentralAppServerRegister.Stop();
             // Wait old save character task to be completed
             if (saveCharactersTask != null && !saveCharactersTask.IsCompleted)
                 await Task.WhenAll(saveCharactersTask, SaveCharacters());
             else
                 await SaveCharacters();
+            base.OnDestroy();
         }
 
         public override void OnPeerDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
         {
-            PlayerCharacterEntity playerCharacterEntity;
-            if (PlayerCharacterEntities.TryGetValue(peer.ConnectId, out playerCharacterEntity))
+            UnregisterPlayerCharacter(peer);
+            SimpleUserCharacterData userData;
+            if (users.TryGetValue(peer.ConnectId, out userData))
             {
-                saveCharactersTask = SaveCharacter(playerCharacterEntity);
-                PlayerCharacterEntities.Remove(peer.ConnectId);
-            }
-            string userId;
-            if (UserIds.TryGetValue(peer.ConnectId, out userId))
-            {
-                var updateMapUserMessage = new RequestUpdateMapUserMessage();
-                updateMapUserMessage.type = RequestUpdateMapUserMessage.UpdateType.Remove;
-                updateMapUserMessage.userId = userId;
-                LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, CentralAppServerRegister.Peer, MessageTypes.RequestUpdateMapUser, updateMapUserMessage);
-                UserIds.Remove(peer.ConnectId);
+                users.Remove(peer.ConnectId);
+                // Remove map user from central server and chat server
+                UpdateMapUser(CentralAppServerRegister.Peer, UpdateMapUserMessage.UpdateType.Remove, userData);
+                if (ChatNetworkManager.IsClientConnected)
+                    UpdateMapUser(ChatNetworkManager.Client.Peer, UpdateMapUserMessage.UpdateType.Remove, userData);
             }
             base.OnPeerDisconnected(peer, disconnectInfo);
-        }
-
-        private async Task SaveCharacter(IPlayerCharacterData playerCharacterData)
-        {
-            if (saveCharactersTask != null && !saveCharactersTask.IsCompleted)
-                await saveCharactersTask;
-            await Database.UpdateCharacter(playerCharacterData);
-            Debug.Log("Character [" + playerCharacterData.Id + "] Saved");
-        }
-
-        private async Task SaveCharacters()
-        {
-            if (saveCharactersTask != null && !saveCharactersTask.IsCompleted)
-                await saveCharactersTask;
-            var tasks = new List<Task>();
-            foreach (var playerCharacterEntity in PlayerCharacterEntities.Values)
-            {
-                tasks.Add(Database.UpdateCharacter(playerCharacterEntity.CloneTo(new PlayerCharacterData())));
-            }
-            await Task.WhenAll(tasks);
-            Debug.Log("Characters Saved");
         }
 
         public override void OnStartServer()
@@ -141,6 +125,8 @@ namespace Insthync.MMOG
         {
             base.OnStopServer();
             CentralAppServerRegister.OnStopServer();
+            if (ChatNetworkManager.IsClientConnected)
+                ChatNetworkManager.StopClient();
             mapServerPeersBySceneName.Clear();
         }
 
@@ -154,17 +140,18 @@ namespace Insthync.MMOG
             CentralServerPeerInfo peerInfo;
             if (!string.IsNullOrEmpty(mapName) &&
                 !mapName.Equals(playerCharacterEntity.CurrentMapName) &&
-                PlayerCharacterEntities.ContainsKey(connectId) &&
+                playerCharacters.ContainsKey(connectId) &&
                 Peers.TryGetValue(connectId, out peer) &&
                 mapServerPeersBySceneName.TryGetValue(mapName, out peerInfo))
             {
-                PlayerCharacterEntities.Remove(connectId);
-                var message = new MMOResponseWarpMessage();
+                peersByCharacterName.Remove(playerCharacterEntity.CharacterName);
+                playerCharacters.Remove(connectId);
+                var message = new MMOWarpMessage();
                 message.sceneName = mapName;
                 message.networkAddress = peerInfo.networkAddress;
                 message.networkPort = peerInfo.networkPort;
                 message.connectKey = peerInfo.connectKey;
-                LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MsgTypes.ResponseWarp, message);
+                LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MsgTypes.Warp, message);
                 var savingCharacterData = new PlayerCharacterData();
                 playerCharacterEntity.CloneTo(savingCharacterData);
                 savingCharacterData.CurrentMapName = mapName;
@@ -175,6 +162,7 @@ namespace Insthync.MMOG
             }
         }
 
+        #region Character spawn function
         public override void SerializeClientReadyExtra(NetDataWriter writer)
         {
             writer.Put(MMOClientInstance.UserId);
@@ -192,7 +180,7 @@ namespace Insthync.MMOG
             var accessToken = reader.GetString();
             var selectCharacterId = reader.GetString();
             // Validate access token
-            if (PlayerCharacterEntities.ContainsKey(peer.ConnectId))
+            if (playerCharacters.ContainsKey(peer.ConnectId))
             {
                 Debug.LogError("[Map Server] User trying to hack: " + userId);
                 playerIdentity.NetworkDestroy();
@@ -220,21 +208,30 @@ namespace Insthync.MMOG
                     playerCharacterEntity.RequestOnRespawn(true);
                 else
                     playerCharacterEntity.RequestOnDead(true);
-                PlayerCharacterEntities[peer.ConnectId] = playerCharacterEntity;
-                UserIds[peer.ConnectId] = userId;
-                // Send update map user message to central server
-                var updateMapUserMessage = new RequestUpdateMapUserMessage();
-                updateMapUserMessage.type = RequestUpdateMapUserMessage.UpdateType.Add;
-                updateMapUserMessage.userId = userId;
-                LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, CentralAppServerRegister.Peer, MessageTypes.RequestUpdateMapUser, updateMapUserMessage);
+                RegisterPlayerCharacter(peer, playerCharacterEntity);
+                var characterName = playerCharacterEntity.CharacterName;
+                var userData = new SimpleUserCharacterData(userId, characterName);
+                users[peer.ConnectId] = userData;
+                // Add map user to central server and chat server
+                UpdateMapUser(CentralAppServerRegister.Peer, UpdateMapUserMessage.UpdateType.Add, userData);
+                if (ChatNetworkManager.IsClientConnected)
+                    UpdateMapUser(ChatNetworkManager.Client.Peer, UpdateMapUserMessage.UpdateType.Add, userData);
             }
         }
+        #endregion
 
-        protected override void HandleResponseWarp(LiteNetLibMessageHandler messageHandler)
+        #region Network message handlers
+        protected override void HandleChatAtServer(LiteNetLibMessageHandler messageHandler)
         {
-            base.HandleResponseWarp(messageHandler);
-            var peerHandler = messageHandler.peerHandler;
-            var message = messageHandler.ReadMessage<MMOResponseWarpMessage>();
+            // Send chat message to chat server, for MMO mode chat message handling by chat server
+            var message = messageHandler.ReadMessage<ChatMessage>();
+            if (ChatNetworkManager.IsClientConnected)
+                ChatNetworkManager.EnterChat(message.channel, message.message, message.sender, message.receiver);
+        }
+
+        protected override void HandleWarpAtClient(LiteNetLibMessageHandler messageHandler)
+        {
+            var message = messageHandler.ReadMessage<MMOWarpMessage>();
             Assets.offlineScene.SceneName = string.Empty;
             StopClient();
             Assets.onlineScene.SceneName = message.sceneName;
@@ -243,27 +240,103 @@ namespace Insthync.MMOG
 
         private void HandleResponseAppServerAddress(LiteNetLibMessageHandler messageHandler)
         {
-            var peerHandler = messageHandler.peerHandler;
             var peer = messageHandler.peer;
             var message = messageHandler.ReadMessage<ResponseAppServerAddressMessage>();
-            if (message.responseCode == AckResponseCode.Success &&
-                message.peerInfo.peerType == CentralServerPeerType.MapServer &&
-                !string.IsNullOrEmpty(message.peerInfo.extra))
-                mapServerPeersBySceneName[message.peerInfo.extra] = message.peerInfo;
+            if (message.responseCode == AckResponseCode.Success)
+            {
+                var peerInfo = message.peerInfo;
+                switch (peerInfo.peerType)
+                {
+                    case CentralServerPeerType.MapServer:
+                        if (!string.IsNullOrEmpty(peerInfo.extra))
+                            mapServerPeersBySceneName[peerInfo.extra] = peerInfo;
+                        break;
+                    case CentralServerPeerType.Chat:
+                        if (!ChatNetworkManager.IsClientConnected)
+                            ChatNetworkManager.StartClient(this, peerInfo.networkAddress, peerInfo.networkPort, peerInfo.connectKey);
+                        break;
+                }
+            }
         }
 
         private void OnAppServerRegistered(AckResponseCode responseCode, BaseAckMessage message)
         {
             if (responseCode == AckResponseCode.Success)
+                UpdateMapUsers(CentralAppServerRegister.Peer, UpdateMapUserMessage.UpdateType.Add);
+        }
+        #endregion
+
+        #region Connect to chat server
+        public void OnChatServerConnected()
+        {
+            UpdateMapUsers(ChatNetworkManager.Client.Peer, UpdateMapUserMessage.UpdateType.Add);
+        }
+
+        public void OnChatMessageReceive(ChatMessage message)
+        {
+            // Filtering chat messages
+            switch (message.channel)
             {
-                foreach (var userId in UserIds.Values)
-                {
-                    var updateMapUserMessage = new RequestUpdateMapUserMessage();
-                    updateMapUserMessage.type = RequestUpdateMapUserMessage.UpdateType.Add;
-                    updateMapUserMessage.userId = userId;
-                    LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, CentralAppServerRegister.Peer, MessageTypes.RequestUpdateMapUser, updateMapUserMessage);
-                }
+                case ChatChannel.Global:
+                    // Send message to all clients
+                    SendPacketToAllPeers(SendOptions.ReliableOrdered, MMOMessageTypes.Chat, message);
+                    break;
+                case ChatChannel.Whisper:
+                    // Send message to client which have the character
+                    NetPeer receiverPeer;
+                    if (!string.IsNullOrEmpty(message.receiver) &&
+                        peersByCharacterName.TryGetValue(message.receiver, out receiverPeer))
+                        LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, receiverPeer, MsgTypes.Chat, message);
+                    break;
+                case ChatChannel.Party:
+                    // TODO: Implement this later when party system ready
+                    break;
+                case ChatChannel.Guild:
+                    // TODO: Implement this later when guild system ready
+                    break;
             }
         }
+        #endregion
+
+        #region Update map user functions
+        private void UpdateMapUsers(NetPeer peer, UpdateMapUserMessage.UpdateType updateType)
+        {
+            foreach (var user in users.Values)
+            {
+                UpdateMapUser(peer, updateType, user);
+            }
+        }
+
+        private void UpdateMapUser(NetPeer peer, UpdateMapUserMessage.UpdateType updateType, SimpleUserCharacterData userData)
+        {
+            var updateMapUserMessage = new UpdateMapUserMessage();
+            updateMapUserMessage.type = updateType;
+            updateMapUserMessage.userData = userData;
+            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, peer, MMOMessageTypes.UpdateMapUser, updateMapUserMessage);
+        }
+        #endregion
+
+        #region Save character functions
+        private async Task SaveCharacter(IPlayerCharacterData playerCharacterData)
+        {
+            if (saveCharactersTask != null && !saveCharactersTask.IsCompleted)
+                await saveCharactersTask;
+            await Database.UpdateCharacter(playerCharacterData);
+            Debug.Log("Character [" + playerCharacterData.Id + "] Saved");
+        }
+
+        private async Task SaveCharacters()
+        {
+            if (saveCharactersTask != null && !saveCharactersTask.IsCompleted)
+                await saveCharactersTask;
+            var tasks = new List<Task>();
+            foreach (var playerCharacterEntity in playerCharacters.Values)
+            {
+                tasks.Add(Database.UpdateCharacter(playerCharacterEntity.CloneTo(new PlayerCharacterData())));
+            }
+            await Task.WhenAll(tasks);
+            Debug.Log("Characters Saved");
+        }
+        #endregion
     }
 }

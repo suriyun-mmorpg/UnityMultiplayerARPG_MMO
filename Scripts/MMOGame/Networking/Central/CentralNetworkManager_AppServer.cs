@@ -15,7 +15,7 @@ namespace Insthync.MMOG
         {
             var message = new RequestAppServerRegisterMessage();
             message.peerInfo = peerInfo;
-            return Client.SendAckPacket(SendOptions.ReliableUnordered, Client.Peer, MessageTypes.RequestAppServerRegister, message, callback);
+            return Client.SendAckPacket(SendOptions.ReliableUnordered, Client.Peer, MMOMessageTypes.RequestAppServerRegister, message, callback);
         }
 
         public uint RequestAppServerAddress(CentralServerPeerType peerType, string extra, AckMessageCallback callback)
@@ -23,7 +23,7 @@ namespace Insthync.MMOG
             var message = new RequestAppServerAddressMessage();
             message.peerType = peerType;
             message.extra = extra;
-            return Client.SendAckPacket(SendOptions.ReliableUnordered, Client.Peer, MessageTypes.RequestAppServerAddress, message, callback);
+            return Client.SendAckPacket(SendOptions.ReliableUnordered, Client.Peer, MMOMessageTypes.RequestAppServerAddress, message, callback);
         }
 
         protected void HandleRequestAppServerRegister(LiteNetLibMessageHandler messageHandler)
@@ -53,17 +53,17 @@ namespace Insthync.MMOG
                                 responseMapAddressMessage.responseCode = AckResponseCode.Success;
                                 responseMapAddressMessage.error = ResponseAppServerAddressMessage.Error.None;
                                 responseMapAddressMessage.peerInfo = mapServerPeer;
-                                LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MessageTypes.ResponseAppServerAddress, responseMapAddressMessage);
+                                LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MMOMessageTypes.ResponseAppServerAddress, responseMapAddressMessage);
                                 // Send current info to other peer
                                 responseMapAddressMessage = new ResponseAppServerAddressMessage();
                                 responseMapAddressMessage.responseCode = AckResponseCode.Success;
                                 responseMapAddressMessage.error = ResponseAppServerAddressMessage.Error.None;
                                 responseMapAddressMessage.peerInfo = peerInfo;
-                                LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, mapServerPeer.peer, MessageTypes.ResponseAppServerAddress, responseMapAddressMessage);
+                                LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, mapServerPeer.peer, MMOMessageTypes.ResponseAppServerAddress, responseMapAddressMessage);
                             }
                             mapServerPeersBySceneName[sceneName] = peerInfo;
                             mapServerPeers[peer.ConnectId] = peerInfo;
-                            mapUsers[peer.ConnectId] = new HashSet<string>();
+                            mapUserIds[peer.ConnectId] = new HashSet<string>();
                             Debug.Log("[Central] Register Map Server: [" + peer.ConnectId + "] [" + sceneName + "]");
                         }
                         else
@@ -71,6 +71,10 @@ namespace Insthync.MMOG
                             error = ResponseAppServerRegisterMessage.Error.MapAlreadyExisted;
                             Debug.Log("[Central] Register Map Server Failed: [" + peer.ConnectId + "] [" + sceneName + "] [" + error + "]");
                         }
+                        break;
+                    case CentralServerPeerType.Chat:
+                        chatServerPeers[peer.ConnectId] = peerInfo;
+                        Debug.Log("[Central] Register Chat Server: [" + peer.ConnectId + "]");
                         break;
                 }
             }
@@ -84,7 +88,7 @@ namespace Insthync.MMOG
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = error == ResponseAppServerRegisterMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
             responseMessage.error = error;
-            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MessageTypes.ResponseAppServerRegister, responseMessage);
+            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MMOMessageTypes.ResponseAppServerRegister, responseMessage);
         }
 
         protected void HandleRequestAppServerAddress(LiteNetLibMessageHandler messageHandler)
@@ -95,7 +99,7 @@ namespace Insthync.MMOG
             var peerInfo = new CentralServerPeerInfo();
             switch (message.peerType)
             {
-                // TODO: Balancing spawner servers
+                // TODO: Balancing servers when there are multiple servers with same type
                 case CentralServerPeerType.MapSpawnServer:
                     if (mapSpawnServerPeers.Count > 0)
                     {
@@ -116,13 +120,25 @@ namespace Insthync.MMOG
                         Debug.Log("[Central] Request Map Address: [" + peer.ConnectId + "] [" + mapName + "] [" + error + "]");
                     }
                     break;
+                case CentralServerPeerType.Chat:
+                    if (chatServerPeers.Count > 0)
+                    {
+                        peerInfo = chatServerPeers.Values.First();
+                        Debug.Log("[Central] Request Chat Address: [" + peer.ConnectId + "]");
+                    }
+                    else
+                    {
+                        error = ResponseAppServerAddressMessage.Error.ServerNotFound;
+                        Debug.Log("[Central] Request Chat Address: [" + peer.ConnectId + "] [" + error + "]");
+                    }
+                    break;
             }
             var responseMessage = new ResponseAppServerAddressMessage();
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = error == ResponseAppServerAddressMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
             responseMessage.error = error;
             responseMessage.peerInfo = peerInfo;
-            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MessageTypes.ResponseAppServerAddress, responseMessage);
+            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MMOMessageTypes.ResponseAppServerAddress, responseMessage);
         }
 
         protected void HandleResponseAppServerRegister(LiteNetLibMessageHandler messageHandler)
@@ -143,24 +159,24 @@ namespace Insthync.MMOG
             peerHandler.TriggerAck(ackId, message.responseCode, message);
         }
 
-        protected void HandleRequestUpdateMapUser(LiteNetLibMessageHandler messageHandler)
+        protected void HandleUpdateMapUser(LiteNetLibMessageHandler messageHandler)
         {
             var peer = messageHandler.peer;
-            var message = messageHandler.ReadMessage<RequestUpdateMapUserMessage>();
-            if (mapUsers.ContainsKey(peer.ConnectId))
+            var message = messageHandler.ReadMessage<UpdateMapUserMessage>();
+            if (mapUserIds.ContainsKey(peer.ConnectId))
             {
                 switch (message.type)
                 {
-                    case RequestUpdateMapUserMessage.UpdateType.Add:
-                        if (!mapUsers[peer.ConnectId].Contains(message.userId))
+                    case UpdateMapUserMessage.UpdateType.Add:
+                        if (!mapUserIds[peer.ConnectId].Contains(message.userData.userId))
                         {
-                            mapUsers[peer.ConnectId].Add(message.userId);
-                            Debug.Log("[Central] Add map user: " + message.userId + " by " + peer.ConnectId);
+                            mapUserIds[peer.ConnectId].Add(message.userData.userId);
+                            Debug.Log("[Central] Add map user: " + message.userData.userId + " by " + peer.ConnectId);
                         }
                         break;
-                    case RequestUpdateMapUserMessage.UpdateType.Remove:
-                        mapUsers[peer.ConnectId].Remove(message.userId);
-                        Debug.Log("[Central] Remove map user: " + message.userId + " by " + peer.ConnectId);
+                    case UpdateMapUserMessage.UpdateType.Remove:
+                        mapUserIds[peer.ConnectId].Remove(message.userData.userId);
+                        Debug.Log("[Central] Remove map user: " + message.userData.userId + " by " + peer.ConnectId);
                         break;
                 }
             }

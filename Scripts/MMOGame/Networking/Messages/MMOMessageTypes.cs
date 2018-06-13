@@ -1,6 +1,6 @@
 ﻿namespace Insthync.MMOG
 {
-    public class MessageTypes
+    public class MMOMessageTypes
     {
         public const short RequestAppServerRegister = 0;
         public const short ResponseAppServerRegister = 1;
@@ -24,6 +24,7 @@
         public const short ResponseSpawnMap = 19;
         public const short RequestValidateAccessToken = 20;
         public const short ResponseValidateAccessToken = 21;
-        public const short RequestUpdateMapUser = 22;
+        public const short UpdateMapUser = 22;
+        public const short Chat = 23;
     }
 }

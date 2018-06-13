@@ -5,7 +5,7 @@ using LiteNetLib.Utils;
 
 namespace Insthync.MMOG
 {
-    public class RequestUpdateMapUserMessage : BaseAckMessage
+    public class UpdateMapUserMessage : ILiteNetLibMessage
     {
         public enum UpdateType : byte
         {
@@ -13,18 +13,19 @@ namespace Insthync.MMOG
             Remove,
         }
         public UpdateType type;
-        public string userId;
+        public SimpleUserCharacterData userData;
 
-        public override void DeserializeData(NetDataReader reader)
+        public void Deserialize(NetDataReader reader)
         {
             type = (UpdateType)reader.GetByte();
-            userId = reader.GetString();
+            userData = new SimpleUserCharacterData(reader.GetString(), reader.GetString());
         }
 
-        public override void SerializeData(NetDataWriter writer)
+        public void Serialize(NetDataWriter writer)
         {
             writer.Put((byte)type);
-            writer.Put(userId);
+            writer.Put(userData.userId);
+            writer.Put(userData.characterName);
         }
     }
 }

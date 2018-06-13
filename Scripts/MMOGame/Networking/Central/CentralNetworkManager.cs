@@ -10,9 +10,10 @@ namespace Insthync.MMOG
         protected readonly Dictionary<string, uint> spawningMapAcks = new Dictionary<string, uint>();
         protected readonly Dictionary<long, CentralServerPeerInfo> mapServerPeers = new Dictionary<long, CentralServerPeerInfo>();
         protected readonly Dictionary<string, CentralServerPeerInfo> mapServerPeersBySceneName = new Dictionary<string, CentralServerPeerInfo>();
+        protected readonly Dictionary<long, CentralServerPeerInfo> chatServerPeers = new Dictionary<long, CentralServerPeerInfo>();
         protected readonly Dictionary<long, CentralUserPeerInfo> userPeers = new Dictionary<long, CentralUserPeerInfo>();
         protected readonly Dictionary<string, CentralUserPeerInfo> userPeersByUserId = new Dictionary<string, CentralUserPeerInfo>();
-        protected readonly Dictionary<long, HashSet<string>> mapUsers = new Dictionary<long, HashSet<string>>();
+        protected readonly Dictionary<long, HashSet<string>> mapUserIds = new Dictionary<long, HashSet<string>>();
 
         [Header("Account configuration")]
         public int minUsernameLength = 2;
@@ -34,33 +35,33 @@ namespace Insthync.MMOG
         protected override void RegisterServerMessages()
         {
             base.RegisterServerMessages();
-            RegisterServerMessage(MessageTypes.RequestAppServerRegister, HandleRequestAppServerRegister);
-            RegisterServerMessage(MessageTypes.RequestAppServerAddress, HandleRequestAppServerAddress);
-            RegisterServerMessage(MessageTypes.RequestUserLogin, HandleRequestUserLogin);
-            RegisterServerMessage(MessageTypes.RequestUserRegister, HandleRequestUserRegister);
-            RegisterServerMessage(MessageTypes.RequestUserLogout, HandleRequestUserLogout);
-            RegisterServerMessage(MessageTypes.RequestCharacters, HandleRequestCharacters);
-            RegisterServerMessage(MessageTypes.RequestCreateCharacter, HandleRequestCreateCharacter);
-            RegisterServerMessage(MessageTypes.RequestDeleteCharacter, HandleRequestDeleteCharacter);
-            RegisterServerMessage(MessageTypes.RequestSelectCharacter, HandleRequestSelectCharacter);
-            RegisterServerMessage(MessageTypes.ResponseSpawnMap, HandleResponseSpawnMap);
-            RegisterServerMessage(MessageTypes.RequestValidateAccessToken, HandleRequestValidateAccessToken);
-            RegisterServerMessage(MessageTypes.RequestUpdateMapUser, HandleRequestUpdateMapUser);
+            RegisterServerMessage(MMOMessageTypes.RequestAppServerRegister, HandleRequestAppServerRegister);
+            RegisterServerMessage(MMOMessageTypes.RequestAppServerAddress, HandleRequestAppServerAddress);
+            RegisterServerMessage(MMOMessageTypes.RequestUserLogin, HandleRequestUserLogin);
+            RegisterServerMessage(MMOMessageTypes.RequestUserRegister, HandleRequestUserRegister);
+            RegisterServerMessage(MMOMessageTypes.RequestUserLogout, HandleRequestUserLogout);
+            RegisterServerMessage(MMOMessageTypes.RequestCharacters, HandleRequestCharacters);
+            RegisterServerMessage(MMOMessageTypes.RequestCreateCharacter, HandleRequestCreateCharacter);
+            RegisterServerMessage(MMOMessageTypes.RequestDeleteCharacter, HandleRequestDeleteCharacter);
+            RegisterServerMessage(MMOMessageTypes.RequestSelectCharacter, HandleRequestSelectCharacter);
+            RegisterServerMessage(MMOMessageTypes.ResponseSpawnMap, HandleResponseSpawnMap);
+            RegisterServerMessage(MMOMessageTypes.RequestValidateAccessToken, HandleRequestValidateAccessToken);
+            RegisterServerMessage(MMOMessageTypes.UpdateMapUser, HandleUpdateMapUser);
         }
 
         protected override void RegisterClientMessages()
         {
             base.RegisterClientMessages();
-            RegisterClientMessage(MessageTypes.ResponseAppServerRegister, HandleResponseAppServerRegister);
-            RegisterClientMessage(MessageTypes.ResponseAppServerAddress, HandleResponseAppServerAddress);
-            RegisterClientMessage(MessageTypes.ResponseUserLogin, HandleResponseUserLogin);
-            RegisterClientMessage(MessageTypes.ResponseUserRegister, HandleResponseUserRegister);
-            RegisterClientMessage(MessageTypes.ResponseUserLogout, HandleResponseUserLogout);
-            RegisterClientMessage(MessageTypes.ResponseCharacters, HandleResponseCharacters);
-            RegisterClientMessage(MessageTypes.ResponseCreateCharacter, HandleResponseCreateCharacter);
-            RegisterClientMessage(MessageTypes.ResponseDeleteCharacter, HandleResponseDeleteCharacter);
-            RegisterClientMessage(MessageTypes.ResponseSelectCharacter, HandleResponseSelectCharacter);
-            RegisterClientMessage(MessageTypes.ResponseValidateAccessToken, HandleResponseValidateAccessToken);
+            RegisterClientMessage(MMOMessageTypes.ResponseAppServerRegister, HandleResponseAppServerRegister);
+            RegisterClientMessage(MMOMessageTypes.ResponseAppServerAddress, HandleResponseAppServerAddress);
+            RegisterClientMessage(MMOMessageTypes.ResponseUserLogin, HandleResponseUserLogin);
+            RegisterClientMessage(MMOMessageTypes.ResponseUserRegister, HandleResponseUserRegister);
+            RegisterClientMessage(MMOMessageTypes.ResponseUserLogout, HandleResponseUserLogout);
+            RegisterClientMessage(MMOMessageTypes.ResponseCharacters, HandleResponseCharacters);
+            RegisterClientMessage(MMOMessageTypes.ResponseCreateCharacter, HandleResponseCreateCharacter);
+            RegisterClientMessage(MMOMessageTypes.ResponseDeleteCharacter, HandleResponseDeleteCharacter);
+            RegisterClientMessage(MMOMessageTypes.ResponseSelectCharacter, HandleResponseSelectCharacter);
+            RegisterClientMessage(MMOMessageTypes.ResponseValidateAccessToken, HandleResponseValidateAccessToken);
         }
 
         public override void OnPeerDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
@@ -72,7 +73,7 @@ namespace Insthync.MMOG
             {
                 mapServerPeersBySceneName.Remove(mapServerPeerInfo.extra);
                 mapServerPeers.Remove(peer.ConnectId);
-                mapUsers.Remove(peer.ConnectId);
+                mapUserIds.Remove(peer.ConnectId);
             }
             CentralUserPeerInfo userPeerInfo;
             if (userPeers.TryGetValue(peer.ConnectId, out userPeerInfo))
@@ -98,7 +99,7 @@ namespace Insthync.MMOG
 
         public bool MapContainsUser(string userId)
         {
-            foreach (var mapUser in mapUsers.Values)
+            foreach (var mapUser in mapUserIds.Values)
             {
                 if (mapUser.Contains(userId))
                     return true;

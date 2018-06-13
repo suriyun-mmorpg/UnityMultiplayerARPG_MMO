@@ -5,7 +5,7 @@ using LiteNetLib.Utils;
 
 namespace Insthync.MMOG
 {
-    public class MMOResponseWarpMessage : ILiteNetLibMessage
+    public class MMOWarpMessage : ILiteNetLibMessage
     {
         public string sceneName;
         public string networkAddress;

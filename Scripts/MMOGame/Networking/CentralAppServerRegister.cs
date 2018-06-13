@@ -22,7 +22,7 @@ namespace Insthync.MMOG
         public CentralAppServerRegister(IAppServer appServer) : base(1, appServer.CentralConnectKey)
         {
             this.appServer = appServer;
-            RegisterMessage(MessageTypes.ResponseAppServerRegister, HandleResponseAppServerRegister);
+            RegisterMessage(MMOMessageTypes.ResponseAppServerRegister, HandleResponseAppServerRegister);
         }
 
         public override void OnNetworkError(NetEndPoint endPoint, int socketErrorCode)
@@ -100,7 +100,7 @@ namespace Insthync.MMOG
             // Send Request
             var message = new RequestAppServerRegisterMessage();
             message.peerInfo = peerInfo;
-            SendAckPacket(SendOptions.ReliableUnordered, netPeer, MessageTypes.RequestAppServerRegister, message, OnAppServerRegistered);
+            SendAckPacket(SendOptions.ReliableUnordered, netPeer, MMOMessageTypes.RequestAppServerRegister, message, OnAppServerRegistered);
         }
 
         public async void OnCentralServerDisconnected(NetPeer netPeer, DisconnectInfo disconnectInfo)
