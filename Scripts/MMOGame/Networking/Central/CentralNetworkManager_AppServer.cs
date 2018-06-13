@@ -46,6 +46,7 @@ namespace Insthync.MMOG
                         var sceneName = peerInfo.extra;
                         if (!mapServerPeersBySceneName.ContainsKey(sceneName))
                         {
+                            // Send map peer info to other map server
                             foreach (var mapServerPeer in mapServerPeers.Values)
                             {
                                 // Send other info to current peer
@@ -61,6 +62,17 @@ namespace Insthync.MMOG
                                 responseMapAddressMessage.peerInfo = peerInfo;
                                 LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, mapServerPeer.peer, MMOMessageTypes.ResponseAppServerAddress, responseMapAddressMessage);
                             }
+                            // Send chat peer info to new map server
+                            if (chatServerPeers.Count > 0)
+                            {
+                                var chatPeerInfo = chatServerPeers.Values.First();
+                                var responseChatAddressMessage = new ResponseAppServerAddressMessage();
+                                responseChatAddressMessage.responseCode = AckResponseCode.Success;
+                                responseChatAddressMessage.error = ResponseAppServerAddressMessage.Error.None;
+                                responseChatAddressMessage.peerInfo = chatPeerInfo;
+                                LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MMOMessageTypes.ResponseAppServerAddress, responseChatAddressMessage);
+                            }
+                            // Collects server data
                             mapServerPeersBySceneName[sceneName] = peerInfo;
                             mapServerPeers[peer.ConnectId] = peerInfo;
                             mapUserIds[peer.ConnectId] = new HashSet<string>();
@@ -74,6 +86,15 @@ namespace Insthync.MMOG
                         break;
                     case CentralServerPeerType.Chat:
                         chatServerPeers[peer.ConnectId] = peerInfo;
+                        // Send chat peer info to map servers
+                        foreach (var mapServerPeer in mapServerPeers.Values)
+                        {
+                            var responseChatAddressMessage = new ResponseAppServerAddressMessage();
+                            responseChatAddressMessage.responseCode = AckResponseCode.Success;
+                            responseChatAddressMessage.error = ResponseAppServerAddressMessage.Error.None;
+                            responseChatAddressMessage.peerInfo = peerInfo;
+                            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, mapServerPeer.peer, MMOMessageTypes.ResponseAppServerAddress, responseChatAddressMessage);
+                        }
                         Debug.Log("[Central] Register Chat Server: [" + peer.ConnectId + "]");
                         break;
                 }

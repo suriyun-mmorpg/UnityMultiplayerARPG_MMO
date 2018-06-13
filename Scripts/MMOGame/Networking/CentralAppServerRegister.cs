@@ -76,7 +76,7 @@ namespace Insthync.MMOG
 
         public void ConnectToCentralServer()
         {
-            Debug.Log("[" + appServer.PeerType + "] Connecting to Central Server");
+            Debug.Log("[" + appServer.PeerType + "] Connecting to Central Server: " + appServer.CentralNetworkAddress + ":" + appServer.CentralNetworkPort + " " + appServer.CentralConnectKey);
             Start();
             Connect(appServer.CentralNetworkAddress, appServer.CentralNetworkPort);
         }

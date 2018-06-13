@@ -63,6 +63,13 @@ namespace Insthync.MMOG
             base.OnStopServer();
         }
 
+        protected override void Update()
+        {
+            base.Update();
+            if (IsServer)
+                CentralAppServerRegister.PollEvents();
+        }
+
         protected override void OnDestroy()
         {
             CentralAppServerRegister.Stop();

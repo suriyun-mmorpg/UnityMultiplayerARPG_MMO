@@ -13,12 +13,19 @@ namespace Insthync.MMOG
         public const string ARG_CENTRAL_ADDRESS = "-centralAddress";
         public const string ARG_CENTRAL_PORT = "-centralPort";
         public const string ARG_MACHINE_ADDRESS = "-machineAddress";
+        // Map spawn server
         public const string ARG_MAP_SPAWN_PORT = "-mapSpawnPort";
+        public const string ARG_MAP_SPAWN_MAX_CONNECTIONS = "-mapSpawnMaxConnections";
         public const string ARG_SPAWN_EXE_PATH = "-spawnExePath";
         public const string ARG_NOT_SPAWN_IN_BATCH_MODE = "-notSpawnInBatchMode";
+        // Map server
         public const string ARG_MAP_PORT = "-mapPort";
+        public const string ARG_MAP_MAX_CONNECTIONS = "-mapMaxConnections";
         public const string ARG_SCENE_NAME = "-sceneName";
+        // Chat server
         public const string ARG_CHAT_PORT = "-chatPort";
+        public const string ARG_CHAT_MAX_CONNECTIONS = "-chatMaxConnections";
+        // Start servers
         public const string ARG_START_CENTRAL_SERVER = "-startCentralServer";
         public const string ARG_START_MAP_SPAWN_SERVER = "-startMapSpawnServer";
         public const string ARG_START_MAP_SERVER = "-startMapServer";
@@ -112,6 +119,12 @@ namespace Insthync.MMOG
                     mapSpawnNetworkManager.networkPort = port;
                 }
 
+                if (IsArgsProvided(args, ARG_MAP_SPAWN_MAX_CONNECTIONS))
+                {
+                    var maxConnections = ReadArgsInt(args, ARG_MAP_SPAWN_MAX_CONNECTIONS, 1100);
+                    mapSpawnNetworkManager.maxConnections = maxConnections;
+                }
+
                 if (IsArgsProvided(args, ARG_SPAWN_EXE_PATH))
                 {
                     var exePath = ReadArgs(args, ARG_SPAWN_EXE_PATH, "./Build.exe");
@@ -133,6 +146,12 @@ namespace Insthync.MMOG
                     mapNetworkManager.networkPort = port;
                 }
 
+                if (IsArgsProvided(args, ARG_MAP_MAX_CONNECTIONS))
+                {
+                    var maxConnections = ReadArgsInt(args, ARG_MAP_MAX_CONNECTIONS, 1100);
+                    mapNetworkManager.maxConnections = maxConnections;
+                }
+
                 if (IsArgsProvided(args, ARG_SCENE_NAME))
                 {
                     var sceneName = ReadArgs(args, ARG_SCENE_NAME);
@@ -143,6 +162,12 @@ namespace Insthync.MMOG
                 {
                     var port = ReadArgsInt(args, ARG_CHAT_PORT, 6003);
                     chatNetworkManager.networkPort = port;
+                }
+
+                if (IsArgsProvided(args, ARG_CHAT_MAX_CONNECTIONS))
+                {
+                    var maxConnections = ReadArgsInt(args, ARG_CHAT_MAX_CONNECTIONS, 1100);
+                    chatNetworkManager.maxConnections = maxConnections;
                 }
 
                 var logFileName = "Log";
