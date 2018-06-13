@@ -226,21 +226,6 @@ Prefab:
       propertyPath: mapNetworkManager
       value: 
       objectReference: {fileID: 1127565838}
-    - target: {fileID: 114946005600446132, guid: d2c274d504629844ba9d4993edf72817,
-        type: 2}
-      propertyPath: startCentralOnAwake
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 114946005600446132, guid: d2c274d504629844ba9d4993edf72817,
-        type: 2}
-      propertyPath: startMapSpawnOnAwake
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 114946005600446132, guid: d2c274d504629844ba9d4993edf72817,
-        type: 2}
-      propertyPath: startChatOnAwake
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: d2c274d504629844ba9d4993edf72817, type: 2}
   m_IsPrefabParent: 0
