@@ -12,6 +12,7 @@ namespace Insthync.MMOG
 
         public const string ARG_CENTRAL_ADDRESS = "-centralAddress";
         public const string ARG_CENTRAL_PORT = "-centralPort";
+        public const string ARG_CENTRAL_MAX_CONNECTIONS = "-centralMaxConnections";
         public const string ARG_MACHINE_ADDRESS = "-machineAddress";
         // Map spawn server
         public const string ARG_MAP_SPAWN_PORT = "-mapSpawnPort";
@@ -97,6 +98,7 @@ namespace Insthync.MMOG
                     var address = ReadArgs(args, ARG_CENTRAL_ADDRESS, "localhost");
                     mapSpawnNetworkManager.centralNetworkAddress = address;
                     mapNetworkManager.centralNetworkAddress = address;
+                    chatNetworkManager.centralNetworkAddress = address;
                 }
 
                 if (IsArgsProvided(args, ARG_CENTRAL_PORT))
@@ -105,12 +107,21 @@ namespace Insthync.MMOG
                     centralNetworkManager.networkPort = port;
                     mapSpawnNetworkManager.centralNetworkPort = port;
                     mapNetworkManager.centralNetworkPort = port;
+                    chatNetworkManager.centralNetworkPort = port;
+                }
+
+                if (IsArgsProvided(args, ARG_CENTRAL_MAX_CONNECTIONS))
+                {
+                    var maxConnections = ReadArgsInt(args, ARG_CENTRAL_MAX_CONNECTIONS, 1100);
+                    centralNetworkManager.maxConnections = maxConnections;
                 }
 
                 if (IsArgsProvided(args, ARG_MACHINE_ADDRESS))
                 {
                     var address = ReadArgs(args, ARG_MACHINE_ADDRESS, "127.0.0.1");
                     mapSpawnNetworkManager.machineAddress = address;
+                    mapNetworkManager.machineAddress = address;
+                    chatNetworkManager.machineAddress = address;
                 }
 
                 if (IsArgsProvided(args, ARG_MAP_SPAWN_PORT))
