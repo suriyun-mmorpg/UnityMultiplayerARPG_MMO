@@ -29,8 +29,8 @@ namespace Insthync.MMOG
             {
                 result = new CharacterItem();
                 result.dataId = reader.GetInt32("dataId");
-                result.level = reader.GetInt32("level");
-                result.amount = reader.GetInt32("amount");
+                result.level = reader.GetInt16("level");
+                result.amount = reader.GetInt16("amount");
                 return true;
             }
             result = CharacterItem.Empty;
