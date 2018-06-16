@@ -164,10 +164,12 @@ namespace Insthync.MMOG
 
         public override async Task CreateUserLogin(string username, string password)
         {
-            await ExecuteNonQuery("INSERT INTO userlogin (id, username, password) VALUES (@id, @username, @password)",
+            await ExecuteNonQuery("INSERT INTO userlogin (id, username, password, email, authType) VALUES (@id, @username, @password, @email, @authType)",
                 new MySqlParameter("@id", GenericUtils.GetUniqueId()),
                 new MySqlParameter("@username", username),
-                new MySqlParameter("@password", GenericUtils.GetMD5(password)));
+                new MySqlParameter("@password", GenericUtils.GetMD5(password)),
+                new MySqlParameter("@email", ""),
+                new MySqlParameter("@authType", AUTH_TYPE_NORMAL));
         }
 
         public override async Task<long> FindUsername(string username)

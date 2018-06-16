@@ -243,10 +243,12 @@ namespace Insthync.MMOG
 
         public override async Task CreateUserLogin(string username, string password)
         {
-            await ExecuteNonQuery("INSERT INTO userlogin (id, username, password) VALUES (@id, @username, @password)",
+            await ExecuteNonQuery("INSERT INTO userlogin (id, username, password, email, authType) VALUES (@id, @username, @password, @email, @authType)",
                 new SqliteParameter("@id", GenericUtils.GetUniqueId()),
                 new SqliteParameter("@username", username),
-                new SqliteParameter("@password", GenericUtils.GetMD5(password)));
+                new SqliteParameter("@password", GenericUtils.GetMD5(password)),
+                new SqliteParameter("@email", ""),
+                new SqliteParameter("@authType", AUTH_TYPE_NORMAL));
         }
 
         public override async Task<long> FindUsername(string username)
