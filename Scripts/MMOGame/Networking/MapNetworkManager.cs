@@ -100,13 +100,22 @@ namespace Insthync.MMOG
             base.OnDestroy();
         }
 
-        public override void OnPeerDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
+        public override async void OnPeerDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
         {
+            var connectId = peer.ConnectId;
+            PlayerCharacterEntity playerCharacterEntity;
+            if (!playerCharacters.TryGetValue(connectId, out playerCharacterEntity))
+            {
+                var savingCharacterData = new PlayerCharacterData();
+                playerCharacterEntity.CloneTo(savingCharacterData);
+                saveCharactersTask = SaveCharacter(savingCharacterData);
+                await saveCharactersTask;
+            }
             UnregisterPlayerCharacter(peer);
             SimpleUserCharacterData userData;
-            if (users.TryGetValue(peer.ConnectId, out userData))
+            if (users.TryGetValue(connectId, out userData))
             {
-                users.Remove(peer.ConnectId);
+                users.Remove(connectId);
                 // Remove map user from central server and chat server
                 UpdateMapUser(CentralAppServerRegister.Peer, UpdateMapUserMessage.UpdateType.Remove, userData);
                 if (ChatNetworkManager.IsClientConnected)
