@@ -7,9 +7,9 @@ namespace Insthync.MMOG
 {
     public abstract partial class BaseDatabase : MonoBehaviour
     {
-        public byte AUTH_TYPE_NORMAL = 1;
-        public byte AUTH_TYPE_FACEBOOK = 2;
-        public byte AUTH_TYPE_GGPLAY = 3;
+        public const byte AUTH_TYPE_NORMAL = 1;
+        public const byte AUTH_TYPE_FACEBOOK = 2;
+        public const byte AUTH_TYPE_GGPLAY = 3;
 
         public abstract Task<string> ValidateUserLogin(string username, string password);
         public abstract Task<bool> ValidateAccessToken(string userId, string accessToken);
