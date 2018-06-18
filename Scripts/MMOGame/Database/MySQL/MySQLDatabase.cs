@@ -57,7 +57,7 @@ namespace Insthync.MMOG
                 {
                     cmd.Parameters.Add(arg);
                 }
-                var task = await cmd.ExecuteNonQueryAsync();
+                await cmd.ExecuteNonQueryAsync();
                 result = cmd.LastInsertedId;
             }
             return result;

@@ -154,7 +154,6 @@ namespace Insthync.MMOG
             }
             // Load gameplay scene, we're going to manage maps in gameplay scene later
             // So we can add gameplay UI just once in gameplay scene
-            var characterData = new PlayerCharacterData();
             var playerCharacter = selectedUI.Data as IPlayerCharacterData;
             MMOClientInstance.Singleton.RequestSelectCharacter(playerCharacter.Id, OnSelectCharacter);
         }
@@ -162,9 +161,7 @@ namespace Insthync.MMOG
         private void OnSelectCharacter(AckResponseCode responseCode, BaseAckMessage message)
         {
             var castedMessage = (ResponseSelectCharacterMessage)message;
-
-            var selectableCharacters = new List<PlayerCharacterData>();
-
+            
             switch (responseCode)
             {
                 case AckResponseCode.Error:
@@ -214,9 +211,7 @@ namespace Insthync.MMOG
         private void OnDeleteCharacter(AckResponseCode responseCode, BaseAckMessage message)
         {
             var castedMessage = (ResponseDeleteCharacterMessage)message;
-
-            var selectableCharacters = new List<PlayerCharacterData>();
-
+            
             switch (responseCode)
             {
                 case AckResponseCode.Error:
