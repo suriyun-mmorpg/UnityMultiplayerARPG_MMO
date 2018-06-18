@@ -246,17 +246,7 @@ namespace Insthync.MMOG
         private void Start()
         {
             scenes.Clear();
-            if (GameInstance.Singleton.startScene != null &&
-                !string.IsNullOrEmpty(GameInstance.Singleton.startScene.SceneName))
-                scenes.Add(GameInstance.Singleton.startScene.SceneName);
-
-            foreach (var scene in GameInstance.Singleton.otherScenes)
-            {
-                if (scene != null &&
-                    !string.IsNullOrEmpty(scene.SceneName) &&
-                    !scenes.Contains(scene.SceneName))
-                    scenes.Add(scene.SceneName);
-            }
+            scenes.AddRange(GameInstance.Singleton.GetGameScenes());
 
             if (startingCentralServer)
                 StartCentralServer();
