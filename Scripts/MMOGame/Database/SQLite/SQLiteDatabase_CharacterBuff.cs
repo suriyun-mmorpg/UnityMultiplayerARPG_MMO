@@ -17,8 +17,8 @@ namespace Insthync.MMOG
             {
                 result = new CharacterBuff();
                 result.id = reader.GetString("id");
-                result.characterId = reader.GetInt64("characterId").ToString();
-                result.type = (BuffType)reader.GetByte("type");
+                result.characterId = reader.GetString("characterId");
+                result.type = (BuffType)reader.GetSByte("type");
                 result.dataId = reader.GetInt32("dataId");
                 result.level = reader.GetInt16("level");
                 result.buffRemainsDuration = reader.GetFloat("buffRemainsDuration");

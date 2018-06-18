@@ -10,7 +10,7 @@ namespace Insthync.MMOG
     {
         private async Task CreateCharacterItem(int idx, string characterId, InventoryType inventoryType, CharacterItem characterItem)
         {
-            await ExecuteNonQuery("INSERT INTO characteritem (id, idx, inventoryType, characterId, dataId, level, amount) VALUES (@id, @idx, @inventoryType, @characterId, @dataId, @level, @amount)",
+            await ExecuteNonQuery("INSERT INTO characteritem (id, idx, inventoryType, characterId, dataId, level, amount, durability) VALUES (@id, @idx, @inventoryType, @characterId, @dataId, @level, @amount, @durability)",
                 new SqliteParameter("@id", characterId + "_" + (byte)inventoryType + "_" + idx),
                 new SqliteParameter("@idx", idx),
                 new SqliteParameter("@inventoryType", (byte)inventoryType),

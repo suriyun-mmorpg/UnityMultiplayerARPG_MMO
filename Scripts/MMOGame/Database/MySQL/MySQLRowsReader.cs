@@ -63,6 +63,16 @@ namespace Insthync.MMOG
             return (byte)dataDict[currentRow][columnName];
         }
 
+        public sbyte GetSByte(int index)
+        {
+            return (sbyte)data[currentRow][index];
+        }
+
+        public sbyte GetSByte(string columnName)
+        {
+            return (sbyte)dataDict[currentRow][columnName];
+        }
+
         public char GetChar(int index)
         {
             return (char)data[currentRow][index];

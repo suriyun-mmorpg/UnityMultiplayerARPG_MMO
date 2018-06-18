@@ -17,7 +17,7 @@ namespace Insthync.MMOG
             {
                 result = new CharacterSkill();
                 result.dataId = reader.GetInt32("dataId");
-                result.level = reader.GetInt16("level");
+                result.level = (short)reader.GetInt32("level");
                 result.coolDownRemainsDuration = reader.GetFloat("coolDownRemainsDuration");
                 return true;
             }

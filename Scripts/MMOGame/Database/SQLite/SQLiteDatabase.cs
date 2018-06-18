@@ -146,7 +146,7 @@ namespace Insthync.MMOG
 
             // Update data
             if (!IsColumnExist("characteritem", "durability"))
-                await ExecuteNonQuery("ALTER TABLE characteritem ADD durability REAL NOT NULL AFTER amount;");
+                await ExecuteNonQuery("ALTER TABLE characteritem ADD durability REAL NOT NULL DEFAULT 0;");
         }
 
         private bool IsColumnExist(string tableName, string findingColumn)

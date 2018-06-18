@@ -17,7 +17,7 @@ namespace Insthync.MMOG
             {
                 result = new CharacterHotkey();
                 result.hotkeyId = reader.GetString("hotkeyId");
-                result.type = (HotkeyType)reader.GetByte("type");
+                result.type = (HotkeyType)reader.GetSByte("type");
                 result.dataId = reader.GetInt32("dataId");
                 return true;
             }

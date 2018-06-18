@@ -55,12 +55,22 @@ namespace Insthync.MMOG
 
         public byte GetByte(int index)
         {
-            return (byte)data[currentRow][index];
+            return (byte)(long)data[currentRow][index];
         }
 
         public byte GetByte(string columnName)
         {
-            return (byte)dataDict[currentRow][columnName];
+            return (byte)(long)dataDict[currentRow][columnName];
+        }
+
+        public sbyte GetSByte(int index)
+        {
+            return (sbyte)(long)data[currentRow][index];
+        }
+
+        public sbyte GetSByte(string columnName)
+        {
+            return (sbyte)(long)dataDict[currentRow][columnName];
         }
 
         public char GetChar(int index)
@@ -95,92 +105,92 @@ namespace Insthync.MMOG
 
         public short GetInt16(int index)
         {
-            return (short)(long)data[currentRow][index];
+            try { return (short)(long)data[currentRow][index]; } catch { return 0; }
         }
 
         public short GetInt16(string columnName)
         {
-            return (short)(long)dataDict[currentRow][columnName];
+            try { return (short)(long)dataDict[currentRow][columnName]; } catch { return 0; }
         }
 
         public int GetInt32(int index)
         {
-            return (int)(long)data[currentRow][index];
+            try { return (int)(long)data[currentRow][index]; } catch { return 0; }
         }
 
         public int GetInt32(string columnName)
         {
-            return (int)(long)dataDict[currentRow][columnName];
+            try { return (int)(long)dataDict[currentRow][columnName]; } catch { return 0; }
         }
 
         public long GetInt64(int index)
         {
-            return (long)data[currentRow][index];
+            try { return (long)data[currentRow][index]; } catch { return 0; }
         }
 
         public long GetInt64(string columnName)
         {
-            return (long)dataDict[currentRow][columnName];
+            try { return (long)dataDict[currentRow][columnName]; } catch { return 0; }
         }
 
         public ushort GetUInt16(int index)
         {
-            return (ushort)(long)data[currentRow][index];
+            try { return (ushort)(long)data[currentRow][index]; } catch { return 0; }
         }
 
         public ushort GetUInt16(string columnName)
         {
-            return (ushort)(long)dataDict[currentRow][columnName];
+            try { return (ushort)(long)dataDict[currentRow][columnName]; } catch { return 0; }
         }
 
         public uint GetUInt32(int index)
         {
-            return (uint)(long)data[currentRow][index];
+            try { return (uint)(long)data[currentRow][index]; } catch { return 0; }
         }
 
         public uint GetUInt32(string columnName)
         {
-            return (uint)(long)dataDict[currentRow][columnName];
+            try { return (uint)(long)dataDict[currentRow][columnName]; } catch { return 0; }
         }
 
         public ulong GetUInt64(int index)
         {
-            return (ulong)(long)data[currentRow][index];
+            try { return (ulong)(long)data[currentRow][index]; } catch { return 0; }
         }
 
         public ulong GetUInt64(string columnName)
         {
-            return (ulong)(long)dataDict[currentRow][columnName];
+            try { return (ulong)(long)dataDict[currentRow][columnName]; } catch { return 0; }
         }
 
         public decimal GetDecimal(int index)
         {
-            return (decimal)(float)data[currentRow][index];
+            try { return (decimal)(float)data[currentRow][index]; } catch { return 0; }
         }
 
         public decimal GetDecimal(string columnName)
         {
-            return (decimal)(float)dataDict[currentRow][columnName];
+            try { return (decimal)(float)dataDict[currentRow][columnName]; } catch { return 0; }
         }
 
         public float GetFloat(int index)
         {
-            return (float)data[currentRow][index];
+            try { return (float)data[currentRow][index]; } catch { return 0; }
         }
 
         public float GetFloat(string columnName)
         {
-            return (float)dataDict[currentRow][columnName];
+            try { return (float)dataDict[currentRow][columnName]; } catch { return 0; }
         }
 
         public double GetDouble(int index)
         {
-            return (float)data[currentRow][index];
+            try { return (float)data[currentRow][index]; } catch { return 0; }
         }
 
         public double GetDouble(string columnName)
         {
-            return (float)dataDict[currentRow][columnName];
+            try { return (float)dataDict[currentRow][columnName]; } catch { return 0; }
         }
 
         public void ResetReader()

@@ -10,7 +10,7 @@ namespace Insthync.MMOG
     {
         private async Task CreateCharacterItem(MySqlConnection connection, int idx, string characterId, InventoryType inventoryType, CharacterItem characterItem)
         {
-            await ExecuteNonQuery(connection, "INSERT INTO characteritem (id, idx, inventoryType, characterId, dataId, level, amount) VALUES (@id, @idx, @inventoryType, @characterId, @dataId, @level, @amount)",
+            await ExecuteNonQuery(connection, "INSERT INTO characteritem (id, idx, inventoryType, characterId, dataId, level, amount, durability) VALUES (@id, @idx, @inventoryType, @characterId, @dataId, @level, @amount, @durability)",
                 new MySqlParameter("@id", characterId + "_" + (byte)inventoryType + "_" + idx),
                 new MySqlParameter("@idx", idx),
                 new MySqlParameter("@inventoryType", (byte)inventoryType),
@@ -30,8 +30,8 @@ namespace Insthync.MMOG
             {
                 result = new CharacterItem();
                 result.dataId = reader.GetInt32("dataId");
-                result.level = reader.GetInt16("level");
-                result.amount = reader.GetInt16("amount");
+                result.level = (short)reader.GetInt32("level");
+                result.amount = (short)reader.GetInt32("amount");
                 result.durability = reader.GetFloat("durability");
                 return true;
             }

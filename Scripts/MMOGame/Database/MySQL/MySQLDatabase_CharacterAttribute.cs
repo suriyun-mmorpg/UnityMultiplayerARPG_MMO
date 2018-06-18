@@ -17,7 +17,7 @@ namespace Insthync.MMOG
             {
                 result = new CharacterAttribute();
                 result.dataId = reader.GetInt32("dataId");
-                result.amount = reader.GetInt16("amount");
+                result.amount = (short)reader.GetInt32("amount");
                 return true;
             }
             result = CharacterAttribute.Empty;
