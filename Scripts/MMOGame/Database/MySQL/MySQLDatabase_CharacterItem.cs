@@ -17,7 +17,8 @@ namespace Insthync.MMOG
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@dataId", characterItem.dataId),
                 new MySqlParameter("@level", characterItem.level),
-                new MySqlParameter("@amount", characterItem.amount));
+                new MySqlParameter("@amount", characterItem.amount),
+                new MySqlParameter("@durability", characterItem.durability));
         }
 
         private bool ReadCharacterItem(MySQLRowsReader reader, out CharacterItem result, bool resetReader = true)
@@ -31,6 +32,7 @@ namespace Insthync.MMOG
                 result.dataId = reader.GetInt32("dataId");
                 result.level = reader.GetInt16("level");
                 result.amount = reader.GetInt16("amount");
+                result.durability = reader.GetFloat("durability");
                 return true;
             }
             result = CharacterItem.Empty;

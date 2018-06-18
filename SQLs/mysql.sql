@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Jun 16, 2018 at 10:06 PM
+-- Generation Time: Jun 18, 2018 at 06:49 AM
 -- Server version: 10.1.28-MariaDB
 -- PHP Version: 7.1.11
 
@@ -85,6 +85,7 @@ CREATE TABLE `characteritem` (
   `dataId` int(11) NOT NULL,
   `level` int(11) NOT NULL,
   `amount` int(11) NOT NULL,
+  `durability` float NOT NULL,
   `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;

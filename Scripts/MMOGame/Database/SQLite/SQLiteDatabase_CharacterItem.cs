@@ -17,7 +17,8 @@ namespace Insthync.MMOG
                 new SqliteParameter("@characterId", characterId),
                 new SqliteParameter("@dataId", characterItem.dataId),
                 new SqliteParameter("@level", characterItem.level),
-                new SqliteParameter("@amount", characterItem.amount));
+                new SqliteParameter("@amount", characterItem.amount),
+                new SqliteParameter("@durability", characterItem.durability));
         }
 
         private bool ReadCharacterItem(SQLiteRowsReader reader, out CharacterItem result, bool resetReader = true)
@@ -31,6 +32,7 @@ namespace Insthync.MMOG
                 result.dataId = reader.GetInt32("dataId");
                 result.level = reader.GetInt16("level");
                 result.amount = reader.GetInt16("amount");
+                result.durability = reader.GetFloat("durability");
                 return true;
             }
             result = CharacterItem.Empty;

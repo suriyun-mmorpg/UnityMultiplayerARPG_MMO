@@ -1,4 +1,5 @@
 ﻿using Mono.Data.Sqlite;
+using System.Data;
 using System.IO;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -142,6 +143,32 @@ namespace Insthync.MMOG
             )");
 
             await ExecuteNonQuery("END");
+
+            // Update data
+            if (!IsColumnExist("characteritem", "durability"))
+                await ExecuteNonQuery("ALTER TABLE characteritem ADD durability REAL NOT NULL AFTER amount;");
+        }
+
+        private bool IsColumnExist(string tableName, string findingColumn)
+        {
+            using (var cmd = new SqliteCommand("PRAGMA table_info(" + tableName + ");", connection))
+            {
+                var table = new DataTable();
+
+                SqliteDataAdapter adp = null;
+                try
+                {
+                    adp = new SqliteDataAdapter(cmd);
+                    adp.Fill(table);
+                    for (int i = 0; i < table.Rows.Count; ++i)
+                    {
+                        if (table.Rows[i]["name"].ToString().Equals(findingColumn))
+                            return true;
+                    }
+                }
+                catch { }
+            }
+            return false;
         }
 
         public string GetConnectionString()
