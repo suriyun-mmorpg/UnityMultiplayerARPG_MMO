@@ -59,8 +59,10 @@ namespace Insthync.MMOG
         public string AppConnectKey { get { return connectKey; } }
         public string AppExtra { get { return !string.IsNullOrEmpty(Assets.onlineScene.SceneName) ? Assets.onlineScene.SceneName : SceneManager.GetActiveScene().name; } }
         public CentralServerPeerType PeerType { get { return CentralServerPeerType.MapServer; } }
-        private float lastSaveTime;
+        private float lastSaveCharacterTime;
+        private float lastSaveWorldTime;
         private Task saveCharactersTask;
+        private Task saveWorldTask;
         // Listing
         private readonly Dictionary<string, CentralServerPeerInfo> mapServerPeersBySceneName = new Dictionary<string, CentralServerPeerInfo>();
         private readonly Dictionary<long, SimpleUserCharacterData> users = new Dictionary<long, SimpleUserCharacterData>();
@@ -78,12 +80,20 @@ namespace Insthync.MMOG
             if (IsServer)
             {
                 CentralAppServerRegister.PollEvents();
-                if (Time.unscaledTime - lastSaveTime > autoSaveDuration)
+                if (Time.unscaledTime - lastSaveCharacterTime > autoSaveDuration)
                 {
                     if (saveCharactersTask == null || saveCharactersTask.IsCompleted)
                     {
                         saveCharactersTask = SaveCharacters();
-                        lastSaveTime = Time.unscaledTime;
+                        lastSaveCharacterTime = Time.unscaledTime;
+                    }
+                }
+                if (Time.unscaledTime - lastSaveWorldTime > autoSaveDuration)
+                {
+                    if (saveWorldTask == null || saveWorldTask.IsCompleted)
+                    {
+                        saveWorldTask = SaveWorld();
+                        lastSaveWorldTime = Time.unscaledTime;
                     }
                 }
             }
@@ -332,6 +342,12 @@ namespace Insthync.MMOG
             }
             await Task.WhenAll(tasks);
             Debug.Log("Characters Saved");
+        }
+
+        private async Task SaveWorld()
+        {
+            // Save building entities / Tree / Rocks
+
         }
         #endregion
     }

@@ -66,10 +66,10 @@ namespace Insthync.MMOG
             var selectableCharacters = GameInstance.PlayerCharacters.Values.ToList();
             CacheList.Generate(selectableCharacters, (index, character, ui) =>
             {
-                var dataId = character.HashId;
+                var dataId = character.DataId;
                 var characterData = new PlayerCharacterData();
                 characterData.DataId = dataId;
-                characterData.SetNewCharacterData(character.title, character.HashId);
+                characterData.SetNewCharacterData(character.title, character.DataId);
                 var uiCharacter = ui.GetComponent<UICharacter>();
                 uiCharacter.Setup(characterData, dataId);
                 // Select trigger when add first entry so deactivate all models is okay beacause first model will active
