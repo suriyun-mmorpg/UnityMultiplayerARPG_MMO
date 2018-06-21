@@ -110,18 +110,10 @@ namespace Insthync.MMOG
             base.OnDestroy();
         }
 
-        public override async void OnPeerDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
+        public override void UnregisterPlayerCharacter(NetPeer peer)
         {
             var connectId = peer.ConnectId;
-            PlayerCharacterEntity playerCharacterEntity;
-            if (!playerCharacters.TryGetValue(connectId, out playerCharacterEntity))
-            {
-                var savingCharacterData = new PlayerCharacterData();
-                playerCharacterEntity.CloneTo(savingCharacterData);
-                saveCharactersTask = SaveCharacter(savingCharacterData);
-                await saveCharactersTask;
-            }
-            UnregisterPlayerCharacter(peer);
+            // Send remove character from map server
             SimpleUserCharacterData userData;
             if (users.TryGetValue(connectId, out userData))
             {
@@ -131,6 +123,22 @@ namespace Insthync.MMOG
                 if (ChatNetworkManager.IsClientConnected)
                     UpdateMapUser(ChatNetworkManager.Client.Peer, UpdateMapUserMessage.UpdateType.Remove, userData);
             }
+            base.UnregisterPlayerCharacter(peer);
+        }
+
+        public override async void OnPeerDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
+        {
+            var connectId = peer.ConnectId;
+            // Save player character data
+            PlayerCharacterEntity playerCharacterEntity;
+            if (!playerCharacters.TryGetValue(connectId, out playerCharacterEntity))
+            {
+                var savingCharacterData = new PlayerCharacterData();
+                playerCharacterEntity.CloneTo(savingCharacterData);
+                saveCharactersTask = SaveCharacter(savingCharacterData);
+                await saveCharactersTask;
+            }
+            UnregisterPlayerCharacter(peer);
             base.OnPeerDisconnected(peer, disconnectInfo);
         }
 
@@ -163,20 +171,22 @@ namespace Insthync.MMOG
                 Peers.TryGetValue(connectId, out peer) &&
                 mapServerPeersBySceneName.TryGetValue(mapName, out peerInfo))
             {
-                peersByCharacterName.Remove(playerCharacterEntity.CharacterName);
-                playerCharacters.Remove(connectId);
                 var message = new MMOWarpMessage();
                 message.sceneName = mapName;
                 message.networkAddress = peerInfo.networkAddress;
                 message.networkPort = peerInfo.networkPort;
                 message.connectKey = peerInfo.connectKey;
                 LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MsgTypes.Warp, message);
+                // Save character current map / position
                 var savingCharacterData = new PlayerCharacterData();
                 playerCharacterEntity.CloneTo(savingCharacterData);
                 savingCharacterData.CurrentMapName = mapName;
                 savingCharacterData.CurrentPosition = position;
                 saveCharactersTask = SaveCharacter(savingCharacterData);
                 await saveCharactersTask;
+                // Unregister player character
+                UnregisterPlayerCharacter(peer);
+                // Destroy character from server
                 playerCharacterEntity.NetworkDestroy();
             }
         }
