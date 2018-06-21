@@ -27,6 +27,7 @@ namespace Insthync.MMOG
             {
                 if (!spawningMapAcks.ContainsKey(scene) && !mapServerPeersBySceneName.ContainsKey(scene))
                     spawningMapAcks[scene] = RequestSpawnMap(peer, scene, OnRequestSpawnMap);
+                await Task.Delay(50);
             }
         }
 
