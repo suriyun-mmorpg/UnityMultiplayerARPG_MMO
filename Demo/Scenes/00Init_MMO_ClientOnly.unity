@@ -566,11 +566,7 @@ MonoBehaviour:
     type: 2}
   itemDropEntityPrefab: {fileID: 114247390284341630, guid: 611b907cf80c87a4eb9e0d5d4a8688f5,
     type: 2}
-  minimapCameraPrefab: {fileID: 114548782499701980, guid: 280aed852e1f49946840d29f4118a058,
-    type: 2}
-  gameplayCameraPrefab: {fileID: 114548782499701980, guid: 9e450ece85c264c48a1f642595379ac8,
-    type: 2}
-  targetObject: {fileID: 1351887008497814, guid: 2ceafc14cf0f8c044a133a016b305afa,
+  buildingEntityPrefab: {fileID: 114110221654115956, guid: 28c0101ec328c9c49a6a5df6fd90ac0c,
     type: 2}
   uiSceneGameplayPrefab: {fileID: 114088817493988554, guid: 4af36d4bdf0cf07409f4412130b793ec,
     type: 2}
