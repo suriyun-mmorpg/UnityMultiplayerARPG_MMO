@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Jun 18, 2018 at 06:49 AM
+-- Generation Time: Jun 22, 2018 at 06:19 PM
 -- Server version: 10.1.28-MariaDB
 -- PHP Version: 7.1.11
 
@@ -32,8 +32,8 @@ CREATE TABLE `characterattribute` (
   `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `idx` int(11) NOT NULL,
   `characterId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-  `dataId` int(11) NOT NULL,
-  `amount` int(11) NOT NULL,
+  `dataId` int(11) NOT NULL DEFAULT '0',
+  `amount` int(11) NOT NULL DEFAULT '0',
   `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -47,10 +47,10 @@ CREATE TABLE `characterattribute` (
 CREATE TABLE `characterbuff` (
   `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `characterId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-  `type` tinyint(4) NOT NULL,
-  `dataId` int(11) NOT NULL,
-  `level` int(11) NOT NULL,
-  `buffRemainsDuration` float NOT NULL,
+  `type` tinyint(4) NOT NULL DEFAULT '0',
+  `dataId` int(11) NOT NULL DEFAULT '0',
+  `level` int(11) NOT NULL DEFAULT '1',
+  `buffRemainsDuration` float NOT NULL DEFAULT '0',
   `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -65,8 +65,8 @@ CREATE TABLE `characterhotkey` (
   `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `characterId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `hotkeyId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-  `type` tinyint(4) NOT NULL,
-  `dataId` int(11) NOT NULL,
+  `type` tinyint(4) NOT NULL DEFAULT '0',
+  `dataId` int(11) NOT NULL DEFAULT '0',
   `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -80,12 +80,12 @@ CREATE TABLE `characterhotkey` (
 CREATE TABLE `characteritem` (
   `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `idx` int(11) NOT NULL,
-  `inventoryType` tinyint(4) NOT NULL,
+  `inventoryType` tinyint(4) NOT NULL DEFAULT '0',
   `characterId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-  `dataId` int(11) NOT NULL,
-  `level` int(11) NOT NULL,
-  `amount` int(11) NOT NULL,
-  `durability` float NOT NULL,
+  `dataId` int(11) NOT NULL DEFAULT '0',
+  `level` int(11) NOT NULL DEFAULT '1',
+  `amount` int(11) NOT NULL DEFAULT '0',
+  `durability` float NOT NULL DEFAULT '0',
   `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -100,8 +100,8 @@ CREATE TABLE `characterquest` (
   `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `idx` int(11) NOT NULL,
   `characterId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-  `dataId` int(11) NOT NULL,
-  `isComplete` tinyint(1) NOT NULL,
+  `dataId` int(11) NOT NULL DEFAULT '0',
+  `isComplete` tinyint(1) NOT NULL DEFAULT '0',
   `killedMonsters` text COLLATE utf8_unicode_ci NOT NULL,
   `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -116,26 +116,26 @@ CREATE TABLE `characterquest` (
 CREATE TABLE `characters` (
   `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `userId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-  `dataId` int(11) NOT NULL,
-  `characterName` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
-  `level` int(11) NOT NULL,
-  `exp` int(11) NOT NULL,
-  `currentHp` int(11) NOT NULL,
-  `currentMp` int(11) NOT NULL,
-  `currentStamina` int(11) NOT NULL,
-  `currentFood` int(11) NOT NULL,
-  `currentWater` int(11) NOT NULL,
-  `statPoint` int(11) NOT NULL,
-  `skillPoint` int(11) NOT NULL,
-  `gold` int(11) NOT NULL,
-  `currentMapName` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-  `currentPositionX` float NOT NULL,
-  `currentPositionY` float NOT NULL,
-  `currentPositionZ` float NOT NULL,
-  `respawnMapName` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-  `respawnPositionX` float NOT NULL,
-  `respawnPositionY` float NOT NULL,
-  `respawnPositionZ` float NOT NULL,
+  `dataId` int(11) NOT NULL DEFAULT '0',
+  `characterName` varchar(32) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  `level` int(11) NOT NULL DEFAULT '1',
+  `exp` int(11) NOT NULL DEFAULT '0',
+  `currentHp` int(11) NOT NULL DEFAULT '0',
+  `currentMp` int(11) NOT NULL DEFAULT '0',
+  `currentStamina` int(11) NOT NULL DEFAULT '0',
+  `currentFood` int(11) NOT NULL DEFAULT '0',
+  `currentWater` int(11) NOT NULL DEFAULT '0',
+  `statPoint` int(11) NOT NULL DEFAULT '0',
+  `skillPoint` int(11) NOT NULL DEFAULT '0',
+  `gold` int(11) NOT NULL DEFAULT '0',
+  `currentMapName` varchar(50) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  `currentPositionX` float NOT NULL DEFAULT '0',
+  `currentPositionY` float NOT NULL DEFAULT '0',
+  `currentPositionZ` float NOT NULL DEFAULT '0',
+  `respawnMapName` varchar(50) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  `respawnPositionX` float NOT NULL DEFAULT '0',
+  `respawnPositionY` float NOT NULL DEFAULT '0',
+  `respawnPositionZ` float NOT NULL DEFAULT '0',
   `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -150,9 +150,9 @@ CREATE TABLE `characterskill` (
   `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `idx` int(11) NOT NULL,
   `characterId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-  `dataId` int(11) NOT NULL,
-  `level` int(11) NOT NULL,
-  `coolDownRemainsDuration` float NOT NULL,
+  `dataId` int(11) NOT NULL DEFAULT '0',
+  `level` int(11) NOT NULL DEFAULT '1',
+  `coolDownRemainsDuration` float NOT NULL DEFAULT '0',
   `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -169,7 +169,7 @@ CREATE TABLE `userlogin` (
   `password` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
   `email` varchar(50) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
   `authType` tinyint(4) NOT NULL DEFAULT '1',
-  `accessToken` varchar(36) COLLATE utf8_unicode_ci NOT NULL,
+  `accessToken` varchar(36) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
   `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
