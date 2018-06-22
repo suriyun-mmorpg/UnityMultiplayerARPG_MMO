@@ -625,6 +625,16 @@ MonoBehaviour:
     amount: 1
   - item: {fileID: 11400000, guid: 0df782e70d43dc54d8a6bc2d6a212f89, type: 2}
     amount: 99
+  - item: {fileID: 11400000, guid: 2d57e318a4843d64d8d3924124b94368, type: 2}
+    amount: 25
+  - item: {fileID: 11400000, guid: e4e881cff53fe054f830d67ad95dd3d0, type: 2}
+    amount: 25
+  - item: {fileID: 11400000, guid: 05fd047386612f342aa61c5ddcf274d1, type: 2}
+    amount: 25
+  - item: {fileID: 11400000, guid: f0ba2e9ab5115a74184f1805934e122d, type: 2}
+    amount: 25
+  - item: {fileID: 11400000, guid: 0a439d3c316c36f4cae03a253c8839d4, type: 2}
+    amount: 25
   homeScene:
     sceneAsset: {fileID: 102900000, guid: d529c814bb9fcd14289ac4141b27e951, type: 3}
     sceneName: 01Home_MMO
