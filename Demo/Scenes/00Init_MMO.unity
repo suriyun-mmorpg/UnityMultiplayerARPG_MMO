@@ -634,16 +634,21 @@ MonoBehaviour:
     tag: NpcTag
   itemDropTag:
     tag: ItemDropTag
+  buildingTag:
+    tag: BuildingTag
   characterLayer:
     layerIndex: 8
   itemDropLayer:
     layerIndex: 9
+  buildingLayer:
+    layerIndex: 13
   nonTargetingLayers:
   - layerIndex: 11
   itemAppearDuration: 60
   pickUpItemDistance: 2
   dropDistance: 1
   conversationDistance: 3
+  buildDistance: 10
   levelUpEffect: {fileID: 114843870614705530, guid: 6f6e255b4877f874c985ed9fb46293a1,
     type: 2}
   startGold: 2000
