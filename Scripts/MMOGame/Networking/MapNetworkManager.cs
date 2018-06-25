@@ -374,12 +374,8 @@ namespace Insthync.MMOG
         public override async void CreateBuildingEntity(BuildingSaveData saveData, bool initialize)
         {
             base.CreateBuildingEntity(saveData, initialize);
-            Debug.LogError("test " + initialize);
             if (!initialize)
-            {
                 await Database.CreateBuilding(Assets.onlineScene.SceneName, saveData);
-                Debug.LogError("test 2");
-            }
         }
 
         public override async void DestroyBuildingEntity(string id)
