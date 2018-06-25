@@ -63,11 +63,44 @@ namespace Insthync.MMOG
             return result;
         }
 
-        public override async Task DeleteBuilding(string id)
+        public override async Task UpdateBuilding(string mapName, IBuildingSaveData saveData)
         {
             var connection = NewConnection();
             connection.Open();
-            await ExecuteNonQuery(connection, "DELETE FROM buildings WHERE id=@id", new MySqlParameter("@id", id));
+            await ExecuteNonQuery(connection, "UPDATE buildings SET " +
+                "parentId=@parentId, " +
+                "dataId=@dataId, " +
+                "currentHp=@currentHp, " +
+                "positionX=@positionX, " +
+                "positionY=@positionY, " +
+                "positionZ=@positionZ, " +
+                "rotationX=@rotationX, " +
+                "rotationY=@rotationY, " +
+                "rotationZ=@rotationZ, " +
+                "creatorId=@creatorId, " +
+                "creatorName=@creatorName " +
+                "WHERE id=@id AND mapName=@mapName",
+                new MySqlParameter("@id", saveData.Id),
+                new MySqlParameter("@parentId", saveData.ParentId),
+                new MySqlParameter("@dataId", saveData.DataId),
+                new MySqlParameter("@currentHp", saveData.CurrentHp),
+                new MySqlParameter("@mapName", mapName),
+                new MySqlParameter("@positionX", saveData.Position.x),
+                new MySqlParameter("@positionY", saveData.Position.y),
+                new MySqlParameter("@positionZ", saveData.Position.z),
+                new MySqlParameter("@rotationX", saveData.Rotation.eulerAngles.x),
+                new MySqlParameter("@rotationY", saveData.Rotation.eulerAngles.y),
+                new MySqlParameter("@rotationZ", saveData.Rotation.eulerAngles.z),
+                new MySqlParameter("@creatorId", saveData.CreatorId),
+                new MySqlParameter("@creatorName", saveData.CreatorName));
+            connection.Close();
+        }
+
+        public override async Task DeleteBuilding(string mapName, string id)
+        {
+            var connection = NewConnection();
+            connection.Open();
+            await ExecuteNonQuery(connection, "DELETE FROM buildings WHERE id=@id AND mapName=@mapName", new MySqlParameter("@id", id), new MySqlParameter("@mapName", mapName));
             connection.Close();
         }
     }

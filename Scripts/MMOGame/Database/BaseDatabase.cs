@@ -35,6 +35,7 @@ namespace Insthync.MMOG
 
         public abstract Task CreateBuilding(string mapName, BuildingSaveData saveData);
         public abstract Task<List<BuildingSaveData>> ReadBuildings(string mapName);
-        public abstract Task DeleteBuilding(string id);
+        public abstract Task UpdateBuilding(string mapName, IBuildingSaveData saveData);
+        public abstract Task DeleteBuilding(string mapName, string id);
     }
 }

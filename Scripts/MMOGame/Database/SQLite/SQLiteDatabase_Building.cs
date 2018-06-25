@@ -32,7 +32,6 @@ namespace Insthync.MMOG
 
         public override async Task CreateBuilding(string mapName, BuildingSaveData saveData)
         {
-            connection.Open();
             await ExecuteNonQuery("INSERT INTO buildings (id, parentId, dataId, currentHp, mapName, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, creatorId, creatorName) VALUES (@id, @parentId, @dataId, @currentHp, @mapName, @positionX, @positionY, @positionZ, @rotationX, @rotationY, @rotationZ, @creatorId, @creatorName)",
                 new SqliteParameter("@id", saveData.Id),
                 new SqliteParameter("@parentId", saveData.ParentId),
@@ -61,9 +60,39 @@ namespace Insthync.MMOG
             return result;
         }
 
-        public override async Task DeleteBuilding(string id)
+        public override async Task UpdateBuilding(string mapName, IBuildingSaveData saveData)
         {
-            await ExecuteNonQuery("DELETE FROM buildings WHERE id=@id", new SqliteParameter("@id", id));
+            await ExecuteNonQuery("UPDATE buildings SET " +
+                "parentId=@parentId, " +
+                "dataId=@dataId, " +
+                "currentHp=@currentHp, " +
+                "positionX=@positionX, " +
+                "positionY=@positionY, " +
+                "positionZ=@positionZ, " +
+                "rotationX=@rotationX, " +
+                "rotationY=@rotationY, " +
+                "rotationZ=@rotationZ, " +
+                "creatorId=@creatorId, " +
+                "creatorName=@creatorName " +
+                "WHERE id=@id AND mapName=@mapName",
+                new SqliteParameter("@id", saveData.Id),
+                new SqliteParameter("@parentId", saveData.ParentId),
+                new SqliteParameter("@dataId", saveData.DataId),
+                new SqliteParameter("@currentHp", saveData.CurrentHp),
+                new SqliteParameter("@mapName", mapName),
+                new SqliteParameter("@positionX", saveData.Position.x),
+                new SqliteParameter("@positionY", saveData.Position.y),
+                new SqliteParameter("@positionZ", saveData.Position.z),
+                new SqliteParameter("@rotationX", saveData.Rotation.eulerAngles.x),
+                new SqliteParameter("@rotationY", saveData.Rotation.eulerAngles.y),
+                new SqliteParameter("@rotationZ", saveData.Rotation.eulerAngles.z),
+                new SqliteParameter("@creatorId", saveData.CreatorId),
+                new SqliteParameter("@creatorName", saveData.CreatorName));
+        }
+
+        public override async Task DeleteBuilding(string mapName, string id)
+        {
+            await ExecuteNonQuery("DELETE FROM buildings WHERE id=@id AND mapName=@mapName", new SqliteParameter("@id", id), new SqliteParameter("@mapName", mapName));
         }
     }
 }

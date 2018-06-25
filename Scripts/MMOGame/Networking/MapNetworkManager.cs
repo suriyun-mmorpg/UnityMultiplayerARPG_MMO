@@ -361,7 +361,41 @@ namespace Insthync.MMOG
         private async Task SaveWorld()
         {
             // Save building entities / Tree / Rocks
+            if (saveWorldTask != null && !saveWorldTask.IsCompleted)
+                await saveWorldTask;
+            var tasks = new List<Task>();
+            foreach (var buildingEntity in buildingEntities.Values)
+            {
+                tasks.Add(Database.UpdateBuilding(Assets.onlineScene.SceneName, buildingEntity));
+            }
+            await Task.WhenAll(tasks);
+        }
 
+        public override async void CreateBuildingEntity(BuildingSaveData saveData, bool initialize)
+        {
+            base.CreateBuildingEntity(saveData, initialize);
+            Debug.LogError("test " + initialize);
+            if (!initialize)
+            {
+                await Database.CreateBuilding(Assets.onlineScene.SceneName, saveData);
+                Debug.LogError("test 2");
+            }
+        }
+
+        public override async void DestroyBuildingEntity(string id)
+        {
+            base.DestroyBuildingEntity(id);
+            await Database.DeleteBuilding(Assets.onlineScene.SceneName, id);
+        }
+
+        public override async void OnServerOnlineSceneLoaded()
+        {
+            base.OnServerOnlineSceneLoaded();
+            var buildings = await Database.ReadBuildings(Assets.onlineScene.SceneName);
+            foreach (var building in buildings)
+            {
+                CreateBuildingEntity(building, true);
+            }
         }
         #endregion
     }
