@@ -32,5 +32,9 @@ namespace Insthync.MMOG
         public abstract Task UpdateCharacter(IPlayerCharacterData characterData);
         public abstract Task DeleteCharacter(string userId, string id);
         public abstract Task<long> FindCharacterName(string characterName);
+
+        public abstract Task CreateBuilding(string mapName, BuildingSaveData saveData);
+        public abstract Task<List<BuildingSaveData>> ReadBuildings(string mapName);
+        public abstract Task DeleteBuilding(string id);
     }
 }

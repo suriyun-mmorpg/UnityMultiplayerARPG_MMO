@@ -142,6 +142,24 @@ namespace Insthync.MMOG
               updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
 
+            await ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS buildings (
+              id TEXT NOT NULL PRIMARY KEY,
+              parentId TEXT NOT NULL,
+              dataId INTEGER NOT NULL,
+              currentHp INTEGER NOT NULL,
+              mapName TEXT NOT NULL,
+              positionX REAL NOT NULL,
+              positionY REAL NOT NULL,
+              positionZ REAL NOT NULL,
+              rotationX REAL NOT NULL,
+              rotationY REAL NOT NULL,
+              rotationZ REAL NOT NULL,
+              creatorId TEXT NOT NULL,
+              creatorName TEXT NOT NULL,
+              createAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+              updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+            )");
+
             await ExecuteNonQuery("END");
 
             // Update data

@@ -107,6 +107,10 @@ namespace Insthync.MMOG
                 await Task.WhenAll(saveCharactersTask, SaveCharacters());
             else
                 await SaveCharacters();
+            if (saveWorldTask != null && !saveWorldTask.IsCompleted)
+                await Task.WhenAll(saveWorldTask, SaveWorld());
+            else
+                await SaveWorld();
             base.OnDestroy();
         }
 
