@@ -4,7 +4,7 @@ using UnityEngine.Events;
 using UnityEngine.UI;
 using LiteNetLibManager;
 
-namespace Insthync.MMOG
+namespace MultiplayerARPG.MMO
 {
     public class UIMmoRegister : UIBase
     {

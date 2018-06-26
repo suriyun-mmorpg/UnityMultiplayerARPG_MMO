@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Insthync.MMOG
+namespace MultiplayerARPG.MMO
 {
     [RequireComponent(typeof(UIMmoServerEntrySelectionManager))]
     public class UIMmoServerList : UIBase

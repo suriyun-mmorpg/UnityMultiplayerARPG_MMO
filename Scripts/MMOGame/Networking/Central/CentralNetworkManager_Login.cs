@@ -3,7 +3,7 @@ using LiteNetLibManager;
 using System;
 using System.Text.RegularExpressions;
 
-namespace Insthync.MMOG
+namespace MultiplayerARPG.MMO
 {
     public partial class CentralNetworkManager
     {

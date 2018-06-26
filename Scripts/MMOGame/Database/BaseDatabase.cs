@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Insthync.MMOG
+namespace MultiplayerARPG.MMO
 {
     public abstract partial class BaseDatabase : MonoBehaviour
     {

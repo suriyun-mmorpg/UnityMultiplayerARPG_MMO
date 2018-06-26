@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 
-namespace Insthync.MMOG
+namespace MultiplayerARPG.MMO
 {
     public struct UserLoginData
     {

@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using LiteNetLibManager;
 
-namespace Insthync.MMOG
+namespace MultiplayerARPG.MMO
 {
     [RequireComponent(typeof(UICharacterSelectionManager))]
     public class UIMmoCharacterList : UIBase

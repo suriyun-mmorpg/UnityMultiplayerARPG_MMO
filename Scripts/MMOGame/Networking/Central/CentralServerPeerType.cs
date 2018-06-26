@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using LiteNetLib;
 
-namespace Insthync.MMOG
+namespace MultiplayerARPG.MMO
 {
     public enum CentralServerPeerType : byte
     {

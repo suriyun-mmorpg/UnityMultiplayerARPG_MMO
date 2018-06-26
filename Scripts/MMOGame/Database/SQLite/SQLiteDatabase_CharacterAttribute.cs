@@ -4,7 +4,7 @@ using UnityEngine;
 using Mono.Data.Sqlite;
 using System.Threading.Tasks;
 
-namespace Insthync.MMOG
+namespace MultiplayerARPG.MMO
 {
     public partial class SQLiteDatabase
     {

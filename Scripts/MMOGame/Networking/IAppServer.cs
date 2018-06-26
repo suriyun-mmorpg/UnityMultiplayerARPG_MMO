@@ -1,5 +1,5 @@
 ﻿
-namespace Insthync.MMOG
+namespace MultiplayerARPG.MMO
 {
     public interface IAppServer
     {

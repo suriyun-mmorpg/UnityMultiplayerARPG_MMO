@@ -7,7 +7,7 @@ using UnityEngine;
 using LiteNetLib;
 using LiteNetLibManager;
 
-namespace Insthync.MMOG
+namespace MultiplayerARPG.MMO
 {
     public partial class CentralNetworkManager
     {

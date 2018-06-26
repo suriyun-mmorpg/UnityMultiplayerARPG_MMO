@@ -4,7 +4,7 @@ using UnityEngine;
 using LiteNetLib;
 using LiteNetLibManager;
 
-namespace Insthync.MMOG
+namespace MultiplayerARPG.MMO
 {
     public class MMOClientInstance : MonoBehaviour
     {

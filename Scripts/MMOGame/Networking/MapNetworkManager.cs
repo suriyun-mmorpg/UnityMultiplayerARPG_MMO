@@ -6,7 +6,7 @@ using LiteNetLib;
 using LiteNetLib.Utils;
 using LiteNetLibManager;
 
-namespace Insthync.MMOG
+namespace MultiplayerARPG.MMO
 {
     public class MapNetworkManager : BaseGameNetworkManager, IAppServer
     {

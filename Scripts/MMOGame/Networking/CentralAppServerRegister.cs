@@ -6,7 +6,7 @@ using LiteNetLibManager;
 using LiteNetLib.Utils;
 using System.Threading.Tasks;
 
-namespace Insthync.MMOG
+namespace MultiplayerARPG.MMO
 {
     public class CentralAppServerRegister : LiteNetLibPeerHandler
     {

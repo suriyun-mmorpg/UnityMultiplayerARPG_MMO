@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using LiteNetLibManager;
 
-namespace Insthync.MMOG
+namespace MultiplayerARPG.MMO
 {
     [RequireComponent(typeof(LogGUI))]
     public class MMOServerInstance : MonoBehaviour

@@ -4,7 +4,7 @@ using UnityEngine;
 using MySql.Data.MySqlClient;
 using System.Threading.Tasks;
 
-namespace Insthync.MMOG
+namespace MultiplayerARPG.MMO
 {
     public partial class MySQLDatabase
     {

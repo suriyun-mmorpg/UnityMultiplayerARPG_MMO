@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using MySql.Data.MySqlClient;
 
-namespace Insthync.MMOG
+namespace MultiplayerARPG.MMO
 {
     public class MySQLRowsReader
     {

@@ -8,7 +8,7 @@ using System.IO;
 using System;
 using System.Threading;
 
-namespace Insthync.MMOG
+namespace MultiplayerARPG.MMO
 {
     public class MapSpawnNetworkManager : LiteNetLibManager.LiteNetLibManager, IAppServer
     {

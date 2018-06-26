@@ -4,7 +4,7 @@ using System.IO;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Insthync.MMOG
+namespace MultiplayerARPG.MMO
 {
     public partial class SQLiteDatabase : BaseDatabase
     {

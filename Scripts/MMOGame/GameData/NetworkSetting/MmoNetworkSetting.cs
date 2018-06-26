@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Insthync.MMOG
+namespace MultiplayerARPG.MMO
 {
     [CreateAssetMenu(fileName = "MmoNetworkSetting", menuName = "Create NetworkSetting/MmoNetworkSetting")]
     public class MmoNetworkSetting : ScriptableObject

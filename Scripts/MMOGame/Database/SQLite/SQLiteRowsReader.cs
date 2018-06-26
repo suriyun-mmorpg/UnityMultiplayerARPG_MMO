@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Data.Common;
 
-namespace Insthync.MMOG
+namespace MultiplayerARPG.MMO
 {
     public class SQLiteRowsReader
     {

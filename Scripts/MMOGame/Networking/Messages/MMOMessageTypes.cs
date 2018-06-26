@@ -1,4 +1,4 @@
-﻿namespace Insthync.MMOG
+﻿namespace MultiplayerARPG.MMO
 {
     public class MMOMessageTypes
     {

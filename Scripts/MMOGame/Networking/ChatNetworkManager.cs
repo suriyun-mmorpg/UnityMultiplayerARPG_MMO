@@ -5,7 +5,7 @@ using LiteNetLibManager;
 using System;
 using LiteNetLib;
 
-namespace Insthync.MMOG
+namespace MultiplayerARPG.MMO
 {
     public class ChatNetworkManager : LiteNetLibManager.LiteNetLibManager, IAppServer
     {

@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-namespace Insthync.MMOG
+namespace MultiplayerARPG.MMO
 {
     public class UIMmoServerEntry : UISelectionEntry<MmoNetworkSetting>
     {

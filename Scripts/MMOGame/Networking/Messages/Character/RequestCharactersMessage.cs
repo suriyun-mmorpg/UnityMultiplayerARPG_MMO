@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using LiteNetLibManager;
 using LiteNetLib.Utils;
 
-namespace Insthync.MMOG
+namespace MultiplayerARPG.MMO
 {
     public class RequestCharactersMessage : BaseAckMessage
     {

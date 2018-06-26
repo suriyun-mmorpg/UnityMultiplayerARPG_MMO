@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-namespace Insthync.MMOG
+namespace MultiplayerARPG.MMO
 {
     [RequireComponent(typeof(UICharacterSelectionManager))]
     public class UIMmoCharacterCreate : UIBase

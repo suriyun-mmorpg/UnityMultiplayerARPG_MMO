@@ -2,7 +2,7 @@
 using LiteNetLib;
 using LiteNetLib.Utils;
 
-namespace Insthync.MMOG
+namespace MultiplayerARPG.MMO
 {
     public class CentralServerPeerInfo : ILiteNetLibMessage
     {

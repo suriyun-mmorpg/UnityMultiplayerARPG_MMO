@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Insthync.MMOG
+namespace MultiplayerARPG.MMO
 {
     public partial class CentralNetworkManager
     {
