@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Events;
 
 namespace MultiplayerARPG.MMO
 {
@@ -9,4 +10,7 @@ namespace MultiplayerARPG.MMO
         public string networkAddress = "127.0.0.1";
         public int networkPort = 6000;
     }
+
+    [System.Serializable]
+    public class MmoNetworkSettingEvent : UnityEvent<MmoNetworkSetting> { }
 }
