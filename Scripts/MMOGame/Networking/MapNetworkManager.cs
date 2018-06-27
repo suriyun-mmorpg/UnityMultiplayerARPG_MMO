@@ -387,10 +387,17 @@ namespace MultiplayerARPG.MMO
         public override async void OnServerOnlineSceneLoaded()
         {
             base.OnServerOnlineSceneLoaded();
+            // Spawn buildings
             var buildings = await Database.ReadBuildings(Assets.onlineScene.SceneName);
             foreach (var building in buildings)
             {
                 CreateBuildingEntity(building, true);
+            }
+            // Spawn harvestables
+            var harvestableSpawnAreas = FindObjectsOfType<HarvestableSpawnArea>();
+            foreach (var harvestableSpawnArea in harvestableSpawnAreas)
+            {
+                harvestableSpawnArea.SpawnAll();
             }
         }
         #endregion
