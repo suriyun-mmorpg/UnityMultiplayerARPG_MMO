@@ -237,7 +237,7 @@ namespace MultiplayerARPG.MMO
                 }
                 playerCharacterData.CloneTo(playerCharacterEntity);
                 // Notify clients that this character is spawn or dead
-                if (playerCharacterEntity.CurrentHp > 0)
+                if (!playerCharacterEntity.IsDead())
                     playerCharacterEntity.RequestOnRespawn(true);
                 else
                     playerCharacterEntity.RequestOnDead(true);
