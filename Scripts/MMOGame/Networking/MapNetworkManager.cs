@@ -134,7 +134,7 @@ namespace MultiplayerARPG.MMO
         {
             var connectId = peer.ConnectId;
             // Save player character data
-            PlayerCharacterEntity playerCharacterEntity;
+            BasePlayerCharacterEntity playerCharacterEntity;
             if (!playerCharacters.TryGetValue(connectId, out playerCharacterEntity))
             {
                 var savingCharacterData = new PlayerCharacterData();
@@ -161,7 +161,7 @@ namespace MultiplayerARPG.MMO
             mapServerPeersBySceneName.Clear();
         }
 
-        public override async void WarpCharacter(PlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position)
+        public override async void WarpCharacter(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position)
         {
             if (playerCharacterEntity == null || !IsServer)
                 return;
@@ -208,7 +208,7 @@ namespace MultiplayerARPG.MMO
             if (playerIdentity == null)
                 return;
 
-            var playerCharacterEntity = playerIdentity.GetComponent<PlayerCharacterEntity>();
+            var playerCharacterEntity = playerIdentity.GetComponent<BasePlayerCharacterEntity>();
             var userId = reader.GetString();
             var accessToken = reader.GetString();
             var selectCharacterId = reader.GetString();
