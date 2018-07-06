@@ -9,13 +9,15 @@ namespace MultiplayerARPG.MMO
     {
         public const byte AUTH_TYPE_NORMAL = 1;
         public const byte AUTH_TYPE_FACEBOOK = 2;
-        public const byte AUTH_TYPE_GGPLAY = 3;
+        public const byte AUTH_TYPE_GOOGLE_PLAY = 3;
 
         public abstract Task<string> ValidateUserLogin(string username, string password);
         public abstract Task<bool> ValidateAccessToken(string userId, string accessToken);
         public abstract Task UpdateAccessToken(string userId, string accessToken);
         public abstract Task CreateUserLogin(string username, string password);
         public abstract Task<long> FindUsername(string username);
+        public abstract Task<string> FacebookLogin(string fbId, string fbToken);
+        public abstract Task<string> GooglePlayLogin(string gId, string gToken);
 
         public abstract Task CreateCharacter(string userId, PlayerCharacterData characterData);
         public abstract Task<PlayerCharacterData> ReadCharacter(string userId, 

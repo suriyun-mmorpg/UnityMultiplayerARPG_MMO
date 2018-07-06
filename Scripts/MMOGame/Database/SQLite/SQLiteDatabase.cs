@@ -1,8 +1,11 @@
 ﻿using Mono.Data.Sqlite;
+using System.Collections.Generic;
 using System.Data;
 using System.IO;
+using System.Net;
 using System.Threading.Tasks;
 using UnityEngine;
+using MiniJSON;
 
 namespace MultiplayerARPG.MMO
 {
@@ -261,9 +264,10 @@ namespace MultiplayerARPG.MMO
         public override async Task<string> ValidateUserLogin(string username, string password)
         {
             var id = string.Empty;
-            var reader = await ExecuteReader("SELECT id FROM userlogin WHERE username=@username AND password=@password LIMIT 1",
+            var reader = await ExecuteReader("SELECT id FROM userlogin WHERE username=@username AND password=@password AND authType=@authType LIMIT 1",
                 new SqliteParameter("@username", username),
-                new SqliteParameter("@password", GenericUtils.GetMD5(password)));
+                new SqliteParameter("@password", GenericUtils.GetMD5(password)),
+                new SqliteParameter("@authType", AUTH_TYPE_NORMAL));
 
             if (reader.Read())
                 id = reader.GetString("id");
@@ -301,6 +305,52 @@ namespace MultiplayerARPG.MMO
             var result = await ExecuteScalar("SELECT COUNT(*) FROM userlogin WHERE username LIKE @username",
                 new SqliteParameter("@username", username));
             return result != null ? (long)result : 0;
+        }
+
+        public override async Task<string> FacebookLogin(string fbId, string fbToken)
+        {
+            var url = "https://graph.facebook.com/" + fbId + "?access_token=" + fbToken + "&fields=id,name,email";
+            var webClient = new WebClient();
+            var json = await webClient.DownloadStringTaskAsync(url);
+            json = json.Replace(@"\u0040", "@");
+
+            var id = string.Empty;
+            var dict = Json.Deserialize(json) as Dictionary<string, object>;
+            if (dict.ContainsKey("id") && dict.ContainsKey("email"))
+            {
+                var email = (string)dict["email"];
+                var reader = await ExecuteReader("SELECT id FROM userlogin WHERE username=@username AND password=@password AND authType=@authType LIMIT 1",
+                    new SqliteParameter("@username", fbId),
+                    new SqliteParameter("@password", GenericUtils.GetMD5(fbId)),
+                    new SqliteParameter("@authType", AUTH_TYPE_FACEBOOK));
+
+                if (reader.Read())
+                    id = reader.GetString("id");
+                else
+                {
+                    await ExecuteNonQuery("INSERT INTO userlogin (id, username, password, email, authType) VALUES (@id, @username, @password, @email, @authType)",
+                        new SqliteParameter("@id", GenericUtils.GetUniqueId()),
+                        new SqliteParameter("@username", fbId),
+                        new SqliteParameter("@password", GenericUtils.GetMD5(fbId)),
+                        new SqliteParameter("@email", email),
+                        new SqliteParameter("@authType", AUTH_TYPE_FACEBOOK));
+
+                    // Read last entry
+                    reader = await ExecuteReader("SELECT id FROM userlogin WHERE username=@username AND password=@password AND authType=@authType LIMIT 1",
+                        new SqliteParameter("@username", fbId),
+                        new SqliteParameter("@password", GenericUtils.GetMD5(fbId)),
+                        new SqliteParameter("@authType", AUTH_TYPE_FACEBOOK));
+
+                    if (reader.Read())
+                        id = reader.GetString("id");
+                }
+            }
+            return id;
+        }
+
+        public override Task<string> GooglePlayLogin(string gId, string gToken)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }
