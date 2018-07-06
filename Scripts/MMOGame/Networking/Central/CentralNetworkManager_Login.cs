@@ -37,6 +37,14 @@ namespace MultiplayerARPG.MMO
             return Client.SendAckPacket(SendOptions.ReliableUnordered, Client.Peer, MMOMessageTypes.RequestValidateAccessToken, message, callback);
         }
 
+        public uint RequestFacebookLogin(string id, string accessToken, AckMessageCallback callback)
+        {
+            var message = new RequestFacebookLoginMessage();
+            message.id = id;
+            message.accessToken = accessToken;
+            return Client.SendAckPacket(SendOptions.ReliableUnordered, Client.Peer, MMOMessageTypes.RequestFacebookLogin, message, callback);
+        }
+
         protected async void HandleRequestUserLogin(LiteNetLibMessageHandler messageHandler)
         {
             var peer = messageHandler.peer;

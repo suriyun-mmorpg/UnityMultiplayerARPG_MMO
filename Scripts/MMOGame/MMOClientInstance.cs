@@ -134,6 +134,11 @@ namespace MultiplayerARPG.MMO
             centralNetworkManager.RequestValidateAccessToken(userId, accessToken, (responseCode, messageData) => OnRequestValidateAccessToken(responseCode, messageData, callback));
         }
 
+        public void RequestFacebookLogin(string id, string accessToken, AckMessageCallback callback)
+        {
+            centralNetworkManager.RequestFacebookLogin(id, accessToken, (responseCode, messageData) => OnRequestUserLogin(responseCode, messageData, callback));
+        }
+
         public void RequestCharacters(AckMessageCallback callback)
         {
             centralNetworkManager.RequestCharacters(callback);
