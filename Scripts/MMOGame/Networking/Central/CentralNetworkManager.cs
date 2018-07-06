@@ -47,6 +47,7 @@ namespace MultiplayerARPG.MMO
             RegisterServerMessage(MMOMessageTypes.ResponseSpawnMap, HandleResponseSpawnMap);
             RegisterServerMessage(MMOMessageTypes.RequestValidateAccessToken, HandleRequestValidateAccessToken);
             RegisterServerMessage(MMOMessageTypes.UpdateMapUser, HandleUpdateMapUser);
+            RegisterServerMessage(MMOMessageTypes.RequestFacebookLogin, HandleRequestFacebookLogin);
         }
 
         protected override void RegisterClientMessages()

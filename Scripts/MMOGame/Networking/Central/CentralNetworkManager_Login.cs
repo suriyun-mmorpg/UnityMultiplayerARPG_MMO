@@ -152,6 +152,42 @@ namespace MultiplayerARPG.MMO
             LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MMOMessageTypes.ResponseValidateAccessToken, responseMessage);
         }
 
+        protected async void HandleRequestFacebookLogin(LiteNetLibMessageHandler messageHandler)
+        {
+            var peer = messageHandler.peer;
+            var message = messageHandler.ReadMessage<RequestFacebookLoginMessage>();
+            var error = ResponseUserLoginMessage.Error.None;
+            var userId = await Database.FacebookLogin(message.id, message.accessToken);
+            var accessToken = string.Empty;
+            if (string.IsNullOrEmpty(userId))
+            {
+                error = ResponseUserLoginMessage.Error.InvalidUsernameOrPassword;
+                userId = string.Empty;
+            }
+            else if (userPeersByUserId.ContainsKey(userId) || MapContainsUser(userId))
+            {
+                error = ResponseUserLoginMessage.Error.AlreadyLogin;
+                userId = string.Empty;
+            }
+            else
+            {
+                var userPeerInfo = new CentralUserPeerInfo();
+                userPeerInfo.peer = peer;
+                userPeerInfo.userId = userId;
+                userPeerInfo.accessToken = accessToken = Regex.Replace(Convert.ToBase64String(Guid.NewGuid().ToByteArray()), "[/+=]", "");
+                userPeersByUserId[userId] = userPeerInfo;
+                userPeers[peer.ConnectId] = userPeerInfo;
+                await Database.UpdateAccessToken(userId, accessToken);
+            }
+            var responseMessage = new ResponseUserLoginMessage();
+            responseMessage.ackId = message.ackId;
+            responseMessage.responseCode = error == ResponseUserLoginMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
+            responseMessage.error = error;
+            responseMessage.userId = userId;
+            responseMessage.accessToken = accessToken;
+            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MMOMessageTypes.ResponseUserLogin, responseMessage);
+        }
+
         protected void HandleResponseUserLogin(LiteNetLibMessageHandler messageHandler)
         {
             var peerHandler = messageHandler.peerHandler;

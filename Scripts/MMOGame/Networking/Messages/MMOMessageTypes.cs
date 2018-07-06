@@ -26,5 +26,6 @@
         public const short ResponseValidateAccessToken = 21;
         public const short UpdateMapUser = 22;
         public const short Chat = 23;
+        public const short RequestFacebookLogin = 24;
     }
 }
