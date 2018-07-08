@@ -16,8 +16,8 @@ namespace MultiplayerARPG.MMO
         public abstract Task UpdateAccessToken(string userId, string accessToken);
         public abstract Task CreateUserLogin(string username, string password);
         public abstract Task<long> FindUsername(string username);
-        public abstract Task<string> FacebookLogin(string fbId, string fbToken);
-        public abstract Task<string> GooglePlayLogin(string email, string idToken);
+        public abstract Task<string> FacebookLogin(string fbId, string accessToken);
+        public abstract Task<string> GooglePlayLogin(string idToken);
 
         public abstract Task CreateCharacter(string userId, PlayerCharacterData characterData);
         public abstract Task<PlayerCharacterData> ReadCharacter(string userId, 

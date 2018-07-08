@@ -45,10 +45,9 @@ namespace MultiplayerARPG.MMO
             return Client.SendAckPacket(SendOptions.ReliableUnordered, Client.Peer, MMOMessageTypes.RequestFacebookLogin, message, callback);
         }
 
-        public uint RequestGooglePlayLogin(string email, string idToken, AckMessageCallback callback)
+        public uint RequestGooglePlayLogin(string idToken, AckMessageCallback callback)
         {
             var message = new RequestGooglePlayLoginMessage();
-            message.email = email;
             message.idToken = idToken;
             return Client.SendAckPacket(SendOptions.ReliableUnordered, Client.Peer, MMOMessageTypes.RequestGooglePlayLogin, message, callback);
         }
@@ -209,7 +208,7 @@ namespace MultiplayerARPG.MMO
             var peer = messageHandler.peer;
             var message = messageHandler.ReadMessage<RequestGooglePlayLoginMessage>();
             var error = ResponseUserLoginMessage.Error.None;
-            var userId = await Database.GooglePlayLogin(message.email, message.idToken);
+            var userId = await Database.GooglePlayLogin(message.idToken);
             var accessToken = string.Empty;
             if (string.IsNullOrEmpty(userId))
             {

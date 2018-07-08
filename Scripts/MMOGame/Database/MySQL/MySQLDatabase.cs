@@ -183,9 +183,9 @@ namespace MultiplayerARPG.MMO
             return result != null ? (long)result : 0;
         }
 
-        public override async Task<string> FacebookLogin(string fbId, string fbToken)
+        public override async Task<string> FacebookLogin(string fbId, string accessToken)
         {
-            var url = "https://graph.facebook.com/" + fbId + "?access_token=" + fbToken + "&fields=id,name,email";
+            var url = "https://graph.facebook.com/" + fbId + "?access_token=" + accessToken + "&fields=id,name,email";
             var webClient = new WebClient();
             var json = await webClient.DownloadStringTaskAsync(url);
             json = json.Replace(@"\u0040", "@");
@@ -224,7 +224,7 @@ namespace MultiplayerARPG.MMO
             return id;
         }
 
-        public override async Task<string> GooglePlayLogin(string email, string idToken)
+        public override async Task<string> GooglePlayLogin(string idToken)
         {
             var url = "https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=" + idToken;
             var webClient = new WebClient();
@@ -232,11 +232,13 @@ namespace MultiplayerARPG.MMO
 
             var id = string.Empty;
             var dict = Json.Deserialize(json) as Dictionary<string, object>;
-            if (dict.ContainsKey("email") && email.Equals((string)dict["email"]))
+            if (dict.ContainsKey("sub") && dict.ContainsKey("email"))
             {
+                var gId = (string)dict["sub"];
+                var email = (string)dict["email"];
                 var reader = await ExecuteReader("SELECT id FROM userlogin WHERE username=@username AND password=@password AND authType=@authType LIMIT 1",
-                    new MySqlParameter("@username", "g_" + email),
-                    new MySqlParameter("@password", GenericUtils.GetMD5(email)),
+                    new MySqlParameter("@username", "g_" + gId),
+                    new MySqlParameter("@password", GenericUtils.GetMD5(gId)),
                     new MySqlParameter("@authType", AUTH_TYPE_GOOGLE_PLAY));
 
                 if (reader.Read())
@@ -245,15 +247,15 @@ namespace MultiplayerARPG.MMO
                 {
                     await ExecuteNonQuery("INSERT INTO userlogin (id, username, password, email, authType) VALUES (@id, @username, @password, @email, @authType)",
                         new MySqlParameter("@id", GenericUtils.GetUniqueId()),
-                        new MySqlParameter("@username", "g_" + email),
-                        new MySqlParameter("@password", GenericUtils.GetMD5(email)),
+                        new MySqlParameter("@username", "g_" + gId),
+                        new MySqlParameter("@password", GenericUtils.GetMD5(gId)),
                         new MySqlParameter("@email", email),
                         new MySqlParameter("@authType", AUTH_TYPE_GOOGLE_PLAY));
 
                     // Read last entry
                     reader = await ExecuteReader("SELECT id FROM userlogin WHERE username=@username AND password=@password AND authType=@authType LIMIT 1",
-                        new MySqlParameter("@username", "g_" + email),
-                        new MySqlParameter("@password", GenericUtils.GetMD5(email)),
+                        new MySqlParameter("@username", "g_" + gId),
+                        new MySqlParameter("@password", GenericUtils.GetMD5(gId)),
                         new MySqlParameter("@authType", AUTH_TYPE_GOOGLE_PLAY));
 
                     if (reader.Read())
