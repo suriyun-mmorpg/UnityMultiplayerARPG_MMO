@@ -45,6 +45,14 @@ namespace MultiplayerARPG.MMO
             return Client.SendAckPacket(SendOptions.ReliableUnordered, Client.Peer, MMOMessageTypes.RequestFacebookLogin, message, callback);
         }
 
+        public uint RequestGooglePlayLogin(string email, string idToken, AckMessageCallback callback)
+        {
+            var message = new RequestGooglePlayLoginMessage();
+            message.email = email;
+            message.idToken = idToken;
+            return Client.SendAckPacket(SendOptions.ReliableUnordered, Client.Peer, MMOMessageTypes.RequestGooglePlayLogin, message, callback);
+        }
+
         protected async void HandleRequestUserLogin(LiteNetLibMessageHandler messageHandler)
         {
             var peer = messageHandler.peer;
@@ -166,6 +174,42 @@ namespace MultiplayerARPG.MMO
             var message = messageHandler.ReadMessage<RequestFacebookLoginMessage>();
             var error = ResponseUserLoginMessage.Error.None;
             var userId = await Database.FacebookLogin(message.id, message.accessToken);
+            var accessToken = string.Empty;
+            if (string.IsNullOrEmpty(userId))
+            {
+                error = ResponseUserLoginMessage.Error.InvalidUsernameOrPassword;
+                userId = string.Empty;
+            }
+            else if (userPeersByUserId.ContainsKey(userId) || MapContainsUser(userId))
+            {
+                error = ResponseUserLoginMessage.Error.AlreadyLogin;
+                userId = string.Empty;
+            }
+            else
+            {
+                var userPeerInfo = new CentralUserPeerInfo();
+                userPeerInfo.peer = peer;
+                userPeerInfo.userId = userId;
+                userPeerInfo.accessToken = accessToken = Regex.Replace(Convert.ToBase64String(Guid.NewGuid().ToByteArray()), "[/+=]", "");
+                userPeersByUserId[userId] = userPeerInfo;
+                userPeers[peer.ConnectId] = userPeerInfo;
+                await Database.UpdateAccessToken(userId, accessToken);
+            }
+            var responseMessage = new ResponseUserLoginMessage();
+            responseMessage.ackId = message.ackId;
+            responseMessage.responseCode = error == ResponseUserLoginMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
+            responseMessage.error = error;
+            responseMessage.userId = userId;
+            responseMessage.accessToken = accessToken;
+            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MMOMessageTypes.ResponseUserLogin, responseMessage);
+        }
+
+        protected async void HandleRequestGooglePlayLogin(LiteNetLibMessageHandler messageHandler)
+        {
+            var peer = messageHandler.peer;
+            var message = messageHandler.ReadMessage<RequestGooglePlayLoginMessage>();
+            var error = ResponseUserLoginMessage.Error.None;
+            var userId = await Database.GooglePlayLogin(message.email, message.idToken);
             var accessToken = string.Empty;
             if (string.IsNullOrEmpty(userId))
             {

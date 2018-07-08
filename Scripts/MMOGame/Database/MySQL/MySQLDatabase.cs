@@ -196,7 +196,7 @@ namespace MultiplayerARPG.MMO
             {
                 var email = (string)dict["email"];
                 var reader = await ExecuteReader("SELECT id FROM userlogin WHERE username=@username AND password=@password AND authType=@authType LIMIT 1",
-                    new MySqlParameter("@username", fbId),
+                    new MySqlParameter("@username", "fb_" + fbId),
                     new MySqlParameter("@password", GenericUtils.GetMD5(fbId)),
                     new MySqlParameter("@authType", AUTH_TYPE_FACEBOOK));
 
@@ -206,14 +206,14 @@ namespace MultiplayerARPG.MMO
                 {
                     await ExecuteNonQuery("INSERT INTO userlogin (id, username, password, email, authType) VALUES (@id, @username, @password, @email, @authType)",
                         new MySqlParameter("@id", GenericUtils.GetUniqueId()),
-                        new MySqlParameter("@username", fbId),
+                        new MySqlParameter("@username", "fb_" + fbId),
                         new MySqlParameter("@password", GenericUtils.GetMD5(fbId)),
                         new MySqlParameter("@email", email),
                         new MySqlParameter("@authType", AUTH_TYPE_FACEBOOK));
 
                     // Read last entry
                     reader = await ExecuteReader("SELECT id FROM userlogin WHERE username=@username AND password=@password AND authType=@authType LIMIT 1",
-                        new MySqlParameter("@username", fbId),
+                        new MySqlParameter("@username", "fb_" + fbId),
                         new MySqlParameter("@password", GenericUtils.GetMD5(fbId)),
                         new MySqlParameter("@authType", AUTH_TYPE_FACEBOOK));
 
@@ -224,9 +224,43 @@ namespace MultiplayerARPG.MMO
             return id;
         }
 
-        public override Task<string> GooglePlayLogin(string gId, string gToken)
+        public override async Task<string> GooglePlayLogin(string email, string idToken)
         {
-            throw new System.NotImplementedException();
+            var url = "https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=" + idToken;
+            var webClient = new WebClient();
+            var json = await webClient.DownloadStringTaskAsync(url);
+
+            var id = string.Empty;
+            var dict = Json.Deserialize(json) as Dictionary<string, object>;
+            if (dict.ContainsKey("email") && email.Equals((string)dict["email"]))
+            {
+                var reader = await ExecuteReader("SELECT id FROM userlogin WHERE username=@username AND password=@password AND authType=@authType LIMIT 1",
+                    new MySqlParameter("@username", "g_" + email),
+                    new MySqlParameter("@password", GenericUtils.GetMD5(email)),
+                    new MySqlParameter("@authType", AUTH_TYPE_GOOGLE_PLAY));
+
+                if (reader.Read())
+                    id = reader.GetString("id");
+                else
+                {
+                    await ExecuteNonQuery("INSERT INTO userlogin (id, username, password, email, authType) VALUES (@id, @username, @password, @email, @authType)",
+                        new MySqlParameter("@id", GenericUtils.GetUniqueId()),
+                        new MySqlParameter("@username", "g_" + email),
+                        new MySqlParameter("@password", GenericUtils.GetMD5(email)),
+                        new MySqlParameter("@email", email),
+                        new MySqlParameter("@authType", AUTH_TYPE_GOOGLE_PLAY));
+
+                    // Read last entry
+                    reader = await ExecuteReader("SELECT id FROM userlogin WHERE username=@username AND password=@password AND authType=@authType LIMIT 1",
+                        new MySqlParameter("@username", "g_" + email),
+                        new MySqlParameter("@password", GenericUtils.GetMD5(email)),
+                        new MySqlParameter("@authType", AUTH_TYPE_GOOGLE_PLAY));
+
+                    if (reader.Read())
+                        id = reader.GetString("id");
+                }
+            }
+            return id;
         }
     }
 }

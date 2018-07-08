@@ -139,6 +139,11 @@ namespace MultiplayerARPG.MMO
             centralNetworkManager.RequestFacebookLogin(id, accessToken, (responseCode, messageData) => OnRequestUserLogin(responseCode, messageData, callback));
         }
 
+        public void RequestGooglePlayLogin(string email, string idToken, AckMessageCallback callback)
+        {
+            centralNetworkManager.RequestGooglePlayLogin(email, idToken, (responseCode, messageData) => OnRequestUserLogin(responseCode, messageData, callback));
+        }
+
         public void RequestCharacters(AckMessageCallback callback)
         {
             centralNetworkManager.RequestCharacters(callback);

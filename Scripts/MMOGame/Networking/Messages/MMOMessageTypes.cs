@@ -27,5 +27,6 @@
         public const short UpdateMapUser = 22;
         public const short Chat = 23;
         public const short RequestFacebookLogin = 24;
+        public const short RequestGooglePlayLogin = 25;
     }
 }
