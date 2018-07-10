@@ -655,12 +655,10 @@ MonoBehaviour:
     sceneAsset: {fileID: 102900000, guid: d529c814bb9fcd14289ac4141b27e951, type: 3}
     sceneName: 01Home_MMO
   startScene:
-    sceneAsset: {fileID: 102900000, guid: 5ff0e5fbbdc3a214d87be31915d46cd5, type: 3}
+    sceneAsset: {fileID: 0}
     sceneName: Map001
   startPosition: {x: 0, y: 0, z: 0}
-  otherScenes:
-  - sceneAsset: {fileID: 102900000, guid: 2621c3c93d9bae14ab8df78426137c00, type: 3}
-    sceneName: Map002
+  otherScenes: []
   minCharacterNameLength: 2
   maxCharacterNameLength: 16
   doNotLoadHomeSceneOnStart: 0
