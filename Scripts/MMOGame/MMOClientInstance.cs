@@ -28,8 +28,11 @@ namespace MultiplayerARPG.MMO
         [Header("Settings")]
         public MmoNetworkSetting[] networkSettings;
 
-        public System.Action<NetPeer> onClientConnected;
-        public System.Action<NetPeer, DisconnectInfo> onClientDisconnected;
+        public System.Action<NetPeer> onCentralClientConnected;
+        public System.Action<NetPeer, DisconnectInfo> onCentralClientDisconnected;
+
+        public System.Action<NetPeer> onMapClientConnected;
+        public System.Action<NetPeer, DisconnectInfo> onMapClientDisconnected;
 
         private void Awake()
         {
@@ -46,24 +49,42 @@ namespace MultiplayerARPG.MMO
         {
             centralNetworkManager.onClientConnected += OnCentralServerConnected;
             centralNetworkManager.onClientDisconnected += OnCentralServerDisconnected;
+            mapNetworkManager.onClientConnected += OnMapServerConnected;
+            mapNetworkManager.onClientDisconnected += OnMapServerDisconnected;
         }
 
         private void OnDisable()
         {
             centralNetworkManager.onClientConnected -= OnCentralServerConnected;
             centralNetworkManager.onClientDisconnected -= OnCentralServerDisconnected;
+            mapNetworkManager.onClientConnected -= OnMapServerConnected;
+            mapNetworkManager.onClientDisconnected -= OnMapServerDisconnected;
         }
 
         public void OnCentralServerConnected(NetPeer netPeer)
         {
-            if (onClientConnected != null)
-                onClientConnected.Invoke(netPeer);
+            if (onCentralClientConnected != null)
+                onCentralClientConnected.Invoke(netPeer);
         }
 
         public void OnCentralServerDisconnected(NetPeer netPeer, DisconnectInfo disconnectInfo)
         {
-            if (onClientDisconnected != null)
-                onClientDisconnected.Invoke(netPeer, disconnectInfo);
+            if (onCentralClientDisconnected != null)
+                onCentralClientDisconnected.Invoke(netPeer, disconnectInfo);
+        }
+
+        public void OnMapServerConnected(NetPeer netPeer)
+        {
+            if (onMapClientConnected != null)
+                onMapClientConnected.Invoke(netPeer);
+            // Disconnect from central server when connected to map server
+            StopCentralClient();
+        }
+
+        public void OnMapServerDisconnected(NetPeer netPeer, DisconnectInfo disconnectInfo)
+        {
+            if (onMapClientDisconnected != null)
+                onMapClientDisconnected.Invoke(netPeer, disconnectInfo);
         }
 
         #region Client functions

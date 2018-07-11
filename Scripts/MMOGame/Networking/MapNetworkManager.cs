@@ -20,6 +20,9 @@ namespace MultiplayerARPG.MMO
         [Header("Database")]
         public float autoSaveDuration = 2f;
 
+        public System.Action<NetPeer> onClientConnected;
+        public System.Action<NetPeer, DisconnectInfo> onClientDisconnected;
+
         private CentralAppServerRegister cacheCentralAppServerRegister;
         public CentralAppServerRegister CentralAppServerRegister
         {
@@ -159,6 +162,20 @@ namespace MultiplayerARPG.MMO
             if (ChatNetworkManager.IsClientConnected)
                 ChatNetworkManager.StopClient();
             mapServerPeersBySceneName.Clear();
+        }
+
+        public override void OnClientConnected(NetPeer peer)
+        {
+            base.OnClientConnected(peer);
+            if (onClientConnected != null)
+                onClientConnected(peer);
+        }
+
+        public override void OnClientDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
+        {
+            base.OnClientDisconnected(peer, disconnectInfo);
+            if (onClientDisconnected != null)
+                onClientDisconnected(peer, disconnectInfo);
         }
 
         public override async void WarpCharacter(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position)
