@@ -8,6 +8,7 @@ namespace MultiplayerARPG.MMO
     {
         public static UIMmoCentralAckLoading Singleton { get; private set; }
         public GameObject rootObject;
+        private float lastUpdateTime;
 
         private void Awake()
         {
@@ -22,11 +23,18 @@ namespace MultiplayerARPG.MMO
 
             if (rootObject != null)
                 rootObject.SetActive(false);
-
-            InvokeRepeating("UpdateUI", 0.5f, 0.5f);
         }
 
-        void UpdateUI()
+        private void Update()
+        {
+            if (Time.unscaledTime - lastUpdateTime >= 0.5f)
+            {
+                UpdateUI();
+                lastUpdateTime = Time.unscaledTime;
+            }
+        }
+
+        private void UpdateUI()
         {
             if (rootObject != null)
                 rootObject.SetActive(MMOClientInstance.Singleton.CentralNetworkManager.IsClientConnected && MMOClientInstance.Singleton.CentralNetworkManager.Client.AckCallbacksCount > 0);
