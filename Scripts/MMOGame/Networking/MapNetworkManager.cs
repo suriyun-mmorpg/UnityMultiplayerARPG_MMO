@@ -222,10 +222,6 @@ namespace MultiplayerARPG.MMO
 
         public override async void DeserializeClientReadyExtra(LiteNetLibIdentity playerIdentity, NetPeer peer, NetDataReader reader)
         {
-            if (playerIdentity == null)
-                return;
-
-            var playerCharacterEntity = playerIdentity.GetComponent<BasePlayerCharacterEntity>();
             var userId = reader.GetString();
             var accessToken = reader.GetString();
             var selectCharacterId = reader.GetString();
@@ -233,13 +229,11 @@ namespace MultiplayerARPG.MMO
             if (playerCharacters.ContainsKey(peer.ConnectId))
             {
                 Debug.LogError("[Map Server] User trying to hack: " + userId);
-                playerIdentity.NetworkDestroy();
                 Server.NetManager.DisconnectPeer(peer);
             }
             else if (!await Database.ValidateAccessToken(userId, accessToken))
             {
                 Debug.LogError("[Map Server] Invalid access token for user: " + userId);
-                playerIdentity.NetworkDestroy();
                 Server.NetManager.DisconnectPeer(peer);
             }
             else
@@ -248,10 +242,19 @@ namespace MultiplayerARPG.MMO
                 if (playerCharacterData == null)
                 {
                     Debug.LogError("[Map Server] Cannot find select character: " + selectCharacterId + " for user: " + userId);
-                    playerIdentity.NetworkDestroy();
                     Server.NetManager.DisconnectPeer(peer);
                     return;
                 }
+                var dataId = playerCharacterData.DataId;
+                PlayerCharacter playerCharacter;
+                if (!GameInstance.PlayerCharacters.TryGetValue(dataId, out playerCharacter) || playerCharacter.entityPrefab == null)
+                {
+                    Debug.LogError("[Map Server] Cannot find player character with data Id: " + dataId);
+                    return;
+                }
+                var playerCharacterPrefab = playerCharacter.entityPrefab;
+                var identity = SpawnPlayer(peer, playerCharacterPrefab.Identity);
+                var playerCharacterEntity = identity.GetComponent<BasePlayerCharacterEntity>();
                 playerCharacterData.CloneTo(playerCharacterEntity);
                 // Notify clients that this character is spawn or dead
                 if (!playerCharacterEntity.IsDead())
