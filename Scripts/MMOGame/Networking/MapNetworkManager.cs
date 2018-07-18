@@ -253,9 +253,11 @@ namespace MultiplayerARPG.MMO
                     return;
                 }
                 var playerCharacterPrefab = playerCharacter.entityPrefab;
-                var identity = SpawnPlayer(peer, playerCharacterPrefab.Identity);
+                var identity = Assets.NetworkSpawn(playerCharacterPrefab.Identity.HashAssetId, playerCharacterData.CurrentPosition, Quaternion.identity, 0, peer.ConnectId);
                 var playerCharacterEntity = identity.GetComponent<BasePlayerCharacterEntity>();
                 playerCharacterData.CloneTo(playerCharacterEntity);
+                identity.SendInitSyncFields(peer);
+                identity.SendInitSyncLists(peer);
                 // Notify clients that this character is spawn or dead
                 if (!playerCharacterEntity.IsDead())
                     playerCharacterEntity.RequestOnRespawn(true);
