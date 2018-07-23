@@ -88,6 +88,7 @@ namespace MultiplayerARPG.MMO
             await FillCharacterRelatesData(connection, characterData);
             await ExecuteNonQuery(connection, "COMMIT");
             connection.Close();
+            this.InvokeClassAddOnMethods("CreateCharacter", userId, characterData);
         }
 
         private bool ReadCharacter(MySQLRowsReader reader, out PlayerCharacterData result, bool resetReader = true)
@@ -140,6 +141,17 @@ namespace MultiplayerARPG.MMO
             var result = new PlayerCharacterData();
             if (ReadCharacter(reader, out result))
             {
+                this.InvokeClassAddOnMethods("ReadCharacter",
+                    userId,
+                    id,
+                    withEquipWeapons,
+                    withAttributes,
+                    withSkills,
+                    withBuffs,
+                    withEquipItems,
+                    withNonEquipItems,
+                    withHotkeys,
+                    withQuests);
                 if (withEquipWeapons)
                     result.EquipWeapons = await ReadCharacterEquipWeapons(id);
                 if (withAttributes)
@@ -224,6 +236,7 @@ namespace MultiplayerARPG.MMO
             await FillCharacterRelatesData(connection, characterData);
             await ExecuteNonQuery(connection, "COMMIT");
             connection.Close();
+            this.InvokeClassAddOnMethods("UpdateCharacter", characterData);
         }
 
         public override async Task DeleteCharacter(string userId, string id)
@@ -246,6 +259,7 @@ namespace MultiplayerARPG.MMO
                 await DeleteCharacterSkills(connection, id);
                 await ExecuteNonQuery(connection, "COMMIT");
                 connection.Close();
+                this.InvokeClassAddOnMethods("DeleteCharacter", userId, id);
             }
         }
 
