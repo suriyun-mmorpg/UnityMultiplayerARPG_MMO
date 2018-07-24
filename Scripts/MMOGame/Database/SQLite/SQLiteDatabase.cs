@@ -164,6 +164,8 @@ namespace MultiplayerARPG.MMO
             )");
 
             await ExecuteNonQuery("END");
+            
+            this.InvokeClassAddOnMethods("Init");
 
             // Update data
             if (!IsColumnExist("characteritem", "durability"))
