@@ -8,7 +8,7 @@ using LiteNetLibManager;
 
 namespace MultiplayerARPG.MMO
 {
-    public class MapNetworkManager : BaseGameNetworkManager, IAppServer
+    public partial class MapNetworkManager : BaseGameNetworkManager, IAppServer
     {
         public static MapNetworkManager Singleton { get; protected set; }
 
