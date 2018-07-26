@@ -170,6 +170,8 @@ namespace MultiplayerARPG.MMO
             // Update data
             if (!IsColumnExist("characteritem", "durability"))
                 await ExecuteNonQuery("ALTER TABLE characteritem ADD durability REAL NOT NULL DEFAULT 0;");
+            if (!IsColumnExist("userlogin", "cash"))
+                await ExecuteNonQuery("ALTER TABLE userlogin ADD cash INTEGER NOT NULL DEFAULT 0;");
         }
 
         private bool IsColumnExist(string tableName, string findingColumn)
