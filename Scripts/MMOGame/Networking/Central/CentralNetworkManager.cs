@@ -49,6 +49,8 @@ namespace MultiplayerARPG.MMO
             RegisterServerMessage(MMOMessageTypes.UpdateMapUser, HandleUpdateMapUser);
             RegisterServerMessage(MMOMessageTypes.RequestFacebookLogin, HandleRequestFacebookLogin);
             RegisterServerMessage(MMOMessageTypes.RequestGooglePlayLogin, HandleRequestGooglePlayLogin);
+            RegisterServerMessage(MMOMessageTypes.RequestCashShopInfo, HandleRequestCashShopInfo);
+            RegisterServerMessage(MMOMessageTypes.RequestCashShopBuy, HandleRequestCashShopBuy);
         }
 
         protected override void RegisterClientMessages()

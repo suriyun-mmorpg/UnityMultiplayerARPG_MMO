@@ -28,5 +28,9 @@
         public const short Chat = 23;
         public const short RequestFacebookLogin = 24;
         public const short RequestGooglePlayLogin = 25;
+        public const short RequestCashShopInfo = 26;
+        public const short ResponseCashShopInfo = 27;
+        public const short RequestCashShopBuy = 28;
+        public const short ResponseCashShopBuy = 29;
     }
 }
