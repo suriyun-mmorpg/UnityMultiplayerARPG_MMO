@@ -274,6 +274,25 @@ namespace MultiplayerARPG.MMO
         #endregion
 
         #region Network message handlers
+        protected override void HandleWarpAtClient(LiteNetLibMessageHandler messageHandler)
+        {
+            var message = messageHandler.ReadMessage<MMOWarpMessage>();
+            Assets.offlineScene.SceneName = string.Empty;
+            StopClient();
+            Assets.onlineScene.SceneName = message.sceneName;
+            StartClient(message.networkAddress, message.networkPort, message.connectKey);
+        }
+
+        protected override void HandleResponseCashShopInfo(LiteNetLibMessageHandler messageHandler)
+        {
+
+        }
+
+        protected override void HandleResponseCashShopBuy(LiteNetLibMessageHandler messageHandler)
+        {
+
+        }
+
         protected override void HandleChatAtServer(LiteNetLibMessageHandler messageHandler)
         {
             // Send chat message to chat server, for MMO mode chat message handling by chat server
@@ -282,13 +301,73 @@ namespace MultiplayerARPG.MMO
                 ChatNetworkManager.EnterChat(message.channel, message.message, message.sender, message.receiver);
         }
 
-        protected override void HandleWarpAtClient(LiteNetLibMessageHandler messageHandler)
+        protected override async void HandleRequestCashShopInfo(LiteNetLibMessageHandler messageHandler)
         {
-            var message = messageHandler.ReadMessage<MMOWarpMessage>();
-            Assets.offlineScene.SceneName = string.Empty;
-            StopClient();
-            Assets.onlineScene.SceneName = message.sceneName;
-            StartClient(message.networkAddress, message.networkPort, message.connectKey);
+            var peer = messageHandler.peer;
+            var message = messageHandler.ReadMessage<BaseAckMessage>();
+            var error = ResponseCashShopInfoMessage.Error.None;
+            var cash = 0;
+            var cashShopItemIds = new List<int>();
+            SimpleUserCharacterData user;
+            if (!users.TryGetValue(peer.ConnectId, out user))
+                error = ResponseCashShopInfoMessage.Error.UserNotFound;
+            else
+            {
+                // Request cash, send item info messages to map server
+                cash = await Database.GetCash(user.userId);
+                foreach (var cashShopItemId in GameInstance.CashShopItems.Keys)
+                {
+                    cashShopItemIds.Add(cashShopItemId);
+                }
+            }
+            
+            var responseMessage = new ResponseCashShopInfoMessage();
+            responseMessage.ackId = message.ackId;
+            responseMessage.responseCode = error == ResponseCashShopInfoMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
+            responseMessage.error = error;
+            responseMessage.cash = cash;
+            responseMessage.cashShopItemIds = cashShopItemIds.ToArray();
+            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MsgTypes.CashShopInfo, responseMessage);
+        }
+
+        protected override async void HandleRequestCashShopBuy(LiteNetLibMessageHandler messageHandler)
+        {
+            var peer = messageHandler.peer;
+            var message = messageHandler.ReadMessage<RequestCashShopBuyMessage>();
+            var error = ResponseCashShopBuyMessage.Error.None;
+            var dataId = message.dataId;
+            var cash = 0;
+            SimpleUserCharacterData user;
+            if (!users.TryGetValue(peer.ConnectId, out user))
+                error = ResponseCashShopBuyMessage.Error.UserNotFound;
+            else
+            {
+                // Request cash, reduce, send item info messages to map server
+                cash = await Database.GetCash(user.userId);
+                BasePlayerCharacterEntity playerCharacter;
+                CashShopItem cashShopItem;
+                if (!playerCharacters.TryGetValue(peer.ConnectId, out playerCharacter))
+                    error = ResponseCashShopBuyMessage.Error.CharacterNotFound;
+                else if (!GameInstance.CashShopItems.TryGetValue(dataId, out cashShopItem))
+                    error = ResponseCashShopBuyMessage.Error.ItemNotFound;
+                else if (cash < cashShopItem.sellPrice)
+                    error = ResponseCashShopBuyMessage.Error.NotEnoughCash;
+                else
+                {
+                    playerCharacter.Gold += cashShopItem.receiveGold;
+                    foreach (var receiveItem in cashShopItem.receiveItems)
+                    {
+                        if (receiveItem.item == null) continue;
+                        var characterItem = CharacterItem.Create(receiveItem.item, 1, receiveItem.amount);
+                        playerCharacter.NonEquipItems.Add(characterItem);
+                    }
+                }
+            }
+            var responseMessage = new ResponseCashShopBuyMessage();
+            responseMessage.ackId = message.ackId;
+            responseMessage.responseCode = error == ResponseCashShopBuyMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
+            responseMessage.error = error;
+            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MsgTypes.CashShopBuy, responseMessage);
         }
 
         private void HandleResponseAppServerAddress(LiteNetLibMessageHandler messageHandler)

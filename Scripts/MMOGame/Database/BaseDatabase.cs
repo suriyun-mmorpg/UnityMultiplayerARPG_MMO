@@ -13,6 +13,7 @@ namespace MultiplayerARPG.MMO
 
         public abstract Task<string> ValidateUserLogin(string username, string password);
         public abstract Task<bool> ValidateAccessToken(string userId, string accessToken);
+        public abstract Task<int> GetCash(string userId);
         public abstract Task UpdateAccessToken(string userId, string accessToken);
         public abstract Task CreateUserLogin(string username, string password);
         public abstract Task<long> FindUsername(string username);

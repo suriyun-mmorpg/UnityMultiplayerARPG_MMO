@@ -153,15 +153,25 @@ namespace MultiplayerARPG.MMO
 
         public override async Task<bool> ValidateAccessToken(string userId, string accessToken)
         {
-            var result = await ExecuteScalar("SELECT COUNT(*) FROM userlogin WHERE id=@id AND accessToken=@accessToken",
+            var result = await ExecuteScalar("SELECT COUNT(*) FROM userlogin WHERE id=@id AND accessToken=@accessToken LIMIT 1",
                 new MySqlParameter("@id", userId),
                 new MySqlParameter("@accessToken", accessToken));
             return (result != null ? (long)result : 0) > 0;
         }
 
+        public override async Task<int> GetCash(string userId)
+        {
+            var cash = 0;
+            var reader = await ExecuteReader("SELECT cash FROM userlogin WHERE id=@id LIMIT 1",
+                new MySqlParameter("@id", userId));
+            if (reader.Read())
+                cash = reader.GetInt32("cash");
+            return cash;
+        }
+
         public override async Task UpdateAccessToken(string userId, string accessToken)
         {
-            await ExecuteNonQuery("UPDATE userlogin SET accessToken=@accessToken WHERE id=@id",
+            await ExecuteNonQuery("UPDATE userlogin SET accessToken=@accessToken WHERE id=@id LIMIT 1",
                 new MySqlParameter("@id", userId),
                 new MySqlParameter("@accessToken", accessToken));
         }
@@ -178,7 +188,7 @@ namespace MultiplayerARPG.MMO
 
         public override async Task<long> FindUsername(string username)
         {
-            var result = await ExecuteScalar("SELECT COUNT(*) FROM userlogin WHERE username LIKE @username",
+            var result = await ExecuteScalar("SELECT COUNT(*) FROM userlogin WHERE username LIKE @username LIMIT 1",
                 new MySqlParameter("@username", username));
             return result != null ? (long)result : 0;
         }
