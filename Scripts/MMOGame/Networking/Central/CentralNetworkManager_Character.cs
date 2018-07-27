@@ -114,8 +114,6 @@ namespace MultiplayerARPG.MMO
             CentralUserPeerInfo userPeerInfo;
             if (!userPeers.TryGetValue(peer.ConnectId, out userPeerInfo))
                 error = ResponseSelectCharacterMessage.Error.NotLoggedin;
-            else if (!string.IsNullOrEmpty(userPeerInfo.selectCharacterId))
-                error = ResponseSelectCharacterMessage.Error.InvalidCharacterData;
             else
             {
                 var character = await Database.ReadCharacter(userPeerInfo.userId, message.characterId, false, false, false, false, false, false, false, false);
@@ -123,12 +121,6 @@ namespace MultiplayerARPG.MMO
                     error = ResponseSelectCharacterMessage.Error.InvalidCharacterData;
                 else if (!mapServerPeersBySceneName.TryGetValue(character.CurrentMapName, out mapServerPeerInfo))
                     error = ResponseSelectCharacterMessage.Error.MapNotReady;
-                else
-                {
-                    userPeerInfo.selectCharacterId = character.Id;
-                    userPeers[peer.ConnectId] = userPeerInfo;
-                    userPeersByUserId[userPeerInfo.userId] = userPeerInfo;
-                }
             }
             var responseMessage = new ResponseSelectCharacterMessage();
             responseMessage.ackId = message.ackId;

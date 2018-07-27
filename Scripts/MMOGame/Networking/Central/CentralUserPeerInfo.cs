@@ -9,20 +9,17 @@ namespace MultiplayerARPG.MMO
         public NetPeer peer;
         public string userId;
         public string accessToken;
-        public string selectCharacterId;
 
         public void Deserialize(NetDataReader reader)
         {
             userId = reader.GetString();
             accessToken = reader.GetString();
-            selectCharacterId = reader.GetString();
         }
 
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(userId);
             writer.Put(accessToken);
-            writer.Put(selectCharacterId);
         }
     }
 }
