@@ -15,20 +15,23 @@ namespace MultiplayerARPG.MMO
         }
         public Error error;
         public int cash;
-        public List<CashShopItemInfo> cashShopItems;
+        public readonly List<NetworkCashShopItem> cashShopItems = new List<NetworkCashShopItem>();
 
         public override void DeserializeData(NetDataReader reader)
         {
             error = (Error)reader.GetByte();
             cash = reader.GetInt();
-            cashShopItems = new List<CashShopItemInfo>();
+            cashShopItems.Clear();
             var size = reader.GetInt();
             for (var i = 0; i < size; ++i)
             {
-                var cashShopItem = new CashShopItemInfo();
-                cashShopItem.networkDataId = reader.GetInt();
-                cashShopItem.externalIconUrl = reader.GetString();
+                var cashShopItem = new NetworkCashShopItem();
+                cashShopItem.dataId = reader.GetInt();
+                cashShopItem.title = reader.GetString();
+                cashShopItem.description = reader.GetString();
+                cashShopItem.iconUrl = reader.GetString();
                 cashShopItem.sellPrice = reader.GetInt();
+                cashShopItems.Add(cashShopItem);
             }
         }
 
@@ -39,8 +42,10 @@ namespace MultiplayerARPG.MMO
             writer.Put(cashShopItems.Count);
             foreach (var cashShopItem in cashShopItems)
             {
-                writer.Put(cashShopItem.networkDataId);
-                writer.Put(cashShopItem.externalIconUrl);
+                writer.Put(cashShopItem.dataId);
+                writer.Put(cashShopItem.title);
+                writer.Put(cashShopItem.description);
+                writer.Put(cashShopItem.iconUrl);
                 writer.Put(cashShopItem.sellPrice);
             }
         }
