@@ -283,16 +283,6 @@ namespace MultiplayerARPG.MMO
             StartClient(message.networkAddress, message.networkPort, message.connectKey);
         }
 
-        protected override void HandleResponseCashShopInfo(LiteNetLibMessageHandler messageHandler)
-        {
-
-        }
-
-        protected override void HandleResponseCashShopBuy(LiteNetLibMessageHandler messageHandler)
-        {
-
-        }
-
         protected override void HandleChatAtServer(LiteNetLibMessageHandler messageHandler)
         {
             // Send chat message to chat server, for MMO mode chat message handling by chat server
