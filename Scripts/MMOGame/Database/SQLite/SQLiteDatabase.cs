@@ -281,7 +281,7 @@ namespace MultiplayerARPG.MMO
 
         public override async Task<bool> ValidateAccessToken(string userId, string accessToken)
         {
-            var result = await ExecuteScalar("SELECT COUNT(*) FROM userlogin WHERE id=@id AND accessToken=@accessToken LIMIT 1",
+            var result = await ExecuteScalar("SELECT COUNT(*) FROM userlogin WHERE id=@id AND accessToken=@accessToken",
                 new SqliteParameter("@id", userId),
                 new SqliteParameter("@accessToken", accessToken));
             return (result != null ? (long)result : 0) > 0;
@@ -299,7 +299,7 @@ namespace MultiplayerARPG.MMO
 
         public override async Task UpdateAccessToken(string userId, string accessToken)
         {
-            await ExecuteNonQuery("UPDATE userlogin SET accessToken=@accessToken WHERE id=@id LIMIT 1",
+            await ExecuteNonQuery("UPDATE userlogin SET accessToken=@accessToken WHERE id=@id",
                 new SqliteParameter("@id", userId),
                 new SqliteParameter("@accessToken", accessToken));
         }
@@ -316,7 +316,7 @@ namespace MultiplayerARPG.MMO
 
         public override async Task<long> FindUsername(string username)
         {
-            var result = await ExecuteScalar("SELECT COUNT(*) FROM userlogin WHERE username LIKE @username LIMIT 1",
+            var result = await ExecuteScalar("SELECT COUNT(*) FROM userlogin WHERE username LIKE @username",
                 new SqliteParameter("@username", username));
             return result != null ? (long)result : 0;
         }
