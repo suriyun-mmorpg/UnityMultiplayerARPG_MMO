@@ -85,7 +85,7 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@respawnPositionZ", characterData.RespawnPosition.z));
             await FillCharacterRelatesData(characterData);
             await ExecuteNonQuery("END");
-            this.InvokeClassAddOnMethods("CreateCharacter", userId, characterData);
+            this.InvokeClassDevExtMethods("CreateCharacter", userId, characterData);
         }
 
         private bool ReadCharacter(SQLiteRowsReader reader, out PlayerCharacterData result, bool resetReader = true)
@@ -138,7 +138,7 @@ namespace MultiplayerARPG.MMO
             var result = new PlayerCharacterData();
             if (ReadCharacter(reader, out result))
             {
-                this.InvokeClassAddOnMethods("ReadCharacter",
+                this.InvokeClassDevExtMethods("ReadCharacter",
                     userId,
                     id,
                     withEquipWeapons,
@@ -230,7 +230,7 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@id", characterData.Id));
             await FillCharacterRelatesData(characterData);
             await ExecuteNonQuery("END");
-            this.InvokeClassAddOnMethods("UpdateCharacter", characterData);
+            this.InvokeClassDevExtMethods("UpdateCharacter", characterData);
         }
 
         public override async Task DeleteCharacter(string userId, string id)
@@ -250,7 +250,7 @@ namespace MultiplayerARPG.MMO
                 await DeleteCharacterQuests(id);
                 await DeleteCharacterSkills(id);
                 await ExecuteNonQuery("END");
-                this.InvokeClassAddOnMethods("DeleteCharacter", userId, id);
+                this.InvokeClassDevExtMethods("DeleteCharacter", userId, id);
             }
         }
 
