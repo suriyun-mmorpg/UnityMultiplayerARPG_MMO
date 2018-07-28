@@ -258,9 +258,9 @@ namespace MultiplayerARPG.MMO
                 playerCharacterData.CloneTo(playerCharacterEntity);
                 // Notify clients that this character is spawn or dead
                 if (!playerCharacterEntity.IsDead())
-                    playerCharacterEntity.RequestOnRespawn(true);
+                    playerCharacterEntity.RequestOnRespawn();
                 else
-                    playerCharacterEntity.RequestOnDead(true);
+                    playerCharacterEntity.RequestOnDead();
                 RegisterPlayerCharacter(peer, playerCharacterEntity);
                 var characterName = playerCharacterEntity.CharacterName;
                 var userData = new SimpleUserCharacterData(userId, characterName);
