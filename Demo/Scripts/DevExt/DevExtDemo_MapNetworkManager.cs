@@ -6,29 +6,35 @@ namespace MultiplayerARPG.MMO
 {
     public partial class MapNetworkManager
     {
-        [Header("Demo Addon")]
+        [Header("Demo Developer Extension")]
         public bool writeAddonLog;
-        protected void AddOnDemo_RegisterClientMessages()
+
+        [DevExtMethods("RegisterClientMessages")]
+        protected void DevExtDemo_RegisterClientMessages()
         {
             if (writeAddonLog) Debug.Log("[" + name + "] LanRpgNetworkManager.RegisterClientMessages()");
         }
 
-        protected void AddOnDemo_RegisterServerMessages()
+        [DevExtMethods("RegisterServerMessages")]
+        protected void DevExtDemo_RegisterServerMessages()
         {
             if (writeAddonLog) Debug.Log("[" + name + "] LanRpgNetworkManager.RegisterServerMessages()");
         }
 
-        protected void AddOnDemo_Init()
+        [DevExtMethods("Init")]
+        protected void DevExtDemo_Init()
         {
             if (writeAddonLog) Debug.Log("[" + name + "] LanRpgNetworkManager.Init()");
         }
 
-        protected void AddOnDemo_OnClientOnlineSceneLoaded()
+        [DevExtMethods("OnClientOnlineSceneLoaded")]
+        protected void DevExtDemo_OnClientOnlineSceneLoaded()
         {
             if (writeAddonLog) Debug.Log("[" + name + "] LanRpgNetworkManager.OnClientOnlineSceneLoaded()");
         }
 
-        protected void AddOnDemo_OnServerOnlineSceneLoaded()
+        [DevExtMethods("OnServerOnlineSceneLoaded")]
+        protected void DevExtDemo_OnServerOnlineSceneLoaded()
         {
             if (writeAddonLog) Debug.Log("[" + name + "] LanRpgNetworkManager.OnServerOnlineSceneLoaded()");
         }
