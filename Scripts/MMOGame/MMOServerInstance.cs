@@ -190,7 +190,7 @@ namespace MultiplayerARPG.MMO
                         logFileName += "_";
                     logFileName += "Central";
                     startLog = true;
-                    gameInstance.doNotLoadHomeSceneOnStart = true;
+                    gameInstance.doNotLoadHomeSceneOnLoadedGameData = true;
                     startingCentralServer = true;
                 }
 
@@ -200,7 +200,7 @@ namespace MultiplayerARPG.MMO
                         logFileName += "_";
                     logFileName += "MapSpawn";
                     startLog = true;
-                    gameInstance.doNotLoadHomeSceneOnStart = true;
+                    gameInstance.doNotLoadHomeSceneOnLoadedGameData = true;
                     startingMapSpawnServer = true;
                 }
 
@@ -210,7 +210,7 @@ namespace MultiplayerARPG.MMO
                         logFileName += "_";
                     logFileName += "Map(" + mapNetworkManager.Assets.onlineScene.SceneName + ")";
                     startLog = true;
-                    gameInstance.doNotLoadHomeSceneOnStart = true;
+                    gameInstance.doNotLoadHomeSceneOnLoadedGameData = true;
                     startingMapServer = true;
                 }
 
@@ -220,7 +220,7 @@ namespace MultiplayerARPG.MMO
                         logFileName += "_";
                     logFileName += "Chat";
                     startLog = true;
-                    gameInstance.doNotLoadHomeSceneOnStart = true;
+                    gameInstance.doNotLoadHomeSceneOnLoadedGameData = true;
                     startingChatServer = true;
                 }
 
