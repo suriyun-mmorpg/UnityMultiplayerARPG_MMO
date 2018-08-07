@@ -165,7 +165,7 @@ namespace MultiplayerARPG.MMO
 
             await ExecuteNonQuery("END");
             
-            this.InvokeClassDevExtMethods("Init");
+            this.InvokeInstanceDevExtMethods("Init");
 
             // Update data
             if (!IsColumnExist("characteritem", "durability"))
