@@ -26,14 +26,14 @@ namespace MultiplayerARPG.MMO
         private string editorDbPath = "./mmorpgtemplate.sqlite3";
         private SqliteConnection connection;
 
-        private void Awake()
+        public override void Initialize()
         {
             connection = NewConnection();
             connection.Open();
             Init();
         }
 
-        private void OnDestroy()
+        public override void Destroy()
         {
             connection.Close();
         }

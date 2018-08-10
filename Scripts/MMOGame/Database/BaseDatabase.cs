@@ -11,6 +11,9 @@ namespace MultiplayerARPG.MMO
         public const byte AUTH_TYPE_FACEBOOK = 2;
         public const byte AUTH_TYPE_GOOGLE_PLAY = 3;
 
+        public virtual void Initialize() { }
+        public virtual void Destroy() { }
+
         public abstract Task<string> ValidateUserLogin(string username, string password);
         public abstract Task<bool> ValidateAccessToken(string userId, string accessToken);
         public abstract Task<int> GetCash(string userId);

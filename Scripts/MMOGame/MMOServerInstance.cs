@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using LiteNetLibManager;
+using System.Net;
+using System.Net.Security;
 
 namespace MultiplayerARPG.MMO
 {
@@ -81,6 +83,11 @@ namespace MultiplayerARPG.MMO
             DontDestroyOnLoad(gameObject);
             Singleton = this;
 
+            if (database != null)
+                database.Initialize();
+
+            // Always accept SSL
+            ServicePointManager.ServerCertificateValidationCallback += new RemoteCertificateValidationCallback((sender, certificate, chain, policyErrors) => { return true; });
             CacheLogGUI.enabled = false;
             if (!Application.isEditor)
             {
@@ -259,6 +266,12 @@ namespace MultiplayerARPG.MMO
 
             if (startingChatServer)
                 StartChatServer();
+        }
+
+        private void OnDestroy()
+        {
+            if (database != null)
+                database.Destroy();
         }
 
         #region Server functions
