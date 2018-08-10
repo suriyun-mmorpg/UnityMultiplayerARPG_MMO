@@ -360,6 +360,66 @@ namespace MultiplayerARPG.MMO
             LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MsgTypes.CashShopBuy, responseMessage);
         }
 
+        protected override async void HandleRequestCashPackageInfo(LiteNetLibMessageHandler messageHandler)
+        {
+            var peer = messageHandler.peer;
+            var message = messageHandler.ReadMessage<BaseAckMessage>();
+            var error = ResponseCashPackageInfoMessage.Error.None;
+            var cash = 0;
+            var cashPackageIds = new List<int>();
+            SimpleUserCharacterData user;
+            if (!users.TryGetValue(peer.ConnectId, out user))
+                error = ResponseCashPackageInfoMessage.Error.UserNotFound;
+            else
+            {
+                // Request cash, send item info messages to map server
+                cash = await Database.GetCash(user.userId);
+                foreach (var cashShopItemId in GameInstance.CashPackages.Keys)
+                {
+                    cashPackageIds.Add(cashShopItemId);
+                }
+            }
+
+            var responseMessage = new ResponseCashPackageInfoMessage();
+            responseMessage.ackId = message.ackId;
+            responseMessage.responseCode = error == ResponseCashPackageInfoMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
+            responseMessage.error = error;
+            responseMessage.cashPackageIds = cashPackageIds.ToArray();
+            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MsgTypes.CashPackageInfo, responseMessage);
+        }
+
+        protected override async void HandleRequestCashPackageBuyValidation(LiteNetLibMessageHandler messageHandler)
+        {
+            var peer = messageHandler.peer;
+            var message = messageHandler.ReadMessage<RequestCashPackageBuyValidationMessage>();
+            var error = ResponseCashPackageBuyValidationMessage.Error.None;
+            var dataId = message.dataId;
+            var cash = 0;
+            SimpleUserCharacterData user;
+            if (!users.TryGetValue(peer.ConnectId, out user))
+                error = ResponseCashPackageBuyValidationMessage.Error.UserNotFound;
+            else
+            {
+                // Request cash, reduce, send item info messages to map server
+                // TODO: Validate purchasing at server side
+                cash = await Database.GetCash(user.userId);
+                BasePlayerCharacterEntity playerCharacter;
+                CashPackage cashPackage;
+                if (!playerCharacters.TryGetValue(peer.ConnectId, out playerCharacter))
+                    error = ResponseCashPackageBuyValidationMessage.Error.CharacterNotFound;
+                else if (!GameInstance.CashPackages.TryGetValue(dataId, out cashPackage))
+                    error = ResponseCashPackageBuyValidationMessage.Error.PackageNotFound;
+                else
+                    cash = await Database.IncreaseCash(user.userId, cashPackage.cashAmount);
+            }
+            var responseMessage = new ResponseCashPackageBuyValidationMessage();
+            responseMessage.ackId = message.ackId;
+            responseMessage.responseCode = error == ResponseCashPackageBuyValidationMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
+            responseMessage.error = error;
+            responseMessage.dataId = dataId;
+            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MsgTypes.CashPackageBuyValidation, responseMessage);
+        }
+
         private void HandleResponseAppServerAddress(LiteNetLibMessageHandler messageHandler)
         {
             var peer = messageHandler.peer;
