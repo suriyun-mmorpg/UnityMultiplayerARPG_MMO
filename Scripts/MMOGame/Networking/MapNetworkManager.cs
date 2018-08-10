@@ -360,20 +360,18 @@ namespace MultiplayerARPG.MMO
             LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MsgTypes.CashShopBuy, responseMessage);
         }
 
-        protected override async void HandleRequestCashPackageInfo(LiteNetLibMessageHandler messageHandler)
+        protected override void HandleRequestCashPackageInfo(LiteNetLibMessageHandler messageHandler)
         {
             var peer = messageHandler.peer;
             var message = messageHandler.ReadMessage<BaseAckMessage>();
             var error = ResponseCashPackageInfoMessage.Error.None;
-            var cash = 0;
             var cashPackageIds = new List<int>();
             SimpleUserCharacterData user;
             if (!users.TryGetValue(peer.ConnectId, out user))
                 error = ResponseCashPackageInfoMessage.Error.UserNotFound;
             else
             {
-                // Request cash, send item info messages to map server
-                cash = await Database.GetCash(user.userId);
+                // Request package info messages to map server
                 foreach (var cashShopItemId in GameInstance.CashPackages.Keys)
                 {
                     cashPackageIds.Add(cashShopItemId);
@@ -394,15 +392,12 @@ namespace MultiplayerARPG.MMO
             var message = messageHandler.ReadMessage<RequestCashPackageBuyValidationMessage>();
             var error = ResponseCashPackageBuyValidationMessage.Error.None;
             var dataId = message.dataId;
-            var cash = 0;
             SimpleUserCharacterData user;
             if (!users.TryGetValue(peer.ConnectId, out user))
                 error = ResponseCashPackageBuyValidationMessage.Error.UserNotFound;
             else
             {
-                // Request cash, reduce, send item info messages to map server
                 // TODO: Validate purchasing at server side
-                cash = await Database.GetCash(user.userId);
                 BasePlayerCharacterEntity playerCharacter;
                 CashPackage cashPackage;
                 if (!playerCharacters.TryGetValue(peer.ConnectId, out playerCharacter))
@@ -410,7 +405,7 @@ namespace MultiplayerARPG.MMO
                 else if (!GameInstance.CashPackages.TryGetValue(dataId, out cashPackage))
                     error = ResponseCashPackageBuyValidationMessage.Error.PackageNotFound;
                 else
-                    cash = await Database.IncreaseCash(user.userId, cashPackage.cashAmount);
+                    await Database.IncreaseCash(user.userId, cashPackage.cashAmount);
             }
             var responseMessage = new ResponseCashPackageBuyValidationMessage();
             responseMessage.ackId = message.ackId;
