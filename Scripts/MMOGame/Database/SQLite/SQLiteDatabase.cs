@@ -297,6 +297,16 @@ namespace MultiplayerARPG.MMO
             return cash;
         }
 
+        public override async Task<int> IncreaseCash(string userId, int amount)
+        {
+            var cash = await GetCash(userId);
+            cash += amount;
+            await ExecuteNonQuery("UPDATE userlogin SET cash=@cash WHERE id=@id",
+                new SqliteParameter("@id", userId),
+                new SqliteParameter("@cash", cash));
+            return cash;
+        }
+
         public override async Task UpdateAccessToken(string userId, string accessToken)
         {
             await ExecuteNonQuery("UPDATE userlogin SET accessToken=@accessToken WHERE id=@id",
