@@ -187,6 +187,7 @@ CREATE TABLE `userlogin` (
   `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `username` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
   `password` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
+  `cash` int(11) NOT NULL,
   `email` varchar(50) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
   `authType` tinyint(4) NOT NULL DEFAULT '1',
   `accessToken` varchar(36) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
