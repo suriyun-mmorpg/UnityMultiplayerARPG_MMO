@@ -9,28 +9,6 @@ namespace MultiplayerARPG.MMO
 {
     public partial class CentralNetworkManager
     {
-        public async void SpawnPublicMaps(NetPeer peer)
-        {
-            // Await 5 seconds before spawn maps
-            await Task.Delay(500);
-            Debug.Log("Spawning Public Maps in 5 seconds...");
-            await Task.Delay(1000);
-            Debug.Log("Spawning Public Maps in 4 seconds...");
-            await Task.Delay(1000);
-            Debug.Log("Spawning Public Maps in 3 seconds...");
-            await Task.Delay(1000);
-            Debug.Log("Spawning Public Maps in 2 seconds...");
-            await Task.Delay(1000);
-            Debug.Log("Spawning Public Maps in 1 seconds...");
-            await Task.Delay(1000);
-            foreach (var scene in MMOServerInstance.Singleton.GetScenes())
-            {
-                if (!spawningMapAcks.ContainsKey(scene) && !mapServerPeersBySceneName.ContainsKey(scene))
-                    spawningMapAcks[scene] = RequestSpawnMap(peer, scene, OnRequestSpawnMap);
-                await Task.Delay(50);
-            }
-        }
-
         public uint RequestSpawnMap(NetPeer peer, string sceneName, AckMessageCallback callback)
         {
             var message = new RequestSpawnMapMessage();

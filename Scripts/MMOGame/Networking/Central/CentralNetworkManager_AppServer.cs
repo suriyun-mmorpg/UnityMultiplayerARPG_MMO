@@ -39,7 +39,6 @@ namespace MultiplayerARPG.MMO
                 {
                     case CentralServerPeerType.MapSpawnServer:
                         mapSpawnServerPeers[peer.ConnectId] = peerInfo;
-                        SpawnPublicMaps(peer);
                         Debug.Log("[Central] Register Map Spawn Server: [" + peer.ConnectId + "]");
                         break;
                     case CentralServerPeerType.MapServer:
