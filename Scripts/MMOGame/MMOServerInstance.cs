@@ -71,7 +71,6 @@ namespace MultiplayerARPG.MMO
         private bool startingMapSpawnServer;
         private bool startingMapServer;
         private bool startingChatServer;
-        private readonly List<string> scenes = new List<string>();
 
         private void Awake()
         {
@@ -252,9 +251,6 @@ namespace MultiplayerARPG.MMO
 
         private void Start()
         {
-            scenes.Clear();
-            scenes.AddRange(GameInstance.Singleton.GetGameScenes());
-
             if (startingCentralServer)
                 StartCentralServer();
 
@@ -293,11 +289,6 @@ namespace MultiplayerARPG.MMO
         public void StartChatServer()
         {
             chatNetworkManager.StartServer();
-        }
-
-        public List<string> GetScenes()
-        {
-            return scenes;
         }
         #endregion
         

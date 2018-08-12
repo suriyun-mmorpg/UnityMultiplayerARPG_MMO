@@ -22,7 +22,7 @@ namespace MultiplayerARPG.MMO
         public string exePath = "./Build.exe";
         public bool notSpawnInBatchMode = false;
         public int startPort = 8000;
-        public List<string> spawningScenes;
+        public List<UnityScene> spawningScenes;
 
         [Header("Running In Editor")]
         public bool isOverrideExePath;
@@ -154,7 +154,17 @@ namespace MultiplayerARPG.MMO
             if (responseCode == AckResponseCode.Success)
             {
                 if (spawningScenes == null || spawningScenes.Count == 0)
-                    spawningScenes = MMOServerInstance.Singleton.GetScenes();
+                {
+                    spawningScenes = new List<UnityScene>();
+                    var sceneNames = GameInstance.Singleton.GetGameScenes();
+                    foreach (var sceneName in sceneNames)
+                    {
+                        spawningScenes.Add(new UnityScene()
+                        {
+                            SceneName = sceneName
+                        });
+                    }
+                }
                 foreach (var scene in spawningScenes)
                 {
                     SpawnMap(scene);
