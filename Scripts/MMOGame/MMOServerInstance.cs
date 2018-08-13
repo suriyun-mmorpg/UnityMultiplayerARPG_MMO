@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-using LiteNetLibManager;
 using System.Net;
 using System.Net.Security;
+using System.IO;
+using MiniJSON;
 
 namespace MultiplayerARPG.MMO
 {
@@ -12,22 +13,35 @@ namespace MultiplayerARPG.MMO
     {
         public static MMOServerInstance Singleton { get; protected set; }
 
-        public const string ARG_CENTRAL_ADDRESS = "-centralAddress";
-        public const string ARG_CENTRAL_PORT = "-centralPort";
-        public const string ARG_CENTRAL_MAX_CONNECTIONS = "-centralMaxConnections";
-        public const string ARG_MACHINE_ADDRESS = "-machineAddress";
+        public const string CONFIG_CENTRAL_ADDRESS = "centralAddress";
+        public const string ARG_CENTRAL_ADDRESS = "-" + CONFIG_CENTRAL_ADDRESS;
+        public const string CONFIG_CENTRAL_PORT = "centralPort";
+        public const string ARG_CENTRAL_PORT = "-" + CONFIG_CENTRAL_PORT;
+        public const string CONFIG_CENTRAL_MAX_CONNECTIONS = "centralMaxConnections";
+        public const string ARG_CENTRAL_MAX_CONNECTIONS = "-" + CONFIG_CENTRAL_MAX_CONNECTIONS;
+        public const string CONFIG_MACHINE_ADDRESS = "machineAddress";
+        public const string ARG_MACHINE_ADDRESS = "-" + CONFIG_MACHINE_ADDRESS;
         // Map spawn server
-        public const string ARG_MAP_SPAWN_PORT = "-mapSpawnPort";
-        public const string ARG_MAP_SPAWN_MAX_CONNECTIONS = "-mapSpawnMaxConnections";
-        public const string ARG_SPAWN_EXE_PATH = "-spawnExePath";
-        public const string ARG_NOT_SPAWN_IN_BATCH_MODE = "-notSpawnInBatchMode";
+        public const string CONFIG_MAP_SPAWN_PORT = "mapSpawnPort";
+        public const string ARG_MAP_SPAWN_PORT = "-" + CONFIG_MAP_SPAWN_PORT;
+        public const string CONFIG_MAP_SPAWN_MAX_CONNECTIONS = "mapSpawnMaxConnections";
+        public const string ARG_MAP_SPAWN_MAX_CONNECTIONS = "-" + CONFIG_MAP_SPAWN_MAX_CONNECTIONS;
+        public const string CONFIG_SPAWN_EXE_PATH = "spawnExePath";
+        public const string ARG_SPAWN_EXE_PATH = "-" + CONFIG_SPAWN_EXE_PATH;
+        public const string CONFIG_NOT_SPAWN_IN_BATCH_MODE = "notSpawnInBatchMode";
+        public const string ARG_NOT_SPAWN_IN_BATCH_MODE = "-" + CONFIG_NOT_SPAWN_IN_BATCH_MODE;
         // Map server
-        public const string ARG_MAP_PORT = "-mapPort";
-        public const string ARG_MAP_MAX_CONNECTIONS = "-mapMaxConnections";
-        public const string ARG_SCENE_NAME = "-sceneName";
+        public const string CONFIG_MAP_PORT = "mapPort";
+        public const string ARG_MAP_PORT = "-" + CONFIG_MAP_PORT;
+        public const string CONFIG_MAP_MAX_CONNECTIONS = "mapMaxConnections";
+        public const string ARG_MAP_MAX_CONNECTIONS = "-" + CONFIG_MAP_MAX_CONNECTIONS;
+        public const string CONFIG_SCENE_NAME = "sceneName";
+        public const string ARG_SCENE_NAME = "-" + CONFIG_SCENE_NAME;
         // Chat server
-        public const string ARG_CHAT_PORT = "-chatPort";
-        public const string ARG_CHAT_MAX_CONNECTIONS = "-chatMaxConnections";
+        public const string CONFIG_CHAT_PORT = "chatPort";
+        public const string ARG_CHAT_PORT = "-" + CONFIG_CHAT_PORT;
+        public const string CONFIG_CHAT_MAX_CONNECTIONS = "chatMaxConnections";
+        public const string ARG_CHAT_MAX_CONNECTIONS = "-" + CONFIG_CHAT_MAX_CONNECTIONS;
         // Start servers
         public const string ARG_START_CENTRAL_SERVER = "-startCentralServer";
         public const string ARG_START_MAP_SPAWN_SERVER = "-startMapSpawnServer";
@@ -92,6 +106,15 @@ namespace MultiplayerARPG.MMO
             {
                 var gameInstance = FindObjectOfType<GameInstance>();
 
+                // Json file read
+                var configFilePath = Path.Combine(Application.dataPath, "config/serverConfig.json");
+                var jsonConfig = new Dictionary<string, object>();
+                if (File.Exists(configFilePath))
+                {
+                    string dataAsJson = File.ReadAllText(configFilePath);
+                    jsonConfig = Json.Deserialize(dataAsJson) as Dictionary<string, object>;
+                }
+
                 // Prepare data
                 var args = Environment.GetCommandLineArgs();
 
@@ -99,92 +122,114 @@ namespace MultiplayerARPG.MMO
                 if (args == null)
                     args = new string[0];
 
-                if (IsArgsProvided(args, ARG_CENTRAL_ADDRESS))
+                // Central network address
+                string centralNetworkAddress;
+                if (ReadArgs(args, ARG_CENTRAL_ADDRESS, out centralNetworkAddress, "localhost") ||
+                    ReadConfigs(jsonConfig, CONFIG_CENTRAL_ADDRESS, out centralNetworkAddress, "localhost"))
                 {
-                    var address = ReadArgs(args, ARG_CENTRAL_ADDRESS, "localhost");
-                    mapSpawnNetworkManager.centralNetworkAddress = address;
-                    mapNetworkManager.centralNetworkAddress = address;
-                    chatNetworkManager.centralNetworkAddress = address;
+                    mapSpawnNetworkManager.centralNetworkAddress = centralNetworkAddress;
+                    mapNetworkManager.centralNetworkAddress = centralNetworkAddress;
+                    chatNetworkManager.centralNetworkAddress = centralNetworkAddress;
                 }
 
-                if (IsArgsProvided(args, ARG_CENTRAL_PORT))
+                // Central network port
+                int centralNetworkPort;
+                if (ReadArgs(args, ARG_CENTRAL_PORT, out centralNetworkPort, 6000) ||
+                    ReadConfigs(jsonConfig, CONFIG_CENTRAL_PORT, out centralNetworkPort, 6000))
                 {
-                    var port = ReadArgsInt(args, ARG_CENTRAL_PORT, 6000);
-                    centralNetworkManager.networkPort = port;
-                    mapSpawnNetworkManager.centralNetworkPort = port;
-                    mapNetworkManager.centralNetworkPort = port;
-                    chatNetworkManager.centralNetworkPort = port;
+                    centralNetworkManager.networkPort = centralNetworkPort;
+                    mapSpawnNetworkManager.centralNetworkPort = centralNetworkPort;
+                    mapNetworkManager.centralNetworkPort = centralNetworkPort;
+                    chatNetworkManager.centralNetworkPort = centralNetworkPort;
                 }
 
-                if (IsArgsProvided(args, ARG_CENTRAL_MAX_CONNECTIONS))
+                // Central max connections
+                int centralMaxConnections;
+                if (ReadArgs(args, ARG_CENTRAL_MAX_CONNECTIONS, out centralMaxConnections, 1100) ||
+                    ReadConfigs(jsonConfig, CONFIG_CENTRAL_MAX_CONNECTIONS, out centralMaxConnections, 1100))
                 {
-                    var maxConnections = ReadArgsInt(args, ARG_CENTRAL_MAX_CONNECTIONS, 1100);
-                    centralNetworkManager.maxConnections = maxConnections;
+                    centralNetworkManager.maxConnections = centralMaxConnections;
                 }
 
-                if (IsArgsProvided(args, ARG_MACHINE_ADDRESS))
+                // Machine network address, will be set to map spawn / map / chat
+                string machineNetworkAddress;
+                if (ReadArgs(args, ARG_MACHINE_ADDRESS, out machineNetworkAddress, "localhost") ||
+                    ReadConfigs(jsonConfig, CONFIG_MACHINE_ADDRESS, out machineNetworkAddress, "localhost"))
                 {
-                    var address = ReadArgs(args, ARG_MACHINE_ADDRESS, "127.0.0.1");
-                    mapSpawnNetworkManager.machineAddress = address;
-                    mapNetworkManager.machineAddress = address;
-                    chatNetworkManager.machineAddress = address;
+                    mapSpawnNetworkManager.machineAddress = machineNetworkAddress;
+                    mapNetworkManager.machineAddress = machineNetworkAddress;
+                    chatNetworkManager.machineAddress = machineNetworkAddress;
                 }
 
-                if (IsArgsProvided(args, ARG_MAP_SPAWN_PORT))
+                // Map spawn network port
+                int mapSpawnNetworkPort;
+                if (ReadArgs(args, ARG_MAP_SPAWN_PORT, out mapSpawnNetworkPort, 6001) ||
+                    ReadConfigs(jsonConfig, CONFIG_MAP_SPAWN_PORT, out mapSpawnNetworkPort, 6001))
                 {
-                    var port = ReadArgsInt(args, ARG_MAP_SPAWN_PORT, 6001);
-                    mapSpawnNetworkManager.networkPort = port;
+                    mapSpawnNetworkManager.networkPort = mapSpawnNetworkPort;
                 }
 
-                if (IsArgsProvided(args, ARG_MAP_SPAWN_MAX_CONNECTIONS))
+                // Map spawn max connections
+                int mapSpawnMaxConnections;
+                if (ReadArgs(args, ARG_MAP_SPAWN_MAX_CONNECTIONS, out mapSpawnMaxConnections, 1100) ||
+                    ReadConfigs(jsonConfig, CONFIG_MAP_SPAWN_MAX_CONNECTIONS, out mapSpawnMaxConnections, 1100))
                 {
-                    var maxConnections = ReadArgsInt(args, ARG_MAP_SPAWN_MAX_CONNECTIONS, 1100);
-                    mapSpawnNetworkManager.maxConnections = maxConnections;
+                    mapSpawnNetworkManager.maxConnections = mapSpawnMaxConnections;
                 }
 
-                if (IsArgsProvided(args, ARG_SPAWN_EXE_PATH))
+                // Map spawn exe path
+                string spawnExePath;
+                if (ReadArgs(args, ARG_SPAWN_EXE_PATH, out spawnExePath, "./Build.exe") ||
+                    ReadConfigs(jsonConfig, CONFIG_SPAWN_EXE_PATH, out spawnExePath, "./Build.exe"))
                 {
-                    var exePath = ReadArgs(args, ARG_SPAWN_EXE_PATH, "./Build.exe");
-                    mapSpawnNetworkManager.exePath = exePath;
+                    mapSpawnNetworkManager.exePath = spawnExePath;
                 }
 
-                if (IsArgsProvided(args, ARG_NOT_SPAWN_IN_BATCH_MODE))
-                    mapSpawnNetworkManager.notSpawnInBatchMode = true;
-
-                if (IsArgsProvided(args, ARG_MACHINE_ADDRESS))
+                // Map spawn in batch mode
+                bool notSpawnInBatchMode = IsArgsProvided(args, ARG_NOT_SPAWN_IN_BATCH_MODE);
+                if (notSpawnInBatchMode || ReadConfigs(jsonConfig, CONFIG_NOT_SPAWN_IN_BATCH_MODE, out notSpawnInBatchMode))
                 {
-                    var address = ReadArgs(args, ARG_MACHINE_ADDRESS, "127.0.0.1");
-                    mapNetworkManager.machineAddress = address;
+                    mapSpawnNetworkManager.notSpawnInBatchMode = notSpawnInBatchMode;
                 }
 
-                if (IsArgsProvided(args, ARG_MAP_PORT))
+                // Map network port
+                int mapNetworkPort;
+                if (ReadArgs(args, ARG_MAP_PORT, out mapNetworkPort, 6002) ||
+                    ReadConfigs(jsonConfig, CONFIG_MAP_PORT, out mapNetworkPort, 6002))
                 {
-                    var port = ReadArgsInt(args, ARG_MAP_PORT, 6002);
-                    mapNetworkManager.networkPort = port;
+                    mapNetworkManager.networkPort = mapNetworkPort;
                 }
 
-                if (IsArgsProvided(args, ARG_MAP_MAX_CONNECTIONS))
+                // Map max connections
+                int mapMaxConnections;
+                if (ReadArgs(args, ARG_MAP_MAX_CONNECTIONS, out mapMaxConnections, 1100) ||
+                    ReadConfigs(jsonConfig, CONFIG_MAP_MAX_CONNECTIONS, out mapMaxConnections, 1100))
                 {
-                    var maxConnections = ReadArgsInt(args, ARG_MAP_MAX_CONNECTIONS, 1100);
-                    mapNetworkManager.maxConnections = maxConnections;
+                    mapNetworkManager.maxConnections = mapMaxConnections;
                 }
 
-                if (IsArgsProvided(args, ARG_SCENE_NAME))
+                // Map scene name
+                string mapSceneName;
+                if (ReadArgs(args, ARG_SCENE_NAME, out mapSceneName) ||
+                    ReadConfigs(jsonConfig, CONFIG_SCENE_NAME, out mapSceneName))
                 {
-                    var sceneName = ReadArgs(args, ARG_SCENE_NAME);
-                    mapNetworkManager.Assets.onlineScene.SceneName = sceneName;
+                    mapNetworkManager.Assets.onlineScene.SceneName = mapSceneName;
                 }
 
-                if (IsArgsProvided(args, ARG_CHAT_PORT))
+                // Chat network port
+                int chatNetworkPort;
+                if (ReadArgs(args, ARG_CHAT_PORT, out chatNetworkPort, 6003) ||
+                    ReadConfigs(jsonConfig, CONFIG_CHAT_PORT, out chatNetworkPort, 6003))
                 {
-                    var port = ReadArgsInt(args, ARG_CHAT_PORT, 6003);
-                    chatNetworkManager.networkPort = port;
+                    chatNetworkManager.networkPort = chatNetworkPort;
                 }
 
-                if (IsArgsProvided(args, ARG_CHAT_MAX_CONNECTIONS))
+                // Chat max connections
+                int chatMaxConnections;
+                if (ReadArgs(args, ARG_CHAT_MAX_CONNECTIONS, out chatMaxConnections, 1100) ||
+                    ReadConfigs(jsonConfig, CONFIG_CHAT_MAX_CONNECTIONS, out chatMaxConnections, 1100))
                 {
-                    var maxConnections = ReadArgsInt(args, ARG_CHAT_MAX_CONNECTIONS, 1100);
-                    chatNetworkManager.maxConnections = maxConnections;
+                    chatNetworkManager.maxConnections = chatMaxConnections;
                 }
 
                 var logFileName = "Log";
@@ -291,27 +336,63 @@ namespace MultiplayerARPG.MMO
             chatNetworkManager.StartServer();
         }
         #endregion
-        
-        private string ReadArgs(string[] args, string argName, string defaultValue = null)
+
+        private bool ReadConfigs(Dictionary<string, object> config, string configName, out string result, string defaultValue = null)
         {
+            result = defaultValue;
+
+            if (config == null || !config.ContainsKey(configName))
+                return false;
+
+            result = (string)config[configName];
+            return true;
+        }
+
+        private bool ReadConfigs(Dictionary<string, object> config, string configName, out int result, int defaultValue = -1)
+        {
+            result = defaultValue;
+
+            if (config == null || !config.ContainsKey(configName))
+                return false;
+
+            result = (int)config[configName];
+            return true;
+        }
+
+        private bool ReadConfigs(Dictionary<string, object> config, string configName, out bool result, bool defaultValue = false)
+        {
+            result = defaultValue;
+
+            if (config == null || !config.ContainsKey(configName))
+                return false;
+
+            result = (bool)config[configName];
+            return true;
+        }
+
+        private bool ReadArgs(string[] args, string argName, out string result, string defaultValue = null)
+        {
+            result = defaultValue;
+
             if (args == null)
-                return defaultValue;
+                return false;
 
             var argsList = new List<string>(args);
             if (!argsList.Contains(argName))
-                return defaultValue;
+                return false;
 
             var index = argsList.FindIndex(0, a => a.Equals(argName));
-            return args[index + 1];
+            result = args[index + 1];
+            return true;
         }
 
-        private int ReadArgsInt(string[] args, string argName, int defaultValue = -1)
+        private bool ReadArgs(string[] args, string argName, out int result, int defaultValue = -1)
         {
-            var number = ReadArgs(args, argName, defaultValue.ToString());
-            var result = defaultValue;
-            if (int.TryParse(number, out result))
-                return result;
-            return defaultValue;
+            result = defaultValue;
+            string number = string.Empty;
+            if (ReadArgs(args, argName, out number, defaultValue.ToString()) && int.TryParse(number, out result))
+                return true;
+            return false;
         }
 
         private bool IsArgsProvided(string[] args, string argName)
