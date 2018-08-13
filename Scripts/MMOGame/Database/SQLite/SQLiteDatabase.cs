@@ -28,6 +28,19 @@ namespace MultiplayerARPG.MMO
 
         public override void Initialize()
         {
+            // Json file read
+            var configFilePath = "./config/sqliteConfig.json";
+            var jsonConfig = new Dictionary<string, object>();
+            Debug.Log("[SQLiteDatabase] Reading config file from " + configFilePath);
+            if (File.Exists(configFilePath))
+            {
+                Debug.Log("[SQLiteDatabase] Found config file");
+                string dataAsJson = File.ReadAllText(configFilePath);
+                jsonConfig = Json.Deserialize(dataAsJson) as Dictionary<string, object>;
+            }
+
+            ConfigReader.ReadConfigs(jsonConfig, "sqliteDbPath", out dbPath, dbPath);
+
             connection = NewConnection();
             connection.Open();
             Init();

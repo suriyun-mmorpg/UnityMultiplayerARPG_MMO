@@ -4,6 +4,7 @@ using System.Net;
 using System.Threading.Tasks;
 using UnityEngine;
 using MiniJSON;
+using System.IO;
 
 namespace MultiplayerARPG.MMO
 {
@@ -26,6 +27,26 @@ namespace MultiplayerARPG.MMO
         private string password = "";
         [SerializeField]
         private string dbName = "mmorpgtemplate";
+
+        public override void Initialize()
+        {
+            // Json file read
+            var configFilePath = "./config/mySqlConfig.json";
+            var jsonConfig = new Dictionary<string, object>();
+            Debug.Log("[MySQLDatabase] Reading config file from " + configFilePath);
+            if (File.Exists(configFilePath))
+            {
+                Debug.Log("[MySQLDatabase] Found config file");
+                string dataAsJson = File.ReadAllText(configFilePath);
+                jsonConfig = Json.Deserialize(dataAsJson) as Dictionary<string, object>;
+            }
+
+            ConfigReader.ReadConfigs(jsonConfig, "mySqlAddress", out address, address);
+            ConfigReader.ReadConfigs(jsonConfig, "mySqlPort", out port, port);
+            ConfigReader.ReadConfigs(jsonConfig, "mySqlUsername", out username, username);
+            ConfigReader.ReadConfigs(jsonConfig, "mySqlPassword", out password, password);
+            ConfigReader.ReadConfigs(jsonConfig, "mySqlDbName", out dbName, dbName);
+        }
 
         public string GetConnectionString()
         {

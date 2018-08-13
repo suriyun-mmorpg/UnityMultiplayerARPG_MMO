@@ -200,6 +200,8 @@ namespace MultiplayerARPG.MMO
                     : Process.GetCurrentProcess().MainModule.FileName;
             }
 
+            UnityEngine.Debug.Log("Starting process from: " + path);
+
             // Spawning Process Info
             var startProcessInfo = new ProcessStartInfo(path)
             {
