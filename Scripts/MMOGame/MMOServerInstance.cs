@@ -30,6 +30,8 @@ namespace MultiplayerARPG.MMO
         public const string ARG_SPAWN_EXE_PATH = "-" + CONFIG_SPAWN_EXE_PATH;
         public const string CONFIG_NOT_SPAWN_IN_BATCH_MODE = "notSpawnInBatchMode";
         public const string ARG_NOT_SPAWN_IN_BATCH_MODE = "-" + CONFIG_NOT_SPAWN_IN_BATCH_MODE;
+        public const string CONFIG_SPAWN_MAPS = "spawnMaps";
+        public const string ARG_SPAWN_MAPS = "-" + CONFIG_SPAWN_MAPS;
         // Map server
         public const string CONFIG_MAP_PORT = "mapPort";
         public const string ARG_MAP_PORT = "-" + CONFIG_MAP_PORT;
@@ -190,6 +192,21 @@ namespace MultiplayerARPG.MMO
                 if (notSpawnInBatchMode || ReadConfigs(jsonConfig, CONFIG_NOT_SPAWN_IN_BATCH_MODE, out notSpawnInBatchMode))
                 {
                     mapSpawnNetworkManager.notSpawnInBatchMode = notSpawnInBatchMode;
+                }
+
+                // Spawn maps
+                List<string> spawnMaps;
+                if (ReadArgs(args, ARG_SPAWN_MAPS, out spawnMaps, new List<string>()) ||
+                    ReadConfigs(jsonConfig, CONFIG_SPAWN_MAPS, out spawnMaps, new List<string>()))
+                {
+                    mapSpawnNetworkManager = new MapSpawnNetworkManager();
+                    foreach (var spawnMap in spawnMaps)
+                    {
+                        mapSpawnNetworkManager.spawningScenes.Add(new UnityScene()
+                        {
+                            SceneName = spawnMap
+                        });
+                    }
                 }
 
                 // Map network port
@@ -370,6 +387,17 @@ namespace MultiplayerARPG.MMO
             return true;
         }
 
+        private bool ReadConfigs(Dictionary<string, object> config, string configName, out List<string> result, List<string> defaultValue = null)
+        {
+            result = defaultValue;
+
+            if (config == null || !config.ContainsKey(configName))
+                return false;
+
+            result = (List<string>)config[configName];
+            return true;
+        }
+
         private bool ReadArgs(string[] args, string argName, out string result, string defaultValue = null)
         {
             result = defaultValue;
@@ -389,9 +417,21 @@ namespace MultiplayerARPG.MMO
         private bool ReadArgs(string[] args, string argName, out int result, int defaultValue = -1)
         {
             result = defaultValue;
-            string number = string.Empty;
-            if (ReadArgs(args, argName, out number, defaultValue.ToString()) && int.TryParse(number, out result))
+            string text = string.Empty;
+            if (ReadArgs(args, argName, out text, defaultValue.ToString()) && int.TryParse(text, out result))
                 return true;
+            return false;
+        }
+
+        private bool ReadArgs(string[] args, string argName, out List<string> result, List<string> defaultValue = null)
+        {
+            result = defaultValue;
+            string text = string.Empty;
+            if (ReadArgs(args, argName, out text, ""))
+            {
+                result = new List<string>(text.Split('|'));
+                return true;
+            }
             return false;
         }
 
