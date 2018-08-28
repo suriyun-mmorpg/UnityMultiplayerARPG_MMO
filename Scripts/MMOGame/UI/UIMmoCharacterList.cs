@@ -84,6 +84,12 @@ namespace MultiplayerARPG.MMO
             }
 
             // Show list of created characters
+            for (var i = selectableCharacters.Count - 1; i >= 0; --i)
+            {
+                var selectableCharacter = selectableCharacters[i];
+                if (selectableCharacter == null || !GameInstance.PlayerCharacters.ContainsKey(selectableCharacter.DataId))
+                    selectableCharacters.RemoveAt(i);
+            }
             selectableCharacters.Sort(new PlayerCharacterDataLastUpdateComparer().Desc());
             CacheList.Generate(selectableCharacters, (index, character, ui) =>
             {
