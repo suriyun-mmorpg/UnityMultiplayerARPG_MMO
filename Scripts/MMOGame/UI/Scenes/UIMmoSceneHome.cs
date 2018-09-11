@@ -40,6 +40,7 @@ namespace MultiplayerARPG.MMO
 
         public void OnCentralServerDisconnected(NetPeer netPeer, DisconnectInfo disconnectInfo)
         {
+            UISceneGlobal.Singleton.ShowDisconnectDialog(disconnectInfo);
             ClearHistory();
         }
 
