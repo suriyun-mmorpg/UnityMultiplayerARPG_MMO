@@ -501,9 +501,9 @@ namespace MultiplayerARPG.MMO
             if (saveCharactersTask != null && !saveCharactersTask.IsCompleted)
                 await saveCharactersTask;
             var tasks = new List<Task>();
-            foreach (var playerCharacterEntity in playerCharacters.Values)
+            foreach (var playerCharacterEntity in playerCharacters)
             {
-                tasks.Add(Database.UpdateCharacter(playerCharacterEntity.CloneTo(new PlayerCharacterData())));
+                tasks.Add(Database.UpdateCharacter(playerCharacterEntity.Value));
             }
             await Task.WhenAll(tasks);
             Debug.Log("Characters Saved");
@@ -515,11 +515,12 @@ namespace MultiplayerARPG.MMO
             if (saveWorldTask != null && !saveWorldTask.IsCompleted)
                 await saveWorldTask;
             var tasks = new List<Task>();
-            foreach (var buildingEntity in buildingEntities.Values)
+            foreach (var buildingEntity in buildingEntities)
             {
-                tasks.Add(Database.UpdateBuilding(Assets.onlineScene.SceneName, buildingEntity));
+                tasks.Add(Database.UpdateBuilding(Assets.onlineScene.SceneName, buildingEntity.Value));
             }
             await Task.WhenAll(tasks);
+            Debug.Log("World Saved");
         }
 
         public override async void CreateBuildingEntity(BuildingSaveData saveData, bool initialize)
