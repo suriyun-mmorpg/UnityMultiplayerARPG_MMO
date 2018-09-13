@@ -124,6 +124,8 @@ namespace MultiplayerARPG.MMO
               statPoint INTEGER NOT NULL,
               skillPoint INTEGER NOT NULL,
               gold INTEGER NOT NULL,
+              partyId INTEGER NOT NULL,
+              guildId INTEGER NOT NULL,
               currentMapName TEXT NOT NULL,
               currentPositionX REAL NOT NULL,
               currentPositionY REAL NOT NULL,
@@ -185,6 +187,10 @@ namespace MultiplayerARPG.MMO
                 await ExecuteNonQuery("ALTER TABLE characteritem ADD durability REAL NOT NULL DEFAULT 0;");
             if (!IsColumnExist("userlogin", "cash"))
                 await ExecuteNonQuery("ALTER TABLE userlogin ADD cash INTEGER NOT NULL DEFAULT 0;");
+            if (!IsColumnExist("characters", "partyId"))
+                await ExecuteNonQuery("ALTER TABLE characters ADD partyId INTEGER NOT NULL DEFAULT 0;");
+            if (!IsColumnExist("characters", "guildId"))
+                await ExecuteNonQuery("ALTER TABLE characters ADD guildId INTEGER NOT NULL DEFAULT 0;");
         }
 
         private bool IsColumnExist(string tableName, string findingColumn)

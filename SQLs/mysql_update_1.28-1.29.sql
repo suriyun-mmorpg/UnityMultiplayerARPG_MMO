@@ -1,0 +1,1 @@
+ALTER TABLE `characters` ADD `partyId` INT NOT NULL DEFAULT '0' AFTER `gold`, ADD `guildId` INT NOT NULL DEFAULT '0' AFTER `partyId`;
