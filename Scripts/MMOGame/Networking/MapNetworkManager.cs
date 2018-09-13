@@ -138,7 +138,7 @@ namespace MultiplayerARPG.MMO
             var connectId = peer.ConnectId;
             // Save player character data
             BasePlayerCharacterEntity playerCharacterEntity;
-            if (!playerCharacters.TryGetValue(connectId, out playerCharacterEntity))
+            if (playerCharacters.TryGetValue(connectId, out playerCharacterEntity))
             {
                 var savingCharacterData = new PlayerCharacterData();
                 playerCharacterEntity.CloneTo(savingCharacterData);
