@@ -178,40 +178,6 @@ namespace MultiplayerARPG.MMO
                 onClientDisconnected(peer, disconnectInfo);
         }
 
-        public override async void WarpCharacter(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position)
-        {
-            if (playerCharacterEntity == null || !IsServer)
-                return;
-            base.WarpCharacter(playerCharacterEntity, mapName, position);
-            long connectId = playerCharacterEntity.ConnectId;
-            NetPeer peer;
-            CentralServerPeerInfo peerInfo;
-            if (!string.IsNullOrEmpty(mapName) &&
-                !mapName.Equals(playerCharacterEntity.CurrentMapName) &&
-                playerCharacters.ContainsKey(connectId) &&
-                Peers.TryGetValue(connectId, out peer) &&
-                mapServerPeersBySceneName.TryGetValue(mapName, out peerInfo))
-            {
-                var message = new MMOWarpMessage();
-                message.sceneName = mapName;
-                message.networkAddress = peerInfo.networkAddress;
-                message.networkPort = peerInfo.networkPort;
-                message.connectKey = peerInfo.connectKey;
-                LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MsgTypes.Warp, message);
-                // Save character current map / position
-                var savingCharacterData = new PlayerCharacterData();
-                playerCharacterEntity.CloneTo(savingCharacterData);
-                savingCharacterData.CurrentMapName = mapName;
-                savingCharacterData.CurrentPosition = position;
-                saveCharactersTask = SaveCharacter(savingCharacterData);
-                await saveCharactersTask;
-                // Unregister player character
-                UnregisterPlayerCharacter(peer);
-                // Destroy character from server
-                playerCharacterEntity.NetworkDestroy();
-            }
-        }
-
         #region Character spawn function
         public override void SerializeClientReadyExtra(NetDataWriter writer)
         {
@@ -551,6 +517,78 @@ namespace MultiplayerARPG.MMO
             {
                 harvestableSpawnArea.SpawnAll();
             }
+        }
+        #endregion
+
+        #region Implement Abstract Functions
+        public override async void WarpCharacter(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position)
+        {
+            if (playerCharacterEntity == null || !IsServer)
+                return;
+            // If warping to same map player does not have to reload new map data
+            if (string.IsNullOrEmpty(mapName) || mapName.Equals(playerCharacterEntity.CurrentMapName))
+            {
+                playerCharacterEntity.CacheNetTransform.Teleport(position, Quaternion.identity);
+                return;
+            }
+            // If warping to different map
+            long connectId = playerCharacterEntity.ConnectId;
+            NetPeer peer;
+            CentralServerPeerInfo peerInfo;
+            if (!string.IsNullOrEmpty(mapName) &&
+                !mapName.Equals(playerCharacterEntity.CurrentMapName) &&
+                playerCharacters.ContainsKey(connectId) &&
+                Peers.TryGetValue(connectId, out peer) &&
+                mapServerPeersBySceneName.TryGetValue(mapName, out peerInfo))
+            {
+                var message = new MMOWarpMessage();
+                message.sceneName = mapName;
+                message.networkAddress = peerInfo.networkAddress;
+                message.networkPort = peerInfo.networkPort;
+                message.connectKey = peerInfo.connectKey;
+                LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MsgTypes.Warp, message);
+                // Save character current map / position
+                var savingCharacterData = new PlayerCharacterData();
+                playerCharacterEntity.CloneTo(savingCharacterData);
+                savingCharacterData.CurrentMapName = mapName;
+                savingCharacterData.CurrentPosition = position;
+                saveCharactersTask = SaveCharacter(savingCharacterData);
+                await saveCharactersTask;
+                // Unregister player character
+                UnregisterPlayerCharacter(peer);
+                // Destroy character from server
+                playerCharacterEntity.NetworkDestroy();
+            }
+        }
+
+        public override void CreateParty(BasePlayerCharacterEntity playerCharacterEntity, bool shareExp, bool shareItem)
+        {
+            if (playerCharacterEntity == null || !IsServer)
+                return;
+        }
+
+        public override void PartySetting(BasePlayerCharacterEntity playerCharacterEntity, bool shareExp, bool shareItem)
+        {
+            if (playerCharacterEntity == null || !IsServer)
+                return;
+        }
+
+        public override void AddPartyMember(BasePlayerCharacterEntity inviteCharacterEntity, BasePlayerCharacterEntity acceptCharacterEntity)
+        {
+            if (inviteCharacterEntity == null || acceptCharacterEntity == null || !IsServer)
+                return;
+        }
+
+        public override void KickFromParty(BasePlayerCharacterEntity playerCharacterEntity, string characterId)
+        {
+            if (playerCharacterEntity == null || !IsServer)
+                return;
+        }
+
+        public override void LeaveParty(BasePlayerCharacterEntity playerCharacterEntity)
+        {
+            if (playerCharacterEntity == null || !IsServer)
+                return;
         }
         #endregion
     }
