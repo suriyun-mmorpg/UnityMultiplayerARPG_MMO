@@ -215,7 +215,7 @@ namespace MultiplayerARPG.MMO
                     return;
                 }
                 // Load party data, if this map-server does not have party data
-                if (!parties.ContainsKey(playerCharacterData.PartyId))
+                if (playerCharacterData.PartyId > 0 && !parties.ContainsKey(playerCharacterData.PartyId))
                     LoadPartyDataFromDatabase(playerCharacterData.PartyId);
                 // If it is not allow this character data, disconnect user
                 var dataId = playerCharacterData.DataId;
@@ -462,12 +462,16 @@ namespace MultiplayerARPG.MMO
         #endregion
 
         #region Load Functions
-        private void LoadPartyDataFromDatabase(int partyId)
+        private async void LoadPartyDataFromDatabase(int partyId)
         {
             // If there are other party loading which is not completed, it will not load again
-            if (loadingPartyIds.Contains(partyId))
+            if (partyId <= 0 || loadingPartyIds.Contains(partyId))
                 return;
             loadingPartyIds.Add(partyId);
+            var party = await Database.ReadParty(partyId);
+            if (party != null)
+                parties[partyId] = party;
+            loadingPartyIds.Remove(partyId);
         }
         #endregion
 

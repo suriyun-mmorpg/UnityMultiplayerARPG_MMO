@@ -12,9 +12,9 @@ namespace MultiplayerARPG.MMO
             return 0;
         }
 
-        public override async Task<PartyMemberData> ReadParty(int id)
+        public override async Task<PartyData> ReadParty(int id)
         {
-            var result = new PartyMemberData();
+            PartyData result = null;
             return result;
         }
 
