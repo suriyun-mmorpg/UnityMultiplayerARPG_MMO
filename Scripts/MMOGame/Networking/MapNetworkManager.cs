@@ -83,7 +83,7 @@ namespace MultiplayerARPG.MMO
             if (IsServer)
             {
                 CentralAppServerRegister.PollEvents();
-                var tempUnscaledTime = Time.unscaledTime;
+                tempUnscaledTime = Time.unscaledTime;
                 if (tempUnscaledTime - lastSaveCharacterTime > autoSaveDuration)
                 {
                     if (saveCharactersTask == null || saveCharactersTask.IsCompleted)
