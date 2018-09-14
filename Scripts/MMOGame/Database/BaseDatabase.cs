@@ -45,5 +45,10 @@ namespace MultiplayerARPG.MMO
         public abstract Task<List<BuildingSaveData>> ReadBuildings(string mapName);
         public abstract Task UpdateBuilding(string mapName, IBuildingSaveData saveData);
         public abstract Task DeleteBuilding(string mapName, string id);
+
+        public abstract Task<int> CreateParty(bool shareExp, bool shareItem, string leaderId);
+        public abstract Task<PartyMemberData> ReadParty(int id);
+        public abstract Task UpdateParty(int id, bool shareExp, bool shareItem);
+        public abstract Task DeleteParty(int id);
     }
 }
