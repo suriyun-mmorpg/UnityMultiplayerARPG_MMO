@@ -59,8 +59,8 @@ namespace MultiplayerARPG.MMO
         {
             await ExecuteNonQuery("BEGIN");
             await ExecuteNonQuery("INSERT INTO characters " +
-                "(id, userId, dataId, characterName, level, exp, currentHp, currentMp, currentStamina, currentFood, currentWater, statPoint, skillPoint, gold, partyId, guildId, currentMapName, currentPositionX, currentPositionY, currentPositionZ, respawnMapName, respawnPositionX, respawnPositionY, respawnPositionZ) VALUES " +
-                "(@id, @userId, @dataId, @characterName, @level, @exp, @currentHp, @currentMp, @currentStamina, @currentFood, @currentWater, @statPoint, @skillPoint, @gold, @partyId, @guildId, @currentMapName, @currentPositionX, @currentPositionY, @currentPositionZ, @respawnMapName, @respawnPositionX, @respawnPositionY, @respawnPositionZ)",
+                "(id, userId, dataId, characterName, level, exp, currentHp, currentMp, currentStamina, currentFood, currentWater, statPoint, skillPoint, gold, currentMapName, currentPositionX, currentPositionY, currentPositionZ, respawnMapName, respawnPositionX, respawnPositionY, respawnPositionZ) VALUES " +
+                "(@id, @userId, @dataId, @characterName, @level, @exp, @currentHp, @currentMp, @currentStamina, @currentFood, @currentWater, @statPoint, @skillPoint, @gold, @currentMapName, @currentPositionX, @currentPositionY, @currentPositionZ, @respawnMapName, @respawnPositionX, @respawnPositionY, @respawnPositionZ)",
                 new SqliteParameter("@id", characterData.Id),
                 new SqliteParameter("@userId", userId),
                 new SqliteParameter("@dataId", characterData.DataId),
@@ -75,8 +75,6 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@statPoint", characterData.StatPoint),
                 new SqliteParameter("@skillPoint", characterData.SkillPoint),
                 new SqliteParameter("@gold", characterData.Gold),
-                new SqliteParameter("@partyId", characterData.PartyId),
-                new SqliteParameter("@guildId", characterData.GuildId),
                 new SqliteParameter("@currentMapName", characterData.CurrentMapName),
                 new SqliteParameter("@currentPositionX", characterData.CurrentPosition.x),
                 new SqliteParameter("@currentPositionY", characterData.CurrentPosition.y),
@@ -111,8 +109,6 @@ namespace MultiplayerARPG.MMO
                 result.StatPoint = reader.GetInt16("statPoint");
                 result.SkillPoint = reader.GetInt16("skillPoint");
                 result.Gold = reader.GetInt32("gold");
-                result.PartyId = reader.GetInt32("partyId");
-                result.GuildId = reader.GetInt32("guildId");
                 result.CurrentMapName = reader.GetString("currentMapName");
                 result.CurrentPosition = new Vector3(reader.GetFloat("currentPositionX"), reader.GetFloat("currentPositionY"), reader.GetFloat("currentPositionZ"));
                 result.RespawnMapName = reader.GetString("respawnMapName");
@@ -202,8 +198,6 @@ namespace MultiplayerARPG.MMO
                 "statPoint=@statPoint, " +
                 "skillPoint=@skillPoint, " +
                 "gold=@gold, " +
-                "partyId=@partyId, " +
-                "guildId=@guildId, " +
                 "currentMapName=@currentMapName, " +
                 "currentPositionX=@currentPositionX, " +
                 "currentPositionY=@currentPositionY, " +
@@ -225,8 +219,6 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@statPoint", characterData.StatPoint),
                 new SqliteParameter("@skillPoint", characterData.SkillPoint),
                 new SqliteParameter("@gold", characterData.Gold),
-                new SqliteParameter("@partyId", characterData.PartyId),
-                new SqliteParameter("@guildId", characterData.GuildId),
                 new SqliteParameter("@currentMapName", characterData.CurrentMapName),
                 new SqliteParameter("@currentPositionX", characterData.CurrentPosition.x),
                 new SqliteParameter("@currentPositionY", characterData.CurrentPosition.y),
