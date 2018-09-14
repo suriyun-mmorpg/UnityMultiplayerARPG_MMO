@@ -61,8 +61,8 @@ namespace MultiplayerARPG.MMO
             connection.Open();
             await ExecuteNonQuery(connection, "START TRANSACTION");
             await ExecuteNonQuery(connection, "INSERT INTO characters " +
-                "(id, userId, dataId, characterName, level, exp, currentHp, currentMp, currentStamina, currentFood, currentWater, statPoint, skillPoint, gold, currentMapName, currentPositionX, currentPositionY, currentPositionZ, respawnMapName, respawnPositionX, respawnPositionY, respawnPositionZ) VALUES " +
-                "(@id, @userId, @dataId, @characterName, @level, @exp, @currentHp, @currentMp, @currentStamina, @currentFood, @currentWater, @statPoint, @skillPoint, @gold, @currentMapName, @currentPositionX, @currentPositionY, @currentPositionZ, @respawnMapName, @respawnPositionX, @respawnPositionY, @respawnPositionZ)",
+                "(id, userId, dataId, characterName, level, exp, currentHp, currentMp, currentStamina, currentFood, currentWater, statPoint, skillPoint, gold, partyId, guildId, currentMapName, currentPositionX, currentPositionY, currentPositionZ, respawnMapName, respawnPositionX, respawnPositionY, respawnPositionZ) VALUES " +
+                "(@id, @userId, @dataId, @characterName, @level, @exp, @currentHp, @currentMp, @currentStamina, @currentFood, @currentWater, @statPoint, @skillPoint, @gold, @partyId, @guildId, @currentMapName, @currentPositionX, @currentPositionY, @currentPositionZ, @respawnMapName, @respawnPositionX, @respawnPositionY, @respawnPositionZ)",
                 new MySqlParameter("@id", characterData.Id),
                 new MySqlParameter("@userId", userId),
                 new MySqlParameter("@dataId", characterData.DataId),
@@ -77,6 +77,8 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@statPoint", characterData.StatPoint),
                 new MySqlParameter("@skillPoint", characterData.SkillPoint),
                 new MySqlParameter("@gold", characterData.Gold),
+                new MySqlParameter("@partyId", characterData.PartyId),
+                new MySqlParameter("@guildId", characterData.GuildId),
                 new MySqlParameter("@currentMapName", characterData.CurrentMapName),
                 new MySqlParameter("@currentPositionX", characterData.CurrentPosition.x),
                 new MySqlParameter("@currentPositionY", characterData.CurrentPosition.y),
@@ -112,6 +114,8 @@ namespace MultiplayerARPG.MMO
                 result.StatPoint = (short)reader.GetInt32("statPoint");
                 result.SkillPoint = (short)reader.GetInt32("skillPoint");
                 result.Gold = reader.GetInt32("gold");
+                result.PartyId = reader.GetInt32("partyId");
+                result.GuildId = reader.GetInt32("guildId");
                 result.CurrentMapName = reader.GetString("currentMapName");
                 result.CurrentPosition = new Vector3(reader.GetFloat("currentPositionX"), reader.GetFloat("currentPositionY"), reader.GetFloat("currentPositionZ"));
                 result.RespawnMapName = reader.GetString("respawnMapName");
@@ -203,6 +207,8 @@ namespace MultiplayerARPG.MMO
                 "statPoint=@statPoint, " +
                 "skillPoint=@skillPoint, " +
                 "gold=@gold, " +
+                "partyId=@partyId, " +
+                "guildId=@guildId, " +
                 "currentMapName=@currentMapName, " +
                 "currentPositionX=@currentPositionX, " +
                 "currentPositionY=@currentPositionY, " +
@@ -224,6 +230,8 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@statPoint", characterData.StatPoint),
                 new MySqlParameter("@skillPoint", characterData.SkillPoint),
                 new MySqlParameter("@gold", characterData.Gold),
+                new MySqlParameter("@partyId", characterData.PartyId),
+                new MySqlParameter("@guildId", characterData.GuildId),
                 new MySqlParameter("@currentMapName", characterData.CurrentMapName),
                 new MySqlParameter("@currentPositionX", characterData.CurrentPosition.x),
                 new MySqlParameter("@currentPositionY", characterData.CurrentPosition.y),

@@ -69,6 +69,7 @@ namespace MultiplayerARPG.MMO
         // Listing
         private readonly Dictionary<string, CentralServerPeerInfo> mapServerPeersBySceneName = new Dictionary<string, CentralServerPeerInfo>();
         private readonly Dictionary<long, SimpleUserCharacterData> users = new Dictionary<long, SimpleUserCharacterData>();
+        private readonly HashSet<int> loadingPartyIds = new HashSet<int>();
 
         protected override void Awake()
         {
@@ -206,12 +207,17 @@ namespace MultiplayerARPG.MMO
             else
             {
                 var playerCharacterData = await Database.ReadCharacter(userId, selectCharacterId);
+                // If data is empty / cannot find character, disconnect user
                 if (playerCharacterData == null)
                 {
                     Debug.LogError("[Map Server] Cannot find select character: " + selectCharacterId + " for user: " + userId);
                     Server.NetManager.DisconnectPeer(peer);
                     return;
                 }
+                // Load party data, if this map-server does not have party data
+                if (!parties.ContainsKey(playerCharacterData.PartyId))
+                    LoadPartyDataFromDatabase(playerCharacterData.PartyId);
+                // If it is not allow this character data, disconnect user
                 var dataId = playerCharacterData.DataId;
                 PlayerCharacter playerCharacter;
                 if (!GameInstance.PlayerCharacters.TryGetValue(dataId, out playerCharacter) || playerCharacter.entityPrefab == null)
@@ -219,6 +225,7 @@ namespace MultiplayerARPG.MMO
                     Debug.LogError("[Map Server] Cannot find player character with data Id: " + dataId);
                     return;
                 }
+                // Spawn character entity and set its data
                 var playerCharacterPrefab = playerCharacter.entityPrefab;
                 var identity = Assets.NetworkSpawn(playerCharacterPrefab.Identity.HashAssetId, playerCharacterData.CurrentPosition, Quaternion.identity, 0, peer.ConnectId);
                 var playerCharacterEntity = identity.GetComponent<BasePlayerCharacterEntity>();
@@ -454,7 +461,17 @@ namespace MultiplayerARPG.MMO
         }
         #endregion
 
-        #region Save character functions
+        #region Load Functions
+        private void LoadPartyDataFromDatabase(int partyId)
+        {
+            // If there are other party loading which is not completed, it will not load again
+            if (loadingPartyIds.Contains(partyId))
+                return;
+            loadingPartyIds.Add(partyId);
+        }
+        #endregion
+
+        #region Save functions
         private async Task SaveCharacter(IPlayerCharacterData playerCharacterData)
         {
             if (saveCharactersTask != null && !saveCharactersTask.IsCompleted)
