@@ -83,20 +83,21 @@ namespace MultiplayerARPG.MMO
             if (IsServer)
             {
                 CentralAppServerRegister.PollEvents();
-                if (Time.unscaledTime - lastSaveCharacterTime > autoSaveDuration)
+                var tempUnscaledTime = Time.unscaledTime;
+                if (tempUnscaledTime - lastSaveCharacterTime > autoSaveDuration)
                 {
                     if (saveCharactersTask == null || saveCharactersTask.IsCompleted)
                     {
                         saveCharactersTask = SaveCharacters();
-                        lastSaveCharacterTime = Time.unscaledTime;
+                        lastSaveCharacterTime = tempUnscaledTime;
                     }
                 }
-                if (Time.unscaledTime - lastSaveWorldTime > autoSaveDuration)
+                if (tempUnscaledTime - lastSaveWorldTime > autoSaveDuration)
                 {
                     if (saveWorldTask == null || saveWorldTask.IsCompleted)
                     {
                         saveWorldTask = SaveWorld();
-                        lastSaveWorldTime = Time.unscaledTime;
+                        lastSaveWorldTime = tempUnscaledTime;
                     }
                 }
             }
@@ -565,30 +566,35 @@ namespace MultiplayerARPG.MMO
         {
             if (playerCharacterEntity == null || !IsServer)
                 return;
+            // TODO: Connect to chat server to create party, then chat server send info to all map server
         }
 
         public override void PartySetting(BasePlayerCharacterEntity playerCharacterEntity, bool shareExp, bool shareItem)
         {
             if (playerCharacterEntity == null || !IsServer)
                 return;
+            // TODO: Connect to chat server to setting party, then chat server send info to all map server
         }
 
         public override void AddPartyMember(BasePlayerCharacterEntity inviteCharacterEntity, BasePlayerCharacterEntity acceptCharacterEntity)
         {
             if (inviteCharacterEntity == null || acceptCharacterEntity == null || !IsServer)
                 return;
+            // TODO: Connect to chat server to add party member, then chat server send info to all map server
         }
 
         public override void KickFromParty(BasePlayerCharacterEntity playerCharacterEntity, string characterId)
         {
             if (playerCharacterEntity == null || !IsServer)
                 return;
+            // TODO: Connect to chat server to kick party member, then chat server send info to all map server
         }
 
         public override void LeaveParty(BasePlayerCharacterEntity playerCharacterEntity)
         {
             if (playerCharacterEntity == null || !IsServer)
                 return;
+            // TODO: Connect to chat server to leave party, then chat server send info to all map server
         }
         #endregion
     }
