@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Jun 25, 2018 at 06:33 PM
+-- Generation Time: Sep 14, 2018 at 12:33 PM
 -- Server version: 10.1.28-MariaDB
 -- PHP Version: 7.1.11
 
@@ -16,7 +16,11 @@ SET time_zone = "+00:00";
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Database: `mmorpgtemplate`
+--
 
 -- --------------------------------------------------------
 
@@ -182,6 +186,19 @@ CREATE TABLE `characterskill` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `party`
+--
+
+CREATE TABLE `party` (
+  `id` int(11) NOT NULL,
+  `shareExp` tinyint(1) NOT NULL,
+  `shareItem` tinyint(1) NOT NULL,
+  `leaderId` varchar(50) COLLATE utf8_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `userlogin`
 --
 
@@ -250,11 +267,27 @@ ALTER TABLE `characterskill`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `party`
+--
+ALTER TABLE `party`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `userlogin`
 --
 ALTER TABLE `userlogin`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `username` (`username`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `party`
+--
+ALTER TABLE `party`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
