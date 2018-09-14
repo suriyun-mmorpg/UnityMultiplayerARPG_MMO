@@ -24,5 +24,9 @@ namespace MultiplayerARPG.MMO
         public override async Task DeleteParty(int id)
         {
         }
+
+        public override async Task SetCharacterParty(string characterId, int partyId)
+        {
+        }
     }
 }

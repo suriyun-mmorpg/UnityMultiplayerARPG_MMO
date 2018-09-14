@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -19,6 +20,7 @@ namespace MultiplayerARPG.MMO
         public string machineAddress = "127.0.0.1";
         [Header("Database")]
         public float autoSaveDuration = 2f;
+        public float reloadPartyDuration = 5f;
 
         public System.Action<NetPeer> onClientConnected;
         public System.Action<NetPeer, DisconnectInfo> onClientDisconnected;
@@ -70,6 +72,7 @@ namespace MultiplayerARPG.MMO
         private readonly Dictionary<string, CentralServerPeerInfo> mapServerPeersBySceneName = new Dictionary<string, CentralServerPeerInfo>();
         private readonly Dictionary<long, SimpleUserCharacterData> users = new Dictionary<long, SimpleUserCharacterData>();
         private readonly HashSet<int> loadingPartyIds = new HashSet<int>();
+        private readonly Dictionary<int, float> lastLoadPartyTime = new Dictionary<int, float>();
 
         protected override void Awake()
         {
@@ -216,7 +219,7 @@ namespace MultiplayerARPG.MMO
                 }
                 // Load party data, if this map-server does not have party data
                 if (playerCharacterData.PartyId > 0 && !parties.ContainsKey(playerCharacterData.PartyId))
-                    LoadPartyDataFromDatabase(playerCharacterData.PartyId);
+                    await LoadPartyDataFromDatabase(playerCharacterData.PartyId);
                 // If it is not allow this character data, disconnect user
                 var dataId = playerCharacterData.DataId;
                 PlayerCharacter playerCharacter;
@@ -396,6 +399,27 @@ namespace MultiplayerARPG.MMO
             LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MsgTypes.CashPackageBuyValidation, responseMessage);
         }
 
+        protected override async void HandleRequestPartyInfo(LiteNetLibMessageHandler messageHandler)
+        {
+            var peer = messageHandler.peer;
+            var message = messageHandler.ReadMessage<BaseAckMessage>();
+            var responseMessage = new ResponsePartyInfoMessage();
+            responseMessage.ackId = message.ackId;
+            responseMessage.responseCode = AckResponseCode.Success;
+            BasePlayerCharacterEntity playerCharacterEntity;
+            PartyData partyData;
+            if (playerCharacters.TryGetValue(peer.ConnectId, out playerCharacterEntity))
+            {
+                await LoadPartyDataFromDatabase(playerCharacterEntity.PartyId);
+                // Set character party id to 0 if there is no party info with defined Id
+                if (parties.TryGetValue(playerCharacterEntity.PartyId, out partyData))
+                    responseMessage.members = partyData.GetMembers().ToArray();
+                else
+                    playerCharacterEntity.PartyId = 0;
+            }
+            LiteNetLibPacketSender.SendPacket(SendOptions.Sequenced, peer, MsgTypes.PartyInfo, responseMessage);
+        }
+
         private void HandleResponseAppServerAddress(LiteNetLibMessageHandler messageHandler)
         {
             var peer = messageHandler.peer;
@@ -462,15 +486,19 @@ namespace MultiplayerARPG.MMO
         #endregion
 
         #region Load Functions
-        private async void LoadPartyDataFromDatabase(int partyId)
+        private async Task LoadPartyDataFromDatabase(int partyId)
         {
             // If there are other party loading which is not completed, it will not load again
             if (partyId <= 0 || loadingPartyIds.Contains(partyId))
+                return;
+            // If it is loading too frequently, skip it
+            if (lastLoadPartyTime.ContainsKey(partyId) && Time.unscaledTime - lastLoadPartyTime[partyId] <= reloadPartyDuration)
                 return;
             loadingPartyIds.Add(partyId);
             var party = await Database.ReadParty(partyId);
             if (party != null)
                 parties[partyId] = party;
+            lastLoadPartyTime[partyId] = Time.unscaledTime;
             loadingPartyIds.Remove(partyId);
         }
         #endregion
@@ -583,39 +611,102 @@ namespace MultiplayerARPG.MMO
             }
         }
 
-        public override void CreateParty(BasePlayerCharacterEntity playerCharacterEntity, bool shareExp, bool shareItem)
+        public override async void CreateParty(BasePlayerCharacterEntity playerCharacterEntity, bool shareExp, bool shareItem)
         {
             if (playerCharacterEntity == null || !IsServer)
                 return;
-            // TODO: Connect to chat server to create party, then chat server send info to all map server
+            var partyId = await Database.CreateParty(shareExp, shareItem, playerCharacterEntity.Id);
+            var party = new PartyData(partyId, shareExp, shareItem, playerCharacterEntity);
+            await Database.SetCharacterParty(playerCharacterEntity.Id, partyId);
+            parties[partyId] = party;
+            playerCharacterEntity.PartyId = partyId;
         }
 
-        public override void PartySetting(BasePlayerCharacterEntity playerCharacterEntity, bool shareExp, bool shareItem)
+        public override async void PartySetting(BasePlayerCharacterEntity playerCharacterEntity, bool shareExp, bool shareItem)
         {
             if (playerCharacterEntity == null || !IsServer)
                 return;
-            // TODO: Connect to chat server to setting party, then chat server send info to all map server
+            var partyId = playerCharacterEntity.PartyId;
+            PartyData party;
+            if (!parties.TryGetValue(partyId, out party))
+                return;
+            if (!party.IsLeader(playerCharacterEntity))
+            {
+                // TODO: May warn that it's not party leader
+                return;
+            }
+            await Database.UpdateParty(playerCharacterEntity.PartyId, shareExp, shareItem);
+            party.Setting(shareExp, shareItem);
+            parties[partyId] = party;
         }
 
-        public override void AddPartyMember(BasePlayerCharacterEntity inviteCharacterEntity, BasePlayerCharacterEntity acceptCharacterEntity)
+        public override async void AddPartyMember(BasePlayerCharacterEntity inviteCharacterEntity, BasePlayerCharacterEntity acceptCharacterEntity)
         {
             if (inviteCharacterEntity == null || acceptCharacterEntity == null || !IsServer)
                 return;
-            // TODO: Connect to chat server to add party member, then chat server send info to all map server
+            var partyId = inviteCharacterEntity.PartyId;
+            PartyData party;
+            if (!parties.TryGetValue(partyId, out party))
+                return;
+            if (!party.IsLeader(inviteCharacterEntity))
+            {
+                // TODO: May warn that it's not party leader
+                return;
+            }
+            if (party.CountMember() == gameInstance.maxPartyMember)
+            {
+                // TODO: May warn that it's exceeds limit max party member
+                return;
+            }
+            await Database.SetCharacterParty(acceptCharacterEntity.Id, partyId);
+            party.AddMember(acceptCharacterEntity);
+            parties[partyId] = party;
+            acceptCharacterEntity.PartyId = partyId;
         }
 
-        public override void KickFromParty(BasePlayerCharacterEntity playerCharacterEntity, string characterId)
+        public override async void KickFromParty(BasePlayerCharacterEntity playerCharacterEntity, string characterId)
         {
             if (playerCharacterEntity == null || !IsServer)
                 return;
-            // TODO: Connect to chat server to kick party member, then chat server send info to all map server
+            var partyId = playerCharacterEntity.PartyId;
+            PartyData party;
+            if (!parties.TryGetValue(partyId, out party))
+                return;
+            if (!party.IsLeader(playerCharacterEntity))
+            {
+                // TODO: May warn that it's not party leader
+                return;
+            }
+            await Database.SetCharacterParty(characterId, 0);
+            party.RemoveMember(characterId);
+            parties[partyId] = party;
         }
 
-        public override void LeaveParty(BasePlayerCharacterEntity playerCharacterEntity)
+        public override async void LeaveParty(BasePlayerCharacterEntity playerCharacterEntity)
         {
             if (playerCharacterEntity == null || !IsServer)
                 return;
-            // TODO: Connect to chat server to leave party, then chat server send info to all map server
+            var partyId = playerCharacterEntity.PartyId;
+            PartyData party;
+            if (!parties.TryGetValue(partyId, out party))
+                return;
+            // If it is leader kick all members and terminate party
+            if (!party.IsLeader(playerCharacterEntity))
+            {
+                var tasks = new List<Task>();
+                foreach (var memberId in party.GetMemberIds())
+                {
+                    tasks.Add(Database.SetCharacterParty(memberId, 0));
+                }
+                await Task.WhenAll(tasks);
+                parties.Remove(partyId);
+            }
+            else
+            {
+                await Database.SetCharacterParty(playerCharacterEntity.Id, 0);
+                party.RemoveMember(playerCharacterEntity.Id);
+                parties[partyId] = party;
+            }
         }
         #endregion
     }
