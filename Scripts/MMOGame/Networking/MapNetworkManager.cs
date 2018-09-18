@@ -413,7 +413,12 @@ namespace MultiplayerARPG.MMO
                 await LoadPartyDataFromDatabase(playerCharacterEntity.PartyId);
                 // Set character party id to 0 if there is no party info with defined Id
                 if (parties.TryGetValue(playerCharacterEntity.PartyId, out partyData))
+                {
+                    responseMessage.shareExp = partyData.shareExp;
+                    responseMessage.shareItem = partyData.shareItem;
+                    responseMessage.leaderId = partyData.leaderId;
                     responseMessage.members = partyData.GetMembers().ToArray();
+                }
                 else
                     playerCharacterEntity.PartyId = 0;
             }
