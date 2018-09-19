@@ -697,7 +697,7 @@ namespace MultiplayerARPG.MMO
             if (!parties.TryGetValue(partyId, out party))
                 return;
             // If it is leader kick all members and terminate party
-            if (!party.IsLeader(playerCharacterEntity))
+            if (party.IsLeader(playerCharacterEntity))
             {
                 var tasks = new List<Task>();
                 foreach (var memberId in party.GetMemberIds())
