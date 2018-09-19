@@ -20,7 +20,6 @@ namespace MultiplayerARPG.MMO
         public string machineAddress = "127.0.0.1";
         [Header("Database")]
         public float autoSaveDuration = 2f;
-        public float reloadPartyDuration = 1f;
 
         public System.Action<NetPeer> onClientConnected;
         public System.Action<NetPeer, DisconnectInfo> onClientDisconnected;
@@ -72,7 +71,6 @@ namespace MultiplayerARPG.MMO
         private readonly Dictionary<string, CentralServerPeerInfo> mapServerPeersBySceneName = new Dictionary<string, CentralServerPeerInfo>();
         private readonly Dictionary<long, SimpleUserCharacterData> users = new Dictionary<long, SimpleUserCharacterData>();
         private readonly HashSet<int> loadingPartyIds = new HashSet<int>();
-        private readonly Dictionary<int, float> lastLoadPartyTime = new Dictionary<int, float>();
 
         protected override void Awake()
         {
@@ -104,6 +102,25 @@ namespace MultiplayerARPG.MMO
                         lastSaveWorldTime = tempUnscaledTime;
                     }
                 }
+            }
+        }
+
+        protected override async void UpdatePartyMembers()
+        {
+            foreach (var party in parties.Values)
+            {
+                foreach (var memberId in party.GetMemberIds())
+                {
+                    BasePlayerCharacterEntity playerCharacterEntity;
+                    if (playerCharactersById.TryGetValue(memberId, out playerCharacterEntity))
+                    {
+                        party.UpdateMember(playerCharacterEntity);
+                        party.UpdateMemberVisible(memberId, true);
+                    }
+                    else
+                        party.UpdateMemberVisible(memberId, false);
+                }
+                await LoadPartyDataFromDatabase(party.id);
             }
         }
 
@@ -396,33 +413,7 @@ namespace MultiplayerARPG.MMO
             responseMessage.dataId = dataId;
             responseMessage.cash = cash;
             LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MsgTypes.CashPackageBuyValidation, responseMessage);
-        }
-
-        protected override async void HandleRequestPartyData(LiteNetLibMessageHandler messageHandler)
-        {
-            var peer = messageHandler.peer;
-            var message = messageHandler.ReadMessage<BaseAckMessage>();
-            var responseMessage = new ResponsePartyInfoMessage();
-            responseMessage.ackId = message.ackId;
-            responseMessage.responseCode = AckResponseCode.Success;
-            BasePlayerCharacterEntity playerCharacterEntity;
-            PartyData partyData;
-            if (playerCharacters.TryGetValue(peer.ConnectId, out playerCharacterEntity) && playerCharacterEntity.PartyId > 0)
-            {
-                await LoadPartyDataFromDatabase(playerCharacterEntity.PartyId);
-                // Set character party id to 0 if there is no party info with defined Id
-                if (parties.TryGetValue(playerCharacterEntity.PartyId, out partyData))
-                {
-                    responseMessage.shareExp = partyData.shareExp;
-                    responseMessage.shareItem = partyData.shareItem;
-                    responseMessage.leaderId = partyData.leaderId;
-                    responseMessage.members = partyData.GetMembers().ToArray();
-                }
-                else
-                    playerCharacterEntity.PartyId = 0;
-            }
-            LiteNetLibPacketSender.SendPacket(SendOptions.Sequenced, peer, MsgTypes.PartyData, responseMessage);
-        }
+        }        
 
         private void HandleResponseAppServerAddress(LiteNetLibMessageHandler messageHandler)
         {
@@ -495,16 +486,12 @@ namespace MultiplayerARPG.MMO
             // If there are other party loading which is not completed, it will not load again
             if (partyId <= 0 || loadingPartyIds.Contains(partyId))
                 return;
-            // If it is loading too frequently, skip it
-            if (lastLoadPartyTime.ContainsKey(partyId) && Time.unscaledTime - lastLoadPartyTime[partyId] <= reloadPartyDuration)
-                return;
             loadingPartyIds.Add(partyId);
             var party = await Database.ReadParty(partyId);
             if (party != null)
                 parties[partyId] = party;
             else
                 parties.Remove(partyId);
-            lastLoadPartyTime[partyId] = Time.unscaledTime;
             loadingPartyIds.Remove(partyId);
         }
         #endregion
@@ -603,17 +590,18 @@ namespace MultiplayerARPG.MMO
                 message.networkPort = peerInfo.networkPort;
                 message.connectKey = peerInfo.connectKey;
                 LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MsgTypes.Warp, message);
-                // Save character current map / position
+                // Clone character data to save
                 var savingCharacterData = new PlayerCharacterData();
                 playerCharacterEntity.CloneTo(savingCharacterData);
-                savingCharacterData.CurrentMapName = mapName;
-                savingCharacterData.CurrentPosition = position;
-                saveCharactersTask = SaveCharacter(savingCharacterData);
-                await saveCharactersTask;
                 // Unregister player character
                 UnregisterPlayerCharacter(peer);
                 // Destroy character from server
                 playerCharacterEntity.NetworkDestroy();
+                // Save character current map / position
+                savingCharacterData.CurrentMapName = mapName;
+                savingCharacterData.CurrentPosition = position;
+                saveCharactersTask = SaveCharacter(savingCharacterData);
+                await saveCharactersTask;
             }
         }
 

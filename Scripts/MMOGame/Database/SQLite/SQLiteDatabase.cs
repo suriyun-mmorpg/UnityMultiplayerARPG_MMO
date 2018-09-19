@@ -178,6 +178,13 @@ namespace MultiplayerARPG.MMO
               updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
 
+            await ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS party (
+              id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+              shareExp INTEGER NOT NULL,
+              shareItem INTEGER NOT NULL,
+              leaderId TEXT NOT NULL
+            )");
+
             await ExecuteNonQuery("END");
             
             this.InvokeInstanceDevExtMethods("Init");
