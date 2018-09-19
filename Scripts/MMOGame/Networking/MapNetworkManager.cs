@@ -107,9 +107,10 @@ namespace MultiplayerARPG.MMO
 
         protected override async void UpdatePartyMembers()
         {
-            foreach (var party in parties.Values)
+            List<Task> tasks = new List<Task>();
+            foreach (var party in parties.Values.ToArray())
             {
-                foreach (var memberId in party.GetMemberIds())
+                foreach (var memberId in party.GetMemberIds().ToArray())
                 {
                     BasePlayerCharacterEntity playerCharacterEntity;
                     if (playerCharactersById.TryGetValue(memberId, out playerCharacterEntity))
@@ -120,8 +121,10 @@ namespace MultiplayerARPG.MMO
                     else
                         party.UpdateMemberVisible(memberId, false);
                 }
-                await LoadPartyDataFromDatabase(party.id);
+                tasks.Add(LoadPartyDataFromDatabase(party.id));
             }
+            await Task.WhenAll(tasks);
+            Debug.Log("Updated party members");
         }
 
         protected override async void OnDestroy()
@@ -584,12 +587,6 @@ namespace MultiplayerARPG.MMO
                 Peers.TryGetValue(connectId, out peer) &&
                 mapServerPeersBySceneName.TryGetValue(mapName, out peerInfo))
             {
-                var message = new MMOWarpMessage();
-                message.sceneName = mapName;
-                message.networkAddress = peerInfo.networkAddress;
-                message.networkPort = peerInfo.networkPort;
-                message.connectKey = peerInfo.connectKey;
-                LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MsgTypes.Warp, message);
                 // Clone character data to save
                 var savingCharacterData = new PlayerCharacterData();
                 playerCharacterEntity.CloneTo(savingCharacterData);
@@ -602,6 +599,13 @@ namespace MultiplayerARPG.MMO
                 savingCharacterData.CurrentPosition = position;
                 saveCharactersTask = SaveCharacter(savingCharacterData);
                 await saveCharactersTask;
+                // Send message to client to warp
+                var message = new MMOWarpMessage();
+                message.sceneName = mapName;
+                message.networkAddress = peerInfo.networkAddress;
+                message.networkPort = peerInfo.networkPort;
+                message.connectKey = peerInfo.connectKey;
+                LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MsgTypes.Warp, message);
             }
         }
 
