@@ -112,6 +112,8 @@ namespace MultiplayerARPG.MMO
                 result.StatPoint = (short)reader.GetInt32("statPoint");
                 result.SkillPoint = (short)reader.GetInt32("skillPoint");
                 result.Gold = reader.GetInt32("gold");
+                result.PartyId = reader.GetInt32("partyId");
+                result.GuildId = reader.GetInt32("guildId");
                 result.CurrentMapName = reader.GetString("currentMapName");
                 result.CurrentPosition = new Vector3(reader.GetFloat("currentPositionX"), reader.GetFloat("currentPositionY"), reader.GetFloat("currentPositionZ"));
                 result.RespawnMapName = reader.GetString("respawnMapName");
