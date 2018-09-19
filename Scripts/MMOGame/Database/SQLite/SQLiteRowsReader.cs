@@ -53,6 +53,16 @@ namespace MultiplayerARPG.MMO
             return (System.DateTime)dataDict[currentRow][columnName];
         }
 
+        public object GetObject(int index)
+        {
+            return data[currentRow][index];
+        }
+
+        public object GetObject(string columnName)
+        {
+            return dataDict[currentRow][columnName];
+        }
+
         public byte GetByte(int index)
         {
             return (byte)(long)data[currentRow][index];
