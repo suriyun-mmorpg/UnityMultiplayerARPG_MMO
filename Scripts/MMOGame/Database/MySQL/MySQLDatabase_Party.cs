@@ -16,7 +16,7 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@shareItem", shareItem ? 1 : 0),
                 new MySqlParameter("@leaderId", leaderId));
             if (reader.Read())
-                id = (int)reader.GetInt64(0);
+                id = (int)reader.GetUInt64(0);
             if (id > 0)
                 await ExecuteNonQuery("UPDATE characters SET partyId=@id WHERE id=@leaderId",
                     new MySqlParameter("@id", id),
@@ -32,7 +32,8 @@ namespace MultiplayerARPG.MMO
             if (reader.Read())
             {
                 result = new PartyData(id, reader.GetBoolean("shareExp"), reader.GetBoolean("shareItem"), reader.GetString("leaderId"));
-                reader = await ExecuteReader("SELECT id, dataId, characterName, level FROM characters WHERE partyId=@id");
+                reader = await ExecuteReader("SELECT id, dataId, characterName, level FROM characters WHERE partyId=@id",
+                    new MySqlParameter("@id", id));
                 PartyMemberData partyMemberData;
                 while (reader.Read())
                 {

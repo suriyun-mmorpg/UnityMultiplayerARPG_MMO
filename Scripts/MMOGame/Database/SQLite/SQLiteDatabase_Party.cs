@@ -11,7 +11,7 @@ namespace MultiplayerARPG.MMO
         {
             int id = 0;
             var reader = await ExecuteReader("INSERT INTO party (shareExp, shareItem, leaderId) VALUES (@shareExp, @shareItem, @leaderId);" +
-                "SELECT LAST_INSERT_ID();",
+                "SELECT LAST_INSERT_ROWID();",
                 new SqliteParameter("@shareExp", shareExp ? 1 : 0),
                 new SqliteParameter("@shareItem", shareItem ? 1 : 0),
                 new SqliteParameter("@leaderId", leaderId));
@@ -32,7 +32,8 @@ namespace MultiplayerARPG.MMO
             if (reader.Read())
             {
                 result = new PartyData(id, reader.GetBoolean("shareExp"), reader.GetBoolean("shareItem"), reader.GetString("leaderId"));
-                reader = await ExecuteReader("SELECT id, dataId, characterName, level FROM characters WHERE partyId=@id");
+                reader = await ExecuteReader("SELECT id, dataId, characterName, level FROM characters WHERE partyId=@id",
+                    new SqliteParameter("@id", id));
                 PartyMemberData partyMemberData;
                 while (reader.Read())
                 {
