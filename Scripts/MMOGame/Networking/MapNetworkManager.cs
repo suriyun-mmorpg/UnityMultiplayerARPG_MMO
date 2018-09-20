@@ -70,7 +70,8 @@ namespace MultiplayerARPG.MMO
         // Listing
         private readonly Dictionary<string, CentralServerPeerInfo> mapServerPeersBySceneName = new Dictionary<string, CentralServerPeerInfo>();
         private readonly Dictionary<long, SimpleUserCharacterData> users = new Dictionary<long, SimpleUserCharacterData>();
-        private readonly HashSet<int> loadingPartyIds = new HashSet<int>();
+        private readonly Dictionary<string, Task> savingCharacters = new Dictionary<string, Task>();
+        private readonly Dictionary<int, Task> loadingPartyIds = new Dictionary<int, Task>();
 
         protected override void Awake()
         {
@@ -142,12 +143,7 @@ namespace MultiplayerARPG.MMO
             // Save player character data
             BasePlayerCharacterEntity playerCharacterEntity;
             if (playerCharacters.TryGetValue(connectId, out playerCharacterEntity))
-            {
-                var savingCharacterData = new PlayerCharacterData();
-                playerCharacterEntity.CloneTo(savingCharacterData);
-                saveCharactersTask = SaveCharacter(savingCharacterData);
-                await saveCharactersTask;
-            }
+                await SaveCharacter(playerCharacterEntity);
             UnregisterPlayerCharacter(peer);
             base.OnPeerDisconnected(peer, disconnectInfo);
         }
@@ -465,10 +461,11 @@ namespace MultiplayerARPG.MMO
         private async Task LoadPartyDataFromDatabase(int partyId)
         {
             // If there are other party loading which is not completed, it will not load again
-            if (partyId <= 0 || loadingPartyIds.Contains(partyId))
+            if (partyId <= 0 || loadingPartyIds.ContainsKey(partyId))
                 return;
-            loadingPartyIds.Add(partyId);
-            var party = await Database.ReadParty(partyId);
+            var task = Database.ReadParty(partyId);
+            loadingPartyIds.Add(partyId, task);
+            var party = await task;
             if (party != null)
                 parties[partyId] = party;
             else
@@ -480,10 +477,15 @@ namespace MultiplayerARPG.MMO
         #region Save functions
         private async Task SaveCharacter(IPlayerCharacterData playerCharacterData)
         {
-            if (saveCharactersTask != null && !saveCharactersTask.IsCompleted)
-                await saveCharactersTask;
-            await Database.UpdateCharacter(playerCharacterData);
+            if (playerCharacterData == null)
+                return;
+            Task task;
+            if (savingCharacters.TryGetValue(playerCharacterData.Id, out task) && !task.IsCompleted)
+                await task;
+            task = Database.UpdateCharacter(playerCharacterData);
+            savingCharacters[playerCharacterData.Id] = task;
             Debug.Log("Character [" + playerCharacterData.Id + "] Saved");
+            await task;
         }
 
         private async Task SaveCharacters()
@@ -493,7 +495,7 @@ namespace MultiplayerARPG.MMO
             var tasks = new List<Task>();
             foreach (var playerCharacterEntity in playerCharacters)
             {
-                tasks.Add(Database.UpdateCharacter(playerCharacterEntity.Value));
+                tasks.Add(SaveCharacter(playerCharacterEntity.Value));
             }
             await Task.WhenAll(tasks);
             Debug.Log("Characters Saved: " + tasks.Count + " character(s)");
@@ -501,7 +503,6 @@ namespace MultiplayerARPG.MMO
 
         private async Task SaveWorld()
         {
-            // Save building entities / Tree / Rocks
             if (saveWorldTask != null && !saveWorldTask.IsCompleted)
                 await saveWorldTask;
             var tasks = new List<Task>();
@@ -571,12 +572,7 @@ namespace MultiplayerARPG.MMO
                 // Save character current map / position
                 savingCharacterData.CurrentMapName = mapName;
                 savingCharacterData.CurrentPosition = position;
-                saveCharactersTask = SaveCharacter(savingCharacterData);
-                await saveCharactersTask;
-                // Unregister player character
-                UnregisterPlayerCharacter(peer);
-                // Destroy character from server
-                playerCharacterEntity.NetworkDestroy();
+                await SaveCharacter(savingCharacterData);
                 // Send message to client to warp
                 var message = new MMOWarpMessage();
                 message.sceneName = mapName;
@@ -584,6 +580,10 @@ namespace MultiplayerARPG.MMO
                 message.networkPort = peerInfo.networkPort;
                 message.connectKey = peerInfo.connectKey;
                 LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MsgTypes.Warp, message);
+                // Unregister player character
+                UnregisterPlayerCharacter(peer);
+                // Destroy character from server
+                playerCharacterEntity.NetworkDestroy();
             }
         }
 
