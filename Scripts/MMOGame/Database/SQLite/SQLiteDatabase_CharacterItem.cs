@@ -75,8 +75,9 @@ namespace MultiplayerARPG.MMO
 
         public async Task CreateCharacterEquipWeapons(string characterId, EquipWeapons equipWeapons)
         {
-            await CreateCharacterItem(0, characterId, InventoryType.EquipWeaponRight, equipWeapons.rightHand);
-            await CreateCharacterItem(0, characterId, InventoryType.EquipWeaponLeft, equipWeapons.leftHand);
+            await Task.WhenAll(
+                CreateCharacterItem(0, characterId, InventoryType.EquipWeaponRight, equipWeapons.rightHand),
+                CreateCharacterItem(0, characterId, InventoryType.EquipWeaponLeft, equipWeapons.leftHand));
         }
 
         public async Task CreateCharacterEquipItem(int idx, string characterId, CharacterItem characterItem)

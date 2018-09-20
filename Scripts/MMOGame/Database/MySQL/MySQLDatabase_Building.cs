@@ -63,7 +63,7 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public override async Task UpdateBuilding(string mapName, IBuildingSaveData saveData)
+        public override async Task UpdateBuilding(string mapName, IBuildingSaveData building)
         {
             var connection = NewConnection();
             await connection.OpenAsync();
@@ -80,19 +80,57 @@ namespace MultiplayerARPG.MMO
                 "creatorId=@creatorId, " +
                 "creatorName=@creatorName " +
                 "WHERE id=@id AND mapName=@mapName",
-                new MySqlParameter("@id", saveData.Id),
-                new MySqlParameter("@parentId", saveData.ParentId),
-                new MySqlParameter("@dataId", saveData.DataId),
-                new MySqlParameter("@currentHp", saveData.CurrentHp),
+                new MySqlParameter("@id", building.Id),
+                new MySqlParameter("@parentId", building.ParentId),
+                new MySqlParameter("@dataId", building.DataId),
+                new MySqlParameter("@currentHp", building.CurrentHp),
                 new MySqlParameter("@mapName", mapName),
-                new MySqlParameter("@positionX", saveData.Position.x),
-                new MySqlParameter("@positionY", saveData.Position.y),
-                new MySqlParameter("@positionZ", saveData.Position.z),
-                new MySqlParameter("@rotationX", saveData.Rotation.eulerAngles.x),
-                new MySqlParameter("@rotationY", saveData.Rotation.eulerAngles.y),
-                new MySqlParameter("@rotationZ", saveData.Rotation.eulerAngles.z),
-                new MySqlParameter("@creatorId", saveData.CreatorId),
-                new MySqlParameter("@creatorName", saveData.CreatorName));
+                new MySqlParameter("@positionX", building.Position.x),
+                new MySqlParameter("@positionY", building.Position.y),
+                new MySqlParameter("@positionZ", building.Position.z),
+                new MySqlParameter("@rotationX", building.Rotation.eulerAngles.x),
+                new MySqlParameter("@rotationY", building.Rotation.eulerAngles.y),
+                new MySqlParameter("@rotationZ", building.Rotation.eulerAngles.z),
+                new MySqlParameter("@creatorId", building.CreatorId),
+                new MySqlParameter("@creatorName", building.CreatorName));
+            connection.Close();
+        }
+
+        public override async Task UpdateBuildings(string mapName, IEnumerable<IBuildingSaveData> buildings)
+        {
+            var tasks = new List<Task>();
+            var connection = NewConnection();
+            await connection.OpenAsync();
+            foreach (var building in buildings)
+            {
+                tasks.Add(ExecuteNonQuery(connection, null, "UPDATE buildings SET " +
+                    "parentId=@parentId, " +
+                    "dataId=@dataId, " +
+                    "currentHp=@currentHp, " +
+                    "positionX=@positionX, " +
+                    "positionY=@positionY, " +
+                    "positionZ=@positionZ, " +
+                    "rotationX=@rotationX, " +
+                    "rotationY=@rotationY, " +
+                    "rotationZ=@rotationZ, " +
+                    "creatorId=@creatorId, " +
+                    "creatorName=@creatorName " +
+                    "WHERE id=@id AND mapName=@mapName",
+                    new MySqlParameter("@id", building.Id),
+                    new MySqlParameter("@parentId", building.ParentId),
+                    new MySqlParameter("@dataId", building.DataId),
+                    new MySqlParameter("@currentHp", building.CurrentHp),
+                    new MySqlParameter("@mapName", mapName),
+                    new MySqlParameter("@positionX", building.Position.x),
+                    new MySqlParameter("@positionY", building.Position.y),
+                    new MySqlParameter("@positionZ", building.Position.z),
+                    new MySqlParameter("@rotationX", building.Rotation.eulerAngles.x),
+                    new MySqlParameter("@rotationY", building.Rotation.eulerAngles.y),
+                    new MySqlParameter("@rotationZ", building.Rotation.eulerAngles.z),
+                    new MySqlParameter("@creatorId", building.CreatorId),
+                    new MySqlParameter("@creatorName", building.CreatorName)));
+            }
+            await Task.WhenAll(tasks);
             connection.Close();
         }
 

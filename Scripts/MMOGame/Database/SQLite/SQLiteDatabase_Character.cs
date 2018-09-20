@@ -12,47 +12,50 @@ namespace MultiplayerARPG.MMO
         {
             // Delete all character then add all of them
             var characterId = characterData.Id;
-            await DeleteCharacterAttributes(characterId);
-            await DeleteCharacterBuffs(characterId);
-            await DeleteCharacterHotkeys(characterId);
-            await DeleteCharacterItems(characterId);
-            await DeleteCharacterQuests(characterId);
-            await DeleteCharacterSkills(characterId);
+            await Task.WhenAll(
+                DeleteCharacterAttributes(characterId),
+                DeleteCharacterBuffs(characterId),
+                DeleteCharacterHotkeys(characterId),
+                DeleteCharacterItems(characterId),
+                DeleteCharacterQuests(characterId),
+                DeleteCharacterSkills(characterId));
 
-            await CreateCharacterEquipWeapons(characterId, characterData.EquipWeapons);
+            var tasks = new List<Task>();
+            tasks.Add(CreateCharacterEquipWeapons(characterId, characterData.EquipWeapons));
             var i = 0;
             foreach (var equipItem in characterData.EquipItems)
             {
-                await CreateCharacterEquipItem(i++, characterId, equipItem);
+                tasks.Add(CreateCharacterEquipItem(i++, characterId, equipItem));
             }
             i = 0;
             foreach (var nonEquipItem in characterData.NonEquipItems)
             {
-                await CreateCharacterNonEquipItem(i++, characterId, nonEquipItem);
+                tasks.Add(CreateCharacterNonEquipItem(i++, characterId, nonEquipItem));
             }
             i = 0;
             foreach (var attribute in characterData.Attributes)
             {
-                await CreateCharacterAttribute(i++, characterId, attribute);
+                tasks.Add(CreateCharacterAttribute(i++, characterId, attribute));
             }
             i = 0;
             foreach (var skill in characterData.Skills)
             {
-                await CreateCharacterSkill(i++, characterId, skill);
+                tasks.Add(CreateCharacterSkill(i++, characterId, skill));
             }
             i = 0;
             foreach (var quest in characterData.Quests)
             {
-                await CreateCharacterQuest(i++, characterId, quest);
+                tasks.Add(CreateCharacterQuest(i++, characterId, quest));
             }
             foreach (var buff in characterData.Buffs)
             {
-                await CreateCharacterBuff(characterId, buff);
+                tasks.Add(CreateCharacterBuff(characterId, buff));
             }
             foreach (var hotkey in characterData.Hotkeys)
             {
-                await CreateCharacterHotkey(characterId, hotkey);
+                tasks.Add(CreateCharacterHotkey(characterId, hotkey));
             }
+            await Task.WhenAll(tasks);
         }
 
         public override async Task CreateCharacter(string userId, PlayerCharacterData characterData)
@@ -184,55 +187,113 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public override async Task UpdateCharacter(IPlayerCharacterData characterData)
+        public override async Task UpdateCharacter(IPlayerCharacterData character)
         {
             await ExecuteNonQuery("BEGIN");
-            await ExecuteNonQuery("UPDATE characters SET " +
-                "dataId=@dataId, " +
-                "characterName=@characterName, " +
-                "level=@level, " +
-                "exp=@exp, " +
-                "currentHp=@currentHp, " +
-                "currentMp=@currentMp, " +
-                "currentStamina=@currentStamina, " +
-                "currentFood=@currentFood, " +
-                "currentWater=@currentWater, " +
-                "statPoint=@statPoint, " +
-                "skillPoint=@skillPoint, " +
-                "gold=@gold, " +
-                "currentMapName=@currentMapName, " +
-                "currentPositionX=@currentPositionX, " +
-                "currentPositionY=@currentPositionY, " +
-                "currentPositionZ=@currentPositionZ, " +
-                "respawnMapName=@respawnMapName, " +
-                "respawnPositionX=@respawnPositionX, " +
-                "respawnPositionY=@respawnPositionY, " +
-                "respawnPositionZ=@respawnPositionZ " +
-                "WHERE id=@id",
-                new SqliteParameter("@dataId", characterData.DataId),
-                new SqliteParameter("@characterName", characterData.CharacterName),
-                new SqliteParameter("@level", characterData.Level),
-                new SqliteParameter("@exp", characterData.Exp),
-                new SqliteParameter("@currentHp", characterData.CurrentHp),
-                new SqliteParameter("@currentMp", characterData.CurrentMp),
-                new SqliteParameter("@currentStamina", characterData.CurrentStamina),
-                new SqliteParameter("@currentFood", characterData.CurrentFood),
-                new SqliteParameter("@currentWater", characterData.CurrentWater),
-                new SqliteParameter("@statPoint", characterData.StatPoint),
-                new SqliteParameter("@skillPoint", characterData.SkillPoint),
-                new SqliteParameter("@gold", characterData.Gold),
-                new SqliteParameter("@currentMapName", characterData.CurrentMapName),
-                new SqliteParameter("@currentPositionX", characterData.CurrentPosition.x),
-                new SqliteParameter("@currentPositionY", characterData.CurrentPosition.y),
-                new SqliteParameter("@currentPositionZ", characterData.CurrentPosition.z),
-                new SqliteParameter("@respawnMapName", characterData.RespawnMapName),
-                new SqliteParameter("@respawnPositionX", characterData.RespawnPosition.x),
-                new SqliteParameter("@respawnPositionY", characterData.RespawnPosition.y),
-                new SqliteParameter("@respawnPositionZ", characterData.RespawnPosition.z),
-                new SqliteParameter("@id", characterData.Id));
-            await FillCharacterRelatesData(characterData);
+            await Task.WhenAll(
+                ExecuteNonQuery("UPDATE characters SET " +
+                    "dataId=@dataId, " +
+                    "characterName=@characterName, " +
+                    "level=@level, " +
+                    "exp=@exp, " +
+                    "currentHp=@currentHp, " +
+                    "currentMp=@currentMp, " +
+                    "currentStamina=@currentStamina, " +
+                    "currentFood=@currentFood, " +
+                    "currentWater=@currentWater, " +
+                    "statPoint=@statPoint, " +
+                    "skillPoint=@skillPoint, " +
+                    "gold=@gold, " +
+                    "currentMapName=@currentMapName, " +
+                    "currentPositionX=@currentPositionX, " +
+                    "currentPositionY=@currentPositionY, " +
+                    "currentPositionZ=@currentPositionZ, " +
+                    "respawnMapName=@respawnMapName, " +
+                    "respawnPositionX=@respawnPositionX, " +
+                    "respawnPositionY=@respawnPositionY, " +
+                    "respawnPositionZ=@respawnPositionZ " +
+                    "WHERE id=@id",
+                    new SqliteParameter("@dataId", character.DataId),
+                    new SqliteParameter("@characterName", character.CharacterName),
+                    new SqliteParameter("@level", character.Level),
+                    new SqliteParameter("@exp", character.Exp),
+                    new SqliteParameter("@currentHp", character.CurrentHp),
+                    new SqliteParameter("@currentMp", character.CurrentMp),
+                    new SqliteParameter("@currentStamina", character.CurrentStamina),
+                    new SqliteParameter("@currentFood", character.CurrentFood),
+                    new SqliteParameter("@currentWater", character.CurrentWater),
+                    new SqliteParameter("@statPoint", character.StatPoint),
+                    new SqliteParameter("@skillPoint", character.SkillPoint),
+                    new SqliteParameter("@gold", character.Gold),
+                    new SqliteParameter("@currentMapName", character.CurrentMapName),
+                    new SqliteParameter("@currentPositionX", character.CurrentPosition.x),
+                    new SqliteParameter("@currentPositionY", character.CurrentPosition.y),
+                    new SqliteParameter("@currentPositionZ", character.CurrentPosition.z),
+                    new SqliteParameter("@respawnMapName", character.RespawnMapName),
+                    new SqliteParameter("@respawnPositionX", character.RespawnPosition.x),
+                    new SqliteParameter("@respawnPositionY", character.RespawnPosition.y),
+                    new SqliteParameter("@respawnPositionZ", character.RespawnPosition.z),
+                    new SqliteParameter("@id", character.Id)),
+                FillCharacterRelatesData(character));
             await ExecuteNonQuery("END");
-            this.InvokeInstanceDevExtMethods("UpdateCharacter", characterData);
+            this.InvokeInstanceDevExtMethods("UpdateCharacter", character);
+        }
+
+        public override async Task UpdateCharacters(IEnumerable<IPlayerCharacterData> characters)
+        {
+            var tasks = new List<Task>();
+            await ExecuteNonQuery("BEGIN");
+            foreach (var character in characters)
+            {
+                tasks.Add(Task.WhenAll(
+                    ExecuteNonQuery("UPDATE characters SET " +
+                        "dataId=@dataId, " +
+                        "characterName=@characterName, " +
+                        "level=@level, " +
+                        "exp=@exp, " +
+                        "currentHp=@currentHp, " +
+                        "currentMp=@currentMp, " +
+                        "currentStamina=@currentStamina, " +
+                        "currentFood=@currentFood, " +
+                        "currentWater=@currentWater, " +
+                        "statPoint=@statPoint, " +
+                        "skillPoint=@skillPoint, " +
+                        "gold=@gold, " +
+                        "currentMapName=@currentMapName, " +
+                        "currentPositionX=@currentPositionX, " +
+                        "currentPositionY=@currentPositionY, " +
+                        "currentPositionZ=@currentPositionZ, " +
+                        "respawnMapName=@respawnMapName, " +
+                        "respawnPositionX=@respawnPositionX, " +
+                        "respawnPositionY=@respawnPositionY, " +
+                        "respawnPositionZ=@respawnPositionZ " +
+                        "WHERE id=@id",
+                        new SqliteParameter("@dataId", character.DataId),
+                        new SqliteParameter("@characterName", character.CharacterName),
+                        new SqliteParameter("@level", character.Level),
+                        new SqliteParameter("@exp", character.Exp),
+                        new SqliteParameter("@currentHp", character.CurrentHp),
+                        new SqliteParameter("@currentMp", character.CurrentMp),
+                        new SqliteParameter("@currentStamina", character.CurrentStamina),
+                        new SqliteParameter("@currentFood", character.CurrentFood),
+                        new SqliteParameter("@currentWater", character.CurrentWater),
+                        new SqliteParameter("@statPoint", character.StatPoint),
+                        new SqliteParameter("@skillPoint", character.SkillPoint),
+                        new SqliteParameter("@gold", character.Gold),
+                        new SqliteParameter("@currentMapName", character.CurrentMapName),
+                        new SqliteParameter("@currentPositionX", character.CurrentPosition.x),
+                        new SqliteParameter("@currentPositionY", character.CurrentPosition.y),
+                        new SqliteParameter("@currentPositionZ", character.CurrentPosition.z),
+                        new SqliteParameter("@respawnMapName", character.RespawnMapName),
+                        new SqliteParameter("@respawnPositionX", character.RespawnPosition.x),
+                        new SqliteParameter("@respawnPositionY", character.RespawnPosition.y),
+                        new SqliteParameter("@respawnPositionZ", character.RespawnPosition.z),
+                        new SqliteParameter("@id", character.Id)),
+                    FillCharacterRelatesData(character)));
+            }
+            await Task.WhenAll(tasks);
+            await ExecuteNonQuery("END");
+            this.InvokeInstanceDevExtMethods("UpdateCharacters", characters);
         }
 
         public override async Task DeleteCharacter(string userId, string id)
@@ -244,13 +305,14 @@ namespace MultiplayerARPG.MMO
             if (count > 0)
             {
                 await ExecuteNonQuery("BEGIN");
-                await ExecuteNonQuery("DELETE FROM characters WHERE id=@characterId", new SqliteParameter("@characterId", id));
-                await DeleteCharacterAttributes(id);
-                await DeleteCharacterBuffs(id);
-                await DeleteCharacterHotkeys(id);
-                await DeleteCharacterItems(id);
-                await DeleteCharacterQuests(id);
-                await DeleteCharacterSkills(id);
+                await Task.WhenAll(
+                    ExecuteNonQuery("DELETE FROM characters WHERE id=@characterId", new SqliteParameter("@characterId", id)),
+                    DeleteCharacterAttributes(id),
+                    DeleteCharacterBuffs(id),
+                    DeleteCharacterHotkeys(id),
+                    DeleteCharacterItems(id),
+                    DeleteCharacterQuests(id),
+                    DeleteCharacterSkills(id));
                 await ExecuteNonQuery("END");
                 this.InvokeInstanceDevExtMethods("DeleteCharacter", userId, id);
             }

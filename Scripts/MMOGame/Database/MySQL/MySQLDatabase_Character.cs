@@ -12,47 +12,50 @@ namespace MultiplayerARPG.MMO
         {
             // Delete all character then add all of them
             var characterId = characterData.Id;
-            await DeleteCharacterAttributes(connection, transaction, characterId);
-            await DeleteCharacterBuffs(connection, transaction, characterId);
-            await DeleteCharacterHotkeys(connection, transaction, characterId);
-            await DeleteCharacterItems(connection, transaction, characterId);
-            await DeleteCharacterQuests(connection, transaction, characterId);
-            await DeleteCharacterSkills(connection, transaction, characterId);
+            await Task.WhenAll(
+                DeleteCharacterAttributes(connection, transaction, characterId),
+                DeleteCharacterBuffs(connection, transaction, characterId),
+                DeleteCharacterHotkeys(connection, transaction, characterId),
+                DeleteCharacterItems(connection, transaction, characterId),
+                DeleteCharacterQuests(connection, transaction, characterId),
+                DeleteCharacterSkills(connection, transaction, characterId));
 
-            await CreateCharacterEquipWeapons(connection, transaction, characterId, characterData.EquipWeapons);
+            var tasks = new List<Task>();
+            tasks.Add(CreateCharacterEquipWeapons(connection, transaction, characterId, characterData.EquipWeapons));
             var i = 0;
             foreach (var equipItem in characterData.EquipItems)
             {
-                await CreateCharacterEquipItem(connection, transaction, i++, characterId, equipItem);
+                tasks.Add(CreateCharacterEquipItem(connection, transaction, i++, characterId, equipItem));
             }
             i = 0;
             foreach (var nonEquipItem in characterData.NonEquipItems)
             {
-                await CreateCharacterNonEquipItem(connection, transaction, i++, characterId, nonEquipItem);
+                tasks.Add(CreateCharacterNonEquipItem(connection, transaction, i++, characterId, nonEquipItem));
             }
             i = 0;
             foreach (var attribute in characterData.Attributes)
             {
-                await CreateCharacterAttribute(connection, transaction, i++, characterId, attribute);
+                tasks.Add(CreateCharacterAttribute(connection, transaction, i++, characterId, attribute));
             }
             i = 0;
             foreach (var skill in characterData.Skills)
             {
-                await CreateCharacterSkill(connection, transaction, i++, characterId, skill);
+                tasks.Add(CreateCharacterSkill(connection, transaction, i++, characterId, skill));
             }
             i = 0;
             foreach (var quest in characterData.Quests)
             {
-                await CreateCharacterQuest(connection, transaction, i++, characterId, quest);
+                tasks.Add(CreateCharacterQuest(connection, transaction, i++, characterId, quest));
             }
             foreach (var buff in characterData.Buffs)
             {
-                await CreateCharacterBuff(connection, transaction, characterId, buff);
+                tasks.Add(CreateCharacterBuff(connection, transaction, characterId, buff));
             }
             foreach (var hotkey in characterData.Hotkeys)
             {
-                await CreateCharacterHotkey(connection, transaction, characterId, hotkey);
+                tasks.Add(CreateCharacterHotkey(connection, transaction, characterId, hotkey));
             }
+            await Task.WhenAll(tasks);
         }
 
         public override async Task CreateCharacter(string userId, PlayerCharacterData characterData)
@@ -188,59 +191,121 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public override async Task UpdateCharacter(IPlayerCharacterData characterData)
+        public override async Task UpdateCharacter(IPlayerCharacterData character)
         {
             var connection = NewConnection();
             await connection.OpenAsync();
             var transaction = await connection.BeginTransactionAsync();
-            await ExecuteNonQuery(connection, transaction, "UPDATE characters SET " +
-                "dataId=@dataId, " +
-                "characterName=@characterName, " +
-                "level=@level, " +
-                "exp=@exp, " +
-                "currentHp=@currentHp, " +
-                "currentMp=@currentMp, " +
-                "currentStamina=@currentStamina, " +
-                "currentFood=@currentFood, " +
-                "currentWater=@currentWater, " +
-                "statPoint=@statPoint, " +
-                "skillPoint=@skillPoint, " +
-                "gold=@gold, " +
-                "currentMapName=@currentMapName, " +
-                "currentPositionX=@currentPositionX, " +
-                "currentPositionY=@currentPositionY, " +
-                "currentPositionZ=@currentPositionZ, " +
-                "respawnMapName=@respawnMapName, " +
-                "respawnPositionX=@respawnPositionX, " +
-                "respawnPositionY=@respawnPositionY, " +
-                "respawnPositionZ=@respawnPositionZ " +
-                "WHERE id=@id",
-                new MySqlParameter("@dataId", characterData.DataId),
-                new MySqlParameter("@characterName", characterData.CharacterName),
-                new MySqlParameter("@level", characterData.Level),
-                new MySqlParameter("@exp", characterData.Exp),
-                new MySqlParameter("@currentHp", characterData.CurrentHp),
-                new MySqlParameter("@currentMp", characterData.CurrentMp),
-                new MySqlParameter("@currentStamina", characterData.CurrentStamina),
-                new MySqlParameter("@currentFood", characterData.CurrentFood),
-                new MySqlParameter("@currentWater", characterData.CurrentWater),
-                new MySqlParameter("@statPoint", characterData.StatPoint),
-                new MySqlParameter("@skillPoint", characterData.SkillPoint),
-                new MySqlParameter("@gold", characterData.Gold),
-                new MySqlParameter("@currentMapName", characterData.CurrentMapName),
-                new MySqlParameter("@currentPositionX", characterData.CurrentPosition.x),
-                new MySqlParameter("@currentPositionY", characterData.CurrentPosition.y),
-                new MySqlParameter("@currentPositionZ", characterData.CurrentPosition.z),
-                new MySqlParameter("@respawnMapName", characterData.RespawnMapName),
-                new MySqlParameter("@respawnPositionX", characterData.RespawnPosition.x),
-                new MySqlParameter("@respawnPositionY", characterData.RespawnPosition.y),
-                new MySqlParameter("@respawnPositionZ", characterData.RespawnPosition.z),
-                new MySqlParameter("@id", characterData.Id));
-            await FillCharacterRelatesData(connection, transaction, characterData);
+            await Task.WhenAll(
+                ExecuteNonQuery(connection, transaction, "UPDATE characters SET " +
+                    "dataId=@dataId, " +
+                    "characterName=@characterName, " +
+                    "level=@level, " +
+                    "exp=@exp, " +
+                    "currentHp=@currentHp, " +
+                    "currentMp=@currentMp, " +
+                    "currentStamina=@currentStamina, " +
+                    "currentFood=@currentFood, " +
+                    "currentWater=@currentWater, " +
+                    "statPoint=@statPoint, " +
+                    "skillPoint=@skillPoint, " +
+                    "gold=@gold, " +
+                    "currentMapName=@currentMapName, " +
+                    "currentPositionX=@currentPositionX, " +
+                    "currentPositionY=@currentPositionY, " +
+                    "currentPositionZ=@currentPositionZ, " +
+                    "respawnMapName=@respawnMapName, " +
+                    "respawnPositionX=@respawnPositionX, " +
+                    "respawnPositionY=@respawnPositionY, " +
+                    "respawnPositionZ=@respawnPositionZ " +
+                    "WHERE id=@id",
+                    new MySqlParameter("@dataId", character.DataId),
+                    new MySqlParameter("@characterName", character.CharacterName),
+                    new MySqlParameter("@level", character.Level),
+                    new MySqlParameter("@exp", character.Exp),
+                    new MySqlParameter("@currentHp", character.CurrentHp),
+                    new MySqlParameter("@currentMp", character.CurrentMp),
+                    new MySqlParameter("@currentStamina", character.CurrentStamina),
+                    new MySqlParameter("@currentFood", character.CurrentFood),
+                    new MySqlParameter("@currentWater", character.CurrentWater),
+                    new MySqlParameter("@statPoint", character.StatPoint),
+                    new MySqlParameter("@skillPoint", character.SkillPoint),
+                    new MySqlParameter("@gold", character.Gold),
+                    new MySqlParameter("@currentMapName", character.CurrentMapName),
+                    new MySqlParameter("@currentPositionX", character.CurrentPosition.x),
+                    new MySqlParameter("@currentPositionY", character.CurrentPosition.y),
+                    new MySqlParameter("@currentPositionZ", character.CurrentPosition.z),
+                    new MySqlParameter("@respawnMapName", character.RespawnMapName),
+                    new MySqlParameter("@respawnPositionX", character.RespawnPosition.x),
+                    new MySqlParameter("@respawnPositionY", character.RespawnPosition.y),
+                    new MySqlParameter("@respawnPositionZ", character.RespawnPosition.z),
+                    new MySqlParameter("@id", character.Id)),
+                FillCharacterRelatesData(connection, transaction, character));
             await transaction.CommitAsync();
             transaction.Dispose();
             connection.Close();
-            this.InvokeInstanceDevExtMethods("UpdateCharacter", characterData);
+            this.InvokeInstanceDevExtMethods("UpdateCharacter", character);
+        }
+
+        public override async Task UpdateCharacters(IEnumerable<IPlayerCharacterData> characters)
+        {
+            var tasks = new List<Task>();
+            var connection = NewConnection();
+            await connection.OpenAsync();
+            var transaction = await connection.BeginTransactionAsync();
+            foreach (var character in characters)
+            {
+                tasks.Add(Task.WhenAll(
+                    ExecuteNonQuery(connection, transaction, "UPDATE characters SET " +
+                        "dataId=@dataId, " +
+                        "characterName=@characterName, " +
+                        "level=@level, " +
+                        "exp=@exp, " +
+                        "currentHp=@currentHp, " +
+                        "currentMp=@currentMp, " +
+                        "currentStamina=@currentStamina, " +
+                        "currentFood=@currentFood, " +
+                        "currentWater=@currentWater, " +
+                        "statPoint=@statPoint, " +
+                        "skillPoint=@skillPoint, " +
+                        "gold=@gold, " +
+                        "currentMapName=@currentMapName, " +
+                        "currentPositionX=@currentPositionX, " +
+                        "currentPositionY=@currentPositionY, " +
+                        "currentPositionZ=@currentPositionZ, " +
+                        "respawnMapName=@respawnMapName, " +
+                        "respawnPositionX=@respawnPositionX, " +
+                        "respawnPositionY=@respawnPositionY, " +
+                        "respawnPositionZ=@respawnPositionZ " +
+                        "WHERE id=@id",
+                        new MySqlParameter("@dataId", character.DataId),
+                        new MySqlParameter("@characterName", character.CharacterName),
+                        new MySqlParameter("@level", character.Level),
+                        new MySqlParameter("@exp", character.Exp),
+                        new MySqlParameter("@currentHp", character.CurrentHp),
+                        new MySqlParameter("@currentMp", character.CurrentMp),
+                        new MySqlParameter("@currentStamina", character.CurrentStamina),
+                        new MySqlParameter("@currentFood", character.CurrentFood),
+                        new MySqlParameter("@currentWater", character.CurrentWater),
+                        new MySqlParameter("@statPoint", character.StatPoint),
+                        new MySqlParameter("@skillPoint", character.SkillPoint),
+                        new MySqlParameter("@gold", character.Gold),
+                        new MySqlParameter("@currentMapName", character.CurrentMapName),
+                        new MySqlParameter("@currentPositionX", character.CurrentPosition.x),
+                        new MySqlParameter("@currentPositionY", character.CurrentPosition.y),
+                        new MySqlParameter("@currentPositionZ", character.CurrentPosition.z),
+                        new MySqlParameter("@respawnMapName", character.RespawnMapName),
+                        new MySqlParameter("@respawnPositionX", character.RespawnPosition.x),
+                        new MySqlParameter("@respawnPositionY", character.RespawnPosition.y),
+                        new MySqlParameter("@respawnPositionZ", character.RespawnPosition.z),
+                        new MySqlParameter("@id", character.Id)),
+                    FillCharacterRelatesData(connection, transaction, character)));
+            }
+            await Task.WhenAll(tasks);
+            await transaction.CommitAsync();
+            transaction.Dispose();
+            connection.Close();
+            this.InvokeInstanceDevExtMethods("UpdateCharacters", characters);
         }
 
         public override async Task DeleteCharacter(string userId, string id)
@@ -254,13 +319,14 @@ namespace MultiplayerARPG.MMO
                 var connection = NewConnection();
                 await connection.OpenAsync();
                 var transaction = await connection.BeginTransactionAsync();
-                await ExecuteNonQuery(connection, transaction, "DELETE FROM characters WHERE id=@characterId", new MySqlParameter("@characterId", id));
-                await DeleteCharacterAttributes(connection, transaction, id);
-                await DeleteCharacterBuffs(connection, transaction, id);
-                await DeleteCharacterHotkeys(connection, transaction, id);
-                await DeleteCharacterItems(connection, transaction, id);
-                await DeleteCharacterQuests(connection, transaction, id);
-                await DeleteCharacterSkills(connection, transaction, id);
+                await Task.WhenAll(
+                    ExecuteNonQuery(connection, transaction, "DELETE FROM characters WHERE id=@characterId", new MySqlParameter("@characterId", id)),
+                    DeleteCharacterAttributes(connection, transaction, id),
+                    DeleteCharacterBuffs(connection, transaction, id),
+                    DeleteCharacterHotkeys(connection, transaction, id),
+                    DeleteCharacterItems(connection, transaction, id),
+                    DeleteCharacterQuests(connection, transaction, id),
+                    DeleteCharacterSkills(connection, transaction, id));
                 await transaction.CommitAsync();
                 transaction.Dispose();
                 connection.Close();
