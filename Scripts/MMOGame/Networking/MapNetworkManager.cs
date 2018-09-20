@@ -566,15 +566,17 @@ namespace MultiplayerARPG.MMO
                 Peers.TryGetValue(connectId, out peer) &&
                 mapServerPeersBySceneName.TryGetValue(mapName, out peerInfo))
             {
+                // Unregister player character
+                UnregisterPlayerCharacter(peer);
                 // Clone character data to save
                 var savingCharacterData = new PlayerCharacterData();
                 playerCharacterEntity.CloneTo(savingCharacterData);
-                // Unregister player character
-                UnregisterPlayerCharacter(peer);
                 // Save character current map / position
                 savingCharacterData.CurrentMapName = mapName;
                 savingCharacterData.CurrentPosition = position;
                 await SaveCharacter(savingCharacterData);
+                // Destroy character from server
+                playerCharacterEntity.NetworkDestroy();
                 // Send message to client to warp
                 var message = new MMOWarpMessage();
                 message.sceneName = mapName;
@@ -582,8 +584,6 @@ namespace MultiplayerARPG.MMO
                 message.networkPort = peerInfo.networkPort;
                 message.connectKey = peerInfo.connectKey;
                 LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MsgTypes.Warp, message);
-                // Destroy character from server
-                playerCharacterEntity.NetworkDestroy();
             }
         }
 
