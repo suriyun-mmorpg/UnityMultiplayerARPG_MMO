@@ -583,7 +583,7 @@ namespace MultiplayerARPG.MMO
                 message.networkAddress = peerInfo.networkAddress;
                 message.networkPort = peerInfo.networkPort;
                 message.connectKey = peerInfo.connectKey;
-                LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MsgTypes.Warp, message);
+                LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, peer, MsgTypes.Warp, message);
             }
         }
 
