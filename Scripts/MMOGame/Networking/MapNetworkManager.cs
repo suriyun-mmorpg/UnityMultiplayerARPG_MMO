@@ -105,28 +105,6 @@ namespace MultiplayerARPG.MMO
             }
         }
 
-        protected override async void UpdatePartyMembers()
-        {
-            List<Task> tasks = new List<Task>();
-            foreach (var party in parties.Values.ToArray())
-            {
-                foreach (var memberId in party.GetMemberIds().ToArray())
-                {
-                    BasePlayerCharacterEntity playerCharacterEntity;
-                    if (playerCharactersById.TryGetValue(memberId, out playerCharacterEntity))
-                    {
-                        party.UpdateMember(playerCharacterEntity);
-                        party.UpdateMemberVisible(memberId, true);
-                    }
-                    else
-                        party.UpdateMemberVisible(memberId, false);
-                }
-                tasks.Add(LoadPartyDataFromDatabase(party.id));
-            }
-            await Task.WhenAll(tasks);
-            Debug.Log("Updated party members");
-        }
-
         protected override async void OnDestroy()
         {
             CentralAppServerRegister.Stop();
@@ -590,15 +568,15 @@ namespace MultiplayerARPG.MMO
                 // Clone character data to save
                 var savingCharacterData = new PlayerCharacterData();
                 playerCharacterEntity.CloneTo(savingCharacterData);
-                // Unregister player character
-                UnregisterPlayerCharacter(peer);
-                // Destroy character from server
-                playerCharacterEntity.NetworkDestroy();
                 // Save character current map / position
                 savingCharacterData.CurrentMapName = mapName;
                 savingCharacterData.CurrentPosition = position;
                 saveCharactersTask = SaveCharacter(savingCharacterData);
                 await saveCharactersTask;
+                // Unregister player character
+                UnregisterPlayerCharacter(peer);
+                // Destroy character from server
+                playerCharacterEntity.NetworkDestroy();
                 // Send message to client to warp
                 var message = new MMOWarpMessage();
                 message.sceneName = mapName;
