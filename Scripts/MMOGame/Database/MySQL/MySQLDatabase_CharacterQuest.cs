@@ -51,9 +51,9 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public async Task CreateCharacterQuest(MySqlConnection connection, int idx, string characterId, CharacterQuest characterQuest)
+        public async Task CreateCharacterQuest(MySqlConnection connection, MySqlTransaction transaction, int idx, string characterId, CharacterQuest characterQuest)
         {
-            await ExecuteNonQuery(connection, "INSERT INTO characterquest (id, idx, characterId, dataId, isComplete, killedMonsters) VALUES (@id, @idx, @characterId, @dataId, @isComplete, @killedMonsters)",
+            await ExecuteNonQuery(connection, transaction, "INSERT INTO characterquest (id, idx, characterId, dataId, isComplete, killedMonsters) VALUES (@id, @idx, @characterId, @dataId, @isComplete, @killedMonsters)",
                 new MySqlParameter("@id", characterId + "_" + idx),
                 new MySqlParameter("@idx", idx),
                 new MySqlParameter("@characterId", characterId),
@@ -75,9 +75,9 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public async Task DeleteCharacterQuests(MySqlConnection connection, string characterId)
+        public async Task DeleteCharacterQuests(MySqlConnection connection, MySqlTransaction transaction, string characterId)
         {
-            await ExecuteNonQuery(connection, "DELETE FROM characterquest WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
+            await ExecuteNonQuery(connection, transaction, "DELETE FROM characterquest WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
         }
     }
 }

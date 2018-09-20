@@ -8,59 +8,59 @@ namespace MultiplayerARPG.MMO
 {
     public partial class MySQLDatabase
     {
-        private async Task FillCharacterRelatesData(MySqlConnection connection, IPlayerCharacterData characterData)
+        private async Task FillCharacterRelatesData(MySqlConnection connection, MySqlTransaction transaction, IPlayerCharacterData characterData)
         {
             // Delete all character then add all of them
             var characterId = characterData.Id;
-            await DeleteCharacterAttributes(connection, characterId);
-            await DeleteCharacterBuffs(connection, characterId);
-            await DeleteCharacterHotkeys(connection, characterId);
-            await DeleteCharacterItems(connection, characterId);
-            await DeleteCharacterQuests(connection, characterId);
-            await DeleteCharacterSkills(connection, characterId);
+            await DeleteCharacterAttributes(connection, transaction, characterId);
+            await DeleteCharacterBuffs(connection, transaction, characterId);
+            await DeleteCharacterHotkeys(connection, transaction, characterId);
+            await DeleteCharacterItems(connection, transaction, characterId);
+            await DeleteCharacterQuests(connection, transaction, characterId);
+            await DeleteCharacterSkills(connection, transaction, characterId);
 
-            await CreateCharacterEquipWeapons(connection, characterId, characterData.EquipWeapons);
+            await CreateCharacterEquipWeapons(connection, transaction, characterId, characterData.EquipWeapons);
             var i = 0;
             foreach (var equipItem in characterData.EquipItems)
             {
-                await CreateCharacterEquipItem(connection, i++, characterId, equipItem);
+                await CreateCharacterEquipItem(connection, transaction, i++, characterId, equipItem);
             }
             i = 0;
             foreach (var nonEquipItem in characterData.NonEquipItems)
             {
-                await CreateCharacterNonEquipItem(connection, i++, characterId, nonEquipItem);
+                await CreateCharacterNonEquipItem(connection, transaction, i++, characterId, nonEquipItem);
             }
             i = 0;
             foreach (var attribute in characterData.Attributes)
             {
-                await CreateCharacterAttribute(connection, i++, characterId, attribute);
+                await CreateCharacterAttribute(connection, transaction, i++, characterId, attribute);
             }
             i = 0;
             foreach (var skill in characterData.Skills)
             {
-                await CreateCharacterSkill(connection, i++, characterId, skill);
+                await CreateCharacterSkill(connection, transaction, i++, characterId, skill);
             }
             i = 0;
             foreach (var quest in characterData.Quests)
             {
-                await CreateCharacterQuest(connection, i++, characterId, quest);
+                await CreateCharacterQuest(connection, transaction, i++, characterId, quest);
             }
             foreach (var buff in characterData.Buffs)
             {
-                await CreateCharacterBuff(connection, characterId, buff);
+                await CreateCharacterBuff(connection, transaction, characterId, buff);
             }
             foreach (var hotkey in characterData.Hotkeys)
             {
-                await CreateCharacterHotkey(connection, characterId, hotkey);
+                await CreateCharacterHotkey(connection, transaction, characterId, hotkey);
             }
         }
 
         public override async Task CreateCharacter(string userId, PlayerCharacterData characterData)
         {
             var connection = NewConnection();
-            connection.Open();
-            await ExecuteNonQuery(connection, "START TRANSACTION");
-            await ExecuteNonQuery(connection, "INSERT INTO characters " +
+            await connection.OpenAsync();
+            var transaction = await connection.BeginTransactionAsync();
+            await ExecuteNonQuery(connection, transaction, "INSERT INTO characters " +
                 "(id, userId, dataId, characterName, level, exp, currentHp, currentMp, currentStamina, currentFood, currentWater, statPoint, skillPoint, gold, currentMapName, currentPositionX, currentPositionY, currentPositionZ, respawnMapName, respawnPositionX, respawnPositionY, respawnPositionZ) VALUES " +
                 "(@id, @userId, @dataId, @characterName, @level, @exp, @currentHp, @currentMp, @currentStamina, @currentFood, @currentWater, @statPoint, @skillPoint, @gold, @currentMapName, @currentPositionX, @currentPositionY, @currentPositionZ, @respawnMapName, @respawnPositionX, @respawnPositionY, @respawnPositionZ)",
                 new MySqlParameter("@id", characterData.Id),
@@ -85,8 +85,9 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@respawnPositionX", characterData.RespawnPosition.x),
                 new MySqlParameter("@respawnPositionY", characterData.RespawnPosition.y),
                 new MySqlParameter("@respawnPositionZ", characterData.RespawnPosition.z));
-            await FillCharacterRelatesData(connection, characterData);
-            await ExecuteNonQuery(connection, "COMMIT");
+            await FillCharacterRelatesData(connection, transaction, characterData);
+            await transaction.CommitAsync();
+            transaction.Dispose();
             connection.Close();
             this.InvokeInstanceDevExtMethods("CreateCharacter", userId, characterData);
         }
@@ -190,9 +191,9 @@ namespace MultiplayerARPG.MMO
         public override async Task UpdateCharacter(IPlayerCharacterData characterData)
         {
             var connection = NewConnection();
-            connection.Open();
-            await ExecuteNonQuery(connection, "START TRANSACTION");
-            await ExecuteNonQuery(connection, "UPDATE characters SET " +
+            await connection.OpenAsync();
+            var transaction = await connection.BeginTransactionAsync();
+            await ExecuteNonQuery(connection, transaction, "UPDATE characters SET " +
                 "dataId=@dataId, " +
                 "characterName=@characterName, " +
                 "level=@level, " +
@@ -235,8 +236,9 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@respawnPositionY", characterData.RespawnPosition.y),
                 new MySqlParameter("@respawnPositionZ", characterData.RespawnPosition.z),
                 new MySqlParameter("@id", characterData.Id));
-            await FillCharacterRelatesData(connection, characterData);
-            await ExecuteNonQuery(connection, "COMMIT");
+            await FillCharacterRelatesData(connection, transaction, characterData);
+            await transaction.CommitAsync();
+            transaction.Dispose();
             connection.Close();
             this.InvokeInstanceDevExtMethods("UpdateCharacter", characterData);
         }
@@ -250,16 +252,17 @@ namespace MultiplayerARPG.MMO
             if (count > 0)
             {
                 var connection = NewConnection();
-                connection.Open();
-                await ExecuteNonQuery(connection, "START TRANSACTION");
-                await ExecuteNonQuery(connection, "DELETE FROM characters WHERE id=@characterId", new MySqlParameter("@characterId", id));
-                await DeleteCharacterAttributes(connection, id);
-                await DeleteCharacterBuffs(connection, id);
-                await DeleteCharacterHotkeys(connection, id);
-                await DeleteCharacterItems(connection, id);
-                await DeleteCharacterQuests(connection, id);
-                await DeleteCharacterSkills(connection, id);
-                await ExecuteNonQuery(connection, "COMMIT");
+                await connection.OpenAsync();
+                var transaction = await connection.BeginTransactionAsync();
+                await ExecuteNonQuery(connection, transaction, "DELETE FROM characters WHERE id=@characterId", new MySqlParameter("@characterId", id));
+                await DeleteCharacterAttributes(connection, transaction, id);
+                await DeleteCharacterBuffs(connection, transaction, id);
+                await DeleteCharacterHotkeys(connection, transaction, id);
+                await DeleteCharacterItems(connection, transaction, id);
+                await DeleteCharacterQuests(connection, transaction, id);
+                await DeleteCharacterSkills(connection, transaction, id);
+                await transaction.CommitAsync();
+                transaction.Dispose();
                 connection.Close();
                 this.InvokeInstanceDevExtMethods("DeleteCharacter", userId, id);
             }

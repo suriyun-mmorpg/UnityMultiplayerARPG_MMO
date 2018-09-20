@@ -25,9 +25,9 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public async Task CreateCharacterHotkey(MySqlConnection connection, string characterId, CharacterHotkey characterHotkey)
+        public async Task CreateCharacterHotkey(MySqlConnection connection, MySqlTransaction transaction, string characterId, CharacterHotkey characterHotkey)
         {
-            await ExecuteNonQuery(connection, "INSERT INTO characterhotkey (id, characterId, hotkeyId, type, dataId) VALUES (@id, @characterId, @hotkeyId, @type, @dataId)",
+            await ExecuteNonQuery(connection, transaction, "INSERT INTO characterhotkey (id, characterId, hotkeyId, type, dataId) VALUES (@id, @characterId, @hotkeyId, @type, @dataId)",
                 new MySqlParameter("@id", characterId + "_" + characterHotkey.hotkeyId),
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@hotkeyId", characterHotkey.hotkeyId),
@@ -48,9 +48,9 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public async Task DeleteCharacterHotkeys(MySqlConnection connection, string characterId)
+        public async Task DeleteCharacterHotkeys(MySqlConnection connection, MySqlTransaction transaction, string characterId)
         {
-            await ExecuteNonQuery(connection, "DELETE FROM characterhotkey WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
+            await ExecuteNonQuery(connection, transaction, "DELETE FROM characterhotkey WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
         }
     }
 }

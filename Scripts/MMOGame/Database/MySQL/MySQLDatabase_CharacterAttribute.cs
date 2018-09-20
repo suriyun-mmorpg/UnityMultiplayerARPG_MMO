@@ -24,9 +24,9 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public async Task CreateCharacterAttribute(MySqlConnection connection, int idx, string characterId, CharacterAttribute characterAttribute)
+        public async Task CreateCharacterAttribute(MySqlConnection connection, MySqlTransaction transaction, int idx, string characterId, CharacterAttribute characterAttribute)
         {
-            await ExecuteNonQuery(connection, "INSERT INTO characterattribute (id, idx, characterId, dataId, amount) VALUES (@id, @idx, @characterId, @dataId, @amount)",
+            await ExecuteNonQuery(connection, transaction, "INSERT INTO characterattribute (id, idx, characterId, dataId, amount) VALUES (@id, @idx, @characterId, @dataId, @amount)",
                 new MySqlParameter("@id", characterId + "_" + idx),
                 new MySqlParameter("@idx", idx),
                 new MySqlParameter("@characterId", characterId),
@@ -47,9 +47,9 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public async Task DeleteCharacterAttributes(MySqlConnection connection, string characterId)
+        public async Task DeleteCharacterAttributes(MySqlConnection connection, MySqlTransaction transaction, string characterId)
         {
-            await ExecuteNonQuery(connection, "DELETE FROM characterattribute WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
+            await ExecuteNonQuery(connection, transaction, "DELETE FROM characterattribute WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
         }
     }
 }

@@ -66,17 +66,19 @@ namespace MultiplayerARPG.MMO
         public async Task<long> ExecuteInsertData(string sql, params MySqlParameter[] args)
         {
             var connection = NewConnection();
-            connection.Open();
-            var result = await ExecuteInsertData(connection, sql, args);
+            await connection.OpenAsync();
+            var result = await ExecuteInsertData(connection, null, sql, args);
             connection.Close();
             return result;
         }
 
-        public async Task<long> ExecuteInsertData(MySqlConnection connection, string sql, params MySqlParameter[] args)
+        public async Task<long> ExecuteInsertData(MySqlConnection connection, MySqlTransaction transaction, string sql, params MySqlParameter[] args)
         {
             long result = 0;
             using (var cmd = new MySqlCommand(sql, connection))
             {
+                if (transaction != null)
+                    cmd.Transaction = transaction;
                 foreach (var arg in args)
                 {
                     cmd.Parameters.Add(arg);
@@ -90,17 +92,19 @@ namespace MultiplayerARPG.MMO
         public async Task<int> ExecuteNonQuery(string sql, params MySqlParameter[] args)
         {
             var connection = NewConnection();
-            connection.Open();
-            var result = await ExecuteNonQuery(connection, sql, args);
+            await connection.OpenAsync();
+            var result = await ExecuteNonQuery(connection, null, sql, args);
             connection.Close();
             return result;
         }
 
-        public async Task<int> ExecuteNonQuery(MySqlConnection connection, string sql, params MySqlParameter[] args)
+        public async Task<int> ExecuteNonQuery(MySqlConnection connection, MySqlTransaction transaction, string sql, params MySqlParameter[] args)
         {
             var numRows = 0;
             using (var cmd = new MySqlCommand(sql, connection))
             {
+                if (transaction != null)
+                    cmd.Transaction = transaction;
                 foreach (var arg in args)
                 {
                     cmd.Parameters.Add(arg);
@@ -113,17 +117,19 @@ namespace MultiplayerARPG.MMO
         public async Task<object> ExecuteScalar(string sql, params MySqlParameter[] args)
         {
             var connection = NewConnection();
-            connection.Open();
-            var result = await ExecuteScalar(connection, sql, args);
+            await connection.OpenAsync();
+            var result = await ExecuteScalar(connection, null, sql, args);
             connection.Close();
             return result;
         }
 
-        public async Task<object> ExecuteScalar(MySqlConnection connection, string sql, params MySqlParameter[] args)
+        public async Task<object> ExecuteScalar(MySqlConnection connection, MySqlTransaction transaction, string sql, params MySqlParameter[] args)
         {
             object result;
             using (var cmd = new MySqlCommand(sql, connection))
             {
+                if (transaction != null)
+                    cmd.Transaction = transaction;
                 foreach (var arg in args)
                 {
                     cmd.Parameters.Add(arg);
@@ -136,17 +142,19 @@ namespace MultiplayerARPG.MMO
         public async Task<MySQLRowsReader> ExecuteReader(string sql, params MySqlParameter[] args)
         {
             var connection = NewConnection();
-            connection.Open();
-            var result = await ExecuteReader(connection, sql, args);
+            await connection.OpenAsync();
+            var result = await ExecuteReader(connection, null, sql, args);
             connection.Close();
             return result;
         }
 
-        public async Task<MySQLRowsReader> ExecuteReader(MySqlConnection connection, string sql, params MySqlParameter[] args)
+        public async Task<MySQLRowsReader> ExecuteReader(MySqlConnection connection, MySqlTransaction transaction, string sql, params MySqlParameter[] args)
         {
             MySQLRowsReader result = new MySQLRowsReader();
             using (var cmd = new MySqlCommand(sql, connection))
             {
+                if (transaction != null)
+                    cmd.Transaction = transaction;
                 foreach (var arg in args)
                 {
                     cmd.Parameters.Add(arg);

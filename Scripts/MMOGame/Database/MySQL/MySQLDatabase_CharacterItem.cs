@@ -8,9 +8,9 @@ namespace MultiplayerARPG.MMO
 {
     public partial class MySQLDatabase
     {
-        private async Task CreateCharacterItem(MySqlConnection connection, int idx, string characterId, InventoryType inventoryType, CharacterItem characterItem)
+        private async Task CreateCharacterItem(MySqlConnection connection, MySqlTransaction transaction, int idx, string characterId, InventoryType inventoryType, CharacterItem characterItem)
         {
-            await ExecuteNonQuery(connection, "INSERT INTO characteritem (id, idx, inventoryType, characterId, dataId, level, amount, durability) VALUES (@id, @idx, @inventoryType, @characterId, @dataId, @level, @amount, @durability)",
+            await ExecuteNonQuery(connection, transaction, "INSERT INTO characteritem (id, idx, inventoryType, characterId, dataId, level, amount, durability) VALUES (@id, @idx, @inventoryType, @characterId, @dataId, @level, @amount, @durability)",
                 new MySqlParameter("@id", characterId + "_" + (byte)inventoryType + "_" + idx),
                 new MySqlParameter("@idx", idx),
                 new MySqlParameter("@inventoryType", (byte)inventoryType),
@@ -73,15 +73,15 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public async Task CreateCharacterEquipWeapons(MySqlConnection connection, string characterId, EquipWeapons equipWeapons)
+        public async Task CreateCharacterEquipWeapons(MySqlConnection connection, MySqlTransaction transaction, string characterId, EquipWeapons equipWeapons)
         {
-            await CreateCharacterItem(connection, 0, characterId, InventoryType.EquipWeaponRight, equipWeapons.rightHand);
-            await CreateCharacterItem(connection, 0, characterId, InventoryType.EquipWeaponLeft, equipWeapons.leftHand);
+            await CreateCharacterItem(connection, transaction, 0, characterId, InventoryType.EquipWeaponRight, equipWeapons.rightHand);
+            await CreateCharacterItem(connection, transaction, 0, characterId, InventoryType.EquipWeaponLeft, equipWeapons.leftHand);
         }
 
-        public Task CreateCharacterEquipItem(MySqlConnection connection, int idx, string characterId, CharacterItem characterItem)
+        public Task CreateCharacterEquipItem(MySqlConnection connection, MySqlTransaction transaction, int idx, string characterId, CharacterItem characterItem)
         {
-            return CreateCharacterItem(connection, idx, characterId, InventoryType.EquipItems, characterItem);
+            return CreateCharacterItem(connection, transaction, idx, characterId, InventoryType.EquipItems, characterItem);
         }
 
         public Task<List<CharacterItem>> ReadCharacterEquipItems(string characterId)
@@ -89,9 +89,9 @@ namespace MultiplayerARPG.MMO
             return ReadCharacterItems(characterId, InventoryType.EquipItems);
         }
 
-        public Task CreateCharacterNonEquipItem(MySqlConnection connection, int idx, string characterId, CharacterItem characterItem)
+        public Task CreateCharacterNonEquipItem(MySqlConnection connection, MySqlTransaction transaction, int idx, string characterId, CharacterItem characterItem)
         {
-            return CreateCharacterItem(connection, idx, characterId, InventoryType.NonEquipItems, characterItem);
+            return CreateCharacterItem(connection, transaction, idx, characterId, InventoryType.NonEquipItems, characterItem);
         }
 
         public Task<List<CharacterItem>> ReadCharacterNonEquipItems(string characterId)
@@ -99,9 +99,9 @@ namespace MultiplayerARPG.MMO
             return ReadCharacterItems(characterId, InventoryType.NonEquipItems);
         }
 
-        public async Task DeleteCharacterItems(MySqlConnection connection, string characterId)
+        public async Task DeleteCharacterItems(MySqlConnection connection, MySqlTransaction transaction, string characterId)
         {
-            await ExecuteNonQuery(connection, "DELETE FROM characteritem WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
+            await ExecuteNonQuery(connection, transaction, "DELETE FROM characteritem WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
         }
     }
 }

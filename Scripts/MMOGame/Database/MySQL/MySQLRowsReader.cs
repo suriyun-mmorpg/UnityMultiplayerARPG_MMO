@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using MySql.Data.MySqlClient;
+using System.Data.Common;
 
 namespace MultiplayerARPG.MMO
 {
@@ -13,7 +13,7 @@ namespace MultiplayerARPG.MMO
         public int RowCount { get { return data.Count; } }
         public bool HasRows { get { return RowCount > 0; } }
 
-        public void Init(MySqlDataReader dataReader)
+        public void Init(DbDataReader dataReader)
         {
             data.Clear();
             dataDict.Clear();

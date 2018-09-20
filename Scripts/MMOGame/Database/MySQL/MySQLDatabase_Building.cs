@@ -33,8 +33,8 @@ namespace MultiplayerARPG.MMO
         public override async Task CreateBuilding(string mapName, BuildingSaveData saveData)
         {
             var connection = NewConnection();
-            connection.Open();
-            await ExecuteNonQuery(connection, "INSERT INTO buildings (id, parentId, dataId, currentHp, mapName, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, creatorId, creatorName) VALUES (@id, @parentId, @dataId, @currentHp, @mapName, @positionX, @positionY, @positionZ, @rotationX, @rotationY, @rotationZ, @creatorId, @creatorName)",
+            await connection.OpenAsync();
+            await ExecuteNonQuery(connection, null, "INSERT INTO buildings (id, parentId, dataId, currentHp, mapName, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, creatorId, creatorName) VALUES (@id, @parentId, @dataId, @currentHp, @mapName, @positionX, @positionY, @positionZ, @rotationX, @rotationY, @rotationZ, @creatorId, @creatorName)",
                 new MySqlParameter("@id", saveData.Id),
                 new MySqlParameter("@parentId", saveData.ParentId),
                 new MySqlParameter("@dataId", saveData.DataId),
@@ -66,8 +66,8 @@ namespace MultiplayerARPG.MMO
         public override async Task UpdateBuilding(string mapName, IBuildingSaveData saveData)
         {
             var connection = NewConnection();
-            connection.Open();
-            await ExecuteNonQuery(connection, "UPDATE buildings SET " +
+            await connection.OpenAsync();
+            await ExecuteNonQuery(connection, null, "UPDATE buildings SET " +
                 "parentId=@parentId, " +
                 "dataId=@dataId, " +
                 "currentHp=@currentHp, " +
@@ -99,8 +99,8 @@ namespace MultiplayerARPG.MMO
         public override async Task DeleteBuilding(string mapName, string id)
         {
             var connection = NewConnection();
-            connection.Open();
-            await ExecuteNonQuery(connection, "DELETE FROM buildings WHERE id=@id AND mapName=@mapName", new MySqlParameter("@id", id), new MySqlParameter("@mapName", mapName));
+            await connection.OpenAsync();
+            await ExecuteNonQuery(connection, null, "DELETE FROM buildings WHERE id=@id AND mapName=@mapName", new MySqlParameter("@id", id), new MySqlParameter("@mapName", mapName));
             connection.Close();
         }
     }
