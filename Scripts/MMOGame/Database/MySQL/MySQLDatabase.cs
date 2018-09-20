@@ -74,6 +74,14 @@ namespace MultiplayerARPG.MMO
 
         public async Task<long> ExecuteInsertData(MySqlConnection connection, MySqlTransaction transaction, string sql, params MySqlParameter[] args)
         {
+            var createLocalConnection = false;
+            if (connection == null)
+            {
+                connection = NewConnection();
+                transaction = null;
+                await connection.OpenAsync();
+                createLocalConnection = true;
+            }
             long result = 0;
             using (var cmd = new MySqlCommand(sql, connection))
             {
@@ -86,6 +94,8 @@ namespace MultiplayerARPG.MMO
                 await cmd.ExecuteNonQueryAsync();
                 result = cmd.LastInsertedId;
             }
+            if (createLocalConnection)
+                connection.Close();
             return result;
         }
 
@@ -100,6 +110,14 @@ namespace MultiplayerARPG.MMO
 
         public async Task<int> ExecuteNonQuery(MySqlConnection connection, MySqlTransaction transaction, string sql, params MySqlParameter[] args)
         {
+            var createLocalConnection = false;
+            if (connection == null)
+            {
+                connection = NewConnection();
+                transaction = null;
+                await connection.OpenAsync();
+                createLocalConnection = true;
+            }
             var numRows = 0;
             using (var cmd = new MySqlCommand(sql, connection))
             {
@@ -111,6 +129,8 @@ namespace MultiplayerARPG.MMO
                 }
                 numRows = await cmd.ExecuteNonQueryAsync();
             }
+            if (createLocalConnection)
+                connection.Close();
             return numRows;
         }
 
@@ -125,6 +145,14 @@ namespace MultiplayerARPG.MMO
 
         public async Task<object> ExecuteScalar(MySqlConnection connection, MySqlTransaction transaction, string sql, params MySqlParameter[] args)
         {
+            var createLocalConnection = false;
+            if (connection == null)
+            {
+                connection = NewConnection();
+                transaction = null;
+                await connection.OpenAsync();
+                createLocalConnection = true;
+            }
             object result;
             using (var cmd = new MySqlCommand(sql, connection))
             {
@@ -136,6 +164,8 @@ namespace MultiplayerARPG.MMO
                 }
                 result = await cmd.ExecuteScalarAsync();
             }
+            if (createLocalConnection)
+                connection.Close();
             return result;
         }
 
@@ -150,7 +180,15 @@ namespace MultiplayerARPG.MMO
 
         public async Task<MySQLRowsReader> ExecuteReader(MySqlConnection connection, MySqlTransaction transaction, string sql, params MySqlParameter[] args)
         {
-            MySQLRowsReader result = new MySQLRowsReader();
+            var createLocalConnection = false;
+            if (connection == null)
+            {
+                connection = NewConnection();
+                transaction = null;
+                await connection.OpenAsync();
+                createLocalConnection = true;
+            }
+            var result = new MySQLRowsReader();
             using (var cmd = new MySqlCommand(sql, connection))
             {
                 if (transaction != null)
@@ -163,6 +201,8 @@ namespace MultiplayerARPG.MMO
                 result.Init(dataReader);
                 dataReader.Close();
             }
+            if (createLocalConnection)
+                connection.Close();
             return result;
         }
 

@@ -287,6 +287,7 @@ namespace MultiplayerARPG.MMO
                 }
                 var dataReader = await cmd.ExecuteReaderAsync();
                 result.Init(dataReader);
+                dataReader.Close();
             }
             return result;
         }

@@ -493,12 +493,12 @@ namespace MultiplayerARPG.MMO
             if (saveCharactersTask != null && !saveCharactersTask.IsCompleted)
                 await saveCharactersTask;
             var tasks = new List<Task>();
-            foreach (var playerCharacterEntity in playerCharacters)
+            foreach (var playerCharacter in playerCharacters.Values)
             {
-                tasks.Add(SaveCharacter(playerCharacterEntity.Value));
+                tasks.Add(SaveCharacter(playerCharacter));
             }
             await Task.WhenAll(tasks);
-            Debug.Log("Characters Saved: " + tasks.Count + " character(s)");
+            Debug.Log("Characters Saved " + tasks.Count + " character(s)");
         }
 
         private async Task SaveWorld()
@@ -506,12 +506,12 @@ namespace MultiplayerARPG.MMO
             if (saveWorldTask != null && !saveWorldTask.IsCompleted)
                 await saveWorldTask;
             var tasks = new List<Task>();
-            foreach (var buildingEntity in buildingEntities)
+            foreach (var buildingEntity in buildingEntities.Values)
             {
-                tasks.Add(Database.UpdateBuilding(Assets.onlineScene.SceneName, buildingEntity.Value));
+                tasks.Add(Database.UpdateBuilding(Assets.onlineScene.SceneName, buildingEntity));
             }
             await Task.WhenAll(tasks);
-            Debug.Log("World Saved: " + tasks.Count + " building(s)");
+            Debug.Log("World Saved " + tasks.Count + " building(s)");
         }
 
         public override async void CreateBuildingEntity(BuildingSaveData saveData, bool initialize)
@@ -569,6 +569,8 @@ namespace MultiplayerARPG.MMO
                 // Clone character data to save
                 var savingCharacterData = new PlayerCharacterData();
                 playerCharacterEntity.CloneTo(savingCharacterData);
+                // Unregister player character
+                UnregisterPlayerCharacter(peer);
                 // Save character current map / position
                 savingCharacterData.CurrentMapName = mapName;
                 savingCharacterData.CurrentPosition = position;
@@ -580,8 +582,6 @@ namespace MultiplayerARPG.MMO
                 message.networkPort = peerInfo.networkPort;
                 message.connectKey = peerInfo.connectKey;
                 LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MsgTypes.Warp, message);
-                // Unregister player character
-                UnregisterPlayerCharacter(peer);
                 // Destroy character from server
                 playerCharacterEntity.NetworkDestroy();
             }

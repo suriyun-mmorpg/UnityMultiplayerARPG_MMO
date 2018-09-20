@@ -38,14 +38,12 @@ namespace MultiplayerARPG.MMO
             bool withQuests = true);
         public abstract Task<List<PlayerCharacterData>> ReadCharacters(string userId);
         public abstract Task UpdateCharacter(IPlayerCharacterData character);
-        public abstract Task UpdateCharacters(IEnumerable<IPlayerCharacterData> characters);
         public abstract Task DeleteCharacter(string userId, string id);
         public abstract Task<long> FindCharacterName(string characterName);
 
         public abstract Task CreateBuilding(string mapName, BuildingSaveData saveData);
         public abstract Task<List<BuildingSaveData>> ReadBuildings(string mapName);
         public abstract Task UpdateBuilding(string mapName, IBuildingSaveData building);
-        public abstract Task UpdateBuildings(string mapName, IEnumerable<IBuildingSaveData> buildings);
         public abstract Task DeleteBuilding(string mapName, string id);
 
         public abstract Task<int> CreateParty(bool shareExp, bool shareItem, string leaderId);
