@@ -28,5 +28,7 @@
         public const ushort Chat = 23;
         public const ushort RequestFacebookLogin = 24;
         public const ushort RequestGooglePlayLogin = 25;
+        public const ushort UpdatePartyMember = 26;
+        public const ushort UpdateParty = 27;
     }
 }

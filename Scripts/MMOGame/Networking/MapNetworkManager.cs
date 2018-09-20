@@ -435,7 +435,52 @@ namespace MultiplayerARPG.MMO
 
         public void OnChatMessageReceive(ChatMessage message)
         {
-            HandleChatAtServer(message);
+            ReadChatMessage(message);
+        }
+
+        public void OnUpdatePartyMember(UpdatePartyMemberMessage message)
+        {
+            PartyData party;
+            BasePlayerCharacterEntity playerCharacter;
+            if (parties.TryGetValue(message.id, out party))
+            {
+                switch (message.type)
+                {
+                    case UpdatePartyMemberMessage.UpdateType.Add:
+                        var partyMember = new PartyMemberData();
+                        partyMember.id = message.characterId;
+                        partyMember.characterName = message.characterName;
+                        partyMember.dataId = message.dataId;
+                        partyMember.level = message.level;
+                        if (playerCharactersById.TryGetValue(message.characterId, out playerCharacter))
+                            playerCharacter.PartyId = message.id;
+                        party.AddMember(partyMember);
+                        break;
+                    case UpdatePartyMemberMessage.UpdateType.Remove:
+                        if (playerCharactersById.TryGetValue(message.characterId, out playerCharacter))
+                            playerCharacter.PartyId = 0;
+                        party.RemoveMember(message.characterId);
+                        break;
+                }
+            }
+        }
+
+        public void OnUpdateParty(UpdatePartyMessage message)
+        {
+            PartyData party;
+            if (parties.TryGetValue(message.id, out party))
+            {
+                switch (message.type)
+                {
+                    case UpdatePartyMessage.UpdateType.Setting:
+                        party.Setting(message.shareExp, message.shareItem);
+                        parties[message.id] = party;
+                        break;
+                    case UpdatePartyMessage.UpdateType.Terminate:
+                        parties.Remove(message.id);
+                        break;
+                }
+            }
         }
         #endregion
 
@@ -612,8 +657,8 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             await Database.UpdateParty(playerCharacterEntity.PartyId, shareExp, shareItem);
-            party.Setting(shareExp, shareItem);
-            parties[partyId] = party;
+            if (ChatNetworkManager.IsClientConnected)
+                ChatNetworkManager.UpdatePartySetting(partyId, shareExp, shareItem);
         }
 
         public override async void AddPartyMember(BasePlayerCharacterEntity inviteCharacterEntity, BasePlayerCharacterEntity acceptCharacterEntity)
@@ -635,9 +680,8 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             await Database.SetCharacterParty(acceptCharacterEntity.Id, partyId);
-            party.AddMember(acceptCharacterEntity);
-            parties[partyId] = party;
-            acceptCharacterEntity.PartyId = partyId;
+            if (ChatNetworkManager.IsClientConnected)
+                ChatNetworkManager.UpdatePartyMemberAdd(partyId, acceptCharacterEntity.Id, acceptCharacterEntity.CharacterName, acceptCharacterEntity.DataId, acceptCharacterEntity.Level);
         }
 
         public override async void KickFromParty(BasePlayerCharacterEntity playerCharacterEntity, string characterId)
@@ -654,8 +698,8 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             await Database.SetCharacterParty(characterId, 0);
-            party.RemoveMember(characterId);
-            parties[partyId] = party;
+            if (ChatNetworkManager.IsClientConnected)
+                ChatNetworkManager.UpdatePartyMemberRemove(partyId, characterId);
         }
 
         public override async void LeaveParty(BasePlayerCharacterEntity playerCharacterEntity)
@@ -673,15 +717,19 @@ namespace MultiplayerARPG.MMO
                 foreach (var memberId in party.GetMemberIds())
                 {
                     tasks.Add(Database.SetCharacterParty(memberId, 0));
+                    if (ChatNetworkManager.IsClientConnected)
+                        ChatNetworkManager.UpdatePartyMemberRemove(partyId, memberId);
                 }
+                tasks.Add(Database.DeleteParty(partyId));
                 await Task.WhenAll(tasks);
-                parties.Remove(partyId);
+                if (ChatNetworkManager.IsClientConnected)
+                    ChatNetworkManager.UpdatePartyTerminate(partyId);
             }
             else
             {
                 await Database.SetCharacterParty(playerCharacterEntity.Id, 0);
-                party.RemoveMember(playerCharacterEntity.Id);
-                parties[partyId] = party;
+                if (ChatNetworkManager.IsClientConnected)
+                    ChatNetworkManager.UpdatePartyMemberRemove(partyId, playerCharacterEntity.Id);
             }
         }
         #endregion
