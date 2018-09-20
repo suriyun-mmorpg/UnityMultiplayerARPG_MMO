@@ -93,32 +93,36 @@ namespace MultiplayerARPG.MMO
         public override async Task UpdateBuildings(string mapName, IEnumerable<IBuildingSaveData> buildings)
         {
             var tasks = new List<Task>();
-            await ExecuteNonQuery("UPDATE buildings SET " +
-                "parentId=@parentId, " +
-                "dataId=@dataId, " +
-                "currentHp=@currentHp, " +
-                "positionX=@positionX, " +
-                "positionY=@positionY, " +
-                "positionZ=@positionZ, " +
-                "rotationX=@rotationX, " +
-                "rotationY=@rotationY, " +
-                "rotationZ=@rotationZ, " +
-                "creatorId=@creatorId, " +
-                "creatorName=@creatorName " +
-                "WHERE id=@id AND mapName=@mapName",
-                new SqliteParameter("@id", saveData.Id),
-                new SqliteParameter("@parentId", saveData.ParentId),
-                new SqliteParameter("@dataId", saveData.DataId),
-                new SqliteParameter("@currentHp", saveData.CurrentHp),
-                new SqliteParameter("@mapName", mapName),
-                new SqliteParameter("@positionX", saveData.Position.x),
-                new SqliteParameter("@positionY", saveData.Position.y),
-                new SqliteParameter("@positionZ", saveData.Position.z),
-                new SqliteParameter("@rotationX", saveData.Rotation.eulerAngles.x),
-                new SqliteParameter("@rotationY", saveData.Rotation.eulerAngles.y),
-                new SqliteParameter("@rotationZ", saveData.Rotation.eulerAngles.z),
-                new SqliteParameter("@creatorId", saveData.CreatorId),
-                new SqliteParameter("@creatorName", saveData.CreatorName));
+            foreach (var building in buildings)
+            {
+                tasks.Add(ExecuteNonQuery("UPDATE buildings SET " +
+                    "parentId=@parentId, " +
+                    "dataId=@dataId, " +
+                    "currentHp=@currentHp, " +
+                    "positionX=@positionX, " +
+                    "positionY=@positionY, " +
+                    "positionZ=@positionZ, " +
+                    "rotationX=@rotationX, " +
+                    "rotationY=@rotationY, " +
+                    "rotationZ=@rotationZ, " +
+                    "creatorId=@creatorId, " +
+                    "creatorName=@creatorName " +
+                    "WHERE id=@id AND mapName=@mapName",
+                    new SqliteParameter("@id", building.Id),
+                    new SqliteParameter("@parentId", building.ParentId),
+                    new SqliteParameter("@dataId", building.DataId),
+                    new SqliteParameter("@currentHp", building.CurrentHp),
+                    new SqliteParameter("@mapName", mapName),
+                    new SqliteParameter("@positionX", building.Position.x),
+                    new SqliteParameter("@positionY", building.Position.y),
+                    new SqliteParameter("@positionZ", building.Position.z),
+                    new SqliteParameter("@rotationX", building.Rotation.eulerAngles.x),
+                    new SqliteParameter("@rotationY", building.Rotation.eulerAngles.y),
+                    new SqliteParameter("@rotationZ", building.Rotation.eulerAngles.z),
+                    new SqliteParameter("@creatorId", building.CreatorId),
+                    new SqliteParameter("@creatorName", building.CreatorName)));
+            }
+            await Task.WhenAll(tasks);
         }
 
         public override async Task DeleteBuilding(string mapName, string id)
