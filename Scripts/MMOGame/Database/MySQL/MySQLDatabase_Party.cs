@@ -34,11 +34,11 @@ namespace MultiplayerARPG.MMO
                 result = new PartyData(id, reader.GetBoolean("shareExp"), reader.GetBoolean("shareItem"), reader.GetString("leaderId"));
                 reader = await ExecuteReader("SELECT id, dataId, characterName, level FROM characters WHERE partyId=@id",
                     new MySqlParameter("@id", id));
-                PartyMemberData partyMemberData;
+                SocialCharacterData partyMemberData;
                 while (reader.Read())
                 {
                     // Get some required data, other data will be set at server side
-                    partyMemberData = new PartyMemberData();
+                    partyMemberData = new SocialCharacterData();
                     partyMemberData.id = reader.GetString("id");
                     partyMemberData.characterName = reader.GetString("characterName");
                     partyMemberData.dataId = reader.GetInt32("dataId");

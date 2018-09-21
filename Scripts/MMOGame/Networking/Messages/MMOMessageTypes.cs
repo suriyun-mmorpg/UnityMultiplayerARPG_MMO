@@ -30,5 +30,7 @@
         public const ushort RequestGooglePlayLogin = 25;
         public const ushort UpdatePartyMember = 26;
         public const ushort UpdateParty = 27;
+        public const ushort UpdateGuildMember = 29;
+        public const ushort UpdateGuild = 30;
     }
 }

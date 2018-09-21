@@ -106,6 +106,36 @@ namespace MultiplayerARPG.MMO
             }
         }
 
+        protected override void UpdatePartyMembers()
+        {
+            var time = Time.unscaledTime;
+            tempPartyDataArray = parties.Values.ToArray();
+            foreach (var party in tempPartyDataArray)
+            {
+                tempPartyMemberIdArray = party.GetMemberIds().ToArray();
+                foreach (var memberId in tempPartyMemberIdArray)
+                {
+                    BasePlayerCharacterEntity playerCharacterEntity;
+                    if (playerCharactersById.TryGetValue(memberId, out playerCharacterEntity))
+                    {
+                        party.UpdateMember(playerCharacterEntity);
+                        party.NotifyMemberOnline(memberId, time);
+                        if (ChatNetworkManager != null && ChatNetworkManager.IsClientConnected)
+                            ChatNetworkManager.UpdatePartyMemberOnline(party.id, 
+                                playerCharacterEntity.Id, 
+                                playerCharacterEntity.CharacterName, 
+                                playerCharacterEntity.DataId, 
+                                playerCharacterEntity.Level, 
+                                playerCharacterEntity.CurrentHp, 
+                                playerCharacterEntity.CacheMaxHp, 
+                                playerCharacterEntity.CurrentMp, 
+                                playerCharacterEntity.CacheMaxMp);
+                    }
+                    party.UpdateMemberOnline(memberId, time);
+                }
+            }
+        }
+
         protected override async void OnDestroy()
         {
             CentralAppServerRegister.Stop();
@@ -442,12 +472,13 @@ namespace MultiplayerARPG.MMO
         {
             PartyData party;
             BasePlayerCharacterEntity playerCharacter;
+            SocialCharacterData partyMember;
             if (parties.TryGetValue(message.id, out party))
             {
                 switch (message.type)
                 {
                     case UpdatePartyMemberMessage.UpdateType.Add:
-                        var partyMember = new PartyMemberData();
+                        partyMember = new SocialCharacterData();
                         partyMember.id = message.characterId;
                         partyMember.characterName = message.characterName;
                         partyMember.dataId = message.dataId;
@@ -460,6 +491,19 @@ namespace MultiplayerARPG.MMO
                         if (playerCharactersById.TryGetValue(message.characterId, out playerCharacter))
                             playerCharacter.PartyId = 0;
                         party.RemoveMember(message.characterId);
+                        break;
+                    case UpdatePartyMemberMessage.UpdateType.Online:
+                        partyMember = new SocialCharacterData();
+                        partyMember.id = message.characterId;
+                        partyMember.characterName = message.characterName;
+                        partyMember.dataId = message.dataId;
+                        partyMember.level = message.level;
+                        partyMember.currentHp = message.currentHp;
+                        partyMember.maxHp = message.maxHp;
+                        partyMember.currentMp = message.currentMp;
+                        partyMember.maxMp = message.maxMp;
+                        party.UpdateMember(partyMember);
+                        party.NotifyMemberOnline(message.characterId, Time.unscaledTime);
                         break;
                 }
             }

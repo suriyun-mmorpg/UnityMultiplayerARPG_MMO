@@ -234,6 +234,22 @@ namespace MultiplayerARPG.MMO
             LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, Client.Peer, MMOMessageTypes.UpdatePartyMember, message);
         }
 
+        public void UpdatePartyMemberOnline(int id, string characterId, string characterName, int dataId, int level, int currentHp, int maxHp, int currentMp, int maxMp)
+        {
+            var message = new UpdatePartyMemberMessage();
+            message.type = UpdatePartyMemberMessage.UpdateType.Online;
+            message.id = id;
+            message.characterId = characterId;
+            message.characterName = characterName;
+            message.dataId = dataId;
+            message.level = level;
+            message.currentHp = currentHp;
+            message.maxHp = maxHp;
+            message.currentMp = currentMp;
+            message.maxMp = maxMp;
+            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, Client.Peer, MMOMessageTypes.UpdatePartyMember, message);
+        }
+
         public void UpdatePartySetting(int id, bool shareExp, bool shareItem)
         {
             var message = new UpdatePartyMessage();
