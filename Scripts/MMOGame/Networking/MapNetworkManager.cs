@@ -109,27 +109,27 @@ namespace MultiplayerARPG.MMO
         protected override void UpdatePartyMembers()
         {
             var time = Time.unscaledTime;
+            BasePlayerCharacterEntity playerCharacter;
             tempPartyDataArray = parties.Values.ToArray();
             foreach (var party in tempPartyDataArray)
             {
                 tempPartyMemberIdArray = party.GetMemberIds().ToArray();
                 foreach (var memberId in tempPartyMemberIdArray)
                 {
-                    BasePlayerCharacterEntity playerCharacterEntity;
-                    if (playerCharactersById.TryGetValue(memberId, out playerCharacterEntity))
+                    if (playerCharactersById.TryGetValue(memberId, out playerCharacter))
                     {
-                        party.UpdateMember(playerCharacterEntity);
+                        party.UpdateMember(playerCharacter);
                         party.NotifyMemberOnline(memberId, time);
                         if (ChatNetworkManager != null && ChatNetworkManager.IsClientConnected)
-                            ChatNetworkManager.UpdatePartyMemberOnline(party.id, 
-                                playerCharacterEntity.Id, 
-                                playerCharacterEntity.CharacterName, 
-                                playerCharacterEntity.DataId, 
-                                playerCharacterEntity.Level, 
-                                playerCharacterEntity.CurrentHp, 
-                                playerCharacterEntity.CacheMaxHp, 
-                                playerCharacterEntity.CurrentMp, 
-                                playerCharacterEntity.CacheMaxMp);
+                            ChatNetworkManager.UpdatePartyMemberOnline(party.id,
+                                playerCharacter.Id,
+                                playerCharacter.CharacterName,
+                                playerCharacter.DataId,
+                                playerCharacter.Level,
+                                playerCharacter.CurrentHp,
+                                playerCharacter.CacheMaxHp,
+                                playerCharacter.CurrentMp,
+                                playerCharacter.CacheMaxMp);
                     }
                     party.UpdateMemberOnline(memberId, time);
                 }
@@ -286,9 +286,11 @@ namespace MultiplayerARPG.MMO
         protected override void HandleChatAtServer(LiteNetLibMessageHandler messageHandler)
         {
             // Send chat message to chat server, for MMO mode chat message handling by chat server
-            var message = messageHandler.ReadMessage<ChatMessage>();
             if (ChatNetworkManager.IsClientConnected)
-                ChatNetworkManager.EnterChat(message.channel, message.message, message.sender, message.receiver);
+            {
+                var message = FillChatChannelId(messageHandler.ReadMessage<ChatMessage>());
+                ChatNetworkManager.EnterChat(message.channel, message.message, message.sender, message.receiver, message.channelId);
+            }
         }
 
         protected override async void HandleRequestCashShopInfo(LiteNetLibMessageHandler messageHandler)

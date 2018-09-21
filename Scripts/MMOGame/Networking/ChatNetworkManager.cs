@@ -200,7 +200,7 @@ namespace MultiplayerARPG.MMO
             }
         }
 
-        public void EnterChat(ChatChannel channel, string message, string senderName, string receiverName)
+        public void EnterChat(ChatChannel channel, string message, string senderName, string receiverName, int channelId)
         {
             if (!IsClientConnected)
                 return;
@@ -210,6 +210,7 @@ namespace MultiplayerARPG.MMO
             chatMessage.message = message;
             chatMessage.sender = senderName;
             chatMessage.receiver = receiverName;
+            chatMessage.channelId = channelId;
             LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, Client.Peer, MMOMessageTypes.Chat, chatMessage);
         }
 
