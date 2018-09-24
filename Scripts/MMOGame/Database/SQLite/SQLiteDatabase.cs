@@ -181,8 +181,8 @@ namespace MultiplayerARPG.MMO
             await ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS guild (
               id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
               guildName TEXT NOT NULL,
-              characterId TEXT NOT NULL,
-              characterName TEXT NOT NULL,
+              leaderId TEXT NOT NULL,
+              leaderName TEXT NOT NULL,
               level INTEGER NOT NULL,
               exp INTEGER NOT NULL,
               skillPoint INTEGER NOT NULL,
