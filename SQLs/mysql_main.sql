@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Sep 14, 2018 at 12:33 PM
+-- Generation Time: Sep 24, 2018 at 02:25 AM
 -- Server version: 10.1.28-MariaDB
 -- PHP Version: 7.1.11
 
@@ -11,12 +11,6 @@ SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET AUTOCOMMIT = 0;
 START TRANSACTION;
 SET time_zone = "+00:00";
-
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
 
 --
 -- Database: `mmorpgtemplate`
@@ -44,7 +38,7 @@ CREATE TABLE `buildings` (
   `creatorName` varchar(32) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
   `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -186,6 +180,23 @@ CREATE TABLE `characterskill` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `guild`
+--
+
+CREATE TABLE `guild` (
+  `id` int(11) NOT NULL,
+  `guildName` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
+  `characterId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `characterName` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
+  `level` int(11) NOT NULL,
+  `exp` int(11) NOT NULL,
+  `skillPoint` int(11) NOT NULL,
+  `message` varchar(100) COLLATE utf8_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `party`
 --
 
@@ -267,6 +278,12 @@ ALTER TABLE `characterskill`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `guild`
+--
+ALTER TABLE `guild`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `party`
 --
 ALTER TABLE `party`
@@ -284,12 +301,14 @@ ALTER TABLE `userlogin`
 --
 
 --
+-- AUTO_INCREMENT for table `guild`
+--
+ALTER TABLE `guild`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `party`
 --
 ALTER TABLE `party`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 COMMIT;
-
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
