@@ -69,7 +69,7 @@ namespace MultiplayerARPG.MMO
         private Task saveWorldTask;
         // Listing
         private readonly Dictionary<string, CentralServerPeerInfo> mapServerPeersBySceneName = new Dictionary<string, CentralServerPeerInfo>();
-        private readonly Dictionary<long, SimpleUserCharacterData> users = new Dictionary<long, SimpleUserCharacterData>();
+        private readonly Dictionary<string, UserCharacterData> usersById = new Dictionary<string, UserCharacterData>();
         private readonly Dictionary<string, Task> savingCharacters = new Dictionary<string, Task>();
         private readonly Dictionary<int, Task> loadingPartyIds = new Dictionary<int, Task>();
 
@@ -106,32 +106,58 @@ namespace MultiplayerARPG.MMO
             }
         }
 
-        protected override void UpdatePartyMembers()
+        protected override void UpdateOnlineCharacters(float time)
         {
-            var time = Time.unscaledTime;
             BasePlayerCharacterEntity playerCharacter;
+            UserCharacterData userData;
+
+            tempCharacterIdArray = playerCharactersById.Keys.ToArray();
+            foreach (var characterId in tempCharacterIdArray)
+            {
+                playerCharacter = playerCharactersById[characterId];
+                if (usersById.TryGetValue(characterId, out userData))
+                {
+                    if (ChatNetworkManager != null && ChatNetworkManager.IsClientConnected)
+                    {
+                        userData.dataId = playerCharacter.DataId;
+                        userData.level = playerCharacter.Level;
+                        userData.currentHp = playerCharacter.CurrentHp;
+                        userData.maxHp = playerCharacter.CacheMaxHp;
+                        userData.currentMp = playerCharacter.CurrentMp;
+                        userData.maxMp = playerCharacter.CacheMaxMp;
+                        usersById[characterId] = userData;
+                        UpdateMapUser(ChatNetworkManager.Client.Peer, UpdateMapUserMessage.UpdateType.Online, userData);
+                    }
+                }
+            }
+
             tempPartyDataArray = parties.Values.ToArray();
             foreach (var party in tempPartyDataArray)
             {
-                tempPartyMemberIdArray = party.GetMemberIds().ToArray();
-                foreach (var memberId in tempPartyMemberIdArray)
+                tempCharacterIdArray = party.GetMemberIds().ToArray();
+                foreach (var memberId in tempCharacterIdArray)
                 {
-                    if (playerCharactersById.TryGetValue(memberId, out playerCharacter))
+                    if (usersById.TryGetValue(memberId, out userData))
                     {
-                        party.UpdateMember(playerCharacter);
+                        party.UpdateMember(userData.ConvertToSocialCharacterData());
                         party.NotifyMemberOnline(memberId, time);
-                        if (ChatNetworkManager != null && ChatNetworkManager.IsClientConnected)
-                            ChatNetworkManager.UpdatePartyMemberOnline(party.id,
-                                playerCharacter.Id,
-                                playerCharacter.CharacterName,
-                                playerCharacter.DataId,
-                                playerCharacter.Level,
-                                playerCharacter.CurrentHp,
-                                playerCharacter.CacheMaxHp,
-                                playerCharacter.CurrentMp,
-                                playerCharacter.CacheMaxMp);
                     }
                     party.UpdateMemberOnline(memberId, time);
+                }
+            }
+
+            tempGuildDataArray = guilds.Values.ToArray();
+            foreach (var guild in tempGuildDataArray)
+            {
+                tempCharacterIdArray = guild.GetMemberIds().ToArray();
+                foreach (var memberId in tempCharacterIdArray)
+                {
+                    if (usersById.TryGetValue(memberId, out userData))
+                    {
+                        guild.UpdateMember(userData.ConvertToSocialCharacterData());
+                        guild.NotifyMemberOnline(memberId, time);
+                    }
+                    guild.UpdateMemberOnline(memberId, time);
                 }
             }
         }
@@ -153,12 +179,13 @@ namespace MultiplayerARPG.MMO
 
         public override void UnregisterPlayerCharacter(NetPeer peer)
         {
-            var connectId = peer.ConnectId;
             // Send remove character from map server
-            SimpleUserCharacterData userData;
-            if (users.TryGetValue(connectId, out userData))
+            BasePlayerCharacterEntity playerCharacter;
+            UserCharacterData userData;
+            if (playerCharacters.TryGetValue(peer.ConnectId, out playerCharacter) && 
+                usersById.TryGetValue(playerCharacter.Id, out userData))
             {
-                users.Remove(connectId);
+                usersById.Remove(playerCharacter.Id);
                 // Remove map user from central server and chat server
                 UpdateMapUser(CentralAppServerRegister.Peer, UpdateMapUserMessage.UpdateType.Remove, userData);
                 if (ChatNetworkManager.IsClientConnected)
@@ -169,10 +196,9 @@ namespace MultiplayerARPG.MMO
 
         public override async void OnPeerDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
         {
-            var connectId = peer.ConnectId;
             // Save player character data
             BasePlayerCharacterEntity playerCharacterEntity;
-            if (playerCharacters.TryGetValue(connectId, out playerCharacterEntity))
+            if (playerCharacters.TryGetValue(peer.ConnectId, out playerCharacterEntity))
                 await SaveCharacter(playerCharacterEntity);
             UnregisterPlayerCharacter(peer);
             base.OnPeerDisconnected(peer, disconnectInfo);
@@ -263,8 +289,17 @@ namespace MultiplayerARPG.MMO
                 else
                     playerCharacterEntity.RequestOnDead();
                 RegisterPlayerCharacter(peer, playerCharacterEntity);
-                var userData = new SimpleUserCharacterData(userId, playerCharacterEntity.Id, playerCharacterEntity.CharacterName);
-                users[peer.ConnectId] = userData;
+                var userData = new UserCharacterData();
+                userData.userId = userId;
+                userData.id = playerCharacterEntity.Id;
+                userData.characterName = playerCharacterEntity.CharacterName;
+                userData.dataId = playerCharacterEntity.DataId;
+                userData.level = playerCharacterEntity.Level;
+                userData.currentHp = playerCharacterEntity.CurrentHp;
+                userData.maxHp = playerCharacterEntity.CacheMaxHp;
+                userData.currentMp = playerCharacterEntity.CurrentMp;
+                userData.maxMp = playerCharacterEntity.CacheMaxMp;
+                usersById[userData.id] = userData;
                 // Add map user to central server and chat server
                 UpdateMapUser(CentralAppServerRegister.Peer, UpdateMapUserMessage.UpdateType.Add, userData);
                 if (ChatNetworkManager.IsClientConnected)
@@ -300,12 +335,14 @@ namespace MultiplayerARPG.MMO
             var error = ResponseCashShopInfoMessage.Error.None;
             var cash = 0;
             var cashShopItemIds = new List<int>();
-            SimpleUserCharacterData user;
-            if (!users.TryGetValue(peer.ConnectId, out user))
+            BasePlayerCharacterEntity playerCharacter;
+            UserCharacterData userData;
+            if (!playerCharacters.TryGetValue(peer.ConnectId, out playerCharacter) || 
+                !usersById.TryGetValue(playerCharacter.Id, out userData))
                 error = ResponseCashShopInfoMessage.Error.UserNotFound;
             else
             {
-                cash = await Database.GetCash(user.userId);
+                cash = await Database.GetCash(userData.userId);
                 foreach (var cashShopItemId in GameInstance.CashShopItems.Keys)
                 {
                     cashShopItemIds.Add(cashShopItemId);
@@ -328,24 +365,23 @@ namespace MultiplayerARPG.MMO
             var error = ResponseCashShopBuyMessage.Error.None;
             var dataId = message.dataId;
             var cash = 0;
-            SimpleUserCharacterData user;
-            if (!users.TryGetValue(peer.ConnectId, out user))
+            BasePlayerCharacterEntity playerCharacter;
+            UserCharacterData userData;
+            if (!playerCharacters.TryGetValue(peer.ConnectId, out playerCharacter) ||
+                !usersById.TryGetValue(playerCharacter.Id, out userData))
                 error = ResponseCashShopBuyMessage.Error.UserNotFound;
             else
             {
                 // Request cash, reduce, send item info messages to map server
-                cash = await Database.GetCash(user.userId);
-                BasePlayerCharacterEntity playerCharacter;
+                cash = await Database.GetCash(userData.userId);
                 CashShopItem cashShopItem;
-                if (!playerCharacters.TryGetValue(peer.ConnectId, out playerCharacter))
-                    error = ResponseCashShopBuyMessage.Error.CharacterNotFound;
-                else if (!GameInstance.CashShopItems.TryGetValue(dataId, out cashShopItem))
+                if (!GameInstance.CashShopItems.TryGetValue(dataId, out cashShopItem))
                     error = ResponseCashShopBuyMessage.Error.ItemNotFound;
                 else if (cash < cashShopItem.sellPrice)
                     error = ResponseCashShopBuyMessage.Error.NotEnoughCash;
                 else
                 {
-                    cash = await Database.DecreaseCash(user.userId, cashShopItem.sellPrice);
+                    cash = await Database.DecreaseCash(userData.userId, cashShopItem.sellPrice);
                     playerCharacter.Gold += cashShopItem.receiveGold;
                     foreach (var receiveItem in cashShopItem.receiveItems)
                     {
@@ -370,12 +406,14 @@ namespace MultiplayerARPG.MMO
             var error = ResponseCashPackageInfoMessage.Error.None;
             var cash = 0;
             var cashPackageIds = new List<int>();
-            SimpleUserCharacterData user;
-            if (!users.TryGetValue(peer.ConnectId, out user))
+            BasePlayerCharacterEntity playerCharacter;
+            UserCharacterData userData;
+            if (!playerCharacters.TryGetValue(peer.ConnectId, out playerCharacter) ||
+                !usersById.TryGetValue(playerCharacter.Id, out userData))
                 error = ResponseCashPackageInfoMessage.Error.UserNotFound;
             else
             {
-                cash = await Database.GetCash(user.userId);
+                cash = await Database.GetCash(userData.userId);
                 foreach (var cashShopItemId in GameInstance.CashPackages.Keys)
                 {
                     cashPackageIds.Add(cashShopItemId);
@@ -398,22 +436,21 @@ namespace MultiplayerARPG.MMO
             var error = ResponseCashPackageBuyValidationMessage.Error.None;
             var dataId = message.dataId;
             var cash = 0;
-            SimpleUserCharacterData user;
-            if (!users.TryGetValue(peer.ConnectId, out user))
+            BasePlayerCharacterEntity playerCharacter;
+            UserCharacterData userData;
+            if (!playerCharacters.TryGetValue(peer.ConnectId, out playerCharacter) ||
+                !usersById.TryGetValue(playerCharacter.Id, out userData))
                 error = ResponseCashPackageBuyValidationMessage.Error.UserNotFound;
             else
             {
                 // Get current cash will return this in case it cannot increase cash
-                cash = await Database.GetCash(user.userId);
+                cash = await Database.GetCash(userData.userId);
                 // TODO: Validate purchasing at server side
-                BasePlayerCharacterEntity playerCharacter;
                 CashPackage cashPackage;
-                if (!playerCharacters.TryGetValue(peer.ConnectId, out playerCharacter))
-                    error = ResponseCashPackageBuyValidationMessage.Error.CharacterNotFound;
-                else if (!GameInstance.CashPackages.TryGetValue(dataId, out cashPackage))
+                if (!GameInstance.CashPackages.TryGetValue(dataId, out cashPackage))
                     error = ResponseCashPackageBuyValidationMessage.Error.PackageNotFound;
                 else
-                    cash = await Database.IncreaseCash(user.userId, cashPackage.cashAmount);
+                    cash = await Database.IncreaseCash(userData.userId, cashPackage.cashAmount);
             }
             var responseMessage = new ResponseCashPackageBuyValidationMessage();
             responseMessage.ackId = message.ackId;
@@ -470,6 +507,41 @@ namespace MultiplayerARPG.MMO
             ReadChatMessage(message);
         }
 
+        public void OnUpdateMapUser(UpdateMapUserMessage message)
+        {
+            UserCharacterData userData;
+            switch (message.type)
+            {
+                case UpdateMapUserMessage.UpdateType.Add:
+                    if (!usersById.ContainsKey(message.id))
+                    {
+                        userData = new UserCharacterData();
+                        userData.id = message.id;
+                        userData.userId = message.userId;
+                        userData.characterName = message.characterName;
+                        userData.dataId = message.dataId;
+                        userData.level = message.level;
+                        usersById[userData.id] = userData;
+                    }
+                    break;
+                case UpdateMapUserMessage.UpdateType.Remove:
+                    if (usersById.TryGetValue(message.id, out userData))
+                        usersById.Remove(userData.id);
+                    break;
+                case UpdateMapUserMessage.UpdateType.Online:
+                    if (usersById.TryGetValue(message.id, out userData))
+                    {
+                        userData.level = message.level;
+                        userData.currentHp = message.currentHp;
+                        userData.maxHp = message.maxHp;
+                        userData.currentMp = message.currentMp;
+                        userData.maxMp = message.maxMp;
+                        usersById[userData.id] = userData;
+                    }
+                    break;
+            }
+        }
+
         public void OnUpdatePartyMember(UpdatePartyMemberMessage message)
         {
             PartyData party;
@@ -493,19 +565,6 @@ namespace MultiplayerARPG.MMO
                         if (playerCharactersById.TryGetValue(message.characterId, out playerCharacter))
                             playerCharacter.PartyId = 0;
                         party.RemoveMember(message.characterId);
-                        break;
-                    case UpdatePartyMemberMessage.UpdateType.Online:
-                        partyMember = new SocialCharacterData();
-                        partyMember.id = message.characterId;
-                        partyMember.characterName = message.characterName;
-                        partyMember.dataId = message.dataId;
-                        partyMember.level = message.level;
-                        partyMember.currentHp = message.currentHp;
-                        partyMember.maxHp = message.maxHp;
-                        partyMember.currentMp = message.currentMp;
-                        partyMember.maxMp = message.maxMp;
-                        party.UpdateMember(partyMember);
-                        party.NotifyMemberOnline(message.characterId, Time.unscaledTime);
                         break;
                 }
             }
@@ -533,17 +592,25 @@ namespace MultiplayerARPG.MMO
         #region Update map user functions
         private void UpdateMapUsers(NetPeer peer, UpdateMapUserMessage.UpdateType updateType)
         {
-            foreach (var user in users.Values)
+            foreach (var user in usersById.Values)
             {
                 UpdateMapUser(peer, updateType, user);
             }
         }
 
-        private void UpdateMapUser(NetPeer peer, UpdateMapUserMessage.UpdateType updateType, SimpleUserCharacterData userData)
+        private void UpdateMapUser(NetPeer peer, UpdateMapUserMessage.UpdateType updateType, UserCharacterData userData)
         {
             var updateMapUserMessage = new UpdateMapUserMessage();
             updateMapUserMessage.type = updateType;
-            updateMapUserMessage.userData = userData;
+            updateMapUserMessage.id = userData.id;
+            updateMapUserMessage.userId = userData.userId;
+            updateMapUserMessage.characterName = userData.characterName;
+            updateMapUserMessage.dataId = userData.dataId;
+            updateMapUserMessage.level = userData.level;
+            updateMapUserMessage.currentHp = userData.currentHp;
+            updateMapUserMessage.maxHp = userData.maxHp;
+            updateMapUserMessage.currentMp = userData.currentMp;
+            updateMapUserMessage.maxMp = userData.maxMp;
             LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, peer, MMOMessageTypes.UpdateMapUser, updateMapUserMessage);
         }
         #endregion
