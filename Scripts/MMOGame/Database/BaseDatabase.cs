@@ -51,5 +51,11 @@ namespace MultiplayerARPG.MMO
         public abstract Task UpdateParty(int id, bool shareExp, bool shareItem);
         public abstract Task DeleteParty(int id);
         public abstract Task SetCharacterParty(string characterId, int partyId);
+
+        public abstract Task<int> CreateGuild(string guildName, string leaderId, string leaderName);
+        public abstract Task<GuildData> ReadGuild(int id);
+        public abstract Task UpdateGuildMessage(int id, string message);
+        public abstract Task DeleteGuild(int id);
+        public abstract Task SetCharacterGuild(string characterId, int guild);
     }
 }

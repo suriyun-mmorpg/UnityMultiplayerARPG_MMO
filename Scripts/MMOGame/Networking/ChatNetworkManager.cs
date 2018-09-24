@@ -247,41 +247,79 @@ namespace MultiplayerARPG.MMO
 
         public void UpdatePartyMemberAdd(int id, string characterId, string characterName, int dataId, int level)
         {
-            var message = new UpdatePartyMemberMessage();
-            message.type = UpdatePartyMemberMessage.UpdateType.Add;
-            message.id = id;
-            message.characterId = characterId;
-            message.characterName = characterName;
-            message.dataId = dataId;
-            message.level = level;
-            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, Client.Peer, MMOMessageTypes.UpdatePartyMember, message);
+            var updateMessage = new UpdatePartyMemberMessage();
+            updateMessage.type = UpdatePartyMemberMessage.UpdateType.Add;
+            updateMessage.id = id;
+            updateMessage.characterId = characterId;
+            updateMessage.characterName = characterName;
+            updateMessage.dataId = dataId;
+            updateMessage.level = level;
+            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, Client.Peer, MMOMessageTypes.UpdatePartyMember, updateMessage);
         }
 
         public void UpdatePartyMemberRemove(int id, string characterId)
         {
-            var message = new UpdatePartyMemberMessage();
-            message.type = UpdatePartyMemberMessage.UpdateType.Remove;
-            message.id = id;
-            message.characterId = characterId;
-            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, Client.Peer, MMOMessageTypes.UpdatePartyMember, message);
+            var updateMessage = new UpdatePartyMemberMessage();
+            updateMessage.type = UpdatePartyMemberMessage.UpdateType.Remove;
+            updateMessage.id = id;
+            updateMessage.characterId = characterId;
+            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, Client.Peer, MMOMessageTypes.UpdatePartyMember, updateMessage);
         }
 
         public void UpdatePartySetting(int id, bool shareExp, bool shareItem)
         {
-            var message = new UpdatePartyMessage();
-            message.type = UpdatePartyMessage.UpdateType.Setting;
-            message.id = id;
-            message.shareExp = shareExp;
-            message.shareItem = shareItem;
-            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, Client.Peer, MMOMessageTypes.UpdateParty, message);
+            var updateMessage = new UpdatePartyMessage();
+            updateMessage.type = UpdatePartyMessage.UpdateType.Setting;
+            updateMessage.id = id;
+            updateMessage.shareExp = shareExp;
+            updateMessage.shareItem = shareItem;
+            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, Client.Peer, MMOMessageTypes.UpdateParty, updateMessage);
         }
 
         public void UpdatePartyTerminate(int id)
         {
-            var message = new UpdatePartyMessage();
-            message.type = UpdatePartyMessage.UpdateType.Terminate;
-            message.id = id;
-            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, Client.Peer, MMOMessageTypes.UpdateParty, message);
+            var updateMessage = new UpdatePartyMessage();
+            updateMessage.type = UpdatePartyMessage.UpdateType.Terminate;
+            updateMessage.id = id;
+            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, Client.Peer, MMOMessageTypes.UpdateParty, updateMessage);
+        }
+
+        public void UpdateGuildMemberAdd(int id, string characterId, string characterName, int dataId, int level)
+        {
+            var updateMessage = new UpdateGuildMemberMessage();
+            updateMessage.type = UpdateGuildMemberMessage.UpdateType.Add;
+            updateMessage.id = id;
+            updateMessage.characterId = characterId;
+            updateMessage.characterName = characterName;
+            updateMessage.dataId = dataId;
+            updateMessage.level = level;
+            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, Client.Peer, MMOMessageTypes.UpdateGuildMember, updateMessage);
+        }
+
+        public void UpdateGuildMemberRemove(int id, string characterId)
+        {
+            var updateMessage = new UpdateGuildMemberMessage();
+            updateMessage.type = UpdateGuildMemberMessage.UpdateType.Remove;
+            updateMessage.id = id;
+            updateMessage.characterId = characterId;
+            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, Client.Peer, MMOMessageTypes.UpdateGuildMember, updateMessage);
+        }
+
+        public void UpdateSetGuildMessage(int id, string message)
+        {
+            var updateMessage = new UpdateGuildMessage();
+            updateMessage.type = UpdateGuildMessage.UpdateType.SetGuildMessage;
+            updateMessage.id = id;
+            updateMessage.message = message;
+            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, Client.Peer, MMOMessageTypes.UpdateGuild, updateMessage);
+        }
+
+        public void UpdateGuildTerminate(int id)
+        {
+            var updateMessage = new UpdateGuildMessage();
+            updateMessage.type = UpdateGuildMessage.UpdateType.Terminate;
+            updateMessage.id = id;
+            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, Client.Peer, MMOMessageTypes.UpdateGuild, updateMessage);
         }
 
         public void StartClient(MapNetworkManager mapNetworkManager, string networkAddress, int networkPort, string connectKey)

@@ -70,8 +70,6 @@ namespace MultiplayerARPG.MMO
         // Listing
         private readonly Dictionary<string, CentralServerPeerInfo> mapServerPeersBySceneName = new Dictionary<string, CentralServerPeerInfo>();
         private readonly Dictionary<string, UserCharacterData> usersById = new Dictionary<string, UserCharacterData>();
-        private readonly Dictionary<string, Task> savingCharacters = new Dictionary<string, Task>();
-        private readonly Dictionary<int, Task> loadingPartyIds = new Dictionary<int, Task>();
 
         protected override void Awake()
         {
@@ -117,7 +115,7 @@ namespace MultiplayerARPG.MMO
                 playerCharacter = playerCharactersById[characterId];
                 if (usersById.TryGetValue(characterId, out userData))
                 {
-                    if (ChatNetworkManager != null && ChatNetworkManager.IsClientConnected)
+                    if (ChatNetworkManager.IsClientConnected)
                     {
                         userData.dataId = playerCharacter.DataId;
                         userData.level = playerCharacter.Level;
@@ -233,6 +231,23 @@ namespace MultiplayerARPG.MMO
                 onClientDisconnected(peer, disconnectInfo);
         }
 
+        public override async void OnServerOnlineSceneLoaded()
+        {
+            base.OnServerOnlineSceneLoaded();
+            // Spawn buildings
+            var buildings = await Database.ReadBuildings(Assets.onlineScene.SceneName);
+            foreach (var building in buildings)
+            {
+                CreateBuildingEntity(building, true);
+            }
+            // Spawn harvestables
+            var harvestableSpawnAreas = FindObjectsOfType<HarvestableSpawnArea>();
+            foreach (var harvestableSpawnArea in harvestableSpawnAreas)
+            {
+                harvestableSpawnArea.SpawnAll();
+            }
+        }
+
         #region Character spawn function
         public override void SerializeClientReadyExtra(NetDataWriter writer)
         {
@@ -270,6 +285,9 @@ namespace MultiplayerARPG.MMO
                 // Load party data, if this map-server does not have party data
                 if (playerCharacterData.PartyId > 0 && !parties.ContainsKey(playerCharacterData.PartyId))
                     await LoadPartyDataFromDatabase(playerCharacterData.PartyId);
+                // Load guild data, if this map-server does not have guild data
+                if (playerCharacterData.PartyId > 0 && !guilds.ContainsKey(playerCharacterData.GuildId))
+                    await LoadGuildDataFromDatabase(playerCharacterData.GuildId);
                 // If it is not allow this character data, disconnect user
                 var dataId = playerCharacterData.DataId;
                 PlayerCharacter playerCharacter;
@@ -612,238 +630,6 @@ namespace MultiplayerARPG.MMO
             updateMapUserMessage.currentMp = userData.currentMp;
             updateMapUserMessage.maxMp = userData.maxMp;
             LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, peer, MMOMessageTypes.UpdateMapUser, updateMapUserMessage);
-        }
-        #endregion
-
-        #region Load Functions
-        private async Task LoadPartyDataFromDatabase(int partyId)
-        {
-            // If there are other party loading which is not completed, it will not load again
-            if (partyId <= 0 || loadingPartyIds.ContainsKey(partyId))
-                return;
-            var task = Database.ReadParty(partyId);
-            loadingPartyIds.Add(partyId, task);
-            var party = await task;
-            if (party != null)
-                parties[partyId] = party;
-            else
-                parties.Remove(partyId);
-            loadingPartyIds.Remove(partyId);
-        }
-        #endregion
-
-        #region Save functions
-        private async Task SaveCharacter(IPlayerCharacterData playerCharacterData)
-        {
-            if (playerCharacterData == null)
-                return;
-            Task task;
-            if (savingCharacters.TryGetValue(playerCharacterData.Id, out task) && !task.IsCompleted)
-                await task;
-            task = Database.UpdateCharacter(playerCharacterData);
-            savingCharacters[playerCharacterData.Id] = task;
-            Debug.Log("Character [" + playerCharacterData.Id + "] Saved");
-            await task;
-        }
-
-        private async Task SaveCharacters()
-        {
-            if (saveCharactersTask != null && !saveCharactersTask.IsCompleted)
-                await saveCharactersTask;
-            var tasks = new List<Task>();
-            foreach (var playerCharacter in playerCharacters.Values)
-            {
-                tasks.Add(SaveCharacter(playerCharacter));
-            }
-            await Task.WhenAll(tasks);
-            Debug.Log("Characters Saved " + tasks.Count + " character(s)");
-        }
-
-        private async Task SaveWorld()
-        {
-            if (saveWorldTask != null && !saveWorldTask.IsCompleted)
-                await saveWorldTask;
-            var tasks = new List<Task>();
-            foreach (var buildingEntity in buildingEntities.Values)
-            {
-                tasks.Add(Database.UpdateBuilding(Assets.onlineScene.SceneName, buildingEntity));
-            }
-            await Task.WhenAll(tasks);
-            Debug.Log("World Saved " + tasks.Count + " building(s)");
-        }
-
-        public override async void CreateBuildingEntity(BuildingSaveData saveData, bool initialize)
-        {
-            base.CreateBuildingEntity(saveData, initialize);
-            if (!initialize)
-                await Database.CreateBuilding(Assets.onlineScene.SceneName, saveData);
-        }
-
-        public override async void DestroyBuildingEntity(string id)
-        {
-            base.DestroyBuildingEntity(id);
-            await Database.DeleteBuilding(Assets.onlineScene.SceneName, id);
-        }
-
-        public override async void OnServerOnlineSceneLoaded()
-        {
-            base.OnServerOnlineSceneLoaded();
-            // Spawn buildings
-            var buildings = await Database.ReadBuildings(Assets.onlineScene.SceneName);
-            foreach (var building in buildings)
-            {
-                CreateBuildingEntity(building, true);
-            }
-            // Spawn harvestables
-            var harvestableSpawnAreas = FindObjectsOfType<HarvestableSpawnArea>();
-            foreach (var harvestableSpawnArea in harvestableSpawnAreas)
-            {
-                harvestableSpawnArea.SpawnAll();
-            }
-        }
-        #endregion
-
-        #region Implement Abstract Functions
-        public override async void WarpCharacter(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position)
-        {
-            if (playerCharacterEntity == null || !IsServer)
-                return;
-            // If warping to same map player does not have to reload new map data
-            if (string.IsNullOrEmpty(mapName) || mapName.Equals(playerCharacterEntity.CurrentMapName))
-            {
-                playerCharacterEntity.CacheNetTransform.Teleport(position, Quaternion.identity);
-                return;
-            }
-            // If warping to different map
-            long connectId = playerCharacterEntity.ConnectId;
-            NetPeer peer;
-            CentralServerPeerInfo peerInfo;
-            if (!string.IsNullOrEmpty(mapName) &&
-                !mapName.Equals(playerCharacterEntity.CurrentMapName) &&
-                playerCharacters.ContainsKey(connectId) &&
-                Peers.TryGetValue(connectId, out peer) &&
-                mapServerPeersBySceneName.TryGetValue(mapName, out peerInfo))
-            {
-                // Unregister player character
-                UnregisterPlayerCharacter(peer);
-                // Clone character data to save
-                var savingCharacterData = new PlayerCharacterData();
-                playerCharacterEntity.CloneTo(savingCharacterData);
-                // Save character current map / position
-                savingCharacterData.CurrentMapName = mapName;
-                savingCharacterData.CurrentPosition = position;
-                await SaveCharacter(savingCharacterData);
-                // Destroy character from server
-                playerCharacterEntity.NetworkDestroy();
-                // Send message to client to warp
-                var message = new MMOWarpMessage();
-                message.sceneName = mapName;
-                message.networkAddress = peerInfo.networkAddress;
-                message.networkPort = peerInfo.networkPort;
-                message.connectKey = peerInfo.connectKey;
-                LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, peer, MsgTypes.Warp, message);
-            }
-        }
-
-        public override async void CreateParty(BasePlayerCharacterEntity playerCharacterEntity, bool shareExp, bool shareItem)
-        {
-            if (playerCharacterEntity == null || !IsServer)
-                return;
-            var partyId = await Database.CreateParty(shareExp, shareItem, playerCharacterEntity.Id);
-            var party = new PartyData(partyId, shareExp, shareItem, playerCharacterEntity);
-            await Database.SetCharacterParty(playerCharacterEntity.Id, partyId);
-            parties[partyId] = party;
-            playerCharacterEntity.PartyId = partyId;
-        }
-
-        public override async void PartySetting(BasePlayerCharacterEntity playerCharacterEntity, bool shareExp, bool shareItem)
-        {
-            if (playerCharacterEntity == null || !IsServer)
-                return;
-            var partyId = playerCharacterEntity.PartyId;
-            PartyData party;
-            if (!parties.TryGetValue(partyId, out party))
-                return;
-            if (!party.IsLeader(playerCharacterEntity))
-            {
-                // TODO: May warn that it's not party leader
-                return;
-            }
-            await Database.UpdateParty(playerCharacterEntity.PartyId, shareExp, shareItem);
-            if (ChatNetworkManager.IsClientConnected)
-                ChatNetworkManager.UpdatePartySetting(partyId, shareExp, shareItem);
-        }
-
-        public override async void AddPartyMember(BasePlayerCharacterEntity inviteCharacterEntity, BasePlayerCharacterEntity acceptCharacterEntity)
-        {
-            if (inviteCharacterEntity == null || acceptCharacterEntity == null || !IsServer)
-                return;
-            var partyId = inviteCharacterEntity.PartyId;
-            PartyData party;
-            if (!parties.TryGetValue(partyId, out party))
-                return;
-            if (!party.IsLeader(inviteCharacterEntity))
-            {
-                // TODO: May warn that it's not party leader
-                return;
-            }
-            if (party.CountMember() == gameInstance.maxPartyMember)
-            {
-                // TODO: May warn that it's exceeds limit max party member
-                return;
-            }
-            await Database.SetCharacterParty(acceptCharacterEntity.Id, partyId);
-            if (ChatNetworkManager.IsClientConnected)
-                ChatNetworkManager.UpdatePartyMemberAdd(partyId, acceptCharacterEntity.Id, acceptCharacterEntity.CharacterName, acceptCharacterEntity.DataId, acceptCharacterEntity.Level);
-        }
-
-        public override async void KickFromParty(BasePlayerCharacterEntity playerCharacterEntity, string characterId)
-        {
-            if (playerCharacterEntity == null || !IsServer)
-                return;
-            var partyId = playerCharacterEntity.PartyId;
-            PartyData party;
-            if (!parties.TryGetValue(partyId, out party))
-                return;
-            if (!party.IsLeader(playerCharacterEntity))
-            {
-                // TODO: May warn that it's not party leader
-                return;
-            }
-            await Database.SetCharacterParty(characterId, 0);
-            if (ChatNetworkManager.IsClientConnected)
-                ChatNetworkManager.UpdatePartyMemberRemove(partyId, characterId);
-        }
-
-        public override async void LeaveParty(BasePlayerCharacterEntity playerCharacterEntity)
-        {
-            if (playerCharacterEntity == null || !IsServer)
-                return;
-            var partyId = playerCharacterEntity.PartyId;
-            PartyData party;
-            if (!parties.TryGetValue(partyId, out party))
-                return;
-            // If it is leader kick all members and terminate party
-            if (party.IsLeader(playerCharacterEntity))
-            {
-                var tasks = new List<Task>();
-                foreach (var memberId in party.GetMemberIds())
-                {
-                    tasks.Add(Database.SetCharacterParty(memberId, 0));
-                    if (ChatNetworkManager.IsClientConnected)
-                        ChatNetworkManager.UpdatePartyMemberRemove(partyId, memberId);
-                }
-                tasks.Add(Database.DeleteParty(partyId));
-                await Task.WhenAll(tasks);
-                if (ChatNetworkManager.IsClientConnected)
-                    ChatNetworkManager.UpdatePartyTerminate(partyId);
-            }
-            else
-            {
-                await Database.SetCharacterParty(playerCharacterEntity.Id, 0);
-                if (ChatNetworkManager.IsClientConnected)
-                    ChatNetworkManager.UpdatePartyMemberRemove(partyId, playerCharacterEntity.Id);
-            }
         }
         #endregion
     }
