@@ -132,13 +132,10 @@ namespace MultiplayerARPG.MMO
 
         private void HandleRequestSpawnMap(LiteNetLibMessageHandler messageHandler)
         {
-            var connectionId = messageHandler.connectionId;
             var message = messageHandler.ReadMessage<RequestSpawnMapMessage>();
             var error = ResponseSpawnMapMessage.Error.None;
             if (!CentralAppServerRegister.IsRegisteredToCentralServer)
                 error = ResponseSpawnMapMessage.Error.NotReady;
-            else if (CentralAppServerRegister.ClientConnectionId != connectionId)
-                error = ResponseSpawnMapMessage.Error.Unauthorized;
             else if (string.IsNullOrEmpty(message.sceneName))
                 error = ResponseSpawnMapMessage.Error.EmptySceneName;
 
