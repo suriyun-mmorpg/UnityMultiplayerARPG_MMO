@@ -76,16 +76,16 @@ namespace MultiplayerARPG.MMO
             }
         }
 
-        private IEnumerator SaveBuildingRoutine(IBuildingSaveData saveData)
+        private IEnumerator SaveBuildingRoutine(IBuildingSaveData buildingSaveData)
         {
-            if (saveData != null && !savingBuildings.Contains(saveData.Id))
+            if (buildingSaveData != null && !savingBuildings.Contains(buildingSaveData.Id))
             {
-                savingBuildings.Add(saveData.Id);
-                var job = new UpdateBuildingJob(Database, Assets.onlineScene.SceneName, saveData);
+                savingBuildings.Add(buildingSaveData.Id);
+                var job = new UpdateBuildingJob(Database, Assets.onlineScene.SceneName, buildingSaveData);
                 job.Start();
                 yield return StartCoroutine(job.WaitFor());
-                savingBuildings.Remove(saveData.Id);
-                Debug.Log("Building [" + saveData.Id + "] Saved");
+                savingBuildings.Remove(buildingSaveData.Id);
+                Debug.Log("Building [" + buildingSaveData.Id + "] Saved");
             }
         }
 
@@ -96,7 +96,7 @@ namespace MultiplayerARPG.MMO
                 var i = 0;
                 foreach (var buildingEntity in buildingEntities.Values)
                 {
-                    StartCoroutine(SaveBuildingRoutine(buildingEntity));
+                    StartCoroutine(SaveBuildingRoutine(buildingEntity.CloneTo(new BuildingSaveData())));
                     ++i;
                 }
                 while (savingBuildings.Count > 0)
