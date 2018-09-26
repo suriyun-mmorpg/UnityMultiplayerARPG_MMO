@@ -463,27 +463,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a13ade7668aa0a74fb466e174ebb004e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentLogLevel: 2
+  currentLogLevel: 0
   connectKey: SampleConnectKey
   networkAddress: localhost
   networkPort: 7770
-  unconnectedMessagesEnabled: 0
-  natPunchEnabled: 0
-  updateTime: 15
-  pingInterval: 1000
-  disconnectTimeout: 5000
-  mergeEnabled: 0
-  simulatePacketLoss: 0
-  simulateLatency: 0
-  simulationPacketLossChance: 10
-  simulationMinLatency: 30
-  simulationMaxLatency: 100
-  discoveryEnabled: 0
-  discoveryRequestData: 
-  discoveryResponseData: 
   maxConnections: 1100
-  reconnectDelay: 500
-  maxConnectAttempts: 10
+  updateServerTimeDuration: 5
   doNotEnterGameOnConnect: 0
   doNotDestroyOnSceneChanges: 0
   writeAddonLog: 0
@@ -699,6 +684,7 @@ MonoBehaviour:
     type: 2}
   uiSceneGameplayMobilePrefab: {fileID: 114630585920460692, guid: 70474cf4f9f686c45b0305621722205f,
     type: 2}
+  defaultControllerPrefab: {fileID: 0}
   serverCharacterPrefab: {fileID: 114427175623056218, guid: 5d1fef0b895ca2a43899fb0236936a59,
     type: 2}
   owningCharacterObjects:
@@ -747,6 +733,8 @@ MonoBehaviour:
   nonTargetingLayers:
   - layerIndex: 11
   itemAppearDuration: 60
+  itemLootLockDuration: 5
+  coCharacterActionDuration: 5
   pickUpItemDistance: 2
   dropDistance: 1
   conversationDistance: 3
@@ -798,6 +786,8 @@ MonoBehaviour:
     sceneName: 01Home_MMO
   minCharacterNameLength: 2
   maxCharacterNameLength: 16
+  maxPartyMember: 10
+  maxGuildMember: 50
   doNotLoadHomeSceneOnLoadedGameData: 0
   useMobileInEditor: 0
   cashShopDatabase: {fileID: 11400000, guid: 677c37c598e6c1045b66de68f1f546f6, type: 2}
