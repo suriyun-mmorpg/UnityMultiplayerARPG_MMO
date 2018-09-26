@@ -6,7 +6,7 @@ namespace MultiplayerARPG.MMO
 {
     public class CentralUserPeerInfo : ILiteNetLibMessage
     {
-        public NetPeer peer;
+        public long connectionId;
         public string userId;
         public string accessToken;
 

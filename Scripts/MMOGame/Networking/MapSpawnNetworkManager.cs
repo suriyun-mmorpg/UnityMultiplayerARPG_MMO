@@ -117,7 +117,7 @@ namespace MultiplayerARPG.MMO
                 }
             }
             if (IsServer)
-                CentralAppServerRegister.PollEvents();
+                CentralAppServerRegister.Update();
         }
 
         protected override void OnDestroy()
@@ -127,26 +127,25 @@ namespace MultiplayerARPG.MMO
                 process.Kill();
             }
             processes.Clear();
-            CentralAppServerRegister.Stop();
             base.OnDestroy();
         }
 
         private void HandleRequestSpawnMap(LiteNetLibMessageHandler messageHandler)
         {
-            var peer = messageHandler.peer;
+            var connectionId = messageHandler.connectionId;
             var message = messageHandler.ReadMessage<RequestSpawnMapMessage>();
             var error = ResponseSpawnMapMessage.Error.None;
             if (!CentralAppServerRegister.IsRegisteredToCentralServer)
                 error = ResponseSpawnMapMessage.Error.NotReady;
-            else if (CentralAppServerRegister.Peer == null || CentralAppServerRegister.Peer != peer)
+            else if (CentralAppServerRegister.ClientConnectionId != connectionId)
                 error = ResponseSpawnMapMessage.Error.Unauthorized;
             else if (string.IsNullOrEmpty(message.sceneName))
                 error = ResponseSpawnMapMessage.Error.EmptySceneName;
 
             if (error != ResponseSpawnMapMessage.Error.None)
-                ReponseMapSpawn(peer, message.ackId, error);
+                ReponseMapSpawn(message.ackId, error);
             else
-                SpawnMap(peer, message);
+                SpawnMap(message);
         }
 
         private void OnAppServerRegistered(AckResponseCode responseCode, BaseAckMessage message)
@@ -177,12 +176,12 @@ namespace MultiplayerARPG.MMO
             freePorts.Enqueue(port);
         }
 
-        private void SpawnMap(NetPeer peer, RequestSpawnMapMessage message)
+        private void SpawnMap(RequestSpawnMapMessage message)
         {
-            SpawnMap(message.sceneName, peer, message);
+            SpawnMap(message.sceneName, message);
         }
 
-        private void SpawnMap(string sceneName, NetPeer peer = null, RequestSpawnMapMessage message = null)
+        private void SpawnMap(string sceneName, RequestSpawnMapMessage message = null)
     {
             // Port to run map server
             if (freePorts.Count > 0)
@@ -243,8 +242,8 @@ namespace MultiplayerARPG.MMO
                             // Notify server that we've successfully handled the request
                             ExecuteOnMainThread(() =>
                             {
-                                if (peer != null && message != null)
-                                    ReponseMapSpawn(peer, message.ackId, ResponseSpawnMapMessage.Error.None);
+                                if (message != null)
+                                    ReponseMapSpawn(message.ackId, ResponseSpawnMapMessage.Error.None);
                             });
 
                             process.WaitForExit();
@@ -256,8 +255,8 @@ namespace MultiplayerARPG.MMO
                         {
                             ExecuteOnMainThread(() =>
                             {
-                                if (peer != null && message != null)
-                                    ReponseMapSpawn(peer, message.ackId, ResponseSpawnMapMessage.Error.CannotExecute);
+                                if (message != null)
+                                    ReponseMapSpawn(message.ackId, ResponseSpawnMapMessage.Error.CannotExecute);
                             });
                         }
                         UnityEngine.Debug.LogError("Tried to start a process at: '" + path + "' but it failed. Make sure that you have set correct the 'exePath' in 'MapSpawnNetworkManager' component");
@@ -284,19 +283,19 @@ namespace MultiplayerARPG.MMO
             }
             catch (Exception e)
             {
-                if (peer != null && message != null)
-                    ReponseMapSpawn(peer, message.ackId, ResponseSpawnMapMessage.Error.Unknow);
+                if (message != null)
+                    ReponseMapSpawn(message.ackId, ResponseSpawnMapMessage.Error.Unknow);
                 UnityEngine.Debug.LogException(e);
             }
         }
 
-        private void ReponseMapSpawn(NetPeer peer, uint ackId, ResponseSpawnMapMessage.Error error)
+        private void ReponseMapSpawn(uint ackId, ResponseSpawnMapMessage.Error error)
         {
             var responseMessage = new ResponseSpawnMapMessage();
             responseMessage.ackId = ackId;
             responseMessage.responseCode = error == ResponseSpawnMapMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
             responseMessage.error = error;
-            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, peer, MMOMessageTypes.ResponseSpawnMap, responseMessage);
+            ClientSendPacket(SendOptions.ReliableOrdered, MMOMessageTypes.ResponseSpawnMap, responseMessage);
         }
 
         private void ExecuteOnMainThread(Action action)

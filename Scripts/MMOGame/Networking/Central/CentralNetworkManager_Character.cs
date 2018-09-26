@@ -11,7 +11,7 @@ namespace MultiplayerARPG.MMO
         public uint RequestCharacters(AckMessageCallback callback)
         {
             var message = new RequestCharactersMessage();
-            return Client.SendAckPacket(SendOptions.ReliableUnordered, Client.Peer, MMOMessageTypes.RequestCharacters, message, callback);
+            return Client.ClientSendAckPacket(SendOptions.ReliableOrdered, MMOMessageTypes.RequestCharacters, message, callback);
         }
 
         public uint RequestCreateCharacter(string characterName, int dataId, AckMessageCallback callback)
@@ -19,31 +19,31 @@ namespace MultiplayerARPG.MMO
             var message = new RequestCreateCharacterMessage();
             message.characterName = characterName;
             message.dataId = dataId;
-            return Client.SendAckPacket(SendOptions.ReliableUnordered, Client.Peer, MMOMessageTypes.RequestCreateCharacter, message, callback);
+            return Client.ClientSendAckPacket(SendOptions.ReliableOrdered, MMOMessageTypes.RequestCreateCharacter, message, callback);
         }
 
         public uint RequestDeleteCharacter(string characterId, AckMessageCallback callback)
         {
             var message = new RequestDeleteCharacterMessage();
             message.characterId = characterId;
-            return Client.SendAckPacket(SendOptions.ReliableUnordered, Client.Peer, MMOMessageTypes.RequestDeleteCharacter, message, callback);
+            return Client.ClientSendAckPacket(SendOptions.ReliableOrdered, MMOMessageTypes.RequestDeleteCharacter, message, callback);
         }
 
         public uint RequestSelectCharacter(string characterId, AckMessageCallback callback)
         {
             var message = new RequestSelectCharacterMessage();
             message.characterId = characterId;
-            return Client.SendAckPacket(SendOptions.ReliableUnordered, Client.Peer, MMOMessageTypes.RequestSelectCharacter, message, callback);
+            return Client.ClientSendAckPacket(SendOptions.ReliableOrdered, MMOMessageTypes.RequestSelectCharacter, message, callback);
         }
 
         protected async void HandleRequestCharacters(LiteNetLibMessageHandler messageHandler)
         {
-            var peer = messageHandler.peer;
+            var connectionId = messageHandler.connectionId;
             var message = messageHandler.ReadMessage<RequestCharactersMessage>();
             var error = ResponseCharactersMessage.Error.None;
             List<PlayerCharacterData> characters = null;
             CentralUserPeerInfo userPeerInfo;
-            if (!userPeers.TryGetValue(peer.ConnectId, out userPeerInfo))
+            if (!userPeers.TryGetValue(connectionId, out userPeerInfo))
                 error = ResponseCharactersMessage.Error.NotLoggedin;
             else
                 characters = await Database.ReadCharacters(userPeerInfo.userId);
@@ -52,18 +52,18 @@ namespace MultiplayerARPG.MMO
             responseMessage.responseCode = error == ResponseCharactersMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
             responseMessage.error = error;
             responseMessage.characters = characters;
-            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MMOMessageTypes.ResponseCharacters, responseMessage);
+            ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MMOMessageTypes.ResponseCharacters, responseMessage);
         }
 
         protected async void HandleRequestCreateCharacter(LiteNetLibMessageHandler messageHandler)
         {
-            var peer = messageHandler.peer;
+            var connectionId = messageHandler.connectionId;
             var message = messageHandler.ReadMessage<RequestCreateCharacterMessage>();
             var error = ResponseCreateCharacterMessage.Error.None;
             var characterName = message.characterName;
             var databaseId = message.dataId;
             CentralUserPeerInfo userPeerInfo;
-            if (!userPeers.TryGetValue(peer.ConnectId, out userPeerInfo))
+            if (!userPeers.TryGetValue(connectionId, out userPeerInfo))
                 error = ResponseCreateCharacterMessage.Error.NotLoggedin;
             else if (string.IsNullOrEmpty(characterName) || characterName.Length < minCharacterNameLength)
                 error = ResponseCreateCharacterMessage.Error.TooShortCharacterName;
@@ -85,16 +85,16 @@ namespace MultiplayerARPG.MMO
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = error == ResponseCreateCharacterMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
             responseMessage.error = error;
-            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MMOMessageTypes.ResponseCreateCharacter, responseMessage);
+            ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MMOMessageTypes.ResponseCreateCharacter, responseMessage);
         }
 
         protected async void HandleRequestDeleteCharacter(LiteNetLibMessageHandler messageHandler)
         {
-            var peer = messageHandler.peer;
+            var connectionId = messageHandler.connectionId;
             var message = messageHandler.ReadMessage<RequestDeleteCharacterMessage>();
             var error = ResponseDeleteCharacterMessage.Error.None;
             CentralUserPeerInfo userPeerInfo;
-            if (!userPeers.TryGetValue(peer.ConnectId, out userPeerInfo))
+            if (!userPeers.TryGetValue(connectionId, out userPeerInfo))
                 error = ResponseDeleteCharacterMessage.Error.NotLoggedin;
             else
                 await Database.DeleteCharacter(userPeerInfo.userId, message.characterId);
@@ -102,17 +102,17 @@ namespace MultiplayerARPG.MMO
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = error == ResponseDeleteCharacterMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
             responseMessage.error = error;
-            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MMOMessageTypes.ResponseDeleteCharacter, responseMessage);
+            ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MMOMessageTypes.ResponseDeleteCharacter, responseMessage);
         }
 
         protected async void HandleRequestSelectCharacter(LiteNetLibMessageHandler messageHandler)
         {
-            var peer = messageHandler.peer;
+            var connectionId = messageHandler.connectionId;
             var message = messageHandler.ReadMessage<RequestSelectCharacterMessage>();
             var error = ResponseSelectCharacterMessage.Error.None;
             CentralServerPeerInfo mapServerPeerInfo = null;
             CentralUserPeerInfo userPeerInfo;
-            if (!userPeers.TryGetValue(peer.ConnectId, out userPeerInfo))
+            if (!userPeers.TryGetValue(connectionId, out userPeerInfo))
                 error = ResponseSelectCharacterMessage.Error.NotLoggedin;
             else
             {
@@ -133,43 +133,39 @@ namespace MultiplayerARPG.MMO
                 responseMessage.networkPort = mapServerPeerInfo.networkPort;
                 responseMessage.connectKey = mapServerPeerInfo.connectKey;
             }
-            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableUnordered, peer, MMOMessageTypes.ResponseSelectCharacter, responseMessage);
+            ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MMOMessageTypes.ResponseSelectCharacter, responseMessage);
         }
 
         protected void HandleResponseCharacters(LiteNetLibMessageHandler messageHandler)
         {
-            var peerHandler = messageHandler.peerHandler;
-            var peer = messageHandler.peer;
+            var transportHandler = messageHandler.transportHandler;
             var message = messageHandler.ReadMessage<ResponseCharactersMessage>();
             var ackId = message.ackId;
-            peerHandler.TriggerAck(ackId, message.responseCode, message);
+            transportHandler.TriggerAck(ackId, message.responseCode, message);
         }
 
         protected void HandleResponseCreateCharacter(LiteNetLibMessageHandler messageHandler)
         {
-            var peerHandler = messageHandler.peerHandler;
-            var peer = messageHandler.peer;
+            var transportHandler = messageHandler.transportHandler;
             var message = messageHandler.ReadMessage<ResponseCreateCharacterMessage>();
             var ackId = message.ackId;
-            peerHandler.TriggerAck(ackId, message.responseCode, message);
+            transportHandler.TriggerAck(ackId, message.responseCode, message);
         }
 
         protected void HandleResponseDeleteCharacter(LiteNetLibMessageHandler messageHandler)
         {
-            var peerHandler = messageHandler.peerHandler;
-            var peer = messageHandler.peer;
+            var transportHandler = messageHandler.transportHandler;
             var message = messageHandler.ReadMessage<ResponseDeleteCharacterMessage>();
             var ackId = message.ackId;
-            peerHandler.TriggerAck(ackId, message.responseCode, message);
+            transportHandler.TriggerAck(ackId, message.responseCode, message);
         }
 
         protected void HandleResponseSelectCharacter(LiteNetLibMessageHandler messageHandler)
         {
-            var peerHandler = messageHandler.peerHandler;
-            var peer = messageHandler.peer;
+            var transportHandler = messageHandler.transportHandler;
             var message = messageHandler.ReadMessage<ResponseSelectCharacterMessage>();
             var ackId = message.ackId;
-            peerHandler.TriggerAck(ackId, message.responseCode, message);
+            transportHandler.TriggerAck(ackId, message.responseCode, message);
         }
     }
 }

@@ -3,63 +3,44 @@ using System.Collections.Generic;
 using UnityEngine;
 using LiteNetLib;
 using LiteNetLibManager;
-using LiteNetLib.Utils;
 using System.Threading.Tasks;
 
 namespace MultiplayerARPG.MMO
 {
-    public class CentralAppServerRegister : LiteNetLibPeerHandler
+    public class CentralAppServerRegister : TransportHandler
     {
         private IAppServer appServer;
 
         public bool IsRegisteredToCentralServer { get; private set; }
-        public NetPeer Peer { get; protected set; }
-        public bool IsConnected { get { return Peer != null && Peer.ConnectionState == ConnectionState.Connected; } }
 
         // Events
         public System.Action<AckResponseCode, BaseAckMessage> onAppServerRegistered;
 
-        public CentralAppServerRegister(IAppServer appServer) : base(1, appServer.CentralConnectKey)
+        public CentralAppServerRegister(IAppServer appServer) : base(new LiteNetLibTransport(), appServer.CentralConnectKey)
         {
             this.appServer = appServer;
             RegisterMessage(MMOMessageTypes.ResponseAppServerRegister, HandleResponseAppServerRegister);
         }
 
-        public override void OnNetworkError(NetEndPoint endPoint, int socketErrorCode)
+        public override void OnClientReceive(TransportEventData eventData)
         {
-            base.OnNetworkError(endPoint, socketErrorCode);
-            Debug.LogError("CentralAppServerRegister::OnNetworkError endPoint: " + endPoint + " socketErrorCode " + socketErrorCode);
-        }
-
-        public override void OnNetworkLatencyUpdate(NetPeer peer, int latency)
-        {
-            base.OnNetworkLatencyUpdate(peer, latency);
-        }
-
-        public override void OnNetworkReceive(NetPeer peer, NetDataReader reader)
-        {
-            base.OnNetworkReceive(peer, reader);
-        }
-
-        public override void OnNetworkReceiveUnconnected(NetEndPoint remoteEndPoint, NetDataReader reader, UnconnectedMessageType messageType)
-        {
-            base.OnNetworkReceiveUnconnected(remoteEndPoint, reader, messageType);
-        }
-
-        public override void OnPeerConnected(NetPeer peer)
-        {
-            base.OnPeerConnected(peer);
-            Debug.Log("CentralAppServerRegister::OnPeerConnected peer.ConnectId: " + peer.ConnectId);
-            OnCentralServerConnected(peer);
-            Peer = peer;
-        }
-
-        public override void OnPeerDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
-        {
-            base.OnPeerDisconnected(peer, disconnectInfo);
-            Debug.Log("CentralAppServerRegister::OnPeerDisconnected peer.ConnectId: " + peer.ConnectId + " disconnectInfo.Reason: " + disconnectInfo.Reason);
-            OnCentralServerDisconnected(peer, disconnectInfo);
-            Peer = null;
+            switch (eventData.type)
+            {
+                case ENetworkEvent.ConnectEvent:
+                    Debug.Log("CentralAppServerRegister::OnPeerConnected.");
+                    OnCentralServerConnected();
+                    break;
+                case ENetworkEvent.DataEvent:
+                    ReadPacket(eventData.connectionId, eventData.reader);
+                    break;
+                case ENetworkEvent.DisconnectEvent:
+                    Debug.Log("CentralAppServerRegister::OnPeerDisconnected. disconnectInfo.Reason: " + eventData.disconnectInfo.Reason);
+                    OnCentralServerDisconnected(eventData.disconnectInfo);
+                    break;
+                case ENetworkEvent.ErrorEvent:
+                    Debug.LogError("CentralAppServerRegister::OnNetworkError endPoint: " + eventData.endPoint + " socketErrorCode " + eventData.socketErrorCode);
+                    break;
+            }
         }
 
         public void OnStartServer()
@@ -77,21 +58,19 @@ namespace MultiplayerARPG.MMO
         public void ConnectToCentralServer()
         {
             Debug.Log("[" + appServer.PeerType + "] Connecting to Central Server: " + appServer.CentralNetworkAddress + ":" + appServer.CentralNetworkPort + " " + appServer.CentralConnectKey);
-            Start();
-            Connect(appServer.CentralNetworkAddress, appServer.CentralNetworkPort);
+            StartClient(appServer.CentralNetworkAddress, appServer.CentralNetworkPort);
         }
 
         public void DisconnectFromCentralServer()
         {
             Debug.Log("[" + appServer.PeerType + "] Disconnecting from Central Server");
-            Stop();
+            StopClient();
         }
 
-        public void OnCentralServerConnected(NetPeer netPeer)
+        public void OnCentralServerConnected()
         {
             Debug.Log("[" + appServer.PeerType + "] Connected to Central Server");
             var peerInfo = new CentralServerPeerInfo();
-            peerInfo.peer = netPeer;
             peerInfo.peerType = appServer.PeerType;
             peerInfo.networkAddress = appServer.AppAddress;
             peerInfo.networkPort = appServer.AppPort;
@@ -100,10 +79,10 @@ namespace MultiplayerARPG.MMO
             // Send Request
             var message = new RequestAppServerRegisterMessage();
             message.peerInfo = peerInfo;
-            SendAckPacket(SendOptions.ReliableUnordered, netPeer, MMOMessageTypes.RequestAppServerRegister, message, OnAppServerRegistered);
+            ClientSendAckPacket(SendOptions.ReliableOrdered, MMOMessageTypes.RequestAppServerRegister, message, OnAppServerRegistered);
         }
 
-        public async void OnCentralServerDisconnected(NetPeer netPeer, DisconnectInfo disconnectInfo)
+        public async void OnCentralServerDisconnected(DisconnectInfo disconnectInfo)
         {
             Debug.Log("[" + appServer.PeerType + "] Disconnected from Central Server");
             IsRegisteredToCentralServer = false;
@@ -123,8 +102,7 @@ namespace MultiplayerARPG.MMO
 
         private void HandleResponseAppServerRegister(LiteNetLibMessageHandler messageHandler)
         {
-            var peerHandler = messageHandler.peerHandler;
-            var peer = messageHandler.peer;
+            var peerHandler = messageHandler.transportHandler;
             var message = messageHandler.ReadMessage<ResponseAppServerRegisterMessage>();
             var ackId = message.ackId;
             peerHandler.TriggerAck(ackId, message.responseCode, message);

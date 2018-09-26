@@ -270,7 +270,7 @@ namespace MultiplayerARPG.MMO
                         logFileName += "_";
                     logFileName += "Central";
                     startLog = true;
-                    gameInstance.doNotLoadHomeSceneOnLoadedGameData = true;
+                    gameInstance.SetOnGameDataLoadedCallback(OnGameDataLoaded);
                     startingCentralServer = true;
                 }
 
@@ -280,7 +280,7 @@ namespace MultiplayerARPG.MMO
                         logFileName += "_";
                     logFileName += "MapSpawn";
                     startLog = true;
-                    gameInstance.doNotLoadHomeSceneOnLoadedGameData = true;
+                    gameInstance.SetOnGameDataLoadedCallback(OnGameDataLoaded);
                     startingMapSpawnServer = true;
                 }
 
@@ -290,7 +290,7 @@ namespace MultiplayerARPG.MMO
                         logFileName += "_";
                     logFileName += "Map(" + mapNetworkManager.Assets.onlineScene.SceneName + ")";
                     startLog = true;
-                    gameInstance.doNotLoadHomeSceneOnLoadedGameData = true;
+                    gameInstance.SetOnGameDataLoadedCallback(OnGameDataLoaded);
                     startingMapServer = true;
                 }
 
@@ -300,7 +300,7 @@ namespace MultiplayerARPG.MMO
                         logFileName += "_";
                     logFileName += "Chat";
                     startLog = true;
-                    gameInstance.doNotLoadHomeSceneOnLoadedGameData = true;
+                    gameInstance.SetOnGameDataLoadedCallback(OnGameDataLoaded);
                     startingChatServer = true;
                 }
 
@@ -323,7 +323,7 @@ namespace MultiplayerARPG.MMO
             }
         }
 
-        private void Start()
+        private void OnGameDataLoaded()
         {
             if (startingCentralServer)
                 StartCentralServer();

@@ -19,7 +19,7 @@ namespace MultiplayerARPG.MMO
             MMOClientInstance.Singleton.onCentralClientConnected += OnCentralServerConnected;
             MMOClientInstance.Singleton.onCentralClientDisconnected += OnCentralServerDisconnected;
             if (MMOClientInstance.Singleton.IsConnectedToCentralServer())
-                OnCentralServerConnected(MMOClientInstance.Singleton.GetCentralClientPeer());
+                OnCentralServerConnected();
             else if (!string.IsNullOrEmpty(MMOClientInstance.SelectedCentralAddress) && MMOClientInstance.SelectedCentralPort > 0)
                 MMOClientInstance.Singleton.StartCentralClient(MMOClientInstance.SelectedCentralAddress, MMOClientInstance.SelectedCentralPort);
         }
@@ -30,7 +30,7 @@ namespace MultiplayerARPG.MMO
             MMOClientInstance.Singleton.onCentralClientDisconnected -= OnCentralServerDisconnected;
         }
 
-        public void OnCentralServerConnected(NetPeer netPeer)
+        public void OnCentralServerConnected()
         {
             ClearHistory();
             Next(uiLogin);
@@ -38,7 +38,7 @@ namespace MultiplayerARPG.MMO
                 MMOClientInstance.Singleton.RequestValidateAccessToken(MMOClientInstance.UserId, MMOClientInstance.AccessToken, OnValidateAccessToken);
         }
 
-        public void OnCentralServerDisconnected(NetPeer netPeer, DisconnectInfo disconnectInfo)
+        public void OnCentralServerDisconnected(DisconnectInfo disconnectInfo)
         {
             UISceneGlobal.Singleton.ShowDisconnectDialog(disconnectInfo);
             ClearHistory();

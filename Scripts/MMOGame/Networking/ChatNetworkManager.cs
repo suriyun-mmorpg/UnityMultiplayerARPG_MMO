@@ -35,9 +35,9 @@ namespace MultiplayerARPG.MMO
         public string AppExtra { get { return string.Empty; } }
         public CentralServerPeerType PeerType { get { return CentralServerPeerType.Chat; } }
         private MapNetworkManager mapNetworkManager;
-        private readonly Dictionary<long, NetPeer> mapServerPeers = new Dictionary<long, NetPeer>();
+        private readonly HashSet<long> mapServerConnectionIds = new HashSet<long>();
         private readonly Dictionary<string, UserCharacterData> mapUsersById = new Dictionary<string, UserCharacterData>();
-        private readonly Dictionary<string, NetPeer> peersByCharacterName = new Dictionary<string, NetPeer>();
+        private readonly Dictionary<string, long> connectionIdsByCharacterName = new Dictionary<string, long>();
 
         protected override void RegisterClientMessages()
         {
@@ -73,30 +73,30 @@ namespace MultiplayerARPG.MMO
         {
             base.Update();
             if (IsServer)
-                CentralAppServerRegister.PollEvents();
+                CentralAppServerRegister.Update();
         }
 
         protected override void OnDestroy()
         {
-            CentralAppServerRegister.Stop();
+            CentralAppServerRegister.StopServer();
             base.OnDestroy();
         }
 
-        public override void OnPeerConnected(NetPeer peer)
+        public override void OnPeerConnected(long connectionId)
         {
-            base.OnPeerConnected(peer);
-            mapServerPeers[peer.ConnectId] = peer;
+            base.OnPeerConnected(connectionId);
+            mapServerConnectionIds.Add(connectionId);
         }
 
-        public override void OnPeerDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
+        public override void OnPeerDisconnected(long connectionId, DisconnectInfo disconnectInfo)
         {
-            base.OnPeerDisconnected(peer, disconnectInfo);
-            mapServerPeers.Remove(peer.ConnectId);
+            base.OnPeerDisconnected(connectionId, disconnectInfo);
+            mapServerConnectionIds.Remove(connectionId);
         }
 
-        public override void OnClientConnected(NetPeer peer)
+        public override void OnClientConnected()
         {
-            base.OnClientConnected(peer);
+            base.OnClientConnected();
             // Send map users to chat server from map server
             if (mapNetworkManager != null)
                 mapNetworkManager.OnChatServerConnected();
@@ -132,7 +132,7 @@ namespace MultiplayerARPG.MMO
 
         private void HandleChatAtServer(LiteNetLibMessageHandler messageHandler)
         {
-            var peer = messageHandler.peer;
+            var connectionId = messageHandler.connectionId;
             var message = messageHandler.ReadMessage<ChatMessage>();
             Debug.Log("Handle chat: " + message.channel + " sender: " + message.sender + " receiver: " + message.receiver + " message: " + message.message);
             switch (message.channel)
@@ -141,28 +141,28 @@ namespace MultiplayerARPG.MMO
                 case ChatChannel.Party:
                 case ChatChannel.Guild:
                     // Send message to all map servers, let's map servers filter messages
-                    SendPacketToAllPeers(SendOptions.ReliableOrdered, MMOMessageTypes.Chat, message);
+                    ServerSendPacketToAllConnections(SendOptions.ReliableOrdered, MMOMessageTypes.Chat, message);
                     break;
                 case ChatChannel.Whisper:
-                    NetPeer senderPeer = null;
-                    NetPeer receiverPeer = null;
+                    long senderConnectionId = 0;
+                    long receiverConnectionId = 0;
                     // Send message to map server which have the character
                     if (!string.IsNullOrEmpty(message.sender) &&
-                        peersByCharacterName.TryGetValue(message.sender, out senderPeer))
-                        LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, senderPeer, MMOMessageTypes.Chat, message);
+                        connectionIdsByCharacterName.TryGetValue(message.sender, out senderConnectionId))
+                        ServerSendPacket(senderConnectionId, SendOptions.ReliableOrdered, MMOMessageTypes.Chat, message);
                     if (!string.IsNullOrEmpty(message.receiver) &&
-                        peersByCharacterName.TryGetValue(message.receiver, out receiverPeer) &&
-                        (senderPeer == null || receiverPeer != senderPeer))
-                        LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, receiverPeer, MMOMessageTypes.Chat, message);
+                        connectionIdsByCharacterName.TryGetValue(message.receiver, out receiverConnectionId) &&
+                        (receiverConnectionId != senderConnectionId))
+                        ServerSendPacket(receiverConnectionId, SendOptions.ReliableOrdered, MMOMessageTypes.Chat, message);
                     break;
             }
         }
 
         private void HandleUpdateMapUserAtServer(LiteNetLibMessageHandler messageHandler)
         {
-            var peer = messageHandler.peer;
+            var connectionId = messageHandler.connectionId;
             var message = messageHandler.ReadMessage<UpdateMapUserMessage>();
-            if (mapServerPeers.ContainsKey(peer.ConnectId))
+            if (mapServerConnectionIds.Contains(connectionId))
             {
                 UserCharacterData userData;
                 switch (message.type)
@@ -177,16 +177,16 @@ namespace MultiplayerARPG.MMO
                             userData.dataId = message.dataId;
                             userData.level = message.level;
                             mapUsersById[userData.id] = userData;
-                            peersByCharacterName[message.characterName] = peer;
-                            Debug.Log("[Chat] Add map user: " + message.userId + " by " + peer.ConnectId);
+                            connectionIdsByCharacterName[message.characterName] = connectionId;
+                            Debug.Log("[Chat] Add map user: " + message.userId + " by " + connectionId);
                         }
                         break;
                     case UpdateMapUserMessage.UpdateType.Remove:
                         if (mapUsersById.TryGetValue(message.id, out userData))
                         {
                             mapUsersById.Remove(userData.id);
-                            peersByCharacterName.Remove(userData.characterName);
-                            Debug.Log("[Chat] Remove map user: " + message.userId + " by " + peer.ConnectId);
+                            connectionIdsByCharacterName.Remove(userData.characterName);
+                            Debug.Log("[Chat] Remove map user: " + message.userId + " by " + connectionId);
                         }
                         break;
                     case UpdateMapUserMessage.UpdateType.Online:
@@ -198,7 +198,7 @@ namespace MultiplayerARPG.MMO
                             userData.currentMp = message.currentMp;
                             userData.maxMp = message.maxMp;
                             mapUsersById[userData.id] = userData;
-                            Debug.Log("[Chat] Update map user: " + message.userId + " by " + peer.ConnectId);
+                            Debug.Log("[Chat] Update map user: " + message.userId + " by " + connectionId);
                         }
                         break;
                 }
@@ -207,26 +207,26 @@ namespace MultiplayerARPG.MMO
 
         private void HandleUpdatePartyMemberAtServer(LiteNetLibMessageHandler messageHandler)
         {
-            var peer = messageHandler.peer;
+            var connectionId = messageHandler.connectionId;
             var message = messageHandler.ReadMessage<UpdatePartyMemberMessage>();
-            if (mapServerPeers.ContainsKey(peer.ConnectId))
+            if (mapServerConnectionIds.Contains(connectionId))
             {
-                foreach (var mapServerPeer in mapServerPeers.Values)
+                foreach (var mapServerConnectionId in mapServerConnectionIds)
                 {
-                    LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, mapServerPeer, MMOMessageTypes.UpdatePartyMember, message);
+                    ServerSendPacket(mapServerConnectionId, SendOptions.ReliableOrdered, MMOMessageTypes.UpdatePartyMember, message);
                 }
             }
         }
 
         private void HandleUpdatePartyAtServer(LiteNetLibMessageHandler messageHandler)
         {
-            var peer = messageHandler.peer;
+            var connectionId = messageHandler.connectionId;
             var message = messageHandler.ReadMessage<UpdatePartyMessage>();
-            if (mapServerPeers.ContainsKey(peer.ConnectId))
+            if (mapServerConnectionIds.Contains(connectionId))
             {
-                foreach (var mapServerPeer in mapServerPeers.Values)
+                foreach (var mapServerConnectionId in mapServerConnectionIds)
                 {
-                    LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, mapServerPeer, MMOMessageTypes.UpdateParty, message);
+                    ServerSendPacket(mapServerConnectionId, SendOptions.ReliableOrdered, MMOMessageTypes.UpdateParty, message);
                 }
             }
         }
@@ -242,7 +242,7 @@ namespace MultiplayerARPG.MMO
             chatMessage.sender = senderName;
             chatMessage.receiver = receiverName;
             chatMessage.channelId = channelId;
-            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, Client.Peer, MMOMessageTypes.Chat, chatMessage);
+            ClientSendPacket(SendOptions.ReliableOrdered, MMOMessageTypes.Chat, chatMessage);
         }
 
         public void UpdatePartyMemberAdd(int id, string characterId, string characterName, int dataId, int level)
@@ -254,7 +254,7 @@ namespace MultiplayerARPG.MMO
             updateMessage.characterName = characterName;
             updateMessage.dataId = dataId;
             updateMessage.level = level;
-            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, Client.Peer, MMOMessageTypes.UpdatePartyMember, updateMessage);
+            ClientSendPacket(SendOptions.ReliableOrdered, MMOMessageTypes.UpdatePartyMember, updateMessage);
         }
 
         public void UpdatePartyMemberRemove(int id, string characterId)
@@ -263,7 +263,7 @@ namespace MultiplayerARPG.MMO
             updateMessage.type = UpdatePartyMemberMessage.UpdateType.Remove;
             updateMessage.id = id;
             updateMessage.characterId = characterId;
-            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, Client.Peer, MMOMessageTypes.UpdatePartyMember, updateMessage);
+            ClientSendPacket(SendOptions.ReliableOrdered, MMOMessageTypes.UpdatePartyMember, updateMessage);
         }
 
         public void UpdatePartySetting(int id, bool shareExp, bool shareItem)
@@ -273,7 +273,7 @@ namespace MultiplayerARPG.MMO
             updateMessage.id = id;
             updateMessage.shareExp = shareExp;
             updateMessage.shareItem = shareItem;
-            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, Client.Peer, MMOMessageTypes.UpdateParty, updateMessage);
+            ClientSendPacket(SendOptions.ReliableOrdered, MMOMessageTypes.UpdateParty, updateMessage);
         }
 
         public void UpdatePartyTerminate(int id)
@@ -281,7 +281,7 @@ namespace MultiplayerARPG.MMO
             var updateMessage = new UpdatePartyMessage();
             updateMessage.type = UpdatePartyMessage.UpdateType.Terminate;
             updateMessage.id = id;
-            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, Client.Peer, MMOMessageTypes.UpdateParty, updateMessage);
+            ClientSendPacket(SendOptions.ReliableOrdered, MMOMessageTypes.UpdateParty, updateMessage);
         }
 
         public void UpdateGuildMemberAdd(int id, string characterId, string characterName, int dataId, int level)
@@ -293,7 +293,7 @@ namespace MultiplayerARPG.MMO
             updateMessage.characterName = characterName;
             updateMessage.dataId = dataId;
             updateMessage.level = level;
-            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, Client.Peer, MMOMessageTypes.UpdateGuildMember, updateMessage);
+            ClientSendPacket(SendOptions.ReliableOrdered, MMOMessageTypes.UpdateGuildMember, updateMessage);
         }
 
         public void UpdateGuildMemberRemove(int id, string characterId)
@@ -302,7 +302,7 @@ namespace MultiplayerARPG.MMO
             updateMessage.type = UpdateGuildMemberMessage.UpdateType.Remove;
             updateMessage.id = id;
             updateMessage.characterId = characterId;
-            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, Client.Peer, MMOMessageTypes.UpdateGuildMember, updateMessage);
+            ClientSendPacket(SendOptions.ReliableOrdered, MMOMessageTypes.UpdateGuildMember, updateMessage);
         }
 
         public void UpdateSetGuildMessage(int id, string message)
@@ -311,7 +311,7 @@ namespace MultiplayerARPG.MMO
             updateMessage.type = UpdateGuildMessage.UpdateType.SetGuildMessage;
             updateMessage.id = id;
             updateMessage.message = message;
-            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, Client.Peer, MMOMessageTypes.UpdateGuild, updateMessage);
+            ClientSendPacket(SendOptions.ReliableOrdered, MMOMessageTypes.UpdateGuild, updateMessage);
         }
 
         public void UpdateGuildTerminate(int id)
@@ -319,7 +319,7 @@ namespace MultiplayerARPG.MMO
             var updateMessage = new UpdateGuildMessage();
             updateMessage.type = UpdateGuildMessage.UpdateType.Terminate;
             updateMessage.id = id;
-            LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, Client.Peer, MMOMessageTypes.UpdateGuild, updateMessage);
+            ClientSendPacket(SendOptions.ReliableOrdered, MMOMessageTypes.UpdateGuild, updateMessage);
         }
 
         public void StartClient(MapNetworkManager mapNetworkManager, string networkAddress, int networkPort, string connectKey)

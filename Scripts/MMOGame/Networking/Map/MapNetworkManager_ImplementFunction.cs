@@ -21,16 +21,15 @@ namespace MultiplayerARPG.MMO
             }
             // If warping to different map
             long connectId = playerCharacterEntity.ConnectId;
-            NetPeer peer;
             CentralServerPeerInfo peerInfo;
             if (!string.IsNullOrEmpty(mapName) &&
                 !mapName.Equals(playerCharacterEntity.CurrentMapName) &&
                 playerCharacters.ContainsKey(connectId) &&
-                Peers.TryGetValue(connectId, out peer) &&
-                mapServerPeersBySceneName.TryGetValue(mapName, out peerInfo))
+                ConnectionIds.Contains(connectId) &&
+                mapServerConnectionIdsBySceneName.TryGetValue(mapName, out peerInfo))
             {
                 // Unregister player character
-                UnregisterPlayerCharacter(peer);
+                UnregisterPlayerCharacter(connectId);
                 // Clone character data to save
                 var savingCharacterData = new PlayerCharacterData();
                 playerCharacterEntity.CloneTo(savingCharacterData);
@@ -46,7 +45,7 @@ namespace MultiplayerARPG.MMO
                 message.networkAddress = peerInfo.networkAddress;
                 message.networkPort = peerInfo.networkPort;
                 message.connectKey = peerInfo.connectKey;
-                LiteNetLibPacketSender.SendPacket(SendOptions.ReliableOrdered, peer, MsgTypes.Warp, message);
+                ServerSendPacket(connectId, SendOptions.ReliableOrdered, MsgTypes.Warp, message);
             }
         }
 

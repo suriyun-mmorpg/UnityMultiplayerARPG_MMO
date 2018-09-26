@@ -22,8 +22,8 @@ namespace MultiplayerARPG.MMO
         public int minCharacterNameLength = 2;
         public int maxCharacterNameLength = 16;
         
-        public System.Action<NetPeer> onClientConnected;
-        public System.Action<NetPeer, DisconnectInfo> onClientDisconnected;
+        public System.Action onClientConnected;
+        public System.Action<DisconnectInfo> onClientDisconnected;
 
         public BaseDatabase Database
         {
@@ -66,37 +66,37 @@ namespace MultiplayerARPG.MMO
             RegisterClientMessage(MMOMessageTypes.ResponseValidateAccessToken, HandleResponseValidateAccessToken);
         }
 
-        public override void OnPeerDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
+        public override void OnPeerDisconnected(long connectionId, DisconnectInfo disconnectInfo)
         {
-            base.OnPeerDisconnected(peer, disconnectInfo);
-            mapSpawnServerPeers.Remove(peer.ConnectId);
+            base.OnPeerDisconnected(connectionId, disconnectInfo);
+            mapSpawnServerPeers.Remove(connectionId);
             CentralServerPeerInfo mapServerPeerInfo;
-            if (mapServerPeers.TryGetValue(peer.ConnectId, out mapServerPeerInfo))
+            if (mapServerPeers.TryGetValue(connectionId, out mapServerPeerInfo))
             {
                 mapServerPeersBySceneName.Remove(mapServerPeerInfo.extra);
-                mapServerPeers.Remove(peer.ConnectId);
-                mapUserIds.Remove(peer.ConnectId);
+                mapServerPeers.Remove(connectionId);
+                mapUserIds.Remove(connectionId);
             }
             CentralUserPeerInfo userPeerInfo;
-            if (userPeers.TryGetValue(peer.ConnectId, out userPeerInfo))
+            if (userPeers.TryGetValue(connectionId, out userPeerInfo))
             {
                 userPeersByUserId.Remove(userPeerInfo.userId);
-                userPeers.Remove(peer.ConnectId);
+                userPeers.Remove(connectionId);
             }
         }
 
-        public override void OnClientConnected(NetPeer peer)
+        public override void OnClientConnected()
         {
-            base.OnClientConnected(peer);
+            base.OnClientConnected();
             if (onClientConnected != null)
-                onClientConnected(peer);
+                onClientConnected();
         }
 
-        public override void OnClientDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
+        public override void OnClientDisconnected(DisconnectInfo disconnectInfo)
         {
-            base.OnClientDisconnected(peer, disconnectInfo);
+            base.OnClientDisconnected(disconnectInfo);
             if (onClientDisconnected != null)
-                onClientDisconnected(peer, disconnectInfo);
+                onClientDisconnected(disconnectInfo);
         }
 
         public bool MapContainsUser(string userId)
