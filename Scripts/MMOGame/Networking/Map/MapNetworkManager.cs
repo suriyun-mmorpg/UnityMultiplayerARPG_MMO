@@ -371,7 +371,7 @@ namespace MultiplayerARPG.MMO
                         var player = Players[connectionId];
                         foreach (var spawnedObject in Assets.SpawnedObjects)
                         {
-                            if (spawnedObject.Value.ConnectId == player.ConnectionId)
+                            if (spawnedObject.Value.ConnectionId == player.ConnectionId)
                                 continue;
 
                             if (spawnedObject.Value.ShouldAddSubscriber(player))
