@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using MySql.Data.MySqlClient;
-using System.Threading.Tasks;
 
 namespace MultiplayerARPG.MMO
 {
@@ -24,9 +23,9 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public async Task CreateCharacterAttribute(MySqlConnection connection, MySqlTransaction transaction, int idx, string characterId, CharacterAttribute characterAttribute)
+        public void CreateCharacterAttribute(MySqlConnection connection, MySqlTransaction transaction, int idx, string characterId, CharacterAttribute characterAttribute)
         {
-            await ExecuteNonQuery(connection, transaction, "INSERT INTO characterattribute (id, idx, characterId, dataId, amount) VALUES (@id, @idx, @characterId, @dataId, @amount)",
+            ExecuteNonQuery(connection, transaction, "INSERT INTO characterattribute (id, idx, characterId, dataId, amount) VALUES (@id, @idx, @characterId, @dataId, @amount)",
                 new MySqlParameter("@id", characterId + "_" + idx),
                 new MySqlParameter("@idx", idx),
                 new MySqlParameter("@characterId", characterId),
@@ -34,10 +33,10 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@amount", characterAttribute.amount));
         }
 
-        public async Task<List<CharacterAttribute>> ReadCharacterAttributes(string characterId)
+        public List<CharacterAttribute> ReadCharacterAttributes(string characterId)
         {
             var result = new List<CharacterAttribute>();
-            var reader = await ExecuteReader("SELECT * FROM characterattribute WHERE characterId=@characterId ORDER BY idx ASC",
+            var reader = ExecuteReader("SELECT * FROM characterattribute WHERE characterId=@characterId ORDER BY idx ASC",
                 new MySqlParameter("@characterId", characterId));
             CharacterAttribute tempAttribute;
             while (ReadCharacterAttribute(reader, out tempAttribute, false))
@@ -47,9 +46,9 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public async Task DeleteCharacterAttributes(MySqlConnection connection, MySqlTransaction transaction, string characterId)
+        public void DeleteCharacterAttributes(MySqlConnection connection, MySqlTransaction transaction, string characterId)
         {
-            await ExecuteNonQuery(connection, transaction, "DELETE FROM characterattribute WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
+            ExecuteNonQuery(connection, transaction, "DELETE FROM characterattribute WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
         }
     }
 }

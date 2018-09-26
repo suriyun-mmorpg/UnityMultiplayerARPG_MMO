@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using MySql.Data.MySqlClient;
-using System.Threading.Tasks;
 
 namespace MultiplayerARPG.MMO
 {
@@ -25,9 +24,9 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public async Task CreateCharacterHotkey(MySqlConnection connection, MySqlTransaction transaction, string characterId, CharacterHotkey characterHotkey)
+        public void CreateCharacterHotkey(MySqlConnection connection, MySqlTransaction transaction, string characterId, CharacterHotkey characterHotkey)
         {
-            await ExecuteNonQuery(connection, transaction, "INSERT INTO characterhotkey (id, characterId, hotkeyId, type, dataId) VALUES (@id, @characterId, @hotkeyId, @type, @dataId)",
+            ExecuteNonQuery(connection, transaction, "INSERT INTO characterhotkey (id, characterId, hotkeyId, type, dataId) VALUES (@id, @characterId, @hotkeyId, @type, @dataId)",
                 new MySqlParameter("@id", characterId + "_" + characterHotkey.hotkeyId),
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@hotkeyId", characterHotkey.hotkeyId),
@@ -35,10 +34,10 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@dataId", characterHotkey.dataId));
         }
 
-        public async Task<List<CharacterHotkey>> ReadCharacterHotkeys(string characterId)
+        public List<CharacterHotkey> ReadCharacterHotkeys(string characterId)
         {
             var result = new List<CharacterHotkey>();
-            var reader = await ExecuteReader("SELECT * FROM characterhotkey WHERE characterId=@characterId",
+            var reader = ExecuteReader("SELECT * FROM characterhotkey WHERE characterId=@characterId",
                 new MySqlParameter("@characterId", characterId));
             CharacterHotkey tempHotkey;
             while (ReadCharacterHotkey(reader, out tempHotkey, false))
@@ -48,9 +47,9 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public async Task DeleteCharacterHotkeys(MySqlConnection connection, MySqlTransaction transaction, string characterId)
+        public void DeleteCharacterHotkeys(MySqlConnection connection, MySqlTransaction transaction, string characterId)
         {
-            await ExecuteNonQuery(connection, transaction, "DELETE FROM characterhotkey WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
+            ExecuteNonQuery(connection, transaction, "DELETE FROM characterhotkey WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
         }
     }
 }

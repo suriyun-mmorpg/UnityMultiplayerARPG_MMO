@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Net;
-using System.Threading.Tasks;
 using UnityEngine;
 using MiniJSON;
 
@@ -51,11 +50,11 @@ namespace MultiplayerARPG.MMO
             connection.Close();
         }
 
-        private async void Init()
+        private void Init()
         {
-            await ExecuteNonQuery("BEGIN");
+            ExecuteNonQuery("BEGIN");
 
-            await ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characterattribute (
+            ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characterattribute (
               id TEXT NOT NULL PRIMARY KEY,
               idx INTEGER NOT NULL,
               characterId TEXT NOT NULL,
@@ -65,7 +64,7 @@ namespace MultiplayerARPG.MMO
               updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
 
-            await ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characterbuff (
+            ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characterbuff (
               id TEXT NOT NULL PRIMARY KEY,
               characterId TEXT NOT NULL,
               type INTEGER NOT NULL,
@@ -76,7 +75,7 @@ namespace MultiplayerARPG.MMO
               updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
 
-            await ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characterhotkey (
+            ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characterhotkey (
               id TEXT NOT NULL PRIMARY KEY,
               characterId TEXT NOT NULL,
               hotkeyId TEXT NOT NULL,
@@ -86,7 +85,7 @@ namespace MultiplayerARPG.MMO
               updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
 
-            await ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characteritem (
+            ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characteritem (
               id TEXT NOT NULL PRIMARY KEY,
               idx INTEGER NOT NULL,
               inventoryType INTEGER NOT NULL,
@@ -98,7 +97,7 @@ namespace MultiplayerARPG.MMO
               updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
 
-            await ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characterquest (
+            ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characterquest (
               id TEXT NOT NULL PRIMARY KEY,
               idx INTEGER NOT NULL,
               characterId TEXT NOT NULL,
@@ -109,7 +108,7 @@ namespace MultiplayerARPG.MMO
               updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
 
-            await ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characters (
+            ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characters (
               id TEXT NOT NULL PRIMARY KEY,
               userId TEXT NOT NULL,
               dataId INGETER NOT NULL,
@@ -138,7 +137,7 @@ namespace MultiplayerARPG.MMO
               updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
 
-            await ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characterskill (
+            ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characterskill (
               id TEXT NOT NULL PRIMARY KEY,
               idx INTEGER NOT NULL,
               characterId TEXT NOT NULL,
@@ -149,7 +148,7 @@ namespace MultiplayerARPG.MMO
               updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
 
-            await ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS userlogin (
+            ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS userlogin (
               id TEXT NOT NULL PRIMARY KEY,
               username TEXT NOT NULL UNIQUE,
               password TEXT NOT NULL,
@@ -160,7 +159,7 @@ namespace MultiplayerARPG.MMO
               updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
 
-            await ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS buildings (
+            ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS buildings (
               id TEXT NOT NULL PRIMARY KEY,
               parentId TEXT NOT NULL,
               dataId INTEGER NOT NULL,
@@ -178,7 +177,7 @@ namespace MultiplayerARPG.MMO
               updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
 
-            await ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS guild (
+            ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS guild (
               id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
               guildName TEXT NOT NULL,
               leaderId TEXT NOT NULL,
@@ -189,26 +188,26 @@ namespace MultiplayerARPG.MMO
               message TEXT NOT NULL
             )");
 
-            await ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS party (
+            ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS party (
               id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
               shareExp INTEGER NOT NULL,
               shareItem INTEGER NOT NULL,
               leaderId TEXT NOT NULL
             )");
 
-            await ExecuteNonQuery("END");
+            ExecuteNonQuery("END");
             
             this.InvokeInstanceDevExtMethods("Init");
 
             // Update data
             if (!IsColumnExist("characteritem", "durability"))
-                await ExecuteNonQuery("ALTER TABLE characteritem ADD durability REAL NOT NULL DEFAULT 0;");
+                ExecuteNonQuery("ALTER TABLE characteritem ADD durability REAL NOT NULL DEFAULT 0;");
             if (!IsColumnExist("userlogin", "cash"))
-                await ExecuteNonQuery("ALTER TABLE userlogin ADD cash INTEGER NOT NULL DEFAULT 0;");
+                ExecuteNonQuery("ALTER TABLE userlogin ADD cash INTEGER NOT NULL DEFAULT 0;");
             if (!IsColumnExist("characters", "partyId"))
-                await ExecuteNonQuery("ALTER TABLE characters ADD partyId INTEGER NOT NULL DEFAULT 0;");
+                ExecuteNonQuery("ALTER TABLE characters ADD partyId INTEGER NOT NULL DEFAULT 0;");
             if (!IsColumnExist("characters", "guildId"))
-                await ExecuteNonQuery("ALTER TABLE characters ADD guildId INTEGER NOT NULL DEFAULT 0;");
+                ExecuteNonQuery("ALTER TABLE characters ADD guildId INTEGER NOT NULL DEFAULT 0;");
         }
 
         private bool IsColumnExist(string tableName, string findingColumn)
@@ -259,7 +258,7 @@ namespace MultiplayerARPG.MMO
             return new SqliteConnection(GetConnectionString());
         }
 
-        public async Task<int> ExecuteNonQuery(string sql, params SqliteParameter[] args)
+        public int ExecuteNonQuery(string sql, params SqliteParameter[] args)
         {
             var numRows = 0;
             using (var cmd = new SqliteCommand(sql, connection))
@@ -268,12 +267,12 @@ namespace MultiplayerARPG.MMO
                 {
                     cmd.Parameters.Add(arg);
                 }
-                numRows = await cmd.ExecuteNonQueryAsync();
+                numRows = cmd.ExecuteNonQuery();
             }
             return numRows;
         }
 
-        public async Task<object> ExecuteScalar(string sql, params SqliteParameter[] args)
+        public object ExecuteScalar(string sql, params SqliteParameter[] args)
         {
             object result;
             using (var cmd = new SqliteCommand(sql, connection))
@@ -282,12 +281,12 @@ namespace MultiplayerARPG.MMO
                 {
                     cmd.Parameters.Add(arg);
                 }
-                result = await cmd.ExecuteScalarAsync();
+                result = cmd.ExecuteScalar();
             }
             return result;
         }
 
-        public async Task<SQLiteRowsReader> ExecuteReader(string sql, params SqliteParameter[] args)
+        public SQLiteRowsReader ExecuteReader(string sql, params SqliteParameter[] args)
         {
             SQLiteRowsReader result = new SQLiteRowsReader();
             using (var cmd = new SqliteCommand(sql, connection))
@@ -296,17 +295,17 @@ namespace MultiplayerARPG.MMO
                 {
                     cmd.Parameters.Add(arg);
                 }
-                var dataReader = await cmd.ExecuteReaderAsync();
+                var dataReader = cmd.ExecuteReader();
                 result.Init(dataReader);
                 dataReader.Close();
             }
             return result;
         }
 
-        public override async Task<string> ValidateUserLogin(string username, string password)
+        public override string ValidateUserLogin(string username, string password)
         {
             var id = string.Empty;
-            var reader = await ExecuteReader("SELECT id FROM userlogin WHERE username=@username AND password=@password AND authType=@authType LIMIT 1",
+            var reader = ExecuteReader("SELECT id FROM userlogin WHERE username=@username AND password=@password AND authType=@authType LIMIT 1",
                 new SqliteParameter("@username", username),
                 new SqliteParameter("@password", GenericUtils.GetMD5(password)),
                 new SqliteParameter("@authType", AUTH_TYPE_NORMAL));
@@ -317,54 +316,54 @@ namespace MultiplayerARPG.MMO
             return id;
         }
 
-        public override async Task<bool> ValidateAccessToken(string userId, string accessToken)
+        public override bool ValidateAccessToken(string userId, string accessToken)
         {
-            var result = await ExecuteScalar("SELECT COUNT(*) FROM userlogin WHERE id=@id AND accessToken=@accessToken",
+            var result = ExecuteScalar("SELECT COUNT(*) FROM userlogin WHERE id=@id AND accessToken=@accessToken",
                 new SqliteParameter("@id", userId),
                 new SqliteParameter("@accessToken", accessToken));
             return (result != null ? (long)result : 0) > 0;
         }
 
-        public override async Task<int> GetCash(string userId)
+        public override int GetCash(string userId)
         {
             var cash = 0;
-            var reader = await ExecuteReader("SELECT cash FROM userlogin WHERE id=@id LIMIT 1",
+            var reader = ExecuteReader("SELECT cash FROM userlogin WHERE id=@id LIMIT 1",
                 new SqliteParameter("@id", userId));
             if (reader.Read())
                 cash = reader.GetInt32("cash");
             return cash;
         }
 
-        public override async Task<int> IncreaseCash(string userId, int amount)
+        public override int IncreaseCash(string userId, int amount)
         {
-            var cash = await GetCash(userId);
+            var cash = GetCash(userId);
             cash += amount;
-            await ExecuteNonQuery("UPDATE userlogin SET cash=@cash WHERE id=@id",
+            ExecuteNonQuery("UPDATE userlogin SET cash=@cash WHERE id=@id",
                 new SqliteParameter("@id", userId),
                 new SqliteParameter("@cash", cash));
             return cash;
         }
 
-        public override async Task<int> DecreaseCash(string userId, int amount)
+        public override int DecreaseCash(string userId, int amount)
         {
-            var cash = await GetCash(userId);
+            var cash = GetCash(userId);
             cash -= amount;
-            await ExecuteNonQuery("UPDATE userlogin SET cash=@cash WHERE id=@id",
+            ExecuteNonQuery("UPDATE userlogin SET cash=@cash WHERE id=@id",
                 new SqliteParameter("@id", userId),
                 new SqliteParameter("@cash", cash));
             return cash;
         }
 
-        public override async Task UpdateAccessToken(string userId, string accessToken)
+        public override void UpdateAccessToken(string userId, string accessToken)
         {
-            await ExecuteNonQuery("UPDATE userlogin SET accessToken=@accessToken WHERE id=@id",
+            ExecuteNonQuery("UPDATE userlogin SET accessToken=@accessToken WHERE id=@id",
                 new SqliteParameter("@id", userId),
                 new SqliteParameter("@accessToken", accessToken));
         }
 
-        public override async Task CreateUserLogin(string username, string password)
+        public override void CreateUserLogin(string username, string password)
         {
-            await ExecuteNonQuery("INSERT INTO userlogin (id, username, password, email, authType) VALUES (@id, @username, @password, @email, @authType)",
+            ExecuteNonQuery("INSERT INTO userlogin (id, username, password, email, authType) VALUES (@id, @username, @password, @email, @authType)",
                 new SqliteParameter("@id", GenericUtils.GetUniqueId()),
                 new SqliteParameter("@username", username),
                 new SqliteParameter("@password", GenericUtils.GetMD5(password)),
@@ -372,18 +371,18 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@authType", AUTH_TYPE_NORMAL));
         }
 
-        public override async Task<long> FindUsername(string username)
+        public override long FindUsername(string username)
         {
-            var result = await ExecuteScalar("SELECT COUNT(*) FROM userlogin WHERE username LIKE @username",
+            var result = ExecuteScalar("SELECT COUNT(*) FROM userlogin WHERE username LIKE @username",
                 new SqliteParameter("@username", username));
             return result != null ? (long)result : 0;
         }
 
-        public override async Task<string> FacebookLogin(string fbId, string accessToken)
+        public override string FacebookLogin(string fbId, string accessToken)
         {
             var url = "https://graph.facebook.com/" + fbId + "?access_token=" + accessToken + "&fields=id,name,email";
             var webClient = new WebClient();
-            var json = await webClient.DownloadStringTaskAsync(url);
+            var json = webClient.DownloadString(url);
             json = json.Replace(@"\u0040", "@");
 
             var id = string.Empty;
@@ -391,7 +390,7 @@ namespace MultiplayerARPG.MMO
             if (dict.ContainsKey("id") && dict.ContainsKey("email"))
             {
                 var email = (string)dict["email"];
-                var reader = await ExecuteReader("SELECT id FROM userlogin WHERE username=@username AND password=@password AND authType=@authType LIMIT 1",
+                var reader = ExecuteReader("SELECT id FROM userlogin WHERE username=@username AND password=@password AND authType=@authType LIMIT 1",
                     new SqliteParameter("@username", "fb_" + fbId),
                     new SqliteParameter("@password", GenericUtils.GetMD5(fbId)),
                     new SqliteParameter("@authType", AUTH_TYPE_FACEBOOK));
@@ -400,7 +399,7 @@ namespace MultiplayerARPG.MMO
                     id = reader.GetString("id");
                 else
                 {
-                    await ExecuteNonQuery("INSERT INTO userlogin (id, username, password, email, authType) VALUES (@id, @username, @password, @email, @authType)",
+                    ExecuteNonQuery("INSERT INTO userlogin (id, username, password, email, authType) VALUES (@id, @username, @password, @email, @authType)",
                         new SqliteParameter("@id", GenericUtils.GetUniqueId()),
                         new SqliteParameter("@username", "fb_" + fbId),
                         new SqliteParameter("@password", GenericUtils.GetMD5(fbId)),
@@ -408,7 +407,7 @@ namespace MultiplayerARPG.MMO
                         new SqliteParameter("@authType", AUTH_TYPE_FACEBOOK));
 
                     // Read last entry
-                    reader = await ExecuteReader("SELECT id FROM userlogin WHERE username=@username AND password=@password AND authType=@authType LIMIT 1",
+                    reader = ExecuteReader("SELECT id FROM userlogin WHERE username=@username AND password=@password AND authType=@authType LIMIT 1",
                         new SqliteParameter("@username", "fb_" + fbId),
                         new SqliteParameter("@password", GenericUtils.GetMD5(fbId)),
                         new SqliteParameter("@authType", AUTH_TYPE_FACEBOOK));
@@ -420,11 +419,11 @@ namespace MultiplayerARPG.MMO
             return id;
         }
 
-        public override async Task<string> GooglePlayLogin(string idToken)
+        public override string GooglePlayLogin(string idToken)
         {
             var url = "https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=" + idToken;
             var webClient = new WebClient();
-            var json = await webClient.DownloadStringTaskAsync(url);
+            var json = webClient.DownloadString(url);
 
             var id = string.Empty;
             var dict = Json.Deserialize(json) as Dictionary<string, object>;
@@ -432,7 +431,7 @@ namespace MultiplayerARPG.MMO
             {
                 var gId = (string)dict["sub"];
                 var email = (string)dict["email"];
-                var reader = await ExecuteReader("SELECT id FROM userlogin WHERE username=@username AND password=@password AND authType=@authType LIMIT 1",
+                var reader = ExecuteReader("SELECT id FROM userlogin WHERE username=@username AND password=@password AND authType=@authType LIMIT 1",
                     new SqliteParameter("@username", "g_" + gId),
                     new SqliteParameter("@password", GenericUtils.GetMD5(gId)),
                     new SqliteParameter("@authType", AUTH_TYPE_GOOGLE_PLAY));
@@ -441,7 +440,7 @@ namespace MultiplayerARPG.MMO
                     id = reader.GetString("id");
                 else
                 {
-                    await ExecuteNonQuery("INSERT INTO userlogin (id, username, password, email, authType) VALUES (@id, @username, @password, @email, @authType)",
+                    ExecuteNonQuery("INSERT INTO userlogin (id, username, password, email, authType) VALUES (@id, @username, @password, @email, @authType)",
                         new SqliteParameter("@id", GenericUtils.GetUniqueId()),
                         new SqliteParameter("@username", "g_" + gId),
                         new SqliteParameter("@password", GenericUtils.GetMD5(gId)),
@@ -449,7 +448,7 @@ namespace MultiplayerARPG.MMO
                         new SqliteParameter("@authType", AUTH_TYPE_GOOGLE_PLAY));
 
                     // Read last entry
-                    reader = await ExecuteReader("SELECT id FROM userlogin WHERE username=@username AND password=@password AND authType=@authType LIMIT 1",
+                    reader = ExecuteReader("SELECT id FROM userlogin WHERE username=@username AND password=@password AND authType=@authType LIMIT 1",
                         new SqliteParameter("@username", "g_" + gId),
                         new SqliteParameter("@password", GenericUtils.GetMD5(gId)),
                         new SqliteParameter("@authType", AUTH_TYPE_GOOGLE_PLAY));

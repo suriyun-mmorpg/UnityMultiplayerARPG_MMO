@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using MySql.Data.MySqlClient;
-using System.Threading.Tasks;
 
 namespace MultiplayerARPG.MMO
 {
@@ -51,9 +50,9 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public async Task CreateCharacterQuest(MySqlConnection connection, MySqlTransaction transaction, int idx, string characterId, CharacterQuest characterQuest)
+        public void CreateCharacterQuest(MySqlConnection connection, MySqlTransaction transaction, int idx, string characterId, CharacterQuest characterQuest)
         {
-            await ExecuteNonQuery(connection, transaction, "INSERT INTO characterquest (id, idx, characterId, dataId, isComplete, killedMonsters) VALUES (@id, @idx, @characterId, @dataId, @isComplete, @killedMonsters)",
+            ExecuteNonQuery(connection, transaction, "INSERT INTO characterquest (id, idx, characterId, dataId, isComplete, killedMonsters) VALUES (@id, @idx, @characterId, @dataId, @isComplete, @killedMonsters)",
                 new MySqlParameter("@id", characterId + "_" + idx),
                 new MySqlParameter("@idx", idx),
                 new MySqlParameter("@characterId", characterId),
@@ -62,10 +61,10 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@killedMonsters", WriteKillMonsters(characterQuest.killedMonsters)));
         }
 
-        public async Task<List<CharacterQuest>> ReadCharacterQuests(string characterId)
+        public List<CharacterQuest> ReadCharacterQuests(string characterId)
         {
             var result = new List<CharacterQuest>();
-            var reader = await ExecuteReader("SELECT * FROM characterquest WHERE characterId=@characterId ORDER BY idx ASC",
+            var reader = ExecuteReader("SELECT * FROM characterquest WHERE characterId=@characterId ORDER BY idx ASC",
                 new MySqlParameter("@characterId", characterId));
             CharacterQuest tempQuest;
             while (ReadCharacterQuest(reader, out tempQuest, false))
@@ -75,9 +74,9 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public async Task DeleteCharacterQuests(MySqlConnection connection, MySqlTransaction transaction, string characterId)
+        public void DeleteCharacterQuests(MySqlConnection connection, MySqlTransaction transaction, string characterId)
         {
-            await ExecuteNonQuery(connection, transaction, "DELETE FROM characterquest WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
+            ExecuteNonQuery(connection, transaction, "DELETE FROM characterquest WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
         }
     }
 }

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Mono.Data.Sqlite;
-using System.Threading.Tasks;
 
 namespace MultiplayerARPG.MMO
 {
@@ -51,9 +50,9 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public async Task CreateCharacterQuest(int idx, string characterId, CharacterQuest characterQuest)
+        public void CreateCharacterQuest(int idx, string characterId, CharacterQuest characterQuest)
         {
-            await ExecuteNonQuery("INSERT INTO characterquest (id, idx, characterId, dataId, isComplete, killedMonsters) VALUES (@id, @idx, @characterId, @dataId, @isComplete, @killedMonsters)",
+            ExecuteNonQuery("INSERT INTO characterquest (id, idx, characterId, dataId, isComplete, killedMonsters) VALUES (@id, @idx, @characterId, @dataId, @isComplete, @killedMonsters)",
                 new SqliteParameter("@id", characterId + "_" + idx),
                 new SqliteParameter("@idx", idx),
                 new SqliteParameter("@characterId", characterId),
@@ -62,10 +61,10 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@killedMonsters", WriteKillMonsters(characterQuest.killedMonsters)));
         }
 
-        public async Task<List<CharacterQuest>> ReadCharacterQuests(string characterId)
+        public List<CharacterQuest> ReadCharacterQuests(string characterId)
         {
             var result = new List<CharacterQuest>();
-            var reader = await ExecuteReader("SELECT * FROM characterquest WHERE characterId=@characterId ORDER BY idx ASC",
+            var reader = ExecuteReader("SELECT * FROM characterquest WHERE characterId=@characterId ORDER BY idx ASC",
                 new SqliteParameter("@characterId", characterId));
             CharacterQuest tempQuest;
             while (ReadCharacterQuest(reader, out tempQuest, false))
@@ -75,9 +74,9 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public async Task DeleteCharacterQuests(string characterId)
+        public void DeleteCharacterQuests(string characterId)
         {
-            await ExecuteNonQuery("DELETE FROM characterquest WHERE characterId=@characterId", new SqliteParameter("@characterId", characterId));
+            ExecuteNonQuery("DELETE FROM characterquest WHERE characterId=@characterId", new SqliteParameter("@characterId", characterId));
         }
     }
 }

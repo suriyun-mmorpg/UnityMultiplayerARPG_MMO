@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Mono.Data.Sqlite;
-using System.Threading.Tasks;
 
 namespace MultiplayerARPG.MMO
 {
@@ -25,9 +24,9 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public async Task CreateCharacterHotkey(string characterId, CharacterHotkey characterHotkey)
+        public void CreateCharacterHotkey(string characterId, CharacterHotkey characterHotkey)
         {
-            await ExecuteNonQuery("INSERT INTO characterhotkey (id, characterId, hotkeyId, type, dataId) VALUES (@id, @characterId, @hotkeyId, @type, @dataId)",
+            ExecuteNonQuery("INSERT INTO characterhotkey (id, characterId, hotkeyId, type, dataId) VALUES (@id, @characterId, @hotkeyId, @type, @dataId)",
                 new SqliteParameter("@id", characterId + "_" + characterHotkey.hotkeyId),
                 new SqliteParameter("@characterId", characterId),
                 new SqliteParameter("@hotkeyId", characterHotkey.hotkeyId),
@@ -35,10 +34,10 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@dataId", characterHotkey.dataId));
         }
 
-        public async Task<List<CharacterHotkey>> ReadCharacterHotkeys(string characterId)
+        public List<CharacterHotkey> ReadCharacterHotkeys(string characterId)
         {
             var result = new List<CharacterHotkey>();
-            var reader = await ExecuteReader("SELECT * FROM characterhotkey WHERE characterId=@characterId",
+            var reader = ExecuteReader("SELECT * FROM characterhotkey WHERE characterId=@characterId",
                 new SqliteParameter("@characterId", characterId));
             CharacterHotkey tempHotkey;
             while (ReadCharacterHotkey(reader, out tempHotkey, false))
@@ -48,9 +47,9 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public async Task DeleteCharacterHotkeys(string characterId)
+        public void DeleteCharacterHotkeys(string characterId)
         {
-            await ExecuteNonQuery("DELETE FROM characterhotkey WHERE characterId=@characterId", new SqliteParameter("@characterId", characterId));
+            ExecuteNonQuery("DELETE FROM characterhotkey WHERE characterId=@characterId", new SqliteParameter("@characterId", characterId));
         }
     }
 }

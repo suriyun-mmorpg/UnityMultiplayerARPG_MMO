@@ -36,7 +36,12 @@ namespace MultiplayerARPG.MMO
             return Client.ClientSendAckPacket(SendOptions.ReliableOrdered, MMOMessageTypes.RequestSelectCharacter, message, callback);
         }
 
-        protected async void HandleRequestCharacters(LiteNetLibMessageHandler messageHandler)
+        protected void HandleRequestCharacters(LiteNetLibMessageHandler messageHandler)
+        {
+            StartCoroutine(HandleRequestCharactersRoutine(messageHandler));
+        }
+
+        private IEnumerator HandleRequestCharactersRoutine(LiteNetLibMessageHandler messageHandler)
         {
             var connectionId = messageHandler.connectionId;
             var message = messageHandler.ReadMessage<RequestCharactersMessage>();
@@ -46,7 +51,12 @@ namespace MultiplayerARPG.MMO
             if (!userPeers.TryGetValue(connectionId, out userPeerInfo))
                 error = ResponseCharactersMessage.Error.NotLoggedin;
             else
-                characters = await Database.ReadCharacters(userPeerInfo.userId);
+            {
+                var job = new LoadCharactersJob(Database, userPeerInfo.userId);
+                job.Start();
+                yield return StartCoroutine(job.WaitFor());
+                characters = job.result;
+            }
             var responseMessage = new ResponseCharactersMessage();
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = error == ResponseCharactersMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
@@ -55,7 +65,12 @@ namespace MultiplayerARPG.MMO
             ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MMOMessageTypes.ResponseCharacters, responseMessage);
         }
 
-        protected async void HandleRequestCreateCharacter(LiteNetLibMessageHandler messageHandler)
+        protected void HandleRequestCreateCharacter(LiteNetLibMessageHandler messageHandler)
+        {
+            StartCoroutine(HandleRequestCreateCharacterRoutine(messageHandler));
+        }
+
+        private IEnumerator HandleRequestCreateCharacterRoutine(LiteNetLibMessageHandler messageHandler)
         {
             var connectionId = messageHandler.connectionId;
             var message = messageHandler.ReadMessage<RequestCreateCharacterMessage>();
@@ -63,7 +78,12 @@ namespace MultiplayerARPG.MMO
             var characterName = message.characterName;
             var databaseId = message.dataId;
             CentralUserPeerInfo userPeerInfo;
-            if (!userPeers.TryGetValue(connectionId, out userPeerInfo))
+            var findCharacterNameJob = new FindCharacterNameJob(Database, characterName);
+            findCharacterNameJob.Start();
+            yield return StartCoroutine(findCharacterNameJob.WaitFor());
+            if (findCharacterNameJob.result > 0)
+                error = ResponseCreateCharacterMessage.Error.CharacterNameAlreadyExisted;
+            else if (!userPeers.TryGetValue(connectionId, out userPeerInfo))
                 error = ResponseCreateCharacterMessage.Error.NotLoggedin;
             else if (string.IsNullOrEmpty(characterName) || characterName.Length < minCharacterNameLength)
                 error = ResponseCreateCharacterMessage.Error.TooShortCharacterName;
@@ -71,15 +91,15 @@ namespace MultiplayerARPG.MMO
                 error = ResponseCreateCharacterMessage.Error.TooLongCharacterName;
             else if (!GameInstance.PlayerCharacters.ContainsKey(databaseId))
                 error = ResponseCreateCharacterMessage.Error.InvalidData;
-            else if (await Database.FindCharacterName(characterName) > 0)
-                error = ResponseCreateCharacterMessage.Error.CharacterNameAlreadyExisted;
             else
             {
                 var characterId = GenericUtils.GetUniqueId();
                 var characterData = new PlayerCharacterData();
                 characterData.Id = characterId;
                 characterData.SetNewCharacterData(characterName, databaseId);
-                await Database.CreateCharacter(userPeerInfo.userId, characterData);
+                var createCharacterJob = new CreateCharacterJob(Database, userPeerInfo.userId, characterData);
+                createCharacterJob.Start();
+                yield return StartCoroutine(createCharacterJob.WaitFor());
             }
             var responseMessage = new ResponseCreateCharacterMessage();
             responseMessage.ackId = message.ackId;
@@ -88,7 +108,12 @@ namespace MultiplayerARPG.MMO
             ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MMOMessageTypes.ResponseCreateCharacter, responseMessage);
         }
 
-        protected async void HandleRequestDeleteCharacter(LiteNetLibMessageHandler messageHandler)
+        protected void HandleRequestDeleteCharacter(LiteNetLibMessageHandler messageHandler)
+        {
+            StartCoroutine(HandleRequestDeleteCharacterRoutine(messageHandler));
+        }
+
+        private IEnumerator HandleRequestDeleteCharacterRoutine(LiteNetLibMessageHandler messageHandler)
         {
             var connectionId = messageHandler.connectionId;
             var message = messageHandler.ReadMessage<RequestDeleteCharacterMessage>();
@@ -97,7 +122,11 @@ namespace MultiplayerARPG.MMO
             if (!userPeers.TryGetValue(connectionId, out userPeerInfo))
                 error = ResponseDeleteCharacterMessage.Error.NotLoggedin;
             else
-                await Database.DeleteCharacter(userPeerInfo.userId, message.characterId);
+            {
+                var job = new DeleteCharactersJob(Database, userPeerInfo.userId, message.characterId);
+                job.Start();
+                yield return StartCoroutine(job.WaitFor());
+            }
             var responseMessage = new ResponseDeleteCharacterMessage();
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = error == ResponseDeleteCharacterMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
@@ -105,7 +134,12 @@ namespace MultiplayerARPG.MMO
             ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MMOMessageTypes.ResponseDeleteCharacter, responseMessage);
         }
 
-        protected async void HandleRequestSelectCharacter(LiteNetLibMessageHandler messageHandler)
+        protected void HandleRequestSelectCharacter(LiteNetLibMessageHandler messageHandler)
+        {
+            StartCoroutine(HandleRequestSelectCharacterRoutine(messageHandler));
+        }
+
+        private IEnumerator HandleRequestSelectCharacterRoutine(LiteNetLibMessageHandler messageHandler)
         {
             var connectionId = messageHandler.connectionId;
             var message = messageHandler.ReadMessage<RequestSelectCharacterMessage>();
@@ -116,7 +150,10 @@ namespace MultiplayerARPG.MMO
                 error = ResponseSelectCharacterMessage.Error.NotLoggedin;
             else
             {
-                var character = await Database.ReadCharacter(userPeerInfo.userId, message.characterId, false, false, false, false, false, false, false, false);
+                var job = new LoadCharacterJob(Database, userPeerInfo.userId, message.characterId, false, false, false, false, false, false, false, false);
+                job.Start();
+                yield return StartCoroutine(job.WaitFor());
+                var character = job.result;
                 if (character == null)
                     error = ResponseSelectCharacterMessage.Error.InvalidCharacterData;
                 else if (!mapServerPeersBySceneName.TryGetValue(character.CurrentMapName, out mapServerPeerInfo))

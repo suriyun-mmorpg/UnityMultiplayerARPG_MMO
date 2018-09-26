@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using MySql.Data.MySqlClient;
-using System.Threading.Tasks;
 
 namespace MultiplayerARPG.MMO
 {
@@ -30,11 +29,11 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public override async Task CreateBuilding(string mapName, BuildingSaveData saveData)
+        public override void CreateBuilding(string mapName, IBuildingSaveData saveData)
         {
             var connection = NewConnection();
-            await connection.OpenAsync();
-            await ExecuteNonQuery(connection, null, "INSERT INTO buildings (id, parentId, dataId, currentHp, mapName, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, creatorId, creatorName) VALUES (@id, @parentId, @dataId, @currentHp, @mapName, @positionX, @positionY, @positionZ, @rotationX, @rotationY, @rotationZ, @creatorId, @creatorName)",
+            connection.Open();
+            ExecuteNonQuery(connection, null, "INSERT INTO buildings (id, parentId, dataId, currentHp, mapName, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, creatorId, creatorName) VALUES (@id, @parentId, @dataId, @currentHp, @mapName, @positionX, @positionY, @positionZ, @rotationX, @rotationY, @rotationZ, @creatorId, @creatorName)",
                 new MySqlParameter("@id", saveData.Id),
                 new MySqlParameter("@parentId", saveData.ParentId),
                 new MySqlParameter("@dataId", saveData.DataId),
@@ -51,10 +50,10 @@ namespace MultiplayerARPG.MMO
             connection.Close();
         }
 
-        public override async Task<List<BuildingSaveData>> ReadBuildings(string mapName)
+        public override List<BuildingSaveData> ReadBuildings(string mapName)
         {
             var result = new List<BuildingSaveData>();
-            var reader = await ExecuteReader("SELECT * FROM buildings WHERE mapName=@mapName", new MySqlParameter("@mapName", mapName));
+            var reader = ExecuteReader("SELECT * FROM buildings WHERE mapName=@mapName", new MySqlParameter("@mapName", mapName));
             BuildingSaveData tempBuilding;
             while (ReadBuilding(reader, out tempBuilding, false))
             {
@@ -63,11 +62,11 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public override async Task UpdateBuilding(string mapName, IBuildingSaveData building)
+        public override void UpdateBuilding(string mapName, IBuildingSaveData building)
         {
             var connection = NewConnection();
-            await connection.OpenAsync();
-            await ExecuteNonQuery(connection, null, "UPDATE buildings SET " +
+            connection.Open();
+            ExecuteNonQuery(connection, null, "UPDATE buildings SET " +
                 "parentId=@parentId, " +
                 "dataId=@dataId, " +
                 "currentHp=@currentHp, " +
@@ -96,11 +95,11 @@ namespace MultiplayerARPG.MMO
             connection.Close();
         }
 
-        public override async Task DeleteBuilding(string mapName, string id)
+        public override void DeleteBuilding(string mapName, string id)
         {
             var connection = NewConnection();
-            await connection.OpenAsync();
-            await ExecuteNonQuery(connection, null, "DELETE FROM buildings WHERE id=@id AND mapName=@mapName", new MySqlParameter("@id", id), new MySqlParameter("@mapName", mapName));
+            connection.Open();
+            ExecuteNonQuery(connection, null, "DELETE FROM buildings WHERE id=@id AND mapName=@mapName", new MySqlParameter("@id", id), new MySqlParameter("@mapName", mapName));
             connection.Close();
         }
     }

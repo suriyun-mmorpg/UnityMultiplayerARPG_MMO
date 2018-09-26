@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Mono.Data.Sqlite;
-using System.Threading.Tasks;
 
 namespace MultiplayerARPG.MMO
 {
@@ -25,9 +24,9 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public async Task CreateCharacterSkill(int idx, string characterId, CharacterSkill characterSkill)
+        public void CreateCharacterSkill(int idx, string characterId, CharacterSkill characterSkill)
         {
-            await ExecuteNonQuery("INSERT INTO characterskill (id, idx, characterId, dataId, level, coolDownRemainsDuration) VALUES (@id, @idx, @characterId, @dataId, @level, @coolDownRemainsDuration)",
+            ExecuteNonQuery("INSERT INTO characterskill (id, idx, characterId, dataId, level, coolDownRemainsDuration) VALUES (@id, @idx, @characterId, @dataId, @level, @coolDownRemainsDuration)",
                 new SqliteParameter("@id", characterId + "_" + idx),
                 new SqliteParameter("@idx", idx),
                 new SqliteParameter("@characterId", characterId),
@@ -36,10 +35,10 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@coolDownRemainsDuration", characterSkill.coolDownRemainsDuration));
         }
         
-        public async Task<List<CharacterSkill>> ReadCharacterSkills(string characterId)
+        public List<CharacterSkill> ReadCharacterSkills(string characterId)
         {
             var result = new List<CharacterSkill>();
-            var reader = await ExecuteReader("SELECT * FROM characterskill WHERE characterId=@characterId ORDER BY idx ASC",
+            var reader = ExecuteReader("SELECT * FROM characterskill WHERE characterId=@characterId ORDER BY idx ASC",
                 new SqliteParameter("@characterId", characterId));
             CharacterSkill tempSkill;
             while (ReadCharacterSkill(reader, out tempSkill, false))
@@ -49,9 +48,9 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public async Task DeleteCharacterSkills(string characterId)
+        public void DeleteCharacterSkills(string characterId)
         {
-            await ExecuteNonQuery("DELETE FROM characterskill WHERE characterId=@characterId", new SqliteParameter("@characterId", characterId));
+            ExecuteNonQuery("DELETE FROM characterskill WHERE characterId=@characterId", new SqliteParameter("@characterId", characterId));
         }
     }
 }

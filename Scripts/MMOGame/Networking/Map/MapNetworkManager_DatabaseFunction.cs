@@ -2,101 +2,122 @@
 using LiteNetLibManager;
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace MultiplayerARPG.MMO
 {
     public partial class MapNetworkManager
     {
-        private readonly Dictionary<int, Task> loadingPartyIds = new Dictionary<int, Task>();
-        private readonly Dictionary<int, Task> loadingGuildIds = new Dictionary<int, Task>();
-        private readonly Dictionary<string, Task> savingCharacters = new Dictionary<string, Task>();
-
-        #region Load Functions
-        private async Task LoadPartyDataFromDatabase(int partyId)
+        protected readonly HashSet<int> loadingPartyIds = new HashSet<int>();
+        protected readonly HashSet<int> loadingGuildIds = new HashSet<int>();
+        protected readonly HashSet<string> savingCharacters = new HashSet<string>();
+        protected readonly HashSet<string> savingBuildings = new HashSet<string>();
+        
+        private IEnumerator LoadPartyRoutine(int id)
         {
-            // If there are other party loading which is not completed, it will not load again
-            if (partyId <= 0 || loadingPartyIds.ContainsKey(partyId))
-                return;
-            var task = Database.ReadParty(partyId);
-            loadingPartyIds.Add(partyId, task);
-            var party = await task;
-            if (party != null)
-                parties[partyId] = party;
-            else
-                parties.Remove(partyId);
-            loadingPartyIds.Remove(partyId);
-        }
-
-        private async Task LoadGuildDataFromDatabase(int guildId)
-        {
-            // If there are other party loading which is not completed, it will not load again
-            if (guildId <= 0 || loadingGuildIds.ContainsKey(guildId))
-                return;
-            var task = Database.ReadGuild(guildId);
-            loadingGuildIds.Add(guildId, task);
-            var guild = await task;
-            if (guild != null)
-                guilds[guildId] = guild;
-            else
-                guilds.Remove(guildId);
-            loadingGuildIds.Remove(guildId);
-        }
-        #endregion
-
-        #region Save functions
-        private async Task SaveCharacter(IPlayerCharacterData playerCharacterData)
-        {
-            if (playerCharacterData == null)
-                return;
-            Task task;
-            if (savingCharacters.TryGetValue(playerCharacterData.Id, out task) && !task.IsCompleted)
-                await task;
-            task = Database.UpdateCharacter(playerCharacterData);
-            savingCharacters[playerCharacterData.Id] = task;
-            Debug.Log("Character [" + playerCharacterData.Id + "] Saved");
-            await task;
-        }
-
-        private async Task SaveCharacters()
-        {
-            if (saveCharactersTask != null && !saveCharactersTask.IsCompleted)
-                await saveCharactersTask;
-            var tasks = new List<Task>();
-            foreach (var playerCharacter in playerCharacters.Values)
+            if (id > 0 && !loadingPartyIds.Contains(id))
             {
-                tasks.Add(SaveCharacter(playerCharacter));
+                loadingPartyIds.Add(id);
+                var job = new LoadPartyJob(Database, id);
+                job.Start();
+                yield return StartCoroutine(job.WaitFor());
+                if (job.result != null)
+                    parties[id] = job.result;
+                else
+                    parties.Remove(id);
+                loadingPartyIds.Remove(id);
             }
-            await Task.WhenAll(tasks);
-            Debug.Log("Characters Saved " + tasks.Count + " character(s)");
         }
 
-        private async Task SaveWorld()
+        private IEnumerator LoadGuildRoutine(int id)
         {
-            if (saveWorldTask != null && !saveWorldTask.IsCompleted)
-                await saveWorldTask;
-            var tasks = new List<Task>();
-            foreach (var buildingEntity in buildingEntities.Values)
+            if (id > 0 && !loadingGuildIds.Contains(id))
             {
-                tasks.Add(Database.UpdateBuilding(Assets.onlineScene.SceneName, buildingEntity));
+                loadingGuildIds.Add(id);
+                var job = new LoadGuildJob(Database, id);
+                job.Start();
+                yield return StartCoroutine(job.WaitFor());
+                if (job.result != null)
+                    guilds[id] = job.result;
+                else
+                    guilds.Remove(id);
+                loadingGuildIds.Remove(id);
             }
-            await Task.WhenAll(tasks);
-            Debug.Log("World Saved " + tasks.Count + " building(s)");
         }
 
-        public override async void CreateBuildingEntity(BuildingSaveData saveData, bool initialize)
+        private IEnumerator SaveCharacterRoutine(IPlayerCharacterData playerCharacterData)
+        {
+            if (playerCharacterData != null && !savingCharacters.Contains(playerCharacterData.Id))
+            {
+                savingCharacters.Add(playerCharacterData.Id);
+                var job = new UpdateCharacterJob(Database, playerCharacterData);
+                job.Start();
+                yield return StartCoroutine(job.WaitFor());
+                savingCharacters.Remove(playerCharacterData.Id);
+                Debug.Log("Character [" + playerCharacterData.Id + "] Saved");
+            }
+        }
+
+        private IEnumerator SaveCharactersRoutine()
+        {
+            if (savingCharacters.Count == 0)
+            {
+                var i = 0;
+                foreach (var playerCharacter in playerCharacters.Values)
+                {
+                    StartCoroutine(SaveCharacterRoutine(playerCharacter.CloneTo(new PlayerCharacterData())));
+                    ++i;
+                }
+                while (savingCharacters.Count > 0)
+                {
+                    yield return 0;
+                }
+                Debug.Log("Saved " + i + " character(s)");
+            }
+        }
+
+        private IEnumerator SaveBuildingRoutine(IBuildingSaveData saveData)
+        {
+            if (saveData != null && !savingBuildings.Contains(saveData.Id))
+            {
+                savingBuildings.Add(saveData.Id);
+                var job = new UpdateBuildingJob(Database, Assets.onlineScene.SceneName, saveData);
+                job.Start();
+                yield return StartCoroutine(job.WaitFor());
+                savingBuildings.Remove(saveData.Id);
+                Debug.Log("Building [" + saveData.Id + "] Saved");
+            }
+        }
+
+        private IEnumerator SaveBuildingsRoutine()
+        {
+            if (savingBuildings.Count == 0)
+            {
+                var i = 0;
+                foreach (var buildingEntity in buildingEntities.Values)
+                {
+                    StartCoroutine(SaveBuildingRoutine(buildingEntity));
+                    ++i;
+                }
+                while (savingBuildings.Count > 0)
+                {
+                    yield return 0;
+                }
+                Debug.Log("Saved " + i + " building(s)");
+            }
+        }
+
+        public override void CreateBuildingEntity(BuildingSaveData saveData, bool initialize)
         {
             base.CreateBuildingEntity(saveData, initialize);
             if (!initialize)
-                await Database.CreateBuilding(Assets.onlineScene.SceneName, saveData);
+                new CreateBuildingJob(Database, Assets.onlineScene.SceneName, saveData).Start();
         }
 
-        public override async void DestroyBuildingEntity(string id)
+        public override void DestroyBuildingEntity(string id)
         {
             base.DestroyBuildingEntity(id);
-            await Database.DeleteBuilding(Assets.onlineScene.SceneName, id);
+            new DeleteBuildingJob(Database, Assets.onlineScene.SceneName, id).Start();
         }
-        #endregion
     }
 }

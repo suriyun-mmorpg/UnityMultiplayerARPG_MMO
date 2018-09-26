@@ -2,15 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Mono.Data.Sqlite;
-using System.Threading.Tasks;
 
 namespace MultiplayerARPG.MMO
 {
     public partial class SQLiteDatabase
     {
-        private async Task CreateCharacterItem(int idx, string characterId, InventoryType inventoryType, CharacterItem characterItem)
+        private void CreateCharacterItem(int idx, string characterId, InventoryType inventoryType, CharacterItem characterItem)
         {
-            await ExecuteNonQuery("INSERT INTO characteritem (id, idx, inventoryType, characterId, dataId, level, amount, durability) VALUES (@id, @idx, @inventoryType, @characterId, @dataId, @level, @amount, @durability)",
+            ExecuteNonQuery("INSERT INTO characteritem (id, idx, inventoryType, characterId, dataId, level, amount, durability) VALUES (@id, @idx, @inventoryType, @characterId, @dataId, @level, @amount, @durability)",
                 new SqliteParameter("@id", characterId + "_" + (byte)inventoryType + "_" + idx),
                 new SqliteParameter("@idx", idx),
                 new SqliteParameter("@inventoryType", (byte)inventoryType),
@@ -39,10 +38,10 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        private async Task<List<CharacterItem>> ReadCharacterItems(string characterId, InventoryType inventoryType)
+        private List<CharacterItem> ReadCharacterItems(string characterId, InventoryType inventoryType)
         {
             var result = new List<CharacterItem>();
-            var reader = await ExecuteReader("SELECT * FROM characteritem WHERE characterId=@characterId AND inventoryType=@inventoryType ORDER BY idx ASC",
+            var reader = ExecuteReader("SELECT * FROM characteritem WHERE characterId=@characterId AND inventoryType=@inventoryType ORDER BY idx ASC",
                 new SqliteParameter("@characterId", characterId),
                 new SqliteParameter("@inventoryType", inventoryType));
             CharacterItem tempInventory;
@@ -53,18 +52,18 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public async Task<EquipWeapons> ReadCharacterEquipWeapons(string characterId)
+        public EquipWeapons ReadCharacterEquipWeapons(string characterId)
         {
             var result = new EquipWeapons();
             // Right hand weapon
-            var reader = await ExecuteReader("SELECT * FROM characteritem WHERE characterId=@characterId AND inventoryType=@inventoryType LIMIT 1",
+            var reader = ExecuteReader("SELECT * FROM characteritem WHERE characterId=@characterId AND inventoryType=@inventoryType LIMIT 1",
                 new SqliteParameter("@characterId", characterId),
                 new SqliteParameter("@inventoryType", InventoryType.EquipWeaponRight));
             CharacterItem rightWeapon;
             if (ReadCharacterItem(reader, out rightWeapon))
                 result.rightHand = rightWeapon;
             // Left hand weapon
-            reader = await ExecuteReader("SELECT * FROM characteritem WHERE characterId=@characterId AND inventoryType=@inventoryType LIMIT 1",
+            reader = ExecuteReader("SELECT * FROM characteritem WHERE characterId=@characterId AND inventoryType=@inventoryType LIMIT 1",
                 new SqliteParameter("@characterId", characterId),
                 new SqliteParameter("@inventoryType", InventoryType.EquipWeaponLeft));
             CharacterItem leftWeapon;
@@ -73,36 +72,35 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public async Task CreateCharacterEquipWeapons(string characterId, EquipWeapons equipWeapons)
+        public void CreateCharacterEquipWeapons(string characterId, EquipWeapons equipWeapons)
         {
-            await Task.WhenAll(
-                CreateCharacterItem(0, characterId, InventoryType.EquipWeaponRight, equipWeapons.rightHand),
-                CreateCharacterItem(0, characterId, InventoryType.EquipWeaponLeft, equipWeapons.leftHand));
+            CreateCharacterItem(0, characterId, InventoryType.EquipWeaponRight, equipWeapons.rightHand);
+            CreateCharacterItem(0, characterId, InventoryType.EquipWeaponLeft, equipWeapons.leftHand);
         }
 
-        public async Task CreateCharacterEquipItem(int idx, string characterId, CharacterItem characterItem)
+        public void CreateCharacterEquipItem(int idx, string characterId, CharacterItem characterItem)
         {
-            await CreateCharacterItem(idx, characterId, InventoryType.EquipItems, characterItem);
+            CreateCharacterItem(idx, characterId, InventoryType.EquipItems, characterItem);
         }
 
-        public Task<List<CharacterItem>> ReadCharacterEquipItems(string characterId)
+        public List<CharacterItem> ReadCharacterEquipItems(string characterId)
         {
             return ReadCharacterItems(characterId, InventoryType.EquipItems);
         }
 
-        public Task CreateCharacterNonEquipItem(int idx, string characterId, CharacterItem characterItem)
+        public void CreateCharacterNonEquipItem(int idx, string characterId, CharacterItem characterItem)
         {
-            return CreateCharacterItem(idx, characterId, InventoryType.NonEquipItems, characterItem);
+            CreateCharacterItem(idx, characterId, InventoryType.NonEquipItems, characterItem);
         }
 
-        public Task<List<CharacterItem>> ReadCharacterNonEquipItems(string characterId)
+        public List<CharacterItem> ReadCharacterNonEquipItems(string characterId)
         {
             return ReadCharacterItems(characterId, InventoryType.NonEquipItems);
         }
 
-        public async Task DeleteCharacterItems(string characterId)
+        public void DeleteCharacterItems(string characterId)
         {
-            await ExecuteNonQuery("DELETE FROM characteritem WHERE characterId=@characterId", new SqliteParameter("@characterId", characterId));
+            ExecuteNonQuery("DELETE FROM characteritem WHERE characterId=@characterId", new SqliteParameter("@characterId", characterId));
         }
     }
 }

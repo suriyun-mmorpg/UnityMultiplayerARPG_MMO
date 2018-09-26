@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Mono.Data.Sqlite;
-using System.Threading.Tasks;
 
 namespace MultiplayerARPG.MMO
 {
@@ -28,9 +27,9 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public async Task CreateCharacterBuff(string characterId, CharacterBuff characterBuff)
+        public void CreateCharacterBuff(string characterId, CharacterBuff characterBuff)
         {
-            await ExecuteNonQuery("INSERT INTO characterbuff (id, characterId, type, dataId, level, buffRemainsDuration) VALUES (@id, @characterId, @type, @dataId, @level, @buffRemainsDuration)",
+            ExecuteNonQuery("INSERT INTO characterbuff (id, characterId, type, dataId, level, buffRemainsDuration) VALUES (@id, @characterId, @type, @dataId, @level, @buffRemainsDuration)",
                 new SqliteParameter("@id", characterBuff.id),
                 new SqliteParameter("@characterId", characterId),
                 new SqliteParameter("@type", (byte)characterBuff.type),
@@ -39,10 +38,10 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@buffRemainsDuration", characterBuff.buffRemainsDuration));
         }
 
-        public async Task<List<CharacterBuff>> ReadCharacterBuffs(string characterId)
+        public List<CharacterBuff> ReadCharacterBuffs(string characterId)
         {
             var result = new List<CharacterBuff>();
-            var reader = await ExecuteReader("SELECT * FROM characterbuff WHERE characterId=@characterId ORDER BY buffRemainsDuration ASC",
+            var reader = ExecuteReader("SELECT * FROM characterbuff WHERE characterId=@characterId ORDER BY buffRemainsDuration ASC",
                 new SqliteParameter("@characterId", characterId));
             CharacterBuff tempBuff;
             while (ReadCharacterBuff(reader, out tempBuff, false))
@@ -52,9 +51,9 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public async Task DeleteCharacterBuffs(string characterId)
+        public void DeleteCharacterBuffs(string characterId)
         {
-            await ExecuteNonQuery("DELETE FROM characterbuff WHERE characterId=@characterId", new SqliteParameter("@characterId", characterId));
+            ExecuteNonQuery("DELETE FROM characterbuff WHERE characterId=@characterId", new SqliteParameter("@characterId", characterId));
         }
     }
 }

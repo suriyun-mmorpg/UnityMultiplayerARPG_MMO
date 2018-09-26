@@ -2,63 +2,62 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Mono.Data.Sqlite;
-using System.Threading.Tasks;
 
 namespace MultiplayerARPG.MMO
 {
     public partial class SQLiteDatabase
     {
-        private async Task FillCharacterRelatesData(IPlayerCharacterData characterData)
+        private void FillCharacterRelatesData(IPlayerCharacterData characterData)
         {
             // Delete all character then add all of them
             var characterId = characterData.Id;
-            await DeleteCharacterAttributes(characterId);
-            await DeleteCharacterBuffs(characterId);
-            await DeleteCharacterHotkeys(characterId);
-            await DeleteCharacterItems(characterId);
-            await DeleteCharacterQuests(characterId);
-            await DeleteCharacterSkills(characterId);
+            DeleteCharacterAttributes(characterId);
+            DeleteCharacterBuffs(characterId);
+            DeleteCharacterHotkeys(characterId);
+            DeleteCharacterItems(characterId);
+            DeleteCharacterQuests(characterId);
+            DeleteCharacterSkills(characterId);
             
-            await CreateCharacterEquipWeapons(characterId, characterData.EquipWeapons);
+            CreateCharacterEquipWeapons(characterId, characterData.EquipWeapons);
             var i = 0;
             foreach (var equipItem in characterData.EquipItems)
             {
-                await CreateCharacterEquipItem(i++, characterId, equipItem);
+                CreateCharacterEquipItem(i++, characterId, equipItem);
             }
             i = 0;
             foreach (var nonEquipItem in characterData.NonEquipItems)
             {
-                await CreateCharacterNonEquipItem(i++, characterId, nonEquipItem);
+                CreateCharacterNonEquipItem(i++, characterId, nonEquipItem);
             }
             i = 0;
             foreach (var attribute in characterData.Attributes)
             {
-                await CreateCharacterAttribute(i++, characterId, attribute);
+                CreateCharacterAttribute(i++, characterId, attribute);
             }
             i = 0;
             foreach (var skill in characterData.Skills)
             {
-                await CreateCharacterSkill(i++, characterId, skill);
+                CreateCharacterSkill(i++, characterId, skill);
             }
             i = 0;
             foreach (var quest in characterData.Quests)
             {
-                await CreateCharacterQuest(i++, characterId, quest);
+                CreateCharacterQuest(i++, characterId, quest);
             }
             foreach (var buff in characterData.Buffs)
             {
-                await CreateCharacterBuff(characterId, buff);
+                CreateCharacterBuff(characterId, buff);
             }
             foreach (var hotkey in characterData.Hotkeys)
             {
-                await CreateCharacterHotkey(characterId, hotkey);
+                CreateCharacterHotkey(characterId, hotkey);
             }
         }
 
-        public override async Task CreateCharacter(string userId, PlayerCharacterData characterData)
+        public override void CreateCharacter(string userId, IPlayerCharacterData characterData)
         {
-            await ExecuteNonQuery("BEGIN");
-            await ExecuteNonQuery("INSERT INTO characters " +
+            ExecuteNonQuery("BEGIN");
+            ExecuteNonQuery("INSERT INTO characters " +
                 "(id, userId, dataId, characterName, level, exp, currentHp, currentMp, currentStamina, currentFood, currentWater, statPoint, skillPoint, gold, currentMapName, currentPositionX, currentPositionY, currentPositionZ, respawnMapName, respawnPositionX, respawnPositionY, respawnPositionZ) VALUES " +
                 "(@id, @userId, @dataId, @characterName, @level, @exp, @currentHp, @currentMp, @currentStamina, @currentFood, @currentWater, @statPoint, @skillPoint, @gold, @currentMapName, @currentPositionX, @currentPositionY, @currentPositionZ, @respawnMapName, @respawnPositionX, @respawnPositionY, @respawnPositionZ)",
                 new SqliteParameter("@id", characterData.Id),
@@ -83,8 +82,8 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@respawnPositionX", characterData.RespawnPosition.x),
                 new SqliteParameter("@respawnPositionY", characterData.RespawnPosition.y),
                 new SqliteParameter("@respawnPositionZ", characterData.RespawnPosition.z));
-            await FillCharacterRelatesData(characterData);
-            await ExecuteNonQuery("END");
+            FillCharacterRelatesData(characterData);
+            ExecuteNonQuery("END");
             this.InvokeInstanceDevExtMethods("CreateCharacter", userId, characterData);
         }
 
@@ -122,7 +121,7 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public override async Task<PlayerCharacterData> ReadCharacter(
+        public override PlayerCharacterData ReadCharacter(
             string userId,
             string id,
             bool withEquipWeapons = true,
@@ -134,7 +133,7 @@ namespace MultiplayerARPG.MMO
             bool withHotkeys = true,
             bool withQuests = true)
         {
-            var reader = await ExecuteReader("SELECT * FROM characters WHERE id=@id AND userId=@userId LIMIT 1",
+            var reader = ExecuteReader("SELECT * FROM characters WHERE id=@id AND userId=@userId LIMIT 1",
                 new SqliteParameter("@id", id),
                 new SqliteParameter("@userId", userId));
             var result = new PlayerCharacterData();
@@ -152,42 +151,42 @@ namespace MultiplayerARPG.MMO
                     withHotkeys,
                     withQuests);
                 if (withEquipWeapons)
-                    result.EquipWeapons = await ReadCharacterEquipWeapons(id);
+                    result.EquipWeapons = ReadCharacterEquipWeapons(id);
                 if (withAttributes)
-                    result.Attributes = await ReadCharacterAttributes(id);
+                    result.Attributes = ReadCharacterAttributes(id);
                 if (withSkills)
-                    result.Skills = await ReadCharacterSkills(id);
+                    result.Skills = ReadCharacterSkills(id);
                 if (withBuffs)
-                    result.Buffs = await ReadCharacterBuffs(id);
+                    result.Buffs = ReadCharacterBuffs(id);
                 if (withEquipItems)
-                    result.EquipItems = await ReadCharacterEquipItems(id);
+                    result.EquipItems = ReadCharacterEquipItems(id);
                 if (withNonEquipItems)
-                    result.NonEquipItems = await ReadCharacterNonEquipItems(id);
+                    result.NonEquipItems = ReadCharacterNonEquipItems(id);
                 if (withHotkeys)
-                    result.Hotkeys = await ReadCharacterHotkeys(id);
+                    result.Hotkeys = ReadCharacterHotkeys(id);
                 if (withQuests)
-                    result.Quests = await ReadCharacterQuests(id);
+                    result.Quests = ReadCharacterQuests(id);
                 return result;
             }
             return null;
         }
 
-        public override async Task<List<PlayerCharacterData>> ReadCharacters(string userId)
+        public override List<PlayerCharacterData> ReadCharacters(string userId)
         {
             var result = new List<PlayerCharacterData>();
-            var reader = await ExecuteReader("SELECT id FROM characters WHERE userId=@userId ORDER BY updateAt DESC", new SqliteParameter("@userId", userId));
+            var reader = ExecuteReader("SELECT id FROM characters WHERE userId=@userId ORDER BY updateAt DESC", new SqliteParameter("@userId", userId));
             while (reader.Read())
             {
                 var characterId = reader.GetString("id");
-                result.Add(await ReadCharacter(userId, characterId, true, true, true, false, true, false, false, false));
+                result.Add(ReadCharacter(userId, characterId, true, true, true, false, true, false, false, false));
             }
             return result;
         }
 
-        public override async Task UpdateCharacter(IPlayerCharacterData character)
+        public override void UpdateCharacter(IPlayerCharacterData character)
         {
-            await ExecuteNonQuery("BEGIN");
-            await ExecuteNonQuery("UPDATE characters SET " +
+            ExecuteNonQuery("BEGIN");
+            ExecuteNonQuery("UPDATE characters SET " +
                 "dataId=@dataId, " +
                 "characterName=@characterName, " +
                 "level=@level, " +
@@ -230,36 +229,35 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@respawnPositionY", character.RespawnPosition.y),
                 new SqliteParameter("@respawnPositionZ", character.RespawnPosition.z),
                 new SqliteParameter("@id", character.Id));
-            await FillCharacterRelatesData(character);
-            await ExecuteNonQuery("END");
+            FillCharacterRelatesData(character);
+            ExecuteNonQuery("END");
             this.InvokeInstanceDevExtMethods("UpdateCharacter", character);
         }
 
-        public override async Task DeleteCharacter(string userId, string id)
+        public override void DeleteCharacter(string userId, string id)
         {
-            var result = await ExecuteScalar("SELECT COUNT(*) FROM characters WHERE id=@id AND userId=@userId",
+            var result = ExecuteScalar("SELECT COUNT(*) FROM characters WHERE id=@id AND userId=@userId",
                 new SqliteParameter("@id", id),
                 new SqliteParameter("@userId", userId));
             var count = result != null ? (long)result : 0;
             if (count > 0)
             {
-                await ExecuteNonQuery("BEGIN");
-                await Task.WhenAll(
-                    ExecuteNonQuery("DELETE FROM characters WHERE id=@characterId", new SqliteParameter("@characterId", id)),
-                    DeleteCharacterAttributes(id),
-                    DeleteCharacterBuffs(id),
-                    DeleteCharacterHotkeys(id),
-                    DeleteCharacterItems(id),
-                    DeleteCharacterQuests(id),
-                    DeleteCharacterSkills(id));
-                await ExecuteNonQuery("END");
+                ExecuteNonQuery("BEGIN");
+                ExecuteNonQuery("DELETE FROM characters WHERE id=@characterId", new SqliteParameter("@characterId", id));
+                DeleteCharacterAttributes(id);
+                DeleteCharacterBuffs(id);
+                DeleteCharacterHotkeys(id);
+                DeleteCharacterItems(id);
+                DeleteCharacterQuests(id);
+                DeleteCharacterSkills(id);
+                ExecuteNonQuery("END");
                 this.InvokeInstanceDevExtMethods("DeleteCharacter", userId, id);
             }
         }
 
-        public override async Task<long> FindCharacterName(string characterName)
+        public override long FindCharacterName(string characterName)
         {
-            var result = await ExecuteScalar("SELECT COUNT(*) FROM characters WHERE characterName LIKE @characterName",
+            var result = ExecuteScalar("SELECT COUNT(*) FROM characters WHERE characterName LIKE @characterName",
                 new SqliteParameter("@characterName", characterName));
             return result != null ? (long)result : 0;
         }

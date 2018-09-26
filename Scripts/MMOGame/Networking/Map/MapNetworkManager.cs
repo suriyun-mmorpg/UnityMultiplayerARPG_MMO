@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -64,9 +65,7 @@ namespace MultiplayerARPG.MMO
         public string AppExtra { get { return !string.IsNullOrEmpty(Assets.onlineScene.SceneName) ? Assets.onlineScene.SceneName : SceneManager.GetActiveScene().name; } }
         public CentralServerPeerType PeerType { get { return CentralServerPeerType.MapServer; } }
         private float lastSaveCharacterTime;
-        private float lastSaveWorldTime;
-        private Task saveCharactersTask;
-        private Task saveWorldTask;
+        private float lastSaveBuildingTime;
         // Listing
         private readonly Dictionary<string, CentralServerPeerInfo> mapServerConnectionIdsBySceneName = new Dictionary<string, CentralServerPeerInfo>();
         private readonly Dictionary<string, UserCharacterData> usersById = new Dictionary<string, UserCharacterData>();
@@ -87,19 +86,13 @@ namespace MultiplayerARPG.MMO
                 tempUnscaledTime = Time.unscaledTime;
                 if (tempUnscaledTime - lastSaveCharacterTime > autoSaveDuration)
                 {
-                    if (saveCharactersTask == null || saveCharactersTask.IsCompleted)
-                    {
-                        saveCharactersTask = SaveCharacters();
-                        lastSaveCharacterTime = tempUnscaledTime;
-                    }
+                    StartCoroutine(SaveCharactersRoutine());
+                    lastSaveCharacterTime = tempUnscaledTime;
                 }
-                if (tempUnscaledTime - lastSaveWorldTime > autoSaveDuration)
+                if (tempUnscaledTime - lastSaveBuildingTime > autoSaveDuration)
                 {
-                    if (saveWorldTask == null || saveWorldTask.IsCompleted)
-                    {
-                        saveWorldTask = SaveWorld();
-                        lastSaveWorldTime = tempUnscaledTime;
-                    }
+                    StartCoroutine(SaveBuildingsRoutine());
+                    lastSaveBuildingTime = tempUnscaledTime;
                 }
             }
         }
@@ -160,17 +153,23 @@ namespace MultiplayerARPG.MMO
             }
         }
 
-        protected override async void OnDestroy()
+        protected override void OnDestroy()
         {
-            // Wait old save character task to be completed
-            if (saveCharactersTask != null && !saveCharactersTask.IsCompleted)
-                await Task.WhenAll(saveCharactersTask, SaveCharacters());
-            else
-                await SaveCharacters();
-            if (saveWorldTask != null && !saveWorldTask.IsCompleted)
-                await Task.WhenAll(saveWorldTask, SaveWorld());
-            else
-                await SaveWorld();
+            StartCoroutine(OnDestroyRoutine());
+        }
+
+        private IEnumerator OnDestroyRoutine()
+        {
+            while (savingCharacters.Count > 0)
+            {
+                yield return 0;
+            }
+            StartCoroutine(SaveCharactersRoutine());
+            while (savingBuildings.Count > 0)
+            {
+                yield return 0;
+            }
+            StartCoroutine(SaveBuildingsRoutine());
             base.OnDestroy();
         }
 
@@ -191,12 +190,24 @@ namespace MultiplayerARPG.MMO
             base.UnregisterPlayerCharacter(connectionId);
         }
 
-        public override async void OnPeerDisconnected(long connectionId, DisconnectInfo disconnectInfo)
+        public override void OnPeerDisconnected(long connectionId, DisconnectInfo disconnectInfo)
+        {
+            StartCoroutine(OnPeerDisconnectedRoutine(connectionId, disconnectInfo));
+        }
+
+        private IEnumerator OnPeerDisconnectedRoutine(long connectionId, DisconnectInfo disconnectInfo)
         {
             // Save player character data
             BasePlayerCharacterEntity playerCharacterEntity;
             if (playerCharacters.TryGetValue(connectionId, out playerCharacterEntity))
-                await SaveCharacter(playerCharacterEntity);
+            {
+                var saveCharacterData = playerCharacterEntity.CloneTo(new PlayerCharacterData());
+                while (savingCharacters.Contains(saveCharacterData.Id))
+                {
+                    yield return 0;
+                }
+                yield return StartCoroutine(SaveCharacterRoutine(saveCharacterData));
+            }
             UnregisterPlayerCharacter(connectionId);
             base.OnPeerDisconnected(connectionId, disconnectInfo);
         }
@@ -220,21 +231,29 @@ namespace MultiplayerARPG.MMO
         {
             base.OnClientConnected();
             if (onClientConnected != null)
-                onClientConnected();
+                onClientConnected.Invoke();
         }
 
         public override void OnClientDisconnected(DisconnectInfo disconnectInfo)
         {
             base.OnClientDisconnected(disconnectInfo);
             if (onClientDisconnected != null)
-                onClientDisconnected(disconnectInfo);
+                onClientDisconnected.Invoke(disconnectInfo);
         }
 
-        public override async void OnServerOnlineSceneLoaded()
+        public override void OnServerOnlineSceneLoaded()
         {
             base.OnServerOnlineSceneLoaded();
+            StartCoroutine(OnServerOnlineSceneLoadedRoutine());
+        }
+
+        private IEnumerator OnServerOnlineSceneLoadedRoutine()
+        {
             // Spawn buildings
-            var buildings = await Database.ReadBuildings(Assets.onlineScene.SceneName);
+            var job = new LoadBuildingsJob(Database, Assets.onlineScene.SceneName);
+            job.Start();
+            yield return StartCoroutine(job.WaitFor());
+            var buildings = job.result;
             foreach (var building in buildings)
             {
                 CreateBuildingEntity(building, true);
@@ -255,72 +274,111 @@ namespace MultiplayerARPG.MMO
             writer.Put(MMOClientInstance.SelectCharacterId);
         }
 
-        public override async void DeserializeClientReadyExtra(LiteNetLibIdentity playerIdentity, long connectionId, NetDataReader reader)
+        public override void SetPlayerReady(long connectionId, NetDataReader reader)
         {
+            if (!IsServer)
+                return;
+
+            var player = Players[connectionId];
+            if (player.IsReady)
+                return;
+
+            player.IsReady = true;
+
             var userId = reader.GetString();
             var accessToken = reader.GetString();
             var selectCharacterId = reader.GetString();
-            // Validate access token
+
             if (playerCharacters.ContainsKey(connectionId))
             {
                 Debug.LogError("[Map Server] User trying to hack: " + userId);
                 transport.ServerDisconnect(connectionId);
+                return;
             }
-            else if (!await Database.ValidateAccessToken(userId, accessToken))
+
+            StartCoroutine(SetPlayerReadyRoutine(connectionId, userId, accessToken, selectCharacterId));
+        }
+
+        private IEnumerator SetPlayerReadyRoutine(long connectionId, string userId, string accessToken, string selectCharacterId)
+        {
+            // Validate access token
+            var validateAccessTokenJob = new ValidateAccessTokenJob(Database, userId, accessToken);
+            validateAccessTokenJob.Start();
+            yield return StartCoroutine(validateAccessTokenJob.WaitFor());
+            if (!validateAccessTokenJob.result)
             {
                 Debug.LogError("[Map Server] Invalid access token for user: " + userId);
                 transport.ServerDisconnect(connectionId);
             }
             else
             {
-                var playerCharacterData = await Database.ReadCharacter(userId, selectCharacterId);
+                var loadCharacterJob = new LoadCharacterJob(Database, userId, selectCharacterId);
+                loadCharacterJob.Start();
+                yield return StartCoroutine(loadCharacterJob.WaitFor());
+                var playerCharacterData = loadCharacterJob.result;
                 // If data is empty / cannot find character, disconnect user
                 if (playerCharacterData == null)
                 {
                     Debug.LogError("[Map Server] Cannot find select character: " + selectCharacterId + " for user: " + userId);
                     transport.ServerDisconnect(connectionId);
-                    return;
                 }
-                // Load party data, if this map-server does not have party data
-                if (playerCharacterData.PartyId > 0 && !parties.ContainsKey(playerCharacterData.PartyId))
-                    await LoadPartyDataFromDatabase(playerCharacterData.PartyId);
-                // Load guild data, if this map-server does not have guild data
-                if (playerCharacterData.PartyId > 0 && !guilds.ContainsKey(playerCharacterData.GuildId))
-                    await LoadGuildDataFromDatabase(playerCharacterData.GuildId);
-                // If it is not allow this character data, disconnect user
-                var dataId = playerCharacterData.DataId;
-                PlayerCharacter playerCharacter;
-                if (!GameInstance.PlayerCharacters.TryGetValue(dataId, out playerCharacter) || playerCharacter.entityPrefab == null)
-                {
-                    Debug.LogError("[Map Server] Cannot find player character with data Id: " + dataId);
-                    return;
-                }
-                // Spawn character entity and set its data
-                var playerCharacterPrefab = playerCharacter.entityPrefab;
-                var identity = Assets.NetworkSpawn(playerCharacterPrefab.Identity.HashAssetId, playerCharacterData.CurrentPosition, Quaternion.identity, 0, connectionId);
-                var playerCharacterEntity = identity.GetComponent<BasePlayerCharacterEntity>();
-                playerCharacterData.CloneTo(playerCharacterEntity);
-                // Notify clients that this character is spawn or dead
-                if (!playerCharacterEntity.IsDead())
-                    playerCharacterEntity.RequestOnRespawn();
                 else
-                    playerCharacterEntity.RequestOnDead();
-                RegisterPlayerCharacter(connectionId, playerCharacterEntity);
-                var userData = new UserCharacterData();
-                userData.userId = userId;
-                userData.id = playerCharacterEntity.Id;
-                userData.characterName = playerCharacterEntity.CharacterName;
-                userData.dataId = playerCharacterEntity.DataId;
-                userData.level = playerCharacterEntity.Level;
-                userData.currentHp = playerCharacterEntity.CurrentHp;
-                userData.maxHp = playerCharacterEntity.CacheMaxHp;
-                userData.currentMp = playerCharacterEntity.CurrentMp;
-                userData.maxMp = playerCharacterEntity.CacheMaxMp;
-                usersById[userData.id] = userData;
-                // Add map user to central server and chat server
-                UpdateMapUser(CentralAppServerRegister, UpdateMapUserMessage.UpdateType.Add, userData);
-                if (ChatNetworkManager.IsClientConnected)
-                    UpdateMapUser(ChatNetworkManager.Client, UpdateMapUserMessage.UpdateType.Add, userData);
+                {
+                    // Load party data, if this map-server does not have party data
+                    if (playerCharacterData.PartyId > 0 && !parties.ContainsKey(playerCharacterData.PartyId))
+                        yield return StartCoroutine(LoadPartyRoutine(playerCharacterData.PartyId));
+
+                    // Load guild data, if this map-server does not have guild data
+                    if (playerCharacterData.PartyId > 0 && !guilds.ContainsKey(playerCharacterData.GuildId))
+                        yield return StartCoroutine(LoadGuildRoutine(playerCharacterData.GuildId));
+
+                    // If it is not allow this character data, disconnect user
+                    var dataId = playerCharacterData.DataId;
+                    PlayerCharacter playerCharacter;
+                    if (!GameInstance.PlayerCharacters.TryGetValue(dataId, out playerCharacter) || playerCharacter.entityPrefab == null)
+                    {
+                        Debug.LogError("[Map Server] Cannot find player character with data Id: " + dataId);
+                    }
+                    else
+                    {
+                        // Spawn character entity and set its data
+                        var playerCharacterPrefab = playerCharacter.entityPrefab;
+                        var identity = Assets.NetworkSpawn(playerCharacterPrefab.Identity.HashAssetId, playerCharacterData.CurrentPosition, Quaternion.identity, 0, connectionId);
+                        var playerCharacterEntity = identity.GetComponent<BasePlayerCharacterEntity>();
+                        playerCharacterData.CloneTo(playerCharacterEntity);
+                        // Notify clients that this character is spawn or dead
+                        if (!playerCharacterEntity.IsDead())
+                            playerCharacterEntity.RequestOnRespawn();
+                        else
+                            playerCharacterEntity.RequestOnDead();
+                        RegisterPlayerCharacter(connectionId, playerCharacterEntity);
+                        var userData = new UserCharacterData();
+                        userData.userId = userId;
+                        userData.id = playerCharacterEntity.Id;
+                        userData.characterName = playerCharacterEntity.CharacterName;
+                        userData.dataId = playerCharacterEntity.DataId;
+                        userData.level = playerCharacterEntity.Level;
+                        userData.currentHp = playerCharacterEntity.CurrentHp;
+                        userData.maxHp = playerCharacterEntity.CacheMaxHp;
+                        userData.currentMp = playerCharacterEntity.CurrentMp;
+                        userData.maxMp = playerCharacterEntity.CacheMaxMp;
+                        usersById[userData.id] = userData;
+                        // Add map user to central server and chat server
+                        UpdateMapUser(CentralAppServerRegister, UpdateMapUserMessage.UpdateType.Add, userData);
+                        if (ChatNetworkManager.IsClientConnected)
+                            UpdateMapUser(ChatNetworkManager.Client, UpdateMapUserMessage.UpdateType.Add, userData);
+
+                        var player = Players[connectionId];
+                        foreach (var spawnedObject in Assets.SpawnedObjects)
+                        {
+                            if (spawnedObject.Value.ConnectId == player.ConnectionId)
+                                continue;
+
+                            if (spawnedObject.Value.ShouldAddSubscriber(player))
+                                spawnedObject.Value.AddSubscriber(player);
+                        }
+                    }
+                }
             }
         }
         #endregion
@@ -345,7 +403,12 @@ namespace MultiplayerARPG.MMO
             }
         }
 
-        protected override async void HandleRequestCashShopInfo(LiteNetLibMessageHandler messageHandler)
+        protected override void HandleRequestCashShopInfo(LiteNetLibMessageHandler messageHandler)
+        {
+            StartCoroutine(HandleRequestCashShopInfoRoutine(messageHandler));
+        }
+
+        private IEnumerator HandleRequestCashShopInfoRoutine(LiteNetLibMessageHandler messageHandler)
         {
             var connectionId = messageHandler.connectionId;
             var message = messageHandler.ReadMessage<BaseAckMessage>();
@@ -354,18 +417,21 @@ namespace MultiplayerARPG.MMO
             var cashShopItemIds = new List<int>();
             BasePlayerCharacterEntity playerCharacter;
             UserCharacterData userData;
-            if (!playerCharacters.TryGetValue(connectionId, out playerCharacter) || 
+            if (!playerCharacters.TryGetValue(connectionId, out playerCharacter) ||
                 !usersById.TryGetValue(playerCharacter.Id, out userData))
                 error = ResponseCashShopInfoMessage.Error.UserNotFound;
             else
             {
-                cash = await Database.GetCash(userData.userId);
+                var job = new GetCashJob(Database, userData.userId);
+                job.Start();
+                yield return StartCoroutine(job.WaitFor());
+                cash = job.result;
                 foreach (var cashShopItemId in GameInstance.CashShopItems.Keys)
                 {
                     cashShopItemIds.Add(cashShopItemId);
                 }
             }
-            
+
             var responseMessage = new ResponseCashShopInfoMessage();
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = error == ResponseCashShopInfoMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
@@ -375,7 +441,12 @@ namespace MultiplayerARPG.MMO
             ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MsgTypes.CashShopInfo, responseMessage);
         }
 
-        protected override async void HandleRequestCashShopBuy(LiteNetLibMessageHandler messageHandler)
+        protected override void HandleRequestCashShopBuy(LiteNetLibMessageHandler messageHandler)
+        {
+            StartCoroutine(HandleRequestCashShopBuyRoutine(messageHandler));
+        }
+
+        private IEnumerator HandleRequestCashShopBuyRoutine(LiteNetLibMessageHandler messageHandler)
         {
             var connectionId = messageHandler.connectionId;
             var message = messageHandler.ReadMessage<RequestCashShopBuyMessage>();
@@ -390,7 +461,10 @@ namespace MultiplayerARPG.MMO
             else
             {
                 // Request cash, reduce, send item info messages to map server
-                cash = await Database.GetCash(userData.userId);
+                var job = new GetCashJob(Database, userData.userId);
+                job.Start();
+                yield return StartCoroutine(job.WaitFor());
+                cash = job.result;
                 CashShopItem cashShopItem;
                 if (!GameInstance.CashShopItems.TryGetValue(dataId, out cashShopItem))
                     error = ResponseCashShopBuyMessage.Error.ItemNotFound;
@@ -398,7 +472,10 @@ namespace MultiplayerARPG.MMO
                     error = ResponseCashShopBuyMessage.Error.NotEnoughCash;
                 else
                 {
-                    cash = await Database.DecreaseCash(userData.userId, cashShopItem.sellPrice);
+                    var decreaseCashJob = new DecreaseCashJob(Database, userData.userId, cashShopItem.sellPrice);
+                    decreaseCashJob.Start();
+                    yield return StartCoroutine(decreaseCashJob.WaitFor());
+                    cash = decreaseCashJob.result;
                     playerCharacter.Gold += cashShopItem.receiveGold;
                     foreach (var receiveItem in cashShopItem.receiveItems)
                     {
@@ -416,7 +493,12 @@ namespace MultiplayerARPG.MMO
             ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MsgTypes.CashShopBuy, responseMessage);
         }
 
-        protected override async void HandleRequestCashPackageInfo(LiteNetLibMessageHandler messageHandler)
+        protected override void HandleRequestCashPackageInfo(LiteNetLibMessageHandler messageHandler)
+        {
+            StartCoroutine(HandleRequestCashPackageInfoRoutine(messageHandler));
+        }
+
+        private IEnumerator HandleRequestCashPackageInfoRoutine(LiteNetLibMessageHandler messageHandler)
         {
             var connectionId = messageHandler.connectionId;
             var message = messageHandler.ReadMessage<BaseAckMessage>();
@@ -430,7 +512,10 @@ namespace MultiplayerARPG.MMO
                 error = ResponseCashPackageInfoMessage.Error.UserNotFound;
             else
             {
-                cash = await Database.GetCash(userData.userId);
+                var job = new GetCashJob(Database, userData.userId);
+                job.Start();
+                yield return StartCoroutine(job.WaitFor());
+                cash = job.result;
                 foreach (var cashShopItemId in GameInstance.CashPackages.Keys)
                 {
                     cashPackageIds.Add(cashShopItemId);
@@ -446,7 +531,12 @@ namespace MultiplayerARPG.MMO
             ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MsgTypes.CashPackageInfo, responseMessage);
         }
 
-        protected override async void HandleRequestCashPackageBuyValidation(LiteNetLibMessageHandler messageHandler)
+        protected override void HandleRequestCashPackageBuyValidation(LiteNetLibMessageHandler messageHandler)
+        {
+            StartCoroutine(HandleRequestCashPackageBuyValidationRoutine(messageHandler));
+        }
+
+        private IEnumerator HandleRequestCashPackageBuyValidationRoutine(LiteNetLibMessageHandler messageHandler)
         {
             var connectionId = messageHandler.connectionId;
             var message = messageHandler.ReadMessage<RequestCashPackageBuyValidationMessage>();
@@ -461,13 +551,21 @@ namespace MultiplayerARPG.MMO
             else
             {
                 // Get current cash will return this in case it cannot increase cash
-                cash = await Database.GetCash(userData.userId);
+                var job = new GetCashJob(Database, userData.userId);
+                job.Start();
+                yield return StartCoroutine(job.WaitFor());
+                cash = job.result;
                 // TODO: Validate purchasing at server side
                 CashPackage cashPackage;
                 if (!GameInstance.CashPackages.TryGetValue(dataId, out cashPackage))
                     error = ResponseCashPackageBuyValidationMessage.Error.PackageNotFound;
                 else
-                    cash = await Database.IncreaseCash(userData.userId, cashPackage.cashAmount);
+                {
+                    var increaseCashJob = new IncreaseCashJob(Database, userData.userId, cashPackage.cashAmount);
+                    increaseCashJob.Start();
+                    yield return StartCoroutine(increaseCashJob.WaitFor());
+                    cash = increaseCashJob.result;
+                }
             }
             var responseMessage = new ResponseCashPackageBuyValidationMessage();
             responseMessage.ackId = message.ackId;
@@ -476,7 +574,7 @@ namespace MultiplayerARPG.MMO
             responseMessage.dataId = dataId;
             responseMessage.cash = cash;
             ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MsgTypes.CashPackageBuyValidation, responseMessage);
-        }        
+        }
 
         private void HandleResponseAppServerAddress(LiteNetLibMessageHandler messageHandler)
         {
