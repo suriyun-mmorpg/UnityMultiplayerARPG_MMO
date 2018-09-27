@@ -672,12 +672,18 @@ namespace MultiplayerARPG.MMO
                         partyMember.dataId = message.dataId;
                         partyMember.level = message.level;
                         if (playerCharactersById.TryGetValue(message.characterId, out playerCharacter))
+                        {
                             playerCharacter.PartyId = message.id;
+                            playerCharacter.IsPartyLeader = party.IsLeader(playerCharacter.Id);
+                        }
                         party.AddMember(partyMember);
                         break;
                     case UpdatePartyMemberMessage.UpdateType.Remove:
                         if (playerCharactersById.TryGetValue(message.characterId, out playerCharacter))
+                        {
                             playerCharacter.PartyId = 0;
+                            playerCharacter.IsPartyLeader = false;
+                        }
                         party.RemoveMember(message.characterId);
                         break;
                 }
@@ -697,6 +703,58 @@ namespace MultiplayerARPG.MMO
                         break;
                     case UpdatePartyMessage.UpdateType.Terminate:
                         parties.Remove(message.id);
+                        break;
+                }
+            }
+        }
+
+        public void OnUpdateGuildMember(UpdateGuildMemberMessage message)
+        {
+            GuildData guild;
+            BasePlayerCharacterEntity playerCharacter;
+            SocialCharacterData guildMember;
+            if (guilds.TryGetValue(message.id, out guild))
+            {
+                switch (message.type)
+                {
+                    case UpdateGuildMemberMessage.UpdateType.Add:
+                        guildMember = new SocialCharacterData();
+                        guildMember.id = message.characterId;
+                        guildMember.characterName = message.characterName;
+                        guildMember.dataId = message.dataId;
+                        guildMember.level = message.level;
+                        if (playerCharactersById.TryGetValue(message.characterId, out playerCharacter))
+                        {
+                            playerCharacter.GuildId = message.id;
+                            playerCharacter.IsGuildLeader = guild.IsLeader(playerCharacter.Id);
+                        }
+                        guild.AddMember(guildMember);
+                        break;
+                    case UpdateGuildMemberMessage.UpdateType.Remove:
+                        if (playerCharactersById.TryGetValue(message.characterId, out playerCharacter))
+                        {
+                            playerCharacter.GuildId = 0;
+                            playerCharacter.IsGuildLeader = false;
+                        }
+                        guild.RemoveMember(message.characterId);
+                        break;
+                }
+            }
+        }
+
+        public void OnUpdateGuild(UpdateGuildMessage message)
+        {
+            GuildData guild;
+            if (guilds.TryGetValue(message.id, out guild))
+            {
+                switch (message.type)
+                {
+                    case UpdateGuildMessage.UpdateType.SetGuildMessage:
+                        guild.guildMessage = message.guildMessage;
+                        guilds[message.id] = guild;
+                        break;
+                    case UpdateGuildMessage.UpdateType.Terminate:
+                        guilds.Remove(message.id);
                         break;
                 }
             }

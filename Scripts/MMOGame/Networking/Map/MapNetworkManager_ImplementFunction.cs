@@ -76,7 +76,8 @@ namespace MultiplayerARPG.MMO
             setCharacterPartyJob.Start();
             yield return StartCoroutine(setCharacterPartyJob.WaitFor());
             parties[partyId] = party;
-            playerCharacterEntity.PartyId = partyId;
+            if (ChatNetworkManager.IsClientConnected)
+                ChatNetworkManager.UpdatePartyMemberAdd(partyId, playerCharacterEntity.Id, playerCharacterEntity.CharacterName, playerCharacterEntity.DataId, playerCharacterEntity.Level);
         }
 
         public override void PartySetting(BasePlayerCharacterEntity playerCharacterEntity, bool shareExp, bool shareItem)
@@ -182,10 +183,11 @@ namespace MultiplayerARPG.MMO
             setCharacterGuildJob.Start();
             yield return StartCoroutine(setCharacterGuildJob.WaitFor());
             guilds[guildId] = guild;
-            playerCharacterEntity.GuildId = guildId;
+            if (ChatNetworkManager.IsClientConnected)
+                ChatNetworkManager.UpdateGuildMemberAdd(guildId, playerCharacterEntity.Id, playerCharacterEntity.CharacterName, playerCharacterEntity.DataId, playerCharacterEntity.Level);
         }
 
-        public override void SetGuildMessage(BasePlayerCharacterEntity playerCharacterEntity, string message)
+        public override void SetGuildMessage(BasePlayerCharacterEntity playerCharacterEntity, string guildMessage)
         {
             if (playerCharacterEntity == null || !IsServer)
                 return;
@@ -197,9 +199,9 @@ namespace MultiplayerARPG.MMO
                 // TODO: May warn that it's not guild leader
                 return;
             }
-            new SetGuildMessageJob(Database, playerCharacterEntity.GuildId, message).Start();
+            new SetGuildMessageJob(Database, playerCharacterEntity.GuildId, guildMessage).Start();
             if (ChatNetworkManager.IsClientConnected)
-                ChatNetworkManager.UpdateSetGuildMessage(playerCharacterEntity.GuildId, message);
+                ChatNetworkManager.UpdateSetGuildMessage(playerCharacterEntity.GuildId, guildMessage);
         }
 
         public override void AddGuildMember(BasePlayerCharacterEntity inviteCharacterEntity, BasePlayerCharacterEntity acceptCharacterEntity)

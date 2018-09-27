@@ -14,14 +14,14 @@ namespace MultiplayerARPG.MMO
         }
         public UpdateType type;
         public int id;
-        public string message;
+        public string guildMessage;
 
         public void Deserialize(NetDataReader reader)
         {
             type = (UpdateType)reader.GetByte();
             id = reader.GetInt();
             if (type == UpdateType.SetGuildMessage)
-                message = reader.GetString();
+                guildMessage = reader.GetString();
         }
 
         public void Serialize(NetDataWriter writer)
@@ -29,7 +29,7 @@ namespace MultiplayerARPG.MMO
             writer.Put((byte)type);
             writer.Put(id);
             if (type == UpdateType.SetGuildMessage)
-                writer.Put(message);
+                writer.Put(guildMessage);
         }
     }
 }

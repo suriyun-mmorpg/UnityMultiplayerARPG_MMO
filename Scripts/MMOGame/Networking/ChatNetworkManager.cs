@@ -47,6 +47,8 @@ namespace MultiplayerARPG.MMO
             RegisterClientMessage(MMOMessageTypes.UpdateMapUser, HandleUpdateMapUserAtClient);
             RegisterClientMessage(MMOMessageTypes.UpdatePartyMember, HandleUpdatePartyMemberAtClient);
             RegisterClientMessage(MMOMessageTypes.UpdateParty, HandleUpdatePartyAtClient);
+            RegisterClientMessage(MMOMessageTypes.UpdateGuildMember, HandleUpdateGuildMemberAtClient);
+            RegisterClientMessage(MMOMessageTypes.UpdateGuild, HandleUpdateGuildAtClient);
         }
 
         protected override void RegisterServerMessages()
@@ -56,6 +58,8 @@ namespace MultiplayerARPG.MMO
             RegisterServerMessage(MMOMessageTypes.UpdateMapUser, HandleUpdateMapUserAtServer);
             RegisterServerMessage(MMOMessageTypes.UpdatePartyMember, HandleUpdatePartyMemberAtServer);
             RegisterServerMessage(MMOMessageTypes.UpdateParty, HandleUpdatePartyAtServer);
+            RegisterServerMessage(MMOMessageTypes.UpdateGuildMember, HandleUpdateGuildMemberAtServer);
+            RegisterServerMessage(MMOMessageTypes.UpdateGuild, HandleUpdateGuildAtServer);
         }
 
         public override void OnStartServer()
@@ -149,6 +153,20 @@ namespace MultiplayerARPG.MMO
             var message = messageHandler.ReadMessage<UpdatePartyMessage>();
             if (mapNetworkManager != null)
                 mapNetworkManager.OnUpdateParty(message);
+        }
+
+        private void HandleUpdateGuildMemberAtClient(LiteNetLibMessageHandler messageHandler)
+        {
+            var message = messageHandler.ReadMessage<UpdateGuildMemberMessage>();
+            if (mapNetworkManager != null)
+                mapNetworkManager.OnUpdateGuildMember(message);
+        }
+
+        private void HandleUpdateGuildAtClient(LiteNetLibMessageHandler messageHandler)
+        {
+            var message = messageHandler.ReadMessage<UpdateGuildMessage>();
+            if (mapNetworkManager != null)
+                mapNetworkManager.OnUpdateGuild(message);
         }
 
         private void HandleChatAtServer(LiteNetLibMessageHandler messageHandler)
@@ -257,6 +275,32 @@ namespace MultiplayerARPG.MMO
             }
         }
 
+        private void HandleUpdateGuildMemberAtServer(LiteNetLibMessageHandler messageHandler)
+        {
+            var connectionId = messageHandler.connectionId;
+            var message = messageHandler.ReadMessage<UpdateGuildMemberMessage>();
+            if (mapServerConnectionIds.Contains(connectionId))
+            {
+                foreach (var mapServerConnectionId in mapServerConnectionIds)
+                {
+                    ServerSendPacket(mapServerConnectionId, SendOptions.ReliableOrdered, MMOMessageTypes.UpdateGuildMember, message);
+                }
+            }
+        }
+
+        private void HandleUpdateGuildAtServer(LiteNetLibMessageHandler messageHandler)
+        {
+            var connectionId = messageHandler.connectionId;
+            var message = messageHandler.ReadMessage<UpdateGuildMessage>();
+            if (mapServerConnectionIds.Contains(connectionId))
+            {
+                foreach (var mapServerConnectionId in mapServerConnectionIds)
+                {
+                    ServerSendPacket(mapServerConnectionId, SendOptions.ReliableOrdered, MMOMessageTypes.UpdateGuild, message);
+                }
+            }
+        }
+
         public void EnterChat(ChatChannel channel, string message, string senderName, string receiverName, int channelId)
         {
             if (!IsClientConnected)
@@ -336,7 +380,7 @@ namespace MultiplayerARPG.MMO
             var updateMessage = new UpdateGuildMessage();
             updateMessage.type = UpdateGuildMessage.UpdateType.SetGuildMessage;
             updateMessage.id = id;
-            updateMessage.message = message;
+            updateMessage.guildMessage = message;
             ClientSendPacket(SendOptions.ReliableOrdered, MMOMessageTypes.UpdateGuild, updateMessage);
         }
 
