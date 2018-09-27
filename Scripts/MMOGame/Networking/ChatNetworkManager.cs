@@ -37,6 +37,7 @@ namespace MultiplayerARPG.MMO
         private MapNetworkManager mapNetworkManager;
         private readonly HashSet<long> mapServerConnectionIds = new HashSet<long>();
         private readonly Dictionary<string, UserCharacterData> mapUsersById = new Dictionary<string, UserCharacterData>();
+        private readonly Dictionary<string, long> connectionIdsByCharacterId = new Dictionary<string, long>();
         private readonly Dictionary<string, long> connectionIdsByCharacterName = new Dictionary<string, long>();
 
         protected override void RegisterClientMessages()
@@ -85,13 +86,33 @@ namespace MultiplayerARPG.MMO
         public override void OnPeerConnected(long connectionId)
         {
             base.OnPeerConnected(connectionId);
-            mapServerConnectionIds.Add(connectionId);
+            if (!mapServerConnectionIds.Contains(connectionId))
+            {
+                mapServerConnectionIds.Add(connectionId);
+                // Send add map users
+                foreach (var userData in mapUsersById.Values)
+                {
+                    UpdateMapUser(connectionId, UpdateMapUserMessage.UpdateType.Add, userData);
+                }
+            }
         }
 
         public override void OnPeerDisconnected(long connectionId, DisconnectInfo disconnectInfo)
         {
             base.OnPeerDisconnected(connectionId, disconnectInfo);
-            mapServerConnectionIds.Remove(connectionId);
+            if (mapServerConnectionIds.Remove(connectionId))
+            {
+                UserCharacterData userData;
+                foreach (var entry in connectionIdsByCharacterId)
+                {
+                    // Find characters which connected to disconnecting map server
+                    if (connectionId != entry.Value || !mapUsersById.TryGetValue(entry.Key, out userData))
+                        continue;
+
+                    // Send remove messages to other map servers
+                    UpdateMapUser(UpdateMapUserMessage.UpdateType.Remove, userData, connectionId);
+                }
+            }
         }
 
         public override void OnClientConnected()
@@ -177,7 +198,9 @@ namespace MultiplayerARPG.MMO
                             userData.dataId = message.dataId;
                             userData.level = message.level;
                             mapUsersById[userData.id] = userData;
+                            connectionIdsByCharacterId[message.id] = connectionId;
                             connectionIdsByCharacterName[message.characterName] = connectionId;
+                            UpdateMapUser(UpdateMapUserMessage.UpdateType.Add, userData, connectionId);
                             Debug.Log("[Chat] Add map user: " + message.userId + " by " + connectionId);
                         }
                         break;
@@ -185,7 +208,9 @@ namespace MultiplayerARPG.MMO
                         if (mapUsersById.TryGetValue(message.id, out userData))
                         {
                             mapUsersById.Remove(userData.id);
+                            connectionIdsByCharacterId.Remove(message.id);
                             connectionIdsByCharacterName.Remove(userData.characterName);
+                            UpdateMapUser(UpdateMapUserMessage.UpdateType.Remove, userData, connectionId);
                             Debug.Log("[Chat] Remove map user: " + message.userId + " by " + connectionId);
                         }
                         break;
@@ -198,6 +223,7 @@ namespace MultiplayerARPG.MMO
                             userData.currentMp = message.currentMp;
                             userData.maxMp = message.maxMp;
                             mapUsersById[userData.id] = userData;
+                            UpdateMapUser(UpdateMapUserMessage.UpdateType.Online, userData, connectionId);
                             Debug.Log("[Chat] Update map user: " + message.userId + " by " + connectionId);
                         }
                         break;
@@ -320,6 +346,33 @@ namespace MultiplayerARPG.MMO
             updateMessage.type = UpdateGuildMessage.UpdateType.Terminate;
             updateMessage.id = id;
             ClientSendPacket(SendOptions.ReliableOrdered, MMOMessageTypes.UpdateGuild, updateMessage);
+        }
+
+        private void UpdateMapUser(UpdateMapUserMessage.UpdateType updateType, UserCharacterData userData, long exceptConnectionId)
+        {
+            foreach (var mapServerConnectionId in mapServerConnectionIds)
+            {
+                if (mapServerConnectionId == exceptConnectionId)
+                    continue;
+
+                UpdateMapUser(mapServerConnectionId, updateType, userData);
+            }
+        }
+        
+        private void UpdateMapUser(long connectionId, UpdateMapUserMessage.UpdateType updateType, UserCharacterData userData)
+        {
+            var updateMapUserMessage = new UpdateMapUserMessage();
+            updateMapUserMessage.type = updateType;
+            updateMapUserMessage.id = userData.id;
+            updateMapUserMessage.userId = userData.userId;
+            updateMapUserMessage.characterName = userData.characterName;
+            updateMapUserMessage.dataId = userData.dataId;
+            updateMapUserMessage.level = userData.level;
+            updateMapUserMessage.currentHp = userData.currentHp;
+            updateMapUserMessage.maxHp = userData.maxHp;
+            updateMapUserMessage.currentMp = userData.currentMp;
+            updateMapUserMessage.maxMp = userData.maxMp;
+            ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MMOMessageTypes.UpdateMapUser, updateMapUserMessage);
         }
 
         public void StartClient(MapNetworkManager mapNetworkManager, string networkAddress, int networkPort, string connectKey)
