@@ -109,7 +109,7 @@ namespace MultiplayerARPG.MMO
                 // TODO: May warn that it's not party leader
                 return;
             }
-            if (party.CountMember() == gameInstance.maxPartyMember)
+            if (party.CountMember() == gameInstance.SocialSystemSetting.maxPartyMember)
             {
                 // TODO: May warn that it's exceeds limit max party member
                 return;
@@ -216,7 +216,7 @@ namespace MultiplayerARPG.MMO
                 // TODO: May warn that it's not guild leader
                 return;
             }
-            if (guild.CountMember() == gameInstance.maxGuildMember)
+            if (guild.CountMember() == gameInstance.SocialSystemSetting.maxGuildMember)
             {
                 // TODO: May warn that it's exceeds limit max guild member
                 return;
