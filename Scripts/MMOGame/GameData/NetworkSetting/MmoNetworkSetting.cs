@@ -3,7 +3,7 @@ using UnityEngine.Events;
 
 namespace MultiplayerARPG.MMO
 {
-    [CreateAssetMenu(fileName = "MmoNetworkSetting", menuName = "Create NetworkSetting/MmoNetworkSetting")]
+    [CreateAssetMenu(fileName = "Mmo Network Setting", menuName = "Create NetworkSetting/Mmo Network Setting")]
     public class MmoNetworkSetting : ScriptableObject
     {
         public string title = "Local Server";
