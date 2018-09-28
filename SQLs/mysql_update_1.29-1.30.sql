@@ -1,3 +1,5 @@
+ALTER TABLE `characters` ADD `guildRole` INT NOT NULL DEFAULT '0' AFTER `guildId`;
+
 CREATE TABLE `guild` (
   `id` int(11) NOT NULL,
   `guildName` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
