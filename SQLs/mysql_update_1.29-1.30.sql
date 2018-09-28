@@ -6,7 +6,7 @@ CREATE TABLE `guild` (
   `level` int(11) NOT NULL,
   `exp` int(11) NOT NULL,
   `skillPoint` int(11) NOT NULL,
-  `message` varchar(100) COLLATE utf8_unicode_ci NOT NULL
+  `guildMessage` varchar(160) COLLATE utf8_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 ALTER TABLE `guild` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
