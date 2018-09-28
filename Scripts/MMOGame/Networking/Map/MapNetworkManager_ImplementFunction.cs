@@ -72,10 +72,12 @@ namespace MultiplayerARPG.MMO
             yield return StartCoroutine(createPartyJob.WaitFor());
             var partyId = createPartyJob.result;
             var party = new PartyData(partyId, shareExp, shareItem, playerCharacterEntity);
-            var setCharacterPartyJob = new SetCharacterPartyJob(Database, playerCharacterEntity.Id, partyId);
-            setCharacterPartyJob.Start();
-            yield return StartCoroutine(setCharacterPartyJob.WaitFor());
             parties[partyId] = party;
+            playerCharacterEntity.PartyId = partyId;
+            playerCharacterEntity.PartyMemberFlags = party.GetPartyMemberFlags(playerCharacterEntity);
+            // Save to database
+            new SetCharacterPartyJob(Database, playerCharacterEntity.Id, partyId).Start();
+            // Broadcast via chat server
             if (ChatNetworkManager.IsClientConnected)
                 ChatNetworkManager.UpdatePartyMemberAdd(partyId, playerCharacterEntity.Id, playerCharacterEntity.CharacterName, playerCharacterEntity.DataId, playerCharacterEntity.Level);
         }
@@ -84,25 +86,31 @@ namespace MultiplayerARPG.MMO
         {
             if (playerCharacterEntity == null || !IsServer)
                 return;
+            var partyId = playerCharacterEntity.PartyId;
             PartyData party;
-            if (!parties.TryGetValue(playerCharacterEntity.PartyId, out party))
+            if (!parties.TryGetValue(partyId, out party))
                 return;
             if (!party.IsLeader(playerCharacterEntity))
             {
                 // TODO: May warn that it's not party leader
                 return;
             }
-            new UpdatePartyJob(Database, playerCharacterEntity.PartyId, shareExp, shareItem).Start();
+            party.Setting(shareExp, shareItem);
+            parties[partyId] = party;
+            // Save to database
+            new UpdatePartyJob(Database, partyId, shareExp, shareItem).Start();
+            // Broadcast via chat server
             if (ChatNetworkManager.IsClientConnected)
-                ChatNetworkManager.UpdatePartySetting(playerCharacterEntity.PartyId, shareExp, shareItem);
+                ChatNetworkManager.UpdatePartySetting(partyId, shareExp, shareItem);
         }
 
         public override void AddPartyMember(BasePlayerCharacterEntity inviteCharacterEntity, BasePlayerCharacterEntity acceptCharacterEntity)
         {
             if (inviteCharacterEntity == null || acceptCharacterEntity == null || !IsServer)
                 return;
+            var partyId = inviteCharacterEntity.PartyId;
             PartyData party;
-            if (!parties.TryGetValue(inviteCharacterEntity.PartyId, out party))
+            if (!parties.TryGetValue(partyId, out party))
                 return;
             if (!party.IsLeader(inviteCharacterEntity))
             {
@@ -114,24 +122,41 @@ namespace MultiplayerARPG.MMO
                 // TODO: May warn that it's exceeds limit max party member
                 return;
             }
-            new SetCharacterPartyJob(Database, acceptCharacterEntity.Id, inviteCharacterEntity.PartyId).Start();
+            party.AddMember(acceptCharacterEntity);
+            parties[partyId] = party;
+            acceptCharacterEntity.PartyId = partyId;
+            acceptCharacterEntity.PartyMemberFlags = party.GetPartyMemberFlags(acceptCharacterEntity);
+            // Save to database
+            new SetCharacterPartyJob(Database, acceptCharacterEntity.Id, partyId).Start();
+            // Broadcast via chat server
             if (ChatNetworkManager.IsClientConnected)
-                ChatNetworkManager.UpdatePartyMemberAdd(inviteCharacterEntity.PartyId, acceptCharacterEntity.Id, acceptCharacterEntity.CharacterName, acceptCharacterEntity.DataId, acceptCharacterEntity.Level);
+                ChatNetworkManager.UpdatePartyMemberAdd(partyId, acceptCharacterEntity.Id, acceptCharacterEntity.CharacterName, acceptCharacterEntity.DataId, acceptCharacterEntity.Level);
         }
 
         public override void KickFromParty(BasePlayerCharacterEntity playerCharacterEntity, string characterId)
         {
             if (playerCharacterEntity == null || !IsServer)
                 return;
+            var partyId = playerCharacterEntity.PartyId;
             PartyData party;
-            if (!parties.TryGetValue(playerCharacterEntity.PartyId, out party))
+            if (!parties.TryGetValue(partyId, out party))
                 return;
             if (!party.IsLeader(playerCharacterEntity))
             {
                 // TODO: May warn that it's not party leader
                 return;
             }
+            BasePlayerCharacterEntity memberCharacterEntity;
+            if (playerCharactersById.TryGetValue(characterId, out memberCharacterEntity))
+            {
+                memberCharacterEntity.PartyId = 0;
+                memberCharacterEntity.PartyMemberFlags = 0;
+            }
+            party.RemoveMember(characterId);
+            parties[partyId] = party;
+            // Save to database
             new SetCharacterPartyJob(Database, characterId, 0).Start();
+            // Broadcast via chat server
             if (ChatNetworkManager.IsClientConnected)
                 ChatNetworkManager.UpdatePartyMemberRemove(playerCharacterEntity.PartyId, characterId);
         }
@@ -149,17 +174,34 @@ namespace MultiplayerARPG.MMO
             {
                 foreach (var memberId in party.GetMemberIds())
                 {
+                    BasePlayerCharacterEntity memberCharacterEntity;
+                    if (playerCharactersById.TryGetValue(memberId, out memberCharacterEntity))
+                    {
+                        memberCharacterEntity.PartyId = 0;
+                        memberCharacterEntity.PartyMemberFlags = 0;
+                    }
+                    // Save to database
                     new SetCharacterPartyJob(Database, memberId, 0).Start();
+                    // Broadcast via chat server
                     if (ChatNetworkManager.IsClientConnected)
                         ChatNetworkManager.UpdatePartyMemberRemove(partyId, memberId);
                 }
+                parties.Remove(partyId);
+                // Save to database
                 new DeletePartyJob(Database, partyId).Start();
+                // Broadcast via chat server
                 if (ChatNetworkManager.IsClientConnected)
                     ChatNetworkManager.UpdatePartyTerminate(partyId);
             }
             else
             {
+                playerCharacterEntity.PartyId = 0;
+                playerCharacterEntity.PartyMemberFlags = 0;
+                party.RemoveMember(playerCharacterEntity.Id);
+                parties[partyId] = party;
+                // Save to database
                 new SetCharacterPartyJob(Database, playerCharacterEntity.Id, 0).Start();
+                // Broadcast via chat server
                 if (ChatNetworkManager.IsClientConnected)
                     ChatNetworkManager.UpdatePartyMemberRemove(partyId, playerCharacterEntity.Id);
             }
@@ -179,10 +221,14 @@ namespace MultiplayerARPG.MMO
             yield return StartCoroutine(createGuildJob.WaitFor());
             var guildId = createGuildJob.result;
             var guild = new GuildData(guildId, guildName, playerCharacterEntity);
-            var setCharacterGuildJob = new SetCharacterGuildJob(Database, playerCharacterEntity.Id, guildId);
-            setCharacterGuildJob.Start();
-            yield return StartCoroutine(setCharacterGuildJob.WaitFor());
+            byte guildRole;
             guilds[guildId] = guild;
+            playerCharacterEntity.GuildId = guildId;
+            playerCharacterEntity.GuildMemberFlags = guild.GetGuildMemberFlagsAndRole(playerCharacterEntity, out guildRole);
+            playerCharacterEntity.GuildRole = guildRole;
+            // Save to database
+            new SetCharacterGuildJob(Database, playerCharacterEntity.Id, guildId, guildRole).Start();
+            // Broadcast via chat server
             if (ChatNetworkManager.IsClientConnected)
                 ChatNetworkManager.UpdateGuildMemberAdd(guildId, playerCharacterEntity.Id, playerCharacterEntity.CharacterName, playerCharacterEntity.DataId, playerCharacterEntity.Level);
         }
@@ -191,25 +237,31 @@ namespace MultiplayerARPG.MMO
         {
             if (playerCharacterEntity == null || !IsServer)
                 return;
+            var guildId = playerCharacterEntity.GuildId;
             GuildData guild;
-            if (!guilds.TryGetValue(playerCharacterEntity.GuildId, out guild))
+            if (!guilds.TryGetValue(guildId, out guild))
                 return;
             if (!guild.IsLeader(playerCharacterEntity))
             {
                 // TODO: May warn that it's not guild leader
                 return;
             }
-            new SetGuildMessageJob(Database, playerCharacterEntity.GuildId, guildMessage).Start();
+            guild.guildMessage = guildMessage;
+            guilds[guildId] = guild;
+            // Save to database
+            new SetGuildMessageJob(Database, guildId, guildMessage).Start();
+            // Broadcast via chat server
             if (ChatNetworkManager.IsClientConnected)
-                ChatNetworkManager.UpdateSetGuildMessage(playerCharacterEntity.GuildId, guildMessage);
+                ChatNetworkManager.UpdateSetGuildMessage(guildId, guildMessage);
         }
 
         public override void AddGuildMember(BasePlayerCharacterEntity inviteCharacterEntity, BasePlayerCharacterEntity acceptCharacterEntity)
         {
             if (inviteCharacterEntity == null || acceptCharacterEntity == null || !IsServer)
                 return;
+            var guildId = inviteCharacterEntity.GuildId;
             GuildData guild;
-            if (!guilds.TryGetValue(inviteCharacterEntity.GuildId, out guild))
+            if (!guilds.TryGetValue(guildId, out guild))
                 return;
             if (!guild.IsLeader(inviteCharacterEntity))
             {
@@ -221,9 +273,17 @@ namespace MultiplayerARPG.MMO
                 // TODO: May warn that it's exceeds limit max guild member
                 return;
             }
-            new SetCharacterGuildJob(Database, acceptCharacterEntity.Id, inviteCharacterEntity.GuildId).Start();
+            guild.AddMember(acceptCharacterEntity);
+            byte guildRole;
+            guilds[guildId] = guild;
+            acceptCharacterEntity.GuildId = guildId;
+            acceptCharacterEntity.GuildMemberFlags = guild.GetGuildMemberFlagsAndRole(acceptCharacterEntity, out guildRole);
+            acceptCharacterEntity.GuildRole = guildRole;
+            // Save to database
+            new SetCharacterGuildJob(Database, acceptCharacterEntity.Id, guildId, guildRole).Start();
+            // Broadcast via chat server
             if (ChatNetworkManager.IsClientConnected)
-                ChatNetworkManager.UpdateGuildMemberAdd(inviteCharacterEntity.GuildId, acceptCharacterEntity.Id, acceptCharacterEntity.CharacterName, acceptCharacterEntity.DataId, acceptCharacterEntity.Level);
+                ChatNetworkManager.UpdateGuildMemberAdd(guildId, acceptCharacterEntity.Id, acceptCharacterEntity.CharacterName, acceptCharacterEntity.DataId, acceptCharacterEntity.Level);
         }
 
         public override void KickFromGuild(BasePlayerCharacterEntity playerCharacterEntity, string characterId)
@@ -238,7 +298,16 @@ namespace MultiplayerARPG.MMO
                 // TODO: May warn that it's not guild leader
                 return;
             }
-            new SetCharacterGuildJob(Database, characterId, 0).Start();
+            BasePlayerCharacterEntity memberCharacterEntity;
+            if (playerCharactersById.TryGetValue(characterId, out memberCharacterEntity))
+            {
+                memberCharacterEntity.GuildId = 0;
+                memberCharacterEntity.GuildMemberFlags = 0;
+                memberCharacterEntity.GuildRole = 0;
+            }
+            // Save to database
+            new SetCharacterGuildJob(Database, characterId, 0, 0).Start();
+            // Broadcast via chat server
             if (ChatNetworkManager.IsClientConnected)
                 ChatNetworkManager.UpdateGuildMemberRemove(playerCharacterEntity.GuildId, characterId);
         }
@@ -256,17 +325,33 @@ namespace MultiplayerARPG.MMO
             {
                 foreach (var memberId in guild.GetMemberIds())
                 {
-                    new SetCharacterGuildJob(Database, memberId, 0).Start();
+                    BasePlayerCharacterEntity memberCharacterEntity;
+                    if (playerCharactersById.TryGetValue(memberId, out memberCharacterEntity))
+                    {
+                        memberCharacterEntity.GuildId = 0;
+                        memberCharacterEntity.GuildMemberFlags = 0;
+                        memberCharacterEntity.GuildRole = 0;
+                    }
+                    // Save to database
+                    new SetCharacterGuildJob(Database, memberId, 0, 0).Start();
+                    // Broadcast via chat server
                     if (ChatNetworkManager.IsClientConnected)
                         ChatNetworkManager.UpdateGuildMemberRemove(guildId, memberId);
                 }
+                // Save to database
                 new DeleteGuildJob(Database, guildId).Start();
+                // Broadcast via chat server
                 if (ChatNetworkManager.IsClientConnected)
                     ChatNetworkManager.UpdateGuildTerminate(guildId);
             }
             else
             {
-                new SetCharacterGuildJob(Database, playerCharacterEntity.Id, 0).Start();
+                playerCharacterEntity.GuildId = 0;
+                playerCharacterEntity.GuildMemberFlags = 0;
+                playerCharacterEntity.GuildRole = 0;
+                // Save to database
+                new SetCharacterGuildJob(Database, playerCharacterEntity.Id, 0, 0).Start();
+                // Broadcast via chat server
                 if (ChatNetworkManager.IsClientConnected)
                     ChatNetworkManager.UpdateGuildMemberRemove(guildId, playerCharacterEntity.Id);
             }
