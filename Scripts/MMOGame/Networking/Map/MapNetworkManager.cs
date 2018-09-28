@@ -348,7 +348,9 @@ namespace MultiplayerARPG.MMO
                         if (playerCharacterEntity.GuildId > 0 && !guilds.ContainsKey(playerCharacterEntity.GuildId))
                         {
                             yield return StartCoroutine(LoadGuildRoutine(playerCharacterEntity.GuildId));
-                            playerCharacterEntity.GuildMemberFlags = guilds[playerCharacterEntity.GuildId].GetGuildMemberFlags(playerCharacterEntity);
+                            byte guildRole;
+                            playerCharacterEntity.GuildMemberFlags = guilds[playerCharacterEntity.GuildId].GetGuildMemberFlagsAndRole(playerCharacterEntity, out guildRole);
+                            playerCharacterEntity.GuildRole = guildRole;
                         }
 
                         // Notify clients that this character is spawn or dead
@@ -730,8 +732,10 @@ namespace MultiplayerARPG.MMO
                         guildMember.level = message.level;
                         if (playerCharactersById.TryGetValue(message.characterId, out playerCharacter))
                         {
+                            byte guildRole;
                             playerCharacter.GuildId = message.id;
-                            playerCharacter.GuildMemberFlags = guild.GetGuildMemberFlags(playerCharacter);
+                            playerCharacter.GuildMemberFlags = guild.GetGuildMemberFlagsAndRole(playerCharacter, out guildRole);
+                            playerCharacter.GuildRole = guildRole;
                         }
                         guild.AddMember(guildMember);
                         break;
@@ -740,6 +744,7 @@ namespace MultiplayerARPG.MMO
                         {
                             playerCharacter.GuildId = 0;
                             playerCharacter.GuildMemberFlags = 0;
+                            playerCharacter.GuildRole = 0;
                         }
                         guild.RemoveMember(message.characterId);
                         break;
