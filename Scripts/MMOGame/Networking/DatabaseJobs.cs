@@ -298,15 +298,17 @@ namespace MultiplayerARPG.MMO
     {
         private string characterId;
         private int id;
-        public SetCharacterGuildJob(BaseDatabase database, string characterId, int id, Action onFinished = null) : base(database, onFinished)
+        private byte guildRole;
+        public SetCharacterGuildJob(BaseDatabase database, string characterId, int id, byte guildRole, Action onFinished = null) : base(database, onFinished)
         {
             this.characterId = characterId;
             this.id = id;
+            this.guildRole = guildRole;
         }
 
         protected override void ThreadFunction()
         {
-            database.SetCharacterGuild(characterId, id);
+            database.SetCharacterGuild(characterId, id, guildRole);
         }
     }
     #endregion

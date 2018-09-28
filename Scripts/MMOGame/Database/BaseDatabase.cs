@@ -56,6 +56,6 @@ namespace MultiplayerARPG.MMO
         public abstract GuildData ReadGuild(int id);
         public abstract void UpdateGuildMessage(int id, string message);
         public abstract void DeleteGuild(int id);
-        public abstract void SetCharacterGuild(string characterId, int guild);
+        public abstract void SetCharacterGuild(string characterId, int guild, byte guildRole);
     }
 }

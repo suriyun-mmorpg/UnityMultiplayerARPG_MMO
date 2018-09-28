@@ -31,7 +31,7 @@ namespace MultiplayerARPG.MMO
             if (reader.Read())
             {
                 result = new GuildData(id, reader.GetString("guildName"), reader.GetString("leaderId"), reader.GetString("leaderName"));
-                reader = ExecuteReader("SELECT id, dataId, characterName, level FROM characters WHERE guildId=@id",
+                reader = ExecuteReader("SELECT id, dataId, characterName, level, guildRole FROM characters WHERE guildId=@id",
                     new SqliteParameter("@id", id));
                 SocialCharacterData guildMemberData;
                 while (reader.Read())
@@ -42,7 +42,7 @@ namespace MultiplayerARPG.MMO
                     guildMemberData.characterName = reader.GetString("characterName");
                     guildMemberData.dataId = reader.GetInt32("dataId");
                     guildMemberData.level = reader.GetInt32("level");
-                    result.AddMember(guildMemberData);
+                    result.AddMember(guildMemberData, reader.GetByte("guildRole"));
                 }
             }
             return result;
@@ -62,11 +62,12 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@id", id));
         }
 
-        public override void SetCharacterGuild(string characterId, int guildId)
+        public override void SetCharacterGuild(string characterId, int guildId, byte guildRole)
         {
-            ExecuteNonQuery("UPDATE characters SET guildId=@guildId WHERE id=@characterId",
+            ExecuteNonQuery("UPDATE characters SET guildId=@guildId, guildRole=@guildRole WHERE id=@characterId",
                 new SqliteParameter("@characterId", characterId),
-                new SqliteParameter("@guildId", guildId));
+                new SqliteParameter("@guildId", guildId),
+                new SqliteParameter("@guildRole", guildRole));
         }
     }
 }
