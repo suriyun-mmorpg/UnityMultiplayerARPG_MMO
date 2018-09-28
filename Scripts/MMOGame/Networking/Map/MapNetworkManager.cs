@@ -155,21 +155,19 @@ namespace MultiplayerARPG.MMO
 
         protected override void OnDestroy()
         {
-            StartCoroutine(OnDestroyRoutine());
-        }
-
-        private IEnumerator OnDestroyRoutine()
-        {
-            while (savingCharacters.Count > 0)
+            // Save immediately
+            if (IsServer)
             {
-                yield return 0;
+                foreach (var playerCharacter in playerCharacters.Values)
+                {
+                    Database.UpdateCharacter(playerCharacter.CloneTo(new PlayerCharacterData()));
+                }
+                var sceneName = Assets.onlineScene.SceneName;
+                foreach (var buildingEntity in buildingEntities.Values)
+                {
+                    Database.UpdateBuilding(sceneName, buildingEntity.CloneTo(new BuildingSaveData()));
+                }
             }
-            StartCoroutine(SaveCharactersRoutine());
-            while (savingBuildings.Count > 0)
-            {
-                yield return 0;
-            }
-            StartCoroutine(SaveBuildingsRoutine());
             base.OnDestroy();
         }
 
@@ -324,14 +322,6 @@ namespace MultiplayerARPG.MMO
                 }
                 else
                 {
-                    // Load party data, if this map-server does not have party data
-                    if (playerCharacterData.PartyId > 0 && !parties.ContainsKey(playerCharacterData.PartyId))
-                        yield return StartCoroutine(LoadPartyRoutine(playerCharacterData.PartyId));
-
-                    // Load guild data, if this map-server does not have guild data
-                    if (playerCharacterData.PartyId > 0 && !guilds.ContainsKey(playerCharacterData.GuildId))
-                        yield return StartCoroutine(LoadGuildRoutine(playerCharacterData.GuildId));
-
                     // If it is not allow this character data, disconnect user
                     var dataId = playerCharacterData.DataId;
                     PlayerCharacter playerCharacter;
@@ -346,6 +336,21 @@ namespace MultiplayerARPG.MMO
                         var identity = Assets.NetworkSpawn(playerCharacterPrefab.Identity.HashAssetId, playerCharacterData.CurrentPosition, Quaternion.identity, 0, connectionId);
                         var playerCharacterEntity = identity.GetComponent<BasePlayerCharacterEntity>();
                         playerCharacterData.CloneTo(playerCharacterEntity);
+                        
+                        // Load party data, if this map-server does not have party data
+                        if (playerCharacterEntity.PartyId > 0 && !parties.ContainsKey(playerCharacterEntity.PartyId))
+                        {
+                            yield return StartCoroutine(LoadPartyRoutine(playerCharacterEntity.PartyId));
+                            playerCharacterEntity.PartyMemberFlags = parties[playerCharacterEntity.PartyId].GetPartyMemberFlags(playerCharacterEntity);
+                        }
+
+                        // Load guild data, if this map-server does not have guild data
+                        if (playerCharacterEntity.GuildId > 0 && !guilds.ContainsKey(playerCharacterEntity.GuildId))
+                        {
+                            yield return StartCoroutine(LoadGuildRoutine(playerCharacterEntity.GuildId));
+                            playerCharacterEntity.GuildMemberFlags = guilds[playerCharacterEntity.GuildId].GetGuildMemberFlags(playerCharacterEntity);
+                        }
+
                         // Notify clients that this character is spawn or dead
                         if (!playerCharacterEntity.IsDead())
                             playerCharacterEntity.RequestOnRespawn();
@@ -674,7 +679,7 @@ namespace MultiplayerARPG.MMO
                         if (playerCharactersById.TryGetValue(message.characterId, out playerCharacter))
                         {
                             playerCharacter.PartyId = message.id;
-                            playerCharacter.IsPartyLeader = party.IsLeader(playerCharacter.Id);
+                            playerCharacter.PartyMemberFlags = party.GetPartyMemberFlags(playerCharacter);
                         }
                         party.AddMember(partyMember);
                         break;
@@ -682,7 +687,7 @@ namespace MultiplayerARPG.MMO
                         if (playerCharactersById.TryGetValue(message.characterId, out playerCharacter))
                         {
                             playerCharacter.PartyId = 0;
-                            playerCharacter.IsPartyLeader = false;
+                            playerCharacter.PartyMemberFlags = 0;
                         }
                         party.RemoveMember(message.characterId);
                         break;
@@ -726,7 +731,7 @@ namespace MultiplayerARPG.MMO
                         if (playerCharactersById.TryGetValue(message.characterId, out playerCharacter))
                         {
                             playerCharacter.GuildId = message.id;
-                            playerCharacter.IsGuildLeader = guild.IsLeader(playerCharacter.Id);
+                            playerCharacter.GuildMemberFlags = guild.GetGuildMemberFlags(playerCharacter);
                         }
                         guild.AddMember(guildMember);
                         break;
@@ -734,7 +739,7 @@ namespace MultiplayerARPG.MMO
                         if (playerCharactersById.TryGetValue(message.characterId, out playerCharacter))
                         {
                             playerCharacter.GuildId = 0;
-                            playerCharacter.IsGuildLeader = false;
+                            playerCharacter.GuildMemberFlags = 0;
                         }
                         guild.RemoveMember(message.characterId);
                         break;
