@@ -10,16 +10,9 @@ namespace MultiplayerARPG.MMO
     {
         public override void WarpCharacter(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position)
         {
-            if (playerCharacterEntity == null || !IsServer)
+            if (!CanWarpCharacter(playerCharacterEntity))
                 return;
-
-            // If warping to same map player does not have to reload new map data
-            if (string.IsNullOrEmpty(mapName) || mapName.Equals(playerCharacterEntity.CurrentMapName))
-            {
-                playerCharacterEntity.CacheNetTransform.Teleport(position, Quaternion.identity);
-                return;
-            }
-
+            base.WarpCharacter(playerCharacterEntity, mapName, position);
             StartCoroutine(WarpCharacterRoutine(playerCharacterEntity, mapName, position));
         }
 
@@ -60,7 +53,7 @@ namespace MultiplayerARPG.MMO
 
         public override void CreateParty(BasePlayerCharacterEntity playerCharacterEntity, bool shareExp, bool shareItem)
         {
-            if (playerCharacterEntity == null || !IsServer)
+            if (!CanCreateParty(playerCharacterEntity))
                 return;
             StartCoroutine(CreatePartyRoutine(playerCharacterEntity, shareExp, shareItem));
         }
@@ -71,10 +64,8 @@ namespace MultiplayerARPG.MMO
             createPartyJob.Start();
             yield return StartCoroutine(createPartyJob.WaitFor());
             var partyId = createPartyJob.result;
-            var party = new PartyData(partyId, shareExp, shareItem, playerCharacterEntity);
-            parties[partyId] = party;
-            playerCharacterEntity.PartyId = partyId;
-            playerCharacterEntity.PartyMemberFlags = party.GetPartyMemberFlags(playerCharacterEntity);
+            // Create party
+            base.CreateParty(playerCharacterEntity, shareExp, shareItem, partyId);
             // Save to database
             new SetCharacterPartyJob(Database, playerCharacterEntity.Id, partyId).Start();
             // Broadcast via chat server
@@ -84,19 +75,12 @@ namespace MultiplayerARPG.MMO
 
         public override void PartySetting(BasePlayerCharacterEntity playerCharacterEntity, bool shareExp, bool shareItem)
         {
-            if (playerCharacterEntity == null || !IsServer)
-                return;
-            var partyId = playerCharacterEntity.PartyId;
+            int partyId;
             PartyData party;
-            if (!parties.TryGetValue(partyId, out party))
+            if (!CanPartySetting(playerCharacterEntity, out partyId, out party))
                 return;
-            if (!party.IsLeader(playerCharacterEntity))
-            {
-                // TODO: May warn that it's not party leader
-                return;
-            }
-            party.Setting(shareExp, shareItem);
-            parties[partyId] = party;
+
+            base.PartySetting(playerCharacterEntity, shareExp, shareItem);
             // Save to database
             new UpdatePartyJob(Database, partyId, shareExp, shareItem).Start();
             // Broadcast via chat server
@@ -106,26 +90,12 @@ namespace MultiplayerARPG.MMO
 
         public override void AddPartyMember(BasePlayerCharacterEntity inviteCharacterEntity, BasePlayerCharacterEntity acceptCharacterEntity)
         {
-            if (inviteCharacterEntity == null || acceptCharacterEntity == null || !IsServer)
-                return;
-            var partyId = inviteCharacterEntity.PartyId;
+            int partyId;
             PartyData party;
-            if (!parties.TryGetValue(partyId, out party))
+            if (!CanAddPartyMember(inviteCharacterEntity, acceptCharacterEntity, out partyId, out party))
                 return;
-            if (!party.IsLeader(inviteCharacterEntity))
-            {
-                // TODO: May warn that it's not party leader
-                return;
-            }
-            if (party.CountMember() == gameInstance.SocialSystemSetting.maxPartyMember)
-            {
-                // TODO: May warn that it's exceeds limit max party member
-                return;
-            }
-            party.AddMember(acceptCharacterEntity);
-            parties[partyId] = party;
-            acceptCharacterEntity.PartyId = partyId;
-            acceptCharacterEntity.PartyMemberFlags = party.GetPartyMemberFlags(acceptCharacterEntity);
+
+            base.AddPartyMember(inviteCharacterEntity, acceptCharacterEntity);
             // Save to database
             new SetCharacterPartyJob(Database, acceptCharacterEntity.Id, partyId).Start();
             // Broadcast via chat server
@@ -135,22 +105,12 @@ namespace MultiplayerARPG.MMO
 
         public override void KickFromParty(BasePlayerCharacterEntity playerCharacterEntity, string characterId)
         {
-            if (playerCharacterEntity == null || !IsServer)
-                return;
-            var partyId = playerCharacterEntity.PartyId;
+            int partyId;
             PartyData party;
-            if (!parties.TryGetValue(partyId, out party))
+            if (!CanKickFromParty(playerCharacterEntity, out partyId, out party))
                 return;
-            if (!party.IsLeader(playerCharacterEntity))
-            {
-                // TODO: May warn that it's not party leader
-                return;
-            }
-            BasePlayerCharacterEntity memberCharacterEntity;
-            if (playerCharactersById.TryGetValue(characterId, out memberCharacterEntity))
-                memberCharacterEntity.ClearParty();
-            party.RemoveMember(characterId);
-            parties[partyId] = party;
+
+            base.KickFromParty(playerCharacterEntity, characterId);
             // Save to database
             new SetCharacterPartyJob(Database, characterId, 0).Start();
             // Broadcast via chat server
@@ -160,12 +120,11 @@ namespace MultiplayerARPG.MMO
 
         public override void LeaveParty(BasePlayerCharacterEntity playerCharacterEntity)
         {
-            if (playerCharacterEntity == null || !IsServer)
-                return;
-            var partyId = playerCharacterEntity.PartyId;
+            int partyId;
             PartyData party;
-            if (!parties.TryGetValue(partyId, out party))
+            if (!CanLeaveParty(playerCharacterEntity, out partyId, out party))
                 return;
+
             // If it is leader kick all members and terminate party
             if (party.IsLeader(playerCharacterEntity))
             {
@@ -202,7 +161,7 @@ namespace MultiplayerARPG.MMO
 
         public override void CreateGuild(BasePlayerCharacterEntity playerCharacterEntity, string guildName)
         {
-            if (playerCharacterEntity == null || !IsServer)
+            if (!CanCreateGuild(playerCharacterEntity))
                 return;
             StartCoroutine(CreateGuildRoutine(playerCharacterEntity, guildName));
         }
@@ -213,12 +172,11 @@ namespace MultiplayerARPG.MMO
             createGuildJob.Start();
             yield return StartCoroutine(createGuildJob.WaitFor());
             var guildId = createGuildJob.result;
-            var guild = new GuildData(guildId, guildName, playerCharacterEntity);
+            // Create guild
+            base.CreateGuild(playerCharacterEntity, guildName, guildId);
+            // Retrieve required data
             byte guildRole;
-            guilds[guildId] = guild;
-            playerCharacterEntity.GuildId = guildId;
-            playerCharacterEntity.GuildMemberFlags = guild.GetGuildMemberFlagsAndRole(playerCharacterEntity, out guildRole);
-            playerCharacterEntity.GuildRole = guildRole;
+            guilds[guildId].GetGuildMemberFlagsAndRole(playerCharacterEntity, out guildRole);
             // Save to database
             new SetCharacterGuildJob(Database, playerCharacterEntity.Id, guildId, guildRole).Start();
             // Broadcast via chat server
@@ -228,19 +186,12 @@ namespace MultiplayerARPG.MMO
 
         public override void SetGuildMessage(BasePlayerCharacterEntity playerCharacterEntity, string guildMessage)
         {
-            if (playerCharacterEntity == null || !IsServer)
-                return;
-            var guildId = playerCharacterEntity.GuildId;
+            int guildId;
             GuildData guild;
-            if (!guilds.TryGetValue(guildId, out guild))
+            if (!CanSetGuildMessage(playerCharacterEntity, out guildId, out guild))
                 return;
-            if (!guild.IsLeader(playerCharacterEntity))
-            {
-                // TODO: May warn that it's not guild leader
-                return;
-            }
-            guild.guildMessage = guildMessage;
-            guilds[guildId] = guild;
+
+            base.SetGuildMessage(playerCharacterEntity, guildMessage);
             // Save to database
             new SetGuildMessageJob(Database, guildId, guildMessage).Start();
             // Broadcast via chat server
@@ -250,28 +201,14 @@ namespace MultiplayerARPG.MMO
 
         public override void AddGuildMember(BasePlayerCharacterEntity inviteCharacterEntity, BasePlayerCharacterEntity acceptCharacterEntity)
         {
-            if (inviteCharacterEntity == null || acceptCharacterEntity == null || !IsServer)
-                return;
-            var guildId = inviteCharacterEntity.GuildId;
+            int guildId;
             GuildData guild;
-            if (!guilds.TryGetValue(guildId, out guild))
+            if (!CanAddGuildMember(inviteCharacterEntity, acceptCharacterEntity, out guildId, out guild))
                 return;
-            if (!guild.IsLeader(inviteCharacterEntity))
-            {
-                // TODO: May warn that it's not guild leader
-                return;
-            }
-            if (guild.CountMember() == gameInstance.SocialSystemSetting.maxGuildMember)
-            {
-                // TODO: May warn that it's exceeds limit max guild member
-                return;
-            }
-            guild.AddMember(acceptCharacterEntity);
+
+            base.AddGuildMember(inviteCharacterEntity, acceptCharacterEntity);
             byte guildRole;
-            guilds[guildId] = guild;
-            acceptCharacterEntity.GuildId = guildId;
-            acceptCharacterEntity.GuildMemberFlags = guild.GetGuildMemberFlagsAndRole(acceptCharacterEntity, out guildRole);
-            acceptCharacterEntity.GuildRole = guildRole;
+            guild.GetGuildMemberFlagsAndRole(acceptCharacterEntity, out guildRole);
             // Save to database
             new SetCharacterGuildJob(Database, acceptCharacterEntity.Id, guildId, guildRole).Start();
             // Broadcast via chat server
@@ -281,22 +218,12 @@ namespace MultiplayerARPG.MMO
 
         public override void KickFromGuild(BasePlayerCharacterEntity playerCharacterEntity, string characterId)
         {
-            if (playerCharacterEntity == null || !IsServer)
-                return;
-            var guildId = playerCharacterEntity.GuildId;
+            int guildId;
             GuildData guild;
-            if (!guilds.TryGetValue(guildId, out guild))
+            if (!CanKickFromGuild(playerCharacterEntity, out guildId, out guild))
                 return;
-            if (!guild.IsLeader(playerCharacterEntity))
-            {
-                // TODO: May warn that it's not guild leader
-                return;
-            }
-            BasePlayerCharacterEntity memberCharacterEntity;
-            if (playerCharactersById.TryGetValue(characterId, out memberCharacterEntity))
-                memberCharacterEntity.ClearGuild();
-            guild.RemoveMember(characterId);
-            guilds[guildId] = guild;
+
+            base.KickFromGuild(playerCharacterEntity, characterId);
             // Save to database
             new SetCharacterGuildJob(Database, characterId, 0, 0).Start();
             // Broadcast via chat server
@@ -306,12 +233,11 @@ namespace MultiplayerARPG.MMO
 
         public override void LeaveGuild(BasePlayerCharacterEntity playerCharacterEntity)
         {
-            if (playerCharacterEntity == null || !IsServer)
-                return;
-            var guildId = playerCharacterEntity.GuildId;
+            int guildId;
             GuildData guild;
-            if (!guilds.TryGetValue(guildId, out guild))
+            if (!CanLeaveGuild(playerCharacterEntity, out guildId, out guild))
                 return;
+
             // If it is leader kick all members and terminate guild
             if (guild.IsLeader(playerCharacterEntity))
             {
@@ -326,6 +252,7 @@ namespace MultiplayerARPG.MMO
                     if (ChatNetworkManager.IsClientConnected)
                         ChatNetworkManager.UpdateGuildMemberRemove(guildId, memberId);
                 }
+                guilds.Remove(guildId);
                 // Save to database
                 new DeleteGuildJob(Database, guildId).Start();
                 // Broadcast via chat server
@@ -335,6 +262,8 @@ namespace MultiplayerARPG.MMO
             else
             {
                 playerCharacterEntity.ClearGuild();
+                guild.RemoveMember(playerCharacterEntity.Id);
+                guilds[guildId] = guild;
                 // Save to database
                 new SetCharacterGuildJob(Database, playerCharacterEntity.Id, 0, 0).Start();
                 // Broadcast via chat server
