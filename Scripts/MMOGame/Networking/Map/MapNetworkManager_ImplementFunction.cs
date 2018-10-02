@@ -199,6 +199,21 @@ namespace MultiplayerARPG.MMO
                 ChatNetworkManager.UpdateSetGuildMessage(guildId, guildMessage);
         }
 
+        public override void SetGuildMemberRole(BasePlayerCharacterEntity playerCharacterEntity, string characterId, byte guildRole)
+        {
+            int guildId;
+            GuildData guild;
+            if (!CanSetGuildMemberRole(playerCharacterEntity, out guildId, out guild))
+                return;
+
+            base.SetGuildMemberRole(playerCharacterEntity, characterId, guildRole);
+            // Save to database
+            new SetGuildMemberRoleJob(Database, characterId, guildRole).Start();
+            // Broadcast via chat server
+            if (ChatNetworkManager.IsClientConnected)
+                ChatNetworkManager.UpdateSetGuildMemberRole(guildId, characterId, guildRole);
+        }
+
         public override void AddGuildMember(BasePlayerCharacterEntity inviteCharacterEntity, BasePlayerCharacterEntity acceptCharacterEntity)
         {
             int guildId;
