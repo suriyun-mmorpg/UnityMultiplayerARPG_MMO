@@ -666,7 +666,7 @@ namespace MultiplayerARPG.MMO
         public void OnUpdatePartyMember(UpdatePartyMemberMessage message)
         {
             PartyData party;
-            BasePlayerCharacterEntity playerCharacter;
+            BasePlayerCharacterEntity playerCharacterEntity;
             SocialCharacterData partyMember;
             if (parties.TryGetValue(message.id, out party))
             {
@@ -678,19 +678,16 @@ namespace MultiplayerARPG.MMO
                         partyMember.characterName = message.characterName;
                         partyMember.dataId = message.dataId;
                         partyMember.level = message.level;
-                        if (playerCharactersById.TryGetValue(message.characterId, out playerCharacter))
+                        if (playerCharactersById.TryGetValue(message.characterId, out playerCharacterEntity))
                         {
-                            playerCharacter.PartyId = message.id;
-                            playerCharacter.PartyMemberFlags = party.GetPartyMemberFlags(playerCharacter);
+                            playerCharacterEntity.PartyId = message.id;
+                            playerCharacterEntity.PartyMemberFlags = party.GetPartyMemberFlags(playerCharacterEntity);
                         }
                         party.AddMember(partyMember);
                         break;
                     case UpdatePartyMemberMessage.UpdateType.Remove:
-                        if (playerCharactersById.TryGetValue(message.characterId, out playerCharacter))
-                        {
-                            playerCharacter.PartyId = 0;
-                            playerCharacter.PartyMemberFlags = 0;
-                        }
+                        if (playerCharactersById.TryGetValue(message.characterId, out playerCharacterEntity))
+                            playerCharacterEntity.ClearParty();
                         party.RemoveMember(message.characterId);
                         break;
                 }
@@ -718,7 +715,7 @@ namespace MultiplayerARPG.MMO
         public void OnUpdateGuildMember(UpdateGuildMemberMessage message)
         {
             GuildData guild;
-            BasePlayerCharacterEntity playerCharacter;
+            BasePlayerCharacterEntity playerCharacterEntity;
             SocialCharacterData guildMember;
             if (guilds.TryGetValue(message.id, out guild))
             {
@@ -730,22 +727,18 @@ namespace MultiplayerARPG.MMO
                         guildMember.characterName = message.characterName;
                         guildMember.dataId = message.dataId;
                         guildMember.level = message.level;
-                        if (playerCharactersById.TryGetValue(message.characterId, out playerCharacter))
+                        if (playerCharactersById.TryGetValue(message.characterId, out playerCharacterEntity))
                         {
                             byte guildRole;
-                            playerCharacter.GuildId = message.id;
-                            playerCharacter.GuildMemberFlags = guild.GetGuildMemberFlagsAndRole(playerCharacter, out guildRole);
-                            playerCharacter.GuildRole = guildRole;
+                            playerCharacterEntity.GuildId = message.id;
+                            playerCharacterEntity.GuildMemberFlags = guild.GetGuildMemberFlagsAndRole(playerCharacterEntity, out guildRole);
+                            playerCharacterEntity.GuildRole = guildRole;
                         }
                         guild.AddMember(guildMember);
                         break;
                     case UpdateGuildMemberMessage.UpdateType.Remove:
-                        if (playerCharactersById.TryGetValue(message.characterId, out playerCharacter))
-                        {
-                            playerCharacter.GuildId = 0;
-                            playerCharacter.GuildMemberFlags = 0;
-                            playerCharacter.GuildRole = 0;
-                        }
+                        if (playerCharactersById.TryGetValue(message.characterId, out playerCharacterEntity))
+                            playerCharacterEntity.ClearGuild();
                         guild.RemoveMember(message.characterId);
                         break;
                 }
