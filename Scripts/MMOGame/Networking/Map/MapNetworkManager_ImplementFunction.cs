@@ -107,7 +107,7 @@ namespace MultiplayerARPG.MMO
         {
             int partyId;
             PartyData party;
-            if (!CanKickFromParty(playerCharacterEntity, out partyId, out party))
+            if (!CanKickFromParty(playerCharacterEntity, characterId, out partyId, out party))
                 return;
 
             base.KickFromParty(playerCharacterEntity, characterId);
@@ -220,7 +220,7 @@ namespace MultiplayerARPG.MMO
         {
             int guildId;
             GuildData guild;
-            if (!CanKickFromGuild(playerCharacterEntity, out guildId, out guild))
+            if (!CanKickFromGuild(playerCharacterEntity, characterId, out guildId, out guild))
                 return;
 
             base.KickFromGuild(playerCharacterEntity, characterId);
