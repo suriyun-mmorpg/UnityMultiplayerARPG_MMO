@@ -148,17 +148,14 @@ namespace MultiplayerARPG.MMO
             }
             BasePlayerCharacterEntity memberCharacterEntity;
             if (playerCharactersById.TryGetValue(characterId, out memberCharacterEntity))
-            {
-                memberCharacterEntity.PartyId = 0;
-                memberCharacterEntity.PartyMemberFlags = 0;
-            }
+                memberCharacterEntity.ClearParty();
             party.RemoveMember(characterId);
             parties[partyId] = party;
             // Save to database
             new SetCharacterPartyJob(Database, characterId, 0).Start();
             // Broadcast via chat server
             if (ChatNetworkManager.IsClientConnected)
-                ChatNetworkManager.UpdatePartyMemberRemove(playerCharacterEntity.PartyId, characterId);
+                ChatNetworkManager.UpdatePartyMemberRemove(partyId, characterId);
         }
 
         public override void LeaveParty(BasePlayerCharacterEntity playerCharacterEntity)
@@ -176,10 +173,7 @@ namespace MultiplayerARPG.MMO
                 {
                     BasePlayerCharacterEntity memberCharacterEntity;
                     if (playerCharactersById.TryGetValue(memberId, out memberCharacterEntity))
-                    {
-                        memberCharacterEntity.PartyId = 0;
-                        memberCharacterEntity.PartyMemberFlags = 0;
-                    }
+                        memberCharacterEntity.ClearParty();
                     // Save to database
                     new SetCharacterPartyJob(Database, memberId, 0).Start();
                     // Broadcast via chat server
@@ -195,8 +189,7 @@ namespace MultiplayerARPG.MMO
             }
             else
             {
-                playerCharacterEntity.PartyId = 0;
-                playerCharacterEntity.PartyMemberFlags = 0;
+                playerCharacterEntity.ClearParty();
                 party.RemoveMember(playerCharacterEntity.Id);
                 parties[partyId] = party;
                 // Save to database
@@ -290,8 +283,9 @@ namespace MultiplayerARPG.MMO
         {
             if (playerCharacterEntity == null || !IsServer)
                 return;
+            var guildId = playerCharacterEntity.GuildId;
             GuildData guild;
-            if (!guilds.TryGetValue(playerCharacterEntity.GuildId, out guild))
+            if (!guilds.TryGetValue(guildId, out guild))
                 return;
             if (!guild.IsLeader(playerCharacterEntity))
             {
@@ -300,16 +294,14 @@ namespace MultiplayerARPG.MMO
             }
             BasePlayerCharacterEntity memberCharacterEntity;
             if (playerCharactersById.TryGetValue(characterId, out memberCharacterEntity))
-            {
-                memberCharacterEntity.GuildId = 0;
-                memberCharacterEntity.GuildMemberFlags = 0;
-                memberCharacterEntity.GuildRole = 0;
-            }
+                memberCharacterEntity.ClearGuild();
+            guild.RemoveMember(characterId);
+            guilds[guildId] = guild;
             // Save to database
             new SetCharacterGuildJob(Database, characterId, 0, 0).Start();
             // Broadcast via chat server
             if (ChatNetworkManager.IsClientConnected)
-                ChatNetworkManager.UpdateGuildMemberRemove(playerCharacterEntity.GuildId, characterId);
+                ChatNetworkManager.UpdateGuildMemberRemove(guildId, characterId);
         }
 
         public override void LeaveGuild(BasePlayerCharacterEntity playerCharacterEntity)
@@ -327,11 +319,7 @@ namespace MultiplayerARPG.MMO
                 {
                     BasePlayerCharacterEntity memberCharacterEntity;
                     if (playerCharactersById.TryGetValue(memberId, out memberCharacterEntity))
-                    {
-                        memberCharacterEntity.GuildId = 0;
-                        memberCharacterEntity.GuildMemberFlags = 0;
-                        memberCharacterEntity.GuildRole = 0;
-                    }
+                        memberCharacterEntity.ClearGuild();
                     // Save to database
                     new SetCharacterGuildJob(Database, memberId, 0, 0).Start();
                     // Broadcast via chat server
@@ -346,9 +334,7 @@ namespace MultiplayerARPG.MMO
             }
             else
             {
-                playerCharacterEntity.GuildId = 0;
-                playerCharacterEntity.GuildMemberFlags = 0;
-                playerCharacterEntity.GuildRole = 0;
+                playerCharacterEntity.ClearGuild();
                 // Save to database
                 new SetCharacterGuildJob(Database, playerCharacterEntity.Id, 0, 0).Start();
                 // Broadcast via chat server
