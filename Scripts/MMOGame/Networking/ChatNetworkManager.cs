@@ -384,6 +384,16 @@ namespace MultiplayerARPG.MMO
             ClientSendPacket(SendOptions.ReliableOrdered, MMOMessageTypes.UpdateGuild, updateMessage);
         }
 
+        public void UpdateSetGuildMemberRole(int id, string characterId, byte guildRole)
+        {
+            var updateMessage = new UpdateGuildMessage();
+            updateMessage.type = UpdateGuildMessage.UpdateType.SetGuildMemberRole;
+            updateMessage.id = id;
+            updateMessage.characterId = characterId;
+            updateMessage.guildRole = guildRole;
+            ClientSendPacket(SendOptions.ReliableOrdered, MMOMessageTypes.UpdateGuild, updateMessage);
+        }
+
         public void UpdateGuildTerminate(int id)
         {
             var updateMessage = new UpdateGuildMessage();

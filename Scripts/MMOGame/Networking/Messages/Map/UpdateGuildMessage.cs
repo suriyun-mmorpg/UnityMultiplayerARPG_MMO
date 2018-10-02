@@ -10,26 +10,45 @@ namespace MultiplayerARPG.MMO
         public enum UpdateType : byte
         {
             SetGuildMessage,
+            SetGuildMemberRole,
             Terminate,
         }
         public UpdateType type;
         public int id;
         public string guildMessage;
+        public string characterId;
+        public byte guildRole;
 
         public void Deserialize(NetDataReader reader)
         {
             type = (UpdateType)reader.GetByte();
             id = reader.GetInt();
-            if (type == UpdateType.SetGuildMessage)
-                guildMessage = reader.GetString();
+            switch (type)
+            {
+                case UpdateType.SetGuildMessage:
+                    guildMessage = reader.GetString();
+                    break;
+                case UpdateType.SetGuildMemberRole:
+                    characterId = reader.GetString();
+                    guildRole = reader.GetByte();
+                    break;
+            }
         }
 
         public void Serialize(NetDataWriter writer)
         {
             writer.Put((byte)type);
             writer.Put(id);
-            if (type == UpdateType.SetGuildMessage)
-                writer.Put(guildMessage);
+            switch (type)
+            {
+                case UpdateType.SetGuildMessage:
+                    writer.Put(guildMessage);
+                    break;
+                case UpdateType.SetGuildMemberRole:
+                    writer.Put(characterId);
+                    writer.Put(guildRole);
+                    break;
+            }
         }
     }
 }
