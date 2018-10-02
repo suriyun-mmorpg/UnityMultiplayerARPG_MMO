@@ -54,6 +54,13 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@message", message),
                 new MySqlParameter("@id", id));
         }
+        
+        public override void UpdateGuildMemberRole(string characterId, byte guildRole)
+        {
+            ExecuteNonQuery("UPDATE characters SET guildRole=@guildRole WHERE id=@characterId",
+                new MySqlParameter("@characterId", characterId),
+                new MySqlParameter("@guildRole", guildRole));
+        }
 
         public override void DeleteGuild(int id)
         {

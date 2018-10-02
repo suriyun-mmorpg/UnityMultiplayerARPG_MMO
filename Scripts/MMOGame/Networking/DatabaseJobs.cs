@@ -280,6 +280,22 @@ namespace MultiplayerARPG.MMO
         }
     }
 
+    public class SetGuildMemberRoleJob : DatabaseJob
+    {
+        private string characterId;
+        private byte guildRole;
+        public SetGuildMemberRoleJob(BaseDatabase database, string characterId, byte guildRole, Action onFinished = null) : base(database, onFinished)
+        {
+            this.characterId = characterId;
+            this.guildRole = guildRole;
+        }
+
+        protected override void ThreadFunction()
+        {
+            database.UpdateGuildMemberRole(characterId, guildRole);
+        }
+    }
+
     public class DeleteGuildJob : DatabaseJob
     {
         private int id;

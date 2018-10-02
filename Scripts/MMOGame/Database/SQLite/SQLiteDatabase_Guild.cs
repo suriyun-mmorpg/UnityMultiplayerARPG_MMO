@@ -55,6 +55,13 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@id", id));
         }
 
+        public override void UpdateGuildMemberRole(string characterId, byte guildRole)
+        {
+            ExecuteNonQuery("UPDATE characters SET guildRole=@guildRole WHERE id=@characterId",
+                new SqliteParameter("@characterId", characterId),
+                new SqliteParameter("@guildRole", guildRole));
+        }
+
         public override void DeleteGuild(int id)
         {
             ExecuteNonQuery("DELETE FROM guild WHERE id=@id;" +
