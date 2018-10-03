@@ -696,6 +696,7 @@ namespace MultiplayerARPG.MMO
 
         public void OnUpdateParty(UpdatePartyMessage message)
         {
+            BasePlayerCharacterEntity playerCharacterEntity;
             PartyData party;
             if (parties.TryGetValue(message.id, out party))
             {
@@ -704,12 +705,19 @@ namespace MultiplayerARPG.MMO
                     case UpdatePartyMessage.UpdateType.ChangeLeader:
                         party.SetLeader(message.characterId);
                         parties[message.id] = party;
+                        if (TryGetPlayerCharacterById(message.characterId, out playerCharacterEntity))
+                            playerCharacterEntity.PartyMemberFlags = party.GetPartyMemberFlags(playerCharacterEntity);
                         break;
                     case UpdatePartyMessage.UpdateType.Setting:
                         party.Setting(message.shareExp, message.shareItem);
                         parties[message.id] = party;
                         break;
                     case UpdatePartyMessage.UpdateType.Terminate:
+                        foreach (var memberId in party.GetMemberIds())
+                        {
+                            if (playerCharactersById.TryGetValue(memberId, out playerCharacterEntity))
+                                playerCharacterEntity.ClearParty();
+                        }
                         parties.Remove(message.id);
                         break;
                 }
@@ -793,6 +801,11 @@ namespace MultiplayerARPG.MMO
                         }
                         break;
                     case UpdateGuildMessage.UpdateType.Terminate:
+                        foreach (var memberId in guild.GetMemberIds())
+                        {
+                            if (playerCharactersById.TryGetValue(memberId, out playerCharacterEntity))
+                                playerCharacterEntity.ClearGuild();
+                        }
                         guilds.Remove(message.id);
                         break;
                 }
