@@ -752,6 +752,7 @@ namespace MultiplayerARPG.MMO
         public void OnUpdateGuild(UpdateGuildMessage message)
         {
             BasePlayerCharacterEntity playerCharacterEntity;
+            byte guildRole;
             GuildData guild;
             if (guilds.TryGetValue(message.id, out guild))
             {
@@ -760,13 +761,18 @@ namespace MultiplayerARPG.MMO
                     case UpdateGuildMessage.UpdateType.ChangeLeader:
                         guild.SetLeader(message.characterId);
                         guilds[message.id] = guild;
+                        if (TryGetPlayerCharacterById(message.characterId, out playerCharacterEntity))
+                        {
+                            playerCharacterEntity.GuildMemberFlags = guild.GetGuildMemberFlagsAndRole(playerCharacterEntity, out guildRole);
+                            playerCharacterEntity.GuildRole = guildRole;
+                        }
                         break;
                     case UpdateGuildMessage.UpdateType.SetGuildMessage:
                         guild.guildMessage = message.guildMessage;
                         guilds[message.id] = guild;
                         break;
                     case UpdateGuildMessage.UpdateType.SetGuildMemberRole:
-                        byte guildRole = message.guildRole;
+                        guildRole = message.guildRole;
                         guild.SetMemberRole(message.characterId, guildRole);
                         guilds[message.id] = guild;
                         if (TryGetPlayerCharacterById(message.characterId, out playerCharacterEntity))
