@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Sep 24, 2018 at 02:25 AM
+-- Generation Time: Oct 03, 2018 at 03:46 AM
 -- Server version: 10.1.28-MariaDB
 -- PHP Version: 7.1.11
 
@@ -199,6 +199,21 @@ CREATE TABLE `guild` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `guildrole`
+--
+
+CREATE TABLE `guildrole` (
+  `guildId` int(11) NOT NULL,
+  `guildRole` int(11) NOT NULL,
+  `name` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `canInvite` tinyint(1) NOT NULL,
+  `canKick` tinyint(1) NOT NULL,
+  `shareExpPercentage` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `party`
 --
 
@@ -284,6 +299,12 @@ ALTER TABLE `characterskill`
 --
 ALTER TABLE `guild`
   ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `guildrole`
+--
+ALTER TABLE `guildrole`
+  ADD PRIMARY KEY (`guildId`,`guildRole`) USING BTREE;
 
 --
 -- Indexes for table `party`

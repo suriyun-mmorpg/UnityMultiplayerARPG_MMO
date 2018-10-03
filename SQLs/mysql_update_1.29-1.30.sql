@@ -12,4 +12,15 @@ CREATE TABLE `guild` (
   `guildMessage` varchar(160) COLLATE utf8_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+CREATE TABLE `guildrole` (
+  `guildId` int(11) NOT NULL,
+  `guildRole` int(11) NOT NULL,
+  `name` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `canInvite` tinyint(1) NOT NULL,
+  `canKick` tinyint(1) NOT NULL,
+  `shareExpPercentage` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
 ALTER TABLE `guild` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE `guildrole` ADD PRIMARY KEY (`guildId`,`guildRole`) USING BTREE;
