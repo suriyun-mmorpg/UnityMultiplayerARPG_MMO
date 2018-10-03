@@ -126,6 +126,7 @@ namespace MultiplayerARPG.MMO
               partyId INTEGER NOT NULL,
               guildId INTEGER NOT NULL,
               guildRole INTEGER NOT NULL,
+              sharedGuildExp INTEGER NOT NULL,
               currentMapName TEXT NOT NULL,
               currentPositionX REAL NOT NULL,
               currentPositionY REAL NOT NULL,
@@ -211,6 +212,8 @@ namespace MultiplayerARPG.MMO
                 ExecuteNonQuery("ALTER TABLE characters ADD guildId INTEGER NOT NULL DEFAULT 0;");
             if (!IsColumnExist("characters", "guildRole"))
                 ExecuteNonQuery("ALTER TABLE characters ADD guildRole INTEGER NOT NULL DEFAULT 0;");
+            if (!IsColumnExist("characters", "sharedGuildExp"))
+                ExecuteNonQuery("ALTER TABLE characters ADD sharedGuildExp INTEGER NOT NULL DEFAULT 0;");
         }
 
         private bool IsColumnExist(string tableName, string findingColumn)

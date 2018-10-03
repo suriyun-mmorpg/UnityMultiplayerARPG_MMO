@@ -149,6 +149,7 @@ CREATE TABLE `characters` (
   `partyId` int(11) NOT NULL DEFAULT '0',
   `guildId` int(11) NOT NULL DEFAULT '0',
   `guildRole` int(11) NOT NULL DEFAULT '0',
+  `sharedGuildExp` int(11) NOT NULL DEFAULT '0',
   `currentMapName` varchar(50) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
   `currentPositionX` float NOT NULL DEFAULT '0',
   `currentPositionY` float NOT NULL DEFAULT '0',

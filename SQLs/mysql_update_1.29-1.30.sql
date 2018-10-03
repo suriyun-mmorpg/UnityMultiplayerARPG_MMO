@@ -1,4 +1,5 @@
 ALTER TABLE `characters` ADD `guildRole` INT NOT NULL DEFAULT '0' AFTER `guildId`;
+ALTER TABLE `characters` ADD `sharedGuildExp` INT NOT NULL DEFAULT '0' AFTER `guildRole`;
 
 CREATE TABLE `guild` (
   `id` int(11) NOT NULL,
