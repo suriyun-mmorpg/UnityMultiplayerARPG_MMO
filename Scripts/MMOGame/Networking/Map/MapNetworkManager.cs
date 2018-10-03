@@ -678,12 +678,12 @@ namespace MultiplayerARPG.MMO
                         partyMember.characterName = message.characterName;
                         partyMember.dataId = message.dataId;
                         partyMember.level = message.level;
+                        party.AddMember(partyMember);
                         if (playerCharactersById.TryGetValue(message.characterId, out playerCharacterEntity))
                         {
                             playerCharacterEntity.PartyId = message.id;
                             playerCharacterEntity.PartyMemberFlags = party.GetPartyMemberFlags(playerCharacterEntity);
                         }
-                        party.AddMember(partyMember);
                         break;
                     case UpdatePartyMemberMessage.UpdateType.Remove:
                         if (playerCharactersById.TryGetValue(message.characterId, out playerCharacterEntity))
@@ -727,6 +727,7 @@ namespace MultiplayerARPG.MMO
                         guildMember.characterName = message.characterName;
                         guildMember.dataId = message.dataId;
                         guildMember.level = message.level;
+                        guild.AddMember(guildMember);
                         if (playerCharactersById.TryGetValue(message.characterId, out playerCharacterEntity))
                         {
                             byte guildRole;
@@ -734,7 +735,6 @@ namespace MultiplayerARPG.MMO
                             playerCharacterEntity.GuildMemberFlags = guild.GetGuildMemberFlagsAndRole(playerCharacterEntity, out guildRole);
                             playerCharacterEntity.GuildRole = guildRole;
                         }
-                        guild.AddMember(guildMember);
                         break;
                     case UpdateGuildMemberMessage.UpdateType.Remove:
                         if (playerCharactersById.TryGetValue(message.characterId, out playerCharacterEntity))
