@@ -168,10 +168,10 @@ namespace MultiplayerARPG.MMO
         }
     }
 
-    public class LoadPartyJob : DatabaseJob<PartyData>
+    public class ReadPartyJob : DatabaseJob<PartyData>
     {
         private int id;
-        public LoadPartyJob(BaseDatabase database, int id, Action<PartyData> onFinished = null) : base(database, onFinished)
+        public ReadPartyJob(BaseDatabase database, int id, Action<PartyData> onFinished = null) : base(database, onFinished)
         {
             this.id = id;
         }
@@ -179,6 +179,22 @@ namespace MultiplayerARPG.MMO
         protected override void ThreadFunction()
         {
             result = database.ReadParty(id);
+        }
+    }
+
+    public class UpdatePartyLeaderJob : DatabaseJob
+    {
+        private int id;
+        private string characterId;
+        public UpdatePartyLeaderJob(BaseDatabase database, int id, string characterId, Action onFinished = null) : base(database, onFinished)
+        {
+            this.id = id;
+            this.characterId = characterId;
+        }
+
+        protected override void ThreadFunction()
+        {
+            database.UpdatePartyLeader(id, characterId);
         }
     }
 
@@ -226,7 +242,7 @@ namespace MultiplayerARPG.MMO
 
         protected override void ThreadFunction()
         {
-            database.SetCharacterParty(characterId, id);
+            database.UpdateCharacterParty(characterId, id);
         }
     }
     #endregion
@@ -236,24 +252,22 @@ namespace MultiplayerARPG.MMO
     {
         private string guildName;
         private string leaderId;
-        private string leaderName;
-        public CreateGuildJob(BaseDatabase database, string guildName, string leaderId, string leaderName, Action<int> onFinished = null) : base(database, onFinished)
+        public CreateGuildJob(BaseDatabase database, string guildName, string leaderId, Action<int> onFinished = null) : base(database, onFinished)
         {
             this.guildName = guildName;
             this.leaderId = leaderId;
-            this.leaderName = leaderName;
         }
 
         protected override void ThreadFunction()
         {
-            result = database.CreateGuild(guildName, leaderId, leaderName);
+            result = database.CreateGuild(guildName, leaderId);
         }
     }
 
-    public class LoadGuildJob : DatabaseJob<GuildData>
+    public class ReadGuildJob : DatabaseJob<GuildData>
     {
         private int id;
-        public LoadGuildJob(BaseDatabase database, int id, Action<GuildData> onFinished = null) : base(database, onFinished)
+        public ReadGuildJob(BaseDatabase database, int id, Action<GuildData> onFinished = null) : base(database, onFinished)
         {
             this.id = id;
         }
@@ -263,12 +277,44 @@ namespace MultiplayerARPG.MMO
             result = database.ReadGuild(id);
         }
     }
+    
+    public class IncreaseGuildExp : DatabaseJob<int>
+    {
+        private int id;
+        private int amount;
+        public IncreaseGuildExp(BaseDatabase database, int id, int amount, Action<int> onFinished = null) : base(database, onFinished)
+        {
+            this.id = id;
+            this.amount = amount;
+        }
 
-    public class SetGuildMessageJob : DatabaseJob
+        protected override void ThreadFunction()
+        {
+            result = database.IncreaseGuildExp(id, amount);
+        }
+    }
+
+    public class UpdateGuildLeaderJob : DatabaseJob
+    {
+        private int id;
+        private string characterId;
+        public UpdateGuildLeaderJob(BaseDatabase database, int id, string characterId, Action onFinished = null) : base(database, onFinished)
+        {
+            this.id = id;
+            this.characterId = characterId;
+        }
+
+        protected override void ThreadFunction()
+        {
+            database.UpdateGuildLeader(id, characterId);
+        }
+    }
+
+    public class UpdateGuildMessageJob : DatabaseJob
     {
         private int id;
         private string message;
-        public SetGuildMessageJob(BaseDatabase database, int id, string message, Action onFinished = null) : base(database, onFinished)
+        public UpdateGuildMessageJob(BaseDatabase database, int id, string message, Action onFinished = null) : base(database, onFinished)
         {
             this.id = id;
             this.message = message;
@@ -277,6 +323,30 @@ namespace MultiplayerARPG.MMO
         protected override void ThreadFunction()
         {
             database.UpdateGuildMessage(id, message);
+        }
+    }
+
+    public class UpdateGuildRoleJob : DatabaseJob
+    {
+        private int id;
+        private byte guildRole;
+        private string name;
+        private bool canInvite;
+        private bool canKick;
+        private byte shareExpPercentage;
+        public UpdateGuildRoleJob(BaseDatabase database, int id, byte guildRole, string name, bool canInvite, bool canKick, byte shareExpPercentage, Action onFinished = null) : base(database, onFinished)
+        {
+            this.id = id;
+            this.guildRole = guildRole;
+            this.name = name;
+            this.canInvite = canInvite;
+            this.canKick = canKick;
+            this.shareExpPercentage = shareExpPercentage;
+        }
+
+        protected override void ThreadFunction()
+        {
+            database.UpdateGuildRole(id, guildRole, name, canInvite, canKick, shareExpPercentage);
         }
     }
 
@@ -324,7 +394,7 @@ namespace MultiplayerARPG.MMO
 
         protected override void ThreadFunction()
         {
-            database.SetCharacterGuild(characterId, id, guildRole);
+            database.UpdateCharacterGuild(characterId, id, guildRole);
         }
     }
     #endregion
@@ -394,10 +464,10 @@ namespace MultiplayerARPG.MMO
         }
     }
 
-    public class LoadBuildingsJob : DatabaseJob<List<BuildingSaveData>>
+    public class ReadBuildingsJob : DatabaseJob<List<BuildingSaveData>>
     {
         private string sceneName;
-        public LoadBuildingsJob(BaseDatabase database, string sceneName, Action<List<BuildingSaveData>> onFinished = null) : base(database, onFinished)
+        public ReadBuildingsJob(BaseDatabase database, string sceneName, Action<List<BuildingSaveData>> onFinished = null) : base(database, onFinished)
         {
             this.sceneName = sceneName;
         }
@@ -458,7 +528,7 @@ namespace MultiplayerARPG.MMO
         }
     }
 
-    public class LoadCharacterJob : DatabaseJob<PlayerCharacterData>
+    public class ReadCharacterJob : DatabaseJob<PlayerCharacterData>
     {
         private string userId;
         private string id;
@@ -470,7 +540,7 @@ namespace MultiplayerARPG.MMO
         private bool withNonEquipItems = true;
         private bool withHotkeys = true;
         private bool withQuests = true;
-        public LoadCharacterJob(BaseDatabase database,
+        public ReadCharacterJob(BaseDatabase database,
             string userId,
             string id,
             bool withEquipWeapons = true,
@@ -511,10 +581,10 @@ namespace MultiplayerARPG.MMO
         }
     }
 
-    public class LoadCharactersJob : DatabaseJob<List<PlayerCharacterData>>
+    public class ReadCharactersJob : DatabaseJob<List<PlayerCharacterData>>
     {
         private string userId;
-        public LoadCharactersJob(BaseDatabase database, string userId, Action<List<PlayerCharacterData>> onFinished = null) : base(database, onFinished)
+        public ReadCharactersJob(BaseDatabase database, string userId, Action<List<PlayerCharacterData>> onFinished = null) : base(database, onFinished)
         {
             this.userId = userId;
         }

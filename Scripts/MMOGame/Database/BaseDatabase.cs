@@ -48,15 +48,19 @@ namespace MultiplayerARPG.MMO
 
         public abstract int CreateParty(bool shareExp, bool shareItem, string leaderId);
         public abstract PartyData ReadParty(int id);
+        public abstract void UpdatePartyLeader(int id, string leaderId);
         public abstract void UpdateParty(int id, bool shareExp, bool shareItem);
         public abstract void DeleteParty(int id);
-        public abstract void SetCharacterParty(string characterId, int partyId);
+        public abstract void UpdateCharacterParty(string characterId, int partyId);
 
-        public abstract int CreateGuild(string guildName, string leaderId, string leaderName);
+        public abstract int CreateGuild(string guildName, string leaderId);
         public abstract GuildData ReadGuild(int id);
+        public abstract int IncreaseGuildExp(int id, int amount);
+        public abstract void UpdateGuildLeader(int id, string leaderId);
         public abstract void UpdateGuildMessage(int id, string message);
+        public abstract void UpdateGuildRole(int id, byte guildRole, string name, bool canInvite, bool canKick, byte shareExpPercentage);
         public abstract void UpdateGuildMemberRole(string characterId, byte guildRole);
         public abstract void DeleteGuild(int id);
-        public abstract void SetCharacterGuild(string characterId, int guild, byte guildRole);
+        public abstract void UpdateCharacterGuild(string characterId, int guild, byte guildRole);
     }
 }

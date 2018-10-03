@@ -48,6 +48,13 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
+        public override void UpdatePartyLeader(int id, string leaderId)
+        {
+            ExecuteNonQuery("UPDATE party SET leaderId=@leaderId WHERE id=@id",
+                new SqliteParameter("@leaderId", leaderId),
+                new SqliteParameter("@id", id));
+        }
+
         public override void UpdateParty(int id, bool shareExp, bool shareItem)
         {
             ExecuteNonQuery("UPDATE party SET shareExp=@shareExp, shareItem=@shareItem WHERE id=@id",
@@ -63,7 +70,7 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@id", id));
         }
 
-        public override void SetCharacterParty(string characterId, int partyId)
+        public override void UpdateCharacterParty(string characterId, int partyId)
         {
             ExecuteNonQuery("UPDATE characters SET partyId=@partyId WHERE id=@characterId",
                 new SqliteParameter("@characterId", characterId),
