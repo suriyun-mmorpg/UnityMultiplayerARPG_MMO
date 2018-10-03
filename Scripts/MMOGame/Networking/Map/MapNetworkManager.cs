@@ -701,6 +701,10 @@ namespace MultiplayerARPG.MMO
             {
                 switch (message.type)
                 {
+                    case UpdatePartyMessage.UpdateType.ChangeLeader:
+                        party.SetLeader(message.characterId);
+                        parties[message.id] = party;
+                        break;
                     case UpdatePartyMessage.UpdateType.Setting:
                         party.Setting(message.shareExp, message.shareItem);
                         parties[message.id] = party;
@@ -753,13 +757,17 @@ namespace MultiplayerARPG.MMO
             {
                 switch (message.type)
                 {
+                    case UpdateGuildMessage.UpdateType.ChangeLeader:
+                        guild.SetLeader(message.characterId);
+                        guilds[message.id] = guild;
+                        break;
                     case UpdateGuildMessage.UpdateType.SetGuildMessage:
                         guild.guildMessage = message.guildMessage;
                         guilds[message.id] = guild;
                         break;
                     case UpdateGuildMessage.UpdateType.SetGuildMemberRole:
                         byte guildRole = message.guildRole;
-                        guild.SetRole(message.characterId, guildRole);
+                        guild.SetMemberRole(message.characterId, guildRole);
                         guilds[message.id] = guild;
                         if (TryGetPlayerCharacterById(message.characterId, out playerCharacterEntity))
                         {

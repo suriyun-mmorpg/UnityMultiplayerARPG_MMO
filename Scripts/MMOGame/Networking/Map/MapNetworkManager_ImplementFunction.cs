@@ -73,6 +73,21 @@ namespace MultiplayerARPG.MMO
                 ChatNetworkManager.UpdatePartyMemberAdd(partyId, playerCharacterEntity.Id, playerCharacterEntity.CharacterName, playerCharacterEntity.DataId, playerCharacterEntity.Level);
         }
 
+        public override void ChangePartyLeader(BasePlayerCharacterEntity playerCharacterEntity, string characterId)
+        {
+            int partyId;
+            PartyData party;
+            if (!CanChangePartyLeader(playerCharacterEntity, characterId, out partyId, out party))
+                return;
+
+            base.ChangePartyLeader(playerCharacterEntity, characterId);
+            // Save to database
+            // TODO::
+            // Broadcast via chat server
+            if (ChatNetworkManager.IsClientConnected)
+                ChatNetworkManager.UpdateChangePartyLeader(partyId, characterId);
+        }
+
         public override void PartySetting(BasePlayerCharacterEntity playerCharacterEntity, bool shareExp, bool shareItem)
         {
             int partyId;
@@ -182,6 +197,24 @@ namespace MultiplayerARPG.MMO
             // Broadcast via chat server
             if (ChatNetworkManager.IsClientConnected)
                 ChatNetworkManager.UpdateGuildMemberAdd(guildId, playerCharacterEntity.Id, playerCharacterEntity.CharacterName, playerCharacterEntity.DataId, playerCharacterEntity.Level);
+        }
+        
+        public override void ChangeGuildLeader(BasePlayerCharacterEntity playerCharacterEntity, string characterId)
+        {
+            int guildId;
+            GuildData guild;
+            if (!CanChangeGuildLeader(playerCharacterEntity, characterId, out guildId, out guild))
+                return;
+
+            base.ChangeGuildLeader(playerCharacterEntity, characterId);
+            byte guildRole;
+            guild.GetGuildMemberFlagsAndRole(characterId, out guildRole);
+            // Save to database
+            // TODO::
+            new SetGuildMemberRoleJob(Database, characterId, guildRole).Start();
+            // Broadcast via chat server
+            if (ChatNetworkManager.IsClientConnected)
+                ChatNetworkManager.UpdateChangeGuildLeader(guildId, characterId);
         }
 
         public override void SetGuildMessage(BasePlayerCharacterEntity playerCharacterEntity, string guildMessage)
