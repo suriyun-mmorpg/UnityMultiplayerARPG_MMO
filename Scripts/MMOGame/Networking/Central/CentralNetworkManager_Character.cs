@@ -52,7 +52,7 @@ namespace MultiplayerARPG.MMO
                 error = ResponseCharactersMessage.Error.NotLoggedin;
             else
             {
-                var job = new LoadCharactersJob(Database, userPeerInfo.userId);
+                var job = new ReadCharactersJob(Database, userPeerInfo.userId);
                 job.Start();
                 yield return StartCoroutine(job.WaitFor());
                 characters = job.result;
@@ -150,7 +150,7 @@ namespace MultiplayerARPG.MMO
                 error = ResponseSelectCharacterMessage.Error.NotLoggedin;
             else
             {
-                var job = new LoadCharacterJob(Database, userPeerInfo.userId, message.characterId, false, false, false, false, false, false, false, false);
+                var job = new ReadCharacterJob(Database, userPeerInfo.userId, message.characterId, false, false, false, false, false, false, false, false);
                 job.Start();
                 yield return StartCoroutine(job.WaitFor());
                 var character = job.result;

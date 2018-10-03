@@ -402,6 +402,19 @@ namespace MultiplayerARPG.MMO
             ClientSendPacket(SendOptions.ReliableOrdered, MMOMessageTypes.UpdateGuild, updateMessage);
         }
 
+        public void UpdateSetGuildRole(int id, byte guildRole, string roleName, bool canInvite, bool canKick, byte shareExpPercentage)
+        {
+            var updateMessage = new UpdateGuildMessage();
+            updateMessage.type = UpdateGuildMessage.UpdateType.SetGuildMessage;
+            updateMessage.id = id;
+            updateMessage.guildRole = guildRole;
+            updateMessage.roleName = roleName;
+            updateMessage.canInvite = canInvite;
+            updateMessage.canKick = canKick;
+            updateMessage.shareExpPercentage = shareExpPercentage;
+            ClientSendPacket(SendOptions.ReliableOrdered, MMOMessageTypes.UpdateGuild, updateMessage);
+        }
+
         public void UpdateSetGuildMemberRole(int id, string characterId, byte guildRole)
         {
             var updateMessage = new UpdateGuildMessage();

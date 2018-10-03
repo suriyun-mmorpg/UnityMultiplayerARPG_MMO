@@ -248,7 +248,7 @@ namespace MultiplayerARPG.MMO
         private IEnumerator OnServerOnlineSceneLoadedRoutine()
         {
             // Spawn buildings
-            var job = new LoadBuildingsJob(Database, Assets.onlineScene.SceneName);
+            var job = new ReadBuildingsJob(Database, Assets.onlineScene.SceneName);
             job.Start();
             yield return StartCoroutine(job.WaitFor());
             var buildings = job.result;
@@ -310,7 +310,7 @@ namespace MultiplayerARPG.MMO
             }
             else
             {
-                var loadCharacterJob = new LoadCharacterJob(Database, userId, selectCharacterId);
+                var loadCharacterJob = new ReadCharacterJob(Database, userId, selectCharacterId);
                 loadCharacterJob.Start();
                 yield return StartCoroutine(loadCharacterJob.WaitFor());
                 var playerCharacterData = loadCharacterJob.result;
@@ -771,9 +771,20 @@ namespace MultiplayerARPG.MMO
                         guild.guildMessage = message.guildMessage;
                         guilds[message.id] = guild;
                         break;
+                    case UpdateGuildMessage.UpdateType.SetGuildRole:
+                        guild.SetRole(message.guildRole, message.roleName, message.canInvite, message.canKick, message.shareExpPercentage);
+                        guilds[message.id] = guild;
+                        foreach (var memberId in guild.GetMemberIds())
+                        {
+                            if (playerCharactersById.TryGetValue(memberId, out playerCharacterEntity))
+                            {
+                                playerCharacterEntity.GuildMemberFlags = guild.GetGuildMemberFlagsAndRole(playerCharacterEntity, out guildRole);
+                                playerCharacterEntity.GuildRole = guildRole;
+                            }
+                        }
+                        break;
                     case UpdateGuildMessage.UpdateType.SetGuildMemberRole:
-                        guildRole = message.guildRole;
-                        guild.SetMemberRole(message.characterId, guildRole);
+                        guild.SetMemberRole(message.characterId, message.guildRole);
                         guilds[message.id] = guild;
                         if (TryGetPlayerCharacterById(message.characterId, out playerCharacterEntity))
                         {

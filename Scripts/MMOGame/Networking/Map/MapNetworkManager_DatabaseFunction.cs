@@ -18,7 +18,7 @@ namespace MultiplayerARPG.MMO
             if (id > 0 && !loadingPartyIds.Contains(id))
             {
                 loadingPartyIds.Add(id);
-                var job = new LoadPartyJob(Database, id);
+                var job = new ReadPartyJob(Database, id);
                 job.Start();
                 yield return StartCoroutine(job.WaitFor());
                 if (job.result != null)
@@ -34,7 +34,7 @@ namespace MultiplayerARPG.MMO
             if (id > 0 && !loadingGuildIds.Contains(id))
             {
                 loadingGuildIds.Add(id);
-                var job = new LoadGuildJob(Database, id);
+                var job = new ReadGuildJob(Database, id);
                 job.Start();
                 yield return StartCoroutine(job.WaitFor());
                 if (job.result != null)

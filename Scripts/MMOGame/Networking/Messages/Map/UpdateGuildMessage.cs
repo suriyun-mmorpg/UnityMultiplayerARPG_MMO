@@ -11,6 +11,7 @@ namespace MultiplayerARPG.MMO
         {
             ChangeLeader,
             SetGuildMessage,
+            SetGuildRole,
             SetGuildMemberRole,
             Terminate,
         }
@@ -19,6 +20,10 @@ namespace MultiplayerARPG.MMO
         public string guildMessage;
         public string characterId;
         public byte guildRole;
+        public string roleName;
+        public bool canInvite;
+        public bool canKick;
+        public byte shareExpPercentage;
 
         public void Deserialize(NetDataReader reader)
         {
@@ -31,6 +36,13 @@ namespace MultiplayerARPG.MMO
                     break;
                 case UpdateType.SetGuildMessage:
                     guildMessage = reader.GetString();
+                    break;
+                case UpdateType.SetGuildRole:
+                    guildRole = reader.GetByte();
+                    roleName = reader.GetString();
+                    canInvite = reader.GetBool();
+                    canKick = reader.GetBool();
+                    shareExpPercentage = reader.GetByte();
                     break;
                 case UpdateType.SetGuildMemberRole:
                     characterId = reader.GetString();
@@ -50,6 +62,13 @@ namespace MultiplayerARPG.MMO
                     break;
                 case UpdateType.SetGuildMessage:
                     writer.Put(guildMessage);
+                    break;
+                case UpdateType.SetGuildRole:
+                    writer.Put(guildRole);
+                    writer.Put(roleName);
+                    writer.Put(canInvite);
+                    writer.Put(canKick);
+                    writer.Put(shareExpPercentage);
                     break;
                 case UpdateType.SetGuildMemberRole:
                     writer.Put(characterId);
