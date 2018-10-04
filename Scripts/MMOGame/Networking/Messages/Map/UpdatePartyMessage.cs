@@ -9,6 +9,7 @@ namespace MultiplayerARPG.MMO
     {
         public enum UpdateType : byte
         {
+            Create,
             ChangeLeader,
             Setting,
             Terminate,
@@ -25,12 +26,17 @@ namespace MultiplayerARPG.MMO
             id = reader.GetInt();
             switch (type)
             {
+                case UpdateType.Create:
+                    shareExp = reader.GetBool();
+                    shareItem = reader.GetBool();
+                    characterId = reader.GetString();
+                    break;
                 case UpdateType.ChangeLeader:
                     characterId = reader.GetString();
                     break;
                 case UpdateType.Setting:
-                shareExp = reader.GetBool();
-                shareItem = reader.GetBool();
+                    shareExp = reader.GetBool();
+                    shareItem = reader.GetBool();
                     break;
             }
         }
@@ -41,6 +47,11 @@ namespace MultiplayerARPG.MMO
             writer.Put(id);
             switch (type)
             {
+                case UpdateType.Create:
+                    writer.Put(shareExp);
+                    writer.Put(shareItem);
+                    writer.Put(characterId);
+                    break;
                 case UpdateType.ChangeLeader:
                     writer.Put(characterId);
                     break;

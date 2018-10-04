@@ -9,6 +9,7 @@ namespace MultiplayerARPG.MMO
     {
         public enum UpdateType : byte
         {
+            Create,
             ChangeLeader,
             SetGuildMessage,
             SetGuildRole,
@@ -17,6 +18,7 @@ namespace MultiplayerARPG.MMO
         }
         public UpdateType type;
         public int id;
+        public string guildName;
         public string guildMessage;
         public string characterId;
         public byte guildRole;
@@ -31,6 +33,10 @@ namespace MultiplayerARPG.MMO
             id = reader.GetInt();
             switch (type)
             {
+                case UpdateType.Create:
+                    guildName = reader.GetString();
+                    characterId = reader.GetString();
+                    break;
                 case UpdateType.ChangeLeader:
                     characterId = reader.GetString();
                     break;
@@ -57,6 +63,10 @@ namespace MultiplayerARPG.MMO
             writer.Put(id);
             switch (type)
             {
+                case UpdateType.Create:
+                    writer.Put(guildName);
+                    writer.Put(characterId);
+                    break;
                 case UpdateType.ChangeLeader:
                     writer.Put(characterId);
                     break;
