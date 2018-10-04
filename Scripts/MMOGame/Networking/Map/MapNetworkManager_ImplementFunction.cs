@@ -70,7 +70,10 @@ namespace MultiplayerARPG.MMO
             new SetCharacterPartyJob(Database, playerCharacterEntity.Id, partyId).Start();
             // Broadcast via chat server
             if (ChatNetworkManager.IsClientConnected)
+            {
+                ChatNetworkManager.UpdateCreateParty(partyId, shareExp, shareItem, playerCharacterEntity.Id);
                 ChatNetworkManager.UpdatePartyMemberAdd(partyId, playerCharacterEntity.Id, playerCharacterEntity.CharacterName, playerCharacterEntity.DataId, playerCharacterEntity.Level);
+            }
         }
 
         public override void ChangePartyLeader(BasePlayerCharacterEntity playerCharacterEntity, string characterId)
@@ -196,7 +199,10 @@ namespace MultiplayerARPG.MMO
             new SetCharacterGuildJob(Database, playerCharacterEntity.Id, guildId, guildRole).Start();
             // Broadcast via chat server
             if (ChatNetworkManager.IsClientConnected)
+            {
+                ChatNetworkManager.UpdateCreateGuild(guildId, guildName, playerCharacterEntity.Id);
                 ChatNetworkManager.UpdateGuildMemberAdd(guildId, playerCharacterEntity.Id, playerCharacterEntity.CharacterName, playerCharacterEntity.DataId, playerCharacterEntity.Level);
+            }
         }
         
         public override void ChangeGuildLeader(BasePlayerCharacterEntity playerCharacterEntity, string characterId)
