@@ -8,18 +8,11 @@ namespace MultiplayerARPG.MMO
     {
         public override int CreateGuild(string guildName, string leaderId)
         {
-            string leaderName = string.Empty;
-            var reader = ExecuteReader("SELECT characterName FROM characters WHERE id=@leaderId LIMIT 1",
-                new MySqlParameter("@leaderId", leaderId));
-            if (reader.Read())
-                leaderName = reader.GetString("characterName");
-
             int id = 0;
-            reader = ExecuteReader("INSERT INTO guild (guildName, leaderId, leaderName, level, exp, skillPoint) VALUES (@guildName, @leaderId, @leaderName, @level, @exp, @skillPoint);" +
+            var reader = ExecuteReader("INSERT INTO guild (guildName, leaderId, level, exp, skillPoint) VALUES (@guildName, @leaderId, @level, @exp, @skillPoint);" +
                 "SELECT LAST_INSERT_ID();",
                 new MySqlParameter("@guildName", guildName),
                 new MySqlParameter("@leaderId", leaderId),
-                new MySqlParameter("@leaderName", leaderName),
                 new MySqlParameter("@level", 1),
                 new MySqlParameter("@exp", 0),
                 new MySqlParameter("@skillPoint", 0));
@@ -39,7 +32,7 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@id", id));
             if (reader.Read())
             {
-                result = new GuildData(id, reader.GetString("guildName"), reader.GetString("leaderId"), reader.GetString("leaderName"));
+                result = new GuildData(id, reader.GetString("guildName"), reader.GetString("leaderId"));
                 reader = ExecuteReader("SELECT id, dataId, characterName, level, guildRole FROM characters WHERE guildId=@id",
                     new MySqlParameter("@id", id));
                 SocialCharacterData guildMemberData;
@@ -72,14 +65,8 @@ namespace MultiplayerARPG.MMO
 
         public override void UpdateGuildLeader(int id, string leaderId)
         {
-            string leaderName = string.Empty;
-            var reader = ExecuteReader("SELECT characterName FROM characters WHERE id=@leaderId LIMIT 1",
-                new MySqlParameter("@leaderId", leaderId));
-            if (reader.Read())
-                leaderName = reader.GetString("characterName");
-            ExecuteNonQuery("UPDATE guild SET leaderId=@leaderId, leaderName=@leaderName WHERE id=@id",
+            ExecuteNonQuery("UPDATE guild SET leaderId=@leaderId WHERE id=@id",
                 new MySqlParameter("@leaderId", leaderId),
-                new MySqlParameter("@leaderName", leaderName),
                 new MySqlParameter("@id", id));
         }
 

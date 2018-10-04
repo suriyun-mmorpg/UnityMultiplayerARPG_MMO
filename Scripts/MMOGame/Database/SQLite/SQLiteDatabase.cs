@@ -183,7 +183,6 @@ namespace MultiplayerARPG.MMO
               id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
               guildName TEXT NOT NULL,
               leaderId TEXT NOT NULL,
-              leaderName TEXT NOT NULL,
               level INTEGER NOT NULL,
               exp INTEGER NOT NULL,
               skillPoint INTEGER NOT NULL,

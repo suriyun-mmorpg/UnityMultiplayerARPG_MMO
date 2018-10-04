@@ -3,7 +3,6 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Oct 03, 2018 at 03:46 AM
 -- Server version: 10.1.28-MariaDB
 -- PHP Version: 7.1.11
 
@@ -189,7 +188,6 @@ CREATE TABLE `guild` (
   `id` int(11) NOT NULL,
   `guildName` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
   `leaderId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-  `leaderName` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
   `level` int(11) NOT NULL,
   `exp` int(11) NOT NULL,
   `skillPoint` int(11) NOT NULL,

@@ -8,18 +8,11 @@ namespace MultiplayerARPG.MMO
     {
         public override int CreateGuild(string guildName, string leaderId)
         {
-            string leaderName = string.Empty;
-            var reader = ExecuteReader("SELECT characterName FROM characters WHERE id=@leaderId LIMIT 1",
-                new SqliteParameter("@leaderId", leaderId));
-            if (reader.Read())
-                leaderName = reader.GetString("characterName");
-
             int id = 0;
-            reader = ExecuteReader("INSERT INTO guild (guildName, leaderId, leaderName, level, exp, skillPoint) VALUES (@guildName, @leaderId, @leaderName, @level, @exp, @skillPoint);" +
+            var reader = ExecuteReader("INSERT INTO guild (guildName, leaderId, level, exp, skillPoint) VALUES (@guildName, @leaderId, @level, @exp, @skillPoint);" +
                 "SELECT LAST_INSERT_ROWID();",
                 new SqliteParameter("@guildName", guildName),
                 new SqliteParameter("@leaderId", leaderId),
-                new SqliteParameter("@leaderName", leaderName),
                 new SqliteParameter("@level", 1),
                 new SqliteParameter("@exp", 0),
                 new SqliteParameter("@skillPoint", 0));
@@ -39,7 +32,7 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@id", id));
             if (reader.Read())
             {
-                result = new GuildData(id, reader.GetString("guildName"), reader.GetString("leaderId"), reader.GetString("leaderName"));
+                result = new GuildData(id, reader.GetString("guildName"), reader.GetString("leaderId"));
                 reader = ExecuteReader("SELECT id, dataId, characterName, level, guildRole FROM characters WHERE guildId=@id",
                     new SqliteParameter("@id", id));
                 SocialCharacterData guildMemberData;
@@ -72,14 +65,8 @@ namespace MultiplayerARPG.MMO
 
         public override void UpdateGuildLeader(int id, string leaderId)
         {
-            string leaderName = string.Empty;
-            var reader = ExecuteReader("SELECT characterName FROM characters WHERE id=@leaderId LIMIT 1",
-                new SqliteParameter("@leaderId", leaderId));
-            if (reader.Read())
-                leaderName = reader.GetString("characterName");
-            ExecuteNonQuery("UPDATE guild SET leaderId=@leaderId, leaderName=@leaderName WHERE id=@id",
+            ExecuteNonQuery("UPDATE guild SET leaderId=@leaderId WHERE id=@id",
                 new SqliteParameter("@leaderId", leaderId),
-                new SqliteParameter("@leaderName", leaderName),
                 new SqliteParameter("@id", id));
         }
 
