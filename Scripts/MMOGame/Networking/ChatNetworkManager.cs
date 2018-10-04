@@ -336,6 +336,17 @@ namespace MultiplayerARPG.MMO
             ClientSendPacket(SendOptions.ReliableOrdered, MMOMessageTypes.UpdatePartyMember, updateMessage);
         }
 
+        public void UpdateCreateParty(int id, bool shareExp, bool shareItem, string characterId)
+        {
+            var updateMessage = new UpdatePartyMessage();
+            updateMessage.type = UpdatePartyMessage.UpdateType.Create;
+            updateMessage.id = id;
+            updateMessage.shareExp = shareExp;
+            updateMessage.shareItem = shareItem;
+            updateMessage.characterId = characterId;
+            ClientSendPacket(SendOptions.ReliableOrdered, MMOMessageTypes.UpdateParty, updateMessage);
+        }
+
         public void UpdateChangePartyLeader(int id, string characterId)
         {
             var updateMessage = new UpdatePartyMessage();
@@ -382,6 +393,16 @@ namespace MultiplayerARPG.MMO
             updateMessage.id = id;
             updateMessage.characterId = characterId;
             ClientSendPacket(SendOptions.ReliableOrdered, MMOMessageTypes.UpdateGuildMember, updateMessage);
+        }
+
+        public void UpdateCreateGuild(int id, string guildName, string characterId)
+        {
+            var updateMessage = new UpdateGuildMessage();
+            updateMessage.type = UpdateGuildMessage.UpdateType.Create;
+            updateMessage.id = id;
+            updateMessage.guildName = guildName;
+            updateMessage.characterId = characterId;
+            ClientSendPacket(SendOptions.ReliableOrdered, MMOMessageTypes.UpdateGuild, updateMessage);
         }
 
         public void UpdateChangeGuildLeader(int id, string characterId)
