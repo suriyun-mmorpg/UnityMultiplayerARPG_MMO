@@ -702,6 +702,10 @@ namespace MultiplayerARPG.MMO
             {
                 switch (message.type)
                 {
+                    case UpdatePartyMessage.UpdateType.Create:
+                        party = new PartyData(message.id, message.shareExp, message.shareItem, message.characterId);
+                        parties[message.id] = party;
+                        break;
                     case UpdatePartyMessage.UpdateType.ChangeLeader:
                         party.SetLeader(message.characterId);
                         parties[message.id] = party;
@@ -766,6 +770,10 @@ namespace MultiplayerARPG.MMO
             {
                 switch (message.type)
                 {
+                    case UpdateGuildMessage.UpdateType.Create:
+                        guild = new GuildData(message.id, message.guildName, message.characterId);
+                        guilds[message.id] = guild;
+                        break;
                     case UpdateGuildMessage.UpdateType.ChangeLeader:
                         guild.SetLeader(message.characterId);
                         guilds[message.id] = guild;
