@@ -342,6 +342,8 @@ namespace MultiplayerARPG.MMO
                         {
                             yield return StartCoroutine(LoadPartyRoutine(playerCharacterEntity.PartyId));
                             playerCharacterEntity.PartyMemberFlags = parties[playerCharacterEntity.PartyId].GetPartyMemberFlags(playerCharacterEntity);
+                            SendCreatePartyToClient(playerCharacterEntity.ConnectId, parties[playerCharacterEntity.PartyId]);
+                            SendAddPartyMembersToClient(playerCharacterEntity.ConnectId, parties[playerCharacterEntity.PartyId]);
                         }
 
                         // Load guild data, if this map-server does not have guild data
@@ -351,6 +353,8 @@ namespace MultiplayerARPG.MMO
                             byte guildRole;
                             playerCharacterEntity.GuildMemberFlags = guilds[playerCharacterEntity.GuildId].GetGuildMemberFlagsAndRole(playerCharacterEntity, out guildRole);
                             playerCharacterEntity.GuildRole = guildRole;
+                            SendCreateGuildToClient(playerCharacterEntity.ConnectId, guilds[playerCharacterEntity.GuildId]);
+                            SendAddGuildMembersToClient(playerCharacterEntity.ConnectId, guilds[playerCharacterEntity.GuildId]);
                         }
 
                         // Notify clients that this character is spawn or dead
