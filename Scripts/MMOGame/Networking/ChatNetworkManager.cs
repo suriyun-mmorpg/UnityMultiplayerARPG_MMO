@@ -257,7 +257,8 @@ namespace MultiplayerARPG.MMO
             {
                 foreach (var mapServerConnectionId in mapServerConnectionIds)
                 {
-                    ServerSendPacket(mapServerConnectionId, SendOptions.ReliableOrdered, MMOMessageTypes.UpdatePartyMember, message);
+                    if (mapServerConnectionId != connectionId)
+                        ServerSendPacket(mapServerConnectionId, SendOptions.ReliableOrdered, MMOMessageTypes.UpdatePartyMember, message);
                 }
             }
         }
@@ -270,7 +271,8 @@ namespace MultiplayerARPG.MMO
             {
                 foreach (var mapServerConnectionId in mapServerConnectionIds)
                 {
-                    ServerSendPacket(mapServerConnectionId, SendOptions.ReliableOrdered, MMOMessageTypes.UpdateParty, message);
+                    if (mapServerConnectionId != connectionId)
+                        ServerSendPacket(mapServerConnectionId, SendOptions.ReliableOrdered, MMOMessageTypes.UpdateParty, message);
                 }
             }
         }
@@ -283,7 +285,8 @@ namespace MultiplayerARPG.MMO
             {
                 foreach (var mapServerConnectionId in mapServerConnectionIds)
                 {
-                    ServerSendPacket(mapServerConnectionId, SendOptions.ReliableOrdered, MMOMessageTypes.UpdateGuildMember, message);
+                    if (mapServerConnectionId != connectionId)
+                        ServerSendPacket(mapServerConnectionId, SendOptions.ReliableOrdered, MMOMessageTypes.UpdateGuildMember, message);
                 }
             }
         }
@@ -296,7 +299,8 @@ namespace MultiplayerARPG.MMO
             {
                 foreach (var mapServerConnectionId in mapServerConnectionIds)
                 {
-                    ServerSendPacket(mapServerConnectionId, SendOptions.ReliableOrdered, MMOMessageTypes.UpdateGuild, message);
+                    if (mapServerConnectionId != connectionId)
+                        ServerSendPacket(mapServerConnectionId, SendOptions.ReliableOrdered, MMOMessageTypes.UpdateGuild, message);
                 }
             }
         }
@@ -311,7 +315,7 @@ namespace MultiplayerARPG.MMO
                 UpdateMapUser(mapServerConnectionId, updateType, userData);
             }
         }
-        
+
         private void UpdateMapUser(long connectionId, UpdateMapUserMessage.UpdateType updateType, UserCharacterData userData)
         {
             var updateMapUserMessage = new UpdateMapUserMessage();
