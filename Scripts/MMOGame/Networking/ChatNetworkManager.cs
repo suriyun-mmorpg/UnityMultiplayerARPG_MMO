@@ -143,7 +143,7 @@ namespace MultiplayerARPG.MMO
 
         private void HandleUpdatePartyMemberAtClient(LiteNetLibMessageHandler messageHandler)
         {
-            var message = messageHandler.ReadMessage<UpdatePartyMemberMessage>();
+            var message = messageHandler.ReadMessage<UpdateSocialMemberMessage>();
             if (mapNetworkManager != null)
                 mapNetworkManager.OnUpdatePartyMember(message);
         }
@@ -157,7 +157,7 @@ namespace MultiplayerARPG.MMO
 
         private void HandleUpdateGuildMemberAtClient(LiteNetLibMessageHandler messageHandler)
         {
-            var message = messageHandler.ReadMessage<UpdateGuildMemberMessage>();
+            var message = messageHandler.ReadMessage<UpdateSocialMemberMessage>();
             if (mapNetworkManager != null)
                 mapNetworkManager.OnUpdateGuildMember(message);
         }
@@ -252,7 +252,7 @@ namespace MultiplayerARPG.MMO
         private void HandleUpdatePartyMemberAtServer(LiteNetLibMessageHandler messageHandler)
         {
             var connectionId = messageHandler.connectionId;
-            var message = messageHandler.ReadMessage<UpdatePartyMemberMessage>();
+            var message = messageHandler.ReadMessage<UpdateSocialMemberMessage>();
             if (mapServerConnectionIds.Contains(connectionId))
             {
                 foreach (var mapServerConnectionId in mapServerConnectionIds)
@@ -278,7 +278,7 @@ namespace MultiplayerARPG.MMO
         private void HandleUpdateGuildMemberAtServer(LiteNetLibMessageHandler messageHandler)
         {
             var connectionId = messageHandler.connectionId;
-            var message = messageHandler.ReadMessage<UpdateGuildMemberMessage>();
+            var message = messageHandler.ReadMessage<UpdateSocialMemberMessage>();
             if (mapServerConnectionIds.Contains(connectionId))
             {
                 foreach (var mapServerConnectionId in mapServerConnectionIds)
@@ -317,8 +317,8 @@ namespace MultiplayerARPG.MMO
 
         public void UpdatePartyMemberAdd(int id, string characterId, string characterName, int dataId, int level)
         {
-            var updateMessage = new UpdatePartyMemberMessage();
-            updateMessage.type = UpdatePartyMemberMessage.UpdateType.Add;
+            var updateMessage = new UpdateSocialMemberMessage();
+            updateMessage.type = UpdateSocialMemberMessage.UpdateType.Add;
             updateMessage.id = id;
             updateMessage.characterId = characterId;
             updateMessage.characterName = characterName;
@@ -329,8 +329,8 @@ namespace MultiplayerARPG.MMO
 
         public void UpdatePartyMemberRemove(int id, string characterId)
         {
-            var updateMessage = new UpdatePartyMemberMessage();
-            updateMessage.type = UpdatePartyMemberMessage.UpdateType.Remove;
+            var updateMessage = new UpdateSocialMemberMessage();
+            updateMessage.type = UpdateSocialMemberMessage.UpdateType.Remove;
             updateMessage.id = id;
             updateMessage.characterId = characterId;
             ClientSendPacket(SendOptions.ReliableOrdered, MMOMessageTypes.UpdatePartyMember, updateMessage);
@@ -376,8 +376,8 @@ namespace MultiplayerARPG.MMO
 
         public void UpdateGuildMemberAdd(int id, string characterId, string characterName, int dataId, int level)
         {
-            var updateMessage = new UpdateGuildMemberMessage();
-            updateMessage.type = UpdateGuildMemberMessage.UpdateType.Add;
+            var updateMessage = new UpdateSocialMemberMessage();
+            updateMessage.type = UpdateSocialMemberMessage.UpdateType.Add;
             updateMessage.id = id;
             updateMessage.characterId = characterId;
             updateMessage.characterName = characterName;
@@ -388,8 +388,8 @@ namespace MultiplayerARPG.MMO
 
         public void UpdateGuildMemberRemove(int id, string characterId)
         {
-            var updateMessage = new UpdateGuildMemberMessage();
-            updateMessage.type = UpdateGuildMemberMessage.UpdateType.Remove;
+            var updateMessage = new UpdateSocialMemberMessage();
+            updateMessage.type = UpdateSocialMemberMessage.UpdateType.Remove;
             updateMessage.id = id;
             updateMessage.characterId = characterId;
             ClientSendPacket(SendOptions.ReliableOrdered, MMOMessageTypes.UpdateGuildMember, updateMessage);
