@@ -406,7 +406,7 @@ namespace MultiplayerARPG.MMO
             if (ChatNetworkManager.IsClientConnected)
             {
                 var message = FillChatChannelId(messageHandler.ReadMessage<ChatMessage>());
-                ChatNetworkManager.EnterChat(message.channel, message.message, message.sender, message.receiver, message.channelId);
+                ChatNetworkManager.Client.SendEnterChat(null, MMOMessageTypes.Chat, message.channel, message.message, message.sender, message.receiver, message.channelId);
             }
         }
 
