@@ -667,18 +667,11 @@ namespace MultiplayerARPG.MMO
         {
             PartyData party;
             BasePlayerCharacterEntity playerCharacterEntity;
-            SocialCharacterData partyMember;
-            if (parties.TryGetValue(message.id, out party))
+            if (parties.TryGetValue(message.id, out party) && UpdateSocialGroupMember(party, message))
             {
                 switch (message.type)
                 {
                     case UpdateSocialMemberMessage.UpdateType.Add:
-                        partyMember = new SocialCharacterData();
-                        partyMember.id = message.characterId;
-                        partyMember.characterName = message.characterName;
-                        partyMember.dataId = message.dataId;
-                        partyMember.level = message.level;
-                        party.AddMember(partyMember);
                         if (playerCharactersById.TryGetValue(message.characterId, out playerCharacterEntity))
                         {
                             playerCharacterEntity.PartyId = message.id;
@@ -688,7 +681,6 @@ namespace MultiplayerARPG.MMO
                     case UpdateSocialMemberMessage.UpdateType.Remove:
                         if (playerCharactersById.TryGetValue(message.characterId, out playerCharacterEntity))
                             playerCharacterEntity.ClearParty();
-                        party.RemoveMember(message.characterId);
                         break;
                 }
             }
@@ -732,18 +724,11 @@ namespace MultiplayerARPG.MMO
         {
             GuildData guild;
             BasePlayerCharacterEntity playerCharacterEntity;
-            SocialCharacterData guildMember;
-            if (guilds.TryGetValue(message.id, out guild))
+            if (guilds.TryGetValue(message.id, out guild) && UpdateSocialGroupMember(guild, message))
             {
                 switch (message.type)
                 {
                     case UpdateSocialMemberMessage.UpdateType.Add:
-                        guildMember = new SocialCharacterData();
-                        guildMember.id = message.characterId;
-                        guildMember.characterName = message.characterName;
-                        guildMember.dataId = message.dataId;
-                        guildMember.level = message.level;
-                        guild.AddMember(guildMember);
                         if (playerCharactersById.TryGetValue(message.characterId, out playerCharacterEntity))
                         {
                             byte guildRole;
@@ -755,7 +740,6 @@ namespace MultiplayerARPG.MMO
                     case UpdateSocialMemberMessage.UpdateType.Remove:
                         if (playerCharactersById.TryGetValue(message.characterId, out playerCharacterEntity))
                             playerCharacterEntity.ClearGuild();
-                        guild.RemoveMember(message.characterId);
                         break;
                 }
             }
