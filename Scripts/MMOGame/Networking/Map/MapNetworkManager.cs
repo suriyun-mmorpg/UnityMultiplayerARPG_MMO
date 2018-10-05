@@ -676,11 +676,18 @@ namespace MultiplayerARPG.MMO
                         {
                             playerCharacterEntity.PartyId = message.id;
                             playerCharacterEntity.PartyMemberFlags = party.GetPartyMemberFlags(playerCharacterEntity);
+                            SendCreatePartyToClient(playerCharacterEntity.ConnectId, party);
+                            SendAddPartyMembersToClient(playerCharacterEntity.ConnectId, party);
                         }
+                        SendAddPartyMemberToClients(party, message.characterId, message.member.id, message.member.dataId, message.member.level);
                         break;
                     case UpdateSocialMemberMessage.UpdateType.Remove:
                         if (playerCharactersById.TryGetValue(message.characterId, out playerCharacterEntity))
+                        {
                             playerCharacterEntity.ClearParty();
+                            SendPartyTerminateToClient(playerCharacterEntity.ConnectId, message.id);
+                        }
+                        SendRemovePartyMemberToClients(party, message.characterId);
                         break;
                 }
             }
@@ -690,12 +697,7 @@ namespace MultiplayerARPG.MMO
         {
             BasePlayerCharacterEntity playerCharacterEntity;
             PartyData party;
-            if (message.type == UpdatePartyMessage.UpdateType.Create)
-            {
-                party = new PartyData(message.id, message.shareExp, message.shareItem, message.characterId);
-                parties[message.id] = party;
-            }
-            else if (parties.TryGetValue(message.id, out party))
+            if (parties.TryGetValue(message.id, out party))
             {
                 switch (message.type)
                 {
@@ -704,16 +706,21 @@ namespace MultiplayerARPG.MMO
                         parties[message.id] = party;
                         if (TryGetPlayerCharacterById(message.characterId, out playerCharacterEntity))
                             playerCharacterEntity.PartyMemberFlags = party.GetPartyMemberFlags(playerCharacterEntity);
+                        SendChangePartyLeaderToClients(party);
                         break;
                     case UpdatePartyMessage.UpdateType.Setting:
                         party.Setting(message.shareExp, message.shareItem);
                         parties[message.id] = party;
+                        SendPartySettingToClients(party);
                         break;
                     case UpdatePartyMessage.UpdateType.Terminate:
                         foreach (var memberId in party.GetMemberIds())
                         {
                             if (playerCharactersById.TryGetValue(memberId, out playerCharacterEntity))
+                            {
                                 playerCharacterEntity.ClearParty();
+                                SendPartyTerminateToClient(playerCharacterEntity.ConnectId, message.id);
+                            }
                         }
                         parties.Remove(message.id);
                         break;
@@ -736,11 +743,18 @@ namespace MultiplayerARPG.MMO
                             playerCharacterEntity.GuildId = message.id;
                             playerCharacterEntity.GuildMemberFlags = guild.GetGuildMemberFlagsAndRole(playerCharacterEntity, out guildRole);
                             playerCharacterEntity.GuildRole = guildRole;
+                            SendCreateGuildToClient(playerCharacterEntity.ConnectId, guild);
+                            SendAddGuildMembersToClient(playerCharacterEntity.ConnectId, guild);
                         }
+                        SendAddGuildMemberToClients(guild, message.characterId, message.member.id, message.member.dataId, message.member.level);
                         break;
                     case UpdateSocialMemberMessage.UpdateType.Remove:
                         if (playerCharactersById.TryGetValue(message.characterId, out playerCharacterEntity))
+                        {
                             playerCharacterEntity.ClearGuild();
+                            SendGuildTerminateToClient(playerCharacterEntity.ConnectId, message.id);
+                        }
+                        SendRemoveGuildMemberToClients(guild, message.characterId);
                         break;
                 }
             }
@@ -751,12 +765,7 @@ namespace MultiplayerARPG.MMO
             BasePlayerCharacterEntity playerCharacterEntity;
             byte guildRole;
             GuildData guild;
-            if (message.type == UpdateGuildMessage.UpdateType.Create)
-            {
-                guild = new GuildData(message.id, message.guildName, message.characterId);
-                guilds[message.id] = guild;
-            }
-            else if (guilds.TryGetValue(message.id, out guild))
+            if (guilds.TryGetValue(message.id, out guild))
             {
                 switch (message.type)
                 {
@@ -768,10 +777,12 @@ namespace MultiplayerARPG.MMO
                             playerCharacterEntity.GuildMemberFlags = guild.GetGuildMemberFlagsAndRole(playerCharacterEntity, out guildRole);
                             playerCharacterEntity.GuildRole = guildRole;
                         }
+                        SendChangeGuildLeaderToClients(guild);
                         break;
                     case UpdateGuildMessage.UpdateType.SetGuildMessage:
                         guild.guildMessage = message.guildMessage;
                         guilds[message.id] = guild;
+                        SendSetGuildMessageToClients(guild);
                         break;
                     case UpdateGuildMessage.UpdateType.SetGuildRole:
                         guild.SetRole(message.guildRole, message.roleName, message.canInvite, message.canKick, message.shareExpPercentage);
@@ -784,6 +795,7 @@ namespace MultiplayerARPG.MMO
                                 playerCharacterEntity.GuildRole = guildRole;
                             }
                         }
+                        SendSetGuildRoleToClients(guild, message.guildRole, message.roleName, message.canInvite, message.canKick, message.shareExpPercentage);
                         break;
                     case UpdateGuildMessage.UpdateType.SetGuildMemberRole:
                         guild.SetMemberRole(message.characterId, message.guildRole);
@@ -793,12 +805,16 @@ namespace MultiplayerARPG.MMO
                             playerCharacterEntity.GuildMemberFlags = guild.GetGuildMemberFlagsAndRole(playerCharacterEntity, out guildRole);
                             playerCharacterEntity.GuildRole = guildRole;
                         }
+                        SendSetGuildMemberRoleToClients(guild, message.characterId, message.guildRole);
                         break;
                     case UpdateGuildMessage.UpdateType.Terminate:
                         foreach (var memberId in guild.GetMemberIds())
                         {
                             if (playerCharactersById.TryGetValue(memberId, out playerCharacterEntity))
+                            {
                                 playerCharacterEntity.ClearGuild();
+                                SendGuildTerminateToClient(playerCharacterEntity.ConnectId, message.id);
+                            }
                         }
                         guilds.Remove(message.id);
                         break;
