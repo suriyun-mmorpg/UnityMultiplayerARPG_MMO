@@ -321,9 +321,13 @@ namespace MultiplayerARPG.MMO
             updateMessage.type = UpdateSocialMemberMessage.UpdateType.Add;
             updateMessage.id = id;
             updateMessage.characterId = characterId;
-            updateMessage.characterName = characterName;
-            updateMessage.dataId = dataId;
-            updateMessage.level = level;
+            updateMessage.member = new SocialCharacterData()
+            {
+                id = characterId,
+                characterName = characterName,
+                dataId = dataId,
+                level = level,
+            };
             ClientSendPacket(SendOptions.ReliableOrdered, MMOMessageTypes.UpdatePartyMember, updateMessage);
         }
 
@@ -380,9 +384,13 @@ namespace MultiplayerARPG.MMO
             updateMessage.type = UpdateSocialMemberMessage.UpdateType.Add;
             updateMessage.id = id;
             updateMessage.characterId = characterId;
-            updateMessage.characterName = characterName;
-            updateMessage.dataId = dataId;
-            updateMessage.level = level;
+            updateMessage.member = new SocialCharacterData()
+            {
+                id = characterId,
+                characterName = characterName,
+                dataId = dataId,
+                level = level,
+            };
             ClientSendPacket(SendOptions.ReliableOrdered, MMOMessageTypes.UpdateGuildMember, updateMessage);
         }
 

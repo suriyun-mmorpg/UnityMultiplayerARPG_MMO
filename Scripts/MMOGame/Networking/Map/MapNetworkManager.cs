@@ -690,14 +690,15 @@ namespace MultiplayerARPG.MMO
         {
             BasePlayerCharacterEntity playerCharacterEntity;
             PartyData party;
-            if (parties.TryGetValue(message.id, out party))
+            if (message.type == UpdatePartyMessage.UpdateType.Create)
+            {
+                party = new PartyData(message.id, message.shareExp, message.shareItem, message.characterId);
+                parties[message.id] = party;
+            }
+            else if (parties.TryGetValue(message.id, out party))
             {
                 switch (message.type)
                 {
-                    case UpdatePartyMessage.UpdateType.Create:
-                        party = new PartyData(message.id, message.shareExp, message.shareItem, message.characterId);
-                        parties[message.id] = party;
-                        break;
                     case UpdatePartyMessage.UpdateType.ChangeLeader:
                         party.SetLeader(message.characterId);
                         parties[message.id] = party;
@@ -750,14 +751,15 @@ namespace MultiplayerARPG.MMO
             BasePlayerCharacterEntity playerCharacterEntity;
             byte guildRole;
             GuildData guild;
-            if (guilds.TryGetValue(message.id, out guild))
+            if (message.type == UpdateGuildMessage.UpdateType.Create)
+            {
+                guild = new GuildData(message.id, message.guildName, message.characterId);
+                guilds[message.id] = guild;
+            }
+            else if (guilds.TryGetValue(message.id, out guild))
             {
                 switch (message.type)
                 {
-                    case UpdateGuildMessage.UpdateType.Create:
-                        guild = new GuildData(message.id, message.guildName, message.characterId);
-                        guilds[message.id] = guild;
-                        break;
                     case UpdateGuildMessage.UpdateType.ChangeLeader:
                         guild.SetLeader(message.characterId);
                         guilds[message.id] = guild;
