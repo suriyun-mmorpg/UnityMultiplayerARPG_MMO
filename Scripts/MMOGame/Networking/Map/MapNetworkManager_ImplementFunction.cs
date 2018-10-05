@@ -192,11 +192,8 @@ namespace MultiplayerARPG.MMO
             var guildId = createGuildJob.result;
             // Create guild
             base.CreateGuild(playerCharacterEntity, guildName, guildId);
-            // Retrieve required data
-            byte guildRole;
-            guilds[guildId].GetGuildMemberFlagsAndRole(playerCharacterEntity, out guildRole);
             // Save to database
-            new SetCharacterGuildJob(Database, playerCharacterEntity.Id, guildId, guildRole).Start();
+            new SetCharacterGuildJob(Database, playerCharacterEntity.Id, guildId, guilds[guildId].GetMemberRole(playerCharacterEntity.Id)).Start();
             // Broadcast via chat server
             if (ChatNetworkManager.IsClientConnected)
             {
@@ -213,11 +210,9 @@ namespace MultiplayerARPG.MMO
                 return;
 
             base.ChangeGuildLeader(playerCharacterEntity, characterId);
-            byte guildRole;
-            guild.GetGuildMemberFlagsAndRole(characterId, out guildRole);
             // Save to database
             new UpdateGuildLeaderJob(Database, guildId, characterId).Start();
-            new SetGuildMemberRoleJob(Database, characterId, guildRole).Start();
+            new SetGuildMemberRoleJob(Database, characterId, guild.GetMemberRole(characterId)).Start();
             // Broadcast via chat server
             if (ChatNetworkManager.IsClientConnected)
                 ChatNetworkManager.Client.SendChangeGuildLeader(null, MMOMessageTypes.UpdateGuild, guildId, characterId);
@@ -253,7 +248,6 @@ namespace MultiplayerARPG.MMO
                 BasePlayerCharacterEntity memberCharacterEntity;
                 if (playerCharactersById.TryGetValue(memberId, out memberCharacterEntity))
                 {
-                    memberCharacterEntity.GuildMemberFlags = guild.GetGuildMemberFlagsAndRole(memberCharacterEntity, out guildRole);
                     memberCharacterEntity.GuildRole = guildRole;
                     // Save to database
                     new SetGuildMemberRoleJob(Database, memberId, guildRole).Start();
@@ -289,10 +283,8 @@ namespace MultiplayerARPG.MMO
                 return;
 
             base.AddGuildMember(inviteCharacterEntity, acceptCharacterEntity);
-            byte guildRole;
-            guild.GetGuildMemberFlagsAndRole(acceptCharacterEntity, out guildRole);
             // Save to database
-            new SetCharacterGuildJob(Database, acceptCharacterEntity.Id, guildId, guildRole).Start();
+            new SetCharacterGuildJob(Database, acceptCharacterEntity.Id, guildId, guild.GetMemberRole(acceptCharacterEntity.Id)).Start();
             // Broadcast via chat server
             if (ChatNetworkManager.IsClientConnected)
                 ChatNetworkManager.Client.SendAddGuildMember(null, MMOMessageTypes.UpdateGuildMember, guildId, acceptCharacterEntity.Id, acceptCharacterEntity.CharacterName, acceptCharacterEntity.DataId, acceptCharacterEntity.Level);
