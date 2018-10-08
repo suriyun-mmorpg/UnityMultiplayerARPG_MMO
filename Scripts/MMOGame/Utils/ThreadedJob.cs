@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Threading;
-using System.Threading.Tasks;
 
 public class ThreadedJob
 {
@@ -57,7 +56,7 @@ public class ThreadedJob
     {
         while (!Update())
         {
-            yield return null;
+            yield return 0;
         }
     }
 
