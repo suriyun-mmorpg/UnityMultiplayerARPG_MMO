@@ -25,14 +25,14 @@ namespace MultiplayerARPG.MMO
             return id;
         }
 
-        public override GuildData ReadGuild(int id)
+        public override GuildData ReadGuild(int id, GuildRole[] defaultGuildRoles)
         {
             GuildData result = null;
             var reader = ExecuteReader("SELECT * FROM guild WHERE id=@id LIMIT 1",
                 new MySqlParameter("@id", id));
             if (reader.Read())
             {
-                result = new GuildData(id, reader.GetString("guildName"), reader.GetString("leaderId"));
+                result = new GuildData(id, reader.GetString("guildName"), reader.GetString("leaderId"), defaultGuildRoles);
                 result.level = reader.GetInt32("level");
                 result.exp = reader.GetInt32("exp");
                 result.skillPoint = reader.GetInt32("skillPoint");

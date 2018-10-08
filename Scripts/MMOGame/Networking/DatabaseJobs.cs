@@ -267,14 +267,16 @@ namespace MultiplayerARPG.MMO
     public class ReadGuildJob : DatabaseJob<GuildData>
     {
         private int id;
-        public ReadGuildJob(BaseDatabase database, int id, Action<GuildData> onFinished = null) : base(database, onFinished)
+        private GuildRole[] defaultGuildRoles;
+        public ReadGuildJob(BaseDatabase database, int id, GuildRole[] defaultGuildRoles, Action<GuildData> onFinished = null) : base(database, onFinished)
         {
             this.id = id;
+            this.defaultGuildRoles = defaultGuildRoles;
         }
 
         protected override void ThreadFunction()
         {
-            result = database.ReadGuild(id);
+            result = database.ReadGuild(id, defaultGuildRoles);
         }
     }
     

@@ -54,7 +54,7 @@ namespace MultiplayerARPG.MMO
         public abstract void UpdateCharacterParty(string characterId, int partyId);
 
         public abstract int CreateGuild(string guildName, string leaderId);
-        public abstract GuildData ReadGuild(int id);
+        public abstract GuildData ReadGuild(int id, GuildRole[] defaultGuildRoles);
         public abstract int IncreaseGuildExp(int id, int amount);
         public abstract void UpdateGuildLeader(int id, string leaderId);
         public abstract void UpdateGuildMessage(int id, string guildMessage);
