@@ -33,19 +33,7 @@ namespace MultiplayerARPG.MMO
             if (reader.Read())
             {
                 result = new GuildData(id, reader.GetString("guildName"), reader.GetString("leaderId"));
-                reader = ExecuteReader("SELECT id, dataId, characterName, level, guildRole FROM characters WHERE guildId=@id",
-                    new SqliteParameter("@id", id));
-                SocialCharacterData guildMemberData;
-                while (reader.Read())
-                {
-                    // Get some required data, other data will be set at server side
-                    guildMemberData = new SocialCharacterData();
-                    guildMemberData.id = reader.GetString("id");
-                    guildMemberData.characterName = reader.GetString("characterName");
-                    guildMemberData.dataId = reader.GetInt32("dataId");
-                    guildMemberData.level = reader.GetInt32("level");
-                    result.AddMember(guildMemberData, reader.GetByte("guildRole"));
-                }
+
                 reader = ExecuteReader("SELECT * FROM guildrole WHERE guildId=@id",
                     new SqliteParameter("@id", id));
                 byte guildRole;
@@ -59,6 +47,20 @@ namespace MultiplayerARPG.MMO
                     guildRoleData.canKick = reader.GetBoolean("canKick");
                     guildRoleData.shareExpPercentage = (byte)reader.GetInt32("shareExpPercentage");
                     result.SetRole(guildRole, guildRoleData);
+                }
+
+                reader = ExecuteReader("SELECT id, dataId, characterName, level, guildRole FROM characters WHERE guildId=@id",
+                    new SqliteParameter("@id", id));
+                SocialCharacterData guildMemberData;
+                while (reader.Read())
+                {
+                    // Get some required data, other data will be set at server side
+                    guildMemberData = new SocialCharacterData();
+                    guildMemberData.id = reader.GetString("id");
+                    guildMemberData.characterName = reader.GetString("characterName");
+                    guildMemberData.dataId = reader.GetInt32("dataId");
+                    guildMemberData.level = reader.GetInt32("level");
+                    result.AddMember(guildMemberData, (byte)reader.GetInt32("guildRole"));
                 }
             }
             return result;
