@@ -267,8 +267,8 @@ namespace MultiplayerARPG.MMO
     public class ReadGuildJob : DatabaseJob<GuildData>
     {
         private int id;
-        private GuildRole[] defaultGuildRoles;
-        public ReadGuildJob(BaseDatabase database, int id, GuildRole[] defaultGuildRoles, Action<GuildData> onFinished = null) : base(database, onFinished)
+        private GuildRoleData[] defaultGuildRoles;
+        public ReadGuildJob(BaseDatabase database, int id, GuildRoleData[] defaultGuildRoles, Action<GuildData> onFinished = null) : base(database, onFinished)
         {
             this.id = id;
             this.defaultGuildRoles = defaultGuildRoles;

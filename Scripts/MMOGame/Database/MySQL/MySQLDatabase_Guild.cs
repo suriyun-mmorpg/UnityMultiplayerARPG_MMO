@@ -25,7 +25,7 @@ namespace MultiplayerARPG.MMO
             return id;
         }
 
-        public override GuildData ReadGuild(int id, GuildRole[] defaultGuildRoles)
+        public override GuildData ReadGuild(int id, GuildRoleData[] defaultGuildRoles)
         {
             GuildData result = null;
             var reader = ExecuteReader("SELECT * FROM guild WHERE id=@id LIMIT 1",
@@ -41,11 +41,11 @@ namespace MultiplayerARPG.MMO
                 reader = ExecuteReader("SELECT * FROM guildrole WHERE guildId=@id",
                     new MySqlParameter("@id", id));
                 byte guildRole;
-                GuildRole guildRoleData;
+                GuildRoleData guildRoleData;
                 while (reader.Read())
                 {
                     guildRole = (byte)reader.GetInt32("guildRole");
-                    guildRoleData = new GuildRole();
+                    guildRoleData = new GuildRoleData();
                     guildRoleData.roleName = reader.GetString("name");
                     guildRoleData.canInvite = reader.GetBoolean("canInvite");
                     guildRoleData.canKick = reader.GetBoolean("canKick");
