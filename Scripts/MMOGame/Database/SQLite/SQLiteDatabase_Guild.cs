@@ -33,6 +33,10 @@ namespace MultiplayerARPG.MMO
             if (reader.Read())
             {
                 result = new GuildData(id, reader.GetString("guildName"), reader.GetString("leaderId"));
+                result.level = reader.GetInt32("level");
+                result.exp = reader.GetInt32("exp");
+                result.skillPoint = reader.GetInt32("skillPoint");
+                result.guildMessage = reader.GetString("guildMessage");
 
                 reader = ExecuteReader("SELECT * FROM guildrole WHERE guildId=@id",
                     new SqliteParameter("@id", id));
