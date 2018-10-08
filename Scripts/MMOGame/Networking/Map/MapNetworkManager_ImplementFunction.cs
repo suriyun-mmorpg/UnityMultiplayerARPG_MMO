@@ -233,14 +233,14 @@ namespace MultiplayerARPG.MMO
                 ChatNetworkManager.Client.SendSetGuildMessage(null, MMOMessageTypes.UpdateGuild, guildId, guildMessage);
         }
 
-        public override void SetGuildRole(BasePlayerCharacterEntity playerCharacterEntity, byte guildRole, string name, bool canInvite, bool canKick, byte shareExpPercentage)
+        public override void SetGuildRole(BasePlayerCharacterEntity playerCharacterEntity, byte guildRole, string roleName, bool canInvite, bool canKick, byte shareExpPercentage)
         {
             int guildId;
             GuildData guild;
             if (!CanSetGuildRole(playerCharacterEntity, guildRole, out guildId, out guild))
                 return;
 
-            guild.SetRole(guildRole, name, canInvite, canKick, shareExpPercentage);
+            guild.SetRole(guildRole, roleName, canInvite, canKick, shareExpPercentage);
             guilds[guildId] = guild;
             // Change characters guild role
             foreach (var memberId in guild.GetMemberIds())
@@ -253,11 +253,12 @@ namespace MultiplayerARPG.MMO
                     new SetGuildMemberRoleJob(Database, memberId, guildRole).Start();
                 }
             }
+            SendSetGuildRoleToClients(guild, guildRole, roleName, canInvite, canKick, shareExpPercentage);
             // Save to database
-            new UpdateGuildRoleJob(Database, guildId, guildRole, name, canInvite, canKick, shareExpPercentage).Start();
+            new UpdateGuildRoleJob(Database, guildId, guildRole, roleName, canInvite, canKick, shareExpPercentage).Start();
             // Broadcast via chat server
             if (ChatNetworkManager.IsClientConnected)
-                ChatNetworkManager.Client.SendSetGuildRole(null, MMOMessageTypes.UpdateGuild, guildId, guildRole, name, canInvite, canKick, shareExpPercentage);
+                ChatNetworkManager.Client.SendSetGuildRole(null, MMOMessageTypes.UpdateGuild, guildId, guildRole, roleName, canInvite, canKick, shareExpPercentage);
         }
 
         public override void SetGuildMemberRole(BasePlayerCharacterEntity playerCharacterEntity, string characterId, byte guildRole)
@@ -319,7 +320,10 @@ namespace MultiplayerARPG.MMO
                 {
                     BasePlayerCharacterEntity memberCharacterEntity;
                     if (playerCharactersById.TryGetValue(memberId, out memberCharacterEntity))
+                    {
                         memberCharacterEntity.ClearGuild();
+                        SendGuildTerminateToClient(memberCharacterEntity.ConnectId, guildId);
+                    }
                     // Save to database
                     new SetCharacterGuildJob(Database, memberId, 0, 0).Start();
                     // Broadcast via chat server
@@ -336,8 +340,10 @@ namespace MultiplayerARPG.MMO
             else
             {
                 playerCharacterEntity.ClearGuild();
+                SendGuildTerminateToClient(playerCharacterEntity.ConnectId, guildId);
                 guild.RemoveMember(playerCharacterEntity.Id);
                 guilds[guildId] = guild;
+                SendRemoveGuildMemberToClients(guild, playerCharacterEntity.Id);
                 // Save to database
                 new SetCharacterGuildJob(Database, playerCharacterEntity.Id, 0, 0).Start();
                 // Broadcast via chat server
