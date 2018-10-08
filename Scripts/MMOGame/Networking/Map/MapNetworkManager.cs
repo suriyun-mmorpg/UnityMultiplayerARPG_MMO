@@ -344,8 +344,9 @@ namespace MultiplayerARPG.MMO
                                 yield return StartCoroutine(LoadPartyRoutine(playerCharacterEntity.PartyId));
                             if (parties.ContainsKey(playerCharacterEntity.PartyId))
                             {
-                                SendCreatePartyToClient(playerCharacterEntity.ConnectId, parties[playerCharacterEntity.PartyId]);
-                                SendAddPartyMembersToClient(playerCharacterEntity.ConnectId, parties[playerCharacterEntity.PartyId]);
+                                var party = parties[playerCharacterEntity.PartyId];
+                                SendCreatePartyToClient(playerCharacterEntity.ConnectId, party);
+                                SendAddPartyMembersToClient(playerCharacterEntity.ConnectId, party);
                             }
                             else
                                 playerCharacterEntity.ClearParty();
