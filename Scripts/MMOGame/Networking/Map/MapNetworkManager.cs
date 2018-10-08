@@ -358,9 +358,13 @@ namespace MultiplayerARPG.MMO
                                 yield return StartCoroutine(LoadGuildRoutine(playerCharacterEntity.GuildId));
                             if (guilds.ContainsKey(playerCharacterEntity.GuildId))
                             {
-                                playerCharacterEntity.GuildRole = guilds[playerCharacterEntity.GuildId].GetMemberRole(playerCharacterEntity.Id);
-                                SendCreateGuildToClient(playerCharacterEntity.ConnectId, guilds[playerCharacterEntity.GuildId]);
-                                SendAddGuildMembersToClient(playerCharacterEntity.ConnectId, guilds[playerCharacterEntity.GuildId]);
+                                var guild = guilds[playerCharacterEntity.GuildId];
+                                playerCharacterEntity.GuildRole = guild.GetMemberRole(playerCharacterEntity.Id);
+                                SendCreateGuildToClient(playerCharacterEntity.ConnectId, guild);
+                                SendAddGuildMembersToClient(playerCharacterEntity.ConnectId, guild);
+                                SendSetGuildMessageToClient(playerCharacterEntity.ConnectId, guild);
+                                SendSetGuildRolesToClient(playerCharacterEntity.ConnectId, guild);
+                                SendSetGuildMemberRolesToClient(playerCharacterEntity.ConnectId, guild);
                             }
                             else
                                 playerCharacterEntity.ClearGuild();
