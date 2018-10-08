@@ -14,8 +14,8 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@guildName", guildName),
                 new SqliteParameter("@leaderId", leaderId),
                 new SqliteParameter("@level", 1),
-                new SqliteParameter("@exp", 0),
-                new SqliteParameter("@skillPoint", 0));
+                new SqliteParameter("@exp", (object)0),
+                new SqliteParameter("@skillPoint", (object)0));
             if (reader.Read())
                 id = (int)reader.GetInt64(0);
             if (id > 0)
@@ -46,6 +46,20 @@ namespace MultiplayerARPG.MMO
                     guildMemberData.level = reader.GetInt32("level");
                     result.AddMember(guildMemberData, reader.GetByte("guildRole"));
                 }
+                reader = ExecuteReader("SELECT * FROM guildrole WHERE guildId=@id",
+                    new SqliteParameter("@id", id));
+                byte guildRole;
+                GuildRole guildRoleData;
+                while (reader.Read())
+                {
+                    guildRole = (byte)reader.GetInt32("guildRole");
+                    guildRoleData = new GuildRole();
+                    guildRoleData.roleName = reader.GetString("name");
+                    guildRoleData.canInvite = reader.GetBoolean("canInvite");
+                    guildRoleData.canKick = reader.GetBoolean("canKick");
+                    guildRoleData.shareExpPercentage = (byte)reader.GetInt32("shareExpPercentage");
+                    result.SetRole(guildRole, guildRoleData);
+                }
             }
             return result;
         }
@@ -70,10 +84,10 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@id", id));
         }
 
-        public override void UpdateGuildMessage(int id, string message)
+        public override void UpdateGuildMessage(int id, string guildMessage)
         {
-            ExecuteNonQuery("UPDATE guild SET message=@message WHERE id=@id",
-                new SqliteParameter("@message", message),
+            ExecuteNonQuery("UPDATE guild SET guildMessage=@guildMessage WHERE id=@id",
+                new SqliteParameter("@guildMessage", guildMessage),
                 new SqliteParameter("@id", id));
         }
 

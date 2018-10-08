@@ -14,8 +14,8 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@guildName", guildName),
                 new MySqlParameter("@leaderId", leaderId),
                 new MySqlParameter("@level", 1),
-                new MySqlParameter("@exp", 0),
-                new MySqlParameter("@skillPoint", 0));
+                new MySqlParameter("@exp", (object)0),
+                new MySqlParameter("@skillPoint", (object)0));
             if (reader.Read())
                 id = (int)reader.GetUInt64(0);
             if (id > 0)
@@ -46,6 +46,20 @@ namespace MultiplayerARPG.MMO
                     guildMemberData.level = reader.GetInt32("level");
                     result.AddMember(guildMemberData, reader.GetByte("guildRole"));
                 }
+                reader = ExecuteReader("SELECT * FROM guildrole WHERE guildId=@id",
+                    new MySqlParameter("@id", id));
+                byte guildRole;
+                GuildRole guildRoleData;
+                while (reader.Read())
+                {
+                    guildRole = (byte)reader.GetInt32("guildRole");
+                    guildRoleData = new GuildRole();
+                    guildRoleData.roleName = reader.GetString("name");
+                    guildRoleData.canInvite = reader.GetBoolean("canInvite");
+                    guildRoleData.canKick = reader.GetBoolean("canKick");
+                    guildRoleData.shareExpPercentage = (byte)reader.GetInt32("shareExpPercentage");
+                    result.SetRole(guildRole, guildRoleData);
+                }
             }
             return result;
         }
@@ -70,10 +84,10 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@id", id));
         }
 
-        public override void UpdateGuildMessage(int id, string message)
+        public override void UpdateGuildMessage(int id, string guildMessage)
         {
-            ExecuteNonQuery("UPDATE guild SET message=@message WHERE id=@id",
-                new MySqlParameter("@message", message),
+            ExecuteNonQuery("UPDATE guild SET guildMessage=@guildMessage WHERE id=@id",
+                new MySqlParameter("@guildMessage", guildMessage),
                 new MySqlParameter("@id", id));
         }
 
