@@ -96,7 +96,7 @@ namespace MultiplayerARPG.MMO
                 // Send add map users
                 foreach (var userData in mapUsersById.Values)
                 {
-                    UpdateMapUser(connectionId, UpdateMapUserMessage.UpdateType.Add, userData);
+                    UpdateMapUser(connectionId, UpdateUserCharacterMessage.UpdateType.Add, userData);
                 }
             }
         }
@@ -114,7 +114,7 @@ namespace MultiplayerARPG.MMO
                         continue;
 
                     // Send remove messages to other map servers
-                    UpdateMapUser(UpdateMapUserMessage.UpdateType.Remove, userData, connectionId);
+                    UpdateMapUser(UpdateUserCharacterMessage.UpdateType.Remove, userData, connectionId);
                 }
             }
         }
@@ -136,7 +136,7 @@ namespace MultiplayerARPG.MMO
 
         private void HandleUpdateMapUserAtClient(LiteNetLibMessageHandler messageHandler)
         {
-            var message = messageHandler.ReadMessage<UpdateMapUserMessage>();
+            var message = messageHandler.ReadMessage<UpdateUserCharacterMessage>();
             if (mapNetworkManager != null)
                 mapNetworkManager.OnUpdateMapUser(message);
         }
@@ -200,49 +200,38 @@ namespace MultiplayerARPG.MMO
         private void HandleUpdateMapUserAtServer(LiteNetLibMessageHandler messageHandler)
         {
             var connectionId = messageHandler.connectionId;
-            var message = messageHandler.ReadMessage<UpdateMapUserMessage>();
+            var message = messageHandler.ReadMessage<UpdateUserCharacterMessage>();
             if (mapServerConnectionIds.Contains(connectionId))
             {
                 UserCharacterData userData;
                 switch (message.type)
                 {
-                    case UpdateMapUserMessage.UpdateType.Add:
-                        if (!mapUsersById.ContainsKey(message.id))
+                    case UpdateUserCharacterMessage.UpdateType.Add:
+                        if (!mapUsersById.ContainsKey(message.CharacterId))
                         {
-                            userData = new UserCharacterData();
-                            userData.id = message.id;
-                            userData.userId = message.userId;
-                            userData.characterName = message.characterName;
-                            userData.dataId = message.dataId;
-                            userData.level = message.level;
-                            mapUsersById[userData.id] = userData;
-                            connectionIdsByCharacterId[message.id] = connectionId;
-                            connectionIdsByCharacterName[message.characterName] = connectionId;
-                            UpdateMapUser(UpdateMapUserMessage.UpdateType.Add, userData, connectionId);
-                            Debug.Log("[Chat] Add map user: " + message.userId + " by " + connectionId);
+                            mapUsersById[message.CharacterId] = message.data;
+                            connectionIdsByCharacterId[message.CharacterId] = connectionId;
+                            connectionIdsByCharacterName[message.CharacterName] = connectionId;
+                            UpdateMapUser(UpdateUserCharacterMessage.UpdateType.Add, message.data, connectionId);
+                            Debug.Log("[Chat] Add map user: " + message.UserId + " by " + connectionId);
                         }
                         break;
-                    case UpdateMapUserMessage.UpdateType.Remove:
-                        if (mapUsersById.TryGetValue(message.id, out userData))
+                    case UpdateUserCharacterMessage.UpdateType.Remove:
+                        if (mapUsersById.TryGetValue(message.CharacterId, out userData))
                         {
                             mapUsersById.Remove(userData.id);
-                            connectionIdsByCharacterId.Remove(message.id);
+                            connectionIdsByCharacterId.Remove(userData.id);
                             connectionIdsByCharacterName.Remove(userData.characterName);
-                            UpdateMapUser(UpdateMapUserMessage.UpdateType.Remove, userData, connectionId);
-                            Debug.Log("[Chat] Remove map user: " + message.userId + " by " + connectionId);
+                            UpdateMapUser(UpdateUserCharacterMessage.UpdateType.Remove, userData, connectionId);
+                            Debug.Log("[Chat] Remove map user: " + message.UserId + " by " + connectionId);
                         }
                         break;
-                    case UpdateMapUserMessage.UpdateType.Online:
-                        if (mapUsersById.TryGetValue(message.id, out userData))
+                    case UpdateUserCharacterMessage.UpdateType.Online:
+                        if (mapUsersById.ContainsKey(message.CharacterId))
                         {
-                            userData.level = message.level;
-                            userData.currentHp = message.currentHp;
-                            userData.maxHp = message.maxHp;
-                            userData.currentMp = message.currentMp;
-                            userData.maxMp = message.maxMp;
-                            mapUsersById[userData.id] = userData;
-                            UpdateMapUser(UpdateMapUserMessage.UpdateType.Online, userData, connectionId);
-                            Debug.Log("[Chat] Update map user: " + message.userId + " by " + connectionId);
+                            mapUsersById[message.CharacterId] = message.data;
+                            UpdateMapUser(UpdateUserCharacterMessage.UpdateType.Online, message.data, connectionId);
+                            Debug.Log("[Chat] Update map user: " + message.UserId + " by " + connectionId);
                         }
                         break;
                 }
@@ -305,7 +294,7 @@ namespace MultiplayerARPG.MMO
             }
         }
 
-        private void UpdateMapUser(UpdateMapUserMessage.UpdateType updateType, UserCharacterData userData, long exceptConnectionId)
+        private void UpdateMapUser(UpdateUserCharacterMessage.UpdateType updateType, UserCharacterData userData, long exceptConnectionId)
         {
             foreach (var mapServerConnectionId in mapServerConnectionIds)
             {
@@ -316,19 +305,11 @@ namespace MultiplayerARPG.MMO
             }
         }
 
-        private void UpdateMapUser(long connectionId, UpdateMapUserMessage.UpdateType updateType, UserCharacterData userData)
+        private void UpdateMapUser(long connectionId, UpdateUserCharacterMessage.UpdateType updateType, UserCharacterData userData)
         {
-            var updateMapUserMessage = new UpdateMapUserMessage();
+            var updateMapUserMessage = new UpdateUserCharacterMessage();
             updateMapUserMessage.type = updateType;
-            updateMapUserMessage.id = userData.id;
-            updateMapUserMessage.userId = userData.userId;
-            updateMapUserMessage.characterName = userData.characterName;
-            updateMapUserMessage.dataId = userData.dataId;
-            updateMapUserMessage.level = userData.level;
-            updateMapUserMessage.currentHp = userData.currentHp;
-            updateMapUserMessage.maxHp = userData.maxHp;
-            updateMapUserMessage.currentMp = userData.currentMp;
-            updateMapUserMessage.maxMp = userData.maxMp;
+            updateMapUserMessage.data = userData;
             ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MMOMessageTypes.UpdateMapUser, updateMapUserMessage);
         }
 

@@ -7,6 +7,8 @@
         public string characterName;
         public int dataId;
         public int level;
+        public int partyId;
+        public int guildId;
         public int currentHp;
         public int maxHp;
         public int currentMp;

@@ -180,21 +180,21 @@ namespace MultiplayerARPG.MMO
         protected void HandleUpdateMapUser(LiteNetLibMessageHandler messageHandler)
         {
             var connectionId = messageHandler.connectionId;
-            var message = messageHandler.ReadMessage<UpdateMapUserMessage>();
+            var message = messageHandler.ReadMessage<UpdateUserCharacterMessage>();
             if (mapUserIds.ContainsKey(connectionId))
             {
                 switch (message.type)
                 {
-                    case UpdateMapUserMessage.UpdateType.Add:
-                        if (!mapUserIds[connectionId].Contains(message.userId))
+                    case UpdateUserCharacterMessage.UpdateType.Add:
+                        if (!mapUserIds[connectionId].Contains(message.UserId))
                         {
-                            mapUserIds[connectionId].Add(message.userId);
-                            Debug.Log("[Central] Add map user: " + message.userId + " by " + connectionId);
+                            mapUserIds[connectionId].Add(message.UserId);
+                            Debug.Log("[Central] Add map user: " + message.UserId + " by " + connectionId);
                         }
                         break;
-                    case UpdateMapUserMessage.UpdateType.Remove:
-                        mapUserIds[connectionId].Remove(message.userId);
-                        Debug.Log("[Central] Remove map user: " + message.userId + " by " + connectionId);
+                    case UpdateUserCharacterMessage.UpdateType.Remove:
+                        mapUserIds[connectionId].Remove(message.UserId);
+                        Debug.Log("[Central] Remove map user: " + message.UserId + " by " + connectionId);
                         break;
                 }
             }

@@ -1,7 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using LiteNetLib;
@@ -80,10 +78,10 @@ namespace MultiplayerARPG.MMO
         protected override void Update()
         {
             base.Update();
+            var tempUnscaledTime = Time.unscaledTime;
             if (IsServer)
             {
                 CentralAppServerRegister.Update();
-                tempUnscaledTime = Time.unscaledTime;
                 if (tempUnscaledTime - lastSaveCharacterTime > autoSaveDuration)
                 {
                     StartCoroutine(SaveCharactersRoutine());
@@ -97,59 +95,23 @@ namespace MultiplayerARPG.MMO
             }
         }
 
-        protected override void UpdateOnlineCharacters(float time)
+        protected override void UpdateOnlineCharacter(long connectionId, BasePlayerCharacterEntity playerCharacterEntity, float time)
         {
-            BasePlayerCharacterEntity playerCharacter;
-            UserCharacterData userData;
+            base.UpdateOnlineCharacter(connectionId, playerCharacterEntity, time);
 
-            tempCharacterIdArray = playerCharactersById.Keys.ToArray();
-            foreach (var characterId in tempCharacterIdArray)
+            UserCharacterData tempUserData;
+            if (ChatNetworkManager.IsClientConnected && usersById.TryGetValue(playerCharacterEntity.Id, out tempUserData))
             {
-                playerCharacter = playerCharactersById[characterId];
-                if (usersById.TryGetValue(characterId, out userData))
-                {
-                    if (ChatNetworkManager.IsClientConnected)
-                    {
-                        userData.dataId = playerCharacter.DataId;
-                        userData.level = playerCharacter.Level;
-                        userData.currentHp = playerCharacter.CurrentHp;
-                        userData.maxHp = playerCharacter.CacheMaxHp;
-                        userData.currentMp = playerCharacter.CurrentMp;
-                        userData.maxMp = playerCharacter.CacheMaxMp;
-                        usersById[characterId] = userData;
-                        UpdateMapUser(ChatNetworkManager.Client, UpdateMapUserMessage.UpdateType.Online, userData);
-                    }
-                }
-            }
-
-            tempPartyDataArray = parties.Values.ToArray();
-            foreach (var party in tempPartyDataArray)
-            {
-                tempCharacterIdArray = party.GetMemberIds().ToArray();
-                foreach (var memberId in tempCharacterIdArray)
-                {
-                    if (usersById.TryGetValue(memberId, out userData))
-                    {
-                        party.UpdateMember(userData.ConvertToSocialCharacterData());
-                        party.NotifyMemberOnline(memberId, time);
-                    }
-                    party.UpdateMemberOnline(memberId, time);
-                }
-            }
-
-            tempGuildDataArray = guilds.Values.ToArray();
-            foreach (var guild in tempGuildDataArray)
-            {
-                tempCharacterIdArray = guild.GetMemberIds().ToArray();
-                foreach (var memberId in tempCharacterIdArray)
-                {
-                    if (usersById.TryGetValue(memberId, out userData))
-                    {
-                        guild.UpdateMember(userData.ConvertToSocialCharacterData());
-                        guild.NotifyMemberOnline(memberId, time);
-                    }
-                    guild.UpdateMemberOnline(memberId, time);
-                }
+                tempUserData.dataId = playerCharacterEntity.DataId;
+                tempUserData.level = playerCharacterEntity.Level;
+                tempUserData.currentHp = playerCharacterEntity.CurrentHp;
+                tempUserData.maxHp = playerCharacterEntity.CacheMaxHp;
+                tempUserData.currentMp = playerCharacterEntity.CurrentMp;
+                tempUserData.maxMp = playerCharacterEntity.CacheMaxMp;
+                tempUserData.partyId = playerCharacterEntity.PartyId;
+                tempUserData.guildId = playerCharacterEntity.GuildId;
+                usersById[playerCharacterEntity.Id] = tempUserData;
+                UpdateMapUser(ChatNetworkManager.Client, UpdateUserCharacterMessage.UpdateType.Online, tempUserData);
             }
         }
 
@@ -181,9 +143,9 @@ namespace MultiplayerARPG.MMO
             {
                 usersById.Remove(playerCharacter.Id);
                 // Remove map user from central server and chat server
-                UpdateMapUser(CentralAppServerRegister, UpdateMapUserMessage.UpdateType.Remove, userData);
+                UpdateMapUser(CentralAppServerRegister, UpdateUserCharacterMessage.UpdateType.Remove, userData);
                 if (ChatNetworkManager.IsClientConnected)
-                    UpdateMapUser(ChatNetworkManager.Client, UpdateMapUserMessage.UpdateType.Remove, userData);
+                    UpdateMapUser(ChatNetworkManager.Client, UpdateUserCharacterMessage.UpdateType.Remove, userData);
             }
             base.UnregisterPlayerCharacter(connectionId);
         }
@@ -389,9 +351,9 @@ namespace MultiplayerARPG.MMO
                         userData.maxMp = playerCharacterEntity.CacheMaxMp;
                         usersById[userData.id] = userData;
                         // Add map user to central server and chat server
-                        UpdateMapUser(CentralAppServerRegister, UpdateMapUserMessage.UpdateType.Add, userData);
+                        UpdateMapUser(CentralAppServerRegister, UpdateUserCharacterMessage.UpdateType.Add, userData);
                         if (ChatNetworkManager.IsClientConnected)
-                            UpdateMapUser(ChatNetworkManager.Client, UpdateMapUserMessage.UpdateType.Add, userData);
+                            UpdateMapUser(ChatNetworkManager.Client, UpdateUserCharacterMessage.UpdateType.Add, userData);
 
                         var player = Players[connectionId];
                         foreach (var spawnedObject in Assets.SpawnedObjects)
@@ -630,7 +592,7 @@ namespace MultiplayerARPG.MMO
         private void OnAppServerRegistered(AckResponseCode responseCode, BaseAckMessage message)
         {
             if (responseCode == AckResponseCode.Success)
-                UpdateMapUsers(CentralAppServerRegister, UpdateMapUserMessage.UpdateType.Add);
+                UpdateMapUsers(CentralAppServerRegister, UpdateUserCharacterMessage.UpdateType.Add);
         }
         #endregion
 
@@ -638,7 +600,7 @@ namespace MultiplayerARPG.MMO
         public void OnChatServerConnected()
         {
             Debug.Log("Connected to chat server");
-            UpdateMapUsers(ChatNetworkManager.Client, UpdateMapUserMessage.UpdateType.Add);
+            UpdateMapUsers(ChatNetworkManager.Client, UpdateUserCharacterMessage.UpdateType.Add);
         }
 
         public void OnChatMessageReceive(ChatMessage message)
@@ -646,36 +608,37 @@ namespace MultiplayerARPG.MMO
             ReadChatMessage(message);
         }
 
-        public void OnUpdateMapUser(UpdateMapUserMessage message)
+        public void OnUpdateMapUser(UpdateUserCharacterMessage message)
         {
-            UserCharacterData userData;
+            var tempUnscaledTime = Time.unscaledTime;
+            int socialId;
+            PartyData party;
+            GuildData guild;
             switch (message.type)
             {
-                case UpdateMapUserMessage.UpdateType.Add:
-                    if (!usersById.ContainsKey(message.id))
-                    {
-                        userData = new UserCharacterData();
-                        userData.id = message.id;
-                        userData.userId = message.userId;
-                        userData.characterName = message.characterName;
-                        userData.dataId = message.dataId;
-                        userData.level = message.level;
-                        usersById[userData.id] = userData;
-                    }
+                case UpdateUserCharacterMessage.UpdateType.Add:
+                    if (!usersById.ContainsKey(message.CharacterId))
+                        usersById.Add(message.CharacterId, message.data);
                     break;
-                case UpdateMapUserMessage.UpdateType.Remove:
-                    if (usersById.TryGetValue(message.id, out userData))
-                        usersById.Remove(userData.id);
+                case UpdateUserCharacterMessage.UpdateType.Remove:
+                    usersById.Remove(message.CharacterId);
                     break;
-                case UpdateMapUserMessage.UpdateType.Online:
-                    if (usersById.TryGetValue(message.id, out userData))
+                case UpdateUserCharacterMessage.UpdateType.Online:
+                    if (usersById.ContainsKey(message.CharacterId))
                     {
-                        userData.level = message.level;
-                        userData.currentHp = message.currentHp;
-                        userData.maxHp = message.maxHp;
-                        userData.currentMp = message.currentMp;
-                        userData.maxMp = message.maxMp;
-                        usersById[userData.id] = userData;
+                        socialId = message.data.partyId;
+                        if (socialId > 0 && parties.TryGetValue(socialId, out party))
+                        {
+                            party.UpdateOnlineMember(message.CharacterId, tempUnscaledTime);
+                            parties[socialId] = party;
+                        }
+                        socialId = message.data.guildId;
+                        if (socialId > 0 && guilds.TryGetValue(socialId, out guild))
+                        {
+                            guild.UpdateOnlineMember(message.CharacterId, tempUnscaledTime);
+                            guilds[socialId] = guild;
+                        }
+                        usersById[message.CharacterId] = message.data;
                     }
                     break;
             }
@@ -690,21 +653,21 @@ namespace MultiplayerARPG.MMO
                 switch (message.type)
                 {
                     case UpdateSocialMemberMessage.UpdateType.Add:
-                        if (playerCharactersById.TryGetValue(message.characterId, out playerCharacterEntity))
+                        if (playerCharactersById.TryGetValue(message.CharacterId, out playerCharacterEntity))
                         {
                             playerCharacterEntity.PartyId = message.id;
                             SendCreatePartyToClient(playerCharacterEntity.ConnectId, party);
                             SendAddPartyMembersToClient(playerCharacterEntity.ConnectId, party);
                         }
-                        SendAddPartyMemberToClients(party, message.characterId, message.member.id, message.member.dataId, message.member.level);
+                        SendAddPartyMemberToClients(party, message.CharacterId, message.data.id, message.data.dataId, message.data.level);
                         break;
                     case UpdateSocialMemberMessage.UpdateType.Remove:
-                        if (playerCharactersById.TryGetValue(message.characterId, out playerCharacterEntity))
+                        if (playerCharactersById.TryGetValue(message.CharacterId, out playerCharacterEntity))
                         {
                             playerCharacterEntity.ClearParty();
                             SendPartyTerminateToClient(playerCharacterEntity.ConnectId, message.id);
                         }
-                        SendRemovePartyMemberToClients(party, message.characterId);
+                        SendRemovePartyMemberToClients(party, message.CharacterId);
                         break;
                 }
             }
@@ -752,22 +715,22 @@ namespace MultiplayerARPG.MMO
                 switch (message.type)
                 {
                     case UpdateSocialMemberMessage.UpdateType.Add:
-                        if (playerCharactersById.TryGetValue(message.characterId, out playerCharacterEntity))
+                        if (playerCharactersById.TryGetValue(message.CharacterId, out playerCharacterEntity))
                         {
                             playerCharacterEntity.GuildId = message.id;
                             playerCharacterEntity.GuildRole = guild.GetMemberRole(playerCharacterEntity.Id);
                             SendCreateGuildToClient(playerCharacterEntity.ConnectId, guild);
                             SendAddGuildMembersToClient(playerCharacterEntity.ConnectId, guild);
                         }
-                        SendAddGuildMemberToClients(guild, message.characterId, message.member.id, message.member.dataId, message.member.level);
+                        SendAddGuildMemberToClients(guild, message.CharacterId, message.data.id, message.data.dataId, message.data.level);
                         break;
                     case UpdateSocialMemberMessage.UpdateType.Remove:
-                        if (playerCharactersById.TryGetValue(message.characterId, out playerCharacterEntity))
+                        if (playerCharactersById.TryGetValue(message.CharacterId, out playerCharacterEntity))
                         {
                             playerCharacterEntity.ClearGuild();
                             SendGuildTerminateToClient(playerCharacterEntity.ConnectId, message.id);
                         }
-                        SendRemoveGuildMemberToClients(guild, message.characterId);
+                        SendRemoveGuildMemberToClients(guild, message.CharacterId);
                         break;
                 }
             }
@@ -827,7 +790,7 @@ namespace MultiplayerARPG.MMO
         #endregion
 
         #region Update map user functions
-        private void UpdateMapUsers(TransportHandler transportHandler, UpdateMapUserMessage.UpdateType updateType)
+        private void UpdateMapUsers(TransportHandler transportHandler, UpdateUserCharacterMessage.UpdateType updateType)
         {
             foreach (var user in usersById.Values)
             {
@@ -835,19 +798,11 @@ namespace MultiplayerARPG.MMO
             }
         }
 
-        private void UpdateMapUser(TransportHandler transportHandler, UpdateMapUserMessage.UpdateType updateType, UserCharacterData userData)
+        private void UpdateMapUser(TransportHandler transportHandler, UpdateUserCharacterMessage.UpdateType updateType, UserCharacterData userData)
         {
-            var updateMapUserMessage = new UpdateMapUserMessage();
+            var updateMapUserMessage = new UpdateUserCharacterMessage();
             updateMapUserMessage.type = updateType;
-            updateMapUserMessage.id = userData.id;
-            updateMapUserMessage.userId = userData.userId;
-            updateMapUserMessage.characterName = userData.characterName;
-            updateMapUserMessage.dataId = userData.dataId;
-            updateMapUserMessage.level = userData.level;
-            updateMapUserMessage.currentHp = userData.currentHp;
-            updateMapUserMessage.maxHp = userData.maxHp;
-            updateMapUserMessage.currentMp = userData.currentMp;
-            updateMapUserMessage.maxMp = userData.maxMp;
+            updateMapUserMessage.data = userData;
             transportHandler.ClientSendPacket(SendOptions.ReliableOrdered, MMOMessageTypes.UpdateMapUser, updateMapUserMessage.Serialize);
         }
         #endregion
