@@ -192,7 +192,7 @@ namespace MultiplayerARPG.MMO
             ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS guildrole (
               guildId INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
               guildRole INTEGER NOT NULL,
-              name TEXT NOT NULL
+              name TEXT NOT NULL,
               canInvite INTEGER NOT NULL,
               canKick INTEGER NOT NULL,
               shareExpPercentage INTEGER NOT NULL
