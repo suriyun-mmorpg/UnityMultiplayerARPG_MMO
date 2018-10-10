@@ -1,3 +1,5 @@
+START TRANSACTION;
+
 ALTER TABLE `characters` ADD `guildRole` INT NOT NULL DEFAULT '0' AFTER `guildId`;
 ALTER TABLE `characters` ADD `sharedGuildExp` INT NOT NULL DEFAULT '0' AFTER `guildRole`;
 
@@ -23,3 +25,5 @@ CREATE TABLE `guildrole` (
 ALTER TABLE `guild` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 ALTER TABLE `guildrole` ADD PRIMARY KEY (`guildId`,`guildRole`) USING BTREE;
+
+COMMIT;

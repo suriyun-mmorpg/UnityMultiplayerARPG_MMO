@@ -1,3 +1,5 @@
+START TRANSACTION;
+
 CREATE TABLE `buildings` (
   `id` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   `parentId` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
@@ -18,3 +20,5 @@ CREATE TABLE `buildings` (
 
 ALTER TABLE `buildings`
   ADD PRIMARY KEY (`id`);
+
+COMMIT;
