@@ -14,7 +14,7 @@
         public int currentMp;
         public int maxMp;
 
-        public SocialCharacterData ConvertToSocialCharacterData()
+        public SocialCharacterData ToSocialCharacterData()
         {
             var result = new SocialCharacterData();
 

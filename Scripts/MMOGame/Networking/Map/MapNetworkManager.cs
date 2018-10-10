@@ -610,7 +610,6 @@ namespace MultiplayerARPG.MMO
 
         public void OnUpdateMapUser(UpdateUserCharacterMessage message)
         {
-            var tempUnscaledTime = Time.unscaledTime;
             int socialId;
             PartyData party;
             GuildData guild;
@@ -629,13 +628,15 @@ namespace MultiplayerARPG.MMO
                         socialId = message.data.partyId;
                         if (socialId > 0 && parties.TryGetValue(socialId, out party))
                         {
-                            party.UpdateOnlineMember(message.CharacterId, tempUnscaledTime);
+                            party.UpdateMember(message.data.ToSocialCharacterData());
+                            party.NotifyOnlineMember(message.CharacterId);
                             parties[socialId] = party;
                         }
                         socialId = message.data.guildId;
                         if (socialId > 0 && guilds.TryGetValue(socialId, out guild))
                         {
-                            guild.UpdateOnlineMember(message.CharacterId, tempUnscaledTime);
+                            guild.UpdateMember(message.data.ToSocialCharacterData());
+                            guild.NotifyOnlineMember(message.CharacterId);
                             guilds[socialId] = guild;
                         }
                         usersById[message.CharacterId] = message.data;
