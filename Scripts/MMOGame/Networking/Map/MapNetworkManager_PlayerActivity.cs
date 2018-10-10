@@ -19,7 +19,7 @@ namespace MultiplayerARPG.MMO
         private IEnumerator WarpCharacterRoutine(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position)
         {
             // If warping to different map
-            var connectId = playerCharacterEntity.ConnectId;
+            var connectId = playerCharacterEntity.ConnectionId;
             CentralServerPeerInfo peerInfo;
             if (!string.IsNullOrEmpty(mapName) &&
                 !mapName.Equals(playerCharacterEntity.CurrentMapName) &&
@@ -322,7 +322,7 @@ namespace MultiplayerARPG.MMO
                     if (playerCharactersById.TryGetValue(memberId, out memberCharacterEntity))
                     {
                         memberCharacterEntity.ClearGuild();
-                        SendGuildTerminateToClient(memberCharacterEntity.ConnectId, guildId);
+                        SendGuildTerminateToClient(memberCharacterEntity.ConnectionId, guildId);
                     }
                     // Save to database
                     new SetCharacterGuildJob(Database, memberId, 0, 0).Start();
@@ -340,7 +340,7 @@ namespace MultiplayerARPG.MMO
             else
             {
                 playerCharacterEntity.ClearGuild();
-                SendGuildTerminateToClient(playerCharacterEntity.ConnectId, guildId);
+                SendGuildTerminateToClient(playerCharacterEntity.ConnectionId, guildId);
                 guild.RemoveMember(playerCharacterEntity.Id);
                 guilds[guildId] = guild;
                 SendRemoveGuildMemberToClients(guild, playerCharacterEntity.Id);
