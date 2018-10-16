@@ -1,0 +1,1 @@
+ALTER TABLE `guild` CHANGE `level` `level` INT(11) NOT NULL DEFAULT '1', CHANGE `exp` `exp` INT(11) NOT NULL DEFAULT '0', CHANGE `skillPoint` `skillPoint` INT(11) NOT NULL DEFAULT '0';

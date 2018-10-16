@@ -188,9 +188,9 @@ CREATE TABLE `guild` (
   `id` int(11) NOT NULL,
   `guildName` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
   `leaderId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-  `level` int(11) NOT NULL,
-  `exp` int(11) NOT NULL,
-  `skillPoint` int(11) NOT NULL,
+  `level` int(11) NOT NULL DEFAULT '1',
+  `exp` int(11) NOT NULL DEFAULT '0',
+  `skillPoint` int(11) NOT NULL DEFAULT '0',
   `guildMessage` varchar(160) COLLATE utf8_unicode_ci NOT NULL DEFAULT ''
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
