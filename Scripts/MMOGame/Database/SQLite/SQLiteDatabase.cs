@@ -185,10 +185,10 @@ namespace MultiplayerARPG.MMO
               id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
               guildName TEXT NOT NULL,
               leaderId TEXT NOT NULL,
-              level INTEGER NOT NULL,
-              exp INTEGER NOT NULL,
-              skillPoint INTEGER NOT NULL,
-              message TEXT NOT NULL
+              level INTEGER NOT NULL DEFAULT 1,
+              exp INTEGER NOT NULL DEFAULT 0,
+              skillPoint INTEGER NOT NULL DEFAULT 0,
+              guildMessage TEXT NOT NULL DEFAULT ''
             )");
 
             ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS guildrole (

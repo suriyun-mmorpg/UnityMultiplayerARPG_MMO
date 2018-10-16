@@ -9,13 +9,10 @@ namespace MultiplayerARPG.MMO
         public override int CreateGuild(string guildName, string leaderId)
         {
             int id = 0;
-            var reader = ExecuteReader("INSERT INTO guild (guildName, leaderId, level, exp, skillPoint) VALUES (@guildName, @leaderId, @level, @exp, @skillPoint);" +
+            var reader = ExecuteReader("INSERT INTO guild (guildName, leaderId) VALUES (@guildName, @leaderId);" +
                 "SELECT LAST_INSERT_ID();",
                 new MySqlParameter("@guildName", guildName),
-                new MySqlParameter("@leaderId", leaderId),
-                new MySqlParameter("@level", 1),
-                new MySqlParameter("@exp", (object)0),
-                new MySqlParameter("@skillPoint", (object)0));
+                new MySqlParameter("@leaderId", leaderId));
             if (reader.Read())
                 id = (int)reader.GetUInt64(0);
             if (id > 0)
