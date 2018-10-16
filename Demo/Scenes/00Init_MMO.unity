@@ -710,6 +710,8 @@ MonoBehaviour:
   gameDatabase: {fileID: 11400000, guid: 78362f3a31c322e4396aa7f42ea58f99, type: 2}
   warpPortalDatabase: {fileID: 11400000, guid: f172355d1b582ff4b95a482eaf2c7b61, type: 2}
   npcDatabase: {fileID: 11400000, guid: dae14f7f7d125fc4096ba7ac1f68d581, type: 2}
+  socialSystemSetting: {fileID: 11400000, guid: afad462dae207414f91b207f6882dad2,
+    type: 2}
   playerTag:
     tag: PlayerTag
   monsterTag:
@@ -786,9 +788,6 @@ MonoBehaviour:
     sceneName: 01Home_MMO
   minCharacterNameLength: 2
   maxCharacterNameLength: 16
-  maxPartyMember: 10
-  maxGuildMember: 50
-  doNotLoadHomeSceneOnLoadedGameData: 0
   useMobileInEditor: 0
   cashShopDatabase: {fileID: 11400000, guid: 677c37c598e6c1045b66de68f1f546f6, type: 2}
 --- !u!4 &1379718503

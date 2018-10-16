@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657844, g: 0.49641222, b: 0.57481694, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -435,23 +435,8 @@ MonoBehaviour:
   connectKey: SampleConnectKey
   networkAddress: localhost
   networkPort: 7770
-  unconnectedMessagesEnabled: 0
-  natPunchEnabled: 0
-  updateTime: 15
-  pingInterval: 1000
-  disconnectTimeout: 5000
-  mergeEnabled: 0
-  simulatePacketLoss: 0
-  simulateLatency: 0
-  simulationPacketLossChance: 10
-  simulationMinLatency: 30
-  simulationMaxLatency: 100
-  discoveryEnabled: 0
-  discoveryRequestData: 
-  discoveryResponseData: 
   maxConnections: 1100
-  reconnectDelay: 500
-  maxConnectAttempts: 10
+  updateServerTimeDuration: 5
   doNotEnterGameOnConnect: 0
   doNotDestroyOnSceneChanges: 0
   writeAddonLog: 0
@@ -667,6 +652,7 @@ MonoBehaviour:
     type: 2}
   uiSceneGameplayMobilePrefab: {fileID: 114630585920460692, guid: 70474cf4f9f686c45b0305621722205f,
     type: 2}
+  defaultControllerPrefab: {fileID: 0}
   serverCharacterPrefab: {fileID: 114427175623056218, guid: 5d1fef0b895ca2a43899fb0236936a59,
     type: 2}
   owningCharacterObjects:
@@ -692,6 +678,8 @@ MonoBehaviour:
   gameDatabase: {fileID: 11400000, guid: 78362f3a31c322e4396aa7f42ea58f99, type: 2}
   warpPortalDatabase: {fileID: 11400000, guid: f172355d1b582ff4b95a482eaf2c7b61, type: 2}
   npcDatabase: {fileID: 11400000, guid: dae14f7f7d125fc4096ba7ac1f68d581, type: 2}
+  socialSystemSetting: {fileID: 11400000, guid: afad462dae207414f91b207f6882dad2,
+    type: 2}
   playerTag:
     tag: PlayerTag
   monsterTag:
@@ -715,6 +703,8 @@ MonoBehaviour:
   nonTargetingLayers:
   - layerIndex: 11
   itemAppearDuration: 60
+  itemLootLockDuration: 5
+  coCharacterActionDuration: 5
   pickUpItemDistance: 2
   dropDistance: 1
   conversationDistance: 3
@@ -766,7 +756,6 @@ MonoBehaviour:
     sceneName: 01Home_MMO
   minCharacterNameLength: 2
   maxCharacterNameLength: 16
-  doNotLoadHomeSceneOnLoadedGameData: 0
   useMobileInEditor: 0
   cashShopDatabase: {fileID: 11400000, guid: 677c37c598e6c1045b66de68f1f546f6, type: 2}
 --- !u!4 &1379718503
