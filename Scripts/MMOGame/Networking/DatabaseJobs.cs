@@ -280,19 +280,27 @@ namespace MultiplayerARPG.MMO
         }
     }
     
-    public class IncreaseGuildExp : DatabaseJob<int>
+    public class IncreaseGuildExpJob : DatabaseJob<bool>
     {
         private int id;
-        private int amount;
-        public IncreaseGuildExp(BaseDatabase database, int id, int amount, Action<int> onFinished = null) : base(database, onFinished)
+        private int increaseExp;
+        private int[] expTree;
+        private short tempResultLevel;
+        public short resultLevel { get { return tempResultLevel; } }
+        private int tempResultExp;
+        public int resultExp { get { return tempResultExp; } }
+        private short tempResultSkillPoint;
+        public short resultSkillPoint { get { return tempResultSkillPoint; } }
+        public IncreaseGuildExpJob(BaseDatabase database, int id, int increaseExp, int[] expTree, Action<bool> onFinished = null) : base(database, onFinished)
         {
             this.id = id;
-            this.amount = amount;
+            this.increaseExp = increaseExp;
+            this.expTree = expTree;
         }
 
         protected override void ThreadFunction()
         {
-            result = database.IncreaseGuildExp(id, amount);
+            result = database.IncreaseGuildExp(id, increaseExp, expTree, out tempResultLevel, out tempResultExp, out tempResultSkillPoint);
         }
     }
 

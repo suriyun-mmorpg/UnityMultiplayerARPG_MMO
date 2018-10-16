@@ -351,5 +351,32 @@ namespace MultiplayerARPG.MMO
                     ChatNetworkManager.Client.SendRemoveSocialMember(null, MMOMessageTypes.UpdateGuildMember, guildId, playerCharacterEntity.Id);
             }
         }
+
+        public override void IncreaseGuildExp(BasePlayerCharacterEntity playerCharacterEntity, int exp)
+        {
+            int guildId;
+            GuildData guild;
+            if (!CanIncreaseGuildExp(playerCharacterEntity, exp, out guildId, out guild))
+                return;
+            StartCoroutine(IncreaseGuildExpRoutine(playerCharacterEntity, exp, guildId, guild));
+        }
+
+        private IEnumerator IncreaseGuildExpRoutine(BasePlayerCharacterEntity playerCharacterEntity, int exp, int guildId, GuildData guild)
+        {
+            var job = new IncreaseGuildExpJob(Database, guildId, exp, gameInstance.SocialSystemSetting.GuildExpTree);
+            job.Start();
+            yield return StartCoroutine(job.WaitFor());
+            if (job.result)
+            {
+                guild.level = job.resultLevel;
+                guild.exp = job.resultExp;
+                guild.skillPoint = job.resultSkillPoint;
+                guilds[guildId] = guild;
+                SendGuildLevelExpSkillPointToClients(guild);
+                // Broadcast via chat server
+                if (ChatNetworkManager.IsClientConnected)
+                    ChatNetworkManager.Client.SendGuildLevelExpSkillPoint(null, MMOMessageTypes.UpdateGuild, guildId, guild.level, guild.exp, guild.skillPoint);
+            }
+        }
     }
 }

@@ -70,17 +70,34 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public override int IncreaseGuildExp(int id, int amount)
+        public override bool IncreaseGuildExp(int id, int increaseExp, int[] expTree, out short resultLevel, out int resultExp, out short resultSkillPoint)
         {
-            int exp = 0;
-            var reader = ExecuteReader("SELECT exp FROM guild WHERE id=@id LIMIT 1",
+            resultLevel = 1;
+            resultExp = 0;
+            resultSkillPoint = 0;
+
+            var reader = ExecuteReader("UPDATE guild SET exp=exp+@increaseExp WHERE id=@id;" +
+                "SELECT level, exp, skillPoint FROM guild WHERE id=@id LIMIT 1;",
+                new SqliteParameter("@increaseExp", increaseExp),
                 new SqliteParameter("@id", id));
             if (reader.Read())
-                exp = reader.GetInt32("exp");
-            ExecuteNonQuery("UPDATE guild SET exp=@exp WHERE id=@id",
-                new SqliteParameter("@exp", exp),
-                new SqliteParameter("@id", id));
-            return exp;
+            {
+                resultLevel = (short)reader.GetInt32("level");
+                resultExp = reader.GetInt32("exp");
+                resultSkillPoint = (short)reader.GetInt32("skillPoint");
+                // Update when guild level is increase
+                if (SocialSystemSetting.CalculateIncreasedGuildExp(expTree, resultLevel, resultExp, resultSkillPoint, out resultLevel, out resultExp, out resultSkillPoint))
+                {
+                    ExecuteNonQuery("UPDATE guild SET level=@level, exp=@exp, skillPoint=@skillPoint WHERE id=@id",
+                        new SqliteParameter("@level", resultLevel),
+                        new SqliteParameter("@exp", resultExp),
+                        new SqliteParameter("@skillPoint", resultSkillPoint),
+                        new SqliteParameter("@id", id));
+                }
+                // Return true if success
+                return true;
+            }
+            return false;
         }
 
         public override void UpdateGuildLeader(int id, string leaderId)

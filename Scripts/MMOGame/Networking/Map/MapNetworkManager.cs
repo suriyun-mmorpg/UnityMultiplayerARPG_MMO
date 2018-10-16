@@ -328,6 +328,7 @@ namespace MultiplayerARPG.MMO
                                 SendSetGuildMessageToClient(playerCharacterEntity.ConnectionId, guild);
                                 SendSetGuildRolesToClient(playerCharacterEntity.ConnectionId, guild);
                                 SendSetGuildMemberRolesToClient(playerCharacterEntity.ConnectionId, guild);
+                                SendGuildLevelExpSkillPointToClient(playerCharacterEntity.ConnectionId, guild);
                             }
                             else
                                 playerCharacterEntity.ClearGuild();
@@ -773,6 +774,13 @@ namespace MultiplayerARPG.MMO
                         if (TryGetPlayerCharacterById(message.characterId, out playerCharacterEntity))
                             playerCharacterEntity.GuildRole = guild.GetMemberRole(playerCharacterEntity.Id);
                         SendSetGuildMemberRoleToClients(guild, message.characterId, message.guildRole);
+                        break;
+                    case UpdateGuildMessage.UpdateType.LevelExpSkillPoint:
+                        guild.level = message.level;
+                        guild.exp = message.exp;
+                        guild.skillPoint = message.skillPoint;
+                        guilds[message.id] = guild;
+                        SendGuildLevelExpSkillPointToClients(guild);
                         break;
                     case UpdateGuildMessage.UpdateType.Terminate:
                         foreach (var memberId in guild.GetMemberIds())

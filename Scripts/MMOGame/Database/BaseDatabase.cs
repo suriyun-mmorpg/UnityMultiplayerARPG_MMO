@@ -55,7 +55,7 @@ namespace MultiplayerARPG.MMO
 
         public abstract int CreateGuild(string guildName, string leaderId);
         public abstract GuildData ReadGuild(int id, GuildRoleData[] defaultGuildRoles);
-        public abstract int IncreaseGuildExp(int id, int amount);
+        public abstract bool IncreaseGuildExp(int id, int increaseExp, int[] expTree, out short resultLevel, out int resultExp, out short resultSkillPoint);
         public abstract void UpdateGuildLeader(int id, string leaderId);
         public abstract void UpdateGuildMessage(int id, string guildMessage);
         public abstract void UpdateGuildRole(int id, byte guildRole, string name, bool canInvite, bool canKick, byte shareExpPercentage);
