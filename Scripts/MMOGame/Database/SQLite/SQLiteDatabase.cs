@@ -112,7 +112,8 @@ namespace MultiplayerARPG.MMO
             ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characters (
               id TEXT NOT NULL PRIMARY KEY,
               userId TEXT NOT NULL,
-              dataId INGETER NOT NULL,
+              dataId INGETER NOT NULL DEFAULT 0,
+              entityId INGETER NOT NULL DEFAULT 0,
               characterName TEXT NOT NULL UNIQUE,
               level INTEGER NOT NULL,
               exp INTEGER NOT NULL,
@@ -224,6 +225,8 @@ namespace MultiplayerARPG.MMO
                 ExecuteNonQuery("ALTER TABLE characters ADD guildRole INTEGER NOT NULL DEFAULT 0;");
             if (!IsColumnExist("characters", "sharedGuildExp"))
                 ExecuteNonQuery("ALTER TABLE characters ADD sharedGuildExp INTEGER NOT NULL DEFAULT 0;");
+            if (!IsColumnExist("characters", "entityId"))
+                ExecuteNonQuery("ALTER TABLE characters ADD entityId INTEGER NOT NULL DEFAULT 0;");
         }
 
         private bool IsColumnExist(string tableName, string findingColumn)

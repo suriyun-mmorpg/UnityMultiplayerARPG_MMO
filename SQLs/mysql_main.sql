@@ -134,6 +134,7 @@ CREATE TABLE `characters` (
   `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `userId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `dataId` int(11) NOT NULL DEFAULT '0',
+  `entityId` int(11) NOT NULL DEFAULT '0',
   `characterName` varchar(32) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
   `level` int(11) NOT NULL DEFAULT '1',
   `exp` int(11) NOT NULL DEFAULT '0',

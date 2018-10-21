@@ -284,18 +284,16 @@ namespace MultiplayerARPG.MMO
                 }
                 else
                 {
+                    BasePlayerCharacterEntity entityPrefab = playerCharacterData.GetEntityPrefab() as BasePlayerCharacterEntity;
                     // If it is not allow this character data, disconnect user
-                    var dataId = playerCharacterData.DataId;
-                    PlayerCharacter playerCharacter;
-                    if (!GameInstance.PlayerCharacters.TryGetValue(dataId, out playerCharacter) || playerCharacter.entityPrefab == null)
+                    if (entityPrefab == null)
                     {
-                        Debug.LogError("[Map Server] Cannot find player character with data Id: " + dataId);
+                        Debug.LogError("[Map Server] Cannot find player character with entity Id: " + playerCharacterData.EntityId);
                     }
                     else
                     {
                         // Spawn character entity and set its data
-                        var playerCharacterPrefab = playerCharacter.entityPrefab;
-                        var identity = Assets.NetworkSpawn(playerCharacterPrefab.Identity.HashAssetId, playerCharacterData.CurrentPosition, Quaternion.identity, 0, connectionId);
+                        var identity = Assets.NetworkSpawn(entityPrefab.Identity.HashAssetId, playerCharacterData.CurrentPosition, Quaternion.identity, 0, connectionId);
                         var playerCharacterEntity = identity.GetComponent<BasePlayerCharacterEntity>();
                         playerCharacterData.CloneTo(playerCharacterEntity);
                         

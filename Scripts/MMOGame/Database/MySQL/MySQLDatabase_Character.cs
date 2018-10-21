@@ -174,11 +174,12 @@ namespace MultiplayerARPG.MMO
         public override void CreateCharacter(string userId, IPlayerCharacterData characterData)
         {
             ExecuteNonQuery("INSERT INTO characters " +
-                "(id, userId, dataId, characterName, level, exp, currentHp, currentMp, currentStamina, currentFood, currentWater, statPoint, skillPoint, gold, currentMapName, currentPositionX, currentPositionY, currentPositionZ, respawnMapName, respawnPositionX, respawnPositionY, respawnPositionZ) VALUES " +
-                "(@id, @userId, @dataId, @characterName, @level, @exp, @currentHp, @currentMp, @currentStamina, @currentFood, @currentWater, @statPoint, @skillPoint, @gold, @currentMapName, @currentPositionX, @currentPositionY, @currentPositionZ, @respawnMapName, @respawnPositionX, @respawnPositionY, @respawnPositionZ)",
+                "(id, userId, dataId, entityId, characterName, level, exp, currentHp, currentMp, currentStamina, currentFood, currentWater, statPoint, skillPoint, gold, currentMapName, currentPositionX, currentPositionY, currentPositionZ, respawnMapName, respawnPositionX, respawnPositionY, respawnPositionZ) VALUES " +
+                "(@id, @userId, @dataId, @entityId, @characterName, @level, @exp, @currentHp, @currentMp, @currentStamina, @currentFood, @currentWater, @statPoint, @skillPoint, @gold, @currentMapName, @currentPositionX, @currentPositionY, @currentPositionZ, @respawnMapName, @respawnPositionX, @respawnPositionY, @respawnPositionZ)",
                 new MySqlParameter("@id", characterData.Id),
                 new MySqlParameter("@userId", userId),
                 new MySqlParameter("@dataId", characterData.DataId),
+                new MySqlParameter("@entityId", characterData.EntityId),
                 new MySqlParameter("@characterName", characterData.CharacterName),
                 new MySqlParameter("@level", characterData.Level),
                 new MySqlParameter("@exp", characterData.Exp),
@@ -212,6 +213,7 @@ namespace MultiplayerARPG.MMO
                 result = new PlayerCharacterData();
                 result.Id = reader.GetString("id");
                 result.DataId = reader.GetInt32("dataId");
+                result.EntityId = reader.GetInt32("entityId");
                 result.CharacterName = reader.GetString("characterName");
                 result.Level = (short)reader.GetInt32("level");
                 result.Exp = reader.GetInt32("exp");
@@ -304,6 +306,7 @@ namespace MultiplayerARPG.MMO
         {
             ExecuteNonQuery("UPDATE characters SET " +
                 "dataId=@dataId, " +
+                "entityId=@entityId, " +
                 "characterName=@characterName, " +
                 "level=@level, " +
                 "exp=@exp, " +
@@ -325,6 +328,7 @@ namespace MultiplayerARPG.MMO
                 "respawnPositionZ=@respawnPositionZ " +
                 "WHERE id=@id",
                 new MySqlParameter("@dataId", character.DataId),
+                new MySqlParameter("@entityId", character.EntityId),
                 new MySqlParameter("@characterName", character.CharacterName),
                 new MySqlParameter("@level", character.Level),
                 new MySqlParameter("@exp", character.Exp),

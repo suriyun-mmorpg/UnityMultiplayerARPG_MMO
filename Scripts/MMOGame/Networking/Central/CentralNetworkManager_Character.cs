@@ -14,11 +14,12 @@ namespace MultiplayerARPG.MMO
             return Client.ClientSendAckPacket(SendOptions.ReliableOrdered, MMOMessageTypes.RequestCharacters, message, callback);
         }
 
-        public uint RequestCreateCharacter(string characterName, int dataId, AckMessageCallback callback)
+        public uint RequestCreateCharacter(string characterName, int dataId, int entityId, AckMessageCallback callback)
         {
             var message = new RequestCreateCharacterMessage();
             message.characterName = characterName;
             message.dataId = dataId;
+            message.entityId = entityId;
             return Client.ClientSendAckPacket(SendOptions.ReliableOrdered, MMOMessageTypes.RequestCreateCharacter, message, callback);
         }
 
@@ -76,7 +77,8 @@ namespace MultiplayerARPG.MMO
             var message = messageHandler.ReadMessage<RequestCreateCharacterMessage>();
             var error = ResponseCreateCharacterMessage.Error.None;
             var characterName = message.characterName;
-            var databaseId = message.dataId;
+            var dataId = message.dataId;
+            var entityId = message.entityId;
             CentralUserPeerInfo userPeerInfo;
             var findCharacterNameJob = new FindCharacterNameJob(Database, characterName);
             findCharacterNameJob.Start();
@@ -89,14 +91,15 @@ namespace MultiplayerARPG.MMO
                 error = ResponseCreateCharacterMessage.Error.TooShortCharacterName;
             else if (characterName.Length > maxCharacterNameLength)
                 error = ResponseCreateCharacterMessage.Error.TooLongCharacterName;
-            else if (!GameInstance.PlayerCharacters.ContainsKey(databaseId))
+            else if (!GameInstance.PlayerCharacters.ContainsKey(dataId) ||
+                !GameInstance.PlayerCharacterEntities.ContainsKey(entityId))
                 error = ResponseCreateCharacterMessage.Error.InvalidData;
             else
             {
                 var characterId = GenericUtils.GetUniqueId();
                 var characterData = new PlayerCharacterData();
                 characterData.Id = characterId;
-                characterData.SetNewCharacterData(characterName, databaseId);
+                characterData.SetNewPlayerCharacterData(characterName, dataId, entityId);
                 var createCharacterJob = new CreateCharacterJob(Database, userPeerInfo.userId, characterData);
                 createCharacterJob.Start();
                 yield return StartCoroutine(createCharacterJob.WaitFor());
