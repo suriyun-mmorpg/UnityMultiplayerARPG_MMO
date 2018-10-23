@@ -103,12 +103,12 @@ namespace MultiplayerARPG.MMO
             if (database != null)
                 database.Initialize();
 
+            var gameInstance = FindObjectOfType<GameInstance>();
             // Always accept SSL
             ServicePointManager.ServerCertificateValidationCallback += new RemoteCertificateValidationCallback((sender, certificate, chain, policyErrors) => { return true; });
             CacheLogGUI.enabled = false;
             if (!Application.isEditor)
             {
-                var gameInstance = FindObjectOfType<GameInstance>();
 
                 // Json file read
                 var configFilePath = "./config/serverConfig.json";
@@ -312,6 +312,12 @@ namespace MultiplayerARPG.MMO
             }
             else
             {
+                gameInstance.SetOnGameDataLoadedCallback(() =>
+                {
+                    OnGameDataLoaded();
+                    gameInstance.OnGameDataLoaded();
+                });
+
                 if (startCentralOnAwake)
                     startingCentralServer = true;
 
