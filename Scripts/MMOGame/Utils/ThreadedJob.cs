@@ -5,7 +5,9 @@ public class ThreadedJob
 {
     private bool m_IsDone = false;
     private object m_Handle = new object();
+#if !DISABLE_THREAD
     private Thread m_Thread = null;
+#endif
 
     public bool IsDone
     {
@@ -29,13 +31,20 @@ public class ThreadedJob
 
     public virtual void Start()
     {
+#if !DISABLE_THREAD
         m_Thread = new Thread(Run);
         m_Thread.Start();
+#else
+        UnityEngine.Debug.Log("Running Thread Function [" + GetType().Name + "]");
+        Run();
+#endif
     }
 
     public virtual void Abort()
     {
+#if !DISABLE_THREAD
         m_Thread.Abort();
+#endif
     }
 
     protected virtual void ThreadFunction() { }
