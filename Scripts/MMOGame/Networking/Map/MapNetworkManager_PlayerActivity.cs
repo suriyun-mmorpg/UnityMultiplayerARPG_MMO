@@ -150,7 +150,10 @@ namespace MultiplayerARPG.MMO
                 {
                     BasePlayerCharacterEntity memberCharacterEntity;
                     if (playerCharactersById.TryGetValue(memberId, out memberCharacterEntity))
+                    {
                         memberCharacterEntity.ClearParty();
+                        SendPartyTerminateToClient(memberCharacterEntity.ConnectionId, partyId);
+                    }
                     // Save to database
                     new SetCharacterPartyJob(Database, memberId, 0).Start();
                     // Broadcast via chat server
@@ -167,8 +170,10 @@ namespace MultiplayerARPG.MMO
             else
             {
                 playerCharacterEntity.ClearParty();
+                SendPartyTerminateToClient(playerCharacterEntity.ConnectionId, partyId);
                 party.RemoveMember(playerCharacterEntity.Id);
                 parties[partyId] = party;
+                SendRemovePartyMemberToClients(party, playerCharacterEntity.Id);
                 // Save to database
                 new SetCharacterPartyJob(Database, playerCharacterEntity.Id, 0).Start();
                 // Broadcast via chat server
