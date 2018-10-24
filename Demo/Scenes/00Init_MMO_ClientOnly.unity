@@ -624,6 +624,7 @@ GameObject:
   - component: {fileID: 1379718506}
   - component: {fileID: 1379718507}
   - component: {fileID: 1379718504}
+  - component: {fileID: 1379718508}
   m_Layer: 0
   m_Name: GameInstance
   m_TagString: Untagged
@@ -857,3 +858,97 @@ MonoBehaviour:
   ambientVolumeSetting:
     id: AMBIENT
   otherVolumeSettings: []
+--- !u!114 &1379718508
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1379718501}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b9ef831daeddb154bb8b802d43566208, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  defaultLanguageKey: ENG
+  newLanguageKey: ENG
+  languageList:
+  - languageKey: ENG
+    dataList:
+    - key: InvalidItemData
+      value: Invalid item data
+    - key: NotFoundCharacter
+      value: Character not found
+    - key: NotAbleToLoot
+      value: Cannot get this item
+    - key: NotEnoughGold
+      value: Have not enough gold
+    - key: NotEnoughItems
+      value: Have not enough items
+    - key: CannotCarryAnymore
+      value: Cannot carry anymore items
+    - key: RefineItemReachedMaxLevel
+      value: Item reached max level
+    - key: RefineSuccess
+      value: Item level up success
+    - key: RefineFail
+      value: Item level up fail
+    - key: CharacterIsInAnotherDeal
+      value: Character is in another deal
+    - key: CharacterIsTooFar
+      value: Character is too far
+    - key: CannotAcceptDealingRequest
+      value: Cannot accept dealing request
+    - key: DealingRequestDeclined
+      value: Dealing request declined
+    - key: InvalidDealingState
+      value: Invalid dealing state
+    - key: DealingCanceled
+      value: Dealing canceled
+    - key: PartyInvitationDeclined
+      value: Party invitation declined
+    - key: CannotSendPartyInvitation
+      value: Cannot send party invitation
+    - key: CannotKickPartyMember
+      value: Cannot kick party member
+    - key: CannotKickYourSelfFromParty
+      value: Cannot kick yourself from party
+    - key: CannotKickPartyLeader
+      value: Cannot kick party leader
+    - key: JoinedAnotherParty
+      value: Already joined another party
+    - key: NotJoinedParty
+      value: Not joined the party
+    - key: NotPartyLeader
+      value: Not a party member
+    - key: CharacterJoinedAnotherParty
+      value: Character already joined another party
+    - key: CharacterNotJoinedParty
+      value: Character not joined the party
+    - key: PartyMemberReachedLimit
+      value: Party member reached limit
+    - key: GuildInvitationDeclined
+      value: Guild invitation declined
+    - key: CannotSendGuildInvitation
+      value: Cannot send guild invitation
+    - key: CannotKickGuildMember
+      value: Cannot kick guild member
+    - key: CannotKickYourSelfFromGuild
+      value: Cannot kick yourself from guild
+    - key: CannotKickGuildLeader
+      value: Cannot kick guild leader
+    - key: CannotKickHigherGuildMember
+      value: Cannot kick higher guild member
+    - key: JoinedAnotherGuild
+      value: Already joined another guild
+    - key: NotJoinedGuild
+      value: Not joined the guild
+    - key: NotGuildLeader
+      value: Not a guild member
+    - key: CharacterJoinedAnotherGuild
+      value: Character already joined another guild
+    - key: CharacterNotJoinedGuild
+      value: Character not joined the guild
+    - key: GuildMemberReachedLimit
+      value: Guild member reached limit
+    - key: GuildRoleNotAvailable
+      value: Guild role is not available
