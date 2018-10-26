@@ -289,6 +289,7 @@ namespace MultiplayerARPG.MMO
                     if (entityPrefab == null)
                     {
                         Debug.LogError("[Map Server] Cannot find player character with entity Id: " + playerCharacterData.EntityId);
+                        transport.ServerDisconnect(connectionId);
                     }
                     else
                     {
