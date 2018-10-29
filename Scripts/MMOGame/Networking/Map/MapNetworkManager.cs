@@ -297,7 +297,14 @@ namespace MultiplayerARPG.MMO
                         var identity = Assets.NetworkSpawn(entityPrefab.Identity.HashAssetId, playerCharacterData.CurrentPosition, Quaternion.identity, 0, connectionId);
                         var playerCharacterEntity = identity.GetComponent<BasePlayerCharacterEntity>();
                         playerCharacterData.CloneTo(playerCharacterEntity);
-                        
+
+                        // Notify clients that this character is spawn or dead
+                        if (!playerCharacterEntity.IsDead())
+                            playerCharacterEntity.RequestOnRespawn();
+                        else
+                            playerCharacterEntity.RequestOnDead();
+                        RegisterPlayerCharacter(connectionId, playerCharacterEntity);
+
                         // Load party data, if this map-server does not have party data
                         if (playerCharacterEntity.PartyId > 0)
                         {
@@ -333,12 +340,7 @@ namespace MultiplayerARPG.MMO
                                 playerCharacterEntity.ClearGuild();
                         }
 
-                        // Notify clients that this character is spawn or dead
-                        if (!playerCharacterEntity.IsDead())
-                            playerCharacterEntity.RequestOnRespawn();
-                        else
-                            playerCharacterEntity.RequestOnDead();
-                        RegisterPlayerCharacter(connectionId, playerCharacterEntity);
+                        // Set user data to map server
                         var userData = new UserCharacterData();
                         userData.userId = userId;
                         userData.id = playerCharacterEntity.Id;
@@ -350,6 +352,7 @@ namespace MultiplayerARPG.MMO
                         userData.currentMp = playerCharacterEntity.CurrentMp;
                         userData.maxMp = playerCharacterEntity.CacheMaxMp;
                         usersById[userData.id] = userData;
+
                         // Add map user to central server and chat server
                         UpdateMapUser(CentralAppServerRegister, UpdateUserCharacterMessage.UpdateType.Add, userData);
                         if (ChatNetworkManager.IsClientConnected)
