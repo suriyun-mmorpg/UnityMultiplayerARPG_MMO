@@ -28,13 +28,14 @@ namespace MultiplayerARPG.MMO
         public abstract void CreateCharacter(string userId, IPlayerCharacterData characterData);
         public abstract PlayerCharacterData ReadCharacter(string userId, 
             string id,
-            bool withEquipWeapons = true, 
-            bool withAttributes = true, 
-            bool withSkills = true, 
-            bool withBuffs = true, 
-            bool withEquipItems = true, 
-            bool withNonEquipItems = true, 
-            bool withHotkeys = true, 
+            bool withEquipWeapons = true,
+            bool withAttributes = true,
+            bool withSkills = true,
+            bool withSkillUsages = true,
+            bool withBuffs = true,
+            bool withEquipItems = true,
+            bool withNonEquipItems = true,
+            bool withHotkeys = true,
             bool withQuests = true);
         public abstract List<PlayerCharacterData> ReadCharacters(string userId);
         public abstract void UpdateCharacter(IPlayerCharacterData character);

@@ -9,8 +9,7 @@ namespace MultiplayerARPG.MMO
     {
         private void CreateCharacterItem(MySqlConnection connection, MySqlTransaction transaction, int idx, string characterId, InventoryType inventoryType, CharacterItem characterItem)
         {
-            ExecuteNonQuery(connection, transaction, "INSERT INTO characteritem (id, idx, inventoryType, characterId, dataId, level, amount, durability) VALUES (@id, @idx, @inventoryType, @characterId, @dataId, @level, @amount, @durability)",
-                new MySqlParameter("@id", characterId + "_" + (byte)inventoryType + "_" + idx),
+            ExecuteNonQuery(connection, transaction, "INSERT INTO characteritem (idx, inventoryType, characterId, dataId, level, amount, durability) VALUES (@idx, @inventoryType, @characterId, @dataId, @level, @amount, @durability)",
                 new MySqlParameter("@idx", idx),
                 new MySqlParameter("@inventoryType", (byte)inventoryType),
                 new MySqlParameter("@characterId", characterId),

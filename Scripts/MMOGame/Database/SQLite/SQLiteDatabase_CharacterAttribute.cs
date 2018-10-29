@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using Mono.Data.Sqlite;
 
 namespace MultiplayerARPG.MMO
@@ -23,11 +22,9 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public void CreateCharacterAttribute(int idx, string characterId, CharacterAttribute characterAttribute)
+        public void CreateCharacterAttribute(string characterId, CharacterAttribute characterAttribute)
         {
-            ExecuteNonQuery("INSERT INTO characterattribute (id, idx, characterId, dataId, amount) VALUES (@id, @idx, @characterId, @dataId, @amount)",
-                new SqliteParameter("@id", characterId + "_" + idx),
-                new SqliteParameter("@idx", idx),
+            ExecuteNonQuery("INSERT INTO characterattribute (characterId, dataId, amount) VALUES (@characterId, @dataId, @amount)",
                 new SqliteParameter("@characterId", characterId),
                 new SqliteParameter("@dataId", characterAttribute.dataId),
                 new SqliteParameter("@amount", characterAttribute.amount));
@@ -36,7 +33,7 @@ namespace MultiplayerARPG.MMO
         public List<CharacterAttribute> ReadCharacterAttributes(string characterId)
         {
             var result = new List<CharacterAttribute>();
-            var reader = ExecuteReader("SELECT * FROM characterattribute WHERE characterId=@characterId ORDER BY idx ASC",
+            var reader = ExecuteReader("SELECT * FROM characterattribute WHERE characterId=@characterId",
                 new SqliteParameter("@characterId", characterId));
             CharacterAttribute tempAttribute;
             while (ReadCharacterAttribute(reader, out tempAttribute, false))

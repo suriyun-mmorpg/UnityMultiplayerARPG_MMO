@@ -15,10 +15,9 @@ namespace MultiplayerARPG.MMO
             try
             {
                 DeleteCharacterAttributes(connection, transaction, characterData.Id);
-                var i = 0;
                 foreach (var attribute in characterData.Attributes)
                 {
-                    CreateCharacterAttribute(connection, transaction, i++, characterData.Id, attribute);
+                    CreateCharacterAttribute(connection, transaction, characterData.Id, attribute);
                 }
                 transaction.Commit();
             }
@@ -119,10 +118,9 @@ namespace MultiplayerARPG.MMO
             try
             {
                 DeleteCharacterQuests(connection, transaction, characterData.Id);
-                var i = 0;
                 foreach (var quest in characterData.Quests)
                 {
-                    CreateCharacterQuest(connection, transaction, i++, characterData.Id, quest);
+                    CreateCharacterQuest(connection, transaction, characterData.Id, quest);
                 }
                 transaction.Commit();
             }
@@ -144,16 +142,39 @@ namespace MultiplayerARPG.MMO
             try
             {
                 DeleteCharacterSkills(connection, transaction, characterData.Id);
-                var i = 0;
                 foreach (var skill in characterData.Skills)
                 {
-                    CreateCharacterSkill(connection, transaction, i++, characterData.Id, skill);
+                    CreateCharacterSkill(connection, transaction, characterData.Id, skill);
                 }
                 transaction.Commit();
             }
             catch (System.Exception ex)
             {
                 Debug.LogError("Transaction, Error occurs while replacing skills of character: " + characterData.Id);
+                Debug.LogException(ex);
+                transaction.Rollback();
+            }
+            transaction.Dispose();
+            connection.Close();
+        }
+
+        private void FillCharacterSkillUsages(IPlayerCharacterData characterData)
+        {
+            var connection = NewConnection();
+            connection.Open();
+            var transaction = connection.BeginTransaction();
+            try
+            {
+                DeleteCharacterSkillUsages(connection, transaction, characterData.Id);
+                foreach (var skillUsage in characterData.SkillUsages)
+                {
+                    CreateCharacterSkillUsage(connection, transaction, characterData.Id, skillUsage);
+                }
+                transaction.Commit();
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogError("Transaction, Error occurs while replacing skill usages of character: " + characterData.Id);
                 Debug.LogException(ex);
                 transaction.Rollback();
             }
@@ -169,6 +190,7 @@ namespace MultiplayerARPG.MMO
             FillCharacterItems(characterData);
             FillCharacterQuests(characterData);
             FillCharacterSkills(characterData);
+            FillCharacterSkillUsages(characterData);
         }
 
         public override void CreateCharacter(string userId, IPlayerCharacterData characterData)
@@ -246,6 +268,7 @@ namespace MultiplayerARPG.MMO
             bool withEquipWeapons = true,
             bool withAttributes = true,
             bool withSkills = true,
+            bool withSkillUsages = true,
             bool withBuffs = true,
             bool withEquipItems = true,
             bool withNonEquipItems = true,
@@ -264,6 +287,7 @@ namespace MultiplayerARPG.MMO
                     withEquipWeapons,
                     withAttributes,
                     withSkills,
+                    withSkillUsages,
                     withBuffs,
                     withEquipItems,
                     withNonEquipItems,
@@ -275,6 +299,8 @@ namespace MultiplayerARPG.MMO
                     result.Attributes = ReadCharacterAttributes(id);
                 if (withSkills)
                     result.Skills = ReadCharacterSkills(id);
+                if (withSkillUsages)
+                    result.SkillUsages = ReadCharacterSkillUsages(id);
                 if (withBuffs)
                     result.Buffs = ReadCharacterBuffs(id);
                 if (withEquipItems)
@@ -297,7 +323,7 @@ namespace MultiplayerARPG.MMO
             while (reader.Read())
             {
                 var characterId = reader.GetString("id");
-                result.Add(ReadCharacter(userId, characterId, true, true, true, false, true, false, false, false));
+                result.Add(ReadCharacter(userId, characterId, true, true, true, false, false, true, false, false, false));
             }
             return result;
         }
@@ -373,6 +399,7 @@ namespace MultiplayerARPG.MMO
                     DeleteCharacterItems(connection, transaction, id);
                     DeleteCharacterQuests(connection, transaction, id);
                     DeleteCharacterSkills(connection, transaction, id);
+                    DeleteCharacterSkillUsages(connection, transaction, id);
                     transaction.Commit();
                 }
                 catch (System.Exception ex)

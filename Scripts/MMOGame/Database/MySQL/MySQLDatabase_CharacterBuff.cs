@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using MySql.Data.MySqlClient;
 
 namespace MultiplayerARPG.MMO
@@ -15,8 +14,6 @@ namespace MultiplayerARPG.MMO
             if (reader.Read())
             {
                 result = new CharacterBuff();
-                result.id = reader.GetString("id");
-                result.characterId = reader.GetString("characterId");
                 result.type = (BuffType)reader.GetSByte("type");
                 result.dataId = reader.GetInt32("dataId");
                 result.level = (short)reader.GetInt32("level");
@@ -29,8 +26,7 @@ namespace MultiplayerARPG.MMO
 
         public void CreateCharacterBuff(MySqlConnection connection, MySqlTransaction transaction, string characterId, CharacterBuff characterBuff)
         {
-            ExecuteNonQuery(connection, transaction, "INSERT INTO characterbuff (id, characterId, type, dataId, level, buffRemainsDuration) VALUES (@id, @characterId, @type, @dataId, @level, @buffRemainsDuration)",
-                new MySqlParameter("@id", characterBuff.id),
+            ExecuteNonQuery(connection, transaction, "INSERT INTO characterbuff (characterId, type, dataId, level, buffRemainsDuration) VALUES (@characterId, @type, @dataId, @level, @buffRemainsDuration)",
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@type", (byte)characterBuff.type),
                 new MySqlParameter("@dataId", characterBuff.dataId),

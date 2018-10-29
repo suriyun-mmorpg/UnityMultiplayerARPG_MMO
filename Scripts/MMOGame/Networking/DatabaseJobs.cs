@@ -545,6 +545,7 @@ namespace MultiplayerARPG.MMO
         private bool withEquipWeapons = true;
         private bool withAttributes = true;
         private bool withSkills = true;
+        private bool withSkillUsages = true;
         private bool withBuffs = true;
         private bool withEquipItems = true;
         private bool withNonEquipItems = true;
@@ -556,6 +557,7 @@ namespace MultiplayerARPG.MMO
             bool withEquipWeapons = true,
             bool withAttributes = true,
             bool withSkills = true,
+            bool withSkillUsages = true,
             bool withBuffs = true,
             bool withEquipItems = true,
             bool withNonEquipItems = true,
@@ -568,6 +570,7 @@ namespace MultiplayerARPG.MMO
             this.withEquipWeapons = withEquipWeapons;
             this.withAttributes = withAttributes;
             this.withSkills = withSkills;
+            this.withSkillUsages = withSkillUsages;
             this.withBuffs = withBuffs;
             this.withEquipItems = withEquipItems;
             this.withNonEquipItems = withNonEquipItems;
@@ -583,6 +586,7 @@ namespace MultiplayerARPG.MMO
                 withEquipWeapons,
                 withAttributes,
                 withSkills,
+                withSkillUsages,
                 withBuffs,
                 withEquipItems,
                 withNonEquipItems,

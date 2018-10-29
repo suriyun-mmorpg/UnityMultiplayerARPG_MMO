@@ -17,6 +17,8 @@ SET time_zone = "+00:00";
 
 -- --------------------------------------------------------
 
+-- --------------------------------------------------------
+
 --
 -- Table structure for table `buildings`
 --
@@ -46,8 +48,6 @@ CREATE TABLE `buildings` (
 --
 
 CREATE TABLE `characterattribute` (
-  `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-  `idx` int(11) NOT NULL,
   `characterId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `dataId` int(11) NOT NULL DEFAULT '0',
   `amount` int(11) NOT NULL DEFAULT '0',
@@ -62,7 +62,6 @@ CREATE TABLE `characterattribute` (
 --
 
 CREATE TABLE `characterbuff` (
-  `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `characterId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `type` tinyint(4) NOT NULL DEFAULT '0',
   `dataId` int(11) NOT NULL DEFAULT '0',
@@ -79,7 +78,6 @@ CREATE TABLE `characterbuff` (
 --
 
 CREATE TABLE `characterhotkey` (
-  `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `characterId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `hotkeyId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `type` tinyint(4) NOT NULL DEFAULT '0',
@@ -95,7 +93,6 @@ CREATE TABLE `characterhotkey` (
 --
 
 CREATE TABLE `characteritem` (
-  `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `idx` int(11) NOT NULL,
   `inventoryType` tinyint(4) NOT NULL DEFAULT '0',
   `characterId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
@@ -114,8 +111,6 @@ CREATE TABLE `characteritem` (
 --
 
 CREATE TABLE `characterquest` (
-  `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-  `idx` int(11) NOT NULL,
   `characterId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `dataId` int(11) NOT NULL DEFAULT '0',
   `isComplete` tinyint(1) NOT NULL DEFAULT '0',
@@ -169,11 +164,23 @@ CREATE TABLE `characters` (
 --
 
 CREATE TABLE `characterskill` (
-  `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-  `idx` int(11) NOT NULL,
   `characterId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `dataId` int(11) NOT NULL DEFAULT '0',
   `level` int(11) NOT NULL DEFAULT '1',
+  `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `characterskillusage`
+--
+
+CREATE TABLE `characterskillusage` (
+  `characterId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `type` tinyint(4) NOT NULL DEFAULT '0',
+  `dataId` int(11) NOT NULL DEFAULT '0',
   `coolDownRemainsDuration` float NOT NULL DEFAULT '0',
   `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -208,6 +215,18 @@ CREATE TABLE `guildrole` (
   `canInvite` tinyint(1) NOT NULL,
   `canKick` tinyint(1) NOT NULL,
   `shareExpPercentage` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `guildskill`
+--
+
+CREATE TABLE `guildskill` (
+  `guildId` int(11) NOT NULL,
+  `dataId` int(11) NOT NULL,
+  `level` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -255,31 +274,31 @@ ALTER TABLE `buildings`
 -- Indexes for table `characterattribute`
 --
 ALTER TABLE `characterattribute`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`characterId`,`dataId`);
 
 --
 -- Indexes for table `characterbuff`
 --
 ALTER TABLE `characterbuff`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`characterId`,`type`,`dataId`);
 
 --
 -- Indexes for table `characterhotkey`
 --
 ALTER TABLE `characterhotkey`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`characterId`,`hotkeyId`);
 
 --
 -- Indexes for table `characteritem`
 --
 ALTER TABLE `characteritem`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`idx`,`inventoryType`,`characterId`);
 
 --
 -- Indexes for table `characterquest`
 --
 ALTER TABLE `characterquest`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`characterId`,`dataId`);
 
 --
 -- Indexes for table `characters`
@@ -291,7 +310,13 @@ ALTER TABLE `characters`
 -- Indexes for table `characterskill`
 --
 ALTER TABLE `characterskill`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`characterId`,`dataId`);
+
+--
+-- Indexes for table `characterskillusage`
+--
+ALTER TABLE `characterskillusage`
+  ADD PRIMARY KEY (`characterId`,`type`,`dataId`);
 
 --
 -- Indexes for table `guild`
@@ -304,6 +329,12 @@ ALTER TABLE `guild`
 --
 ALTER TABLE `guildrole`
   ADD PRIMARY KEY (`guildId`,`guildRole`) USING BTREE;
+
+--
+-- Indexes for table `guildskill`
+--
+ALTER TABLE `guildskill`
+  ADD PRIMARY KEY (`guildId`,`dataId`);
 
 --
 -- Indexes for table `party`

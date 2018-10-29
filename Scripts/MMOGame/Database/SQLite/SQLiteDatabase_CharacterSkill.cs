@@ -17,28 +17,24 @@ namespace MultiplayerARPG.MMO
                 result = new CharacterSkill();
                 result.dataId = reader.GetInt32("dataId");
                 result.level = reader.GetInt16("level");
-                result.coolDownRemainsDuration = reader.GetFloat("coolDownRemainsDuration");
                 return true;
             }
             result = CharacterSkill.Empty;
             return false;
         }
 
-        public void CreateCharacterSkill(int idx, string characterId, CharacterSkill characterSkill)
+        public void CreateCharacterSkill(string characterId, CharacterSkill characterSkill)
         {
-            ExecuteNonQuery("INSERT INTO characterskill (id, idx, characterId, dataId, level, coolDownRemainsDuration) VALUES (@id, @idx, @characterId, @dataId, @level, @coolDownRemainsDuration)",
-                new SqliteParameter("@id", characterId + "_" + idx),
-                new SqliteParameter("@idx", idx),
+            ExecuteNonQuery("INSERT INTO characterskill (characterId, dataId, level) VALUES (@characterId, @dataId, @level)",
                 new SqliteParameter("@characterId", characterId),
                 new SqliteParameter("@dataId", characterSkill.dataId),
-                new SqliteParameter("@level", characterSkill.level),
-                new SqliteParameter("@coolDownRemainsDuration", characterSkill.coolDownRemainsDuration));
+                new SqliteParameter("@level", characterSkill.level));
         }
         
         public List<CharacterSkill> ReadCharacterSkills(string characterId)
         {
             var result = new List<CharacterSkill>();
-            var reader = ExecuteReader("SELECT * FROM characterskill WHERE characterId=@characterId ORDER BY idx ASC",
+            var reader = ExecuteReader("SELECT * FROM characterskill WHERE characterId=@characterId",
                 new SqliteParameter("@characterId", characterId));
             CharacterSkill tempSkill;
             while (ReadCharacterSkill(reader, out tempSkill, false))

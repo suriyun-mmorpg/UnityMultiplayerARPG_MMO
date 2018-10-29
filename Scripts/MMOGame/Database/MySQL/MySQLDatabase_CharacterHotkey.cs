@@ -26,8 +26,7 @@ namespace MultiplayerARPG.MMO
 
         public void CreateCharacterHotkey(MySqlConnection connection, MySqlTransaction transaction, string characterId, CharacterHotkey characterHotkey)
         {
-            ExecuteNonQuery(connection, transaction, "INSERT INTO characterhotkey (id, characterId, hotkeyId, type, dataId) VALUES (@id, @characterId, @hotkeyId, @type, @dataId)",
-                new MySqlParameter("@id", characterId + "_" + characterHotkey.hotkeyId),
+            ExecuteNonQuery(connection, transaction, "INSERT INTO characterhotkey (characterId, hotkeyId, type, dataId) VALUES (@characterId, @hotkeyId, @type, @dataId)",
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@hotkeyId", characterHotkey.hotkeyId),
                 new MySqlParameter("@type", characterHotkey.type),

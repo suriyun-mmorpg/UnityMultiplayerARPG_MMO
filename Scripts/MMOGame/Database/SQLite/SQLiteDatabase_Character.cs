@@ -17,6 +17,7 @@ namespace MultiplayerARPG.MMO
             DeleteCharacterItems(characterId);
             DeleteCharacterQuests(characterId);
             DeleteCharacterSkills(characterId);
+            DeleteCharacterSkillUsages(characterId);
             
             CreateCharacterEquipWeapons(characterId, characterData.EquipWeapons);
             var i = 0;
@@ -29,20 +30,21 @@ namespace MultiplayerARPG.MMO
             {
                 CreateCharacterNonEquipItem(i++, characterId, nonEquipItem);
             }
-            i = 0;
             foreach (var attribute in characterData.Attributes)
             {
-                CreateCharacterAttribute(i++, characterId, attribute);
+                CreateCharacterAttribute(characterId, attribute);
             }
-            i = 0;
             foreach (var skill in characterData.Skills)
             {
-                CreateCharacterSkill(i++, characterId, skill);
+                CreateCharacterSkill(characterId, skill);
             }
-            i = 0;
+            foreach (var skillUsage in characterData.SkillUsages)
+            {
+                CreateCharacterSkillUsage(characterId, skillUsage);
+            }
             foreach (var quest in characterData.Quests)
             {
-                CreateCharacterQuest(i++, characterId, quest);
+                CreateCharacterQuest(characterId, quest);
             }
             foreach (var buff in characterData.Buffs)
             {
@@ -131,6 +133,7 @@ namespace MultiplayerARPG.MMO
             bool withEquipWeapons = true,
             bool withAttributes = true,
             bool withSkills = true,
+            bool withSkillUsages = true,
             bool withBuffs = true,
             bool withEquipItems = true,
             bool withNonEquipItems = true,
@@ -149,6 +152,7 @@ namespace MultiplayerARPG.MMO
                     withEquipWeapons,
                     withAttributes,
                     withSkills,
+                    withSkillUsages,
                     withBuffs,
                     withEquipItems,
                     withNonEquipItems,
@@ -160,6 +164,8 @@ namespace MultiplayerARPG.MMO
                     result.Attributes = ReadCharacterAttributes(id);
                 if (withSkills)
                     result.Skills = ReadCharacterSkills(id);
+                if (withSkillUsages)
+                    result.SkillUsages = ReadCharacterSkillUsages(id);
                 if (withBuffs)
                     result.Buffs = ReadCharacterBuffs(id);
                 if (withEquipItems)
@@ -182,7 +188,7 @@ namespace MultiplayerARPG.MMO
             while (reader.Read())
             {
                 var characterId = reader.GetString("id");
-                result.Add(ReadCharacter(userId, characterId, true, true, true, false, true, false, false, false));
+                result.Add(ReadCharacter(userId, characterId, true, true, true, false, false, true, false, false, false));
             }
             return result;
         }
@@ -256,6 +262,7 @@ namespace MultiplayerARPG.MMO
                 DeleteCharacterItems(id);
                 DeleteCharacterQuests(id);
                 DeleteCharacterSkills(id);
+                DeleteCharacterSkillUsages(id);
                 ExecuteNonQuery("END");
                 this.InvokeInstanceDevExtMethods("DeleteCharacter", userId, id);
             }
