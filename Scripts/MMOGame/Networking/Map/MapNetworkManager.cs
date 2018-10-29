@@ -10,8 +10,6 @@ namespace MultiplayerARPG.MMO
 {
     public partial class MapNetworkManager : BaseGameNetworkManager, IAppServer
     {
-        public static MapNetworkManager Singleton { get; protected set; }
-
         [Header("Central Network Connection")]
         public string centralConnectKey = "SampleConnectKey";
         public string centralNetworkAddress = "127.0.0.1";
@@ -67,13 +65,6 @@ namespace MultiplayerARPG.MMO
         // Listing
         private readonly Dictionary<string, CentralServerPeerInfo> mapServerConnectionIdsBySceneName = new Dictionary<string, CentralServerPeerInfo>();
         private readonly Dictionary<string, UserCharacterData> usersById = new Dictionary<string, UserCharacterData>();
-
-        protected override void Awake()
-        {
-            Singleton = this;
-            doNotDestroyOnSceneChanges = true;
-            base.Awake();
-        }
 
         protected override void Update()
         {
