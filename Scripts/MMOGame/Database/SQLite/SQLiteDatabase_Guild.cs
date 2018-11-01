@@ -60,8 +60,15 @@ namespace MultiplayerARPG.MMO
                     guildMemberData.id = reader.GetString("id");
                     guildMemberData.characterName = reader.GetString("characterName");
                     guildMemberData.dataId = reader.GetInt32("dataId");
-                    guildMemberData.level = reader.GetInt32("level");
+                    guildMemberData.level = reader.GetInt16("level");
                     result.AddMember(guildMemberData, (byte)reader.GetInt32("guildRole"));
+                }
+
+                reader = ExecuteReader("SELECT dataId, level WHERE guildId=@id",
+                    new SqliteParameter("@id", id));
+                while (reader.Read())
+                {
+                    result.SetSkillLevel(reader.GetInt32("dataId"), reader.GetInt16("level"));
                 }
             }
             return result;
@@ -128,6 +135,15 @@ namespace MultiplayerARPG.MMO
             ExecuteNonQuery("UPDATE characters SET guildRole=@guildRole WHERE id=@characterId",
                 new SqliteParameter("@characterId", characterId),
                 new SqliteParameter("@guildRole", guildRole));
+        }
+
+        public override void UpdateGuildSkillLevel(int id, int dataId, short level)
+        {
+            ExecuteNonQuery("REPLACE INTO guildskill (guildId, dataId, level) " +
+                "VALUES (@guildId, @dataId, @level)",
+                new SqliteParameter("@guildId", id),
+                new SqliteParameter("@dataId", dataId),
+                new SqliteParameter("@level", level));
         }
 
         public override void DeleteGuild(int id)

@@ -25,7 +25,7 @@ namespace MultiplayerARPG.MMO
             {
                 data.characterName = reader.GetString();
                 data.dataId = reader.GetInt();
-                data.level = reader.GetInt();
+                data.level = reader.GetShort();
                 data.partyId = reader.GetInt();
                 data.guildId = reader.GetInt();
             }

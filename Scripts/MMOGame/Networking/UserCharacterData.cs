@@ -6,7 +6,7 @@
         public string userId;
         public string characterName;
         public int dataId;
-        public int level;
+        public short level;
         public int partyId;
         public int guildId;
         public int currentHp;

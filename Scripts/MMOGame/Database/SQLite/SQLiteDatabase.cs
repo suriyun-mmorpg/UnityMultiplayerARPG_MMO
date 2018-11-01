@@ -142,6 +142,15 @@ namespace MultiplayerARPG.MMO
               updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
 
+            ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characterskillusage (
+              characterId TEXT NOT NULL,
+              type INTEGER NOT NULL DEFAULT 0,
+              dataId INTEGER NOT NULL DEFAULT 0,
+              coolDownRemainsDuration REAL NOT NULL DEFAULT 0,
+              createAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+              updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+            )");
+
             ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS userlogin (
               id TEXT NOT NULL PRIMARY KEY,
               username TEXT NOT NULL UNIQUE,
@@ -183,12 +192,18 @@ namespace MultiplayerARPG.MMO
             )");
 
             ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS guildrole (
-              guildId INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+              guildId INTEGER NOT NULL,
               guildRole INTEGER NOT NULL,
               name TEXT NOT NULL,
               canInvite INTEGER NOT NULL DEFAULT 0,
               canKick INTEGER NOT NULL DEFAULT 0,
               shareExpPercentage INTEGER NOT NULL
+            )");
+
+            ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS guildskill (
+              guildId INTEGER NOT NULL,
+              dataId INTEGER NOT NULL,
+              level INTEGER NOT NULL
             )");
 
             ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS party (

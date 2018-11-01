@@ -61,6 +61,7 @@ namespace MultiplayerARPG.MMO
         public abstract void UpdateGuildMessage(int id, string guildMessage);
         public abstract void UpdateGuildRole(int id, byte guildRole, string name, bool canInvite, bool canKick, byte shareExpPercentage);
         public abstract void UpdateGuildMemberRole(string characterId, byte guildRole);
+        public abstract void UpdateGuildSkillLevel(int id, int dataId, short level);
         public abstract void DeleteGuild(int id);
         public abstract void UpdateCharacterGuild(string characterId, int guild, byte guildRole);
     }
