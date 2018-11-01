@@ -383,5 +383,20 @@ namespace MultiplayerARPG.MMO
                     ChatNetworkManager.Client.SendGuildLevelExpSkillPoint(null, MMOMessageTypes.UpdateGuild, guildId, guild.level, guild.exp, guild.skillPoint);
             }
         }
+
+        public override void AddGuildSkill(BasePlayerCharacterEntity playerCharacterEntity, int dataId)
+        {
+            int guildId;
+            GuildData guild;
+            if (!CanAddGuildSkill(playerCharacterEntity, dataId, out guildId, out guild))
+                return;
+
+            base.AddGuildSkill(playerCharacterEntity, dataId);
+            // TODO: Save to database
+
+            // Broadcast via chat server
+            if (ChatNetworkManager.IsClientConnected)
+                ChatNetworkManager.Client.SendSetGuildSkillLevel(null, MMOMessageTypes.UpdateGuild, guildId, dataId, guild.GetSkillLevel(dataId));
+        }
     }
 }
