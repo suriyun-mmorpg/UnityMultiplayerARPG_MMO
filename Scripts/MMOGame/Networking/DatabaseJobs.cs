@@ -360,11 +360,11 @@ namespace MultiplayerARPG.MMO
         }
     }
 
-    public class SetGuildMemberRoleJob : DatabaseJob
+    public class UpdateGuildMemberRoleJob : DatabaseJob
     {
         private string characterId;
         private byte guildRole;
-        public SetGuildMemberRoleJob(BaseDatabase database, string characterId, byte guildRole, Action onFinished = null) : base(database, onFinished)
+        public UpdateGuildMemberRoleJob(BaseDatabase database, string characterId, byte guildRole, Action onFinished = null) : base(database, onFinished)
         {
             this.characterId = characterId;
             this.guildRole = guildRole;
@@ -373,6 +373,24 @@ namespace MultiplayerARPG.MMO
         protected override void ThreadFunction()
         {
             database.UpdateGuildMemberRole(characterId, guildRole);
+        }
+    }
+
+    public class UpdateGuildSkillLevelJob : DatabaseJob
+    {
+        private int id;
+        private int dataId;
+        private short level;
+        public UpdateGuildSkillLevelJob(BaseDatabase database, int id, int dataId, short level, Action onFinished = null) : base(database, onFinished)
+        {
+            this.id = id;
+            this.dataId = dataId;
+            this.level = level;
+        }
+
+        protected override void ThreadFunction()
+        {
+            database.UpdateGuildSkillLevel(id, dataId, level);
         }
     }
 

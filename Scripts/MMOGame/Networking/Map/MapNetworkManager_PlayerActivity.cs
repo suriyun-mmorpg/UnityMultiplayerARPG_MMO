@@ -217,7 +217,7 @@ namespace MultiplayerARPG.MMO
             base.ChangeGuildLeader(playerCharacterEntity, characterId);
             // Save to database
             new UpdateGuildLeaderJob(Database, guildId, characterId).Start();
-            new SetGuildMemberRoleJob(Database, characterId, guild.GetMemberRole(characterId)).Start();
+            new UpdateGuildMemberRoleJob(Database, characterId, guild.GetMemberRole(characterId)).Start();
             // Broadcast via chat server
             if (ChatNetworkManager.IsClientConnected)
                 ChatNetworkManager.Client.SendChangeGuildLeader(null, MMOMessageTypes.UpdateGuild, guildId, characterId);
@@ -255,7 +255,7 @@ namespace MultiplayerARPG.MMO
                 {
                     memberCharacterEntity.GuildRole = guildRole;
                     // Save to database
-                    new SetGuildMemberRoleJob(Database, memberId, guildRole).Start();
+                    new UpdateGuildMemberRoleJob(Database, memberId, guildRole).Start();
                 }
             }
             SendSetGuildRoleToClients(guild, guildRole, roleName, canInvite, canKick, shareExpPercentage);
@@ -275,7 +275,7 @@ namespace MultiplayerARPG.MMO
 
             base.SetGuildMemberRole(playerCharacterEntity, characterId, guildRole);
             // Save to database
-            new SetGuildMemberRoleJob(Database, characterId, guildRole).Start();
+            new UpdateGuildMemberRoleJob(Database, characterId, guildRole).Start();
             // Broadcast via chat server
             if (ChatNetworkManager.IsClientConnected)
                 ChatNetworkManager.Client.SendSetGuildMemberRole(null, MMOMessageTypes.UpdateGuild, guildId, characterId, guildRole);
@@ -392,8 +392,8 @@ namespace MultiplayerARPG.MMO
                 return;
 
             base.AddGuildSkill(playerCharacterEntity, dataId);
-            // TODO: Save to database
-
+            // Save to database
+            new UpdateGuildSkillLevelJob(Database, guildId, dataId, guild.GetSkillLevel(dataId)).Start();
             // Broadcast via chat server
             if (ChatNetworkManager.IsClientConnected)
                 ChatNetworkManager.Client.SendSetGuildSkillLevel(null, MMOMessageTypes.UpdateGuild, guildId, dataId, guild.GetSkillLevel(dataId));
