@@ -23,18 +23,20 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public void CreateCharacterSkill(string characterId, CharacterSkill characterSkill)
+        public void CreateCharacterSkill(int idx, string characterId, CharacterSkill characterSkill)
         {
-            ExecuteNonQuery("INSERT INTO characterskill (characterId, dataId, level) VALUES (@characterId, @dataId, @level)",
+            ExecuteNonQuery("INSERT INTO characterskill (id, idx, characterId, dataId, level, coolDownRemainsDuration) VALUES (@id, @idx, @characterId, @dataId, @level, 0)",
+                new SqliteParameter("@id", characterId + "_" + idx),
+                new SqliteParameter("@idx", idx),
                 new SqliteParameter("@characterId", characterId),
                 new SqliteParameter("@dataId", characterSkill.dataId),
                 new SqliteParameter("@level", characterSkill.level));
         }
-        
+
         public List<CharacterSkill> ReadCharacterSkills(string characterId)
         {
             var result = new List<CharacterSkill>();
-            var reader = ExecuteReader("SELECT * FROM characterskill WHERE characterId=@characterId",
+            var reader = ExecuteReader("SELECT * FROM characterskill WHERE characterId=@characterId ORDER BY idx ASC",
                 new SqliteParameter("@characterId", characterId));
             CharacterSkill tempSkill;
             while (ReadCharacterSkill(reader, out tempSkill, false))

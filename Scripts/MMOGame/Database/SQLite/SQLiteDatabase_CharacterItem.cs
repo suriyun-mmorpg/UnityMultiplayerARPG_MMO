@@ -9,7 +9,8 @@ namespace MultiplayerARPG.MMO
     {
         private void CreateCharacterItem(int idx, string characterId, InventoryType inventoryType, CharacterItem characterItem)
         {
-            ExecuteNonQuery("INSERT INTO characteritem (idx, inventoryType, characterId, dataId, level, amount, durability) VALUES (@idx, @inventoryType, @characterId, @dataId, @level, @amount, @durability)",
+            ExecuteNonQuery("INSERT INTO characteritem (id, idx, inventoryType, characterId, dataId, level, amount, durability) VALUES (@id, @idx, @inventoryType, @characterId, @dataId, @level, @amount, @durability)",
+                new SqliteParameter("@id", characterId + "_" + (byte)inventoryType + "_" + idx),
                 new SqliteParameter("@idx", idx),
                 new SqliteParameter("@inventoryType", (byte)inventoryType),
                 new SqliteParameter("@characterId", characterId),

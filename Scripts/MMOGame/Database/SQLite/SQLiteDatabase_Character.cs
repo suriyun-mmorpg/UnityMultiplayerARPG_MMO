@@ -30,21 +30,24 @@ namespace MultiplayerARPG.MMO
             {
                 CreateCharacterNonEquipItem(i++, characterId, nonEquipItem);
             }
+            i = 0;
             foreach (var attribute in characterData.Attributes)
             {
-                CreateCharacterAttribute(characterId, attribute);
+                CreateCharacterAttribute(i++, characterId, attribute);
             }
+            i = 0;
             foreach (var skill in characterData.Skills)
             {
-                CreateCharacterSkill(characterId, skill);
+                CreateCharacterSkill(i++, characterId, skill);
             }
             foreach (var skillUsage in characterData.SkillUsages)
             {
                 CreateCharacterSkillUsage(characterId, skillUsage);
             }
+            i = 0;
             foreach (var quest in characterData.Quests)
             {
-                CreateCharacterQuest(characterId, quest);
+                CreateCharacterQuest(i++, characterId, quest);
             }
             foreach (var buff in characterData.Buffs)
             {

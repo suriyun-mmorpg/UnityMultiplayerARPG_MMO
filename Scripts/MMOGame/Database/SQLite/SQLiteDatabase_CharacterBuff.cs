@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 using Mono.Data.Sqlite;
 
 namespace MultiplayerARPG.MMO
@@ -26,7 +27,8 @@ namespace MultiplayerARPG.MMO
 
         public void CreateCharacterBuff(string characterId, CharacterBuff characterBuff)
         {
-            ExecuteNonQuery("INSERT INTO characterbuff (characterId, type, dataId, level, buffRemainsDuration) VALUES (@characterId, @type, @dataId, @level, @buffRemainsDuration)",
+            ExecuteNonQuery("INSERT INTO characterbuff (id, characterId, type, dataId, level, buffRemainsDuration) VALUES (@id, @characterId, @type, @dataId, @level, @buffRemainsDuration)",
+                new SqliteParameter("@id", characterId + "_" + characterBuff.type + "_" + characterBuff.dataId),
                 new SqliteParameter("@characterId", characterId),
                 new SqliteParameter("@type", (byte)characterBuff.type),
                 new SqliteParameter("@dataId", characterBuff.dataId),

@@ -55,48 +55,55 @@ namespace MultiplayerARPG.MMO
             ExecuteNonQuery("BEGIN");
 
             ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characterattribute (
+              id TEXT NOT NULL PRIMARY KEY,
+              idx INTEGER NOT NULL,
               characterId TEXT NOT NULL,
-              dataId INTEGER NOT NULL DEFAULT 0,
-              amount INTEGER NOT NULL DEFAULT 0,
+              dataId INTEGER NOT NULL,
+              amount INTEGER NOT NULL,
               createAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
               updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
 
             ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characterbuff (
+              id TEXT NOT NULL PRIMARY KEY,
               characterId TEXT NOT NULL,
-              type INTEGER NOT NULL DEFAULT 0,
-              dataId INTEGER NOT NULL DEFAULT 0,
-              level INTEGER NOT NULL DEFAULT 0,
-              buffRemainsDuration REAL NOT NULL DEFAULT 0,
+              type INTEGER NOT NULL,
+              dataId INTEGER NOT NULL,
+              level INTEGER NOT NULL,
+              buffRemainsDuration REAL NOT NULL,
               createAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
               updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
 
             ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characterhotkey (
+              id TEXT NOT NULL PRIMARY KEY,
               characterId TEXT NOT NULL,
               hotkeyId TEXT NOT NULL,
-              type INTEGER NOT NULL DEFAULT 0,
-              dataId INTEGER NOT NULL DEFAULT 0,
+              type INTEGER NOT NULL,
+              dataId INTEGER NOT NULL,
               createAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
               updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
 
             ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characteritem (
+              id TEXT NOT NULL PRIMARY KEY,
               idx INTEGER NOT NULL,
               inventoryType INTEGER NOT NULL,
               characterId TEXT NOT NULL,
-              dataId INTERGER NOT NULL DEFAULT 0,
-              level INTEGER NOT NULL DEFAULT 0,
-              amount INTEGER NOT NULL DEFAULT 0,
+              dataId INTERGER NOT NULL,
+              level INTEGER NOT NULL,
+              amount INTEGER NOT NULL,
               durability REAL NOT NULL DEFAULT 0,
               createAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
               updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
 
             ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characterquest (
+              id TEXT NOT NULL PRIMARY KEY,
+              idx INTEGER NOT NULL,
               characterId TEXT NOT NULL,
-              dataId INTEGER NOT NULL DEFAULT 0,
-              isComplete INTEGER NOT NULL DEFAULT 0,
+              dataId INTEGER NOT NULL,
+              isComplete INTEGER NOT NULL,
               killedMonsters TEXT NOT NULL,
               createAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
               updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -108,41 +115,45 @@ namespace MultiplayerARPG.MMO
               dataId INGETER NOT NULL DEFAULT 0,
               entityId INGETER NOT NULL DEFAULT 0,
               characterName TEXT NOT NULL UNIQUE,
-              level INTEGER NOT NULL DEFAULT 1,
-              exp INTEGER NOT NULL DEFAULT 0,
-              currentHp INTEGER NOT NULL DEFAULT 0,
-              currentMp INTEGER NOT NULL DEFAULT 0,
-              currentStamina INTEGER NOT NULL DEFAULT 0,
-              currentFood INTEGER NOT NULL DEFAULT 0,
-              currentWater INTEGER NOT NULL DEFAULT 0,
-              statPoint INTEGER NOT NULL DEFAULT 0,
-              skillPoint INTEGER NOT NULL DEFAULT 0,
-              gold INTEGER NOT NULL DEFAULT 0,
+              level INTEGER NOT NULL,
+              exp INTEGER NOT NULL,
+              currentHp INTEGER NOT NULL,
+              currentMp INTEGER NOT NULL,
+              currentStamina INTEGER NOT NULL,
+              currentFood INTEGER NOT NULL,
+              currentWater INTEGER NOT NULL,
+              statPoint INTEGER NOT NULL,
+              skillPoint INTEGER NOT NULL,
+              gold INTEGER NOT NULL,
               partyId INTEGER NOT NULL DEFAULT 0,
               guildId INTEGER NOT NULL DEFAULT 0,
               guildRole INTEGER NOT NULL DEFAULT 0,
               sharedGuildExp INTEGER NOT NULL DEFAULT 0,
               currentMapName TEXT NOT NULL,
-              currentPositionX REAL NOT NULL DEFAULT 0,
-              currentPositionY REAL NOT NULL DEFAULT 0,
-              currentPositionZ REAL NOT NULL DEFAULT 0,
+              currentPositionX REAL NOT NULL,
+              currentPositionY REAL NOT NULL,
+              currentPositionZ REAL NOT NULL,
               respawnMapName TEXT NOT NULL,
-              respawnPositionX REAL NOT NULL DEFAULT 0,
-              respawnPositionY REAL NOT NULL DEFAULT 0,
-              respawnPositionZ REAL NOT NULL DEFAULT 0,
+              respawnPositionX REAL NOT NULL,
+              respawnPositionY REAL NOT NULL,
+              respawnPositionZ REAL NOT NULL,
               createAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
               updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
 
             ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characterskill (
+              id TEXT NOT NULL PRIMARY KEY,
+              idx INTEGER NOT NULL,
               characterId TEXT NOT NULL,
-              dataId INTEGER NOT NULL DEFAULT 0,
-              level INTEGER NOT NULL DEFAULT 0,
+              dataId INTEGER NOT NULL,
+              level INTEGER NOT NULL,
+              coolDownRemainsDuration REAL NOT NULL,
               createAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
               updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
 
             ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characterskillusage (
+              id TEXT NOT NULL PRIMARY KEY,
               characterId TEXT NOT NULL,
               type INTEGER NOT NULL DEFAULT 0,
               dataId INTEGER NOT NULL DEFAULT 0,
@@ -157,7 +168,7 @@ namespace MultiplayerARPG.MMO
               password TEXT NOT NULL,
               cash INTEGER NOT NULL DEFAULT 0,
               email TEXT NOT NULL,
-              authType INTEGER NOT NULL DEFAULT 0,
+              authType INTEGER NOT NULL,
               accessToken TEXT,
               createAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
               updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -166,15 +177,15 @@ namespace MultiplayerARPG.MMO
             ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS buildings (
               id TEXT NOT NULL PRIMARY KEY,
               parentId TEXT NOT NULL,
-              dataId INTEGER NOT NULL DEFAULT 0,
-              currentHp INTEGER NOT NULL DEFAULT 0,
+              dataId INTEGER NOT NULL,
+              currentHp INTEGER NOT NULL,
               mapName TEXT NOT NULL,
-              positionX REAL NOT NULL DEFAULT 0,
-              positionY REAL NOT NULL DEFAULT 0,
-              positionZ REAL NOT NULL DEFAULT 0,
-              rotationX REAL NOT NULL DEFAULT 0,
-              rotationY REAL NOT NULL DEFAULT 0,
-              rotationZ REAL NOT NULL DEFAULT 0,
+              positionX REAL NOT NULL,
+              positionY REAL NOT NULL,
+              positionZ REAL NOT NULL,
+              rotationX REAL NOT NULL,
+              rotationY REAL NOT NULL,
+              rotationZ REAL NOT NULL,
               creatorId TEXT NOT NULL,
               creatorName TEXT NOT NULL,
               createAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -195,21 +206,15 @@ namespace MultiplayerARPG.MMO
               guildId INTEGER NOT NULL,
               guildRole INTEGER NOT NULL,
               name TEXT NOT NULL,
-              canInvite INTEGER NOT NULL DEFAULT 0,
-              canKick INTEGER NOT NULL DEFAULT 0,
+              canInvite INTEGER NOT NULL,
+              canKick INTEGER NOT NULL,
               shareExpPercentage INTEGER NOT NULL
-            )");
-
-            ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS guildskill (
-              guildId INTEGER NOT NULL,
-              dataId INTEGER NOT NULL,
-              level INTEGER NOT NULL
             )");
 
             ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS party (
               id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-              shareExp INTEGER NOT NULL DEFAULT 0,
-              shareItem INTEGER NOT NULL DEFAULT 0,
+              shareExp INTEGER NOT NULL,
+              shareItem INTEGER NOT NULL,
               leaderId TEXT NOT NULL
             )");
 

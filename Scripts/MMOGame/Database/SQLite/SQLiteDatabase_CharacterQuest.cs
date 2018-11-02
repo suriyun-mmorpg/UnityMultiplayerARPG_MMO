@@ -50,9 +50,11 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public void CreateCharacterQuest(string characterId, CharacterQuest characterQuest)
+        public void CreateCharacterQuest(int idx, string characterId, CharacterQuest characterQuest)
         {
-            ExecuteNonQuery("INSERT INTO characterquest (characterId, dataId, isComplete, killedMonsters) VALUES (@characterId, @dataId, @isComplete, @killedMonsters)",
+            ExecuteNonQuery("INSERT INTO characterquest (id, idx, characterId, dataId, isComplete, killedMonsters) VALUES (@id, @idx, @characterId, @dataId, @isComplete, @killedMonsters)",
+                new SqliteParameter("@id", characterId + "_" + idx),
+                new SqliteParameter("@idx", idx),
                 new SqliteParameter("@characterId", characterId),
                 new SqliteParameter("@dataId", characterQuest.dataId),
                 new SqliteParameter("@isComplete", characterQuest.isComplete ? 1 : 0),
@@ -62,7 +64,7 @@ namespace MultiplayerARPG.MMO
         public List<CharacterQuest> ReadCharacterQuests(string characterId)
         {
             var result = new List<CharacterQuest>();
-            var reader = ExecuteReader("SELECT * FROM characterquest WHERE characterId=@characterId",
+            var reader = ExecuteReader("SELECT * FROM characterquest WHERE characterId=@characterId ORDER BY idx ASC",
                 new SqliteParameter("@characterId", characterId));
             CharacterQuest tempQuest;
             while (ReadCharacterQuest(reader, out tempQuest, false))

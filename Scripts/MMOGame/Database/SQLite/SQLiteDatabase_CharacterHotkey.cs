@@ -26,7 +26,8 @@ namespace MultiplayerARPG.MMO
 
         public void CreateCharacterHotkey(string characterId, CharacterHotkey characterHotkey)
         {
-            ExecuteNonQuery("INSERT INTO characterhotkey (characterId, hotkeyId, type, dataId) VALUES (@characterId, @hotkeyId, @type, @dataId)",
+            ExecuteNonQuery("INSERT INTO characterhotkey (id, characterId, hotkeyId, type, dataId) VALUES (@id, @characterId, @hotkeyId, @type, @dataId)",
+                new SqliteParameter("@id", characterId + "_" + characterHotkey.hotkeyId),
                 new SqliteParameter("@characterId", characterId),
                 new SqliteParameter("@hotkeyId", characterHotkey.hotkeyId),
                 new SqliteParameter("@type", characterHotkey.type),
