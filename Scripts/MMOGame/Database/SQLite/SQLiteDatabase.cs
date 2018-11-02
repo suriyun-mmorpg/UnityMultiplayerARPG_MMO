@@ -54,7 +54,7 @@ namespace MultiplayerARPG.MMO
         {
             ExecuteNonQuery("BEGIN");
 
-            ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characterattribute (=
+            ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characterattribute (
               characterId TEXT NOT NULL,
               dataId INTEGER NOT NULL DEFAULT 0,
               amount INTEGER NOT NULL DEFAULT 0,
