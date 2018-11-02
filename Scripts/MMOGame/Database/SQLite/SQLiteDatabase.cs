@@ -232,26 +232,6 @@ namespace MultiplayerARPG.MMO
                 ExecuteNonQuery("ALTER TABLE characters ADD sharedGuildExp INTEGER NOT NULL DEFAULT 0;");
             if (!IsColumnExist("characters", "entityId"))
                 ExecuteNonQuery("ALTER TABLE characters ADD entityId INTEGER NOT NULL DEFAULT 0;");
-            if (IsColumnExist("characterattribute", "id"))
-                ExecuteNonQuery("ALTER TABLE characterattribute DROP id;");
-            if (IsColumnExist("characterattribute", "idx"))
-                ExecuteNonQuery("ALTER TABLE characterattribute DROP idx");
-            if (IsColumnExist("characterbuff", "id"))
-                ExecuteNonQuery("ALTER TABLE characterbuff DROP id;");
-            if (IsColumnExist("characterhotkey", "id"))
-                ExecuteNonQuery("ALTER TABLE characterhotkey DROP id");
-            if (IsColumnExist("characteritem", "id"))
-                ExecuteNonQuery("ALTER TABLE characteritem DROP id");
-            if (IsColumnExist("characterquest", "id"))
-                ExecuteNonQuery("ALTER TABLE characterquest DROP id;");
-            if (IsColumnExist("characterquest", "idx"))
-                ExecuteNonQuery("ALTER TABLE characterquest DROP idx");
-            if (IsColumnExist("characterskill", "id"))
-                ExecuteNonQuery("ALTER TABLE characterskill DROP id;");
-            if (IsColumnExist("characterskill", "idx"))
-                ExecuteNonQuery("ALTER TABLE characterskill DROP idx");
-            if (IsColumnExist("coolDownRemainsDuration", "idx"))
-                ExecuteNonQuery("ALTER TABLE characterskill DROP coolDownRemainsDuration");
         }
 
         private bool IsColumnExist(string tableName, string findingColumn)
