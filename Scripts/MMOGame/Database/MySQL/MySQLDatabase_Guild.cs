@@ -64,7 +64,7 @@ namespace MultiplayerARPG.MMO
                     result.AddMember(guildMemberData, (byte)reader.GetInt32("guildRole"));
                 }
 
-                reader = ExecuteReader("SELECT dataId, level WHERE guildId=@id",
+                reader = ExecuteReader("SELECT dataId, level FROM guildskill WHERE guildId=@id",
                     new MySqlParameter("@id", id));
                 while (reader.Read())
                 {
