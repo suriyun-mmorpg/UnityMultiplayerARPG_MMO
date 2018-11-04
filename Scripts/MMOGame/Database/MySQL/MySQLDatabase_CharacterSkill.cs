@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using System.Collections.Generic;
 using MySql.Data.MySqlClient;
 
 namespace MultiplayerARPG.MMO
@@ -23,9 +21,11 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public void CreateCharacterSkill(MySqlConnection connection, MySqlTransaction transaction, string characterId, CharacterSkill characterSkill)
+        public void CreateCharacterSkill(MySqlConnection connection, MySqlTransaction transaction, int idx, string characterId, CharacterSkill characterSkill)
         {
-            ExecuteNonQuery(connection, transaction, "INSERT INTO characterskill (characterId, dataId, level) VALUES (@characterId, @dataId, @level)",
+            ExecuteNonQuery(connection, transaction, "INSERT INTO characterskill (id, idx, characterId, dataId, level) VALUES (@id, @idx, @characterId, @dataId, @level)",
+                new MySqlParameter("@id", characterId + "_" + idx),
+                new MySqlParameter("@idx", idx),
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@dataId", characterSkill.dataId),
                 new MySqlParameter("@level", characterSkill.level));
@@ -34,7 +34,7 @@ namespace MultiplayerARPG.MMO
         public List<CharacterSkill> ReadCharacterSkills(string characterId)
         {
             var result = new List<CharacterSkill>();
-            var reader = ExecuteReader("SELECT * FROM characterskill WHERE characterId=@characterId",
+            var reader = ExecuteReader("SELECT * FROM characterskill WHERE characterId=@characterId ORDER BY idx ASC",
                 new MySqlParameter("@characterId", characterId));
             CharacterSkill tempSkill;
             while (ReadCharacterSkill(reader, out tempSkill, false))

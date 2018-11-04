@@ -15,9 +15,10 @@ namespace MultiplayerARPG.MMO
             try
             {
                 DeleteCharacterAttributes(connection, transaction, characterData.Id);
+                var i = 0;
                 foreach (var attribute in characterData.Attributes)
                 {
-                    CreateCharacterAttribute(connection, transaction, characterData.Id, attribute);
+                    CreateCharacterAttribute(connection, transaction, i++, characterData.Id, attribute);
                 }
                 transaction.Commit();
             }
@@ -118,9 +119,10 @@ namespace MultiplayerARPG.MMO
             try
             {
                 DeleteCharacterQuests(connection, transaction, characterData.Id);
+                var i = 0;
                 foreach (var quest in characterData.Quests)
                 {
-                    CreateCharacterQuest(connection, transaction, characterData.Id, quest);
+                    CreateCharacterQuest(connection, transaction, i++, characterData.Id, quest);
                 }
                 transaction.Commit();
             }
@@ -142,9 +144,10 @@ namespace MultiplayerARPG.MMO
             try
             {
                 DeleteCharacterSkills(connection, transaction, characterData.Id);
+                var i = 0;
                 foreach (var skill in characterData.Skills)
                 {
-                    CreateCharacterSkill(connection, transaction, characterData.Id, skill);
+                    CreateCharacterSkill(connection, transaction, i++, characterData.Id, skill);
                 }
                 transaction.Commit();
             }

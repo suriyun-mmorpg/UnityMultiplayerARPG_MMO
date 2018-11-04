@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using MySql.Data.MySqlClient;
 
 namespace MultiplayerARPG.MMO
@@ -22,9 +21,11 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public void CreateCharacterAttribute(MySqlConnection connection, MySqlTransaction transaction, string characterId, CharacterAttribute characterAttribute)
+        public void CreateCharacterAttribute(MySqlConnection connection, MySqlTransaction transaction, int idx, string characterId, CharacterAttribute characterAttribute)
         {
-            ExecuteNonQuery(connection, transaction, "INSERT INTO characterattribute (characterId, dataId, amount) VALUES (@characterId, @dataId, @amount)",
+            ExecuteNonQuery(connection, transaction, "INSERT INTO characterattribute (id, idx, characterId, dataId, amount) VALUES (@id, @idx, @characterId, @dataId, @amount)",
+                new MySqlParameter("@id", characterId + "_" + idx),
+                new MySqlParameter("@idx", idx),
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@dataId", characterAttribute.dataId),
                 new MySqlParameter("@amount", characterAttribute.amount));
@@ -33,7 +34,7 @@ namespace MultiplayerARPG.MMO
         public List<CharacterAttribute> ReadCharacterAttributes(string characterId)
         {
             var result = new List<CharacterAttribute>();
-            var reader = ExecuteReader("SELECT * FROM characterattribute WHERE characterId=@characterId",
+            var reader = ExecuteReader("SELECT * FROM characterattribute WHERE characterId=@characterId ORDER BY idx ASC",
                 new MySqlParameter("@characterId", characterId));
             CharacterAttribute tempAttribute;
             while (ReadCharacterAttribute(reader, out tempAttribute, false))

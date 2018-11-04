@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using MySql.Data.MySqlClient;
 
 namespace MultiplayerARPG.MMO
@@ -26,14 +25,15 @@ namespace MultiplayerARPG.MMO
 
         public void CreateCharacterBuff(MySqlConnection connection, MySqlTransaction transaction, string characterId, CharacterBuff characterBuff)
         {
-            ExecuteNonQuery(connection, transaction, "INSERT INTO characterbuff (characterId, type, dataId, level, buffRemainsDuration) VALUES (@characterId, @type, @dataId, @level, @buffRemainsDuration)",
+            ExecuteNonQuery(connection, transaction, "INSERT INTO characterbuff (id, characterId, type, dataId, level, buffRemainsDuration) VALUES (@id, @characterId, @type, @dataId, @level, @buffRemainsDuration)",
+                new MySqlParameter("@id", characterId + "_" + characterBuff.type + "_" + characterBuff.dataId),
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@type", (byte)characterBuff.type),
                 new MySqlParameter("@dataId", characterBuff.dataId),
                 new MySqlParameter("@level", characterBuff.level),
                 new MySqlParameter("@buffRemainsDuration", characterBuff.buffRemainsDuration));
         }
-        
+
         public List<CharacterBuff> ReadCharacterBuffs(string characterId)
         {
             var result = new List<CharacterBuff>();

@@ -25,7 +25,8 @@ namespace MultiplayerARPG.MMO
 
         public void CreateCharacterSkillUsage(MySqlConnection connection, MySqlTransaction transaction, string characterId, CharacterSkillUsage characterSkillUsage)
         {
-            ExecuteNonQuery(connection, transaction, "INSERT INTO characterskillusage (characterId, type, dataId, level, coolDownRemainsDuration) VALUES (@characterId, @type, @dataId, @level, @coolDownRemainsDuration)",
+            ExecuteNonQuery(connection, transaction, "INSERT INTO characterskillusage (id, characterId, type, dataId, level, coolDownRemainsDuration) VALUES (@id, @characterId, @type, @dataId, @level, @coolDownRemainsDuration)",
+                new MySqlParameter("@id", characterId + "_" + characterSkillUsage.type + "_" + characterSkillUsage.dataId),
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@type", (byte)characterSkillUsage.type),
                 new MySqlParameter("@dataId", characterSkillUsage.dataId),

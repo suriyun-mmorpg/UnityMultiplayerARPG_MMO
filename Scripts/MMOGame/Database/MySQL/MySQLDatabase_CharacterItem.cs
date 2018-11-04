@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using System.Collections.Generic;
 using MySql.Data.MySqlClient;
 
 namespace MultiplayerARPG.MMO
@@ -9,7 +7,8 @@ namespace MultiplayerARPG.MMO
     {
         private void CreateCharacterItem(MySqlConnection connection, MySqlTransaction transaction, int idx, string characterId, InventoryType inventoryType, CharacterItem characterItem)
         {
-            ExecuteNonQuery(connection, transaction, "INSERT INTO characteritem (idx, inventoryType, characterId, dataId, level, amount, durability) VALUES (@idx, @inventoryType, @characterId, @dataId, @level, @amount, @durability)",
+            ExecuteNonQuery(connection, transaction, "INSERT INTO characteritem (id, idx, inventoryType, characterId, dataId, level, amount, durability) VALUES (@id, @idx, @inventoryType, @characterId, @dataId, @level, @amount, @durability)",
+                new MySqlParameter("@id", characterId + "_" + (byte)inventoryType + "_" + idx),
                 new MySqlParameter("@idx", idx),
                 new MySqlParameter("@inventoryType", (byte)inventoryType),
                 new MySqlParameter("@characterId", characterId),
