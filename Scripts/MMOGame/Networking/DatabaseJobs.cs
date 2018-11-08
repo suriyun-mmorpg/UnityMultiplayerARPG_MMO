@@ -381,16 +381,18 @@ namespace MultiplayerARPG.MMO
         private int id;
         private int dataId;
         private short level;
-        public UpdateGuildSkillLevelJob(BaseDatabase database, int id, int dataId, short level, Action onFinished = null) : base(database, onFinished)
+        private short skillPoint;
+        public UpdateGuildSkillLevelJob(BaseDatabase database, int id, int dataId, short level, short skillPoint, Action onFinished = null) : base(database, onFinished)
         {
             this.id = id;
             this.dataId = dataId;
             this.level = level;
+            this.skillPoint = skillPoint;
         }
 
         protected override void ThreadFunction()
         {
-            database.UpdateGuildSkillLevel(id, dataId, level);
+            database.UpdateGuildSkillLevel(id, dataId, level, skillPoint);
         }
     }
 

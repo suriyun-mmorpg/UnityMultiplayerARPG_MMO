@@ -120,7 +120,10 @@ namespace MultiplayerARPG.MMO
 
         public override void UpdateGuildRole(int id, byte guildRole, string name, bool canInvite, bool canKick, byte shareExpPercentage)
         {
-            ExecuteNonQuery("REPLACE INTO guildrole (guildId, guildRole, name, canInvite, canKick, shareExpPercentage) " +
+            ExecuteNonQuery("DELETE FROM guildrole WHERE guildId=@guildId AND guildRole=@guildRole",
+                new SqliteParameter("@guildId", id),
+                new SqliteParameter("@guildRole", guildRole));
+            ExecuteNonQuery("INSERT INTO guildrole (guildId, guildRole, name, canInvite, canKick, shareExpPercentage) " +
                 "VALUES (@guildId, @guildRole, @name, @canInvite, @canKick, @shareExpPercentage)",
                 new SqliteParameter("@guildId", id),
                 new SqliteParameter("@guildRole", guildRole),
@@ -137,13 +140,19 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@guildRole", guildRole));
         }
 
-        public override void UpdateGuildSkillLevel(int id, int dataId, short level)
+        public override void UpdateGuildSkillLevel(int id, int dataId, short level, short skillPoint)
         {
-            ExecuteNonQuery("REPLACE INTO guildskill (guildId, dataId, level) " +
+            ExecuteNonQuery("DELETE FROM guildskill WHERE guildId=@guildId AND dataId=@dataId",
+                new SqliteParameter("@guildId", id),
+                new SqliteParameter("@dataId", dataId));
+            ExecuteNonQuery("INSERT INTO guildskill (guildId, dataId, level) " +
                 "VALUES (@guildId, @dataId, @level)",
                 new SqliteParameter("@guildId", id),
                 new SqliteParameter("@dataId", dataId),
                 new SqliteParameter("@level", level));
+            ExecuteNonQuery("UPDATE guild SET skillPoint=@skillPoint WHERE id=@id",
+                new SqliteParameter("@skillPoint", skillPoint),
+                new SqliteParameter("@id", id));
         }
 
         public override void DeleteGuild(int id)

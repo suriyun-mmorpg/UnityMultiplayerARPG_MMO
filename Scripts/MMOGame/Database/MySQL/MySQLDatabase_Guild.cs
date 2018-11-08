@@ -120,7 +120,10 @@ namespace MultiplayerARPG.MMO
 
         public override void UpdateGuildRole(int id, byte guildRole, string name, bool canInvite, bool canKick, byte shareExpPercentage)
         {
-            ExecuteNonQuery("REPLACE INTO guildrole (guildId, guildRole, name, canInvite, canKick, shareExpPercentage) " +
+            ExecuteNonQuery("DELETE FROM guildrole WHERE guildId=@guildId AND guildRole=@guildRole",
+                new MySqlParameter("@guildId", id),
+                new MySqlParameter("@guildRole", guildRole));
+            ExecuteNonQuery("INSERT INTO guildrole (guildId, guildRole, name, canInvite, canKick, shareExpPercentage) " +
                 "VALUES (@guildId, @guildRole, @name, @canInvite, @canKick, @shareExpPercentage)",
                 new MySqlParameter("@guildId", id),
                 new MySqlParameter("@guildRole", guildRole),
@@ -137,13 +140,19 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@guildRole", guildRole));
         }
 
-        public override void UpdateGuildSkillLevel(int id, int dataId, short level)
+        public override void UpdateGuildSkillLevel(int id, int dataId, short level, short skillPoint)
         {
-            ExecuteNonQuery("REPLACE INTO guildskill (guildId, dataId, level) " +
+            ExecuteNonQuery("DELETE FROM guildskill WHERE guildId=@guildId AND dataId=@dataId",
+                new MySqlParameter("@guildId", id),
+                new MySqlParameter("@dataId", dataId));
+            ExecuteNonQuery("INSERT INTO guildskill (guildId, dataId, level) " +
                 "VALUES (@guildId, @dataId, @level)",
                 new MySqlParameter("@guildId", id),
                 new MySqlParameter("@dataId", dataId),
                 new MySqlParameter("@level", level));
+            ExecuteNonQuery("UPDATE guild SET skillPoint=@skillPoint WHERE id=@id",
+                new MySqlParameter("@skillPoint", skillPoint),
+                new MySqlParameter("@id", id));
         }
 
         public override void DeleteGuild(int id)
