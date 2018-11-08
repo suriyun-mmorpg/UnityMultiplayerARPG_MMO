@@ -390,13 +390,16 @@ namespace MultiplayerARPG.MMO
             GuildData guild;
             if (!CanAddGuildSkill(playerCharacterEntity, dataId, out guildId, out guild))
                 return;
-
+            
             base.AddGuildSkill(playerCharacterEntity, dataId);
             // Save to database
-            new UpdateGuildSkillLevelJob(Database, guildId, dataId, guild.GetSkillLevel(dataId)).Start();
+            new UpdateGuildSkillLevelJob(Database, guildId, dataId, guild.GetSkillLevel(dataId), guild.skillPoint).Start();
             // Broadcast via chat server
             if (ChatNetworkManager.IsClientConnected)
+            {
                 ChatNetworkManager.Client.SendSetGuildSkillLevel(null, MMOMessageTypes.UpdateGuild, guildId, dataId, guild.GetSkillLevel(dataId));
+                ChatNetworkManager.Client.SendGuildLevelExpSkillPoint(null, MMOMessageTypes.UpdateGuild, guildId, guild.level, guild.exp, guild.skillPoint);
+            }
         }
     }
 }
