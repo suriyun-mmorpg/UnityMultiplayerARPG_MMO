@@ -394,6 +394,7 @@ namespace MultiplayerARPG.MMO
         {
             var connectionId = messageHandler.connectionId;
             var message = messageHandler.ReadMessage<BaseAckMessage>();
+            // Set response data
             var error = ResponseCashShopInfoMessage.Error.None;
             var cash = 0;
             var cashShopItemIds = new List<int>();
@@ -413,7 +414,7 @@ namespace MultiplayerARPG.MMO
                     cashShopItemIds.Add(cashShopItemId);
                 }
             }
-
+            // Send response message
             var responseMessage = new ResponseCashShopInfoMessage();
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = error == ResponseCashShopInfoMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
@@ -432,6 +433,7 @@ namespace MultiplayerARPG.MMO
         {
             var connectionId = messageHandler.connectionId;
             var message = messageHandler.ReadMessage<RequestCashShopBuyMessage>();
+            // Set response data
             var error = ResponseCashShopBuyMessage.Error.None;
             var dataId = message.dataId;
             var cash = 0;
@@ -467,10 +469,12 @@ namespace MultiplayerARPG.MMO
                     }
                 }
             }
+            // Send response message
             var responseMessage = new ResponseCashShopBuyMessage();
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = error == ResponseCashShopBuyMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
             responseMessage.error = error;
+            responseMessage.dataId = dataId;
             responseMessage.cash = cash;
             ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MsgTypes.CashShopBuy, responseMessage);
         }
@@ -484,6 +488,7 @@ namespace MultiplayerARPG.MMO
         {
             var connectionId = messageHandler.connectionId;
             var message = messageHandler.ReadMessage<BaseAckMessage>();
+            // Set response data
             var error = ResponseCashPackageInfoMessage.Error.None;
             var cash = 0;
             var cashPackageIds = new List<int>();
@@ -503,7 +508,7 @@ namespace MultiplayerARPG.MMO
                     cashPackageIds.Add(cashShopItemId);
                 }
             }
-
+            // Send response message
             var responseMessage = new ResponseCashPackageInfoMessage();
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = error == ResponseCashPackageInfoMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
@@ -522,6 +527,8 @@ namespace MultiplayerARPG.MMO
         {
             var connectionId = messageHandler.connectionId;
             var message = messageHandler.ReadMessage<RequestCashPackageBuyValidationMessage>();
+            // TODO: Validate purchasing at server side
+            // Set response data
             var error = ResponseCashPackageBuyValidationMessage.Error.None;
             var dataId = message.dataId;
             var cash = 0;
@@ -537,7 +544,6 @@ namespace MultiplayerARPG.MMO
                 job.Start();
                 yield return StartCoroutine(job.WaitFor());
                 cash = job.result;
-                // TODO: Validate purchasing at server side
                 CashPackage cashPackage;
                 if (!GameInstance.CashPackages.TryGetValue(dataId, out cashPackage))
                     error = ResponseCashPackageBuyValidationMessage.Error.PackageNotFound;
@@ -549,6 +555,7 @@ namespace MultiplayerARPG.MMO
                     cash = increaseCashJob.result;
                 }
             }
+            // Send response message
             var responseMessage = new ResponseCashPackageBuyValidationMessage();
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = error == ResponseCashPackageBuyValidationMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
