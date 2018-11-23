@@ -219,8 +219,6 @@ namespace MultiplayerARPG.MMO
             )");
 
             ExecuteNonQuery("END");
-            
-            this.InvokeInstanceDevExtMethods("Init");
 
             // Update data
             if (!IsColumnExist("characteritem", "durability"))
@@ -237,6 +235,8 @@ namespace MultiplayerARPG.MMO
                 ExecuteNonQuery("ALTER TABLE characters ADD sharedGuildExp INTEGER NOT NULL DEFAULT 0;");
             if (!IsColumnExist("characters", "entityId"))
                 ExecuteNonQuery("ALTER TABLE characters ADD entityId INTEGER NOT NULL DEFAULT 0;");
+
+            this.InvokeInstanceDevExtMethods("Init");
         }
 
         private bool IsColumnExist(string tableName, string findingColumn)
