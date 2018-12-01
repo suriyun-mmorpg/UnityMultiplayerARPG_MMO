@@ -71,9 +71,15 @@ namespace MultiplayerARPG.MMO
             connectionIdsByCharacterName.Clear();
         }
 
+        public void StartClient(MapNetworkManager mapNetworkManager, string networkAddress, int networkPort, string connectKey)
+        {
+            // Start client as map server
+            this.mapNetworkManager = mapNetworkManager;
+            base.StartClient(networkAddress, networkPort, connectKey);
+        }
+
         public override void OnStartServer()
         {
-            Clean();
             CentralAppServerRegister.OnStartServer();
             base.OnStartServer();
         }
@@ -84,6 +90,13 @@ namespace MultiplayerARPG.MMO
                 Clean();
             CentralAppServerRegister.OnStopServer();
             base.OnStopServer();
+        }
+
+        public override void OnStopClient()
+        {
+            if (!IsServer)
+                Clean();
+            base.OnStopClient();
         }
 
         protected override void Update()
@@ -323,19 +336,6 @@ namespace MultiplayerARPG.MMO
             updateMapUserMessage.type = updateType;
             updateMapUserMessage.data = userData;
             ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MMOMessageTypes.UpdateMapUser, updateMapUserMessage);
-        }
-
-        public void StartClient(MapNetworkManager mapNetworkManager, string networkAddress, int networkPort, string connectKey)
-        {
-            // Start client as map server
-            this.mapNetworkManager = mapNetworkManager;
-            base.StartClient(networkAddress, networkPort, connectKey);
-        }
-
-        public override void OnStopClient()
-        {
-            base.OnStopClient();
-            mapNetworkManager = null;
         }
     }
 }
