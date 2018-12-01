@@ -36,7 +36,14 @@ namespace MultiplayerARPG.MMO
         private readonly List<Action> mainThreadActions = new List<Action>();
         private readonly object processLock = new object();
         private uint processIdCounter = 0;
-        private Dictionary<uint, Process> processes = new Dictionary<uint, Process>();
+        /// <summary>
+        /// Dictionary of Map servers processes
+        /// </summary>
+        private readonly Dictionary<uint, Process> processes = new Dictionary<uint, Process>();
+        /// <summary>
+        /// List of Map servers that restarting in update loop
+        /// </summary>
+        private readonly List<string> restartingScenes = new List<string>();
 
         public string ExePath
         {
@@ -99,7 +106,12 @@ namespace MultiplayerARPG.MMO
             freePorts.Clear();
             mainThreadActions.Clear();
             processIdCounter = 0;
+            foreach (var process in processes.Values)
+            {
+                process.Kill();
+            }
             processes.Clear();
+            restartingScenes.Clear();
         }
 
         public override void OnStopServer()
@@ -119,32 +131,38 @@ namespace MultiplayerARPG.MMO
         protected override void Update()
         {
             base.Update();
-            if (IsServer && CentralAppServerRegister.IsRegisteredToCentralServer)
+            if (IsServer)
             {
-                if (mainThreadActions.Count > 0)
+                CentralAppServerRegister.Update();
+                if (CentralAppServerRegister.IsRegisteredToCentralServer)
                 {
-                    lock (mainThreadLock)
+                    if (mainThreadActions.Count > 0)
                     {
-                        foreach (var actions in mainThreadActions)
+                        lock (mainThreadLock)
                         {
-                            actions.Invoke();
-                        }
+                            foreach (var actions in mainThreadActions)
+                            {
+                                actions.Invoke();
+                            }
 
-                        mainThreadActions.Clear();
+                            mainThreadActions.Clear();
+                        }
+                    }
+                    if (restartingScenes.Count > 0)
+                    {
+                        foreach (var scene in restartingScenes)
+                        {
+                            SpawnMap(scene, true);
+                        }
+                        restartingScenes.Clear();
                     }
                 }
             }
-            if (IsServer)
-                CentralAppServerRegister.Update();
         }
 
         protected override void OnDestroy()
         {
-            foreach (var process in processes.Values)
-            {
-                process.Kill();
-            }
-            processes.Clear();
+            Clean();
             base.OnDestroy();
         }
 
@@ -160,7 +178,7 @@ namespace MultiplayerARPG.MMO
             if (error != ResponseSpawnMapMessage.Error.None)
                 ReponseMapSpawn(message.ackId, error);
             else
-                SpawnMap(message);
+                SpawnMap(message, false);
         }
 
         private void OnAppServerRegistered(AckResponseCode responseCode, BaseAckMessage message)
@@ -181,7 +199,7 @@ namespace MultiplayerARPG.MMO
                 }
                 foreach (var scene in spawningScenes)
                 {
-                    SpawnMap(scene);
+                    SpawnMap(scene, true);
                 }
             }
         }
@@ -191,12 +209,12 @@ namespace MultiplayerARPG.MMO
             freePorts.Enqueue(port);
         }
 
-        private void SpawnMap(RequestSpawnMapMessage message)
+        private void SpawnMap(RequestSpawnMapMessage message, bool autoRestart)
         {
-            SpawnMap(message.sceneName, message);
+            SpawnMap(message.sceneName, autoRestart, message);
         }
 
-        private void SpawnMap(string sceneName, RequestSpawnMapMessage message = null)
+        private void SpawnMap(string sceneName, bool autoRestart, RequestSpawnMapMessage message = null)
     {
             // Port to run map server
             if (freePorts.Count > 0)
@@ -241,26 +259,23 @@ namespace MultiplayerARPG.MMO
                 {
                     try
                     {
-                        UnityEngine.Debug.Log("New thread started");
-
                         using (var process = Process.Start(startProcessInfo))
                         {
-                            UnityEngine.Debug.Log("Process started. Spawn Id: " + processId + ", pid: " + process.Id);
-                            processStarted = true;
-
                             lock (processLock)
                             {
                                 // Save the process
                                 processes[processId] = process;
                             }
 
-                            // Notify server that we've successfully handled the request
+                            processStarted = true;
+
                             ExecuteOnMainThread(() =>
                             {
+                                UnityEngine.Debug.Log("Process started. Spawn Id: " + processId + ", pid: " + process.Id);
+                                // Notify server that it's successfully handled the request
                                 if (message != null)
                                     ReponseMapSpawn(message.ackId, ResponseSpawnMapMessage.Error.None);
                             });
-
                             process.WaitForExit();
                         }
                     }
@@ -270,12 +285,14 @@ namespace MultiplayerARPG.MMO
                         {
                             ExecuteOnMainThread(() =>
                             {
+                                UnityEngine.Debug.LogError("Tried to start a process at: '" + path + "' but it failed. Make sure that you have set correct the 'exePath' in 'MapSpawnNetworkManager' component");
+                                UnityEngine.Debug.LogException(e);
+
+                                // Notify server that it failed to spawn map scene handled the request
                                 if (message != null)
                                     ReponseMapSpawn(message.ackId, ResponseSpawnMapMessage.Error.CannotExecute);
                             });
                         }
-                        UnityEngine.Debug.LogError("Tried to start a process at: '" + path + "' but it failed. Make sure that you have set correct the 'exePath' in 'MapSpawnNetworkManager' component");
-                        UnityEngine.Debug.LogException(e);
                     }
                     finally
                     {
@@ -283,6 +300,10 @@ namespace MultiplayerARPG.MMO
                         {
                             // Remove the process
                             processes.Remove(processId);
+
+                            // Restarting scene
+                            if (autoRestart)
+                                restartingScenes.Add(sceneName);
                         }
 
                         ExecuteOnMainThread(() =>
