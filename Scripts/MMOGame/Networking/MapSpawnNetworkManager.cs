@@ -215,7 +215,7 @@ namespace MultiplayerARPG.MMO
         }
 
         private void SpawnMap(string sceneName, bool autoRestart, RequestSpawnMapMessage message = null)
-    {
+        {
             // Port to run map server
             if (freePorts.Count > 0)
                 spawningPort = freePorts.Dequeue();
@@ -232,7 +232,8 @@ namespace MultiplayerARPG.MMO
                     : Process.GetCurrentProcess().MainModule.FileName;
             }
 
-            UnityEngine.Debug.Log("Starting process from: " + path);
+            if (LogInfo)
+                UnityEngine.Debug.Log("Starting process from: " + path);
 
             // Spawning Process Info
             var startProcessInfo = new ProcessStartInfo(path)
@@ -245,11 +246,12 @@ namespace MultiplayerARPG.MMO
                     string.Format("{0} {1} ", MMOServerInstance.ARG_CENTRAL_ADDRESS, centralNetworkAddress) +
                     string.Format("{0} {1} ", MMOServerInstance.ARG_CENTRAL_PORT, centralNetworkPort) +
                     string.Format("{0} {1} ", MMOServerInstance.ARG_MACHINE_ADDRESS, machineAddress) +
-                    string.Format("{0} {1} ", MMOServerInstance.ARG_MAP_PORT, port) + 
+                    string.Format("{0} {1} ", MMOServerInstance.ARG_MAP_PORT, port) +
                     " " + MMOServerInstance.ARG_START_MAP_SERVER,
             };
 
-            UnityEngine.Debug.Log("Starting process with args: " + startProcessInfo.Arguments);
+            if (LogInfo)
+                UnityEngine.Debug.Log("Starting process with args: " + startProcessInfo.Arguments);
 
             var processId = ++processIdCounter;
             var processStarted = false;
@@ -271,7 +273,8 @@ namespace MultiplayerARPG.MMO
 
                             ExecuteOnMainThread(() =>
                             {
-                                UnityEngine.Debug.Log("Process started. Spawn Id: " + processId + ", pid: " + process.Id);
+                                if (LogInfo)
+                                    UnityEngine.Debug.Log("Process started. Spawn Id: " + processId + ", pid: " + process.Id);
                                 // Notify server that it's successfully handled the request
                                 if (message != null)
                                     ReponseMapSpawn(message.ackId, ResponseSpawnMapMessage.Error.None);
@@ -285,8 +288,11 @@ namespace MultiplayerARPG.MMO
                         {
                             ExecuteOnMainThread(() =>
                             {
-                                UnityEngine.Debug.LogError("Tried to start a process at: '" + path + "' but it failed. Make sure that you have set correct the 'exePath' in 'MapSpawnNetworkManager' component");
-                                UnityEngine.Debug.LogException(e);
+                                if (LogFatal)
+                                {
+                                    UnityEngine.Debug.LogError("Tried to start a process at: '" + path + "' but it failed. Make sure that you have set correct the 'exePath' in 'MapSpawnNetworkManager' component");
+                                    UnityEngine.Debug.LogException(e);
+                                }
 
                                 // Notify server that it failed to spawn map scene handled the request
                                 if (message != null)
@@ -311,7 +317,8 @@ namespace MultiplayerARPG.MMO
                             // Release the port number
                             FreePort(port);
 
-                            UnityEngine.Debug.Log("Process spawn id: " + processId + " killed.");
+                            if (LogInfo)
+                                UnityEngine.Debug.Log("Process spawn id: " + processId + " killed.");
                         });
                     }
 
@@ -321,7 +328,13 @@ namespace MultiplayerARPG.MMO
             {
                 if (message != null)
                     ReponseMapSpawn(message.ackId, ResponseSpawnMapMessage.Error.Unknow);
-                UnityEngine.Debug.LogException(e);
+
+                // Restarting scene
+                if (autoRestart)
+                    restartingScenes.Add(sceneName);
+
+                if (LogFatal)
+                    UnityEngine.Debug.LogException(e);
             }
         }
 

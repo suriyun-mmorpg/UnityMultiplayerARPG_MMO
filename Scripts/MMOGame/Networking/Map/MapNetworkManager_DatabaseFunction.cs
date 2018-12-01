@@ -49,7 +49,8 @@ namespace MultiplayerARPG.MMO
                 job.Start();
                 yield return StartCoroutine(job.WaitFor());
                 savingCharacters.Remove(playerCharacterData.Id);
-                Debug.Log("Character [" + playerCharacterData.Id + "] Saved");
+                if (LogInfo)
+                    Debug.Log("Character [" + playerCharacterData.Id + "] Saved");
             }
         }
 
@@ -67,7 +68,8 @@ namespace MultiplayerARPG.MMO
                 {
                     yield return 0;
                 }
-                Debug.Log("Saved " + i + " character(s)");
+                if (LogInfo)
+                    Debug.Log("Saved " + i + " character(s)");
             }
         }
 
@@ -80,7 +82,8 @@ namespace MultiplayerARPG.MMO
                 job.Start();
                 yield return StartCoroutine(job.WaitFor());
                 savingBuildings.Remove(buildingSaveData.Id);
-                Debug.Log("Building [" + buildingSaveData.Id + "] Saved");
+                if (LogInfo)
+                    Debug.Log("Building [" + buildingSaveData.Id + "] Saved");
             }
         }
 
@@ -98,7 +101,8 @@ namespace MultiplayerARPG.MMO
                 {
                     yield return 0;
                 }
-                Debug.Log("Saved " + i + " building(s)");
+                if (LogInfo)
+                    Debug.Log("Saved " + i + " building(s)");
             }
         }
 

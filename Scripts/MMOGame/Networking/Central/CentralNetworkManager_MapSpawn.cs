@@ -27,7 +27,8 @@ namespace MultiplayerARPG.MMO
         protected void OnRequestSpawnMap(AckResponseCode responseCode, BaseAckMessage messageData)
         {
             var castedMessage = messageData as ResponseSpawnMapMessage;
-            Debug.Log("Spawn Map Ack Id: " + messageData.ackId + "  Status: " + responseCode + " Error: " + castedMessage.error);
+            if (LogInfo)
+                Debug.Log("Spawn Map Ack Id: " + messageData.ackId + "  Status: " + responseCode + " Error: " + castedMessage.error);
         }
     }
 }

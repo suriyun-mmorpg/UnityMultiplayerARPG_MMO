@@ -145,7 +145,7 @@ namespace MultiplayerARPG.MMO
             // Send remove character from map server
             BasePlayerCharacterEntity playerCharacter;
             UserCharacterData userData;
-            if (playerCharacters.TryGetValue(connectionId, out playerCharacter) && 
+            if (playerCharacters.TryGetValue(connectionId, out playerCharacter) &&
                 usersById.TryGetValue(playerCharacter.Id, out userData))
             {
                 usersById.Remove(playerCharacter.Id);
@@ -258,7 +258,8 @@ namespace MultiplayerARPG.MMO
 
             if (playerCharacters.ContainsKey(connectionId))
             {
-                Debug.LogError("[Map Server] User trying to hack: " + userId);
+                if (LogError)
+                    Debug.LogError("[Map Server] User trying to hack: " + userId);
                 transport.ServerDisconnect(connectionId);
                 return;
             }
@@ -274,7 +275,8 @@ namespace MultiplayerARPG.MMO
             yield return StartCoroutine(validateAccessTokenJob.WaitFor());
             if (!validateAccessTokenJob.result)
             {
-                Debug.LogError("[Map Server] Invalid access token for user: " + userId);
+                if (LogError)
+                    Debug.LogError("[Map Server] Invalid access token for user: " + userId);
                 transport.ServerDisconnect(connectionId);
             }
             else
@@ -286,7 +288,8 @@ namespace MultiplayerARPG.MMO
                 // If data is empty / cannot find character, disconnect user
                 if (playerCharacterData == null)
                 {
-                    Debug.LogError("[Map Server] Cannot find select character: " + selectCharacterId + " for user: " + userId);
+                    if (LogError)
+                        Debug.LogError("[Map Server] Cannot find select character: " + selectCharacterId + " for user: " + userId);
                     transport.ServerDisconnect(connectionId);
                 }
                 else
@@ -295,7 +298,8 @@ namespace MultiplayerARPG.MMO
                     // If it is not allow this character data, disconnect user
                     if (entityPrefab == null)
                     {
-                        Debug.LogError("[Map Server] Cannot find player character with entity Id: " + playerCharacterData.EntityId);
+                        if (LogError)
+                            Debug.LogError("[Map Server] Cannot find player character with entity Id: " + playerCharacterData.EntityId);
                         transport.ServerDisconnect(connectionId);
                     }
                     else
@@ -592,14 +596,16 @@ namespace MultiplayerARPG.MMO
                     case CentralServerPeerType.MapServer:
                         if (!string.IsNullOrEmpty(peerInfo.extra))
                         {
-                            Debug.Log("Register map server: " + peerInfo.extra);
+                            if (LogInfo)
+                                Debug.Log("Register map server: " + peerInfo.extra);
                             mapServerConnectionIdsBySceneName[peerInfo.extra] = peerInfo;
                         }
                         break;
                     case CentralServerPeerType.Chat:
                         if (!ChatNetworkManager.IsClientConnected)
                         {
-                            Debug.Log("Connecting to chat server");
+                            if (LogInfo)
+                                Debug.Log("Connecting to chat server");
                             ChatNetworkManager.StartClient(this, peerInfo.networkAddress, peerInfo.networkPort, peerInfo.connectKey);
                         }
                         break;
@@ -617,7 +623,8 @@ namespace MultiplayerARPG.MMO
         #region Connect to chat server
         public void OnChatServerConnected()
         {
-            Debug.Log("Connected to chat server");
+            if (LogInfo)
+                Debug.Log("Connected to chat server");
             UpdateMapUsers(ChatNetworkManager.Client, UpdateUserCharacterMessage.UpdateType.Add);
         }
 

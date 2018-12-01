@@ -198,7 +198,8 @@ namespace MultiplayerARPG.MMO
         {
             var connectionId = messageHandler.connectionId;
             var message = messageHandler.ReadMessage<ChatMessage>();
-            Debug.Log("Handle chat: " + message.channel + " sender: " + message.sender + " receiver: " + message.receiver + " message: " + message.message);
+            if (LogInfo)
+                Debug.Log("Handle chat: " + message.channel + " sender: " + message.sender + " receiver: " + message.receiver + " message: " + message.message);
             switch (message.channel)
             {
                 case ChatChannel.Global:
@@ -238,7 +239,8 @@ namespace MultiplayerARPG.MMO
                             connectionIdsByCharacterId[message.CharacterId] = connectionId;
                             connectionIdsByCharacterName[message.CharacterName] = connectionId;
                             UpdateMapUser(UpdateUserCharacterMessage.UpdateType.Add, message.data, connectionId);
-                            Debug.Log("[Chat] Add map user: " + message.UserId + " by " + connectionId);
+                            if (LogInfo)
+                                Debug.Log("[Chat] Add map user: " + message.UserId + " by " + connectionId);
                         }
                         break;
                     case UpdateUserCharacterMessage.UpdateType.Remove:
@@ -248,7 +250,8 @@ namespace MultiplayerARPG.MMO
                             connectionIdsByCharacterId.Remove(userData.id);
                             connectionIdsByCharacterName.Remove(userData.characterName);
                             UpdateMapUser(UpdateUserCharacterMessage.UpdateType.Remove, userData, connectionId);
-                            Debug.Log("[Chat] Remove map user: " + message.UserId + " by " + connectionId);
+                            if (LogInfo)
+                                Debug.Log("[Chat] Remove map user: " + message.UserId + " by " + connectionId);
                         }
                         break;
                     case UpdateUserCharacterMessage.UpdateType.Online:
@@ -256,7 +259,8 @@ namespace MultiplayerARPG.MMO
                         {
                             mapUsersById[message.CharacterId] = message.data;
                             UpdateMapUser(UpdateUserCharacterMessage.UpdateType.Online, message.data, connectionId);
-                            Debug.Log("[Chat] Update map user: " + message.UserId + " by " + connectionId);
+                            if (LogInfo)
+                                Debug.Log("[Chat] Update map user: " + message.UserId + " by " + connectionId);
                         }
                         break;
                 }
