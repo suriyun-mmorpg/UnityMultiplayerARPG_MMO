@@ -8,11 +8,6 @@ namespace MultiplayerARPG.MMO
 {
     public partial class MapNetworkManager
     {
-        protected readonly HashSet<int> loadingPartyIds = new HashSet<int>();
-        protected readonly HashSet<int> loadingGuildIds = new HashSet<int>();
-        protected readonly HashSet<string> savingCharacters = new HashSet<string>();
-        protected readonly HashSet<string> savingBuildings = new HashSet<string>();
-        
         private IEnumerator LoadPartyRoutine(int id)
         {
             if (id > 0 && !loadingPartyIds.Contains(id))

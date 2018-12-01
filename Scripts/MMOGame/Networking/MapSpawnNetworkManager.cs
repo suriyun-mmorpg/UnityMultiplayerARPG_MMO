@@ -34,7 +34,7 @@ namespace MultiplayerARPG.MMO
         private readonly Queue<int> freePorts = new Queue<int>();
         private readonly object mainThreadLock = new object();
         private readonly List<Action> mainThreadActions = new List<Action>();
-        private object processLock = new object();
+        private readonly object processLock = new object();
         private uint processIdCounter = 0;
         private Dictionary<uint, Process> processes = new Dictionary<uint, Process>();
 
@@ -92,10 +92,28 @@ namespace MultiplayerARPG.MMO
             base.OnStartServer();
         }
 
+        protected virtual void Clean()
+        {
+            spawningPort = -1;
+            portCounter = -1;
+            freePorts.Clear();
+            mainThreadActions.Clear();
+            processIdCounter = 0;
+            processes.Clear();
+        }
+
         public override void OnStopServer()
         {
             CentralAppServerRegister.OnStopServer();
+            Clean();
             base.OnStopServer();
+        }
+
+        public override void OnStopClient()
+        {
+            if (!IsServer)
+                Clean();
+            base.OnStopClient();
         }
 
         protected override void Update()

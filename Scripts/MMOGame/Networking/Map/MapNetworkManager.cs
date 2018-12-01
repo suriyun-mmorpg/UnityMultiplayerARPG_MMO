@@ -65,6 +65,11 @@ namespace MultiplayerARPG.MMO
         // Listing
         private readonly Dictionary<string, CentralServerPeerInfo> mapServerConnectionIdsBySceneName = new Dictionary<string, CentralServerPeerInfo>();
         private readonly Dictionary<string, UserCharacterData> usersById = new Dictionary<string, UserCharacterData>();
+        // Database operations
+        protected readonly HashSet<int> loadingPartyIds = new HashSet<int>();
+        protected readonly HashSet<int> loadingGuildIds = new HashSet<int>();
+        protected readonly HashSet<string> savingCharacters = new HashSet<string>();
+        protected readonly HashSet<string> savingBuildings = new HashSet<string>();
 
         protected override void Update()
         {
@@ -84,6 +89,17 @@ namespace MultiplayerARPG.MMO
                     lastSaveBuildingTime = tempUnscaledTime;
                 }
             }
+        }
+
+        protected override void Clean()
+        {
+            base.Clean();
+            mapServerConnectionIdsBySceneName.Clear();
+            usersById.Clear();
+            loadingPartyIds.Clear();
+            loadingGuildIds.Clear();
+            savingCharacters.Clear();
+            savingBuildings.Clear();
         }
 
         protected override void UpdateOnlineCharacter(long connectionId, BasePlayerCharacterEntity playerCharacterEntity, float time)

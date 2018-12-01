@@ -89,14 +89,39 @@ namespace MultiplayerARPG.MMO
         {
             base.OnClientConnected();
             if (onClientConnected != null)
-                onClientConnected();
+                onClientConnected.Invoke();
         }
 
         public override void OnClientDisconnected(DisconnectInfo disconnectInfo)
         {
             base.OnClientDisconnected(disconnectInfo);
             if (onClientDisconnected != null)
-                onClientDisconnected(disconnectInfo);
+                onClientDisconnected.Invoke(disconnectInfo);
+        }
+
+        protected virtual void Clean()
+        {
+            mapSpawnServerPeers.Clear();
+            spawningMapAcks.Clear();
+            mapServerPeers.Clear();
+            mapServerPeersBySceneName.Clear();
+            chatServerPeers.Clear();
+            userPeers.Clear();
+            userPeersByUserId.Clear();
+            mapUserIds.Clear();
+        }
+
+        public override void OnStartServer()
+        {
+            Clean();
+            base.OnStartServer();
+        }
+
+        public override void OnStopServer()
+        {
+            if (!IsServer)
+                Clean();
+            base.OnStopServer();
         }
 
         public bool MapContainsUser(string userId)

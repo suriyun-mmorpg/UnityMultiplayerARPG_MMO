@@ -62,14 +62,26 @@ namespace MultiplayerARPG.MMO
             RegisterServerMessage(MMOMessageTypes.UpdateGuild, HandleUpdateGuildAtServer);
         }
 
+        protected virtual void Clean()
+        {
+            mapNetworkManager = null;
+            mapServerConnectionIds.Clear();
+            mapUsersById.Clear();
+            connectionIdsByCharacterId.Clear();
+            connectionIdsByCharacterName.Clear();
+        }
+
         public override void OnStartServer()
         {
+            Clean();
             CentralAppServerRegister.OnStartServer();
             base.OnStartServer();
         }
 
         public override void OnStopServer()
         {
+            if (!IsServer)
+                Clean();
             CentralAppServerRegister.OnStopServer();
             base.OnStopServer();
         }
