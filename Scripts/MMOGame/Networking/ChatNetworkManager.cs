@@ -14,6 +14,11 @@ namespace MultiplayerARPG.MMO
         public int centralNetworkPort = 6000;
         public string machineAddress = "127.0.0.1";
 
+        public BaseDatabase Database
+        {
+            get { return MMOServerInstance.Singleton.Database; }
+        }
+
         private CentralAppServerRegister cacheCentralAppServerRegister;
         public CentralAppServerRegister CentralAppServerRegister
         {
@@ -343,6 +348,36 @@ namespace MultiplayerARPG.MMO
             updateMapUserMessage.type = updateType;
             updateMapUserMessage.data = userData;
             ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MMOMessageTypes.UpdateMapUser, updateMapUserMessage);
+        }
+
+        private void HandleGMCommand(string command)
+        {
+            if (string.IsNullOrEmpty(command))
+                return;
+
+            var splited = command.Split(' ');
+            var commandKey = splited[0];
+            if (GMCommands.IsSplitedLengthValid(commandKey, splited.Length))
+            {
+                if (commandKey.Equals(GMCommands.GiveGold) || commandKey.Equals(GMCommands.GiveItem))
+                {
+                    var receiver = splited[1];
+                    long receiverConnectionId = 0;
+                    // Send message to map server which have the character
+                    if (!string.IsNullOrEmpty(receiver) &&
+                        connectionIdsByCharacterName.TryGetValue(receiver, out receiverConnectionId))
+                    {
+                        var message = new ChatMessage();
+                        message.channel = ChatChannel.Global;
+                        message.message = command;
+                        ServerSendPacket(receiverConnectionId, SendOptions.ReliableOrdered, MMOMessageTypes.Chat, message);
+                    }
+                    else
+                    {
+                        // Add item / gold to offline characters
+                    }
+                }
+            }
         }
     }
 }
