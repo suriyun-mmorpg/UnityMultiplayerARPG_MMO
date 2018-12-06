@@ -272,6 +272,7 @@ CREATE TABLE `userlogin` (
   `email` varchar(50) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
   `authType` tinyint(4) NOT NULL DEFAULT '1',
   `accessToken` varchar(36) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  `userLevel` tinyint(1) NOT NULL DEFAULT '0',
   `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
