@@ -57,7 +57,7 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@idx", idx),
                 new SqliteParameter("@characterId", characterId),
                 new SqliteParameter("@dataId", characterQuest.dataId),
-                new SqliteParameter("@isComplete", characterQuest.isComplete ? 1 : 0),
+                new SqliteParameter("@isComplete", characterQuest.isComplete),
                 new SqliteParameter("@killedMonsters", WriteKillMonsters(characterQuest.killedMonsters)));
         }
 

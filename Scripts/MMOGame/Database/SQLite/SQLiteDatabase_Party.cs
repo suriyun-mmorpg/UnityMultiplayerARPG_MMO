@@ -11,8 +11,8 @@ namespace MultiplayerARPG.MMO
             int id = 0;
             var reader = ExecuteReader("INSERT INTO party (shareExp, shareItem, leaderId) VALUES (@shareExp, @shareItem, @leaderId);" +
                 "SELECT LAST_INSERT_ROWID();",
-                new SqliteParameter("@shareExp", shareExp ? 1 : 0),
-                new SqliteParameter("@shareItem", shareItem ? 1 : 0),
+                new SqliteParameter("@shareExp", shareExp),
+                new SqliteParameter("@shareItem", shareItem),
                 new SqliteParameter("@leaderId", leaderId));
             if (reader.Read())
                 id = (int)reader.GetInt64(0);

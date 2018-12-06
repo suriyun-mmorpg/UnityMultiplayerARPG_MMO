@@ -128,8 +128,8 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@guildId", id),
                 new SqliteParameter("@guildRole", guildRole),
                 new SqliteParameter("@name", name),
-                new SqliteParameter("@canInvite", canInvite ? 1 : 0),
-                new SqliteParameter("@canKick", canKick ? 1 : 0),
+                new SqliteParameter("@canInvite", canInvite),
+                new SqliteParameter("@canKick", canKick),
                 new SqliteParameter("@shareExpPercentage", shareExpPercentage));
         }
 

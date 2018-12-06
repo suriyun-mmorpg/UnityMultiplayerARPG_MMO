@@ -128,8 +128,8 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@guildId", id),
                 new MySqlParameter("@guildRole", guildRole),
                 new MySqlParameter("@name", name),
-                new MySqlParameter("@canInvite", canInvite ? 1 : 0),
-                new MySqlParameter("@canKick", canKick ? 1 : 0),
+                new MySqlParameter("@canInvite", canInvite),
+                new MySqlParameter("@canKick", canKick),
                 new MySqlParameter("@shareExpPercentage", shareExpPercentage));
         }
 
