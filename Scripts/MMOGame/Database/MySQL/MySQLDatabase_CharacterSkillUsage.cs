@@ -17,6 +17,9 @@ namespace MultiplayerARPG.MMO
                 result.type = (SkillUsageType)reader.GetSByte("type");
                 result.dataId = reader.GetInt32("dataId");
                 result.coolDownRemainsDuration = reader.GetFloat("coolDownRemainsDuration");
+                result.isSummoned = reader.GetBoolean("isSummoned");
+                result.currentSummonedHp = reader.GetInt32("currentSummonedHp");
+                result.currentSummonedMp = reader.GetInt32("currentSummonedMp");
                 return true;
             }
             result = CharacterSkillUsage.Empty;
@@ -25,12 +28,15 @@ namespace MultiplayerARPG.MMO
 
         public void CreateCharacterSkillUsage(MySqlConnection connection, MySqlTransaction transaction, string characterId, CharacterSkillUsage characterSkillUsage)
         {
-            ExecuteNonQuery(connection, transaction, "INSERT INTO characterskillusage (id, characterId, type, dataId, coolDownRemainsDuration) VALUES (@id, @characterId, @type, @dataId, @coolDownRemainsDuration)",
+            ExecuteNonQuery(connection, transaction, "INSERT INTO characterskillusage (id, characterId, type, dataId, coolDownRemainsDuration, isSummoned, currentSummonedHp, currentSummonedMp) VALUES (@id, @characterId, @type, @dataId, @coolDownRemainsDuration, @isSummoned, @currentSummonedHp, @currentSummonedMp)",
                 new MySqlParameter("@id", characterId + "_" + characterSkillUsage.type + "_" + characterSkillUsage.dataId),
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@type", (byte)characterSkillUsage.type),
                 new MySqlParameter("@dataId", characterSkillUsage.dataId),
-                new MySqlParameter("@coolDownRemainsDuration", characterSkillUsage.coolDownRemainsDuration));
+                new MySqlParameter("@coolDownRemainsDuration", characterSkillUsage.coolDownRemainsDuration),
+                new MySqlParameter("@isSummoned", characterSkillUsage.isSummoned),
+                new MySqlParameter("@currentSummonedHp", characterSkillUsage.currentSummonedHp),
+                new MySqlParameter("@currentSummonedMp", characterSkillUsage.currentSummonedMp));
         }
 
         public List<CharacterSkillUsage> ReadCharacterSkillUsages(string characterId)

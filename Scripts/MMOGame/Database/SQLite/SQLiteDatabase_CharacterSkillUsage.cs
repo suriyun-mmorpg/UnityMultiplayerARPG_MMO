@@ -17,6 +17,9 @@ namespace MultiplayerARPG.MMO
                 result.type = (SkillUsageType)reader.GetSByte("type");
                 result.dataId = reader.GetInt32("dataId");
                 result.coolDownRemainsDuration = reader.GetFloat("coolDownRemainsDuration");
+                result.isSummoned = reader.GetBoolean("isSummoned");
+                result.currentSummonedHp = reader.GetInt32("currentSummonedHp");
+                result.currentSummonedMp = reader.GetInt32("currentSummonedMp");
                 return true;
             }
             result = CharacterSkillUsage.Empty;
@@ -25,12 +28,15 @@ namespace MultiplayerARPG.MMO
 
         public void CreateCharacterSkillUsage(string characterId, CharacterSkillUsage characterSkillUsage)
         {
-            ExecuteNonQuery("INSERT INTO characterskillusage (id, characterId, type, dataId, coolDownRemainsDuration) VALUES (@id, @characterId, @type, @dataId, @coolDownRemainsDuration)",
+            ExecuteNonQuery("INSERT INTO characterskillusage (id, characterId, type, dataId, coolDownRemainsDuration, isSummoned, currentSummonedHp, currentSummonedMp) VALUES (@id, @characterId, @type, @dataId, @coolDownRemainsDuration, @isSummoned, @currentSummonedHp, @currentSummonedMp)",
                 new SqliteParameter("@id", characterId + "_" + characterSkillUsage.type + "_" + characterSkillUsage.dataId),
                 new SqliteParameter("@characterId", characterId),
                 new SqliteParameter("@type", (byte)characterSkillUsage.type),
                 new SqliteParameter("@dataId", characterSkillUsage.dataId),
-                new SqliteParameter("@coolDownRemainsDuration", characterSkillUsage.coolDownRemainsDuration));
+                new SqliteParameter("@coolDownRemainsDuration", characterSkillUsage.coolDownRemainsDuration),
+                new SqliteParameter("@isSummoned", characterSkillUsage.isSummoned),
+                new SqliteParameter("@currentSummonedHp", characterSkillUsage.currentSummonedHp),
+                new SqliteParameter("@currentSummonedMp", characterSkillUsage.currentSummonedMp));
         }
 
         public List<CharacterSkillUsage> ReadCharacterSkillUsages(string characterId)

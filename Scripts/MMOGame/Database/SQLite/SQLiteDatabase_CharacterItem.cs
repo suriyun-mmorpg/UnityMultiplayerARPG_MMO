@@ -9,7 +9,7 @@ namespace MultiplayerARPG.MMO
     {
         private void CreateCharacterItem(int idx, string characterId, InventoryType inventoryType, CharacterItem characterItem)
         {
-            ExecuteNonQuery("INSERT INTO characteritem (id, idx, inventoryType, characterId, dataId, level, amount, durability) VALUES (@id, @idx, @inventoryType, @characterId, @dataId, @level, @amount, @durability)",
+            ExecuteNonQuery("INSERT INTO characteritem (id, idx, inventoryType, characterId, dataId, level, amount, durability, isSummoned, currentSummonedHp, currentSummonedMp, currentSummonedExp) VALUES (@id, @idx, @inventoryType, @characterId, @dataId, @level, @amount, @durability, @isSummoned, @currentSummonedHp, @currentSummonedMp, @currentSummonedExp)",
                 new SqliteParameter("@id", characterId + "_" + (byte)inventoryType + "_" + idx),
                 new SqliteParameter("@idx", idx),
                 new SqliteParameter("@inventoryType", (byte)inventoryType),
@@ -17,7 +17,11 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@dataId", characterItem.dataId),
                 new SqliteParameter("@level", characterItem.level),
                 new SqliteParameter("@amount", characterItem.amount),
-                new SqliteParameter("@durability", characterItem.durability));
+                new SqliteParameter("@durability", characterItem.durability),
+                new SqliteParameter("@isSummoned", characterItem.isSummoned),
+                new SqliteParameter("@currentSummonedHp", characterItem.currentSummonedHp),
+                new SqliteParameter("@currentSummonedMp", characterItem.currentSummonedMp),
+                new SqliteParameter("@currentSummonedExp", characterItem.currentSummonedExp));
         }
 
         private bool ReadCharacterItem(SQLiteRowsReader reader, out CharacterItem result, bool resetReader = true)
@@ -32,6 +36,10 @@ namespace MultiplayerARPG.MMO
                 result.level = reader.GetInt16("level");
                 result.amount = reader.GetInt16("amount");
                 result.durability = reader.GetFloat("durability");
+                result.isSummoned = reader.GetBoolean("isSummoned");
+                result.currentSummonedHp = reader.GetInt32("currentSummonedHp");
+                result.currentSummonedMp = reader.GetInt32("currentSummonedMp");
+                result.currentSummonedExp = reader.GetInt32("currentSummonedExp");
                 return true;
             }
             result = CharacterItem.Empty;
