@@ -211,6 +211,12 @@ namespace MultiplayerARPG.MMO
               shareExpPercentage INTEGER NOT NULL
             )");
 
+            ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS guildskill (
+              guildId INTEGER NOT NULL,
+              dataId INTEGER NOT NULL,
+              level INTEGER NOT NULL
+            )");
+
             ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS party (
               id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
               shareExp INTEGER NOT NULL,
@@ -223,18 +229,45 @@ namespace MultiplayerARPG.MMO
             // Update data
             if (!IsColumnExist("characteritem", "durability"))
                 ExecuteNonQuery("ALTER TABLE characteritem ADD durability REAL NOT NULL DEFAULT 0;");
+
             if (!IsColumnExist("userlogin", "cash"))
                 ExecuteNonQuery("ALTER TABLE userlogin ADD cash INTEGER NOT NULL DEFAULT 0;");
+
             if (!IsColumnExist("characters", "partyId"))
                 ExecuteNonQuery("ALTER TABLE characters ADD partyId INTEGER NOT NULL DEFAULT 0;");
+
             if (!IsColumnExist("characters", "guildId"))
                 ExecuteNonQuery("ALTER TABLE characters ADD guildId INTEGER NOT NULL DEFAULT 0;");
+
             if (!IsColumnExist("characters", "guildRole"))
                 ExecuteNonQuery("ALTER TABLE characters ADD guildRole INTEGER NOT NULL DEFAULT 0;");
+
             if (!IsColumnExist("characters", "sharedGuildExp"))
                 ExecuteNonQuery("ALTER TABLE characters ADD sharedGuildExp INTEGER NOT NULL DEFAULT 0;");
+
             if (!IsColumnExist("characters", "entityId"))
                 ExecuteNonQuery("ALTER TABLE characters ADD entityId INTEGER NOT NULL DEFAULT 0;");
+
+            if (!IsColumnExist("characteritem", "isSummoned"))
+                ExecuteNonQuery("ALTER TABLE characteritem ADD isSummoned INTEGER NOT NULL DEFAULT 0;");
+
+            if (!IsColumnExist("characteritem", "currentSummonedHp"))
+                ExecuteNonQuery("ALTER TABLE characteritem ADD currentSummonedHp INTEGER NOT NULL DEFAULT 0;");
+
+            if (!IsColumnExist("characteritem", "currentSummonedMp"))
+                ExecuteNonQuery("ALTER TABLE characteritem ADD currentSummonedMp INTEGER NOT NULL DEFAULT 0;");
+
+            if (!IsColumnExist("characteritem", "currentSummonedExp"))
+                ExecuteNonQuery("ALTER TABLE characteritem ADD currentSummonedExp INTEGER NOT NULL DEFAULT 0;");
+
+            if (!IsColumnExist("characterskillusage", "isSummoned"))
+                ExecuteNonQuery("ALTER TABLE characterskillusage ADD isSummoned INTEGER NOT NULL DEFAULT 0;");
+
+            if (!IsColumnExist("characterskillusage", "currentSummonedHp"))
+                ExecuteNonQuery("ALTER TABLE characterskillusage ADD currentSummonedHp INTEGER NOT NULL DEFAULT 0;");
+
+            if (!IsColumnExist("characterskillusage", "currentSummonedMp"))
+                ExecuteNonQuery("ALTER TABLE characterskillusage ADD currentSummonedMp INTEGER NOT NULL DEFAULT 0;");
 
             this.InvokeInstanceDevExtMethods("Init");
         }
