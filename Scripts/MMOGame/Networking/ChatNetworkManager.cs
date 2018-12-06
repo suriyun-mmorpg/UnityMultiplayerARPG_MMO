@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 using LiteNetLibManager;
-using System;
 using LiteNetLib;
 
 namespace MultiplayerARPG.MMO
 {
-    public class ChatNetworkManager : LiteNetLibManager.LiteNetLibManager, IAppServer
+    public partial class ChatNetworkManager : LiteNetLibManager.LiteNetLibManager, IAppServer
     {
         [Header("Central Network Connection")]
         public string centralConnectKey = "SampleConnectKey";

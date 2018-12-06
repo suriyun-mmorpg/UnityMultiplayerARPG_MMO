@@ -10,7 +10,7 @@ using System.Threading;
 
 namespace MultiplayerARPG.MMO
 {
-    public class MapSpawnNetworkManager : LiteNetLibManager.LiteNetLibManager, IAppServer
+    public partial class MapSpawnNetworkManager : LiteNetLibManager.LiteNetLibManager, IAppServer
     {
         [Header("Central Network Connection")]
         public string centralConnectKey = "SampleConnectKey";
