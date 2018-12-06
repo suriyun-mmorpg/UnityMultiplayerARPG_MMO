@@ -91,16 +91,9 @@ namespace MultiplayerARPG.MMO
         public string AppExtra { get { return string.Empty; } }
         public CentralServerPeerType PeerType { get { return CentralServerPeerType.MapSpawnServer; } }
 
-        public override void OnStartServer()
-        {
-            CentralAppServerRegister.OnStartServer();
-            spawningPort = startPort;
-            portCounter = startPort;
-            base.OnStartServer();
-        }
-
         protected virtual void Clean()
         {
+            this.InvokeInstanceDevExtMethods("Clean");
             spawningPort = -1;
             portCounter = -1;
             freePorts.Clear();
@@ -112,6 +105,15 @@ namespace MultiplayerARPG.MMO
             }
             processes.Clear();
             restartingScenes.Clear();
+        }
+
+        public override void OnStartServer()
+        {
+            this.InvokeInstanceDevExtMethods("OnStartServer");
+            CentralAppServerRegister.OnStartServer();
+            spawningPort = startPort;
+            portCounter = startPort;
+            base.OnStartServer();
         }
 
         public override void OnStopServer()

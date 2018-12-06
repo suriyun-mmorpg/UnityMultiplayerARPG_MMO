@@ -42,6 +42,7 @@ namespace MultiplayerARPG.MMO
 
         protected override void RegisterClientMessages()
         {
+            this.InvokeInstanceDevExtMethods("RegisterClientMessages");
             base.RegisterClientMessages();
             RegisterClientMessage(MMOMessageTypes.Chat, HandleChatAtClient);
             RegisterClientMessage(MMOMessageTypes.UpdateMapUser, HandleUpdateMapUserAtClient);
@@ -53,6 +54,7 @@ namespace MultiplayerARPG.MMO
 
         protected override void RegisterServerMessages()
         {
+            this.InvokeInstanceDevExtMethods("RegisterServerMessages");
             base.RegisterServerMessages();
             RegisterServerMessage(MMOMessageTypes.Chat, HandleChatAtServer);
             RegisterServerMessage(MMOMessageTypes.UpdateMapUser, HandleUpdateMapUserAtServer);
@@ -64,6 +66,7 @@ namespace MultiplayerARPG.MMO
 
         protected virtual void Clean()
         {
+            this.InvokeInstanceDevExtMethods("Clean");
             mapNetworkManager = null;
             mapServerConnectionIds.Clear();
             mapUsersById.Clear();
@@ -80,6 +83,7 @@ namespace MultiplayerARPG.MMO
 
         public override void OnStartServer()
         {
+            this.InvokeInstanceDevExtMethods("OnStartServer");
             CentralAppServerRegister.OnStartServer();
             base.OnStartServer();
         }

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using LiteNetLib;
+using LiteNetLibManager;
 
 namespace MultiplayerARPG.MMO
 {
@@ -29,11 +30,28 @@ namespace MultiplayerARPG.MMO
         {
             get { return MMOServerInstance.Singleton.Database; }
         }
-        
+
         // This server will collect servers data
         // All Map servers addresses, Login server address, Chat server address, Database server configs
+        protected override void RegisterClientMessages()
+        {
+            this.InvokeInstanceDevExtMethods("RegisterClientMessages");
+            base.RegisterClientMessages();
+            RegisterClientMessage(MMOMessageTypes.ResponseAppServerRegister, HandleResponseAppServerRegister);
+            RegisterClientMessage(MMOMessageTypes.ResponseAppServerAddress, HandleResponseAppServerAddress);
+            RegisterClientMessage(MMOMessageTypes.ResponseUserLogin, HandleResponseUserLogin);
+            RegisterClientMessage(MMOMessageTypes.ResponseUserRegister, HandleResponseUserRegister);
+            RegisterClientMessage(MMOMessageTypes.ResponseUserLogout, HandleResponseUserLogout);
+            RegisterClientMessage(MMOMessageTypes.ResponseCharacters, HandleResponseCharacters);
+            RegisterClientMessage(MMOMessageTypes.ResponseCreateCharacter, HandleResponseCreateCharacter);
+            RegisterClientMessage(MMOMessageTypes.ResponseDeleteCharacter, HandleResponseDeleteCharacter);
+            RegisterClientMessage(MMOMessageTypes.ResponseSelectCharacter, HandleResponseSelectCharacter);
+            RegisterClientMessage(MMOMessageTypes.ResponseValidateAccessToken, HandleResponseValidateAccessToken);
+        }
+
         protected override void RegisterServerMessages()
         {
+            this.InvokeInstanceDevExtMethods("RegisterServerMessages");
             base.RegisterServerMessages();
             RegisterServerMessage(MMOMessageTypes.RequestAppServerRegister, HandleRequestAppServerRegister);
             RegisterServerMessage(MMOMessageTypes.RequestAppServerAddress, HandleRequestAppServerAddress);
@@ -51,19 +69,36 @@ namespace MultiplayerARPG.MMO
             RegisterServerMessage(MMOMessageTypes.RequestGooglePlayLogin, HandleRequestGooglePlayLogin);
         }
 
-        protected override void RegisterClientMessages()
+        protected virtual void Clean()
         {
-            base.RegisterClientMessages();
-            RegisterClientMessage(MMOMessageTypes.ResponseAppServerRegister, HandleResponseAppServerRegister);
-            RegisterClientMessage(MMOMessageTypes.ResponseAppServerAddress, HandleResponseAppServerAddress);
-            RegisterClientMessage(MMOMessageTypes.ResponseUserLogin, HandleResponseUserLogin);
-            RegisterClientMessage(MMOMessageTypes.ResponseUserRegister, HandleResponseUserRegister);
-            RegisterClientMessage(MMOMessageTypes.ResponseUserLogout, HandleResponseUserLogout);
-            RegisterClientMessage(MMOMessageTypes.ResponseCharacters, HandleResponseCharacters);
-            RegisterClientMessage(MMOMessageTypes.ResponseCreateCharacter, HandleResponseCreateCharacter);
-            RegisterClientMessage(MMOMessageTypes.ResponseDeleteCharacter, HandleResponseDeleteCharacter);
-            RegisterClientMessage(MMOMessageTypes.ResponseSelectCharacter, HandleResponseSelectCharacter);
-            RegisterClientMessage(MMOMessageTypes.ResponseValidateAccessToken, HandleResponseValidateAccessToken);
+            this.InvokeInstanceDevExtMethods("Clean");
+            mapSpawnServerPeers.Clear();
+            spawningMapAcks.Clear();
+            mapServerPeers.Clear();
+            mapServerPeersBySceneName.Clear();
+            chatServerPeers.Clear();
+            userPeers.Clear();
+            userPeersByUserId.Clear();
+            mapUserIds.Clear();
+        }
+
+        public override void OnStartServer()
+        {
+            this.InvokeInstanceDevExtMethods("OnStartServer");
+            base.OnStartServer();
+        }
+
+        public override void OnStopServer()
+        {
+            Clean();
+            base.OnStopServer();
+        }
+
+        public override void OnStopClient()
+        {
+            if (!IsServer)
+                Clean();
+            base.OnStopClient();
         }
 
         public override void OnPeerDisconnected(long connectionId, DisconnectInfo disconnectInfo)
@@ -97,31 +132,6 @@ namespace MultiplayerARPG.MMO
             base.OnClientDisconnected(disconnectInfo);
             if (onClientDisconnected != null)
                 onClientDisconnected.Invoke(disconnectInfo);
-        }
-
-        protected virtual void Clean()
-        {
-            mapSpawnServerPeers.Clear();
-            spawningMapAcks.Clear();
-            mapServerPeers.Clear();
-            mapServerPeersBySceneName.Clear();
-            chatServerPeers.Clear();
-            userPeers.Clear();
-            userPeersByUserId.Clear();
-            mapUserIds.Clear();
-        }
-
-        public override void OnStartServer()
-        {
-            Clean();
-            base.OnStartServer();
-        }
-
-        public override void OnStopServer()
-        {
-            if (!IsServer)
-                Clean();
-            base.OnStopServer();
         }
 
         public bool MapContainsUser(string userId)
