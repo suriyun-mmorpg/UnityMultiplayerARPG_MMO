@@ -354,7 +354,7 @@ namespace MultiplayerARPG.MMO
             updateMapUserMessage.data = userData;
             ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MMOMessageTypes.UpdateMapUser, updateMapUserMessage);
         }
-
+        
         private void HandleGMCommand(string sender, string command)
         {
             if (string.IsNullOrEmpty(command))
@@ -378,10 +378,6 @@ namespace MultiplayerARPG.MMO
                         message.channel = ChatChannel.Global;
                         message.message = command;
                         ServerSendPacket(receiverConnectionId, SendOptions.ReliableOrdered, MMOMessageTypes.Chat, message);
-                    }
-                    else
-                    {
-                        // Add item / gold to offline characters
                     }
                 }
                 else
