@@ -211,6 +211,11 @@ namespace MultiplayerARPG.MMO
             switch (message.channel)
             {
                 case ChatChannel.Global:
+                    if (GMCommands.IsGMCommand(message.message))
+                        HandleGMCommand(message.sender, message.message);
+                    else
+                        ServerSendPacketToAllConnections(SendOptions.ReliableOrdered, MMOMessageTypes.Chat, message);
+                    break;
                 case ChatChannel.Party:
                 case ChatChannel.Guild:
                     // Send message to all map servers, let's map servers filter messages
@@ -350,7 +355,7 @@ namespace MultiplayerARPG.MMO
             ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MMOMessageTypes.UpdateMapUser, updateMapUserMessage);
         }
 
-        private void HandleGMCommand(string command)
+        private void HandleGMCommand(string sender, string command)
         {
             if (string.IsNullOrEmpty(command))
                 return;
@@ -359,10 +364,12 @@ namespace MultiplayerARPG.MMO
             var commandKey = splited[0];
             if (GMCommands.IsSplitedLengthValid(commandKey, splited.Length))
             {
-                if (commandKey.Equals(GMCommands.GiveGold) || commandKey.Equals(GMCommands.GiveItem))
+                string receiver;
+                long receiverConnectionId;
+                if (commandKey.Equals(GMCommands.GiveGold) || 
+                    commandKey.Equals(GMCommands.GiveItem))
                 {
-                    var receiver = splited[1];
-                    long receiverConnectionId = 0;
+                    receiver = splited[1];
                     // Send message to map server which have the character
                     if (!string.IsNullOrEmpty(receiver) &&
                         connectionIdsByCharacterName.TryGetValue(receiver, out receiverConnectionId))
@@ -375,6 +382,19 @@ namespace MultiplayerARPG.MMO
                     else
                     {
                         // Add item / gold to offline characters
+                    }
+                }
+                else
+                {
+                    receiver = sender;
+                    // Send message to map server which have the character
+                    if (!string.IsNullOrEmpty(receiver) &&
+                        connectionIdsByCharacterName.TryGetValue(receiver, out receiverConnectionId))
+                    {
+                        var message = new ChatMessage();
+                        message.channel = ChatChannel.Global;
+                        message.message = command;
+                        ServerSendPacket(receiverConnectionId, SendOptions.ReliableOrdered, MMOMessageTypes.Chat, message);
                     }
                 }
             }
