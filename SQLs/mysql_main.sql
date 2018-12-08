@@ -103,10 +103,6 @@ CREATE TABLE `characteritem` (
   `level` int(11) NOT NULL DEFAULT '1',
   `amount` int(11) NOT NULL DEFAULT '0',
   `durability` float NOT NULL DEFAULT '0',
-  `isSummoned` tinyint(1) NOT NULL DEFAULT '0',
-  `currentSummonedHp` int(11) NOT NULL DEFAULT '0',
-  `currentSummonedMp` int(11) NOT NULL DEFAULT '0',
-  `currentSummonedExp` int(11) NOT NULL DEFAULT '0',
   `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -195,9 +191,6 @@ CREATE TABLE `characterskillusage` (
   `dataId` int(11) NOT NULL DEFAULT '0',
   `level` int(11) NOT NULL DEFAULT '1',
   `coolDownRemainsDuration` float NOT NULL DEFAULT '0',
-  `isSummoned` tinyint(1) NOT NULL DEFAULT '0',
-  `currentSummonedHp` int(11) NOT NULL DEFAULT '0',
-  `currentSummonedMp` int(11) NOT NULL DEFAULT '0',
   `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;

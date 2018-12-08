@@ -17,9 +17,6 @@ namespace MultiplayerARPG.MMO
                 result.type = (SkillUsageType)reader.GetSByte("type");
                 result.dataId = reader.GetInt32("dataId");
                 result.coolDownRemainsDuration = reader.GetFloat("coolDownRemainsDuration");
-                result.isSummoned = reader.GetBoolean("isSummoned");
-                result.currentSummonedHp = reader.GetInt32("currentSummonedHp");
-                result.currentSummonedMp = reader.GetInt32("currentSummonedMp");
                 return true;
             }
             result = CharacterSkillUsage.Empty;
@@ -33,10 +30,7 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@characterId", characterId),
                 new SqliteParameter("@type", (byte)characterSkillUsage.type),
                 new SqliteParameter("@dataId", characterSkillUsage.dataId),
-                new SqliteParameter("@coolDownRemainsDuration", characterSkillUsage.coolDownRemainsDuration),
-                new SqliteParameter("@isSummoned", characterSkillUsage.isSummoned),
-                new SqliteParameter("@currentSummonedHp", characterSkillUsage.currentSummonedHp),
-                new SqliteParameter("@currentSummonedMp", characterSkillUsage.currentSummonedMp));
+                new SqliteParameter("@coolDownRemainsDuration", characterSkillUsage.coolDownRemainsDuration));
         }
 
         public List<CharacterSkillUsage> ReadCharacterSkillUsages(string characterId)

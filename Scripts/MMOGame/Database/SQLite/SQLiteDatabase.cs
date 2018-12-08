@@ -248,27 +248,6 @@ namespace MultiplayerARPG.MMO
             if (!IsColumnExist("characters", "entityId"))
                 ExecuteNonQuery("ALTER TABLE characters ADD entityId INTEGER NOT NULL DEFAULT 0;");
 
-            if (!IsColumnExist("characteritem", "isSummoned"))
-                ExecuteNonQuery("ALTER TABLE characteritem ADD isSummoned INTEGER NOT NULL DEFAULT 0;");
-
-            if (!IsColumnExist("characteritem", "currentSummonedHp"))
-                ExecuteNonQuery("ALTER TABLE characteritem ADD currentSummonedHp INTEGER NOT NULL DEFAULT 0;");
-
-            if (!IsColumnExist("characteritem", "currentSummonedMp"))
-                ExecuteNonQuery("ALTER TABLE characteritem ADD currentSummonedMp INTEGER NOT NULL DEFAULT 0;");
-
-            if (!IsColumnExist("characteritem", "currentSummonedExp"))
-                ExecuteNonQuery("ALTER TABLE characteritem ADD currentSummonedExp INTEGER NOT NULL DEFAULT 0;");
-
-            if (!IsColumnExist("characterskillusage", "isSummoned"))
-                ExecuteNonQuery("ALTER TABLE characterskillusage ADD isSummoned INTEGER NOT NULL DEFAULT 0;");
-
-            if (!IsColumnExist("characterskillusage", "currentSummonedHp"))
-                ExecuteNonQuery("ALTER TABLE characterskillusage ADD currentSummonedHp INTEGER NOT NULL DEFAULT 0;");
-
-            if (!IsColumnExist("characterskillusage", "currentSummonedMp"))
-                ExecuteNonQuery("ALTER TABLE characterskillusage ADD currentSummonedMp INTEGER NOT NULL DEFAULT 0;");
-
             this.InvokeInstanceDevExtMethods("Init");
         }
 

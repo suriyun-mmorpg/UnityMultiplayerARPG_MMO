@@ -15,11 +15,7 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@dataId", characterItem.dataId),
                 new MySqlParameter("@level", characterItem.level),
                 new MySqlParameter("@amount", characterItem.amount),
-                new MySqlParameter("@durability", characterItem.durability),
-                new MySqlParameter("@isSummoned", characterItem.isSummoned),
-                new MySqlParameter("@currentSummonedHp", characterItem.currentSummonedHp),
-                new MySqlParameter("@currentSummonedMp", characterItem.currentSummonedMp),
-                new MySqlParameter("@currentSummonedExp", characterItem.currentSummonedExp));
+                new MySqlParameter("@durability", characterItem.durability));
         }
 
         private bool ReadCharacterItem(MySQLRowsReader reader, out CharacterItem result, bool resetReader = true)
@@ -34,10 +30,6 @@ namespace MultiplayerARPG.MMO
                 result.level = (short)reader.GetInt32("level");
                 result.amount = (short)reader.GetInt32("amount");
                 result.durability = reader.GetFloat("durability");
-                result.isSummoned = reader.GetBoolean("isSummoned");
-                result.currentSummonedHp = reader.GetInt32("currentSummonedHp");
-                result.currentSummonedMp = reader.GetInt32("currentSummonedMp");
-                result.currentSummonedExp = reader.GetInt32("currentSummonedExp");
                 return true;
             }
             result = CharacterItem.Empty;

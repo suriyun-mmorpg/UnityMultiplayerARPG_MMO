@@ -17,11 +17,7 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@dataId", characterItem.dataId),
                 new SqliteParameter("@level", characterItem.level),
                 new SqliteParameter("@amount", characterItem.amount),
-                new SqliteParameter("@durability", characterItem.durability),
-                new SqliteParameter("@isSummoned", characterItem.isSummoned),
-                new SqliteParameter("@currentSummonedHp", characterItem.currentSummonedHp),
-                new SqliteParameter("@currentSummonedMp", characterItem.currentSummonedMp),
-                new SqliteParameter("@currentSummonedExp", characterItem.currentSummonedExp));
+                new SqliteParameter("@durability", characterItem.durability));
         }
 
         private bool ReadCharacterItem(SQLiteRowsReader reader, out CharacterItem result, bool resetReader = true)
@@ -36,10 +32,6 @@ namespace MultiplayerARPG.MMO
                 result.level = reader.GetInt16("level");
                 result.amount = reader.GetInt16("amount");
                 result.durability = reader.GetFloat("durability");
-                result.isSummoned = reader.GetBoolean("isSummoned");
-                result.currentSummonedHp = reader.GetInt32("currentSummonedHp");
-                result.currentSummonedMp = reader.GetInt32("currentSummonedMp");
-                result.currentSummonedExp = reader.GetInt32("currentSummonedExp");
                 return true;
             }
             result = CharacterItem.Empty;
