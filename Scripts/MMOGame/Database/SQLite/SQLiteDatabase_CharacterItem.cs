@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using System.Collections.Generic;
 using Mono.Data.Sqlite;
 
 namespace MultiplayerARPG.MMO
@@ -9,7 +7,7 @@ namespace MultiplayerARPG.MMO
     {
         private void CreateCharacterItem(int idx, string characterId, InventoryType inventoryType, CharacterItem characterItem)
         {
-            ExecuteNonQuery("INSERT INTO characteritem (id, idx, inventoryType, characterId, dataId, level, amount, durability) VALUES (@id, @idx, @inventoryType, @characterId, @dataId, @level, @amount, @durability)",
+            ExecuteNonQuery("INSERT INTO characteritem (id, idx, inventoryType, characterId, dataId, level, amount, durability, exp, lockRemainsDuration) VALUES (@id, @idx, @inventoryType, @characterId, @dataId, @level, @amount, @durability, @exp, @lockRemainsDuration)",
                 new SqliteParameter("@id", characterId + "_" + (byte)inventoryType + "_" + idx),
                 new SqliteParameter("@idx", idx),
                 new SqliteParameter("@inventoryType", (byte)inventoryType),
@@ -17,7 +15,9 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@dataId", characterItem.dataId),
                 new SqliteParameter("@level", characterItem.level),
                 new SqliteParameter("@amount", characterItem.amount),
-                new SqliteParameter("@durability", characterItem.durability));
+                new SqliteParameter("@durability", characterItem.durability),
+                new SqliteParameter("@exp", characterItem.exp),
+                new SqliteParameter("@lockRemainsDuration", characterItem.lockRemainsDuration));
         }
 
         private bool ReadCharacterItem(SQLiteRowsReader reader, out CharacterItem result, bool resetReader = true)
@@ -32,6 +32,8 @@ namespace MultiplayerARPG.MMO
                 result.level = reader.GetInt16("level");
                 result.amount = reader.GetInt16("amount");
                 result.durability = reader.GetFloat("durability");
+                result.exp = reader.GetInt32("exp");
+                result.lockRemainsDuration = reader.GetFloat("lockRemainsDuration");
                 return true;
             }
             result = CharacterItem.Empty;

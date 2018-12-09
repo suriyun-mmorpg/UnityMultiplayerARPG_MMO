@@ -94,6 +94,8 @@ namespace MultiplayerARPG.MMO
               level INTEGER NOT NULL,
               amount INTEGER NOT NULL,
               durability REAL NOT NULL DEFAULT 0,
+              exp INTEGER NOT NULL DEFAULT 0,
+              lockRemainsDuration REAL NOT NULL DEFAULT 0,
               createAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
               updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
@@ -158,6 +160,20 @@ namespace MultiplayerARPG.MMO
               type INTEGER NOT NULL DEFAULT 0,
               dataId INTEGER NOT NULL DEFAULT 0,
               coolDownRemainsDuration REAL NOT NULL DEFAULT 0,
+              createAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+              updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+            )");
+
+            ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS charactersummon (
+              id TEXT NOT NULL PRIMARY KEY,
+              characterId TEXT NOT NULL,
+              type INTEGER NOT NULL DEFAULT 0,
+              dataId INTEGER NOT NULL DEFAULT 0,
+              summonRemainsDuration REAL NOT NULL DEFAULT 0,
+              level INTEGER NOT NULL DEFAULT 0,
+              exp INTEGER NOT NULL DEFAULT 0,
+              currentHp INTEGER NOT NULL DEFAULT 0,
+              currentMp INTEGER NOT NULL DEFAULT 0,
               createAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
               updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
@@ -229,6 +245,12 @@ namespace MultiplayerARPG.MMO
             // Update data
             if (!IsColumnExist("characteritem", "durability"))
                 ExecuteNonQuery("ALTER TABLE characteritem ADD durability REAL NOT NULL DEFAULT 0;");
+
+            if (!IsColumnExist("characteritem", "exp"))
+                ExecuteNonQuery("ALTER TABLE characteritem ADD exp INTEGER NOT NULL DEFAULT 0;");
+
+            if (!IsColumnExist("characteritem", "lockRemainsDuration"))
+                ExecuteNonQuery("ALTER TABLE characteritem ADD lockRemainsDuration REAL NOT NULL DEFAULT 0;");
 
             if (!IsColumnExist("userlogin", "cash"))
                 ExecuteNonQuery("ALTER TABLE userlogin ADD cash INTEGER NOT NULL DEFAULT 0;");
