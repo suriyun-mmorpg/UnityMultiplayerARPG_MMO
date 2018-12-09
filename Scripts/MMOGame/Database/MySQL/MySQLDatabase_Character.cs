@@ -185,6 +185,30 @@ namespace MultiplayerARPG.MMO
             connection.Close();
         }
 
+        private void FillCharacterSummons(IPlayerCharacterData characterData)
+        {
+            var connection = NewConnection();
+            connection.Open();
+            var transaction = connection.BeginTransaction();
+            try
+            {
+                DeleteCharacterSummons(connection, transaction, characterData.Id);
+                foreach (var skillUsage in characterData.Summons)
+                {
+                    CreateCharacterSummon(connection, transaction, characterData.Id, skillUsage);
+                }
+                transaction.Commit();
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogError("Transaction, Error occurs while replacing skill usages of character: " + characterData.Id);
+                Debug.LogException(ex);
+                transaction.Rollback();
+            }
+            transaction.Dispose();
+            connection.Close();
+        }
+
         private void FillCharacterRelatesData(IPlayerCharacterData characterData)
         {
             FillCharacterAttributes(characterData);
@@ -194,6 +218,7 @@ namespace MultiplayerARPG.MMO
             FillCharacterQuests(characterData);
             FillCharacterSkills(characterData);
             FillCharacterSkillUsages(characterData);
+            FillCharacterSummons(characterData);
         }
 
         public override void CreateCharacter(string userId, IPlayerCharacterData characterData)
@@ -275,6 +300,7 @@ namespace MultiplayerARPG.MMO
             bool withBuffs = true,
             bool withEquipItems = true,
             bool withNonEquipItems = true,
+            bool withSummons = true,
             bool withHotkeys = true,
             bool withQuests = true)
         {
@@ -294,6 +320,7 @@ namespace MultiplayerARPG.MMO
                     withBuffs,
                     withEquipItems,
                     withNonEquipItems,
+                    withSummons,
                     withHotkeys,
                     withQuests);
                 if (withEquipWeapons)
@@ -310,6 +337,8 @@ namespace MultiplayerARPG.MMO
                     result.EquipItems = ReadCharacterEquipItems(id);
                 if (withNonEquipItems)
                     result.NonEquipItems = ReadCharacterNonEquipItems(id);
+                if (withSummons)
+                    result.Summons = ReadCharacterSummons(id);
                 if (withHotkeys)
                     result.Hotkeys = ReadCharacterHotkeys(id);
                 if (withQuests)
@@ -326,7 +355,7 @@ namespace MultiplayerARPG.MMO
             while (reader.Read())
             {
                 var characterId = reader.GetString("id");
-                result.Add(ReadCharacter(userId, characterId, true, true, true, false, false, true, false, false, false));
+                result.Add(ReadCharacter(userId, characterId, true, true, true, false, false, true, false, false, false, false));
             }
             return result;
         }

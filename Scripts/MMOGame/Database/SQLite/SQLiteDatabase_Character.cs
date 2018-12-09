@@ -18,6 +18,7 @@ namespace MultiplayerARPG.MMO
             DeleteCharacterQuests(characterId);
             DeleteCharacterSkills(characterId);
             DeleteCharacterSkillUsages(characterId);
+            DeleteCharacterSummons(characterId);
             
             CreateCharacterEquipWeapons(characterId, characterData.EquipWeapons);
             var i = 0;
@@ -43,6 +44,10 @@ namespace MultiplayerARPG.MMO
             foreach (var skillUsage in characterData.SkillUsages)
             {
                 CreateCharacterSkillUsage(characterId, skillUsage);
+            }
+            foreach (var summon in characterData.Summons)
+            {
+                CreateCharacterSummon(characterId, summon);
             }
             i = 0;
             foreach (var quest in characterData.Quests)
@@ -140,6 +145,7 @@ namespace MultiplayerARPG.MMO
             bool withBuffs = true,
             bool withEquipItems = true,
             bool withNonEquipItems = true,
+            bool withSummons = true,
             bool withHotkeys = true,
             bool withQuests = true)
         {
@@ -159,6 +165,7 @@ namespace MultiplayerARPG.MMO
                     withBuffs,
                     withEquipItems,
                     withNonEquipItems,
+                    withSummons,
                     withHotkeys,
                     withQuests);
                 if (withEquipWeapons)
@@ -175,6 +182,8 @@ namespace MultiplayerARPG.MMO
                     result.EquipItems = ReadCharacterEquipItems(id);
                 if (withNonEquipItems)
                     result.NonEquipItems = ReadCharacterNonEquipItems(id);
+                if (withSummons)
+                    result.Summons = ReadCharacterSummons(id);
                 if (withHotkeys)
                     result.Hotkeys = ReadCharacterHotkeys(id);
                 if (withQuests)
@@ -191,7 +200,7 @@ namespace MultiplayerARPG.MMO
             while (reader.Read())
             {
                 var characterId = reader.GetString("id");
-                result.Add(ReadCharacter(userId, characterId, true, true, true, false, false, true, false, false, false));
+                result.Add(ReadCharacter(userId, characterId, true, true, true, false, false, true, false, false, false, false));
             }
             return result;
         }

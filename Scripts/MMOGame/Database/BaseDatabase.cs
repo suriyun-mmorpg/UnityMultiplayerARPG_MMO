@@ -35,6 +35,7 @@ namespace MultiplayerARPG.MMO
             bool withBuffs = true,
             bool withEquipItems = true,
             bool withNonEquipItems = true,
+            bool withSummons = true,
             bool withHotkeys = true,
             bool withQuests = true);
         public abstract List<PlayerCharacterData> ReadCharacters(string userId);

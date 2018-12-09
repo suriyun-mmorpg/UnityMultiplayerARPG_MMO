@@ -25,7 +25,7 @@ namespace MultiplayerARPG.MMO
 
         public void CreateCharacterSkillUsage(string characterId, CharacterSkillUsage characterSkillUsage)
         {
-            ExecuteNonQuery("INSERT INTO characterskillusage (id, characterId, type, dataId, coolDownRemainsDuration, isSummoned, currentSummonedHp, currentSummonedMp) VALUES (@id, @characterId, @type, @dataId, @coolDownRemainsDuration, @isSummoned, @currentSummonedHp, @currentSummonedMp)",
+            ExecuteNonQuery("INSERT INTO characterskillusage (id, characterId, type, dataId, coolDownRemainsDuration) VALUES (@id, @characterId, @type, @dataId, @coolDownRemainsDuration)",
                 new SqliteParameter("@id", characterId + "_" + characterSkillUsage.type + "_" + characterSkillUsage.dataId),
                 new SqliteParameter("@characterId", characterId),
                 new SqliteParameter("@type", (byte)characterSkillUsage.type),
