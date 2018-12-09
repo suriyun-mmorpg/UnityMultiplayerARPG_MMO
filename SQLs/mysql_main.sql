@@ -3,6 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
+-- Generation Time: Dec 09, 2018 at 11:50 PM
 -- Server version: 10.1.28-MariaDB
 -- PHP Version: 7.1.11
 
@@ -103,6 +104,8 @@ CREATE TABLE `characteritem` (
   `level` int(11) NOT NULL DEFAULT '1',
   `amount` int(11) NOT NULL DEFAULT '0',
   `durability` float NOT NULL DEFAULT '0',
+  `exp` int(11) NOT NULL DEFAULT '0',
+  `lockRemainsDuration` float NOT NULL DEFAULT '0',
   `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -198,6 +201,26 @@ CREATE TABLE `characterskillusage` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `charactersummon`
+--
+
+CREATE TABLE `charactersummon` (
+  `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `characterId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `type` tinyint(4) NOT NULL DEFAULT '0',
+  `dataId` int(11) NOT NULL DEFAULT '0',
+  `summonRemainsDuration` float NOT NULL DEFAULT '0',
+  `level` int(11) NOT NULL DEFAULT '0',
+  `exp` int(11) NOT NULL DEFAULT '0',
+  `currentHp` int(11) NOT NULL DEFAULT '0',
+  `currentMp` int(11) NOT NULL DEFAULT '0',
+  `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `guild`
 --
 
@@ -229,7 +252,7 @@ CREATE TABLE `guildrole` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `guildrole`
+-- Table structure for table `guildskill`
 --
 
 CREATE TABLE `guildskill` (
@@ -326,6 +349,12 @@ ALTER TABLE `characterskill`
 -- Indexes for table `characterskillusage`
 --
 ALTER TABLE `characterskillusage`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `charactersummon`
+--
+ALTER TABLE `charactersummon`
   ADD PRIMARY KEY (`id`);
 
 --
