@@ -294,7 +294,7 @@ namespace MultiplayerARPG.MMO
                 }
                 else
                 {
-                    BasePlayerCharacterEntity entityPrefab = playerCharacterData.GetEntityPrefab() as BasePlayerCharacterEntity;
+                    var entityPrefab = playerCharacterData.GetEntityPrefab() as BasePlayerCharacterEntity;
                     // If it is not allow this character data, disconnect user
                     if (entityPrefab == null)
                     {
@@ -308,6 +308,12 @@ namespace MultiplayerARPG.MMO
                         var identity = Assets.NetworkSpawn(entityPrefab.Identity.HashAssetId, playerCharacterData.CurrentPosition, Quaternion.identity, 0, connectionId);
                         var playerCharacterEntity = identity.GetComponent<BasePlayerCharacterEntity>();
                         playerCharacterData.CloneTo(playerCharacterEntity);
+
+                        // Load user level
+                        var loadUserLevelJob = new GetUserLevelJob(Database, userId);
+                        loadUserLevelJob.Start();
+                        yield return StartCoroutine(loadUserLevelJob.WaitFor());
+                        playerCharacterEntity.UserLevel = loadUserLevelJob.result;
 
                         // Notify clients that this character is spawn or dead
                         if (!playerCharacterEntity.IsDead())

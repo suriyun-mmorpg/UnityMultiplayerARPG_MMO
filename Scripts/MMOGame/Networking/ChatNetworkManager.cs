@@ -211,10 +211,7 @@ namespace MultiplayerARPG.MMO
             switch (message.channel)
             {
                 case ChatChannel.Global:
-                    if (GMCommands.IsGMCommand(message.message))
-                        HandleGMCommand(message.sender, message.message);
-                    else
-                        ServerSendPacketToAllConnections(SendOptions.ReliableOrdered, MMOMessageTypes.Chat, message);
+                    ServerSendPacketToAllConnections(SendOptions.ReliableOrdered, MMOMessageTypes.Chat, message);
                     break;
                 case ChatChannel.Party:
                 case ChatChannel.Guild:
@@ -353,47 +350,6 @@ namespace MultiplayerARPG.MMO
             updateMapUserMessage.type = updateType;
             updateMapUserMessage.data = userData;
             ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MMOMessageTypes.UpdateMapUser, updateMapUserMessage);
-        }
-        
-        private void HandleGMCommand(string sender, string command)
-        {
-            if (string.IsNullOrEmpty(command))
-                return;
-
-            var splited = command.Split(' ');
-            var commandKey = splited[0];
-            if (GMCommands.IsSplitedLengthValid(commandKey, splited.Length))
-            {
-                string receiver;
-                long receiverConnectionId;
-                if (commandKey.Equals(GMCommands.GiveGold) || 
-                    commandKey.Equals(GMCommands.GiveItem))
-                {
-                    receiver = splited[1];
-                    // Send message to map server which have the character
-                    if (!string.IsNullOrEmpty(receiver) &&
-                        connectionIdsByCharacterName.TryGetValue(receiver, out receiverConnectionId))
-                    {
-                        var message = new ChatMessage();
-                        message.channel = ChatChannel.Global;
-                        message.message = command;
-                        ServerSendPacket(receiverConnectionId, SendOptions.ReliableOrdered, MMOMessageTypes.Chat, message);
-                    }
-                }
-                else
-                {
-                    receiver = sender;
-                    // Send message to map server which have the character
-                    if (!string.IsNullOrEmpty(receiver) &&
-                        connectionIdsByCharacterName.TryGetValue(receiver, out receiverConnectionId))
-                    {
-                        var message = new ChatMessage();
-                        message.channel = ChatChannel.Global;
-                        message.message = command;
-                        ServerSendPacket(receiverConnectionId, SendOptions.ReliableOrdered, MMOMessageTypes.Chat, message);
-                    }
-                }
-            }
         }
     }
 }

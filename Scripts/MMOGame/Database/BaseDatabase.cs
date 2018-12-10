@@ -16,6 +16,7 @@ namespace MultiplayerARPG.MMO
 
         public abstract string ValidateUserLogin(string username, string password);
         public abstract bool ValidateAccessToken(string userId, string accessToken);
+        public abstract byte GetUserLevel(string userId);
         public abstract int GetCash(string userId);
         public abstract int IncreaseCash(string userId, int amount);
         public abstract int DecreaseCash(string userId, int amount);

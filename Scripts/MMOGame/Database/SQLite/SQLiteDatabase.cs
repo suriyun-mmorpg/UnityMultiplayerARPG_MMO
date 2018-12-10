@@ -183,6 +183,7 @@ namespace MultiplayerARPG.MMO
               username TEXT NOT NULL UNIQUE,
               password TEXT NOT NULL,
               cash INTEGER NOT NULL DEFAULT 0,
+              userLevel INTEGER NOT NULL DEFAULT 0,
               email TEXT NOT NULL,
               authType INTEGER NOT NULL,
               accessToken TEXT,
@@ -254,6 +255,9 @@ namespace MultiplayerARPG.MMO
 
             if (!IsColumnExist("userlogin", "cash"))
                 ExecuteNonQuery("ALTER TABLE userlogin ADD cash INTEGER NOT NULL DEFAULT 0;");
+
+            if (!IsColumnExist("userlogin", "userLevel"))
+                ExecuteNonQuery("ALTER TABLE userlogin ADD userLevel INTEGER NOT NULL DEFAULT 0;");
 
             if (!IsColumnExist("characters", "partyId"))
                 ExecuteNonQuery("ALTER TABLE characters ADD partyId INTEGER NOT NULL DEFAULT 0;");
@@ -385,6 +389,16 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@id", userId),
                 new SqliteParameter("@accessToken", accessToken));
             return (result != null ? (long)result : 0) > 0;
+        }
+
+        public override byte GetUserLevel(string userId)
+        {
+            var userLevel = (byte)0;
+            var reader = ExecuteReader("SELECT userLevel FROM userlogin WHERE id=@id LIMIT 1",
+                new SqliteParameter("@id", userId));
+            if (reader.Read())
+                userLevel = (byte)reader.GetSByte("userLevel");
+            return userLevel;
         }
 
         public override int GetCash(string userId)

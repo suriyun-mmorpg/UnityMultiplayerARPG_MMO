@@ -146,6 +146,20 @@ namespace MultiplayerARPG.MMO
             result = database.GooglePlayLogin(idToken);
         }
     }
+
+    public class GetUserLevelJob : DatabaseJob<byte>
+    {
+        private string userId;
+        public GetUserLevelJob(BaseDatabase database, string userId, Action<byte> onFinished = null) : base(database, onFinished)
+        {
+            this.userId = userId;
+        }
+
+        protected override void ThreadFunction()
+        {
+            result = database.GetUserLevel(userId);
+        }
+    }
     #endregion
 
     #region Party

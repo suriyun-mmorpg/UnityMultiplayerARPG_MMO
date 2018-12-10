@@ -227,6 +227,16 @@ namespace MultiplayerARPG.MMO
             return (result != null ? (long)result : 0) > 0;
         }
 
+        public override byte GetUserLevel(string userId)
+        {
+            var userLevel = (byte)0;
+            var reader = ExecuteReader("SELECT userLevel FROM userlogin WHERE id=@id LIMIT 1",
+                new MySqlParameter("@id", userId));
+            if (reader.Read())
+                userLevel = (byte)reader.GetSByte("userLevel");
+            return userLevel;
+        }
+
         public override int GetCash(string userId)
         {
             var cash = 0;
