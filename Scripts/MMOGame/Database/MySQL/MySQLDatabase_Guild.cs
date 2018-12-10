@@ -60,7 +60,7 @@ namespace MultiplayerARPG.MMO
                     guildMemberData.id = reader.GetString("id");
                     guildMemberData.characterName = reader.GetString("characterName");
                     guildMemberData.dataId = reader.GetInt32("dataId");
-                    guildMemberData.level = reader.GetInt16("level");
+                    guildMemberData.level = (short)reader.GetInt32("level");
                     result.AddMember(guildMemberData, (byte)reader.GetInt32("guildRole"));
                 }
 
@@ -68,7 +68,7 @@ namespace MultiplayerARPG.MMO
                     new MySqlParameter("@id", id));
                 while (reader.Read())
                 {
-                    result.SetSkillLevel(reader.GetInt32("dataId"), reader.GetInt16("level"));
+                    result.SetSkillLevel(reader.GetInt32("dataId"), (short)reader.GetInt32("level"));
                 }
             }
             return result;

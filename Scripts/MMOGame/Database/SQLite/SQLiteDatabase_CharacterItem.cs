@@ -29,8 +29,8 @@ namespace MultiplayerARPG.MMO
             {
                 result = new CharacterItem();
                 result.dataId = reader.GetInt32("dataId");
-                result.level = reader.GetInt16("level");
-                result.amount = reader.GetInt16("amount");
+                result.level = (short)reader.GetInt32("level");
+                result.amount = (short)reader.GetInt32("amount");
                 result.durability = reader.GetFloat("durability");
                 result.exp = reader.GetInt32("exp");
                 result.lockRemainsDuration = reader.GetFloat("lockRemainsDuration");
