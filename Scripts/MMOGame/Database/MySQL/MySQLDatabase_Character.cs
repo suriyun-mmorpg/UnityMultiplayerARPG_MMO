@@ -432,6 +432,7 @@ namespace MultiplayerARPG.MMO
                     DeleteCharacterQuests(connection, transaction, id);
                     DeleteCharacterSkills(connection, transaction, id);
                     DeleteCharacterSkillUsages(connection, transaction, id);
+                    DeleteCharacterSummons(connection, transaction, id);
                     transaction.Commit();
                 }
                 catch (System.Exception ex)

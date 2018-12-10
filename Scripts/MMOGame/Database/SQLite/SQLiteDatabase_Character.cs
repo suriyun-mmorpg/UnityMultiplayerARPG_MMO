@@ -275,6 +275,7 @@ namespace MultiplayerARPG.MMO
                 DeleteCharacterQuests(id);
                 DeleteCharacterSkills(id);
                 DeleteCharacterSkillUsages(id);
+                DeleteCharacterSummons(id);
                 ExecuteNonQuery("END");
                 this.InvokeInstanceDevExtMethods("DeleteCharacter", userId, id);
             }
