@@ -309,6 +309,14 @@ namespace MultiplayerARPG.MMO
                         var playerCharacterEntity = identity.GetComponent<BasePlayerCharacterEntity>();
                         playerCharacterData.CloneTo(playerCharacterEntity);
 
+                        // Summon saved summons
+                        for (var i = 0; i < playerCharacterEntity.Summons.Count; ++i)
+                        {
+                            var summon = playerCharacterEntity.Summons[i];
+                            summon.Summon(playerCharacterEntity, summon.Level, summon.summonRemainsDuration, summon.Exp, summon.CurrentHp, summon.CurrentMp);
+                            playerCharacterEntity.Summons[i] = summon;
+                        }
+
                         // Load user level
                         var loadUserLevelJob = new GetUserLevelJob(Database, userId);
                         loadUserLevelJob.Start();
