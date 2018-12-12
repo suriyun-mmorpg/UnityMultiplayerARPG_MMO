@@ -603,7 +603,8 @@ MonoBehaviour:
     type: 2}
   uiSceneGameplayMobilePrefab: {fileID: 114630585920460692, guid: 70474cf4f9f686c45b0305621722205f,
     type: 2}
-  defaultControllerPrefab: {fileID: 0}
+  defaultControllerPrefab: {fileID: 114072456199855828, guid: 9b0dda0d289a10c40ba6b4f2444b5b0e,
+    type: 2}
   serverCharacterPrefab: {fileID: 114801908678275750, guid: 421d789af0533a74fb6efc3521d9f8b7,
     type: 2}
   owningCharacterObjects:
@@ -660,9 +661,13 @@ MonoBehaviour:
   dropDistance: 0.5
   conversationDistance: 1
   buildDistance: 2
+  minSummonDistance: 2
+  maxSummonDistance: 3
   enemySpottedNotifyDistance: 5
   minFollowSummonerDistance: 5
   maxFollowSummonerDistance: 10
+  petDeadLockDuration: 60
+  petUnSummonLockDuration: 30
   levelUpEffect: {fileID: 114843870614705530, guid: 6f6e255b4877f874c985ed9fb46293a1,
     type: 2}
   startGold: 2000
