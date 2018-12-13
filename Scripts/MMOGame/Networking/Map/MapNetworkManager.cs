@@ -260,7 +260,7 @@ namespace MultiplayerARPG.MMO
             {
                 if (LogError)
                     Debug.LogError("[Map Server] User trying to hack: " + userId);
-                transport.ServerDisconnect(connectionId);
+                Transport.ServerDisconnect(connectionId);
                 return;
             }
 
@@ -277,7 +277,7 @@ namespace MultiplayerARPG.MMO
             {
                 if (LogError)
                     Debug.LogError("[Map Server] Invalid access token for user: " + userId);
-                transport.ServerDisconnect(connectionId);
+                Transport.ServerDisconnect(connectionId);
             }
             else
             {
@@ -290,7 +290,7 @@ namespace MultiplayerARPG.MMO
                 {
                     if (LogError)
                         Debug.LogError("[Map Server] Cannot find select character: " + selectCharacterId + " for user: " + userId);
-                    transport.ServerDisconnect(connectionId);
+                    Transport.ServerDisconnect(connectionId);
                 }
                 else
                 {
@@ -300,7 +300,7 @@ namespace MultiplayerARPG.MMO
                     {
                         if (LogError)
                             Debug.LogError("[Map Server] Cannot find player character with entity Id: " + playerCharacterData.EntityId);
-                        transport.ServerDisconnect(connectionId);
+                        Transport.ServerDisconnect(connectionId);
                     }
                     else
                     {
