@@ -1,11 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using LiteNetLibManager;
-using LiteNetLib.Utils;
+﻿using LiteNetLib.Utils;
 
 namespace MultiplayerARPG.MMO
 {
-    public class UpdateUserCharacterMessage : ILiteNetLibMessage
+    public class UpdateUserCharacterMessage : INetSerializable
     {
         public enum UpdateType : byte
         {

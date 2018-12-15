@@ -1,10 +1,8 @@
-﻿using LiteNetLibManager;
-using LiteNetLib;
-using LiteNetLib.Utils;
+﻿using LiteNetLib.Utils;
 
 namespace MultiplayerARPG.MMO
 {
-    public class CentralUserPeerInfo : ILiteNetLibMessage
+    public class CentralUserPeerInfo : INetSerializable
     {
         public long connectionId;
         public string userId;

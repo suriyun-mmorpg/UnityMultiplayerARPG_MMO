@@ -1,11 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using LiteNetLibManager;
-using LiteNetLib.Utils;
+﻿using LiteNetLib.Utils;
 
 namespace MultiplayerARPG.MMO
 {
-    public class MMOWarpMessage : ILiteNetLibMessage
+    public class MMOWarpMessage : INetSerializable
     {
         public string sceneName;
         public string networkAddress;
