@@ -385,13 +385,13 @@ namespace MultiplayerARPG.MMO
                             UpdateMapUser(ChatNetworkManager.Client, UpdateUserCharacterMessage.UpdateType.Add, userData);
 
                         var player = Players[connectionId];
-                        foreach (var spawnedObject in Assets.SpawnedObjects)
+                        foreach (var spawnedObject in Assets.SpawnedObjects.Values)
                         {
-                            if (spawnedObject.Value.ConnectionId == player.ConnectionId)
+                            if (spawnedObject.ConnectionId == player.ConnectionId)
                                 continue;
 
-                            if (spawnedObject.Value.ShouldAddSubscriber(player))
-                                spawnedObject.Value.AddSubscriber(player);
+                            if (spawnedObject.ShouldAddSubscriber(player))
+                                spawnedObject.AddSubscriber(player);
                         }
                     }
                 }
