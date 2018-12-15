@@ -1,56 +1,18 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using LiteNetLibManager;
 
 namespace MultiplayerARPG.MMO
 {
     [RequireComponent(typeof(UICharacterSelectionManager))]
-    public class UIMmoCharacterList : UIBase
+    public class UIMmoCharacterList : UICharacterList
     {
-        public UICharacter uiCharacterPrefab;
-        public Transform uiCharacterContainer;
-        public Transform characterModelContainer;
-        [Header("UI Elements")]
-        public Button buttonStart;
-        public Button buttonDelete;
-
-        private UIList cacheList;
-        public UIList CacheList
+        protected override void LoadCharacters()
         {
-            get
-            {
-                if (cacheList == null)
-                {
-                    cacheList = gameObject.AddComponent<UIList>();
-                    cacheList.uiPrefab = uiCharacterPrefab.gameObject;
-                    cacheList.uiContainer = uiCharacterContainer;
-                }
-                return cacheList;
-            }
+            MMOClientInstance.Singleton.RequestCharacters(OnRequestedCharacters);
         }
 
-        private UICharacterSelectionManager selectionManager;
-        public UICharacterSelectionManager SelectionManager
-        {
-            get
-            {
-                if (selectionManager == null)
-                    selectionManager = GetComponent<UICharacterSelectionManager>();
-                selectionManager.selectionMode = UISelectionMode.Toggle;
-                return selectionManager;
-            }
-        }
-
-        private readonly Dictionary<string, BaseCharacterModel> CharacterModels = new Dictionary<string, BaseCharacterModel>();
-
-        private void LoadCharacters()
-        {
-            MMOClientInstance.Singleton.RequestCharacters(OnLoadCharacters);
-        }
-
-        private void OnLoadCharacters(AckResponseCode responseCode, BaseAckMessage message)
+        private void OnRequestedCharacters(AckResponseCode responseCode, BaseAckMessage message)
         {
             var castedMessage = (ResponseCharactersMessage)message;
             SelectionManager.Clear();
@@ -105,51 +67,7 @@ namespace MultiplayerARPG.MMO
             });
         }
 
-        public override void Show()
-        {
-            buttonStart.onClick.RemoveListener(OnClickStart);
-            buttonStart.onClick.AddListener(OnClickStart);
-            buttonDelete.onClick.RemoveListener(OnClickDelete);
-            buttonDelete.onClick.AddListener(OnClickDelete);
-            // Clear selection
-            SelectionManager.eventOnSelect.RemoveListener(OnSelectCharacter);
-            SelectionManager.eventOnSelect.AddListener(OnSelectCharacter);
-            SelectionManager.Clear();
-            CacheList.HideAll();
-            // Unenabled buttons
-            buttonStart.gameObject.SetActive(false);
-            buttonDelete.gameObject.SetActive(false);
-            // Remove all models
-            characterModelContainer.RemoveChildren();
-            CharacterModels.Clear();
-            LoadCharacters();
-            base.Show();
-        }
-
-        public override void Hide()
-        {
-            characterModelContainer.RemoveChildren();
-            base.Hide();
-        }
-
-        private void OnSelectCharacter(UICharacter ui)
-        {
-            buttonStart.gameObject.SetActive(true);
-            buttonDelete.gameObject.SetActive(true);
-            characterModelContainer.SetChildrenActive(false);
-            var playerCharacter = ui.Data as IPlayerCharacterData;
-            ShowCharacter(playerCharacter.Id);
-        }
-
-        private void ShowCharacter(string id)
-        {
-            BaseCharacterModel characterModel;
-            if (string.IsNullOrEmpty(id) || !CharacterModels.TryGetValue(id, out characterModel))
-                return;
-            characterModel.gameObject.SetActive(true);
-        }
-
-        private void OnClickStart()
+        protected override void OnClickStart()
         {
             var selectedUI = SelectionManager.SelectedUI;
             if (selectedUI == null)
@@ -161,10 +79,10 @@ namespace MultiplayerARPG.MMO
             // Load gameplay scene, we're going to manage maps in gameplay scene later
             // So we can add gameplay UI just once in gameplay scene
             var playerCharacter = selectedUI.Data as IPlayerCharacterData;
-            MMOClientInstance.Singleton.RequestSelectCharacter(playerCharacter.Id, OnSelectCharacter);
+            MMOClientInstance.Singleton.RequestSelectCharacter(playerCharacter.Id, OnRequestedSelectCharacter);
         }
 
-        private void OnSelectCharacter(AckResponseCode responseCode, BaseAckMessage message)
+        private void OnRequestedSelectCharacter(AckResponseCode responseCode, BaseAckMessage message)
         {
             var castedMessage = (ResponseSelectCharacterMessage)message;
             
@@ -198,7 +116,7 @@ namespace MultiplayerARPG.MMO
             }
         }
 
-        private void OnClickDelete()
+        protected override void OnClickDelete()
         {
             var selectedUI = SelectionManager.SelectedUI;
             if (selectedUI == null)
@@ -209,10 +127,10 @@ namespace MultiplayerARPG.MMO
             }
 
             var playerCharacter = selectedUI.Data as IPlayerCharacterData;
-            MMOClientInstance.Singleton.RequestDeleteCharacter(playerCharacter.Id, OnDeleteCharacter);
+            MMOClientInstance.Singleton.RequestDeleteCharacter(playerCharacter.Id, OnRequestedDeleteCharacter);
         }
 
-        private void OnDeleteCharacter(AckResponseCode responseCode, BaseAckMessage message)
+        private void OnRequestedDeleteCharacter(AckResponseCode responseCode, BaseAckMessage message)
         {
             var castedMessage = (ResponseDeleteCharacterMessage)message;
             
