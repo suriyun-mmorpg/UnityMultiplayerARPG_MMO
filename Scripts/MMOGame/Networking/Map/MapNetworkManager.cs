@@ -411,10 +411,17 @@ namespace MultiplayerARPG.MMO
 
         protected override void HandleChatAtServer(LiteNetLibMessageHandler messageHandler)
         {
+            var message = FillChatChannelId(messageHandler.ReadMessage<ChatMessage>());
+            // Local chat will processes immediately, not have to be sent to chat server
+            if (message.channel == ChatChannel.Local &&
+                !GMCommands.IsGMCommand(message.message))
+            {
+                ReadChatMessage(message);
+                return;
+            }
             // Send chat message to chat server, for MMO mode chat message handling by chat server
             if (ChatNetworkManager.IsClientConnected)
             {
-                var message = FillChatChannelId(messageHandler.ReadMessage<ChatMessage>());
                 ChatNetworkManager.Client.SendEnterChat(null, MMOMessageTypes.Chat, message.channel, message.message, message.sender, message.receiver, message.channelId);
             }
         }
