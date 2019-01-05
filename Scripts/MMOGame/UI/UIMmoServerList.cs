@@ -49,7 +49,7 @@ namespace MultiplayerARPG.MMO
             SelectionManager.DeselectSelectedUI();
             SelectionManager.Clear();
 
-            var networkSettings = MMOClientInstance.Singleton.networkSettings;
+            var networkSettings = MMOClientInstance.Singleton.NetworkSettings;
             CacheList.Generate(networkSettings, (index, networkSetting, ui) =>
             {
                 var uiServerEntry = ui.GetComponent<UIMmoServerEntry>();

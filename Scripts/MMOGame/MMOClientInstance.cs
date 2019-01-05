@@ -1,5 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Net;
+using System.Net.Security;
 using UnityEngine;
 using LiteNetLib;
 using LiteNetLibManager;
@@ -22,11 +24,16 @@ namespace MultiplayerARPG.MMO
         [SerializeField]
         private MapNetworkManager mapNetworkManager;
 
+        [Header("Settings")]
+        [SerializeField]
+        private bool useWebSocket = false;
+        [SerializeField]
+        private MmoNetworkSetting[] networkSettings;
+
         public CentralNetworkManager CentralNetworkManager { get { return centralNetworkManager; } }
         public MapNetworkManager MapNetworkManager { get { return mapNetworkManager; } }
-
-        [Header("Settings")]
-        public MmoNetworkSetting[] networkSettings;
+        public bool UseWebSocket { get { return useWebSocket; } }
+        public MmoNetworkSetting[] NetworkSettings { get { return networkSettings; } }
 
         public System.Action onCentralClientConnected;
         public System.Action<DisconnectInfo> onCentralClientDisconnected;
@@ -43,6 +50,13 @@ namespace MultiplayerARPG.MMO
             }
             DontDestroyOnLoad(gameObject);
             Singleton = this;
+
+            // Always accept SSL
+            ServicePointManager.ServerCertificateValidationCallback += new RemoteCertificateValidationCallback((sender, certificate, chain, policyErrors) => { return true; });
+
+            // Active WebSockets
+            CentralNetworkManager.useWebSocket = UseWebSocket;
+            MapNetworkManager.useWebSocket = UseWebSocket;
         }
 
         private void OnEnable()

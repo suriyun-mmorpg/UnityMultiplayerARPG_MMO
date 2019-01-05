@@ -61,6 +61,10 @@ namespace MultiplayerARPG.MMO
         private MapNetworkManager mapNetworkManager;
         [SerializeField]
         private ChatNetworkManager chatNetworkManager;
+
+        [Header("Settings")]
+        [SerializeField]
+        private bool useWebSocket = false;
         [SerializeField]
         private BaseDatabase database;
 
@@ -69,6 +73,8 @@ namespace MultiplayerARPG.MMO
         public MapNetworkManager MapNetworkManager { get { return mapNetworkManager; } }
         public ChatNetworkManager ChatNetworkManager { get { return chatNetworkManager; } }
         public BaseDatabase Database { get { return database; } }
+        public bool UseWebSocket { get { return useWebSocket; } }
+
         private LogGUI cacheLogGUI;
         public LogGUI CacheLogGUI
         {
@@ -104,8 +110,16 @@ namespace MultiplayerARPG.MMO
                 database.Initialize();
 
             var gameInstance = FindObjectOfType<GameInstance>();
+
             // Always accept SSL
             ServicePointManager.ServerCertificateValidationCallback += new RemoteCertificateValidationCallback((sender, certificate, chain, policyErrors) => { return true; });
+
+            // Active WebSockets
+            CentralNetworkManager.useWebSocket = UseWebSocket;
+            MapSpawnNetworkManager.useWebSocket = UseWebSocket;
+            MapNetworkManager.useWebSocket = UseWebSocket;
+            ChatNetworkManager.useWebSocket = UseWebSocket;
+
             CacheLogGUI.enabled = false;
             if (!Application.isEditor)
             {
