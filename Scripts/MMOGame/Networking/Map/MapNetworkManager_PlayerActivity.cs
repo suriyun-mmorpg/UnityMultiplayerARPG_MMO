@@ -19,7 +19,7 @@ namespace MultiplayerARPG.MMO
         private IEnumerator WarpCharacterRoutine(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position)
         {
             // If warping to different map
-            var connectId = playerCharacterEntity.ConnectionId;
+            long connectId = playerCharacterEntity.ConnectionId;
             CentralServerPeerInfo peerInfo;
             if (!string.IsNullOrEmpty(mapName) &&
                 !mapName.Equals(playerCharacterEntity.CurrentMapName) &&
@@ -29,7 +29,7 @@ namespace MultiplayerARPG.MMO
                 // Unregister player character
                 UnregisterPlayerCharacter(connectId);
                 // Clone character data to save
-                var savingCharacterData = new PlayerCharacterData();
+                PlayerCharacterData savingCharacterData = new PlayerCharacterData();
                 playerCharacterEntity.CloneTo(savingCharacterData);
                 // Save character current map / position
                 savingCharacterData.CurrentMapName = mapName;
@@ -42,7 +42,7 @@ namespace MultiplayerARPG.MMO
                 // Destroy character from server
                 playerCharacterEntity.NetworkDestroy();
                 // Send message to client to warp
-                var message = new MMOWarpMessage();
+                MMOWarpMessage message = new MMOWarpMessage();
                 message.sceneName = mapName;
                 message.networkAddress = peerInfo.networkAddress;
                 message.networkPort = peerInfo.networkPort;
@@ -60,10 +60,10 @@ namespace MultiplayerARPG.MMO
 
         private IEnumerator CreatePartyRoutine(BasePlayerCharacterEntity playerCharacterEntity, bool shareExp, bool shareItem)
         {
-            var createPartyJob = new CreatePartyJob(Database, shareExp, shareItem, playerCharacterEntity.Id);
+            CreatePartyJob createPartyJob = new CreatePartyJob(Database, shareExp, shareItem, playerCharacterEntity.Id);
             createPartyJob.Start();
             yield return StartCoroutine(createPartyJob.WaitFor());
-            var partyId = createPartyJob.result;
+            int partyId = createPartyJob.result;
             // Create party
             base.CreateParty(playerCharacterEntity, shareExp, shareItem, partyId);
             // Save to database
@@ -146,7 +146,7 @@ namespace MultiplayerARPG.MMO
             // If it is leader kick all members and terminate party
             if (party.IsLeader(playerCharacterEntity))
             {
-                foreach (var memberId in party.GetMemberIds())
+                foreach (string memberId in party.GetMemberIds())
                 {
                     BasePlayerCharacterEntity memberCharacterEntity;
                     if (playerCharactersById.TryGetValue(memberId, out memberCharacterEntity))
@@ -191,10 +191,10 @@ namespace MultiplayerARPG.MMO
 
         private IEnumerator CreateGuildRoutine(BasePlayerCharacterEntity playerCharacterEntity, string guildName)
         {
-            var createGuildJob = new CreateGuildJob(Database, guildName, playerCharacterEntity.Id);
+            CreateGuildJob createGuildJob = new CreateGuildJob(Database, guildName, playerCharacterEntity.Id);
             createGuildJob.Start();
             yield return StartCoroutine(createGuildJob.WaitFor());
-            var guildId = createGuildJob.result;
+            int guildId = createGuildJob.result;
             // Create guild
             base.CreateGuild(playerCharacterEntity, guildName, guildId);
             // Save to database
@@ -248,7 +248,7 @@ namespace MultiplayerARPG.MMO
             guild.SetRole(guildRole, roleName, canInvite, canKick, shareExpPercentage);
             guilds[guildId] = guild;
             // Change characters guild role
-            foreach (var memberId in guild.GetMemberIds())
+            foreach (string memberId in guild.GetMemberIds())
             {
                 BasePlayerCharacterEntity memberCharacterEntity;
                 if (playerCharactersById.TryGetValue(memberId, out memberCharacterEntity))
@@ -321,7 +321,7 @@ namespace MultiplayerARPG.MMO
             // If it is leader kick all members and terminate guild
             if (guild.IsLeader(playerCharacterEntity))
             {
-                foreach (var memberId in guild.GetMemberIds())
+                foreach (string memberId in guild.GetMemberIds())
                 {
                     BasePlayerCharacterEntity memberCharacterEntity;
                     if (playerCharactersById.TryGetValue(memberId, out memberCharacterEntity))
@@ -368,7 +368,7 @@ namespace MultiplayerARPG.MMO
 
         private IEnumerator IncreaseGuildExpRoutine(BasePlayerCharacterEntity playerCharacterEntity, int exp, int guildId, GuildData guild)
         {
-            var job = new IncreaseGuildExpJob(Database, guildId, exp, gameInstance.SocialSystemSetting.GuildExpTree);
+            IncreaseGuildExpJob job = new IncreaseGuildExpJob(Database, guildId, exp, gameInstance.SocialSystemSetting.GuildExpTree);
             job.Start();
             yield return StartCoroutine(job.WaitFor());
             if (job.result)

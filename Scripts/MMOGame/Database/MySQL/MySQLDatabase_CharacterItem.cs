@@ -42,8 +42,8 @@ namespace MultiplayerARPG.MMO
 
         private List<CharacterItem> ReadCharacterItems(string characterId, InventoryType inventoryType)
         {
-            var result = new List<CharacterItem>();
-            var reader = ExecuteReader("SELECT * FROM characteritem WHERE characterId=@characterId AND inventoryType=@inventoryType ORDER BY idx ASC",
+            List<CharacterItem> result = new List<CharacterItem>();
+            MySQLRowsReader reader = ExecuteReader("SELECT * FROM characteritem WHERE characterId=@characterId AND inventoryType=@inventoryType ORDER BY idx ASC",
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@inventoryType", inventoryType));
             CharacterItem tempInventory;
@@ -56,9 +56,9 @@ namespace MultiplayerARPG.MMO
 
         public EquipWeapons ReadCharacterEquipWeapons(string characterId)
         {
-            var result = new EquipWeapons();
+            EquipWeapons result = new EquipWeapons();
             // Right hand weapon
-            var reader = ExecuteReader("SELECT * FROM characteritem WHERE characterId=@characterId AND inventoryType=@inventoryType LIMIT 1",
+            MySQLRowsReader reader = ExecuteReader("SELECT * FROM characteritem WHERE characterId=@characterId AND inventoryType=@inventoryType LIMIT 1",
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@inventoryType", InventoryType.EquipWeaponRight));
             CharacterItem rightWeapon;

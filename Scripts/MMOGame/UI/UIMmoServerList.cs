@@ -39,7 +39,7 @@ namespace MultiplayerARPG.MMO
 
         public void OnClickConnect()
         {
-            var data = SelectionManager.SelectedUI.Data;
+            MmoNetworkSetting data = SelectionManager.SelectedUI.Data;
             MMOClientInstance.Singleton.StartCentralClient(data.networkAddress, data.networkPort);
         }
 
@@ -49,10 +49,10 @@ namespace MultiplayerARPG.MMO
             SelectionManager.DeselectSelectedUI();
             SelectionManager.Clear();
 
-            var networkSettings = MMOClientInstance.Singleton.NetworkSettings;
+            MmoNetworkSetting[] networkSettings = MMOClientInstance.Singleton.NetworkSettings;
             CacheList.Generate(networkSettings, (index, networkSetting, ui) =>
             {
-                var uiServerEntry = ui.GetComponent<UIMmoServerEntry>();
+                UIMmoServerEntry uiServerEntry = ui.GetComponent<UIMmoServerEntry>();
                 uiServerEntry.Data = networkSetting;
                 uiServerEntry.Show();
                 SelectionManager.Add(uiServerEntry);

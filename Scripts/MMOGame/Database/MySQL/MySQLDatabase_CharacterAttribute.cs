@@ -33,8 +33,8 @@ namespace MultiplayerARPG.MMO
 
         public List<CharacterAttribute> ReadCharacterAttributes(string characterId)
         {
-            var result = new List<CharacterAttribute>();
-            var reader = ExecuteReader("SELECT * FROM characterattribute WHERE characterId=@characterId ORDER BY idx ASC",
+            List<CharacterAttribute> result = new List<CharacterAttribute>();
+            MySQLRowsReader reader = ExecuteReader("SELECT * FROM characterattribute WHERE characterId=@characterId ORDER BY idx ASC",
                 new MySqlParameter("@characterId", characterId));
             CharacterAttribute tempAttribute;
             while (ReadCharacterAttribute(reader, out tempAttribute, false))

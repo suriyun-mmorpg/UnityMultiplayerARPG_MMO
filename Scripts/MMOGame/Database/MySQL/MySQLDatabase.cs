@@ -30,8 +30,8 @@ namespace MultiplayerARPG.MMO
         public override void Initialize()
         {
             // Json file read
-            var configFilePath = "./config/mySqlConfig.json";
-            var jsonConfig = new Dictionary<string, object>();
+            string configFilePath = "./config/mySqlConfig.json";
+            Dictionary<string, object> jsonConfig = new Dictionary<string, object>();
             Debug.Log("[MySQLDatabase] Reading config file from " + configFilePath);
             if (File.Exists(configFilePath))
             {
@@ -49,7 +49,7 @@ namespace MultiplayerARPG.MMO
 
         public string GetConnectionString()
         {
-            var connectionString = "Server=" + address + ";" +
+            string connectionString = "Server=" + address + ";" +
                 "Port=" + port + ";" +
                 "Uid=" + username + ";" +
                 (string.IsNullOrEmpty(password) ? "" : "Pwd=\"" + password + "\";") +
@@ -64,16 +64,16 @@ namespace MultiplayerARPG.MMO
 
         public long ExecuteInsertData(string sql, params MySqlParameter[] args)
         {
-            var connection = NewConnection();
+            MySqlConnection connection = NewConnection();
             connection.Open();
-            var result = ExecuteInsertData(connection, null, sql, args);
+            long result = ExecuteInsertData(connection, null, sql, args);
             connection.Close();
             return result;
         }
 
         public long ExecuteInsertData(MySqlConnection connection, MySqlTransaction transaction, string sql, params MySqlParameter[] args)
         {
-            var createLocalConnection = false;
+            bool createLocalConnection = false;
             if (connection == null)
             {
                 connection = NewConnection();
@@ -82,11 +82,11 @@ namespace MultiplayerARPG.MMO
                 createLocalConnection = true;
             }
             long result = 0;
-            using (var cmd = new MySqlCommand(sql, connection))
+            using (MySqlCommand cmd = new MySqlCommand(sql, connection))
             {
                 if (transaction != null)
                     cmd.Transaction = transaction;
-                foreach (var arg in args)
+                foreach (MySqlParameter arg in args)
                 {
                     cmd.Parameters.Add(arg);
                 }
@@ -100,16 +100,16 @@ namespace MultiplayerARPG.MMO
 
         public int ExecuteNonQuery(string sql, params MySqlParameter[] args)
         {
-            var connection = NewConnection();
+            MySqlConnection connection = NewConnection();
             connection.Open();
-            var result = ExecuteNonQuery(connection, null, sql, args);
+            int result = ExecuteNonQuery(connection, null, sql, args);
             connection.Close();
             return result;
         }
 
         public int ExecuteNonQuery(MySqlConnection connection, MySqlTransaction transaction, string sql, params MySqlParameter[] args)
         {
-            var createLocalConnection = false;
+            bool createLocalConnection = false;
             if (connection == null)
             {
                 connection = NewConnection();
@@ -117,12 +117,12 @@ namespace MultiplayerARPG.MMO
                 connection.Open();
                 createLocalConnection = true;
             }
-            var numRows = 0;
-            using (var cmd = new MySqlCommand(sql, connection))
+            int numRows = 0;
+            using (MySqlCommand cmd = new MySqlCommand(sql, connection))
             {
                 if (transaction != null)
                     cmd.Transaction = transaction;
-                foreach (var arg in args)
+                foreach (MySqlParameter arg in args)
                 {
                     cmd.Parameters.Add(arg);
                 }
@@ -135,16 +135,16 @@ namespace MultiplayerARPG.MMO
 
         public object ExecuteScalar(string sql, params MySqlParameter[] args)
         {
-            var connection = NewConnection();
+            MySqlConnection connection = NewConnection();
             connection.Open();
-            var result = ExecuteScalar(connection, null, sql, args);
+            object result = ExecuteScalar(connection, null, sql, args);
             connection.Close();
             return result;
         }
 
         public object ExecuteScalar(MySqlConnection connection, MySqlTransaction transaction, string sql, params MySqlParameter[] args)
         {
-            var createLocalConnection = false;
+            bool createLocalConnection = false;
             if (connection == null)
             {
                 connection = NewConnection();
@@ -153,11 +153,11 @@ namespace MultiplayerARPG.MMO
                 createLocalConnection = true;
             }
             object result;
-            using (var cmd = new MySqlCommand(sql, connection))
+            using (MySqlCommand cmd = new MySqlCommand(sql, connection))
             {
                 if (transaction != null)
                     cmd.Transaction = transaction;
-                foreach (var arg in args)
+                foreach (MySqlParameter arg in args)
                 {
                     cmd.Parameters.Add(arg);
                 }
@@ -170,16 +170,16 @@ namespace MultiplayerARPG.MMO
 
         public MySQLRowsReader ExecuteReader(string sql, params MySqlParameter[] args)
         {
-            var connection = NewConnection();
+            MySqlConnection connection = NewConnection();
             connection.Open();
-            var result = ExecuteReader(connection, null, sql, args);
+            MySQLRowsReader result = ExecuteReader(connection, null, sql, args);
             connection.Close();
             return result;
         }
 
         public MySQLRowsReader ExecuteReader(MySqlConnection connection, MySqlTransaction transaction, string sql, params MySqlParameter[] args)
         {
-            var createLocalConnection = false;
+            bool createLocalConnection = false;
             if (connection == null)
             {
                 connection = NewConnection();
@@ -187,16 +187,16 @@ namespace MultiplayerARPG.MMO
                 connection.Open();
                 createLocalConnection = true;
             }
-            var result = new MySQLRowsReader();
-            using (var cmd = new MySqlCommand(sql, connection))
+            MySQLRowsReader result = new MySQLRowsReader();
+            using (MySqlCommand cmd = new MySqlCommand(sql, connection))
             {
                 if (transaction != null)
                     cmd.Transaction = transaction;
-                foreach (var arg in args)
+                foreach (MySqlParameter arg in args)
                 {
                     cmd.Parameters.Add(arg);
                 }
-                var dataReader = cmd.ExecuteReader();
+                MySqlDataReader dataReader = cmd.ExecuteReader();
                 result.Init(dataReader);
                 dataReader.Close();
             }
@@ -207,8 +207,8 @@ namespace MultiplayerARPG.MMO
 
         public override string ValidateUserLogin(string username, string password)
         {
-            var id = string.Empty;
-            var reader = ExecuteReader("SELECT id FROM userlogin WHERE username=@username AND password=@password AND authType=@authType LIMIT 1",
+            string id = string.Empty;
+            MySQLRowsReader reader = ExecuteReader("SELECT id FROM userlogin WHERE username=@username AND password=@password AND authType=@authType LIMIT 1",
                 new MySqlParameter("@username", username),
                 new MySqlParameter("@password", GenericUtils.GetMD5(password)),
                 new MySqlParameter("@authType", AUTH_TYPE_NORMAL));
@@ -221,7 +221,7 @@ namespace MultiplayerARPG.MMO
 
         public override bool ValidateAccessToken(string userId, string accessToken)
         {
-            var result = ExecuteScalar("SELECT COUNT(*) FROM userlogin WHERE id=@id AND accessToken=@accessToken",
+            object result = ExecuteScalar("SELECT COUNT(*) FROM userlogin WHERE id=@id AND accessToken=@accessToken",
                 new MySqlParameter("@id", userId),
                 new MySqlParameter("@accessToken", accessToken));
             return (result != null ? (long)result : 0) > 0;
@@ -229,8 +229,8 @@ namespace MultiplayerARPG.MMO
 
         public override byte GetUserLevel(string userId)
         {
-            var userLevel = (byte)0;
-            var reader = ExecuteReader("SELECT userLevel FROM userlogin WHERE id=@id LIMIT 1",
+            byte userLevel = (byte)0;
+            MySQLRowsReader reader = ExecuteReader("SELECT userLevel FROM userlogin WHERE id=@id LIMIT 1",
                 new MySqlParameter("@id", userId));
             if (reader.Read())
                 userLevel = (byte)reader.GetSByte("userLevel");
@@ -239,8 +239,8 @@ namespace MultiplayerARPG.MMO
 
         public override int GetCash(string userId)
         {
-            var cash = 0;
-            var reader = ExecuteReader("SELECT cash FROM userlogin WHERE id=@id LIMIT 1",
+            int cash = 0;
+            MySQLRowsReader reader = ExecuteReader("SELECT cash FROM userlogin WHERE id=@id LIMIT 1",
                 new MySqlParameter("@id", userId));
             if (reader.Read())
                 cash = reader.GetInt32("cash");
@@ -249,7 +249,7 @@ namespace MultiplayerARPG.MMO
 
         public override int IncreaseCash(string userId, int amount)
         {
-            var cash = GetCash(userId);
+            int cash = GetCash(userId);
             cash += amount;
             ExecuteNonQuery("UPDATE userlogin SET cash=@cash WHERE id=@id",
                 new MySqlParameter("@id", userId),
@@ -259,7 +259,7 @@ namespace MultiplayerARPG.MMO
 
         public override int DecreaseCash(string userId, int amount)
         {
-            var cash = GetCash(userId);
+            int cash = GetCash(userId);
             cash -= amount;
             ExecuteNonQuery("UPDATE userlogin SET cash=@cash WHERE id=@id",
                 new MySqlParameter("@id", userId),
@@ -286,24 +286,24 @@ namespace MultiplayerARPG.MMO
 
         public override long FindUsername(string username)
         {
-            var result = ExecuteScalar("SELECT COUNT(*) FROM userlogin WHERE username LIKE @username",
+            object result = ExecuteScalar("SELECT COUNT(*) FROM userlogin WHERE username LIKE @username",
                 new MySqlParameter("@username", username));
             return result != null ? (long)result : 0;
         }
 
         public override string FacebookLogin(string fbId, string accessToken)
         {
-            var url = "https://graph.facebook.com/" + fbId + "?access_token=" + accessToken + "&fields=id,name,email";
-            var webClient = new WebClient();
-            var json = webClient.DownloadString(url);
+            string url = "https://graph.facebook.com/" + fbId + "?access_token=" + accessToken + "&fields=id,name,email";
+            WebClient webClient = new WebClient();
+            string json = webClient.DownloadString(url);
             json = json.Replace(@"\u0040", "@");
 
-            var id = string.Empty;
-            var dict = Json.Deserialize(json) as Dictionary<string, object>;
+            string id = string.Empty;
+            Dictionary<string, object> dict = Json.Deserialize(json) as Dictionary<string, object>;
             if (dict.ContainsKey("id") && dict.ContainsKey("email"))
             {
-                var email = (string)dict["email"];
-                var reader = ExecuteReader("SELECT id FROM userlogin WHERE username=@username AND password=@password AND authType=@authType LIMIT 1",
+                string email = (string)dict["email"];
+                MySQLRowsReader reader = ExecuteReader("SELECT id FROM userlogin WHERE username=@username AND password=@password AND authType=@authType LIMIT 1",
                     new MySqlParameter("@username", "fb_" + fbId),
                     new MySqlParameter("@password", GenericUtils.GetMD5(fbId)),
                     new MySqlParameter("@authType", AUTH_TYPE_FACEBOOK));
@@ -334,17 +334,17 @@ namespace MultiplayerARPG.MMO
 
         public override string GooglePlayLogin(string idToken)
         {
-            var url = "https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=" + idToken;
-            var webClient = new WebClient();
-            var json = webClient.DownloadString(url);
+            string url = "https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=" + idToken;
+            WebClient webClient = new WebClient();
+            string json = webClient.DownloadString(url);
 
-            var id = string.Empty;
-            var dict = Json.Deserialize(json) as Dictionary<string, object>;
+            string id = string.Empty;
+            Dictionary<string, object> dict = Json.Deserialize(json) as Dictionary<string, object>;
             if (dict.ContainsKey("sub") && dict.ContainsKey("email"))
             {
-                var gId = (string)dict["sub"];
-                var email = (string)dict["email"];
-                var reader = ExecuteReader("SELECT id FROM userlogin WHERE username=@username AND password=@password AND authType=@authType LIMIT 1",
+                string gId = (string)dict["sub"];
+                string email = (string)dict["email"];
+                MySQLRowsReader reader = ExecuteReader("SELECT id FROM userlogin WHERE username=@username AND password=@password AND authType=@authType LIMIT 1",
                     new MySqlParameter("@username", "g_" + gId),
                     new MySqlParameter("@password", GenericUtils.GetMD5(gId)),
                     new MySqlParameter("@authType", AUTH_TYPE_GOOGLE_PLAY));

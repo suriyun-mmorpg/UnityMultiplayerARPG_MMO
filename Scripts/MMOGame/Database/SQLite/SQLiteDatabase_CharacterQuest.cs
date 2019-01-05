@@ -9,13 +9,13 @@ namespace MultiplayerARPG.MMO
     {
         private Dictionary<int, int> ReadKillMonsters(string killMonsters)
         {
-            var result = new Dictionary<int, int>();
-            var splitSets = killMonsters.Split(';');
-            foreach (var set in splitSets)
+            Dictionary<int, int> result = new Dictionary<int, int>();
+            string[] splitSets = killMonsters.Split(';');
+            foreach (string set in splitSets)
             {
                 if (string.IsNullOrEmpty(set))
                     continue;
-                var splitData = set.Split(':');
+                string[] splitData = set.Split(':');
                 if (splitData.Length != 2)
                     continue;
                 result[int.Parse(splitData[0])] = int.Parse(splitData[1]);
@@ -25,8 +25,8 @@ namespace MultiplayerARPG.MMO
 
         private string WriteKillMonsters(Dictionary<int, int> killMonsters)
         {
-            var result = "";
-            foreach (var keyValue in killMonsters)
+            string result = "";
+            foreach (KeyValuePair<int, int> keyValue in killMonsters)
             {
                 result += keyValue.Key + ":" + keyValue.Value + ";";
             }
@@ -63,8 +63,8 @@ namespace MultiplayerARPG.MMO
 
         public List<CharacterQuest> ReadCharacterQuests(string characterId)
         {
-            var result = new List<CharacterQuest>();
-            var reader = ExecuteReader("SELECT * FROM characterquest WHERE characterId=@characterId ORDER BY idx ASC",
+            List<CharacterQuest> result = new List<CharacterQuest>();
+            SQLiteRowsReader reader = ExecuteReader("SELECT * FROM characterquest WHERE characterId=@characterId ORDER BY idx ASC",
                 new SqliteParameter("@characterId", characterId));
             CharacterQuest tempQuest;
             while (ReadCharacterQuest(reader, out tempQuest, false))

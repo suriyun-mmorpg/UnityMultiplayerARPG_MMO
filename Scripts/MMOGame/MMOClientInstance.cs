@@ -202,7 +202,7 @@ namespace MultiplayerARPG.MMO
             UserId = string.Empty;
             AccessToken = string.Empty;
             SelectCharacterId = string.Empty;
-            var castedMessage = messageData as ResponseUserLoginMessage;
+            ResponseUserLoginMessage castedMessage = messageData as ResponseUserLoginMessage;
             if (castedMessage.responseCode == AckResponseCode.Success)
             {
                 UserId = castedMessage.userId;
@@ -228,7 +228,7 @@ namespace MultiplayerARPG.MMO
 
             UserId = string.Empty;
             AccessToken = string.Empty;
-            var castedMessage = messageData as ResponseValidateAccessTokenMessage;
+            ResponseValidateAccessTokenMessage castedMessage = messageData as ResponseValidateAccessTokenMessage;
             if (castedMessage.responseCode == AckResponseCode.Success)
             {
                 UserId = castedMessage.userId;
@@ -242,7 +242,7 @@ namespace MultiplayerARPG.MMO
                 callback(responseCode, messageData);
 
             SelectCharacterId = string.Empty;
-            var castedMessage = messageData as ResponseSelectCharacterMessage;
+            ResponseSelectCharacterMessage castedMessage = messageData as ResponseSelectCharacterMessage;
             if (castedMessage.responseCode == AckResponseCode.Success)
                 SelectCharacterId = characterId;
         }

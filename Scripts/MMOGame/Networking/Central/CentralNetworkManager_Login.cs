@@ -10,7 +10,7 @@ namespace MultiplayerARPG.MMO
     {
         public uint RequestUserLogin(string username, string password, AckMessageCallback callback)
         {
-            var message = new RequestUserLoginMessage();
+            RequestUserLoginMessage message = new RequestUserLoginMessage();
             message.username = username;
             message.password = password;
             return Client.ClientSendAckPacket(SendOptions.ReliableOrdered, MMOMessageTypes.RequestUserLogin, message, callback);
@@ -18,7 +18,7 @@ namespace MultiplayerARPG.MMO
 
         public uint RequestUserRegister(string username, string password, AckMessageCallback callback)
         {
-            var message = new RequestUserRegisterMessage();
+            RequestUserRegisterMessage message = new RequestUserRegisterMessage();
             message.username = username;
             message.password = password;
             return Client.ClientSendAckPacket(SendOptions.ReliableOrdered, MMOMessageTypes.RequestUserRegister, message, callback);
@@ -26,13 +26,13 @@ namespace MultiplayerARPG.MMO
 
         public uint RequestUserLogout(AckMessageCallback callback)
         {
-            var message = new BaseAckMessage();
+            BaseAckMessage message = new BaseAckMessage();
             return Client.ClientSendAckPacket(SendOptions.ReliableOrdered, MMOMessageTypes.RequestUserLogout, message, callback);
         }
 
         public uint RequestValidateAccessToken(string userId, string accessToken, AckMessageCallback callback)
         {
-            var message = new RequestValidateAccessTokenMessage();
+            RequestValidateAccessTokenMessage message = new RequestValidateAccessTokenMessage();
             message.userId = userId;
             message.accessToken = accessToken;
             return Client.ClientSendAckPacket(SendOptions.ReliableOrdered, MMOMessageTypes.RequestValidateAccessToken, message, callback);
@@ -40,7 +40,7 @@ namespace MultiplayerARPG.MMO
 
         public uint RequestFacebookLogin(string id, string accessToken, AckMessageCallback callback)
         {
-            var message = new RequestFacebookLoginMessage();
+            RequestFacebookLoginMessage message = new RequestFacebookLoginMessage();
             message.id = id;
             message.accessToken = accessToken;
             return Client.ClientSendAckPacket(SendOptions.ReliableOrdered, MMOMessageTypes.RequestFacebookLogin, message, callback);
@@ -48,7 +48,7 @@ namespace MultiplayerARPG.MMO
 
         public uint RequestGooglePlayLogin(string idToken, AckMessageCallback callback)
         {
-            var message = new RequestGooglePlayLoginMessage();
+            RequestGooglePlayLoginMessage message = new RequestGooglePlayLoginMessage();
             message.idToken = idToken;
             return Client.ClientSendAckPacket(SendOptions.ReliableOrdered, MMOMessageTypes.RequestGooglePlayLogin, message, callback);
         }
@@ -60,14 +60,14 @@ namespace MultiplayerARPG.MMO
 
         private IEnumerator HandleRequestUserLoginRoutine(LiteNetLibMessageHandler messageHandler)
         {
-            var connectionId = messageHandler.connectionId;
-            var message = messageHandler.ReadMessage<RequestUserLoginMessage>();
-            var error = ResponseUserLoginMessage.Error.None;
-            var validateJob = new ValidateUserLoginJob(Database, message.username, message.password);
+            long connectionId = messageHandler.connectionId;
+            RequestUserLoginMessage message = messageHandler.ReadMessage<RequestUserLoginMessage>();
+            ResponseUserLoginMessage.Error error = ResponseUserLoginMessage.Error.None;
+            ValidateUserLoginJob validateJob = new ValidateUserLoginJob(Database, message.username, message.password);
             validateJob.Start();
             yield return StartCoroutine(validateJob.WaitFor());
-            var userId = validateJob.result;
-            var accessToken = string.Empty;
+            string userId = validateJob.result;
+            string accessToken = string.Empty;
             if (string.IsNullOrEmpty(userId))
             {
                 error = ResponseUserLoginMessage.Error.InvalidUsernameOrPassword;
@@ -80,17 +80,17 @@ namespace MultiplayerARPG.MMO
             }
             else
             {
-                var userPeerInfo = new CentralUserPeerInfo();
+                CentralUserPeerInfo userPeerInfo = new CentralUserPeerInfo();
                 userPeerInfo.connectionId = connectionId;
                 userPeerInfo.userId = userId;
                 userPeerInfo.accessToken = accessToken = Regex.Replace(Convert.ToBase64String(Guid.NewGuid().ToByteArray()), "[/+=]", "");
                 userPeersByUserId[userId] = userPeerInfo;
                 userPeers[connectionId] = userPeerInfo;
-                var updateAccessTokenJob = new UpdateAccessTokenJob(Database, userId, accessToken);
+                UpdateAccessTokenJob updateAccessTokenJob = new UpdateAccessTokenJob(Database, userId, accessToken);
                 updateAccessTokenJob.Start();
                 yield return StartCoroutine(updateAccessTokenJob.WaitFor());
             }
-            var responseMessage = new ResponseUserLoginMessage();
+            ResponseUserLoginMessage responseMessage = new ResponseUserLoginMessage();
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = error == ResponseUserLoginMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
             responseMessage.error = error;
@@ -106,12 +106,12 @@ namespace MultiplayerARPG.MMO
 
         private IEnumerator HandleRequestUserRegisterRoutine(LiteNetLibMessageHandler messageHandler)
         {
-            var connectionId = messageHandler.connectionId;
-            var message = messageHandler.ReadMessage<RequestUserRegisterMessage>();
-            var error = ResponseUserRegisterMessage.Error.None;
-            var username = message.username;
-            var password = message.password;
-            var findUsernameJob = new FindUsernameJob(Database, username);
+            long connectionId = messageHandler.connectionId;
+            RequestUserRegisterMessage message = messageHandler.ReadMessage<RequestUserRegisterMessage>();
+            ResponseUserRegisterMessage.Error error = ResponseUserRegisterMessage.Error.None;
+            string username = message.username;
+            string password = message.password;
+            FindUsernameJob findUsernameJob = new FindUsernameJob(Database, username);
             findUsernameJob.Start();
             yield return StartCoroutine(findUsernameJob.WaitFor());
             if (findUsernameJob.result > 0)
@@ -124,11 +124,11 @@ namespace MultiplayerARPG.MMO
                 error = ResponseUserRegisterMessage.Error.TooShortPassword;
             else
             {
-                var createUserLoginJob = new CreateUserLoginJob(Database, username, password);
+                CreateUserLoginJob createUserLoginJob = new CreateUserLoginJob(Database, username, password);
                 createUserLoginJob.Start();
                 yield return StartCoroutine(createUserLoginJob.WaitFor());
             }
-            var responseMessage = new ResponseUserRegisterMessage();
+            ResponseUserRegisterMessage responseMessage = new ResponseUserRegisterMessage();
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = error == ResponseUserRegisterMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
             responseMessage.error = error;
@@ -142,18 +142,18 @@ namespace MultiplayerARPG.MMO
 
         private IEnumerator HandleRequestUserLogoutRoutine(LiteNetLibMessageHandler messageHandler)
         {
-            var connectionId = messageHandler.connectionId;
-            var message = messageHandler.ReadMessage<BaseAckMessage>();
+            long connectionId = messageHandler.connectionId;
+            BaseAckMessage message = messageHandler.ReadMessage<BaseAckMessage>();
             CentralUserPeerInfo userPeerInfo;
             if (userPeers.TryGetValue(connectionId, out userPeerInfo))
             {
                 userPeersByUserId.Remove(userPeerInfo.userId);
                 userPeers.Remove(connectionId);
-                var updateAccessTokenJob = new UpdateAccessTokenJob(Database, userPeerInfo.userId, string.Empty);
+                UpdateAccessTokenJob updateAccessTokenJob = new UpdateAccessTokenJob(Database, userPeerInfo.userId, string.Empty);
                 updateAccessTokenJob.Start();
                 yield return StartCoroutine(updateAccessTokenJob.WaitFor());
             }
-            var responseMessage = new BaseAckMessage();
+            BaseAckMessage responseMessage = new BaseAckMessage();
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = AckResponseCode.Success;
             ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MMOMessageTypes.ResponseUserLogout, responseMessage);
@@ -166,12 +166,12 @@ namespace MultiplayerARPG.MMO
 
         private IEnumerator HandleRequestValidateAccessTokenRoutine(LiteNetLibMessageHandler messageHandler)
         {
-            var connectionId = messageHandler.connectionId;
-            var message = messageHandler.ReadMessage<RequestValidateAccessTokenMessage>();
-            var error = ResponseValidateAccessTokenMessage.Error.None;
-            var userId = message.userId;
-            var accessToken = message.accessToken;
-            var validateAccessTokenJob = new ValidateAccessTokenJob(Database, userId, accessToken);
+            long connectionId = messageHandler.connectionId;
+            RequestValidateAccessTokenMessage message = messageHandler.ReadMessage<RequestValidateAccessTokenMessage>();
+            ResponseValidateAccessTokenMessage.Error error = ResponseValidateAccessTokenMessage.Error.None;
+            string userId = message.userId;
+            string accessToken = message.accessToken;
+            ValidateAccessTokenJob validateAccessTokenJob = new ValidateAccessTokenJob(Database, userId, accessToken);
             validateAccessTokenJob.Start();
             yield return StartCoroutine(validateAccessTokenJob.WaitFor());
             if (!validateAccessTokenJob.result)
@@ -194,11 +194,11 @@ namespace MultiplayerARPG.MMO
                 userPeerInfo.accessToken = accessToken = Regex.Replace(Convert.ToBase64String(Guid.NewGuid().ToByteArray()), "[/+=]", "");
                 userPeersByUserId[userId] = userPeerInfo;
                 userPeers[connectionId] = userPeerInfo;
-                var updateAccessTokenJob = new UpdateAccessTokenJob(Database, userId, accessToken);
+                UpdateAccessTokenJob updateAccessTokenJob = new UpdateAccessTokenJob(Database, userId, accessToken);
                 updateAccessTokenJob.Start();
                 yield return StartCoroutine(updateAccessTokenJob.WaitFor());
             }
-            var responseMessage = new ResponseValidateAccessTokenMessage();
+            ResponseValidateAccessTokenMessage responseMessage = new ResponseValidateAccessTokenMessage();
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = error == ResponseValidateAccessTokenMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
             responseMessage.error = error;
@@ -214,14 +214,14 @@ namespace MultiplayerARPG.MMO
 
         private IEnumerator HandleRequestFacebookLoginRoutine(LiteNetLibMessageHandler messageHandler)
         {
-            var connectionId = messageHandler.connectionId;
-            var message = messageHandler.ReadMessage<RequestFacebookLoginMessage>();
-            var error = ResponseUserLoginMessage.Error.None;
-            var job = new FacebookLoginJob(Database, message.id, message.accessToken);
+            long connectionId = messageHandler.connectionId;
+            RequestFacebookLoginMessage message = messageHandler.ReadMessage<RequestFacebookLoginMessage>();
+            ResponseUserLoginMessage.Error error = ResponseUserLoginMessage.Error.None;
+            FacebookLoginJob job = new FacebookLoginJob(Database, message.id, message.accessToken);
             job.Start();
             yield return StartCoroutine(job.WaitFor());
-            var userId = job.result;
-            var accessToken = string.Empty;
+            string userId = job.result;
+            string accessToken = string.Empty;
             if (string.IsNullOrEmpty(userId))
             {
                 error = ResponseUserLoginMessage.Error.InvalidUsernameOrPassword;
@@ -234,17 +234,17 @@ namespace MultiplayerARPG.MMO
             }
             else
             {
-                var userPeerInfo = new CentralUserPeerInfo();
+                CentralUserPeerInfo userPeerInfo = new CentralUserPeerInfo();
                 userPeerInfo.connectionId = connectionId;
                 userPeerInfo.userId = userId;
                 userPeerInfo.accessToken = accessToken = Regex.Replace(Convert.ToBase64String(Guid.NewGuid().ToByteArray()), "[/+=]", "");
                 userPeersByUserId[userId] = userPeerInfo;
                 userPeers[connectionId] = userPeerInfo;
-                var updateAccessTokenJob = new UpdateAccessTokenJob(Database, userId, accessToken);
+                UpdateAccessTokenJob updateAccessTokenJob = new UpdateAccessTokenJob(Database, userId, accessToken);
                 updateAccessTokenJob.Start();
                 yield return StartCoroutine(updateAccessTokenJob.WaitFor());
             }
-            var responseMessage = new ResponseUserLoginMessage();
+            ResponseUserLoginMessage responseMessage = new ResponseUserLoginMessage();
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = error == ResponseUserLoginMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
             responseMessage.error = error;
@@ -260,14 +260,14 @@ namespace MultiplayerARPG.MMO
 
         IEnumerator HandleRequestGooglePlayLoginRoutine(LiteNetLibMessageHandler messageHandler)
         {
-            var connectionId = messageHandler.connectionId;
-            var message = messageHandler.ReadMessage<RequestGooglePlayLoginMessage>();
-            var error = ResponseUserLoginMessage.Error.None;
-            var job = new GooglePlayLoginJob(Database, message.idToken);
+            long connectionId = messageHandler.connectionId;
+            RequestGooglePlayLoginMessage message = messageHandler.ReadMessage<RequestGooglePlayLoginMessage>();
+            ResponseUserLoginMessage.Error error = ResponseUserLoginMessage.Error.None;
+            GooglePlayLoginJob job = new GooglePlayLoginJob(Database, message.idToken);
             job.Start();
             yield return StartCoroutine(job.WaitFor());
-            var userId = job.result;
-            var accessToken = string.Empty;
+            string userId = job.result;
+            string accessToken = string.Empty;
             if (string.IsNullOrEmpty(userId))
             {
                 error = ResponseUserLoginMessage.Error.InvalidUsernameOrPassword;
@@ -280,17 +280,17 @@ namespace MultiplayerARPG.MMO
             }
             else
             {
-                var userPeerInfo = new CentralUserPeerInfo();
+                CentralUserPeerInfo userPeerInfo = new CentralUserPeerInfo();
                 userPeerInfo.connectionId = connectionId;
                 userPeerInfo.userId = userId;
                 userPeerInfo.accessToken = accessToken = Regex.Replace(Convert.ToBase64String(Guid.NewGuid().ToByteArray()), "[/+=]", "");
                 userPeersByUserId[userId] = userPeerInfo;
                 userPeers[connectionId] = userPeerInfo;
-                var updateAccessTokenJob = new UpdateAccessTokenJob(Database, userId, accessToken);
+                UpdateAccessTokenJob updateAccessTokenJob = new UpdateAccessTokenJob(Database, userId, accessToken);
                 updateAccessTokenJob.Start();
                 yield return StartCoroutine(updateAccessTokenJob.WaitFor());
             }
-            var responseMessage = new ResponseUserLoginMessage();
+            ResponseUserLoginMessage responseMessage = new ResponseUserLoginMessage();
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = error == ResponseUserLoginMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
             responseMessage.error = error;
@@ -301,33 +301,33 @@ namespace MultiplayerARPG.MMO
 
         protected void HandleResponseUserLogin(LiteNetLibMessageHandler messageHandler)
         {
-            var transportHandler = messageHandler.transportHandler;
-            var message = messageHandler.ReadMessage<ResponseUserLoginMessage>();
-            var ackId = message.ackId;
+            TransportHandler transportHandler = messageHandler.transportHandler;
+            ResponseUserLoginMessage message = messageHandler.ReadMessage<ResponseUserLoginMessage>();
+            uint ackId = message.ackId;
             transportHandler.TriggerAck(ackId, message.responseCode, message);
         }
 
         protected void HandleResponseUserRegister(LiteNetLibMessageHandler messageHandler)
         {
-            var transportHandler = messageHandler.transportHandler;
-            var message = messageHandler.ReadMessage<ResponseUserRegisterMessage>();
-            var ackId = message.ackId;
+            TransportHandler transportHandler = messageHandler.transportHandler;
+            ResponseUserRegisterMessage message = messageHandler.ReadMessage<ResponseUserRegisterMessage>();
+            uint ackId = message.ackId;
             transportHandler.TriggerAck(ackId, message.responseCode, message);
         }
 
         protected void HandleResponseUserLogout(LiteNetLibMessageHandler messageHandler)
         {
-            var transportHandler = messageHandler.transportHandler;
-            var message = messageHandler.ReadMessage<BaseAckMessage>();
-            var ackId = message.ackId;
+            TransportHandler transportHandler = messageHandler.transportHandler;
+            BaseAckMessage message = messageHandler.ReadMessage<BaseAckMessage>();
+            uint ackId = message.ackId;
             transportHandler.TriggerAck(ackId, message.responseCode, message);
         }
 
         protected void HandleResponseValidateAccessToken(LiteNetLibMessageHandler messageHandler)
         {
-            var transportHandler = messageHandler.transportHandler;
-            var message = messageHandler.ReadMessage<ResponseValidateAccessTokenMessage>();
-            var ackId = message.ackId;
+            TransportHandler transportHandler = messageHandler.transportHandler;
+            ResponseValidateAccessTokenMessage message = messageHandler.ReadMessage<ResponseValidateAccessTokenMessage>();
+            uint ackId = message.ackId;
             transportHandler.TriggerAck(ackId, message.responseCode, message);
         }
     }

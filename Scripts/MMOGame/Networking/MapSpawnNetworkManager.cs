@@ -99,7 +99,7 @@ namespace MultiplayerARPG.MMO
             freePorts.Clear();
             mainThreadActions.Clear();
             processIdCounter = 0;
-            foreach (var process in processes.Values)
+            foreach (Process process in processes.Values)
             {
                 process.Kill();
             }
@@ -142,7 +142,7 @@ namespace MultiplayerARPG.MMO
                     {
                         lock (mainThreadLock)
                         {
-                            foreach (var actions in mainThreadActions)
+                            foreach (Action actions in mainThreadActions)
                             {
                                 actions.Invoke();
                             }
@@ -152,7 +152,7 @@ namespace MultiplayerARPG.MMO
                     }
                     if (restartingScenes.Count > 0)
                     {
-                        foreach (var scene in restartingScenes)
+                        foreach (string scene in restartingScenes)
                         {
                             SpawnMap(scene, true);
                         }
@@ -170,8 +170,8 @@ namespace MultiplayerARPG.MMO
 
         private void HandleRequestSpawnMap(LiteNetLibMessageHandler messageHandler)
         {
-            var message = messageHandler.ReadMessage<RequestSpawnMapMessage>();
-            var error = ResponseSpawnMapMessage.Error.None;
+            RequestSpawnMapMessage message = messageHandler.ReadMessage<RequestSpawnMapMessage>();
+            ResponseSpawnMapMessage.Error error = ResponseSpawnMapMessage.Error.None;
             if (!CentralAppServerRegister.IsRegisteredToCentralServer)
                 error = ResponseSpawnMapMessage.Error.NotReady;
             else if (string.IsNullOrEmpty(message.sceneName))
@@ -190,8 +190,8 @@ namespace MultiplayerARPG.MMO
                 if (spawningScenes == null || spawningScenes.Count == 0)
                 {
                     spawningScenes = new List<UnityScene>();
-                    var sceneNames = GameInstance.Singleton.GetGameScenes();
-                    foreach (var sceneName in sceneNames)
+                    List<string> sceneNames = GameInstance.Singleton.GetGameScenes();
+                    foreach (string sceneName in sceneNames)
                     {
                         spawningScenes.Add(new UnityScene()
                         {
@@ -199,7 +199,7 @@ namespace MultiplayerARPG.MMO
                         });
                     }
                 }
-                foreach (var scene in spawningScenes)
+                foreach (UnityScene scene in spawningScenes)
                 {
                     SpawnMap(scene, true);
                 }
@@ -223,10 +223,10 @@ namespace MultiplayerARPG.MMO
                 spawningPort = freePorts.Dequeue();
             else
                 spawningPort = portCounter++;
-            var port = spawningPort;
+            int port = spawningPort;
 
             // Path to executable
-            var path = ExePath;
+            string path = ExePath;
             if (string.IsNullOrEmpty(path))
             {
                 path = File.Exists(Environment.GetCommandLineArgs()[0])
@@ -238,7 +238,7 @@ namespace MultiplayerARPG.MMO
                 UnityEngine.Debug.Log("Starting process from: " + path);
 
             // Spawning Process Info
-            var startProcessInfo = new ProcessStartInfo(path)
+            ProcessStartInfo startProcessInfo = new ProcessStartInfo(path)
             {
                 CreateNoWindow = false,
                 UseShellExecute = false,
@@ -255,15 +255,15 @@ namespace MultiplayerARPG.MMO
             if (LogInfo)
                 UnityEngine.Debug.Log("Starting process with args: " + startProcessInfo.Arguments);
 
-            var processId = ++processIdCounter;
-            var processStarted = false;
+            uint processId = ++processIdCounter;
+            bool processStarted = false;
             try
             {
                 new Thread(() =>
                 {
                     try
                     {
-                        using (var process = Process.Start(startProcessInfo))
+                        using (Process process = Process.Start(startProcessInfo))
                         {
                             lock (processLock)
                             {
@@ -342,7 +342,7 @@ namespace MultiplayerARPG.MMO
 
         private void ReponseMapSpawn(uint ackId, ResponseSpawnMapMessage.Error error)
         {
-            var responseMessage = new ResponseSpawnMapMessage();
+            ResponseSpawnMapMessage responseMessage = new ResponseSpawnMapMessage();
             responseMessage.ackId = ackId;
             responseMessage.responseCode = error == ResponseSpawnMapMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
             responseMessage.error = error;

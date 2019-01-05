@@ -53,7 +53,7 @@ public class LogGUI : MonoBehaviour
         {
             writer.WriteLine("(" + type + ") " + logString + "\n" + stackTrace.Replace("\n", "\n\t\t"));
         }
-        var color = Color.white;
+        Color color = Color.white;
         switch (type)
         {
             case LogType.Error:
@@ -86,7 +86,7 @@ public class LogGUI : MonoBehaviour
         scrollPosition = GUILayout.BeginScrollView(scrollPosition, GUILayout.Width(Screen.width), GUILayout.Height(logAreaHeight));
         for (int i = 0; i < logList.Count; ++i)
         {
-            var logData = logList[i];
+            LogData logData = logList[i];
             GUI.color = logData.logColor;
             GUILayout.Label(logData.logText);
         }

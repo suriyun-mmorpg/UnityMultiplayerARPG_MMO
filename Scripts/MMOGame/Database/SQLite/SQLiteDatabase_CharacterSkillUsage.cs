@@ -35,8 +35,8 @@ namespace MultiplayerARPG.MMO
 
         public List<CharacterSkillUsage> ReadCharacterSkillUsages(string characterId)
         {
-            var result = new List<CharacterSkillUsage>();
-            var reader = ExecuteReader("SELECT * FROM characterskillusage WHERE characterId=@characterId ORDER BY coolDownRemainsDuration ASC",
+            List<CharacterSkillUsage> result = new List<CharacterSkillUsage>();
+            SQLiteRowsReader reader = ExecuteReader("SELECT * FROM characterskillusage WHERE characterId=@characterId ORDER BY coolDownRemainsDuration ASC",
                 new SqliteParameter("@characterId", characterId));
             CharacterSkillUsage tempSkillUsage;
             while (ReadCharacterSkillUsage(reader, out tempSkillUsage, false))

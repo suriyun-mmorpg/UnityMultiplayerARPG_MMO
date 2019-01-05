@@ -33,8 +33,8 @@ namespace MultiplayerARPG.MMO
 
         public List<CharacterSkill> ReadCharacterSkills(string characterId)
         {
-            var result = new List<CharacterSkill>();
-            var reader = ExecuteReader("SELECT * FROM characterskill WHERE characterId=@characterId ORDER BY idx ASC",
+            List<CharacterSkill> result = new List<CharacterSkill>();
+            MySQLRowsReader reader = ExecuteReader("SELECT * FROM characterskill WHERE characterId=@characterId ORDER BY idx ASC",
                 new MySqlParameter("@characterId", characterId));
             CharacterSkill tempSkill;
             while (ReadCharacterSkill(reader, out tempSkill, false))

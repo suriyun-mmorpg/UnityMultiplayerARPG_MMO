@@ -36,8 +36,8 @@ namespace MultiplayerARPG.MMO
 
         public List<CharacterHotkey> ReadCharacterHotkeys(string characterId)
         {
-            var result = new List<CharacterHotkey>();
-            var reader = ExecuteReader("SELECT * FROM characterhotkey WHERE characterId=@characterId",
+            List<CharacterHotkey> result = new List<CharacterHotkey>();
+            SQLiteRowsReader reader = ExecuteReader("SELECT * FROM characterhotkey WHERE characterId=@characterId",
                 new SqliteParameter("@characterId", characterId));
             CharacterHotkey tempHotkey;
             while (ReadCharacterHotkey(reader, out tempHotkey, false))

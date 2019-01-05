@@ -38,8 +38,8 @@ namespace MultiplayerARPG.MMO
 
         public List<CharacterBuff> ReadCharacterBuffs(string characterId)
         {
-            var result = new List<CharacterBuff>();
-            var reader = ExecuteReader("SELECT * FROM characterbuff WHERE characterId=@characterId ORDER BY buffRemainsDuration ASC",
+            List<CharacterBuff> result = new List<CharacterBuff>();
+            SQLiteRowsReader reader = ExecuteReader("SELECT * FROM characterbuff WHERE characterId=@characterId ORDER BY buffRemainsDuration ASC",
                 new SqliteParameter("@characterId", characterId));
             CharacterBuff tempBuff;
             while (ReadCharacterBuff(reader, out tempBuff, false))

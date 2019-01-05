@@ -10,13 +10,13 @@ namespace MultiplayerARPG.MMO
     {
         public uint RequestCharacters(AckMessageCallback callback)
         {
-            var message = new RequestCharactersMessage();
+            RequestCharactersMessage message = new RequestCharactersMessage();
             return Client.ClientSendAckPacket(SendOptions.ReliableOrdered, MMOMessageTypes.RequestCharacters, message, callback);
         }
 
         public uint RequestCreateCharacter(string characterName, int dataId, int entityId, AckMessageCallback callback)
         {
-            var message = new RequestCreateCharacterMessage();
+            RequestCreateCharacterMessage message = new RequestCreateCharacterMessage();
             message.characterName = characterName;
             message.dataId = dataId;
             message.entityId = entityId;
@@ -25,14 +25,14 @@ namespace MultiplayerARPG.MMO
 
         public uint RequestDeleteCharacter(string characterId, AckMessageCallback callback)
         {
-            var message = new RequestDeleteCharacterMessage();
+            RequestDeleteCharacterMessage message = new RequestDeleteCharacterMessage();
             message.characterId = characterId;
             return Client.ClientSendAckPacket(SendOptions.ReliableOrdered, MMOMessageTypes.RequestDeleteCharacter, message, callback);
         }
 
         public uint RequestSelectCharacter(string characterId, AckMessageCallback callback)
         {
-            var message = new RequestSelectCharacterMessage();
+            RequestSelectCharacterMessage message = new RequestSelectCharacterMessage();
             message.characterId = characterId;
             return Client.ClientSendAckPacket(SendOptions.ReliableOrdered, MMOMessageTypes.RequestSelectCharacter, message, callback);
         }
@@ -44,21 +44,21 @@ namespace MultiplayerARPG.MMO
 
         private IEnumerator HandleRequestCharactersRoutine(LiteNetLibMessageHandler messageHandler)
         {
-            var connectionId = messageHandler.connectionId;
-            var message = messageHandler.ReadMessage<RequestCharactersMessage>();
-            var error = ResponseCharactersMessage.Error.None;
+            long connectionId = messageHandler.connectionId;
+            RequestCharactersMessage message = messageHandler.ReadMessage<RequestCharactersMessage>();
+            ResponseCharactersMessage.Error error = ResponseCharactersMessage.Error.None;
             List<PlayerCharacterData> characters = null;
             CentralUserPeerInfo userPeerInfo;
             if (!userPeers.TryGetValue(connectionId, out userPeerInfo))
                 error = ResponseCharactersMessage.Error.NotLoggedin;
             else
             {
-                var job = new ReadCharactersJob(Database, userPeerInfo.userId);
+                ReadCharactersJob job = new ReadCharactersJob(Database, userPeerInfo.userId);
                 job.Start();
                 yield return StartCoroutine(job.WaitFor());
                 characters = job.result;
             }
-            var responseMessage = new ResponseCharactersMessage();
+            ResponseCharactersMessage responseMessage = new ResponseCharactersMessage();
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = error == ResponseCharactersMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
             responseMessage.error = error;
@@ -73,14 +73,14 @@ namespace MultiplayerARPG.MMO
 
         private IEnumerator HandleRequestCreateCharacterRoutine(LiteNetLibMessageHandler messageHandler)
         {
-            var connectionId = messageHandler.connectionId;
-            var message = messageHandler.ReadMessage<RequestCreateCharacterMessage>();
-            var error = ResponseCreateCharacterMessage.Error.None;
-            var characterName = message.characterName;
-            var dataId = message.dataId;
-            var entityId = message.entityId;
+            long connectionId = messageHandler.connectionId;
+            RequestCreateCharacterMessage message = messageHandler.ReadMessage<RequestCreateCharacterMessage>();
+            ResponseCreateCharacterMessage.Error error = ResponseCreateCharacterMessage.Error.None;
+            string characterName = message.characterName;
+            int dataId = message.dataId;
+            int entityId = message.entityId;
             CentralUserPeerInfo userPeerInfo;
-            var findCharacterNameJob = new FindCharacterNameJob(Database, characterName);
+            FindCharacterNameJob findCharacterNameJob = new FindCharacterNameJob(Database, characterName);
             findCharacterNameJob.Start();
             yield return StartCoroutine(findCharacterNameJob.WaitFor());
             if (findCharacterNameJob.result > 0)
@@ -96,15 +96,15 @@ namespace MultiplayerARPG.MMO
                 error = ResponseCreateCharacterMessage.Error.InvalidData;
             else
             {
-                var characterId = GenericUtils.GetUniqueId();
-                var characterData = new PlayerCharacterData();
+                string characterId = GenericUtils.GetUniqueId();
+                PlayerCharacterData characterData = new PlayerCharacterData();
                 characterData.Id = characterId;
                 characterData.SetNewPlayerCharacterData(characterName, dataId, entityId);
-                var createCharacterJob = new CreateCharacterJob(Database, userPeerInfo.userId, characterData);
+                CreateCharacterJob createCharacterJob = new CreateCharacterJob(Database, userPeerInfo.userId, characterData);
                 createCharacterJob.Start();
                 yield return StartCoroutine(createCharacterJob.WaitFor());
             }
-            var responseMessage = new ResponseCreateCharacterMessage();
+            ResponseCreateCharacterMessage responseMessage = new ResponseCreateCharacterMessage();
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = error == ResponseCreateCharacterMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
             responseMessage.error = error;
@@ -118,19 +118,19 @@ namespace MultiplayerARPG.MMO
 
         private IEnumerator HandleRequestDeleteCharacterRoutine(LiteNetLibMessageHandler messageHandler)
         {
-            var connectionId = messageHandler.connectionId;
-            var message = messageHandler.ReadMessage<RequestDeleteCharacterMessage>();
-            var error = ResponseDeleteCharacterMessage.Error.None;
+            long connectionId = messageHandler.connectionId;
+            RequestDeleteCharacterMessage message = messageHandler.ReadMessage<RequestDeleteCharacterMessage>();
+            ResponseDeleteCharacterMessage.Error error = ResponseDeleteCharacterMessage.Error.None;
             CentralUserPeerInfo userPeerInfo;
             if (!userPeers.TryGetValue(connectionId, out userPeerInfo))
                 error = ResponseDeleteCharacterMessage.Error.NotLoggedin;
             else
             {
-                var job = new DeleteCharactersJob(Database, userPeerInfo.userId, message.characterId);
+                DeleteCharactersJob job = new DeleteCharactersJob(Database, userPeerInfo.userId, message.characterId);
                 job.Start();
                 yield return StartCoroutine(job.WaitFor());
             }
-            var responseMessage = new ResponseDeleteCharacterMessage();
+            ResponseDeleteCharacterMessage responseMessage = new ResponseDeleteCharacterMessage();
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = error == ResponseDeleteCharacterMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
             responseMessage.error = error;
@@ -144,25 +144,25 @@ namespace MultiplayerARPG.MMO
 
         private IEnumerator HandleRequestSelectCharacterRoutine(LiteNetLibMessageHandler messageHandler)
         {
-            var connectionId = messageHandler.connectionId;
-            var message = messageHandler.ReadMessage<RequestSelectCharacterMessage>();
-            var error = ResponseSelectCharacterMessage.Error.None;
+            long connectionId = messageHandler.connectionId;
+            RequestSelectCharacterMessage message = messageHandler.ReadMessage<RequestSelectCharacterMessage>();
+            ResponseSelectCharacterMessage.Error error = ResponseSelectCharacterMessage.Error.None;
             CentralServerPeerInfo mapServerPeerInfo = null;
             CentralUserPeerInfo userPeerInfo;
             if (!userPeers.TryGetValue(connectionId, out userPeerInfo))
                 error = ResponseSelectCharacterMessage.Error.NotLoggedin;
             else
             {
-                var job = new ReadCharacterJob(Database, userPeerInfo.userId, message.characterId, false, false, false, false, false, false, false, false, false);
+                ReadCharacterJob job = new ReadCharacterJob(Database, userPeerInfo.userId, message.characterId, false, false, false, false, false, false, false, false, false);
                 job.Start();
                 yield return StartCoroutine(job.WaitFor());
-                var character = job.result;
+                PlayerCharacterData character = job.result;
                 if (character == null)
                     error = ResponseSelectCharacterMessage.Error.InvalidCharacterData;
                 else if (!mapServerPeersBySceneName.TryGetValue(character.CurrentMapName, out mapServerPeerInfo))
                     error = ResponseSelectCharacterMessage.Error.MapNotReady;
             }
-            var responseMessage = new ResponseSelectCharacterMessage();
+            ResponseSelectCharacterMessage responseMessage = new ResponseSelectCharacterMessage();
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = error == ResponseSelectCharacterMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
             responseMessage.error = error;
@@ -178,33 +178,33 @@ namespace MultiplayerARPG.MMO
 
         protected void HandleResponseCharacters(LiteNetLibMessageHandler messageHandler)
         {
-            var transportHandler = messageHandler.transportHandler;
-            var message = messageHandler.ReadMessage<ResponseCharactersMessage>();
-            var ackId = message.ackId;
+            TransportHandler transportHandler = messageHandler.transportHandler;
+            ResponseCharactersMessage message = messageHandler.ReadMessage<ResponseCharactersMessage>();
+            uint ackId = message.ackId;
             transportHandler.TriggerAck(ackId, message.responseCode, message);
         }
 
         protected void HandleResponseCreateCharacter(LiteNetLibMessageHandler messageHandler)
         {
-            var transportHandler = messageHandler.transportHandler;
-            var message = messageHandler.ReadMessage<ResponseCreateCharacterMessage>();
-            var ackId = message.ackId;
+            TransportHandler transportHandler = messageHandler.transportHandler;
+            ResponseCreateCharacterMessage message = messageHandler.ReadMessage<ResponseCreateCharacterMessage>();
+            uint ackId = message.ackId;
             transportHandler.TriggerAck(ackId, message.responseCode, message);
         }
 
         protected void HandleResponseDeleteCharacter(LiteNetLibMessageHandler messageHandler)
         {
-            var transportHandler = messageHandler.transportHandler;
-            var message = messageHandler.ReadMessage<ResponseDeleteCharacterMessage>();
-            var ackId = message.ackId;
+            TransportHandler transportHandler = messageHandler.transportHandler;
+            ResponseDeleteCharacterMessage message = messageHandler.ReadMessage<ResponseDeleteCharacterMessage>();
+            uint ackId = message.ackId;
             transportHandler.TriggerAck(ackId, message.responseCode, message);
         }
 
         protected void HandleResponseSelectCharacter(LiteNetLibMessageHandler messageHandler)
         {
-            var transportHandler = messageHandler.transportHandler;
-            var message = messageHandler.ReadMessage<ResponseSelectCharacterMessage>();
-            var ackId = message.ackId;
+            TransportHandler transportHandler = messageHandler.transportHandler;
+            ResponseSelectCharacterMessage message = messageHandler.ReadMessage<ResponseSelectCharacterMessage>();
+            uint ackId = message.ackId;
             transportHandler.TriggerAck(ackId, message.responseCode, message);
         }
     }

@@ -127,7 +127,7 @@ namespace MultiplayerARPG.MMO
             {
                 mapServerConnectionIds.Add(connectionId);
                 // Send add map users
-                foreach (var userData in mapUsersById.Values)
+                foreach (UserCharacterData userData in mapUsersById.Values)
                 {
                     UpdateMapUser(connectionId, UpdateUserCharacterMessage.UpdateType.Add, userData);
                 }
@@ -140,7 +140,7 @@ namespace MultiplayerARPG.MMO
             if (mapServerConnectionIds.Remove(connectionId))
             {
                 UserCharacterData userData;
-                foreach (var entry in connectionIdsByCharacterId)
+                foreach (KeyValuePair<string, long> entry in connectionIdsByCharacterId)
                 {
                     // Find characters which connected to disconnecting map server
                     if (connectionId != entry.Value || !mapUsersById.TryGetValue(entry.Key, out userData))
@@ -162,50 +162,50 @@ namespace MultiplayerARPG.MMO
 
         private void HandleChatAtClient(LiteNetLibMessageHandler messageHandler)
         {
-            var message = messageHandler.ReadMessage<ChatMessage>();
+            ChatMessage message = messageHandler.ReadMessage<ChatMessage>();
             if (mapNetworkManager != null)
                 mapNetworkManager.OnChatMessageReceive(message);
         }
 
         private void HandleUpdateMapUserAtClient(LiteNetLibMessageHandler messageHandler)
         {
-            var message = messageHandler.ReadMessage<UpdateUserCharacterMessage>();
+            UpdateUserCharacterMessage message = messageHandler.ReadMessage<UpdateUserCharacterMessage>();
             if (mapNetworkManager != null)
                 mapNetworkManager.OnUpdateMapUser(message);
         }
 
         private void HandleUpdatePartyMemberAtClient(LiteNetLibMessageHandler messageHandler)
         {
-            var message = messageHandler.ReadMessage<UpdateSocialMemberMessage>();
+            UpdateSocialMemberMessage message = messageHandler.ReadMessage<UpdateSocialMemberMessage>();
             if (mapNetworkManager != null)
                 mapNetworkManager.OnUpdatePartyMember(message);
         }
 
         private void HandleUpdatePartyAtClient(LiteNetLibMessageHandler messageHandler)
         {
-            var message = messageHandler.ReadMessage<UpdatePartyMessage>();
+            UpdatePartyMessage message = messageHandler.ReadMessage<UpdatePartyMessage>();
             if (mapNetworkManager != null)
                 mapNetworkManager.OnUpdateParty(message);
         }
 
         private void HandleUpdateGuildMemberAtClient(LiteNetLibMessageHandler messageHandler)
         {
-            var message = messageHandler.ReadMessage<UpdateSocialMemberMessage>();
+            UpdateSocialMemberMessage message = messageHandler.ReadMessage<UpdateSocialMemberMessage>();
             if (mapNetworkManager != null)
                 mapNetworkManager.OnUpdateGuildMember(message);
         }
 
         private void HandleUpdateGuildAtClient(LiteNetLibMessageHandler messageHandler)
         {
-            var message = messageHandler.ReadMessage<UpdateGuildMessage>();
+            UpdateGuildMessage message = messageHandler.ReadMessage<UpdateGuildMessage>();
             if (mapNetworkManager != null)
                 mapNetworkManager.OnUpdateGuild(message);
         }
 
         private void HandleChatAtServer(LiteNetLibMessageHandler messageHandler)
         {
-            var connectionId = messageHandler.connectionId;
-            var message = messageHandler.ReadMessage<ChatMessage>();
+            long connectionId = messageHandler.connectionId;
+            ChatMessage message = messageHandler.ReadMessage<ChatMessage>();
             if (LogInfo)
                 Debug.Log("Handle chat: " + message.channel + " sender: " + message.sender + " receiver: " + message.receiver + " message: " + message.message);
             switch (message.channel)
@@ -235,8 +235,8 @@ namespace MultiplayerARPG.MMO
 
         private void HandleUpdateMapUserAtServer(LiteNetLibMessageHandler messageHandler)
         {
-            var connectionId = messageHandler.connectionId;
-            var message = messageHandler.ReadMessage<UpdateUserCharacterMessage>();
+            long connectionId = messageHandler.connectionId;
+            UpdateUserCharacterMessage message = messageHandler.ReadMessage<UpdateUserCharacterMessage>();
             if (mapServerConnectionIds.Contains(connectionId))
             {
                 UserCharacterData userData;
@@ -279,11 +279,11 @@ namespace MultiplayerARPG.MMO
 
         private void HandleUpdatePartyMemberAtServer(LiteNetLibMessageHandler messageHandler)
         {
-            var connectionId = messageHandler.connectionId;
-            var message = messageHandler.ReadMessage<UpdateSocialMemberMessage>();
+            long connectionId = messageHandler.connectionId;
+            UpdateSocialMemberMessage message = messageHandler.ReadMessage<UpdateSocialMemberMessage>();
             if (mapServerConnectionIds.Contains(connectionId))
             {
-                foreach (var mapServerConnectionId in mapServerConnectionIds)
+                foreach (long mapServerConnectionId in mapServerConnectionIds)
                 {
                     if (mapServerConnectionId != connectionId)
                         ServerSendPacket(mapServerConnectionId, SendOptions.ReliableOrdered, MMOMessageTypes.UpdatePartyMember, message);
@@ -293,11 +293,11 @@ namespace MultiplayerARPG.MMO
 
         private void HandleUpdatePartyAtServer(LiteNetLibMessageHandler messageHandler)
         {
-            var connectionId = messageHandler.connectionId;
-            var message = messageHandler.ReadMessage<UpdatePartyMessage>();
+            long connectionId = messageHandler.connectionId;
+            UpdatePartyMessage message = messageHandler.ReadMessage<UpdatePartyMessage>();
             if (mapServerConnectionIds.Contains(connectionId))
             {
-                foreach (var mapServerConnectionId in mapServerConnectionIds)
+                foreach (long mapServerConnectionId in mapServerConnectionIds)
                 {
                     if (mapServerConnectionId != connectionId)
                         ServerSendPacket(mapServerConnectionId, SendOptions.ReliableOrdered, MMOMessageTypes.UpdateParty, message);
@@ -307,11 +307,11 @@ namespace MultiplayerARPG.MMO
 
         private void HandleUpdateGuildMemberAtServer(LiteNetLibMessageHandler messageHandler)
         {
-            var connectionId = messageHandler.connectionId;
-            var message = messageHandler.ReadMessage<UpdateSocialMemberMessage>();
+            long connectionId = messageHandler.connectionId;
+            UpdateSocialMemberMessage message = messageHandler.ReadMessage<UpdateSocialMemberMessage>();
             if (mapServerConnectionIds.Contains(connectionId))
             {
-                foreach (var mapServerConnectionId in mapServerConnectionIds)
+                foreach (long mapServerConnectionId in mapServerConnectionIds)
                 {
                     if (mapServerConnectionId != connectionId)
                         ServerSendPacket(mapServerConnectionId, SendOptions.ReliableOrdered, MMOMessageTypes.UpdateGuildMember, message);
@@ -321,11 +321,11 @@ namespace MultiplayerARPG.MMO
 
         private void HandleUpdateGuildAtServer(LiteNetLibMessageHandler messageHandler)
         {
-            var connectionId = messageHandler.connectionId;
-            var message = messageHandler.ReadMessage<UpdateGuildMessage>();
+            long connectionId = messageHandler.connectionId;
+            UpdateGuildMessage message = messageHandler.ReadMessage<UpdateGuildMessage>();
             if (mapServerConnectionIds.Contains(connectionId))
             {
-                foreach (var mapServerConnectionId in mapServerConnectionIds)
+                foreach (long mapServerConnectionId in mapServerConnectionIds)
                 {
                     if (mapServerConnectionId != connectionId)
                         ServerSendPacket(mapServerConnectionId, SendOptions.ReliableOrdered, MMOMessageTypes.UpdateGuild, message);
@@ -335,7 +335,7 @@ namespace MultiplayerARPG.MMO
 
         private void UpdateMapUser(UpdateUserCharacterMessage.UpdateType updateType, UserCharacterData userData, long exceptConnectionId)
         {
-            foreach (var mapServerConnectionId in mapServerConnectionIds)
+            foreach (long mapServerConnectionId in mapServerConnectionIds)
             {
                 if (mapServerConnectionId == exceptConnectionId)
                     continue;
@@ -346,7 +346,7 @@ namespace MultiplayerARPG.MMO
 
         private void UpdateMapUser(long connectionId, UpdateUserCharacterMessage.UpdateType updateType, UserCharacterData userData)
         {
-            var updateMapUserMessage = new UpdateUserCharacterMessage();
+            UpdateUserCharacterMessage updateMapUserMessage = new UpdateUserCharacterMessage();
             updateMapUserMessage.type = updateType;
             updateMapUserMessage.data = userData;
             ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MMOMessageTypes.UpdateMapUser, updateMapUserMessage);

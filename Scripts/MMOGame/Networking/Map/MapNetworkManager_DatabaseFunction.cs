@@ -13,7 +13,7 @@ namespace MultiplayerARPG.MMO
             if (id > 0 && !loadingPartyIds.Contains(id))
             {
                 loadingPartyIds.Add(id);
-                var job = new ReadPartyJob(Database, id);
+                ReadPartyJob job = new ReadPartyJob(Database, id);
                 job.Start();
                 yield return StartCoroutine(job.WaitFor());
                 if (job.result != null)
@@ -29,7 +29,7 @@ namespace MultiplayerARPG.MMO
             if (id > 0 && !loadingGuildIds.Contains(id))
             {
                 loadingGuildIds.Add(id);
-                var job = new ReadGuildJob(Database, id, gameInstance.SocialSystemSetting.GuildMemberRoles);
+                ReadGuildJob job = new ReadGuildJob(Database, id, gameInstance.SocialSystemSetting.GuildMemberRoles);
                 job.Start();
                 yield return StartCoroutine(job.WaitFor());
                 if (job.result != null)
@@ -45,7 +45,7 @@ namespace MultiplayerARPG.MMO
             if (playerCharacterData != null && !savingCharacters.Contains(playerCharacterData.Id))
             {
                 savingCharacters.Add(playerCharacterData.Id);
-                var job = new UpdateCharacterJob(Database, playerCharacterData);
+                UpdateCharacterJob job = new UpdateCharacterJob(Database, playerCharacterData);
                 job.Start();
                 yield return StartCoroutine(job.WaitFor());
                 savingCharacters.Remove(playerCharacterData.Id);
@@ -58,8 +58,8 @@ namespace MultiplayerARPG.MMO
         {
             if (savingCharacters.Count == 0)
             {
-                var i = 0;
-                foreach (var playerCharacter in playerCharacters.Values)
+                int i = 0;
+                foreach (BasePlayerCharacterEntity playerCharacter in playerCharacters.Values)
                 {
                     StartCoroutine(SaveCharacterRoutine(playerCharacter.CloneTo(new PlayerCharacterData())));
                     ++i;
@@ -78,7 +78,7 @@ namespace MultiplayerARPG.MMO
             if (buildingSaveData != null && !savingBuildings.Contains(buildingSaveData.Id))
             {
                 savingBuildings.Add(buildingSaveData.Id);
-                var job = new UpdateBuildingJob(Database, Assets.onlineScene.SceneName, buildingSaveData);
+                UpdateBuildingJob job = new UpdateBuildingJob(Database, Assets.onlineScene.SceneName, buildingSaveData);
                 job.Start();
                 yield return StartCoroutine(job.WaitFor());
                 savingBuildings.Remove(buildingSaveData.Id);
@@ -91,8 +91,8 @@ namespace MultiplayerARPG.MMO
         {
             if (savingBuildings.Count == 0)
             {
-                var i = 0;
-                foreach (var buildingEntity in buildingEntities.Values)
+                int i = 0;
+                foreach (BuildingEntity buildingEntity in buildingEntities.Values)
                 {
                     StartCoroutine(SaveBuildingRoutine(buildingEntity.CloneTo(new BuildingSaveData())));
                     ++i;

@@ -31,7 +31,7 @@ namespace MultiplayerARPG.MMO
 
         public override void CreateBuilding(string mapName, IBuildingSaveData saveData)
         {
-            var connection = NewConnection();
+            MySqlConnection connection = NewConnection();
             connection.Open();
             ExecuteNonQuery(connection, null, "INSERT INTO buildings (id, parentId, dataId, currentHp, mapName, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, creatorId, creatorName) VALUES (@id, @parentId, @dataId, @currentHp, @mapName, @positionX, @positionY, @positionZ, @rotationX, @rotationY, @rotationZ, @creatorId, @creatorName)",
                 new MySqlParameter("@id", saveData.Id),
@@ -52,8 +52,8 @@ namespace MultiplayerARPG.MMO
 
         public override List<BuildingSaveData> ReadBuildings(string mapName)
         {
-            var result = new List<BuildingSaveData>();
-            var reader = ExecuteReader("SELECT * FROM buildings WHERE mapName=@mapName", new MySqlParameter("@mapName", mapName));
+            List<BuildingSaveData> result = new List<BuildingSaveData>();
+            MySQLRowsReader reader = ExecuteReader("SELECT * FROM buildings WHERE mapName=@mapName", new MySqlParameter("@mapName", mapName));
             BuildingSaveData tempBuilding;
             while (ReadBuilding(reader, out tempBuilding, false))
             {
@@ -64,7 +64,7 @@ namespace MultiplayerARPG.MMO
 
         public override void UpdateBuilding(string mapName, IBuildingSaveData building)
         {
-            var connection = NewConnection();
+            MySqlConnection connection = NewConnection();
             connection.Open();
             ExecuteNonQuery(connection, null, "UPDATE buildings SET " +
                 "parentId=@parentId, " +
@@ -97,7 +97,7 @@ namespace MultiplayerARPG.MMO
 
         public override void DeleteBuilding(string mapName, string id)
         {
-            var connection = NewConnection();
+            MySqlConnection connection = NewConnection();
             connection.Open();
             ExecuteNonQuery(connection, null, "DELETE FROM buildings WHERE id=@id AND mapName=@mapName", new MySqlParameter("@id", id), new MySqlParameter("@mapName", mapName));
             connection.Close();

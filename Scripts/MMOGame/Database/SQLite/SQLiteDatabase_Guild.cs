@@ -9,7 +9,7 @@ namespace MultiplayerARPG.MMO
         public override int CreateGuild(string guildName, string leaderId)
         {
             int id = 0;
-            var reader = ExecuteReader("INSERT INTO guild (guildName, leaderId) VALUES (@guildName, @leaderId);" +
+            SQLiteRowsReader reader = ExecuteReader("INSERT INTO guild (guildName, leaderId) VALUES (@guildName, @leaderId);" +
                 "SELECT LAST_INSERT_ROWID();",
                 new SqliteParameter("@guildName", guildName),
                 new SqliteParameter("@leaderId", leaderId));
@@ -25,7 +25,7 @@ namespace MultiplayerARPG.MMO
         public override GuildData ReadGuild(int id, GuildRoleData[] defaultGuildRoles)
         {
             GuildData result = null;
-            var reader = ExecuteReader("SELECT * FROM guild WHERE id=@id LIMIT 1",
+            SQLiteRowsReader reader = ExecuteReader("SELECT * FROM guild WHERE id=@id LIMIT 1",
                 new SqliteParameter("@id", id));
             if (reader.Read())
             {
@@ -80,7 +80,7 @@ namespace MultiplayerARPG.MMO
             resultExp = 0;
             resultSkillPoint = 0;
 
-            var reader = ExecuteReader("UPDATE guild SET exp=exp+@increaseExp WHERE id=@id;" +
+            SQLiteRowsReader reader = ExecuteReader("UPDATE guild SET exp=exp+@increaseExp WHERE id=@id;" +
                 "SELECT level, exp, skillPoint FROM guild WHERE id=@id LIMIT 1;",
                 new SqliteParameter("@increaseExp", increaseExp),
                 new SqliteParameter("@id", id));

@@ -16,7 +16,7 @@
 
         public SocialCharacterData ToSocialCharacterData()
         {
-            var result = new SocialCharacterData();
+            SocialCharacterData result = new SocialCharacterData();
 
             result.id = id;
             result.characterName = characterName;

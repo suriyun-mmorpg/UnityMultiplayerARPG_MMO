@@ -8,26 +8,26 @@ namespace MultiplayerARPG.MMO
     {
         protected override void OnClickCreate()
         {
-            var gameInstance = GameInstance.Singleton;
-            var selectedUI = SelectionManager.SelectedUI;
+            GameInstance gameInstance = GameInstance.Singleton;
+            UICharacter selectedUI = SelectionManager.SelectedUI;
             if (selectedUI == null)
             {
                 UISceneGlobal.Singleton.ShowMessageDialog("Cannot create character", "Please select character class");
                 Debug.LogWarning("Cannot create character, did not selected character class");
                 return;
             }
-            var characterName = inputCharacterName.text.Trim();
+            string characterName = inputCharacterName.text.Trim();
             MMOClientInstance.Singleton.RequestCreateCharacter(characterName, selectedUI.Data.DataId, selectedUI.Data.EntityId, OnRequestedCreateCharacter);
         }
 
         private void OnRequestedCreateCharacter(AckResponseCode responseCode, BaseAckMessage message)
         {
-            var castedMessage = (ResponseCreateCharacterMessage)message;
+            ResponseCreateCharacterMessage castedMessage = (ResponseCreateCharacterMessage)message;
 
             switch (responseCode)
             {
                 case AckResponseCode.Error:
-                    var errorMessage = string.Empty;
+                    string errorMessage = string.Empty;
                     switch (castedMessage.error)
                     {
                         case ResponseCreateCharacterMessage.Error.NotLoggedin:

@@ -9,14 +9,14 @@ namespace MultiplayerARPG.MMO
     {
         private void FillCharacterAttributes(IPlayerCharacterData characterData)
         {
-            var connection = NewConnection();
+            MySqlConnection connection = NewConnection();
             connection.Open();
-            var transaction = connection.BeginTransaction();
+            MySqlTransaction transaction = connection.BeginTransaction();
             try
             {
                 DeleteCharacterAttributes(connection, transaction, characterData.Id);
-                var i = 0;
-                foreach (var attribute in characterData.Attributes)
+                int i = 0;
+                foreach (CharacterAttribute attribute in characterData.Attributes)
                 {
                     CreateCharacterAttribute(connection, transaction, i++, characterData.Id, attribute);
                 }
@@ -34,13 +34,13 @@ namespace MultiplayerARPG.MMO
 
         private void FillCharacterBuffs(IPlayerCharacterData characterData)
         {
-            var connection = NewConnection();
+            MySqlConnection connection = NewConnection();
             connection.Open();
-            var transaction = connection.BeginTransaction();
+            MySqlTransaction transaction = connection.BeginTransaction();
             try
             {
                 DeleteCharacterBuffs(connection, transaction, characterData.Id);
-                foreach (var buff in characterData.Buffs)
+                foreach (CharacterBuff buff in characterData.Buffs)
                 {
                     CreateCharacterBuff(connection, transaction, characterData.Id, buff);
                 }
@@ -58,13 +58,13 @@ namespace MultiplayerARPG.MMO
 
         private void FillCharacterHotkeys(IPlayerCharacterData characterData)
         {
-            var connection = NewConnection();
+            MySqlConnection connection = NewConnection();
             connection.Open();
-            var transaction = connection.BeginTransaction();
+            MySqlTransaction transaction = connection.BeginTransaction();
             try
             {
                 DeleteCharacterHotkeys(connection, transaction, characterData.Id);
-                foreach (var hotkey in characterData.Hotkeys)
+                foreach (CharacterHotkey hotkey in characterData.Hotkeys)
                 {
                     CreateCharacterHotkey(connection, transaction, characterData.Id, hotkey);
                 }
@@ -82,20 +82,20 @@ namespace MultiplayerARPG.MMO
 
         private void FillCharacterItems(IPlayerCharacterData characterData)
         {
-            var connection = NewConnection();
+            MySqlConnection connection = NewConnection();
             connection.Open();
-            var transaction = connection.BeginTransaction();
+            MySqlTransaction transaction = connection.BeginTransaction();
             try
             {
                 DeleteCharacterItems(connection, transaction, characterData.Id);
                 CreateCharacterEquipWeapons(connection, transaction, characterData.Id, characterData.EquipWeapons);
-                var i = 0;
-                foreach (var equipItem in characterData.EquipItems)
+                int i = 0;
+                foreach (CharacterItem equipItem in characterData.EquipItems)
                 {
                     CreateCharacterEquipItem(connection, transaction, i++, characterData.Id, equipItem);
                 }
                 i = 0;
-                foreach (var nonEquipItem in characterData.NonEquipItems)
+                foreach (CharacterItem nonEquipItem in characterData.NonEquipItems)
                 {
                     CreateCharacterNonEquipItem(connection, transaction, i++, characterData.Id, nonEquipItem);
                 }
@@ -113,14 +113,14 @@ namespace MultiplayerARPG.MMO
 
         private void FillCharacterQuests(IPlayerCharacterData characterData)
         {
-            var connection = NewConnection();
+            MySqlConnection connection = NewConnection();
             connection.Open();
-            var transaction = connection.BeginTransaction();
+            MySqlTransaction transaction = connection.BeginTransaction();
             try
             {
                 DeleteCharacterQuests(connection, transaction, characterData.Id);
-                var i = 0;
-                foreach (var quest in characterData.Quests)
+                int i = 0;
+                foreach (CharacterQuest quest in characterData.Quests)
                 {
                     CreateCharacterQuest(connection, transaction, i++, characterData.Id, quest);
                 }
@@ -138,14 +138,14 @@ namespace MultiplayerARPG.MMO
 
         private void FillCharacterSkills(IPlayerCharacterData characterData)
         {
-            var connection = NewConnection();
+            MySqlConnection connection = NewConnection();
             connection.Open();
-            var transaction = connection.BeginTransaction();
+            MySqlTransaction transaction = connection.BeginTransaction();
             try
             {
                 DeleteCharacterSkills(connection, transaction, characterData.Id);
-                var i = 0;
-                foreach (var skill in characterData.Skills)
+                int i = 0;
+                foreach (CharacterSkill skill in characterData.Skills)
                 {
                     CreateCharacterSkill(connection, transaction, i++, characterData.Id, skill);
                 }
@@ -163,13 +163,13 @@ namespace MultiplayerARPG.MMO
 
         private void FillCharacterSkillUsages(IPlayerCharacterData characterData)
         {
-            var connection = NewConnection();
+            MySqlConnection connection = NewConnection();
             connection.Open();
-            var transaction = connection.BeginTransaction();
+            MySqlTransaction transaction = connection.BeginTransaction();
             try
             {
                 DeleteCharacterSkillUsages(connection, transaction, characterData.Id);
-                foreach (var skillUsage in characterData.SkillUsages)
+                foreach (CharacterSkillUsage skillUsage in characterData.SkillUsages)
                 {
                     CreateCharacterSkillUsage(connection, transaction, characterData.Id, skillUsage);
                 }
@@ -187,13 +187,13 @@ namespace MultiplayerARPG.MMO
 
         private void FillCharacterSummons(IPlayerCharacterData characterData)
         {
-            var connection = NewConnection();
+            MySqlConnection connection = NewConnection();
             connection.Open();
-            var transaction = connection.BeginTransaction();
+            MySqlTransaction transaction = connection.BeginTransaction();
             try
             {
                 DeleteCharacterSummons(connection, transaction, characterData.Id);
-                foreach (var skillUsage in characterData.Summons)
+                foreach (CharacterSummon skillUsage in characterData.Summons)
                 {
                     CreateCharacterSummon(connection, transaction, characterData.Id, skillUsage);
                 }
@@ -304,10 +304,10 @@ namespace MultiplayerARPG.MMO
             bool withHotkeys = true,
             bool withQuests = true)
         {
-            var reader = ExecuteReader("SELECT * FROM characters WHERE id=@id AND userId=@userId LIMIT 1",
+            MySQLRowsReader reader = ExecuteReader("SELECT * FROM characters WHERE id=@id AND userId=@userId LIMIT 1",
                 new MySqlParameter("@id", id),
                 new MySqlParameter("@userId", userId));
-            var result = new PlayerCharacterData();
+            PlayerCharacterData result = new PlayerCharacterData();
             if (ReadCharacter(reader, out result))
             {
                 this.InvokeInstanceDevExtMethods("ReadCharacter",
@@ -350,11 +350,11 @@ namespace MultiplayerARPG.MMO
 
         public override List<PlayerCharacterData> ReadCharacters(string userId)
         {
-            var result = new List<PlayerCharacterData>();
-            var reader = ExecuteReader("SELECT id FROM characters WHERE userId=@userId ORDER BY updateAt DESC", new MySqlParameter("@userId", userId));
+            List<PlayerCharacterData> result = new List<PlayerCharacterData>();
+            MySQLRowsReader reader = ExecuteReader("SELECT id FROM characters WHERE userId=@userId ORDER BY updateAt DESC", new MySqlParameter("@userId", userId));
             while (reader.Read())
             {
-                var characterId = reader.GetString("id");
+                string characterId = reader.GetString("id");
                 result.Add(ReadCharacter(userId, characterId, true, true, true, false, false, true, false, false, false, false));
             }
             return result;
@@ -413,15 +413,15 @@ namespace MultiplayerARPG.MMO
 
         public override void DeleteCharacter(string userId, string id)
         {
-            var result = ExecuteScalar("SELECT COUNT(*) FROM characters WHERE id=@id AND userId=@userId",
+            object result = ExecuteScalar("SELECT COUNT(*) FROM characters WHERE id=@id AND userId=@userId",
                 new MySqlParameter("@id", id),
                 new MySqlParameter("@userId", userId));
-            var count = result != null ? (long)result : 0;
+            long count = result != null ? (long)result : 0;
             if (count > 0)
             {
-                var connection = NewConnection();
+                MySqlConnection connection = NewConnection();
                 connection.Open();
-                var transaction = connection.BeginTransaction();
+                MySqlTransaction transaction = connection.BeginTransaction();
                 try
                 {
                     ExecuteNonQuery(connection, transaction, "DELETE FROM characters WHERE id=@characterId", new MySqlParameter("@characterId", id));
@@ -449,7 +449,7 @@ namespace MultiplayerARPG.MMO
 
         public override long FindCharacterName(string characterName)
         {
-            var result = ExecuteScalar("SELECT COUNT(*) FROM characters WHERE characterName LIKE @characterName",
+            object result = ExecuteScalar("SELECT COUNT(*) FROM characters WHERE characterName LIKE @characterName",
                 new MySqlParameter("@characterName", characterName));
             return result != null ? (long)result : 0;
         }

@@ -42,8 +42,8 @@ namespace MultiplayerARPG.MMO
 
         private List<CharacterItem> ReadCharacterItems(string characterId, InventoryType inventoryType)
         {
-            var result = new List<CharacterItem>();
-            var reader = ExecuteReader("SELECT * FROM characteritem WHERE characterId=@characterId AND inventoryType=@inventoryType ORDER BY idx ASC",
+            List<CharacterItem> result = new List<CharacterItem>();
+            SQLiteRowsReader reader = ExecuteReader("SELECT * FROM characteritem WHERE characterId=@characterId AND inventoryType=@inventoryType ORDER BY idx ASC",
                 new SqliteParameter("@characterId", characterId),
                 new SqliteParameter("@inventoryType", inventoryType));
             CharacterItem tempInventory;
@@ -56,9 +56,9 @@ namespace MultiplayerARPG.MMO
 
         public EquipWeapons ReadCharacterEquipWeapons(string characterId)
         {
-            var result = new EquipWeapons();
+            EquipWeapons result = new EquipWeapons();
             // Right hand weapon
-            var reader = ExecuteReader("SELECT * FROM characteritem WHERE characterId=@characterId AND inventoryType=@inventoryType LIMIT 1",
+            SQLiteRowsReader reader = ExecuteReader("SELECT * FROM characteritem WHERE characterId=@characterId AND inventoryType=@inventoryType LIMIT 1",
                 new SqliteParameter("@characterId", characterId),
                 new SqliteParameter("@inventoryType", InventoryType.EquipWeaponRight));
             CharacterItem rightWeapon;

@@ -47,8 +47,8 @@ namespace MultiplayerARPG.MMO
                 return false;
 
             result = new List<string>();
-            var objResults = (List<object>)config[configName];
-            foreach (var objResult in objResults)
+            List<object> objResults = (List<object>)config[configName];
+            foreach (object objResult in objResults)
             {
                 result.Add((string)objResult);
             }
@@ -62,11 +62,11 @@ namespace MultiplayerARPG.MMO
             if (args == null)
                 return false;
 
-            var argsList = new List<string>(args);
+            List<string> argsList = new List<string>(args);
             if (!argsList.Contains(argName))
                 return false;
 
-            var index = argsList.FindIndex(0, a => a.Equals(argName));
+            int index = argsList.FindIndex(0, a => a.Equals(argName));
             result = args[index + 1];
             return true;
         }
@@ -97,7 +97,7 @@ namespace MultiplayerARPG.MMO
             if (args == null)
                 return false;
 
-            var argsList = new List<string>(args);
+            List<string> argsList = new List<string>(args);
             return argsList.Contains(argName);
         }
     }

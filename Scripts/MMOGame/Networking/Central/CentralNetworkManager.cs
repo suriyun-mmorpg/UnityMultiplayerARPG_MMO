@@ -136,7 +136,7 @@ namespace MultiplayerARPG.MMO
 
         public bool MapContainsUser(string userId)
         {
-            foreach (var mapUser in mapUserIds.Values)
+            foreach (HashSet<string> mapUser in mapUserIds.Values)
             {
                 if (mapUser.Contains(userId))
                     return true;

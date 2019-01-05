@@ -74,7 +74,7 @@ namespace MultiplayerARPG.MMO
         protected override void Update()
         {
             base.Update();
-            var tempUnscaledTime = Time.unscaledTime;
+            float tempUnscaledTime = Time.unscaledTime;
             if (IsServer)
             {
                 CentralAppServerRegister.Update();
@@ -127,12 +127,12 @@ namespace MultiplayerARPG.MMO
             // Save immediately
             if (IsServer)
             {
-                foreach (var playerCharacter in playerCharacters.Values)
+                foreach (BasePlayerCharacterEntity playerCharacter in playerCharacters.Values)
                 {
                     Database.UpdateCharacter(playerCharacter.CloneTo(new PlayerCharacterData()));
                 }
-                var sceneName = Assets.onlineScene.SceneName;
-                foreach (var buildingEntity in buildingEntities.Values)
+                string sceneName = Assets.onlineScene.SceneName;
+                foreach (BuildingEntity buildingEntity in buildingEntities.Values)
                 {
                     Database.UpdateBuilding(sceneName, buildingEntity.CloneTo(new BuildingSaveData()));
                 }
@@ -168,7 +168,7 @@ namespace MultiplayerARPG.MMO
             BasePlayerCharacterEntity playerCharacterEntity;
             if (playerCharacters.TryGetValue(connectionId, out playerCharacterEntity))
             {
-                var saveCharacterData = playerCharacterEntity.CloneTo(new PlayerCharacterData());
+                PlayerCharacterData saveCharacterData = playerCharacterEntity.CloneTo(new PlayerCharacterData());
                 while (savingCharacters.Contains(saveCharacterData.Id))
                 {
                     yield return 0;
@@ -217,17 +217,17 @@ namespace MultiplayerARPG.MMO
         private IEnumerator OnServerOnlineSceneLoadedRoutine()
         {
             // Spawn buildings
-            var job = new ReadBuildingsJob(Database, Assets.onlineScene.SceneName);
+            ReadBuildingsJob job = new ReadBuildingsJob(Database, Assets.onlineScene.SceneName);
             job.Start();
             yield return StartCoroutine(job.WaitFor());
-            var buildings = job.result;
-            foreach (var building in buildings)
+            List<BuildingSaveData> buildings = job.result;
+            foreach (BuildingSaveData building in buildings)
             {
                 CreateBuildingEntity(building, true);
             }
             // Spawn harvestables
-            var harvestableSpawnAreas = FindObjectsOfType<HarvestableSpawnArea>();
-            foreach (var harvestableSpawnArea in harvestableSpawnAreas)
+            HarvestableSpawnArea[] harvestableSpawnAreas = FindObjectsOfType<HarvestableSpawnArea>();
+            foreach (HarvestableSpawnArea harvestableSpawnArea in harvestableSpawnAreas)
             {
                 harvestableSpawnArea.SpawnAll();
             }
@@ -246,15 +246,15 @@ namespace MultiplayerARPG.MMO
             if (!IsServer)
                 return;
 
-            var player = Players[connectionId];
+            LiteNetLibPlayer player = Players[connectionId];
             if (player.IsReady)
                 return;
 
             player.IsReady = true;
 
-            var userId = reader.GetString();
-            var accessToken = reader.GetString();
-            var selectCharacterId = reader.GetString();
+            string userId = reader.GetString();
+            string accessToken = reader.GetString();
+            string selectCharacterId = reader.GetString();
 
             if (playerCharacters.ContainsKey(connectionId))
             {
@@ -270,7 +270,7 @@ namespace MultiplayerARPG.MMO
         private IEnumerator SetPlayerReadyRoutine(long connectionId, string userId, string accessToken, string selectCharacterId)
         {
             // Validate access token
-            var validateAccessTokenJob = new ValidateAccessTokenJob(Database, userId, accessToken);
+            ValidateAccessTokenJob validateAccessTokenJob = new ValidateAccessTokenJob(Database, userId, accessToken);
             validateAccessTokenJob.Start();
             yield return StartCoroutine(validateAccessTokenJob.WaitFor());
             if (!validateAccessTokenJob.result)
@@ -281,10 +281,10 @@ namespace MultiplayerARPG.MMO
             }
             else
             {
-                var loadCharacterJob = new ReadCharacterJob(Database, userId, selectCharacterId);
+                ReadCharacterJob loadCharacterJob = new ReadCharacterJob(Database, userId, selectCharacterId);
                 loadCharacterJob.Start();
                 yield return StartCoroutine(loadCharacterJob.WaitFor());
-                var playerCharacterData = loadCharacterJob.result;
+                PlayerCharacterData playerCharacterData = loadCharacterJob.result;
                 // If data is empty / cannot find character, disconnect user
                 if (playerCharacterData == null)
                 {
@@ -294,7 +294,7 @@ namespace MultiplayerARPG.MMO
                 }
                 else
                 {
-                    var entityPrefab = playerCharacterData.GetEntityPrefab() as BasePlayerCharacterEntity;
+                    BasePlayerCharacterEntity entityPrefab = playerCharacterData.GetEntityPrefab() as BasePlayerCharacterEntity;
                     // If it is not allow this character data, disconnect user
                     if (entityPrefab == null)
                     {
@@ -305,20 +305,20 @@ namespace MultiplayerARPG.MMO
                     else
                     {
                         // Spawn character entity and set its data
-                        var identity = Assets.NetworkSpawn(entityPrefab.Identity.HashAssetId, playerCharacterData.CurrentPosition, Quaternion.identity, 0, connectionId);
-                        var playerCharacterEntity = identity.GetComponent<BasePlayerCharacterEntity>();
+                        LiteNetLibIdentity identity = Assets.NetworkSpawn(entityPrefab.Identity.HashAssetId, playerCharacterData.CurrentPosition, Quaternion.identity, 0, connectionId);
+                        BasePlayerCharacterEntity playerCharacterEntity = identity.GetComponent<BasePlayerCharacterEntity>();
                         playerCharacterData.CloneTo(playerCharacterEntity);
 
                         // Summon saved summons
-                        for (var i = 0; i < playerCharacterEntity.Summons.Count; ++i)
+                        for (int i = 0; i < playerCharacterEntity.Summons.Count; ++i)
                         {
-                            var summon = playerCharacterEntity.Summons[i];
+                            CharacterSummon summon = playerCharacterEntity.Summons[i];
                             summon.Summon(playerCharacterEntity, summon.Level, summon.summonRemainsDuration, summon.Exp, summon.CurrentHp, summon.CurrentMp);
                             playerCharacterEntity.Summons[i] = summon;
                         }
 
                         // Load user level
-                        var loadUserLevelJob = new GetUserLevelJob(Database, userId);
+                        GetUserLevelJob loadUserLevelJob = new GetUserLevelJob(Database, userId);
                         loadUserLevelJob.Start();
                         yield return StartCoroutine(loadUserLevelJob.WaitFor());
                         playerCharacterEntity.UserLevel = loadUserLevelJob.result;
@@ -337,7 +337,7 @@ namespace MultiplayerARPG.MMO
                                 yield return StartCoroutine(LoadPartyRoutine(playerCharacterEntity.PartyId));
                             if (parties.ContainsKey(playerCharacterEntity.PartyId))
                             {
-                                var party = parties[playerCharacterEntity.PartyId];
+                                PartyData party = parties[playerCharacterEntity.PartyId];
                                 SendCreatePartyToClient(playerCharacterEntity.ConnectionId, party);
                                 SendAddPartyMembersToClient(playerCharacterEntity.ConnectionId, party);
                             }
@@ -352,7 +352,7 @@ namespace MultiplayerARPG.MMO
                                 yield return StartCoroutine(LoadGuildRoutine(playerCharacterEntity.GuildId));
                             if (guilds.ContainsKey(playerCharacterEntity.GuildId))
                             {
-                                var guild = guilds[playerCharacterEntity.GuildId];
+                                GuildData guild = guilds[playerCharacterEntity.GuildId];
                                 playerCharacterEntity.GuildRole = guild.GetMemberRole(playerCharacterEntity.Id);
                                 SendCreateGuildToClient(playerCharacterEntity.ConnectionId, guild);
                                 SendAddGuildMembersToClient(playerCharacterEntity.ConnectionId, guild);
@@ -367,7 +367,7 @@ namespace MultiplayerARPG.MMO
                         }
 
                         // Set user data to map server
-                        var userData = new UserCharacterData();
+                        UserCharacterData userData = new UserCharacterData();
                         userData.userId = userId;
                         userData.id = playerCharacterEntity.Id;
                         userData.characterName = playerCharacterEntity.CharacterName;
@@ -384,8 +384,8 @@ namespace MultiplayerARPG.MMO
                         if (ChatNetworkManager.IsClientConnected)
                             UpdateMapUser(ChatNetworkManager.Client, UpdateUserCharacterMessage.UpdateType.Add, userData);
 
-                        var player = Players[connectionId];
-                        foreach (var spawnedObject in Assets.SpawnedObjects.Values)
+                        LiteNetLibPlayer player = Players[connectionId];
+                        foreach (LiteNetLibIdentity spawnedObject in Assets.SpawnedObjects.Values)
                         {
                             if (spawnedObject.ConnectionId == player.ConnectionId)
                                 continue;
@@ -402,7 +402,7 @@ namespace MultiplayerARPG.MMO
         #region Network message handlers
         protected override void HandleWarpAtClient(LiteNetLibMessageHandler messageHandler)
         {
-            var message = messageHandler.ReadMessage<MMOWarpMessage>();
+            MMOWarpMessage message = messageHandler.ReadMessage<MMOWarpMessage>();
             Assets.offlineScene.SceneName = string.Empty;
             StopClient();
             Assets.onlineScene.SceneName = message.sceneName;
@@ -411,7 +411,7 @@ namespace MultiplayerARPG.MMO
 
         protected override void HandleChatAtServer(LiteNetLibMessageHandler messageHandler)
         {
-            var message = FillChatChannelId(messageHandler.ReadMessage<ChatMessage>());
+            ChatMessage message = FillChatChannelId(messageHandler.ReadMessage<ChatMessage>());
             // Local chat will processes immediately, not have to be sent to chat server
             if (message.channel == ChatChannel.Local &&
                 !GMCommands.IsGMCommand(message.message))
@@ -433,12 +433,12 @@ namespace MultiplayerARPG.MMO
 
         private IEnumerator HandleRequestCashShopInfoRoutine(LiteNetLibMessageHandler messageHandler)
         {
-            var connectionId = messageHandler.connectionId;
-            var message = messageHandler.ReadMessage<BaseAckMessage>();
+            long connectionId = messageHandler.connectionId;
+            BaseAckMessage message = messageHandler.ReadMessage<BaseAckMessage>();
             // Set response data
-            var error = ResponseCashShopInfoMessage.Error.None;
-            var cash = 0;
-            var cashShopItemIds = new List<int>();
+            ResponseCashShopInfoMessage.Error error = ResponseCashShopInfoMessage.Error.None;
+            int cash = 0;
+            List<int> cashShopItemIds = new List<int>();
             BasePlayerCharacterEntity playerCharacter;
             UserCharacterData userData;
             if (!playerCharacters.TryGetValue(connectionId, out playerCharacter) ||
@@ -446,17 +446,17 @@ namespace MultiplayerARPG.MMO
                 error = ResponseCashShopInfoMessage.Error.UserNotFound;
             else
             {
-                var job = new GetCashJob(Database, userData.userId);
+                GetCashJob job = new GetCashJob(Database, userData.userId);
                 job.Start();
                 yield return StartCoroutine(job.WaitFor());
                 cash = job.result;
-                foreach (var cashShopItemId in GameInstance.CashShopItems.Keys)
+                foreach (int cashShopItemId in GameInstance.CashShopItems.Keys)
                 {
                     cashShopItemIds.Add(cashShopItemId);
                 }
             }
             // Send response message
-            var responseMessage = new ResponseCashShopInfoMessage();
+            ResponseCashShopInfoMessage responseMessage = new ResponseCashShopInfoMessage();
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = error == ResponseCashShopInfoMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
             responseMessage.error = error;
@@ -472,12 +472,12 @@ namespace MultiplayerARPG.MMO
 
         private IEnumerator HandleRequestCashShopBuyRoutine(LiteNetLibMessageHandler messageHandler)
         {
-            var connectionId = messageHandler.connectionId;
-            var message = messageHandler.ReadMessage<RequestCashShopBuyMessage>();
+            long connectionId = messageHandler.connectionId;
+            RequestCashShopBuyMessage message = messageHandler.ReadMessage<RequestCashShopBuyMessage>();
             // Set response data
-            var error = ResponseCashShopBuyMessage.Error.None;
-            var dataId = message.dataId;
-            var cash = 0;
+            ResponseCashShopBuyMessage.Error error = ResponseCashShopBuyMessage.Error.None;
+            int dataId = message.dataId;
+            int cash = 0;
             BasePlayerCharacterEntity playerCharacter;
             UserCharacterData userData;
             if (!playerCharacters.TryGetValue(connectionId, out playerCharacter) ||
@@ -486,7 +486,7 @@ namespace MultiplayerARPG.MMO
             else
             {
                 // Request cash, reduce, send item info messages to map server
-                var job = new GetCashJob(Database, userData.userId);
+                GetCashJob job = new GetCashJob(Database, userData.userId);
                 job.Start();
                 yield return StartCoroutine(job.WaitFor());
                 cash = job.result;
@@ -497,21 +497,21 @@ namespace MultiplayerARPG.MMO
                     error = ResponseCashShopBuyMessage.Error.NotEnoughCash;
                 else
                 {
-                    var decreaseCashJob = new DecreaseCashJob(Database, userData.userId, cashShopItem.sellPrice);
+                    DecreaseCashJob decreaseCashJob = new DecreaseCashJob(Database, userData.userId, cashShopItem.sellPrice);
                     decreaseCashJob.Start();
                     yield return StartCoroutine(decreaseCashJob.WaitFor());
                     cash = decreaseCashJob.result;
                     playerCharacter.Gold += cashShopItem.receiveGold;
-                    foreach (var receiveItem in cashShopItem.receiveItems)
+                    foreach (ItemAmount receiveItem in cashShopItem.receiveItems)
                     {
                         if (receiveItem.item == null) continue;
-                        var characterItem = CharacterItem.Create(receiveItem.item, 1, receiveItem.amount);
+                        CharacterItem characterItem = CharacterItem.Create(receiveItem.item, 1, receiveItem.amount);
                         playerCharacter.NonEquipItems.Add(characterItem);
                     }
                 }
             }
             // Send response message
-            var responseMessage = new ResponseCashShopBuyMessage();
+            ResponseCashShopBuyMessage responseMessage = new ResponseCashShopBuyMessage();
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = error == ResponseCashShopBuyMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
             responseMessage.error = error;
@@ -527,12 +527,12 @@ namespace MultiplayerARPG.MMO
 
         private IEnumerator HandleRequestCashPackageInfoRoutine(LiteNetLibMessageHandler messageHandler)
         {
-            var connectionId = messageHandler.connectionId;
-            var message = messageHandler.ReadMessage<BaseAckMessage>();
+            long connectionId = messageHandler.connectionId;
+            BaseAckMessage message = messageHandler.ReadMessage<BaseAckMessage>();
             // Set response data
-            var error = ResponseCashPackageInfoMessage.Error.None;
-            var cash = 0;
-            var cashPackageIds = new List<int>();
+            ResponseCashPackageInfoMessage.Error error = ResponseCashPackageInfoMessage.Error.None;
+            int cash = 0;
+            List<int> cashPackageIds = new List<int>();
             BasePlayerCharacterEntity playerCharacter;
             UserCharacterData userData;
             if (!playerCharacters.TryGetValue(connectionId, out playerCharacter) ||
@@ -540,17 +540,17 @@ namespace MultiplayerARPG.MMO
                 error = ResponseCashPackageInfoMessage.Error.UserNotFound;
             else
             {
-                var job = new GetCashJob(Database, userData.userId);
+                GetCashJob job = new GetCashJob(Database, userData.userId);
                 job.Start();
                 yield return StartCoroutine(job.WaitFor());
                 cash = job.result;
-                foreach (var cashShopItemId in GameInstance.CashPackages.Keys)
+                foreach (int cashShopItemId in GameInstance.CashPackages.Keys)
                 {
                     cashPackageIds.Add(cashShopItemId);
                 }
             }
             // Send response message
-            var responseMessage = new ResponseCashPackageInfoMessage();
+            ResponseCashPackageInfoMessage responseMessage = new ResponseCashPackageInfoMessage();
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = error == ResponseCashPackageInfoMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
             responseMessage.error = error;
@@ -566,13 +566,13 @@ namespace MultiplayerARPG.MMO
 
         private IEnumerator HandleRequestCashPackageBuyValidationRoutine(LiteNetLibMessageHandler messageHandler)
         {
-            var connectionId = messageHandler.connectionId;
-            var message = messageHandler.ReadMessage<RequestCashPackageBuyValidationMessage>();
+            long connectionId = messageHandler.connectionId;
+            RequestCashPackageBuyValidationMessage message = messageHandler.ReadMessage<RequestCashPackageBuyValidationMessage>();
             // TODO: Validate purchasing at server side
             // Set response data
-            var error = ResponseCashPackageBuyValidationMessage.Error.None;
-            var dataId = message.dataId;
-            var cash = 0;
+            ResponseCashPackageBuyValidationMessage.Error error = ResponseCashPackageBuyValidationMessage.Error.None;
+            int dataId = message.dataId;
+            int cash = 0;
             BasePlayerCharacterEntity playerCharacter;
             UserCharacterData userData;
             if (!playerCharacters.TryGetValue(connectionId, out playerCharacter) ||
@@ -581,7 +581,7 @@ namespace MultiplayerARPG.MMO
             else
             {
                 // Get current cash will return this in case it cannot increase cash
-                var job = new GetCashJob(Database, userData.userId);
+                GetCashJob job = new GetCashJob(Database, userData.userId);
                 job.Start();
                 yield return StartCoroutine(job.WaitFor());
                 cash = job.result;
@@ -590,14 +590,14 @@ namespace MultiplayerARPG.MMO
                     error = ResponseCashPackageBuyValidationMessage.Error.PackageNotFound;
                 else
                 {
-                    var increaseCashJob = new IncreaseCashJob(Database, userData.userId, cashPackage.cashAmount);
+                    IncreaseCashJob increaseCashJob = new IncreaseCashJob(Database, userData.userId, cashPackage.cashAmount);
                     increaseCashJob.Start();
                     yield return StartCoroutine(increaseCashJob.WaitFor());
                     cash = increaseCashJob.result;
                 }
             }
             // Send response message
-            var responseMessage = new ResponseCashPackageBuyValidationMessage();
+            ResponseCashPackageBuyValidationMessage responseMessage = new ResponseCashPackageBuyValidationMessage();
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = error == ResponseCashPackageBuyValidationMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
             responseMessage.error = error;
@@ -608,10 +608,10 @@ namespace MultiplayerARPG.MMO
 
         private void HandleResponseAppServerAddress(LiteNetLibMessageHandler messageHandler)
         {
-            var message = messageHandler.ReadMessage<ResponseAppServerAddressMessage>();
+            ResponseAppServerAddressMessage message = messageHandler.ReadMessage<ResponseAppServerAddressMessage>();
             if (message.responseCode == AckResponseCode.Success)
             {
-                var peerInfo = message.peerInfo;
+                CentralServerPeerInfo peerInfo = message.peerInfo;
                 switch (peerInfo.peerType)
                 {
                     case CentralServerPeerType.MapServer:
@@ -739,7 +739,7 @@ namespace MultiplayerARPG.MMO
                         SendPartySettingToClients(party);
                         break;
                     case UpdatePartyMessage.UpdateType.Terminate:
-                        foreach (var memberId in party.GetMemberIds())
+                        foreach (string memberId in party.GetMemberIds())
                         {
                             if (playerCharactersById.TryGetValue(memberId, out playerCharacterEntity))
                             {
@@ -806,7 +806,7 @@ namespace MultiplayerARPG.MMO
                     case UpdateGuildMessage.UpdateType.SetGuildRole:
                         guild.SetRole(message.guildRole, message.roleName, message.canInvite, message.canKick, message.shareExpPercentage);
                         guilds[message.id] = guild;
-                        foreach (var memberId in guild.GetMemberIds())
+                        foreach (string memberId in guild.GetMemberIds())
                         {
                             if (playerCharactersById.TryGetValue(memberId, out playerCharacterEntity))
                                 playerCharacterEntity.GuildRole = guild.GetMemberRole(playerCharacterEntity.Id);
@@ -833,7 +833,7 @@ namespace MultiplayerARPG.MMO
                         SendGuildLevelExpSkillPointToClients(guild);
                         break;
                     case UpdateGuildMessage.UpdateType.Terminate:
-                        foreach (var memberId in guild.GetMemberIds())
+                        foreach (string memberId in guild.GetMemberIds())
                         {
                             if (playerCharactersById.TryGetValue(memberId, out playerCharacterEntity))
                             {
@@ -851,7 +851,7 @@ namespace MultiplayerARPG.MMO
         #region Update map user functions
         private void UpdateMapUsers(TransportHandler transportHandler, UpdateUserCharacterMessage.UpdateType updateType)
         {
-            foreach (var user in usersById.Values)
+            foreach (UserCharacterData user in usersById.Values)
             {
                 UpdateMapUser(transportHandler, updateType, user);
             }
@@ -859,7 +859,7 @@ namespace MultiplayerARPG.MMO
 
         private void UpdateMapUser(TransportHandler transportHandler, UpdateUserCharacterMessage.UpdateType updateType, UserCharacterData userData)
         {
-            var updateMapUserMessage = new UpdateUserCharacterMessage();
+            UpdateUserCharacterMessage updateMapUserMessage = new UpdateUserCharacterMessage();
             updateMapUserMessage.type = updateType;
             updateMapUserMessage.data = userData;
             transportHandler.ClientSendPacket(SendOptions.ReliableOrdered, MMOMessageTypes.UpdateMapUser, updateMapUserMessage.Serialize);

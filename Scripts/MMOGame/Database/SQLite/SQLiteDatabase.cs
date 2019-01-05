@@ -28,8 +28,8 @@ namespace MultiplayerARPG.MMO
         public override void Initialize()
         {
             // Json file read
-            var configFilePath = "./config/sqliteConfig.json";
-            var jsonConfig = new Dictionary<string, object>();
+            string configFilePath = "./config/sqliteConfig.json";
+            Dictionary<string, object> jsonConfig = new Dictionary<string, object>();
             Debug.Log("[SQLiteDatabase] Reading config file from " + configFilePath);
             if (File.Exists(configFilePath))
             {
@@ -279,9 +279,9 @@ namespace MultiplayerARPG.MMO
 
         private bool IsColumnExist(string tableName, string findingColumn)
         {
-            using (var cmd = new SqliteCommand("PRAGMA table_info(" + tableName + ");", connection))
+            using (SqliteCommand cmd = new SqliteCommand("PRAGMA table_info(" + tableName + ");", connection))
             {
-                var table = new DataTable();
+                DataTable table = new DataTable();
 
                 SqliteDataAdapter adp = null;
                 try
@@ -301,7 +301,7 @@ namespace MultiplayerARPG.MMO
 
         public string GetConnectionString()
         {
-            var path = dbPath;
+            string path = dbPath;
             if (Application.isMobilePlatform)
             {
                 if (path.StartsWith("./"))
@@ -327,10 +327,10 @@ namespace MultiplayerARPG.MMO
 
         public int ExecuteNonQuery(string sql, params SqliteParameter[] args)
         {
-            var numRows = 0;
-            using (var cmd = new SqliteCommand(sql, connection))
+            int numRows = 0;
+            using (SqliteCommand cmd = new SqliteCommand(sql, connection))
             {
-                foreach (var arg in args)
+                foreach (SqliteParameter arg in args)
                 {
                     cmd.Parameters.Add(arg);
                 }
@@ -342,9 +342,9 @@ namespace MultiplayerARPG.MMO
         public object ExecuteScalar(string sql, params SqliteParameter[] args)
         {
             object result;
-            using (var cmd = new SqliteCommand(sql, connection))
+            using (SqliteCommand cmd = new SqliteCommand(sql, connection))
             {
-                foreach (var arg in args)
+                foreach (SqliteParameter arg in args)
                 {
                     cmd.Parameters.Add(arg);
                 }
@@ -356,13 +356,13 @@ namespace MultiplayerARPG.MMO
         public SQLiteRowsReader ExecuteReader(string sql, params SqliteParameter[] args)
         {
             SQLiteRowsReader result = new SQLiteRowsReader();
-            using (var cmd = new SqliteCommand(sql, connection))
+            using (SqliteCommand cmd = new SqliteCommand(sql, connection))
             {
-                foreach (var arg in args)
+                foreach (SqliteParameter arg in args)
                 {
                     cmd.Parameters.Add(arg);
                 }
-                var dataReader = cmd.ExecuteReader();
+                SqliteDataReader dataReader = cmd.ExecuteReader();
                 result.Init(dataReader);
                 dataReader.Close();
             }
@@ -371,8 +371,8 @@ namespace MultiplayerARPG.MMO
 
         public override string ValidateUserLogin(string username, string password)
         {
-            var id = string.Empty;
-            var reader = ExecuteReader("SELECT id FROM userlogin WHERE username=@username AND password=@password AND authType=@authType LIMIT 1",
+            string id = string.Empty;
+            SQLiteRowsReader reader = ExecuteReader("SELECT id FROM userlogin WHERE username=@username AND password=@password AND authType=@authType LIMIT 1",
                 new SqliteParameter("@username", username),
                 new SqliteParameter("@password", GenericUtils.GetMD5(password)),
                 new SqliteParameter("@authType", AUTH_TYPE_NORMAL));
@@ -385,7 +385,7 @@ namespace MultiplayerARPG.MMO
 
         public override bool ValidateAccessToken(string userId, string accessToken)
         {
-            var result = ExecuteScalar("SELECT COUNT(*) FROM userlogin WHERE id=@id AND accessToken=@accessToken",
+            object result = ExecuteScalar("SELECT COUNT(*) FROM userlogin WHERE id=@id AND accessToken=@accessToken",
                 new SqliteParameter("@id", userId),
                 new SqliteParameter("@accessToken", accessToken));
             return (result != null ? (long)result : 0) > 0;
@@ -393,8 +393,8 @@ namespace MultiplayerARPG.MMO
 
         public override byte GetUserLevel(string userId)
         {
-            var userLevel = (byte)0;
-            var reader = ExecuteReader("SELECT userLevel FROM userlogin WHERE id=@id LIMIT 1",
+            byte userLevel = (byte)0;
+            SQLiteRowsReader reader = ExecuteReader("SELECT userLevel FROM userlogin WHERE id=@id LIMIT 1",
                 new SqliteParameter("@id", userId));
             if (reader.Read())
                 userLevel = (byte)reader.GetSByte("userLevel");
@@ -403,8 +403,8 @@ namespace MultiplayerARPG.MMO
 
         public override int GetCash(string userId)
         {
-            var cash = 0;
-            var reader = ExecuteReader("SELECT cash FROM userlogin WHERE id=@id LIMIT 1",
+            int cash = 0;
+            SQLiteRowsReader reader = ExecuteReader("SELECT cash FROM userlogin WHERE id=@id LIMIT 1",
                 new SqliteParameter("@id", userId));
             if (reader.Read())
                 cash = reader.GetInt32("cash");
@@ -413,7 +413,7 @@ namespace MultiplayerARPG.MMO
 
         public override int IncreaseCash(string userId, int amount)
         {
-            var cash = GetCash(userId);
+            int cash = GetCash(userId);
             cash += amount;
             ExecuteNonQuery("UPDATE userlogin SET cash=@cash WHERE id=@id",
                 new SqliteParameter("@id", userId),
@@ -423,7 +423,7 @@ namespace MultiplayerARPG.MMO
 
         public override int DecreaseCash(string userId, int amount)
         {
-            var cash = GetCash(userId);
+            int cash = GetCash(userId);
             cash -= amount;
             ExecuteNonQuery("UPDATE userlogin SET cash=@cash WHERE id=@id",
                 new SqliteParameter("@id", userId),
@@ -450,24 +450,24 @@ namespace MultiplayerARPG.MMO
 
         public override long FindUsername(string username)
         {
-            var result = ExecuteScalar("SELECT COUNT(*) FROM userlogin WHERE username LIKE @username",
+            object result = ExecuteScalar("SELECT COUNT(*) FROM userlogin WHERE username LIKE @username",
                 new SqliteParameter("@username", username));
             return result != null ? (long)result : 0;
         }
 
         public override string FacebookLogin(string fbId, string accessToken)
         {
-            var url = "https://graph.facebook.com/" + fbId + "?access_token=" + accessToken + "&fields=id,name,email";
-            var webClient = new WebClient();
-            var json = webClient.DownloadString(url);
+            string url = "https://graph.facebook.com/" + fbId + "?access_token=" + accessToken + "&fields=id,name,email";
+            WebClient webClient = new WebClient();
+            string json = webClient.DownloadString(url);
             json = json.Replace(@"\u0040", "@");
 
-            var id = string.Empty;
-            var dict = Json.Deserialize(json) as Dictionary<string, object>;
+            string id = string.Empty;
+            Dictionary<string, object> dict = Json.Deserialize(json) as Dictionary<string, object>;
             if (dict.ContainsKey("id") && dict.ContainsKey("email"))
             {
-                var email = (string)dict["email"];
-                var reader = ExecuteReader("SELECT id FROM userlogin WHERE username=@username AND password=@password AND authType=@authType LIMIT 1",
+                string email = (string)dict["email"];
+                SQLiteRowsReader reader = ExecuteReader("SELECT id FROM userlogin WHERE username=@username AND password=@password AND authType=@authType LIMIT 1",
                     new SqliteParameter("@username", "fb_" + fbId),
                     new SqliteParameter("@password", GenericUtils.GetMD5(fbId)),
                     new SqliteParameter("@authType", AUTH_TYPE_FACEBOOK));
@@ -498,17 +498,17 @@ namespace MultiplayerARPG.MMO
 
         public override string GooglePlayLogin(string idToken)
         {
-            var url = "https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=" + idToken;
-            var webClient = new WebClient();
-            var json = webClient.DownloadString(url);
+            string url = "https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=" + idToken;
+            WebClient webClient = new WebClient();
+            string json = webClient.DownloadString(url);
 
-            var id = string.Empty;
-            var dict = Json.Deserialize(json) as Dictionary<string, object>;
+            string id = string.Empty;
+            Dictionary<string, object> dict = Json.Deserialize(json) as Dictionary<string, object>;
             if (dict.ContainsKey("sub") && dict.ContainsKey("email"))
             {
-                var gId = (string)dict["sub"];
-                var email = (string)dict["email"];
-                var reader = ExecuteReader("SELECT id FROM userlogin WHERE username=@username AND password=@password AND authType=@authType LIMIT 1",
+                string gId = (string)dict["sub"];
+                string email = (string)dict["email"];
+                SQLiteRowsReader reader = ExecuteReader("SELECT id FROM userlogin WHERE username=@username AND password=@password AND authType=@authType LIMIT 1",
                     new SqliteParameter("@username", "g_" + gId),
                     new SqliteParameter("@password", GenericUtils.GetMD5(gId)),
                     new SqliteParameter("@authType", AUTH_TYPE_GOOGLE_PLAY));

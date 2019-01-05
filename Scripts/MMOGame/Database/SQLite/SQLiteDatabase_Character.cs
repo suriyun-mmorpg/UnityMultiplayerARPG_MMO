@@ -10,7 +10,7 @@ namespace MultiplayerARPG.MMO
         private void FillCharacterRelatesData(IPlayerCharacterData characterData)
         {
             // Delete all character then add all of them
-            var characterId = characterData.Id;
+            string characterId = characterData.Id;
             DeleteCharacterAttributes(characterId);
             DeleteCharacterBuffs(characterId);
             DeleteCharacterHotkeys(characterId);
@@ -21,44 +21,44 @@ namespace MultiplayerARPG.MMO
             DeleteCharacterSummons(characterId);
             
             CreateCharacterEquipWeapons(characterId, characterData.EquipWeapons);
-            var i = 0;
-            foreach (var equipItem in characterData.EquipItems)
+            int i = 0;
+            foreach (CharacterItem equipItem in characterData.EquipItems)
             {
                 CreateCharacterEquipItem(i++, characterId, equipItem);
             }
             i = 0;
-            foreach (var nonEquipItem in characterData.NonEquipItems)
+            foreach (CharacterItem nonEquipItem in characterData.NonEquipItems)
             {
                 CreateCharacterNonEquipItem(i++, characterId, nonEquipItem);
             }
             i = 0;
-            foreach (var attribute in characterData.Attributes)
+            foreach (CharacterAttribute attribute in characterData.Attributes)
             {
                 CreateCharacterAttribute(i++, characterId, attribute);
             }
             i = 0;
-            foreach (var skill in characterData.Skills)
+            foreach (CharacterSkill skill in characterData.Skills)
             {
                 CreateCharacterSkill(i++, characterId, skill);
             }
-            foreach (var skillUsage in characterData.SkillUsages)
+            foreach (CharacterSkillUsage skillUsage in characterData.SkillUsages)
             {
                 CreateCharacterSkillUsage(characterId, skillUsage);
             }
-            foreach (var summon in characterData.Summons)
+            foreach (CharacterSummon summon in characterData.Summons)
             {
                 CreateCharacterSummon(characterId, summon);
             }
             i = 0;
-            foreach (var quest in characterData.Quests)
+            foreach (CharacterQuest quest in characterData.Quests)
             {
                 CreateCharacterQuest(i++, characterId, quest);
             }
-            foreach (var buff in characterData.Buffs)
+            foreach (CharacterBuff buff in characterData.Buffs)
             {
                 CreateCharacterBuff(characterId, buff);
             }
-            foreach (var hotkey in characterData.Hotkeys)
+            foreach (CharacterHotkey hotkey in characterData.Hotkeys)
             {
                 CreateCharacterHotkey(characterId, hotkey);
             }
@@ -149,10 +149,10 @@ namespace MultiplayerARPG.MMO
             bool withHotkeys = true,
             bool withQuests = true)
         {
-            var reader = ExecuteReader("SELECT * FROM characters WHERE id=@id AND userId=@userId LIMIT 1",
+            SQLiteRowsReader reader = ExecuteReader("SELECT * FROM characters WHERE id=@id AND userId=@userId LIMIT 1",
                 new SqliteParameter("@id", id),
                 new SqliteParameter("@userId", userId));
-            var result = new PlayerCharacterData();
+            PlayerCharacterData result = new PlayerCharacterData();
             if (ReadCharacter(reader, out result))
             {
                 this.InvokeInstanceDevExtMethods("ReadCharacter",
@@ -195,11 +195,11 @@ namespace MultiplayerARPG.MMO
 
         public override List<PlayerCharacterData> ReadCharacters(string userId)
         {
-            var result = new List<PlayerCharacterData>();
-            var reader = ExecuteReader("SELECT id FROM characters WHERE userId=@userId ORDER BY updateAt DESC", new SqliteParameter("@userId", userId));
+            List<PlayerCharacterData> result = new List<PlayerCharacterData>();
+            SQLiteRowsReader reader = ExecuteReader("SELECT id FROM characters WHERE userId=@userId ORDER BY updateAt DESC", new SqliteParameter("@userId", userId));
             while (reader.Read())
             {
-                var characterId = reader.GetString("id");
+                string characterId = reader.GetString("id");
                 result.Add(ReadCharacter(userId, characterId, true, true, true, false, false, true, false, false, false, false));
             }
             return result;
@@ -260,10 +260,10 @@ namespace MultiplayerARPG.MMO
 
         public override void DeleteCharacter(string userId, string id)
         {
-            var result = ExecuteScalar("SELECT COUNT(*) FROM characters WHERE id=@id AND userId=@userId",
+            object result = ExecuteScalar("SELECT COUNT(*) FROM characters WHERE id=@id AND userId=@userId",
                 new SqliteParameter("@id", id),
                 new SqliteParameter("@userId", userId));
-            var count = result != null ? (long)result : 0;
+            long count = result != null ? (long)result : 0;
             if (count > 0)
             {
                 ExecuteNonQuery("BEGIN");
@@ -283,7 +283,7 @@ namespace MultiplayerARPG.MMO
 
         public override long FindCharacterName(string characterName)
         {
-            var result = ExecuteScalar("SELECT COUNT(*) FROM characters WHERE characterName LIKE @characterName",
+            object result = ExecuteScalar("SELECT COUNT(*) FROM characters WHERE characterName LIKE @characterName",
                 new SqliteParameter("@characterName", characterName));
             return result != null ? (long)result : 0;
         }

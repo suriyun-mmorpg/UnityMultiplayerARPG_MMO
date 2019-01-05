@@ -29,7 +29,7 @@ namespace MultiplayerARPG.MMO
 
         public void OnClickRegister()
         {
-            var uiSceneGlobal = UISceneGlobal.Singleton;
+            UISceneGlobal uiSceneGlobal = UISceneGlobal.Singleton;
             if (string.IsNullOrEmpty(Username))
             {
                 uiSceneGlobal.ShowMessageDialog("Cannot register", "Username is empty");
@@ -53,11 +53,11 @@ namespace MultiplayerARPG.MMO
 
         public void OnRegister(AckResponseCode responseCode, BaseAckMessage message)
         {
-            var castedMessage = (ResponseUserRegisterMessage)message;
+            ResponseUserRegisterMessage castedMessage = (ResponseUserRegisterMessage)message;
             switch (responseCode)
             {
                 case AckResponseCode.Error:
-                    var errorMessage = string.Empty;
+                    string errorMessage = string.Empty;
                     switch (castedMessage.error)
                     {
                         case ResponseUserRegisterMessage.Error.TooShortUsername:

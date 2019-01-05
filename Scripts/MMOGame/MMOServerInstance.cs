@@ -109,7 +109,7 @@ namespace MultiplayerARPG.MMO
             if (database != null)
                 database.Initialize();
 
-            var gameInstance = FindObjectOfType<GameInstance>();
+            GameInstance gameInstance = FindObjectOfType<GameInstance>();
 
             // Always accept SSL
             ServicePointManager.ServerCertificateValidationCallback += new RemoteCertificateValidationCallback((sender, certificate, chain, policyErrors) => { return true; });
@@ -125,8 +125,8 @@ namespace MultiplayerARPG.MMO
             {
 
                 // Json file read
-                var configFilePath = "./config/serverConfig.json";
-                var jsonConfig = new Dictionary<string, object>();
+                string configFilePath = "./config/serverConfig.json";
+                Dictionary<string, object> jsonConfig = new Dictionary<string, object>();
                 Debug.Log("[MMOServerInstance] Reading config file from " + configFilePath);
                 if (File.Exists(configFilePath))
                 {
@@ -136,7 +136,7 @@ namespace MultiplayerARPG.MMO
                 }
 
                 // Prepare data
-                var args = Environment.GetCommandLineArgs();
+                string[] args = Environment.GetCommandLineArgs();
 
                 // Android fix
                 if (args == null)
@@ -226,7 +226,7 @@ namespace MultiplayerARPG.MMO
                     ConfigReader.ReadConfigs(jsonConfig, CONFIG_SPAWN_MAPS, out spawnMaps, new List<string>()))
                 {
                     mapSpawnNetworkManager.spawningScenes = new List<UnityScene>();
-                    foreach (var spawnMap in spawnMaps)
+                    foreach (string spawnMap in spawnMaps)
                     {
                         mapSpawnNetworkManager.spawningScenes.Add(new UnityScene()
                         {
@@ -275,8 +275,8 @@ namespace MultiplayerARPG.MMO
                     chatNetworkManager.maxConnections = chatMaxConnections;
                 }
 
-                var logFileName = "Log";
-                var startLog = false;
+                string logFileName = "Log";
+                bool startLog = false;
 
                 if (ConfigReader.IsArgsProvided(args, ARG_START_CENTRAL_SERVER))
                 {

@@ -49,8 +49,8 @@ namespace MultiplayerARPG.MMO
 
         public override List<BuildingSaveData> ReadBuildings(string mapName)
         {
-            var result = new List<BuildingSaveData>();
-            var reader = ExecuteReader("SELECT * FROM buildings WHERE mapName=@mapName", new SqliteParameter("@mapName", mapName));
+            List<BuildingSaveData> result = new List<BuildingSaveData>();
+            SQLiteRowsReader reader = ExecuteReader("SELECT * FROM buildings WHERE mapName=@mapName", new SqliteParameter("@mapName", mapName));
             BuildingSaveData tempBuilding;
             while (ReadBuilding(reader, out tempBuilding, false))
             {

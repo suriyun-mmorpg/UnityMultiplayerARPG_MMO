@@ -18,7 +18,7 @@ namespace MultiplayerARPG.MMO
 
         public void OnClickLogin()
         {
-            var uiSceneGlobal = UISceneGlobal.Singleton;
+            UISceneGlobal uiSceneGlobal = UISceneGlobal.Singleton;
             if (string.IsNullOrEmpty(Username))
             {
                 uiSceneGlobal.ShowMessageDialog("Cannot login", "Username is empty");
@@ -36,11 +36,11 @@ namespace MultiplayerARPG.MMO
 
         public void OnLogin(AckResponseCode responseCode, BaseAckMessage message)
         {
-            var castedMessage = (ResponseUserLoginMessage)message;
+            ResponseUserLoginMessage castedMessage = (ResponseUserLoginMessage)message;
             switch (responseCode)
             {
                 case AckResponseCode.Error:
-                    var errorMessage = string.Empty;
+                    string errorMessage = string.Empty;
                     switch (castedMessage.error)
                     {
                         case ResponseUserLoginMessage.Error.AlreadyLogin:

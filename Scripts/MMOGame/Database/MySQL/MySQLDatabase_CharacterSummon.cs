@@ -43,8 +43,8 @@ namespace MultiplayerARPG.MMO
 
         public List<CharacterSummon> ReadCharacterSummons(string characterId)
         {
-            var result = new List<CharacterSummon>();
-            var reader = ExecuteReader("SELECT * FROM charactersummon WHERE characterId=@characterId ORDER BY type DESC",
+            List<CharacterSummon> result = new List<CharacterSummon>();
+            MySQLRowsReader reader = ExecuteReader("SELECT * FROM charactersummon WHERE characterId=@characterId ORDER BY type DESC",
                 new MySqlParameter("@characterId", characterId));
             CharacterSummon tempSummon;
             while (ReadCharacterSummon(reader, out tempSummon, false))

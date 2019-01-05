@@ -9,7 +9,7 @@ namespace MultiplayerARPG.MMO
         public override int CreateParty(bool shareExp, bool shareItem, string leaderId)
         {
             int id = 0;
-            var reader = ExecuteReader("INSERT INTO party (shareExp, shareItem, leaderId) VALUES (@shareExp, @shareItem, @leaderId);" +
+            SQLiteRowsReader reader = ExecuteReader("INSERT INTO party (shareExp, shareItem, leaderId) VALUES (@shareExp, @shareItem, @leaderId);" +
                 "SELECT LAST_INSERT_ROWID();",
                 new SqliteParameter("@shareExp", shareExp),
                 new SqliteParameter("@shareItem", shareItem),
@@ -26,7 +26,7 @@ namespace MultiplayerARPG.MMO
         public override PartyData ReadParty(int id)
         {
             PartyData result = null;
-            var reader = ExecuteReader("SELECT * FROM party WHERE id=@id LIMIT 1",
+            SQLiteRowsReader reader = ExecuteReader("SELECT * FROM party WHERE id=@id LIMIT 1",
                 new SqliteParameter("@id", id));
             if (reader.Read())
             {

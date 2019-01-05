@@ -14,7 +14,7 @@ namespace MultiplayerARPG.MMO
 
         private void OnRequestedCharacters(AckResponseCode responseCode, BaseAckMessage message)
         {
-            var castedMessage = (ResponseCharactersMessage)message;
+            ResponseCharactersMessage castedMessage = (ResponseCharactersMessage)message;
             SelectionManager.Clear();
             // Unenabled buttons
             buttonStart.gameObject.SetActive(false);
@@ -23,12 +23,12 @@ namespace MultiplayerARPG.MMO
             characterModelContainer.RemoveChildren();
             CharacterModels.Clear();
 
-            var selectableCharacters = new List<PlayerCharacterData>();
+            List<PlayerCharacterData> selectableCharacters = new List<PlayerCharacterData>();
 
             switch (responseCode)
             {
                 case AckResponseCode.Error:
-                    var errorMessage = string.Empty;
+                    string errorMessage = string.Empty;
                     switch (castedMessage.error)
                     {
                         case ResponseCharactersMessage.Error.NotLoggedin:
@@ -46,19 +46,19 @@ namespace MultiplayerARPG.MMO
             }
 
             // Show list of created characters
-            for (var i = selectableCharacters.Count - 1; i >= 0; --i)
+            for (int i = selectableCharacters.Count - 1; i >= 0; --i)
             {
-                var selectableCharacter = selectableCharacters[i];
+                PlayerCharacterData selectableCharacter = selectableCharacters[i];
                 if (selectableCharacter == null || !GameInstance.PlayerCharacters.ContainsKey(selectableCharacter.DataId))
                     selectableCharacters.RemoveAt(i);
             }
             selectableCharacters.Sort(new PlayerCharacterDataLastUpdateComparer().Desc());
             CacheList.Generate(selectableCharacters, (index, character, ui) =>
             {
-                var uiCharacter = ui.GetComponent<UICharacter>();
+                UICharacter uiCharacter = ui.GetComponent<UICharacter>();
                 uiCharacter.Data = character;
                 // Select trigger when add first entry so deactivate all models is okay beacause first model will active
-                var characterModel = character.InstantiateModel(characterModelContainer);
+                BaseCharacterModel characterModel = character.InstantiateModel(characterModelContainer);
                 CharacterModels[character.Id] = characterModel;
                 characterModel.gameObject.SetActive(false);
                 characterModel.SetEquipWeapons(character.EquipWeapons);
@@ -69,7 +69,7 @@ namespace MultiplayerARPG.MMO
 
         protected override void OnClickStart()
         {
-            var selectedUI = SelectionManager.SelectedUI;
+            UICharacter selectedUI = SelectionManager.SelectedUI;
             if (selectedUI == null)
             {
                 UISceneGlobal.Singleton.ShowMessageDialog("Cannot start game", "Please choose character to start game");
@@ -78,18 +78,18 @@ namespace MultiplayerARPG.MMO
             }
             // Load gameplay scene, we're going to manage maps in gameplay scene later
             // So we can add gameplay UI just once in gameplay scene
-            var playerCharacter = selectedUI.Data as IPlayerCharacterData;
+            IPlayerCharacterData playerCharacter = selectedUI.Data as IPlayerCharacterData;
             MMOClientInstance.Singleton.RequestSelectCharacter(playerCharacter.Id, OnRequestedSelectCharacter);
         }
 
         private void OnRequestedSelectCharacter(AckResponseCode responseCode, BaseAckMessage message)
         {
-            var castedMessage = (ResponseSelectCharacterMessage)message;
+            ResponseSelectCharacterMessage castedMessage = (ResponseSelectCharacterMessage)message;
             
             switch (responseCode)
             {
                 case AckResponseCode.Error:
-                    var errorMessage = string.Empty;
+                    string errorMessage = string.Empty;
                     switch (castedMessage.error)
                     {
                         case ResponseSelectCharacterMessage.Error.NotLoggedin:
@@ -118,7 +118,7 @@ namespace MultiplayerARPG.MMO
 
         protected override void OnClickDelete()
         {
-            var selectedUI = SelectionManager.SelectedUI;
+            UICharacter selectedUI = SelectionManager.SelectedUI;
             if (selectedUI == null)
             {
                 UISceneGlobal.Singleton.ShowMessageDialog("Cannot delete character", "Please choose character to delete");
@@ -126,18 +126,18 @@ namespace MultiplayerARPG.MMO
                 return;
             }
 
-            var playerCharacter = selectedUI.Data as IPlayerCharacterData;
+            IPlayerCharacterData playerCharacter = selectedUI.Data as IPlayerCharacterData;
             MMOClientInstance.Singleton.RequestDeleteCharacter(playerCharacter.Id, OnRequestedDeleteCharacter);
         }
 
         private void OnRequestedDeleteCharacter(AckResponseCode responseCode, BaseAckMessage message)
         {
-            var castedMessage = (ResponseDeleteCharacterMessage)message;
+            ResponseDeleteCharacterMessage castedMessage = (ResponseDeleteCharacterMessage)message;
             
             switch (responseCode)
             {
                 case AckResponseCode.Error:
-                    var errorMessage = string.Empty;
+                    string errorMessage = string.Empty;
                     switch (castedMessage.error)
                     {
                         case ResponseDeleteCharacterMessage.Error.NotLoggedin:

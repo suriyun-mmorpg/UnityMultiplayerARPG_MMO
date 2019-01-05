@@ -21,12 +21,12 @@ namespace MultiplayerARPG.MMO
             VisibleFieldCount = dataReader.VisibleFieldCount;
             while (dataReader.Read())
             {
-                var row = new List<object>();
-                var rowDict = new Dictionary<string, object>();
-                for (var i = 0; i < FieldCount; ++i)
+                List<object> row = new List<object>();
+                Dictionary<string, object> rowDict = new Dictionary<string, object>();
+                for (int i = 0; i < FieldCount; ++i)
                 {
-                    var fieldName = dataReader.GetName(i);
-                    var value = dataReader.GetValue(i);
+                    string fieldName = dataReader.GetName(i);
+                    object value = dataReader.GetValue(i);
                     row.Add(value);
                     rowDict.Add(fieldName, value);
                 }

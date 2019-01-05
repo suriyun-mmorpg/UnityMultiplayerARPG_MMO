@@ -70,14 +70,14 @@ namespace MultiplayerARPG.MMO
         public void OnCentralServerConnected()
         {
             Debug.Log("[" + appServer.PeerType + "] Connected to Central Server");
-            var peerInfo = new CentralServerPeerInfo();
+            CentralServerPeerInfo peerInfo = new CentralServerPeerInfo();
             peerInfo.peerType = appServer.PeerType;
             peerInfo.networkAddress = appServer.AppAddress;
             peerInfo.networkPort = appServer.AppPort;
             peerInfo.connectKey = appServer.AppConnectKey;
             peerInfo.extra = appServer.AppExtra;
             // Send Request
-            var message = new RequestAppServerRegisterMessage();
+            RequestAppServerRegisterMessage message = new RequestAppServerRegisterMessage();
             message.peerInfo = peerInfo;
             ClientSendAckPacket(SendOptions.ReliableOrdered, MMOMessageTypes.RequestAppServerRegister, message, OnAppServerRegistered);
         }
@@ -102,9 +102,9 @@ namespace MultiplayerARPG.MMO
 
         private void HandleResponseAppServerRegister(LiteNetLibMessageHandler messageHandler)
         {
-            var peerHandler = messageHandler.transportHandler;
-            var message = messageHandler.ReadMessage<ResponseAppServerRegisterMessage>();
-            var ackId = message.ackId;
+            TransportHandler peerHandler = messageHandler.transportHandler;
+            ResponseAppServerRegisterMessage message = messageHandler.ReadMessage<ResponseAppServerRegisterMessage>();
+            uint ackId = message.ackId;
             peerHandler.TriggerAck(ackId, message.responseCode, message);
         }
 

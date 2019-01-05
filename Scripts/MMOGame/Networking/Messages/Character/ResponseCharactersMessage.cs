@@ -20,10 +20,10 @@ namespace MultiplayerARPG.MMO
             error = (Error)reader.GetByte();
 
             characters = new List<PlayerCharacterData>();
-            var count = reader.GetInt();
-            for (var i = 0; i < count; ++i)
+            int count = reader.GetInt();
+            for (int i = 0; i < count; ++i)
             {
-                var character = new PlayerCharacterData();
+                PlayerCharacterData character = new PlayerCharacterData();
                 characters.Add(character.DeserializeCharacterData(reader));
             }
         }
@@ -34,7 +34,7 @@ namespace MultiplayerARPG.MMO
             if (characters == null)
                 characters = new List<PlayerCharacterData>();
             writer.Put(characters.Count);
-            foreach (var character in characters)
+            foreach (PlayerCharacterData character in characters)
             {
                 character.SerializeCharacterData(writer);
             }

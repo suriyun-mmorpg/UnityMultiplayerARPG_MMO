@@ -9,7 +9,7 @@ namespace MultiplayerARPG.MMO
         public override int CreateGuild(string guildName, string leaderId)
         {
             int id = 0;
-            var reader = ExecuteReader("INSERT INTO guild (guildName, leaderId) VALUES (@guildName, @leaderId);" +
+            MySQLRowsReader reader = ExecuteReader("INSERT INTO guild (guildName, leaderId) VALUES (@guildName, @leaderId);" +
                 "SELECT LAST_INSERT_ID();",
                 new MySqlParameter("@guildName", guildName),
                 new MySqlParameter("@leaderId", leaderId));
@@ -25,7 +25,7 @@ namespace MultiplayerARPG.MMO
         public override GuildData ReadGuild(int id, GuildRoleData[] defaultGuildRoles)
         {
             GuildData result = null;
-            var reader = ExecuteReader("SELECT * FROM guild WHERE id=@id LIMIT 1",
+            MySQLRowsReader reader = ExecuteReader("SELECT * FROM guild WHERE id=@id LIMIT 1",
                 new MySqlParameter("@id", id));
             if (reader.Read())
             {
@@ -80,7 +80,7 @@ namespace MultiplayerARPG.MMO
             resultExp = 0;
             resultSkillPoint = 0;
 
-            var reader = ExecuteReader("UPDATE guild SET exp=exp+@increaseExp WHERE id=@id;" +
+            MySQLRowsReader reader = ExecuteReader("UPDATE guild SET exp=exp+@increaseExp WHERE id=@id;" +
                 "SELECT level, exp, skillPoint FROM guild WHERE id=@id LIMIT 1;",
                 new MySqlParameter("@increaseExp", increaseExp),
                 new MySqlParameter("@id", id));
