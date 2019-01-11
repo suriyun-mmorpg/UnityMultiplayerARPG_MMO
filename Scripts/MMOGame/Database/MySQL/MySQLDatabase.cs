@@ -9,13 +9,6 @@ namespace MultiplayerARPG.MMO
 {
     public partial class MySQLDatabase : BaseDatabase
     {
-        public enum InventoryType : byte
-        {
-            NonEquipItems,
-            EquipItems,
-            EquipWeaponRight,
-            EquipWeaponLeft,
-        }
         [SerializeField]
         private string address = "127.0.0.1";
         [SerializeField]

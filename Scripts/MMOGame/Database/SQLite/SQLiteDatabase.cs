@@ -10,13 +10,6 @@ namespace MultiplayerARPG.MMO
 {
     public partial class SQLiteDatabase : BaseDatabase
     {
-        public enum InventoryType : byte
-        {
-            NonEquipItems,
-            EquipItems,
-            EquipWeaponRight,
-            EquipWeaponLeft,
-        }
         [SerializeField]
         private string dbPath = "./mmorpgtemplate.sqlite3";
         [Header("Running In Editor")]
