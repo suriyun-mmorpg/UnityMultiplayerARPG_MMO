@@ -504,9 +504,8 @@ namespace MultiplayerARPG.MMO
                     playerCharacter.Gold += cashShopItem.receiveGold;
                     foreach (ItemAmount receiveItem in cashShopItem.receiveItems)
                     {
-                        if (receiveItem.item == null) continue;
-                        CharacterItem characterItem = CharacterItem.Create(receiveItem.item, 1, receiveItem.amount);
-                        playerCharacter.NonEquipItems.Add(characterItem);
+                        if (receiveItem.item == null || receiveItem.amount <= 0) continue;
+                        playerCharacter.NonEquipItems.Add(CharacterItem.Create(receiveItem.item, 1, receiveItem.amount));
                     }
                 }
             }
