@@ -80,6 +80,7 @@ namespace MultiplayerARPG.MMO
             string characterName = message.characterName;
             int dataId = message.dataId;
             int entityId = message.entityId;
+            byte[] extra = message.extra;
             CentralUserPeerInfo userPeerInfo;
             FindCharacterNameJob findCharacterNameJob = new FindCharacterNameJob(Database, characterName);
             findCharacterNameJob.Start();
@@ -101,6 +102,7 @@ namespace MultiplayerARPG.MMO
                 PlayerCharacterData characterData = new PlayerCharacterData();
                 characterData.Id = characterId;
                 characterData.SetNewPlayerCharacterData(characterName, dataId, entityId);
+                ApplyCreateCharacterExtra(characterData, extra);
                 CreateCharacterJob createCharacterJob = new CreateCharacterJob(Database, userPeerInfo.userId, characterData);
                 createCharacterJob.Start();
                 yield return StartCoroutine(createCharacterJob.WaitFor());
@@ -110,6 +112,11 @@ namespace MultiplayerARPG.MMO
             responseMessage.responseCode = error == ResponseCreateCharacterMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
             responseMessage.error = error;
             ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MMOMessageTypes.ResponseCreateCharacter, responseMessage);
+        }
+
+        private void ApplyCreateCharacterExtra(PlayerCharacterData characterData, byte[] extra)
+        {
+            this.InvokeInstanceDevExtMethods("ApplyCreateCharacterExtra", characterData, extra);
         }
 
         protected void HandleRequestDeleteCharacter(LiteNetLibMessageHandler messageHandler)
