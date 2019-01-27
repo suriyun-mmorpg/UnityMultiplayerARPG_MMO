@@ -15,7 +15,7 @@ namespace MultiplayerARPG.MMO
         private void OnRequestedCharacters(AckResponseCode responseCode, BaseAckMessage message)
         {
             ResponseCharactersMessage castedMessage = (ResponseCharactersMessage)message;
-            SelectionManager.Clear();
+            CacheCharacterSelectionManager.Clear();
             // Unenabled buttons
             buttonStart.gameObject.SetActive(false);
             buttonDelete.gameObject.SetActive(false);
@@ -53,7 +53,7 @@ namespace MultiplayerARPG.MMO
                     selectableCharacters.RemoveAt(i);
             }
             selectableCharacters.Sort(new PlayerCharacterDataLastUpdateComparer().Desc());
-            CacheList.Generate(selectableCharacters, (index, character, ui) =>
+            CacheCharacterList.Generate(selectableCharacters, (index, character, ui) =>
             {
                 UICharacter uiCharacter = ui.GetComponent<UICharacter>();
                 uiCharacter.Data = character;
@@ -63,13 +63,13 @@ namespace MultiplayerARPG.MMO
                 characterModel.gameObject.SetActive(false);
                 characterModel.SetEquipWeapons(character.EquipWeapons);
                 characterModel.SetEquipItems(character.EquipItems);
-                SelectionManager.Add(uiCharacter);
+                CacheCharacterSelectionManager.Add(uiCharacter);
             });
         }
 
         protected override void OnClickStart()
         {
-            UICharacter selectedUI = SelectionManager.SelectedUI;
+            UICharacter selectedUI = CacheCharacterSelectionManager.SelectedUI;
             if (selectedUI == null)
             {
                 UISceneGlobal.Singleton.ShowMessageDialog("Cannot start game", "Please choose character to start game");
@@ -118,7 +118,7 @@ namespace MultiplayerARPG.MMO
 
         protected override void OnClickDelete()
         {
-            UICharacter selectedUI = SelectionManager.SelectedUI;
+            UICharacter selectedUI = CacheCharacterSelectionManager.SelectedUI;
             if (selectedUI == null)
             {
                 UISceneGlobal.Singleton.ShowMessageDialog("Cannot delete character", "Please choose character to delete");

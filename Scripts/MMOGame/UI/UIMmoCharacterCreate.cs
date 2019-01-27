@@ -9,7 +9,7 @@ namespace MultiplayerARPG.MMO
         protected override void OnClickCreate()
         {
             GameInstance gameInstance = GameInstance.Singleton;
-            UICharacter selectedUI = SelectionManager.SelectedUI;
+            UICharacter selectedUI = CacheCharacterSelectionManager.SelectedUI;
             if (selectedUI == null)
             {
                 UISceneGlobal.Singleton.ShowMessageDialog("Cannot create character", "Please select character class");
