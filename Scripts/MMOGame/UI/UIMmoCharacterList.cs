@@ -20,7 +20,7 @@ namespace MultiplayerARPG.MMO
             buttonDelete.gameObject.SetActive(false);
             // Remove all models
             characterModelContainer.RemoveChildren();
-            CharacterModels.Clear();
+            CharacterModelById.Clear();
 
             List<PlayerCharacterData> selectableCharacters = new List<PlayerCharacterData>();
 
@@ -58,7 +58,7 @@ namespace MultiplayerARPG.MMO
                 uiCharacter.Data = character;
                 // Select trigger when add first entry so deactivate all models is okay beacause first model will active
                 BaseCharacterModel characterModel = character.InstantiateModel(characterModelContainer);
-                CharacterModels[character.Id] = characterModel;
+                CharacterModelById[character.Id] = characterModel;
                 characterModel.gameObject.SetActive(false);
                 characterModel.SetEquipWeapons(character.EquipWeapons);
                 characterModel.SetEquipItems(character.EquipItems);
