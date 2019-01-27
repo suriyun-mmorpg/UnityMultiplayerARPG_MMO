@@ -4,7 +4,6 @@ using LiteNetLibManager;
 
 namespace MultiplayerARPG.MMO
 {
-    [RequireComponent(typeof(UICharacterSelectionManager))]
     public class UIMmoCharacterList : UICharacterList
     {
         protected override void LoadCharacters()

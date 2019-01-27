@@ -3,7 +3,6 @@ using UnityEngine;
 
 namespace MultiplayerARPG.MMO
 {
-    [RequireComponent(typeof(UICharacterSelectionManager))]
     public class UIMmoCharacterCreate : UICharacterCreate
     {
         protected override void OnClickCreate()
