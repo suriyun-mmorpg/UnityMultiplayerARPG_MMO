@@ -14,12 +14,13 @@ namespace MultiplayerARPG.MMO
             return Client.ClientSendAckPacket(SendOptions.ReliableOrdered, MMOMessageTypes.RequestCharacters, message, callback);
         }
 
-        public uint RequestCreateCharacter(string characterName, int dataId, int entityId, AckMessageCallback callback)
+        public uint RequestCreateCharacter(string characterName, int dataId, int entityId, byte[] extra, AckMessageCallback callback)
         {
             RequestCreateCharacterMessage message = new RequestCreateCharacterMessage();
             message.characterName = characterName;
             message.dataId = dataId;
             message.entityId = entityId;
+            message.extra = extra;
             return Client.ClientSendAckPacket(SendOptions.ReliableOrdered, MMOMessageTypes.RequestCreateCharacter, message, callback);
         }
 

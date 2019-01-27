@@ -10,12 +10,14 @@ namespace MultiplayerARPG.MMO
         public string characterName;
         public int entityId;
         public int dataId;
+        public byte[] extra;
 
         public override void DeserializeData(NetDataReader reader)
         {
             characterName = reader.GetString();
             entityId = reader.GetInt();
             dataId = reader.GetInt();
+            extra = reader.GetBytesWithLength();
         }
 
         public override void SerializeData(NetDataWriter writer)
@@ -23,6 +25,7 @@ namespace MultiplayerARPG.MMO
             writer.Put(characterName);
             writer.Put(entityId);
             writer.Put(dataId);
+            writer.PutBytesWithLength(extra);
         }
     }
 }
