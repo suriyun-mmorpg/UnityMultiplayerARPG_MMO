@@ -1277,6 +1277,11 @@ MonoBehaviour:
   characterModelContainer: {fileID: 1620260896}
   buttonStart: {fileID: 1979356302}
   buttonDelete: {fileID: 1616698438}
+  eventOnSelectCharacter:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: MultiplayerARPG.CharacterDataEvent, Assembly-CSharp, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
 --- !u!114 &186974760
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7363,12 +7368,12 @@ MonoBehaviour:
         m_CallState: 2
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
-  onSelectCharacter:
+  eventOnSelectCharacter:
     m_PersistentCalls:
       m_Calls: []
     m_TypeName: MultiplayerARPG.CharacterDataEvent, Assembly-CSharp, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
-  onSelectCharacterClass:
+  eventOnSelectCharacterClass:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 749938037}
