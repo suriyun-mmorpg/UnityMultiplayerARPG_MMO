@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using LiteNetLib;
 using LiteNetLibManager;
+using LiteNetLib.Utils;
 
 namespace MultiplayerARPG.MMO
 {
@@ -14,14 +15,18 @@ namespace MultiplayerARPG.MMO
             return Client.ClientSendAckPacket(SendOptions.ReliableOrdered, MMOMessageTypes.RequestCharacters, message, callback);
         }
 
-        public uint RequestCreateCharacter(string characterName, int dataId, int entityId, byte[] extra, AckMessageCallback callback)
+        public uint RequestCreateCharacter(PlayerCharacterData characterData, AckMessageCallback callback)
         {
             RequestCreateCharacterMessage message = new RequestCreateCharacterMessage();
-            message.characterName = characterName;
-            message.dataId = dataId;
-            message.entityId = entityId;
-            message.extra = extra;
-            return Client.ClientSendAckPacket(SendOptions.ReliableOrdered, MMOMessageTypes.RequestCreateCharacter, message, callback);
+            message.characterName = characterData.CharacterName;
+            message.dataId = characterData.DataId;
+            message.entityId = characterData.EntityId;
+            return Client.ClientSendAckPacket(SendOptions.ReliableOrdered, MMOMessageTypes.RequestCreateCharacter, message, callback, (writer) => SerializeCreateCharacterExtra(characterData, writer));
+        }
+
+        private void SerializeCreateCharacterExtra(PlayerCharacterData characterData, NetDataWriter writer)
+        {
+            this.InvokeInstanceDevExtMethods("SerializeCreateCharacterExtra", characterData, writer);
         }
 
         public uint RequestDeleteCharacter(string characterId, AckMessageCallback callback)
@@ -80,7 +85,6 @@ namespace MultiplayerARPG.MMO
             string characterName = message.characterName;
             int dataId = message.dataId;
             int entityId = message.entityId;
-            byte[] extra = message.extra;
             CentralUserPeerInfo userPeerInfo;
             FindCharacterNameJob findCharacterNameJob = new FindCharacterNameJob(Database, characterName);
             findCharacterNameJob.Start();
@@ -102,7 +106,7 @@ namespace MultiplayerARPG.MMO
                 PlayerCharacterData characterData = new PlayerCharacterData();
                 characterData.Id = characterId;
                 characterData.SetNewPlayerCharacterData(characterName, dataId, entityId);
-                ApplyCreateCharacterExtra(characterData, extra);
+                DeserializeCreateCharacterExtra(characterData, messageHandler.reader);
                 CreateCharacterJob createCharacterJob = new CreateCharacterJob(Database, userPeerInfo.userId, characterData);
                 createCharacterJob.Start();
                 yield return StartCoroutine(createCharacterJob.WaitFor());
@@ -114,9 +118,9 @@ namespace MultiplayerARPG.MMO
             ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MMOMessageTypes.ResponseCreateCharacter, responseMessage);
         }
 
-        private void ApplyCreateCharacterExtra(PlayerCharacterData characterData, byte[] extra)
+        private void DeserializeCreateCharacterExtra(PlayerCharacterData characterData, NetDataReader reader)
         {
-            this.InvokeInstanceDevExtMethods("ApplyCreateCharacterExtra", characterData, extra);
+            this.InvokeInstanceDevExtMethods("DeserializeCreateCharacterExtra", characterData, reader);
         }
 
         protected void HandleRequestDeleteCharacter(LiteNetLibMessageHandler messageHandler)

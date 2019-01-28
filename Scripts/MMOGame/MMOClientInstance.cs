@@ -179,14 +179,9 @@ namespace MultiplayerARPG.MMO
             centralNetworkManager.RequestCharacters(callback);
         }
 
-        public void RequestCreateCharacter(string characterName, int dataId, int entityId, AckMessageCallback callback)
+        public void RequestCreateCharacter(PlayerCharacterData characterData, AckMessageCallback callback)
         {
-            centralNetworkManager.RequestCreateCharacter(characterName, dataId, entityId, new byte[0], callback);
-        }
-
-        public void RequestCreateCharacter(string characterName, int dataId, int entityId, byte[] extra, AckMessageCallback callback)
-        {
-            centralNetworkManager.RequestCreateCharacter(characterName, dataId, entityId, extra, callback);
+            centralNetworkManager.RequestCreateCharacter(characterData, callback);
         }
 
         public void RequestDeleteCharacter(string characterId, AckMessageCallback callback)
