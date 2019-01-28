@@ -10,8 +10,6 @@ namespace MultiplayerARPG.MMO
     public class UIMmoSceneHome : UIHistory
     {
         public UIMmoLogin uiLogin;
-        public UIMmoCharacterList uiCharacterList;
-        public UIMmoCharacterCreate uiCharacterCreate;
         public UnityEvent onValidateAccessTokenSuccess;
 
         private void OnEnable()
