@@ -7,8 +7,10 @@ namespace MultiplayerARPG.MMO
     {
         protected override void OnClickCreate()
         {
-            CreatingPlayerCharacterData.CharacterName = inputCharacterName.text.Trim();
-            MMOClientInstance.Singleton.RequestCreateCharacter(CreatingPlayerCharacterData, OnRequestedCreateCharacter);
+            PlayerCharacterData characterData = new PlayerCharacterData();
+            characterData.Id = GenericUtils.GetUniqueId();
+            characterData.SetNewPlayerCharacterData(inputCharacterName.text.Trim(), SelectedDataId, SelectedEntityId);
+            MMOClientInstance.Singleton.RequestCreateCharacter(characterData, OnRequestedCreateCharacter);
         }
 
         private void OnRequestedCreateCharacter(AckResponseCode responseCode, BaseAckMessage message)
