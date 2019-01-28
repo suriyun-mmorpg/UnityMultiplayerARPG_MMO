@@ -21,6 +21,8 @@ namespace MultiplayerARPG.MMO
             // Remove all models
             characterModelContainer.RemoveChildren();
             CharacterModelById.Clear();
+            // Remove all cached data
+            PlayerCharacterDataById.Clear();
 
             List<PlayerCharacterData> selectableCharacters = new List<PlayerCharacterData>();
 
@@ -52,17 +54,22 @@ namespace MultiplayerARPG.MMO
                     selectableCharacters.RemoveAt(i);
             }
             selectableCharacters.Sort(new PlayerCharacterDataLastUpdateComparer().Desc());
-            CacheCharacterList.Generate(selectableCharacters, (index, character, ui) =>
+            CacheCharacterList.Generate(selectableCharacters, (index, characterData, ui) =>
             {
+                // Cache player character to dictionary, we will use it later
+                PlayerCharacterDataById[characterData.Id] = characterData;
                 UICharacter uiCharacter = ui.GetComponent<UICharacter>();
-                uiCharacter.Data = character;
+                uiCharacter.Data = characterData;
                 // Select trigger when add first entry so deactivate all models is okay beacause first model will active
-                BaseCharacterModel characterModel = character.InstantiateModel(characterModelContainer);
-                CharacterModelById[character.Id] = characterModel;
-                characterModel.gameObject.SetActive(false);
-                characterModel.SetEquipWeapons(character.EquipWeapons);
-                characterModel.SetEquipItems(character.EquipItems);
-                CacheCharacterSelectionManager.Add(uiCharacter);
+                BaseCharacterModel characterModel = characterData.InstantiateModel(characterModelContainer);
+                if (characterModel != null)
+                {
+                    CharacterModelById[characterData.Id] = characterModel;
+                    characterModel.gameObject.SetActive(false);
+                    characterModel.SetEquipWeapons(characterData.EquipWeapons);
+                    characterModel.SetEquipItems(characterData.EquipItems);
+                    CacheCharacterSelectionManager.Add(uiCharacter);
+                }
             });
         }
 
