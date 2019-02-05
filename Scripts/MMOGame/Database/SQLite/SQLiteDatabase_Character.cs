@@ -66,7 +66,7 @@ namespace MultiplayerARPG.MMO
 
         public override void CreateCharacter(string userId, IPlayerCharacterData characterData)
         {
-            ExecuteNonQuery("BEGIN");
+            BeginTransaction();
             ExecuteNonQuery("INSERT INTO characters " +
                 "(id, userId, dataId, entityId, characterName, level, exp, currentHp, currentMp, currentStamina, currentFood, currentWater, statPoint, skillPoint, gold, currentMapName, currentPositionX, currentPositionY, currentPositionZ, respawnMapName, respawnPositionX, respawnPositionY, respawnPositionZ) VALUES " +
                 "(@id, @userId, @dataId, @entityId, @characterName, @level, @exp, @currentHp, @currentMp, @currentStamina, @currentFood, @currentWater, @statPoint, @skillPoint, @gold, @currentMapName, @currentPositionX, @currentPositionY, @currentPositionZ, @respawnMapName, @respawnPositionX, @respawnPositionY, @respawnPositionZ)",
@@ -94,8 +94,8 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@respawnPositionY", characterData.RespawnPosition.y),
                 new SqliteParameter("@respawnPositionZ", characterData.RespawnPosition.z));
             FillCharacterRelatesData(characterData);
-            ExecuteNonQuery("END");
             this.InvokeInstanceDevExtMethods("CreateCharacter", userId, characterData);
+            EndTransaction();
         }
 
         private bool ReadCharacter(SQLiteRowsReader reader, out PlayerCharacterData result, bool resetReader = true)
@@ -208,7 +208,7 @@ namespace MultiplayerARPG.MMO
 
         public override void UpdateCharacter(IPlayerCharacterData character)
         {
-            ExecuteNonQuery("BEGIN");
+            BeginTransaction();
             ExecuteNonQuery("UPDATE characters SET " +
                 "dataId=@dataId, " +
                 "entityId=@entityId, " +
@@ -255,8 +255,8 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@respawnPositionZ", character.RespawnPosition.z),
                 new SqliteParameter("@id", character.Id));
             FillCharacterRelatesData(character);
-            ExecuteNonQuery("END");
             this.InvokeInstanceDevExtMethods("UpdateCharacter", character);
+            EndTransaction();
         }
 
         public override void DeleteCharacter(string userId, string id)
@@ -267,7 +267,7 @@ namespace MultiplayerARPG.MMO
             long count = result != null ? (long)result : 0;
             if (count > 0)
             {
-                ExecuteNonQuery("BEGIN");
+                BeginTransaction();
                 ExecuteNonQuery("DELETE FROM characters WHERE id=@characterId", new SqliteParameter("@characterId", id));
                 DeleteCharacterAttributes(id);
                 DeleteCharacterBuffs(id);
@@ -277,8 +277,8 @@ namespace MultiplayerARPG.MMO
                 DeleteCharacterSkills(id);
                 DeleteCharacterSkillUsages(id);
                 DeleteCharacterSummons(id);
-                ExecuteNonQuery("END");
                 this.InvokeInstanceDevExtMethods("DeleteCharacter", userId, id);
+                EndTransaction();
             }
         }
 

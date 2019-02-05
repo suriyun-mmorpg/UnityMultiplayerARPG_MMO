@@ -17,6 +17,7 @@ namespace MultiplayerARPG.MMO
         [Tooltip("You should set this to where you build app to make database path as same as map server")]
         private string editorDbPath = "./mmorpgtemplate.sqlite3";
         private SqliteConnection connection;
+        private int transactionCount;
 
         public override void Initialize()
         {
@@ -35,6 +36,7 @@ namespace MultiplayerARPG.MMO
 
             connection = NewConnection();
             connection.Open();
+            transactionCount = 0;
             Init();
         }
 
@@ -45,7 +47,7 @@ namespace MultiplayerARPG.MMO
 
         private void Init()
         {
-            ExecuteNonQuery("BEGIN");
+            BeginTransaction();
 
             ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characterattribute (
               id TEXT NOT NULL PRIMARY KEY,
@@ -234,8 +236,6 @@ namespace MultiplayerARPG.MMO
               leaderId TEXT NOT NULL
             )");
 
-            ExecuteNonQuery("END");
-
             // Update data
             if (!IsColumnExist("characteritem", "durability"))
                 ExecuteNonQuery("ALTER TABLE characteritem ADD durability REAL NOT NULL DEFAULT 0;");
@@ -267,6 +267,7 @@ namespace MultiplayerARPG.MMO
             if (!IsColumnExist("characters", "entityId"))
                 ExecuteNonQuery("ALTER TABLE characters ADD entityId INTEGER NOT NULL DEFAULT 0;");
 
+            EndTransaction();
             this.InvokeInstanceDevExtMethods("Init");
         }
 
@@ -528,6 +529,22 @@ namespace MultiplayerARPG.MMO
                 }
             }
             return id;
+        }
+
+        public void BeginTransaction()
+        {
+            transactionCount++;
+            if (transactionCount > 1)
+                return;
+            ExecuteNonQuery("BEGIN");
+        }
+
+        public void EndTransaction()
+        {
+            transactionCount--;
+            if (transactionCount > 0)
+                return;
+            ExecuteNonQuery("END");
         }
     }
 }
