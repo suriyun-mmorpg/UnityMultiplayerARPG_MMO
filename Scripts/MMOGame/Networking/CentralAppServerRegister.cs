@@ -16,7 +16,7 @@ namespace MultiplayerARPG.MMO
         // Events
         public System.Action<AckResponseCode, BaseAckMessage> onAppServerRegistered;
 
-        public CentralAppServerRegister(IAppServer appServer) : base(new LiteNetLibTransport(), appServer.CentralConnectKey)
+        public CentralAppServerRegister(ITransport transport, IAppServer appServer) : base(transport, appServer.CentralConnectKey)
         {
             this.appServer = appServer;
             RegisterMessage(MMOMessageTypes.ResponseAppServerRegister, HandleResponseAppServerRegister);

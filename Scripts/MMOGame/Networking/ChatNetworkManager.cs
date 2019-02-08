@@ -9,6 +9,7 @@ namespace MultiplayerARPG.MMO
     public partial class ChatNetworkManager : LiteNetLibManager.LiteNetLibManager, IAppServer
     {
         [Header("Central Network Connection")]
+        public BaseTransportFactory centralTransportFactory;
         public string centralConnectKey = "SampleConnectKey";
         public string centralNetworkAddress = "127.0.0.1";
         public int centralNetworkPort = 6000;
@@ -18,6 +19,30 @@ namespace MultiplayerARPG.MMO
         {
             get { return MMOServerInstance.Singleton.Database; }
         }
+        
+        public BaseTransportFactory CentralTransportFactory
+        {
+            get
+            {
+#if UNITY_WEBGL && !UNITY_EDITOR
+                // Force to use websocket transport if it's running as webgl
+                if (centralTransportFactory == null || !centralTransportFactory.CanUseWithWebGL)
+                    centralTransportFactory = gameObject.AddComponent<WebSocketTransportFactory>();
+#else
+                if (useWebSocket)
+                {
+                    if (centralTransportFactory == null || !centralTransportFactory.CanUseWithWebGL)
+                        centralTransportFactory = gameObject.AddComponent<WebSocketTransportFactory>();
+                }
+                else
+                {
+                    if (centralTransportFactory == null)
+                        centralTransportFactory = gameObject.AddComponent<LiteNetLibTransportFactory>();
+                }
+#endif
+                return centralTransportFactory;
+            }
+        }
 
         private CentralAppServerRegister cacheCentralAppServerRegister;
         public CentralAppServerRegister CentralAppServerRegister
@@ -25,7 +50,7 @@ namespace MultiplayerARPG.MMO
             get
             {
                 if (cacheCentralAppServerRegister == null)
-                    cacheCentralAppServerRegister = new CentralAppServerRegister(this);
+                    cacheCentralAppServerRegister = new CentralAppServerRegister(CentralTransportFactory.Build(), this);
                 return cacheCentralAppServerRegister;
             }
         }
