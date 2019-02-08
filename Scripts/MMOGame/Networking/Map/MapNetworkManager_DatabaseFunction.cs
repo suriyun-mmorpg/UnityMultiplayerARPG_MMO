@@ -94,6 +94,7 @@ namespace MultiplayerARPG.MMO
                 int i = 0;
                 foreach (BuildingEntity buildingEntity in buildingEntities.Values)
                 {
+                    if (buildingEntity == null) continue;
                     StartCoroutine(SaveBuildingRoutine(buildingEntity.CloneTo(new BuildingSaveData())));
                     ++i;
                 }

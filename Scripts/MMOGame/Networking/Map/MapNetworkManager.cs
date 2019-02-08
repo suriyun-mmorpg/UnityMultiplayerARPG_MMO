@@ -134,6 +134,7 @@ namespace MultiplayerARPG.MMO
                 string sceneName = Assets.onlineScene.SceneName;
                 foreach (BuildingEntity buildingEntity in buildingEntities.Values)
                 {
+                    if (buildingEntity == null) continue;
                     Database.UpdateBuilding(sceneName, buildingEntity.CloneTo(new BuildingSaveData()));
                 }
             }
