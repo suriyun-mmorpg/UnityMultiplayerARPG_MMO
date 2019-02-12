@@ -412,7 +412,7 @@ namespace MultiplayerARPG.MMO
                             UpdateMapUser(ChatNetworkManager.Client, UpdateUserCharacterMessage.UpdateType.Add, userData);
 
                         LiteNetLibPlayer player = Players[connectionId];
-                        foreach (LiteNetLibIdentity spawnedObject in Assets.SpawnedObjects.Values)
+                        foreach (LiteNetLibIdentity spawnedObject in Assets.GetSpawnedObjects())
                         {
                             if (spawnedObject.ConnectionId == player.ConnectionId)
                                 continue;
