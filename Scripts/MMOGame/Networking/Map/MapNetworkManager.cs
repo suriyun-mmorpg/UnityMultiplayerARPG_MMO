@@ -273,7 +273,7 @@ namespace MultiplayerARPG.MMO
             if (!IsServer)
                 return;
 
-            LiteNetLibPlayer player = Players[connectionId];
+            LiteNetLibPlayer player = GetPlayer(connectionId);
             if (player.IsReady)
                 return;
 
@@ -411,7 +411,7 @@ namespace MultiplayerARPG.MMO
                         if (ChatNetworkManager.IsClientConnected)
                             UpdateMapUser(ChatNetworkManager.Client, UpdateUserCharacterMessage.UpdateType.Add, userData);
 
-                        LiteNetLibPlayer player = Players[connectionId];
+                        LiteNetLibPlayer player = GetPlayer(connectionId);
                         foreach (LiteNetLibIdentity spawnedObject in Assets.GetSpawnedObjects())
                         {
                             if (spawnedObject.ConnectionId == player.ConnectionId)
