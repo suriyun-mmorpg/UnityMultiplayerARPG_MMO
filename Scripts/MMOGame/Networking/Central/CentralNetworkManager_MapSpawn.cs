@@ -1,8 +1,5 @@
 ﻿using LiteNetLib;
 using LiteNetLibManager;
-using System.Collections;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace MultiplayerARPG.MMO
@@ -20,8 +17,7 @@ namespace MultiplayerARPG.MMO
         {
             TransportHandler transportHandler = messageHandler.transportHandler;
             ResponseSpawnMapMessage message = messageHandler.ReadMessage<ResponseSpawnMapMessage>();
-            uint ackId = message.ackId;
-            transportHandler.TriggerAck(ackId, message.responseCode, message);
+            transportHandler.TriggerAck(message.ackId, message.responseCode, message);
         }
 
         protected void OnRequestSpawnMap(AckResponseCode responseCode, BaseAckMessage messageData)

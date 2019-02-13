@@ -104,8 +104,7 @@ namespace MultiplayerARPG.MMO
         {
             TransportHandler peerHandler = messageHandler.transportHandler;
             ResponseAppServerRegisterMessage message = messageHandler.ReadMessage<ResponseAppServerRegisterMessage>();
-            uint ackId = message.ackId;
-            peerHandler.TriggerAck(ackId, message.responseCode, message);
+            peerHandler.TriggerAck(message.ackId, message.responseCode, message);
         }
 
         public void OnAppServerRegistered(AckResponseCode responseCode, BaseAckMessage message)

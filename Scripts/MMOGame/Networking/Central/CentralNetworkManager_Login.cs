@@ -303,32 +303,28 @@ namespace MultiplayerARPG.MMO
         {
             TransportHandler transportHandler = messageHandler.transportHandler;
             ResponseUserLoginMessage message = messageHandler.ReadMessage<ResponseUserLoginMessage>();
-            uint ackId = message.ackId;
-            transportHandler.TriggerAck(ackId, message.responseCode, message);
+            transportHandler.TriggerAck(message.ackId, message.responseCode, message);
         }
 
         protected void HandleResponseUserRegister(LiteNetLibMessageHandler messageHandler)
         {
             TransportHandler transportHandler = messageHandler.transportHandler;
             ResponseUserRegisterMessage message = messageHandler.ReadMessage<ResponseUserRegisterMessage>();
-            uint ackId = message.ackId;
-            transportHandler.TriggerAck(ackId, message.responseCode, message);
+            transportHandler.TriggerAck(message.ackId, message.responseCode, message);
         }
 
         protected void HandleResponseUserLogout(LiteNetLibMessageHandler messageHandler)
         {
             TransportHandler transportHandler = messageHandler.transportHandler;
             BaseAckMessage message = messageHandler.ReadMessage<BaseAckMessage>();
-            uint ackId = message.ackId;
-            transportHandler.TriggerAck(ackId, message.responseCode, message);
+            transportHandler.TriggerAck(message.ackId, message.responseCode, message);
         }
 
         protected void HandleResponseValidateAccessToken(LiteNetLibMessageHandler messageHandler)
         {
             TransportHandler transportHandler = messageHandler.transportHandler;
             ResponseValidateAccessTokenMessage message = messageHandler.ReadMessage<ResponseValidateAccessTokenMessage>();
-            uint ackId = message.ackId;
-            transportHandler.TriggerAck(ackId, message.responseCode, message);
+            transportHandler.TriggerAck(message.ackId, message.responseCode, message);
         }
     }
 }
