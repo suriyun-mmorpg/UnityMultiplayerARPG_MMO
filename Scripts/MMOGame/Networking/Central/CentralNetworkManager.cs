@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using LiteNetLib;
-using LiteNetLibManager;
 
 namespace MultiplayerARPG.MMO
 {
@@ -9,11 +8,15 @@ namespace MultiplayerARPG.MMO
     {
         protected readonly Dictionary<long, CentralServerPeerInfo> mapSpawnServerPeers = new Dictionary<long, CentralServerPeerInfo>();
         protected readonly Dictionary<string, uint> spawningMapAcks = new Dictionary<string, uint>();
+        // Map server peers
         protected readonly Dictionary<long, CentralServerPeerInfo> mapServerPeers = new Dictionary<long, CentralServerPeerInfo>();
         protected readonly Dictionary<string, CentralServerPeerInfo> mapServerPeersBySceneName = new Dictionary<string, CentralServerPeerInfo>();
+        // Chat server peers
         protected readonly Dictionary<long, CentralServerPeerInfo> chatServerPeers = new Dictionary<long, CentralServerPeerInfo>();
+        // User peers (Login / Register / Manager characters)
         protected readonly Dictionary<long, CentralUserPeerInfo> userPeers = new Dictionary<long, CentralUserPeerInfo>();
         protected readonly Dictionary<string, CentralUserPeerInfo> userPeersByUserId = new Dictionary<string, CentralUserPeerInfo>();
+        // Map users, users whom connected to map server / instance map server will be kept in this list
         protected readonly Dictionary<long, HashSet<string>> mapUserIds = new Dictionary<long, HashSet<string>>();
 
         [Header("Account configuration")]
@@ -104,7 +107,9 @@ namespace MultiplayerARPG.MMO
         public override void OnPeerDisconnected(long connectionId, DisconnectInfo disconnectInfo)
         {
             base.OnPeerDisconnected(connectionId, disconnectInfo);
+            // Remove disconnect map spawn server
             mapSpawnServerPeers.Remove(connectionId);
+            // Remove disconnect map server
             CentralServerPeerInfo mapServerPeerInfo;
             if (mapServerPeers.TryGetValue(connectionId, out mapServerPeerInfo))
             {
@@ -112,6 +117,9 @@ namespace MultiplayerARPG.MMO
                 mapServerPeers.Remove(connectionId);
                 mapUserIds.Remove(connectionId);
             }
+            // Remove disconnect chat server
+            chatServerPeers.Remove(connectionId);
+            // Remove disconnect user
             CentralUserPeerInfo userPeerInfo;
             if (userPeers.TryGetValue(connectionId, out userPeerInfo))
             {
