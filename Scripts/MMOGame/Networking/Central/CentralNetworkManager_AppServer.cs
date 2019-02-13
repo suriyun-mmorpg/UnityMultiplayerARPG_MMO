@@ -61,6 +61,25 @@ namespace MultiplayerARPG.MMO
                                 Debug.Log("[Central] Register Map Server Failed: [" + connectionId + "] [" + sceneName + "] [" + error + "]");
                         }
                         break;
+                    case CentralServerPeerType.InstanceMapServer:
+                        string eventId = peerInfo.extra;
+                        if (!instanceMapServerPeersByInstanceId.ContainsKey(eventId))
+                        {
+                            BroadcastAppServers(connectionId, peerInfo);
+                            // Collects server data
+                            instanceMapServerPeersByInstanceId[eventId] = peerInfo;
+                            instanceMapServerPeers[connectionId] = peerInfo;
+                            mapUserIds[connectionId] = new HashSet<string>();
+                            if (LogInfo)
+                                Debug.Log("[Central] Register Instance Map Server: [" + connectionId + "] [" + eventId + "]");
+                        }
+                        else
+                        {
+                            error = ResponseAppServerRegisterMessage.Error.EventAlreadyExisted;
+                            if (LogInfo)
+                                Debug.Log("[Central] Register Instance Map Server Failed: [" + connectionId + "] [" + eventId + "] [" + error + "]");
+                        }
+                        break;
                     case CentralServerPeerType.Chat:
                         chatServerPeers[connectionId] = peerInfo;
                         // Send chat peer info to map servers

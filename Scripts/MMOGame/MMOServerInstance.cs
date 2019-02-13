@@ -41,6 +41,8 @@ namespace MultiplayerARPG.MMO
         public const string ARG_MAP_MAX_CONNECTIONS = "-" + CONFIG_MAP_MAX_CONNECTIONS;
         public const string CONFIG_SCENE_NAME = "sceneName";
         public const string ARG_SCENE_NAME = "-" + CONFIG_SCENE_NAME;
+        public const string CONFIG_INSTANCE_ID = "instanceId";
+        public const string ARG_INSTANCE_ID = "-" + CONFIG_INSTANCE_ID;
         // Chat server
         public const string CONFIG_CHAT_PORT = "chatPort";
         public const string ARG_CHAT_PORT = "-" + CONFIG_CHAT_PORT;
@@ -257,6 +259,13 @@ namespace MultiplayerARPG.MMO
                     ConfigReader.ReadConfigs(jsonConfig, CONFIG_SCENE_NAME, out mapSceneName))
                 {
                     mapNetworkManager.Assets.onlineScene.SceneName = mapSceneName;
+                }
+
+                // Instance Id
+                string instanceId;
+                if (ConfigReader.ReadArgs(args, ARG_INSTANCE_ID, out instanceId))
+                {
+                    mapNetworkManager.instanceId = instanceId;
                 }
 
                 // Chat network port

@@ -8,37 +8,63 @@ namespace MultiplayerARPG.MMO
 {
     public partial class MapNetworkManager
     {
-        public override void WarpCharacter(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position)
+        public override string GetCurrentMapName(BasePlayerCharacterEntity playerCharacterEntity)
+        {
+            if (!IsInstanceMap())
+                return base.GetCurrentMapName(playerCharacterEntity);
+            return instanceMapCurrentLocations[playerCharacterEntity.ObjectId].Key;
+        }
+
+        public override Vector3 GetCurrentPosition(BasePlayerCharacterEntity playerCharacterEntity)
+        {
+            if (!IsInstanceMap())
+                return base.GetCurrentPosition(playerCharacterEntity);
+            return instanceMapCurrentLocations[playerCharacterEntity.ObjectId].Value;
+        }
+
+        public override bool CanWarpCharacter(BasePlayerCharacterEntity playerCharacterEntity)
+        {
+            return base.CanWarpCharacter(playerCharacterEntity) && !warpingCharactersByObjectId.Contains(playerCharacterEntity.ObjectId);
+        }
+
+        public override void WarpCharacter(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position, bool isInstanceMap)
         {
             if (!CanWarpCharacter(playerCharacterEntity))
                 return;
-            base.WarpCharacter(playerCharacterEntity, mapName, position);
-            StartCoroutine(WarpCharacterRoutine(playerCharacterEntity, mapName, position));
+            base.WarpCharacter(playerCharacterEntity, mapName, position, isInstanceMap);
+            StartCoroutine(WarpCharacterRoutine(playerCharacterEntity, mapName, position, isInstanceMap));
         }
 
-        private IEnumerator WarpCharacterRoutine(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position)
+        private IEnumerator WarpCharacterRoutine(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position, bool isInstanceMap)
         {
             // If warping to different map
-            long connectId = playerCharacterEntity.ConnectionId;
+            long connectionId = playerCharacterEntity.ConnectionId;
             CentralServerPeerInfo peerInfo;
             if (!string.IsNullOrEmpty(mapName) &&
                 !mapName.Equals(playerCharacterEntity.CurrentMapName) &&
-                playerCharacters.ContainsKey(connectId) &&
+                playerCharacters.ContainsKey(connectionId) &&
                 mapServerConnectionIdsBySceneName.TryGetValue(mapName, out peerInfo))
             {
+                // Add this character to warping list
+                warpingCharactersByObjectId.Add(playerCharacterEntity.ObjectId);
                 // Unregister player character
-                UnregisterPlayerCharacter(connectId);
+                UnregisterPlayerCharacter(connectionId);
                 // Clone character data to save
                 PlayerCharacterData savingCharacterData = new PlayerCharacterData();
                 playerCharacterEntity.CloneTo(savingCharacterData);
                 // Save character current map / position
-                savingCharacterData.CurrentMapName = mapName;
-                savingCharacterData.CurrentPosition = position;
+                if (!isInstanceMap)
+                {
+                    savingCharacterData.CurrentMapName = mapName;
+                    savingCharacterData.CurrentPosition = position;
+                }
                 while (savingCharacters.Contains(savingCharacterData.Id))
                 {
                     yield return 0;
                 }
                 yield return StartCoroutine(SaveCharacterRoutine(savingCharacterData));
+                // Remove this character from warping list
+                warpingCharactersByObjectId.Remove(playerCharacterEntity.ObjectId);
                 // Destroy character from server
                 playerCharacterEntity.NetworkDestroy();
                 // Send message to client to warp
@@ -47,8 +73,60 @@ namespace MultiplayerARPG.MMO
                 message.networkAddress = peerInfo.networkAddress;
                 message.networkPort = peerInfo.networkPort;
                 message.connectKey = peerInfo.connectKey;
-                ServerSendPacket(connectId, SendOptions.ReliableOrdered, MsgTypes.Warp, message);
+                ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MsgTypes.Warp, message);
             }
+        }
+
+        public override void WarpCharacterToInstance(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position)
+        {
+            if (!CanWarpCharacter(playerCharacterEntity))
+                return;
+            // Generate instance id
+            string instanceId = GenericUtils.GetUniqueId();
+            RequestSpawnMapMessage requestSpawnMapMessage = new RequestSpawnMapMessage();
+            requestSpawnMapMessage.sceneName = mapName;
+            requestSpawnMapMessage.instanceId = instanceId;
+            // Prepare data for warp character later when instance map server registered to this map server
+            HashSet<uint> instanceMapWarpingCharacters = new HashSet<uint>();
+            instanceMapWarpingCharacters.Add(playerCharacterEntity.ObjectId);
+            warpingCharactersByObjectId.Add(playerCharacterEntity.ObjectId);
+            instanceMapWarpingCharactersByInstanceId.Add(instanceId, instanceMapWarpingCharacters);
+            instanceMapWarpingLocations.Add(instanceId, new KeyValuePair<string, Vector3>(mapName, position));
+            CentralAppServerRegister.ClientSendAckPacket(SendOptions.ReliableOrdered, MMOMessageTypes.RequestSpawnMap, requestSpawnMapMessage, OnRequestSpawnMap);
+        }
+
+        private void OnRequestSpawnMap(AckResponseCode responseCode, BaseAckMessage messageData)
+        {
+            ResponseSpawnMapMessage castedMessage = messageData as ResponseSpawnMapMessage;
+            if (LogInfo)
+                Debug.Log("Spawn Map Ack Id: " + messageData.ackId + "  Status: " + responseCode + " Error: " + castedMessage.error);
+            if (responseCode == AckResponseCode.Error ||
+                responseCode == AckResponseCode.Timeout)
+            {
+                // Remove warping characters who warping to instance map
+                HashSet<uint> instanceMapWarpingCharacters;
+                if (instanceMapWarpingCharactersByInstanceId.TryGetValue(castedMessage.instanceId, out instanceMapWarpingCharacters))
+                {
+                    foreach (uint warpingCharacter in instanceMapWarpingCharacters)
+                    {
+                        warpingCharactersByObjectId.Remove(warpingCharacter);
+                    }
+                    instanceMapWarpingCharactersByInstanceId.Remove(castedMessage.instanceId);
+                }
+                instanceMapWarpingLocations.Remove(castedMessage.instanceId);
+            }
+        }
+
+        public override void WarpCharacterToInstanceFollowPartyLeader(BasePlayerCharacterEntity playerCharacterEntity)
+        {
+            if (!CanWarpCharacter(playerCharacterEntity))
+                return;
+            // TODO: Implement this
+        }
+
+        public override bool IsInstanceMap()
+        {
+            return !string.IsNullOrEmpty(instanceId);
         }
 
         public override void CreateParty(BasePlayerCharacterEntity playerCharacterEntity, bool shareExp, bool shareItem)

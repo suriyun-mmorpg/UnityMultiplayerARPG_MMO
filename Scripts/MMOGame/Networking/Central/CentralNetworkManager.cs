@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using LiteNetLib;
+using LiteNetLibManager;
 
 namespace MultiplayerARPG.MMO
 {
@@ -11,6 +12,9 @@ namespace MultiplayerARPG.MMO
         // Map server peers
         protected readonly Dictionary<long, CentralServerPeerInfo> mapServerPeers = new Dictionary<long, CentralServerPeerInfo>();
         protected readonly Dictionary<string, CentralServerPeerInfo> mapServerPeersBySceneName = new Dictionary<string, CentralServerPeerInfo>();
+        // Instance map server peers
+        protected readonly Dictionary<long, CentralServerPeerInfo> instanceMapServerPeers = new Dictionary<long, CentralServerPeerInfo>();
+        protected readonly Dictionary<string, CentralServerPeerInfo> instanceMapServerPeersByInstanceId = new Dictionary<string, CentralServerPeerInfo>();
         // Chat server peers
         protected readonly Dictionary<long, CentralServerPeerInfo> chatServerPeers = new Dictionary<long, CentralServerPeerInfo>();
         // User peers (Login / Register / Manager characters)
@@ -18,6 +22,9 @@ namespace MultiplayerARPG.MMO
         protected readonly Dictionary<string, CentralUserPeerInfo> userPeersByUserId = new Dictionary<string, CentralUserPeerInfo>();
         // Map users, users whom connected to map server / instance map server will be kept in this list
         protected readonly Dictionary<long, HashSet<string>> mapUserIds = new Dictionary<long, HashSet<string>>();
+        // Ack Id / Map-Server Transport Handler dictionary
+        private readonly Dictionary<uint, TransportHandler> requestSpawnMapTransportHandlers = new Dictionary<uint, TransportHandler>();
+        private readonly Dictionary<uint, uint> requestSpawnMapAckIds = new Dictionary<uint, uint>();
 
         [Header("Account configuration")]
         public int minUsernameLength = 2;
@@ -65,6 +72,7 @@ namespace MultiplayerARPG.MMO
             RegisterServerMessage(MMOMessageTypes.RequestCreateCharacter, HandleRequestCreateCharacter);
             RegisterServerMessage(MMOMessageTypes.RequestDeleteCharacter, HandleRequestDeleteCharacter);
             RegisterServerMessage(MMOMessageTypes.RequestSelectCharacter, HandleRequestSelectCharacter);
+            RegisterServerMessage(MMOMessageTypes.RequestSpawnMap, HandleRequestSpawnMap);
             RegisterServerMessage(MMOMessageTypes.ResponseSpawnMap, HandleResponseSpawnMap);
             RegisterServerMessage(MMOMessageTypes.RequestValidateAccessToken, HandleRequestValidateAccessToken);
             RegisterServerMessage(MMOMessageTypes.UpdateMapUser, HandleUpdateMapUser);
@@ -79,10 +87,14 @@ namespace MultiplayerARPG.MMO
             spawningMapAcks.Clear();
             mapServerPeers.Clear();
             mapServerPeersBySceneName.Clear();
+            instanceMapServerPeers.Clear();
+            instanceMapServerPeersByInstanceId.Clear();
             chatServerPeers.Clear();
             userPeers.Clear();
             userPeersByUserId.Clear();
             mapUserIds.Clear();
+            requestSpawnMapTransportHandlers.Clear();
+            requestSpawnMapAckIds.Clear();
         }
 
         public override void OnStartServer()
@@ -115,6 +127,14 @@ namespace MultiplayerARPG.MMO
             {
                 mapServerPeersBySceneName.Remove(mapServerPeerInfo.extra);
                 mapServerPeers.Remove(connectionId);
+                mapUserIds.Remove(connectionId);
+            }
+            // Remove disconnect instance map server
+            CentralServerPeerInfo instanceMapServerPeerInfo;
+            if (instanceMapServerPeers.TryGetValue(connectionId, out instanceMapServerPeerInfo))
+            {
+                instanceMapServerPeersByInstanceId.Remove(instanceMapServerPeerInfo.extra);
+                instanceMapServerPeers.Remove(connectionId);
                 mapUserIds.Remove(connectionId);
             }
             // Remove disconnect chat server

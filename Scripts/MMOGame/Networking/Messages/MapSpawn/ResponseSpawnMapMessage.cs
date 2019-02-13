@@ -17,15 +17,18 @@ namespace MultiplayerARPG.MMO
             Unknow,
         }
         public Error error;
+        public string instanceId;
 
         public override void DeserializeData(NetDataReader reader)
         {
             error = (Error)reader.GetByte();
+            instanceId = reader.GetString();
         }
 
         public override void SerializeData(NetDataWriter writer)
         {
             writer.Put((byte)error);
+            writer.Put(instanceId);
         }
     }
 }

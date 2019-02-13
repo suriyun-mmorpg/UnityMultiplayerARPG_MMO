@@ -8,7 +8,7 @@ using LiteNetLibManager;
 
 namespace MultiplayerARPG.MMO
 {
-    public partial class MapNetworkManager : BaseGameNetworkManager, IAppServer
+    public sealed partial class MapNetworkManager : BaseGameNetworkManager, IAppServer
     {
         [Header("Central Network Connection")]
         public BaseTransportFactory centralTransportFactory;
@@ -16,6 +16,7 @@ namespace MultiplayerARPG.MMO
         public string centralNetworkAddress = "127.0.0.1";
         public int centralNetworkPort = 6000;
         public string machineAddress = "127.0.0.1";
+        public string instanceId;
 
         [Header("Database")]
         public float autoSaveDuration = 2f;
@@ -89,13 +90,18 @@ namespace MultiplayerARPG.MMO
         private float lastSaveCharacterTime;
         private float lastSaveBuildingTime;
         // Listing
+        private readonly HashSet<uint> warpingCharactersByObjectId = new HashSet<uint>();
+        private readonly Dictionary<uint, KeyValuePair<string, Vector3>> instanceMapCurrentLocations = new Dictionary<uint, KeyValuePair<string, Vector3>>();
         private readonly Dictionary<string, CentralServerPeerInfo> mapServerConnectionIdsBySceneName = new Dictionary<string, CentralServerPeerInfo>();
+        private readonly Dictionary<string, CentralServerPeerInfo> instanceMapServerConnectionIdsByInstanceId = new Dictionary<string, CentralServerPeerInfo>();
+        private readonly Dictionary<string, HashSet<uint>> instanceMapWarpingCharactersByInstanceId = new Dictionary<string, HashSet<uint>>();
+        private readonly Dictionary<string, KeyValuePair<string, Vector3>> instanceMapWarpingLocations = new Dictionary<string, KeyValuePair<string, Vector3>>();
         private readonly Dictionary<string, UserCharacterData> usersById = new Dictionary<string, UserCharacterData>();
         // Database operations
-        protected readonly HashSet<int> loadingPartyIds = new HashSet<int>();
-        protected readonly HashSet<int> loadingGuildIds = new HashSet<int>();
-        protected readonly HashSet<string> savingCharacters = new HashSet<string>();
-        protected readonly HashSet<string> savingBuildings = new HashSet<string>();
+        private readonly HashSet<int> loadingPartyIds = new HashSet<int>();
+        private readonly HashSet<int> loadingGuildIds = new HashSet<int>();
+        private readonly HashSet<string> savingCharacters = new HashSet<string>();
+        private readonly HashSet<string> savingBuildings = new HashSet<string>();
 
         protected override void Update()
         {
@@ -109,7 +115,7 @@ namespace MultiplayerARPG.MMO
                     StartCoroutine(SaveCharactersRoutine());
                     lastSaveCharacterTime = tempUnscaledTime;
                 }
-                if (tempUnscaledTime - lastSaveBuildingTime > autoSaveDuration)
+                if (tempUnscaledTime - lastSaveBuildingTime > autoSaveDuration && !IsInstanceMap())
                 {
                     StartCoroutine(SaveBuildingsRoutine());
                     lastSaveBuildingTime = tempUnscaledTime;
@@ -120,7 +126,12 @@ namespace MultiplayerARPG.MMO
         protected override void Clean()
         {
             base.Clean();
+            warpingCharactersByObjectId.Clear();
+            instanceMapCurrentLocations.Clear();
             mapServerConnectionIdsBySceneName.Clear();
+            instanceMapServerConnectionIdsByInstanceId.Clear();
+            instanceMapWarpingCharactersByInstanceId.Clear();
+            instanceMapWarpingLocations.Clear();
             usersById.Clear();
             loadingPartyIds.Clear();
             loadingGuildIds.Clear();
@@ -218,7 +229,6 @@ namespace MultiplayerARPG.MMO
             CentralAppServerRegister.OnStopServer();
             if (ChatNetworkManager.IsClientConnected)
                 ChatNetworkManager.StopClient();
-            mapServerConnectionIdsBySceneName.Clear();
         }
 
         public override void OnClientConnected()
@@ -335,6 +345,10 @@ namespace MultiplayerARPG.MMO
                         LiteNetLibIdentity identity = Assets.NetworkSpawn(entityPrefab.Identity.HashAssetId, playerCharacterData.CurrentPosition, Quaternion.identity, 0, connectionId);
                         BasePlayerCharacterEntity playerCharacterEntity = identity.GetComponent<BasePlayerCharacterEntity>();
                         playerCharacterData.CloneTo(playerCharacterEntity);
+
+                        // Prepare saving location for this character
+                        if (IsInstanceMap())
+                            instanceMapCurrentLocations.Add(playerCharacterEntity.ObjectId, new KeyValuePair<string, Vector3>(playerCharacterData.CurrentMapName, playerCharacterData.CurrentPosition));
 
                         // Summon saved summons
                         for (int i = 0; i < playerCharacterEntity.Summons.Count; ++i)
@@ -646,6 +660,28 @@ namespace MultiplayerARPG.MMO
                             if (LogInfo)
                                 Debug.Log("Register map server: " + peerInfo.extra);
                             mapServerConnectionIdsBySceneName[peerInfo.extra] = peerInfo;
+                        }
+                        break;
+                    case CentralServerPeerType.InstanceMapServer:
+                        if (!string.IsNullOrEmpty(peerInfo.extra))
+                        {
+                            if (LogInfo)
+                                Debug.Log("Register instance map server: " + peerInfo.extra);
+                            instanceMapServerConnectionIdsByInstanceId[peerInfo.extra] = peerInfo;
+                            // Warp characters
+                            HashSet<uint> warpingCharacters = new HashSet<uint>();
+                            KeyValuePair<string, Vector3> warpingLocation;
+                            if (instanceMapWarpingCharactersByInstanceId.TryGetValue(peerInfo.extra, out warpingCharacters) &&
+                                instanceMapWarpingLocations.TryGetValue(peerInfo.extra, out warpingLocation))
+                            {
+                                BasePlayerCharacterEntity warpingCharacterEntity;
+                                foreach (uint warpingCharacter in warpingCharacters)
+                                {
+                                    if (!Assets.TryGetSpawnedObject(warpingCharacter, out warpingCharacterEntity))
+                                        continue;
+                                    WarpCharacter(warpingCharacterEntity, warpingLocation.Key, warpingLocation.Value, true);
+                                }
+                            }
                         }
                         break;
                     case CentralServerPeerType.Chat:

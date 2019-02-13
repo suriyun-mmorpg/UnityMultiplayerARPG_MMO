@@ -4,6 +4,7 @@
     {
         MapSpawnServer,
         MapServer,
+        InstanceMapServer,
         Chat,
     }
 }

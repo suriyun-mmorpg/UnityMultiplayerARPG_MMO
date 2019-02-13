@@ -12,6 +12,7 @@ namespace MultiplayerARPG.MMO
             None,
             InvalidHash,
             MapAlreadyExisted,
+            EventAlreadyExisted,
         }
         public Error error;
 
