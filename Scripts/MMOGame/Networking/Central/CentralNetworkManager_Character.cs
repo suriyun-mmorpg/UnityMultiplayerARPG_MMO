@@ -192,32 +192,28 @@ namespace MultiplayerARPG.MMO
         {
             TransportHandler transportHandler = messageHandler.transportHandler;
             ResponseCharactersMessage message = messageHandler.ReadMessage<ResponseCharactersMessage>();
-            uint ackId = message.ackId;
-            transportHandler.TriggerAck(ackId, message.responseCode, message);
+            transportHandler.TriggerAck(message.ackId, message.responseCode, message);
         }
 
         protected void HandleResponseCreateCharacter(LiteNetLibMessageHandler messageHandler)
         {
             TransportHandler transportHandler = messageHandler.transportHandler;
             ResponseCreateCharacterMessage message = messageHandler.ReadMessage<ResponseCreateCharacterMessage>();
-            uint ackId = message.ackId;
-            transportHandler.TriggerAck(ackId, message.responseCode, message);
+            transportHandler.TriggerAck(message.ackId, message.responseCode, message);
         }
 
         protected void HandleResponseDeleteCharacter(LiteNetLibMessageHandler messageHandler)
         {
             TransportHandler transportHandler = messageHandler.transportHandler;
             ResponseDeleteCharacterMessage message = messageHandler.ReadMessage<ResponseDeleteCharacterMessage>();
-            uint ackId = message.ackId;
-            transportHandler.TriggerAck(ackId, message.responseCode, message);
+            transportHandler.TriggerAck(message.ackId, message.responseCode, message);
         }
 
         protected void HandleResponseSelectCharacter(LiteNetLibMessageHandler messageHandler)
         {
             TransportHandler transportHandler = messageHandler.transportHandler;
             ResponseSelectCharacterMessage message = messageHandler.ReadMessage<ResponseSelectCharacterMessage>();
-            uint ackId = message.ackId;
-            transportHandler.TriggerAck(ackId, message.responseCode, message);
+            transportHandler.TriggerAck(message.ackId, message.responseCode, message);
         }
     }
 }
