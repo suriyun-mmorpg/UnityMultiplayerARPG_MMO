@@ -46,32 +46,7 @@ namespace MultiplayerARPG.MMO
                         string sceneName = peerInfo.extra;
                         if (!mapServerPeersBySceneName.ContainsKey(sceneName))
                         {
-                            // Send map peer info to other map server
-                            foreach (CentralServerPeerInfo mapServerPeer in mapServerPeers.Values)
-                            {
-                                // Send other info to current peer
-                                ResponseAppServerAddressMessage responseMapAddressMessage = new ResponseAppServerAddressMessage();
-                                responseMapAddressMessage.responseCode = AckResponseCode.Success;
-                                responseMapAddressMessage.error = ResponseAppServerAddressMessage.Error.None;
-                                responseMapAddressMessage.peerInfo = mapServerPeer;
-                                ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MMOMessageTypes.ResponseAppServerAddress, responseMapAddressMessage);
-                                // Send current info to other peer
-                                responseMapAddressMessage = new ResponseAppServerAddressMessage();
-                                responseMapAddressMessage.responseCode = AckResponseCode.Success;
-                                responseMapAddressMessage.error = ResponseAppServerAddressMessage.Error.None;
-                                responseMapAddressMessage.peerInfo = peerInfo;
-                                ServerSendPacket(mapServerPeer.connectionId, SendOptions.ReliableOrdered, MMOMessageTypes.ResponseAppServerAddress, responseMapAddressMessage);
-                            }
-                            // Send chat peer info to new map server
-                            if (chatServerPeers.Count > 0)
-                            {
-                                CentralServerPeerInfo chatPeerInfo = chatServerPeers.Values.First();
-                                ResponseAppServerAddressMessage responseChatAddressMessage = new ResponseAppServerAddressMessage();
-                                responseChatAddressMessage.responseCode = AckResponseCode.Success;
-                                responseChatAddressMessage.error = ResponseAppServerAddressMessage.Error.None;
-                                responseChatAddressMessage.peerInfo = chatPeerInfo;
-                                ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MMOMessageTypes.ResponseAppServerAddress, responseChatAddressMessage);
-                            }
+                            BroadcastAppServers(connectionId, peerInfo);
                             // Collects server data
                             mapServerPeersBySceneName[sceneName] = peerInfo;
                             mapServerPeers[connectionId] = peerInfo;
@@ -114,6 +89,41 @@ namespace MultiplayerARPG.MMO
             responseMessage.responseCode = error == ResponseAppServerRegisterMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
             responseMessage.error = error;
             ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MMOMessageTypes.ResponseAppServerRegister, responseMessage);
+        }
+
+        /// <summary>
+        /// This function will be used to send connection information to connected map servers and chat servers
+        /// </summary>
+        /// <param name="connectionId"></param>
+        /// <param name="peerInfo"></param>
+        protected void BroadcastAppServers(long connectionId, CentralServerPeerInfo peerInfo)
+        {
+            // Send map peer info to other map server
+            foreach (CentralServerPeerInfo mapServerPeer in mapServerPeers.Values)
+            {
+                // Send other info to current peer
+                ResponseAppServerAddressMessage responseMapAddressMessage = new ResponseAppServerAddressMessage();
+                responseMapAddressMessage.responseCode = AckResponseCode.Success;
+                responseMapAddressMessage.error = ResponseAppServerAddressMessage.Error.None;
+                responseMapAddressMessage.peerInfo = mapServerPeer;
+                ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MMOMessageTypes.ResponseAppServerAddress, responseMapAddressMessage);
+                // Send current info to other peer
+                responseMapAddressMessage = new ResponseAppServerAddressMessage();
+                responseMapAddressMessage.responseCode = AckResponseCode.Success;
+                responseMapAddressMessage.error = ResponseAppServerAddressMessage.Error.None;
+                responseMapAddressMessage.peerInfo = peerInfo;
+                ServerSendPacket(mapServerPeer.connectionId, SendOptions.ReliableOrdered, MMOMessageTypes.ResponseAppServerAddress, responseMapAddressMessage);
+            }
+            // Send chat peer info to new map server
+            if (chatServerPeers.Count > 0)
+            {
+                CentralServerPeerInfo chatPeerInfo = chatServerPeers.Values.First();
+                ResponseAppServerAddressMessage responseChatAddressMessage = new ResponseAppServerAddressMessage();
+                responseChatAddressMessage.responseCode = AckResponseCode.Success;
+                responseChatAddressMessage.error = ResponseAppServerAddressMessage.Error.None;
+                responseChatAddressMessage.peerInfo = chatPeerInfo;
+                ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MMOMessageTypes.ResponseAppServerAddress, responseChatAddressMessage);
+            }
         }
 
         protected void HandleRequestAppServerAddress(LiteNetLibMessageHandler messageHandler)
@@ -175,16 +185,14 @@ namespace MultiplayerARPG.MMO
         {
             TransportHandler transportHandler = messageHandler.transportHandler;
             ResponseAppServerRegisterMessage message = messageHandler.ReadMessage<ResponseAppServerRegisterMessage>();
-            uint ackId = message.ackId;
-            transportHandler.TriggerAck(ackId, message.responseCode, message);
+            transportHandler.TriggerAck(message.ackId, message.responseCode, message);
         }
 
         protected void HandleResponseAppServerAddress(LiteNetLibMessageHandler messageHandler)
         {
             TransportHandler transportHandler = messageHandler.transportHandler;
             ResponseAppServerAddressMessage message = messageHandler.ReadMessage<ResponseAppServerAddressMessage>();
-            uint ackId = message.ackId;
-            transportHandler.TriggerAck(ackId, message.responseCode, message);
+            transportHandler.TriggerAck(message.ackId, message.responseCode, message);
         }
 
         protected void HandleUpdateMapUser(LiteNetLibMessageHandler messageHandler)
