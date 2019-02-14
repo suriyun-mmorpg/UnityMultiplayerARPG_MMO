@@ -106,7 +106,6 @@ namespace MultiplayerARPG.MMO
         private float lastSaveCharacterTime;
         private float lastSaveBuildingTime;
         // Listing
-        private readonly HashSet<uint> warpingCharactersByObjectId = new HashSet<uint>();
         private readonly Dictionary<uint, KeyValuePair<string, Vector3>> instanceMapCurrentLocations = new Dictionary<uint, KeyValuePair<string, Vector3>>();
         private readonly Dictionary<string, CentralServerPeerInfo> mapServerConnectionIdsBySceneName = new Dictionary<string, CentralServerPeerInfo>();
         private readonly Dictionary<string, CentralServerPeerInfo> instanceMapServerConnectionIdsByInstanceId = new Dictionary<string, CentralServerPeerInfo>();
@@ -142,7 +141,6 @@ namespace MultiplayerARPG.MMO
         protected override void Clean()
         {
             base.Clean();
-            warpingCharactersByObjectId.Clear();
             instanceMapCurrentLocations.Clear();
             mapServerConnectionIdsBySceneName.Clear();
             instanceMapServerConnectionIdsByInstanceId.Clear();
@@ -409,6 +407,7 @@ namespace MultiplayerARPG.MMO
                             if (guilds.ContainsKey(playerCharacterEntity.GuildId))
                             {
                                 GuildData guild = guilds[playerCharacterEntity.GuildId];
+                                playerCharacterEntity.GuildName = guild.guildName;
                                 playerCharacterEntity.GuildRole = guild.GetMemberRole(playerCharacterEntity.Id);
                                 SendCreateGuildToClient(playerCharacterEntity.ConnectionId, guild);
                                 SendAddGuildMembersToClient(playerCharacterEntity.ConnectionId, guild);
@@ -840,6 +839,7 @@ namespace MultiplayerARPG.MMO
                         if (playerCharactersById.TryGetValue(message.CharacterId, out playerCharacterEntity))
                         {
                             playerCharacterEntity.GuildId = message.id;
+                            playerCharacterEntity.GuildName = guild.guildName;
                             playerCharacterEntity.GuildRole = guild.GetMemberRole(playerCharacterEntity.Id);
                             SendCreateGuildToClient(playerCharacterEntity.ConnectionId, guild);
                             SendAddGuildMembersToClient(playerCharacterEntity.ConnectionId, guild);

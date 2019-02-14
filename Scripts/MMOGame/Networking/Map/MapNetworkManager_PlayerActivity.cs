@@ -22,11 +22,6 @@ namespace MultiplayerARPG.MMO
             return instanceMapCurrentLocations[playerCharacterEntity.ObjectId].Value;
         }
 
-        public override bool CanWarpCharacter(BasePlayerCharacterEntity playerCharacterEntity)
-        {
-            return base.CanWarpCharacter(playerCharacterEntity) && !warpingCharactersByObjectId.Contains(playerCharacterEntity.ObjectId);
-        }
-
         protected override void WarpCharacter(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position)
         {
             if (!CanWarpCharacter(playerCharacterEntity))
@@ -49,7 +44,7 @@ namespace MultiplayerARPG.MMO
                 mapInfo.IsSceneSet())
             {
                 // Add this character to warping list
-                warpingCharactersByObjectId.Add(playerCharacterEntity.ObjectId);
+                playerCharacterEntity.IsWarping = true;
                 // Unregister player character
                 UnregisterPlayerCharacter(connectionId);
                 // Clone character data to save
@@ -63,7 +58,7 @@ namespace MultiplayerARPG.MMO
                 }
                 yield return StartCoroutine(SaveCharacterRoutine(savingCharacterData));
                 // Remove this character from warping list
-                warpingCharactersByObjectId.Remove(playerCharacterEntity.ObjectId);
+                playerCharacterEntity.IsWarping = false;
                 // Destroy character from server
                 playerCharacterEntity.NetworkDestroy();
                 // Send message to client to warp
@@ -88,7 +83,7 @@ namespace MultiplayerARPG.MMO
             // Prepare data for warp character later when instance map server registered to this map server
             HashSet<uint> instanceMapWarpingCharacters = new HashSet<uint>();
             instanceMapWarpingCharacters.Add(playerCharacterEntity.ObjectId);
-            warpingCharactersByObjectId.Add(playerCharacterEntity.ObjectId);
+            playerCharacterEntity.IsWarping = true;
             instanceMapWarpingCharactersByInstanceId.Add(instanceId, instanceMapWarpingCharacters);
             instanceMapWarpingLocations.Add(instanceId, new KeyValuePair<string, Vector3>(mapName, position));
             CentralAppServerRegister.ClientSendAckPacket(SendOptions.ReliableOrdered, MMOMessageTypes.RequestSpawnMap, requestSpawnMapMessage, OnRequestSpawnMap);
@@ -108,7 +103,7 @@ namespace MultiplayerARPG.MMO
                 mapInfo.IsSceneSet())
             {
                 // Add this character to warping list
-                warpingCharactersByObjectId.Add(playerCharacterEntity.ObjectId);
+                playerCharacterEntity.IsWarping = true;
                 // Unregister player character
                 UnregisterPlayerCharacter(connectionId);
                 // Clone character data to save
@@ -120,7 +115,7 @@ namespace MultiplayerARPG.MMO
                 }
                 yield return StartCoroutine(SaveCharacterRoutine(savingCharacterData));
                 // Remove this character from warping list
-                warpingCharactersByObjectId.Remove(playerCharacterEntity.ObjectId);
+                playerCharacterEntity.IsWarping = false;
                 // Destroy character from server
                 playerCharacterEntity.NetworkDestroy();
                 // Send message to client to warp
@@ -145,9 +140,11 @@ namespace MultiplayerARPG.MMO
                 HashSet<uint> instanceMapWarpingCharacters;
                 if (instanceMapWarpingCharactersByInstanceId.TryGetValue(castedMessage.instanceId, out instanceMapWarpingCharacters))
                 {
+                    BasePlayerCharacterEntity playerCharacterEntity;
                     foreach (uint warpingCharacter in instanceMapWarpingCharacters)
                     {
-                        warpingCharactersByObjectId.Remove(warpingCharacter);
+                        if (Assets.TryGetSpawnedObject(warpingCharacter, out playerCharacterEntity))
+                            playerCharacterEntity.IsWarping = false;
                     }
                     instanceMapWarpingCharactersByInstanceId.Remove(castedMessage.instanceId);
                 }
