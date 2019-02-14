@@ -81,8 +81,28 @@ namespace MultiplayerARPG.MMO
             requestSpawnMapMessage.instanceId = instanceId;
             // Prepare data for warp character later when instance map server registered to this map server
             HashSet<uint> instanceMapWarpingCharacters = new HashSet<uint>();
-            instanceMapWarpingCharacters.Add(playerCharacterEntity.ObjectId);
-            playerCharacterEntity.IsWarping = true;
+            PartyData party;
+            if (parties.TryGetValue(playerCharacterEntity.PartyId, out party))
+            {
+                // If character is party member, will bring party member to join instance
+                if (party.IsLeader(playerCharacterEntity))
+                {
+                    List<BasePlayerCharacterEntity> aliveAllies = playerCharacterEntity.FindAliveCharacters<BasePlayerCharacterEntity>(gameInstance.joinInstanceDungeonDistance, true, false, false);
+                    foreach (BasePlayerCharacterEntity aliveAlly in aliveAllies)
+                    {
+                        if (!party.IsMember(aliveAlly))
+                            continue;
+                        instanceMapWarpingCharacters.Add(aliveAlly.ObjectId);
+                        aliveAlly.IsWarping = true;
+                    }
+                }
+            }
+            else
+            {
+                // If no party enter instance alone
+                instanceMapWarpingCharacters.Add(playerCharacterEntity.ObjectId);
+                playerCharacterEntity.IsWarping = true;
+            }
             instanceMapWarpingCharactersByInstanceId.Add(instanceId, instanceMapWarpingCharacters);
             instanceMapWarpingLocations.Add(instanceId, new KeyValuePair<string, Vector3>(mapName, position));
             CentralAppServerRegister.ClientSendAckPacket(SendOptions.ReliableOrdered, MMOMessageTypes.RequestSpawnMap, requestSpawnMapMessage, OnRequestSpawnMap);
