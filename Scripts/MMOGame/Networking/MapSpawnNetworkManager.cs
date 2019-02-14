@@ -22,7 +22,7 @@ namespace MultiplayerARPG.MMO
         public string exePath = "./Build.exe";
         public bool notSpawnInBatchMode = false;
         public int startPort = 8000;
-        public List<UnityScene> spawningScenes;
+        public List<MapInfo> spawningMaps;
 
         [Header("Running In Editor")]
         public bool isOverrideExePath;
@@ -198,7 +198,7 @@ namespace MultiplayerARPG.MMO
             ResponseSpawnMapMessage.Error error = ResponseSpawnMapMessage.Error.None;
             if (!CentralAppServerRegister.IsRegisteredToCentralServer)
                 error = ResponseSpawnMapMessage.Error.NotReady;
-            else if (string.IsNullOrEmpty(message.sceneName))
+            else if (string.IsNullOrEmpty(message.mapId))
                 error = ResponseSpawnMapMessage.Error.EmptySceneName;
 
             if (error != ResponseSpawnMapMessage.Error.None)
@@ -211,21 +211,14 @@ namespace MultiplayerARPG.MMO
         {
             if (responseCode == AckResponseCode.Success)
             {
-                if (spawningScenes == null || spawningScenes.Count == 0)
+                if (spawningMaps == null || spawningMaps.Count == 0)
                 {
-                    spawningScenes = new List<UnityScene>();
-                    List<string> sceneNames = GameInstance.Singleton.GetGameScenes();
-                    foreach (string sceneName in sceneNames)
-                    {
-                        spawningScenes.Add(new UnityScene()
-                        {
-                            SceneName = sceneName
-                        });
-                    }
+                    spawningMaps = new List<MapInfo>();
+                    spawningMaps.AddRange(GameInstance.MapInfos.Values);
                 }
-                foreach (UnityScene scene in spawningScenes)
+                foreach (MapInfo map in spawningMaps)
                 {
-                    SpawnMap(scene, true);
+                    SpawnMap(map.Id, true);
                 }
             }
         }
@@ -237,10 +230,10 @@ namespace MultiplayerARPG.MMO
 
         private void SpawnMap(RequestSpawnMapMessage message, bool autoRestart)
         {
-            SpawnMap(message.sceneName, autoRestart, message);
+            SpawnMap(message.mapId, autoRestart, message);
         }
 
-        private void SpawnMap(string sceneName, bool autoRestart, RequestSpawnMapMessage message = null)
+        private void SpawnMap(string mapId, bool autoRestart, RequestSpawnMapMessage message = null)
         {
             // Port to run map server
             if (freePorts.Count > 0)
@@ -268,7 +261,7 @@ namespace MultiplayerARPG.MMO
                 UseShellExecute = false,
                 Arguments = " " +
                     (!NotSpawnInBatchMode ? "-batchmode -nographics " : "") +
-                    string.Format("{0} {1} ", MMOServerInstance.ARG_SCENE_NAME, sceneName) +
+                    string.Format("{0} {1} ", MMOServerInstance.ARG_MAP_DATA_ID, mapId) +
                     (message != null ? string.Format("{0} {1} ", MMOServerInstance.ARG_INSTANCE_ID, message.instanceId) : "") +
                     string.Format("{0} {1} ", MMOServerInstance.ARG_CENTRAL_ADDRESS, centralNetworkAddress) +
                     string.Format("{0} {1} ", MMOServerInstance.ARG_CENTRAL_PORT, centralNetworkPort) +
@@ -336,7 +329,7 @@ namespace MultiplayerARPG.MMO
 
                             // Restarting scene
                             if (autoRestart)
-                                restartingScenes.Add(sceneName);
+                                restartingScenes.Add(mapId);
                         }
 
                         ExecuteOnMainThread(() =>
@@ -358,7 +351,7 @@ namespace MultiplayerARPG.MMO
 
                 // Restarting scene
                 if (autoRestart)
-                    restartingScenes.Add(sceneName);
+                    restartingScenes.Add(mapId);
 
                 if (LogFatal)
                     UnityEngine.Debug.LogException(e);
@@ -371,7 +364,7 @@ namespace MultiplayerARPG.MMO
             responseMessage.ackId = ackId;
             responseMessage.responseCode = error == ResponseSpawnMapMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
             responseMessage.error = error;
-            ClientSendPacket(SendOptions.ReliableOrdered, MMOMessageTypes.ResponseSpawnMap, responseMessage);
+            CentralAppServerRegister.ClientSendPacket(SendOptions.ReliableOrdered, MMOMessageTypes.ResponseSpawnMap, responseMessage.Serialize);
         }
 
         private void ExecuteOnMainThread(Action action)

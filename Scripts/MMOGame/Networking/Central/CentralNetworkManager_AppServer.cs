@@ -62,22 +62,22 @@ namespace MultiplayerARPG.MMO
                         }
                         break;
                     case CentralServerPeerType.InstanceMapServer:
-                        string eventId = peerInfo.extra;
-                        if (!instanceMapServerPeersByInstanceId.ContainsKey(eventId))
+                        string instanceId = peerInfo.extra;
+                        if (!instanceMapServerPeersByInstanceId.ContainsKey(instanceId))
                         {
                             BroadcastAppServers(connectionId, peerInfo);
                             // Collects server data
-                            instanceMapServerPeersByInstanceId[eventId] = peerInfo;
+                            instanceMapServerPeersByInstanceId[instanceId] = peerInfo;
                             instanceMapServerPeers[connectionId] = peerInfo;
                             mapUserIds[connectionId] = new HashSet<string>();
                             if (LogInfo)
-                                Debug.Log("[Central] Register Instance Map Server: [" + connectionId + "] [" + eventId + "]");
+                                Debug.Log("[Central] Register Instance Map Server: [" + connectionId + "] [" + instanceId + "]");
                         }
                         else
                         {
                             error = ResponseAppServerRegisterMessage.Error.EventAlreadyExisted;
                             if (LogInfo)
-                                Debug.Log("[Central] Register Instance Map Server Failed: [" + connectionId + "] [" + eventId + "] [" + error + "]");
+                                Debug.Log("[Central] Register Instance Map Server Failed: [" + connectionId + "] [" + instanceId + "] [" + error + "]");
                         }
                         break;
                     case CentralServerPeerType.Chat:

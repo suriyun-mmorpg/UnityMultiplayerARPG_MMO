@@ -10,7 +10,7 @@ namespace MultiplayerARPG.MMO
         public uint RequestSpawnMap(long connectionId, string sceneName, string instanceId, AckMessageCallback callback)
         {
             RequestSpawnMapMessage message = new RequestSpawnMapMessage();
-            message.sceneName = sceneName;
+            message.mapId = sceneName;
             message.instanceId = instanceId;
             return RequestSpawnMap(connectionId, message, callback);
         }

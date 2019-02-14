@@ -27,15 +27,15 @@ namespace MultiplayerARPG.MMO
             return base.CanWarpCharacter(playerCharacterEntity) && !warpingCharactersByObjectId.Contains(playerCharacterEntity.ObjectId);
         }
 
-        public override void WarpCharacter(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position, bool isInstanceMap)
+        protected override void WarpCharacter(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position)
         {
             if (!CanWarpCharacter(playerCharacterEntity))
                 return;
-            base.WarpCharacter(playerCharacterEntity, mapName, position, isInstanceMap);
-            StartCoroutine(WarpCharacterRoutine(playerCharacterEntity, mapName, position, isInstanceMap));
+            base.WarpCharacter(playerCharacterEntity, mapName, position);
+            StartCoroutine(WarpCharacterRoutine(playerCharacterEntity, mapName, position));
         }
 
-        private IEnumerator WarpCharacterRoutine(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position, bool isInstanceMap)
+        private IEnumerator WarpCharacterRoutine(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position)
         {
             // If warping to different map
             long connectionId = playerCharacterEntity.ConnectionId;
@@ -52,12 +52,8 @@ namespace MultiplayerARPG.MMO
                 // Clone character data to save
                 PlayerCharacterData savingCharacterData = new PlayerCharacterData();
                 playerCharacterEntity.CloneTo(savingCharacterData);
-                // Save character current map / position
-                if (!isInstanceMap)
-                {
-                    savingCharacterData.CurrentMapName = mapName;
-                    savingCharacterData.CurrentPosition = position;
-                }
+                savingCharacterData.CurrentMapName = mapName;
+                savingCharacterData.CurrentPosition = position;
                 while (savingCharacters.Contains(savingCharacterData.Id))
                 {
                     yield return 0;
@@ -77,14 +73,14 @@ namespace MultiplayerARPG.MMO
             }
         }
 
-        public override void WarpCharacterToInstance(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position)
+        protected override void WarpCharacterToInstance(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position)
         {
             if (!CanWarpCharacter(playerCharacterEntity))
                 return;
             // Generate instance id
             string instanceId = GenericUtils.GetUniqueId();
             RequestSpawnMapMessage requestSpawnMapMessage = new RequestSpawnMapMessage();
-            requestSpawnMapMessage.sceneName = mapName;
+            requestSpawnMapMessage.mapId = mapName;
             requestSpawnMapMessage.instanceId = instanceId;
             // Prepare data for warp character later when instance map server registered to this map server
             HashSet<uint> instanceMapWarpingCharacters = new HashSet<uint>();
@@ -93,6 +89,42 @@ namespace MultiplayerARPG.MMO
             instanceMapWarpingCharactersByInstanceId.Add(instanceId, instanceMapWarpingCharacters);
             instanceMapWarpingLocations.Add(instanceId, new KeyValuePair<string, Vector3>(mapName, position));
             CentralAppServerRegister.ClientSendAckPacket(SendOptions.ReliableOrdered, MMOMessageTypes.RequestSpawnMap, requestSpawnMapMessage, OnRequestSpawnMap);
+        }
+
+        private IEnumerator WarpCharacterToInstanceRoutine(BasePlayerCharacterEntity playerCharacterEntity, string instanceId)
+        {
+            // If warping to different map
+            long connectionId = playerCharacterEntity.ConnectionId;
+            CentralServerPeerInfo peerInfo;
+            KeyValuePair<string, Vector3> warpingLocation;
+            if (playerCharacters.ContainsKey(connectionId) &&
+                instanceMapWarpingLocations.TryGetValue(instanceId, out warpingLocation) &&
+                instanceMapServerConnectionIdsByInstanceId.TryGetValue(instanceId, out peerInfo))
+            {
+                // Add this character to warping list
+                warpingCharactersByObjectId.Add(playerCharacterEntity.ObjectId);
+                // Unregister player character
+                UnregisterPlayerCharacter(connectionId);
+                // Clone character data to save
+                PlayerCharacterData savingCharacterData = new PlayerCharacterData();
+                playerCharacterEntity.CloneTo(savingCharacterData);
+                while (savingCharacters.Contains(savingCharacterData.Id))
+                {
+                    yield return 0;
+                }
+                yield return StartCoroutine(SaveCharacterRoutine(savingCharacterData));
+                // Remove this character from warping list
+                warpingCharactersByObjectId.Remove(playerCharacterEntity.ObjectId);
+                // Destroy character from server
+                playerCharacterEntity.NetworkDestroy();
+                // Send message to client to warp
+                MMOWarpMessage message = new MMOWarpMessage();
+                message.sceneName = warpingLocation.Key;
+                message.networkAddress = peerInfo.networkAddress;
+                message.networkPort = peerInfo.networkPort;
+                message.connectKey = peerInfo.connectKey;
+                ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MsgTypes.Warp, message);
+            }
         }
 
         private void OnRequestSpawnMap(AckResponseCode responseCode, BaseAckMessage messageData)
@@ -117,14 +149,7 @@ namespace MultiplayerARPG.MMO
             }
         }
 
-        public override void WarpCharacterToInstanceFollowPartyLeader(BasePlayerCharacterEntity playerCharacterEntity)
-        {
-            if (!CanWarpCharacter(playerCharacterEntity))
-                return;
-            // TODO: Implement this
-        }
-
-        public override bool IsInstanceMap()
+        protected override bool IsInstanceMap()
         {
             return !string.IsNullOrEmpty(instanceId);
         }

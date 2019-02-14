@@ -7,18 +7,18 @@ namespace MultiplayerARPG.MMO
 {
     public class RequestSpawnMapMessage : BaseAckMessage
     {
-        public string sceneName;
+        public string mapId;
         public string instanceId;
 
         public override void DeserializeData(NetDataReader reader)
         {
-            sceneName = reader.GetString();
+            mapId = reader.GetString();
             instanceId = reader.GetString();
         }
 
         public override void SerializeData(NetDataWriter writer)
         {
-            writer.Put(sceneName);
+            writer.Put(mapId);
             writer.Put(instanceId);
         }
     }

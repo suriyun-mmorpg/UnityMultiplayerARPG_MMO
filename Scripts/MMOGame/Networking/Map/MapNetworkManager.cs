@@ -85,8 +85,26 @@ namespace MultiplayerARPG.MMO
         public string AppAddress { get { return machineAddress; } }
         public int AppPort { get { return networkPort; } }
         public string AppConnectKey { get { return connectKey; } }
-        public string AppExtra { get { return !string.IsNullOrEmpty(Assets.onlineScene.SceneName) ? Assets.onlineScene.SceneName : SceneManager.GetActiveScene().name; } }
-        public CentralServerPeerType PeerType { get { return CentralServerPeerType.MapServer; } }
+        public string AppExtra
+        {
+            get
+            {
+                if (IsInstanceMap())
+                    return instanceId;
+                if (!string.IsNullOrEmpty(Assets.onlineScene.SceneName))
+                    return Assets.onlineScene.SceneName;
+                return SceneManager.GetActiveScene().name;
+            }
+        }
+        public CentralServerPeerType PeerType
+        {
+            get
+            {
+                if (IsInstanceMap())
+                    return CentralServerPeerType.InstanceMapServer;
+                return CentralServerPeerType.MapServer;
+            }
+        }
         private float lastSaveCharacterTime;
         private float lastSaveBuildingTime;
         // Listing
@@ -348,7 +366,11 @@ namespace MultiplayerARPG.MMO
 
                         // Prepare saving location for this character
                         if (IsInstanceMap())
+                        {
                             instanceMapCurrentLocations.Add(playerCharacterEntity.ObjectId, new KeyValuePair<string, Vector3>(playerCharacterData.CurrentMapName, playerCharacterData.CurrentPosition));
+                            // Set position to map's start position
+                            playerCharacterEntity.CurrentPosition = CurrentMapInfo.startPosition;
+                        }
 
                         // Summon saved summons
                         for (int i = 0; i < playerCharacterEntity.Summons.Count; ++i)
@@ -670,16 +692,14 @@ namespace MultiplayerARPG.MMO
                             instanceMapServerConnectionIdsByInstanceId[peerInfo.extra] = peerInfo;
                             // Warp characters
                             HashSet<uint> warpingCharacters = new HashSet<uint>();
-                            KeyValuePair<string, Vector3> warpingLocation;
-                            if (instanceMapWarpingCharactersByInstanceId.TryGetValue(peerInfo.extra, out warpingCharacters) &&
-                                instanceMapWarpingLocations.TryGetValue(peerInfo.extra, out warpingLocation))
+                            if (instanceMapWarpingCharactersByInstanceId.TryGetValue(peerInfo.extra, out warpingCharacters))
                             {
                                 BasePlayerCharacterEntity warpingCharacterEntity;
                                 foreach (uint warpingCharacter in warpingCharacters)
                                 {
                                     if (!Assets.TryGetSpawnedObject(warpingCharacter, out warpingCharacterEntity))
                                         continue;
-                                    WarpCharacter(warpingCharacterEntity, warpingLocation.Key, warpingLocation.Value, true);
+                                    StartCoroutine(WarpCharacterToInstanceRoutine(warpingCharacterEntity, peerInfo.extra));
                                 }
                             }
                         }

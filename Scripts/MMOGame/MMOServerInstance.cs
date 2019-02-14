@@ -39,8 +39,8 @@ namespace MultiplayerARPG.MMO
         public const string ARG_MAP_PORT = "-" + CONFIG_MAP_PORT;
         public const string CONFIG_MAP_MAX_CONNECTIONS = "mapMaxConnections";
         public const string ARG_MAP_MAX_CONNECTIONS = "-" + CONFIG_MAP_MAX_CONNECTIONS;
-        public const string CONFIG_SCENE_NAME = "sceneName";
-        public const string ARG_SCENE_NAME = "-" + CONFIG_SCENE_NAME;
+        public const string CONFIG_MAP_DATA_ID = "mapDataId";
+        public const string ARG_MAP_DATA_ID = "-" + CONFIG_MAP_DATA_ID;
         public const string CONFIG_INSTANCE_ID = "instanceId";
         public const string ARG_INSTANCE_ID = "-" + CONFIG_INSTANCE_ID;
         // Chat server
@@ -93,6 +93,7 @@ namespace MultiplayerARPG.MMO
         public bool startMapSpawnOnAwake;
         public bool startChatOnAwake;
 
+        private List<string> spawningMapIds;
         private bool startingCentralServer;
         private bool startingMapSpawnServer;
         private bool startingMapServer;
@@ -223,18 +224,11 @@ namespace MultiplayerARPG.MMO
                 }
 
                 // Spawn maps
-                List<string> spawnMaps;
-                if (ConfigReader.ReadArgs(args, ARG_SPAWN_MAPS, out spawnMaps, new List<string>()) ||
-                    ConfigReader.ReadConfigs(jsonConfig, CONFIG_SPAWN_MAPS, out spawnMaps, new List<string>()))
+                List<string> spawnMapIds;
+                if (ConfigReader.ReadArgs(args, ARG_SPAWN_MAPS, out spawnMapIds, new List<string>()) ||
+                    ConfigReader.ReadConfigs(jsonConfig, CONFIG_SPAWN_MAPS, out spawnMapIds, new List<string>()))
                 {
-                    mapSpawnNetworkManager.spawningScenes = new List<UnityScene>();
-                    foreach (string spawnMap in spawnMaps)
-                    {
-                        mapSpawnNetworkManager.spawningScenes.Add(new UnityScene()
-                        {
-                            SceneName = spawnMap
-                        });
-                    }
+                    spawningMapIds = spawnMapIds;
                 }
 
                 // Map network port
@@ -255,8 +249,8 @@ namespace MultiplayerARPG.MMO
 
                 // Map scene name
                 string mapSceneName;
-                if (ConfigReader.ReadArgs(args, ARG_SCENE_NAME, out mapSceneName) ||
-                    ConfigReader.ReadConfigs(jsonConfig, CONFIG_SCENE_NAME, out mapSceneName))
+                if (ConfigReader.ReadArgs(args, ARG_MAP_DATA_ID, out mapSceneName) ||
+                    ConfigReader.ReadConfigs(jsonConfig, CONFIG_MAP_DATA_ID, out mapSceneName))
                 {
                     mapNetworkManager.Assets.onlineScene.SceneName = mapSceneName;
                 }
@@ -358,7 +352,19 @@ namespace MultiplayerARPG.MMO
                 StartCentralServer();
 
             if (startingMapSpawnServer)
+            {
+                if (spawningMapIds != null && spawningMapIds.Count > 0)
+                {
+                    mapSpawnNetworkManager.spawningMaps = new List<MapInfo>();
+                    MapInfo tempMapInfo;
+                    foreach (string spawningMapId in spawningMapIds)
+                    {
+                        if (GameInstance.MapInfos.TryGetValue(spawningMapId, out tempMapInfo))
+                            mapSpawnNetworkManager.spawningMaps.Add(tempMapInfo);
+                    }
+                }
                 StartMapSpawnServer();
+            }
 
             if (startingMapServer)
                 StartMapServer();
