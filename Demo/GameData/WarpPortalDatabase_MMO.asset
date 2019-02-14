@@ -3,7 +3,7 @@
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
@@ -12,21 +12,17 @@ MonoBehaviour:
   m_Name: WarpPortalDatabase_MMO
   m_EditorClassIdentifier: 
   maps:
-  - map:
-      sceneAsset: {fileID: 102900000, guid: 5ff0e5fbbdc3a214d87be31915d46cd5, type: 3}
-      sceneName: Map001
+  - mapInfo: {fileID: 11400000, guid: de8b0e4099f8d444692e88f92309e90d, type: 2}
     warpPortals:
-    - position: {x: 0, y: 0, z: 3}
-      warpToMap:
-        sceneAsset: {fileID: 102900000, guid: 2621c3c93d9bae14ab8df78426137c00, type: 3}
-        sceneName: Map002
+    - entityPrefab: {fileID: 0}
+      position: {x: 0, y: 0, z: 3}
+      warpPortalType: 0
+      warpToMap: {fileID: 11400000, guid: fbe2a93dfafee544cbeaf175d3491e33, type: 2}
       warpToPosition: {x: 0, y: 0, z: 0}
-  - map:
-      sceneAsset: {fileID: 102900000, guid: 2621c3c93d9bae14ab8df78426137c00, type: 3}
-      sceneName: Map002
+  - mapInfo: {fileID: 11400000, guid: fbe2a93dfafee544cbeaf175d3491e33, type: 2}
     warpPortals:
-    - position: {x: 0, y: 0, z: 3}
-      warpToMap:
-        sceneAsset: {fileID: 102900000, guid: 5ff0e5fbbdc3a214d87be31915d46cd5, type: 3}
-        sceneName: Map001
+    - entityPrefab: {fileID: 0}
+      position: {x: 0, y: 0, z: 3}
+      warpPortalType: 0
+      warpToMap: {fileID: 11400000, guid: de8b0e4099f8d444692e88f92309e90d, type: 2}
       warpToPosition: {x: 0, y: 0, z: 0}
