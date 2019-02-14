@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using LiteNetLib;
 using LiteNetLib.Utils;
 using LiteNetLibManager;
@@ -472,7 +471,6 @@ namespace MultiplayerARPG.MMO
             MMOWarpMessage message = messageHandler.ReadMessage<MMOWarpMessage>();
             Assets.offlineScene.SceneName = string.Empty;
             StopClient();
-            Assets.onlineScene.SceneName = message.sceneName;
             StartClient(message.networkAddress, message.networkPort, message.connectKey);
         }
 

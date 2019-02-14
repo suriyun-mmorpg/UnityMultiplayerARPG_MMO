@@ -63,7 +63,6 @@ namespace MultiplayerARPG.MMO
                 playerCharacterEntity.NetworkDestroy();
                 // Send message to client to warp
                 MMOWarpMessage message = new MMOWarpMessage();
-                message.sceneName = mapInfo.scene;
                 message.networkAddress = peerInfo.networkAddress;
                 message.networkPort = peerInfo.networkPort;
                 message.connectKey = peerInfo.connectKey;
@@ -120,7 +119,6 @@ namespace MultiplayerARPG.MMO
                 playerCharacterEntity.NetworkDestroy();
                 // Send message to client to warp
                 MMOWarpMessage message = new MMOWarpMessage();
-                message.sceneName = mapInfo.scene;
                 message.networkAddress = peerInfo.networkAddress;
                 message.networkPort = peerInfo.networkPort;
                 message.connectKey = peerInfo.connectKey;
