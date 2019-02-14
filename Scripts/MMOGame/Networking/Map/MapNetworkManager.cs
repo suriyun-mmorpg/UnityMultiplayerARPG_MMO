@@ -10,6 +10,8 @@ namespace MultiplayerARPG.MMO
 {
     public sealed partial class MapNetworkManager : BaseGameNetworkManager, IAppServer
     {
+        public const float TERMINATE_INSTANCE_DELAY = 30f;  // Close instance when no clients connected within 30 seconds
+
         [Header("Central Network Connection")]
         public BaseTransportFactory centralTransportFactory;
         public string centralConnectKey = "SampleConnectKey";
@@ -23,6 +25,8 @@ namespace MultiplayerARPG.MMO
 
         public System.Action onClientConnected;
         public System.Action<DisconnectInfo> onClientDisconnected;
+
+        private float terminatingTime;
 
         public BaseTransportFactory CentralTransportFactory
         {
@@ -134,6 +138,14 @@ namespace MultiplayerARPG.MMO
                 {
                     StartCoroutine(SaveBuildingsRoutine());
                     lastSaveBuildingTime = tempUnscaledTime;
+                }
+                // Quitting application when no players
+                if (IsInstanceMap())
+                {
+                    if (Players.Count > 0)
+                        terminatingTime = tempUnscaledTime;
+                    else if (tempUnscaledTime - terminatingTime >= TERMINATE_INSTANCE_DELAY)
+                        Application.Quit();
                 }
             }
         }
