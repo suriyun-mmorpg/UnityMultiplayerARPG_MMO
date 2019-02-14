@@ -39,8 +39,8 @@ namespace MultiplayerARPG.MMO
         public const string ARG_MAP_PORT = "-" + CONFIG_MAP_PORT;
         public const string CONFIG_MAP_MAX_CONNECTIONS = "mapMaxConnections";
         public const string ARG_MAP_MAX_CONNECTIONS = "-" + CONFIG_MAP_MAX_CONNECTIONS;
-        public const string CONFIG_MAP_DATA_ID = "mapDataId";
-        public const string ARG_MAP_DATA_ID = "-" + CONFIG_MAP_DATA_ID;
+        public const string CONFIG_MAP_ID = "mapId";
+        public const string ARG_MAP_ID = "-" + CONFIG_MAP_ID;
         public const string CONFIG_INSTANCE_ID = "instanceId";
         public const string ARG_INSTANCE_ID = "-" + CONFIG_INSTANCE_ID;
         // Chat server
@@ -250,8 +250,8 @@ namespace MultiplayerARPG.MMO
 
                 // Map scene name
                 string mapId = string.Empty;
-                if (ConfigReader.ReadArgs(args, ARG_MAP_DATA_ID, out mapId) ||
-                    ConfigReader.ReadConfigs(jsonConfig, CONFIG_MAP_DATA_ID, out mapId))
+                if (ConfigReader.ReadArgs(args, ARG_MAP_ID, out mapId) ||
+                    ConfigReader.ReadConfigs(jsonConfig, CONFIG_MAP_ID, out mapId))
                 {
                     startingMapId = mapId;
                 }

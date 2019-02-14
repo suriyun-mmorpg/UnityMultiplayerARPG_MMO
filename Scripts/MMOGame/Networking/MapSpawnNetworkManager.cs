@@ -261,7 +261,7 @@ namespace MultiplayerARPG.MMO
                 UseShellExecute = false,
                 Arguments = " " +
                     (!NotSpawnInBatchMode ? "-batchmode -nographics " : "") +
-                    string.Format("{0} {1} ", MMOServerInstance.ARG_MAP_DATA_ID, mapId) +
+                    string.Format("{0} {1} ", MMOServerInstance.ARG_MAP_ID, mapId) +
                     (message != null ? string.Format("{0} {1} ", MMOServerInstance.ARG_INSTANCE_ID, message.instanceId) : "") +
                     string.Format("{0} {1} ", MMOServerInstance.ARG_CENTRAL_ADDRESS, centralNetworkAddress) +
                     string.Format("{0} {1} ", MMOServerInstance.ARG_CENTRAL_PORT, centralNetworkPort) +
