@@ -8,7 +8,6 @@ namespace MultiplayerARPG.MMO
     public partial class CentralNetworkManager : LiteNetLibManager.LiteNetLibManager
     {
         protected readonly Dictionary<long, CentralServerPeerInfo> mapSpawnServerPeers = new Dictionary<long, CentralServerPeerInfo>();
-        protected readonly Dictionary<string, uint> spawningMapAcks = new Dictionary<string, uint>();
         // Map server peers
         protected readonly Dictionary<long, CentralServerPeerInfo> mapServerPeers = new Dictionary<long, CentralServerPeerInfo>();
         protected readonly Dictionary<string, CentralServerPeerInfo> mapServerPeersBySceneName = new Dictionary<string, CentralServerPeerInfo>();
@@ -22,9 +21,8 @@ namespace MultiplayerARPG.MMO
         protected readonly Dictionary<string, CentralUserPeerInfo> userPeersByUserId = new Dictionary<string, CentralUserPeerInfo>();
         // Map users, users whom connected to map server / instance map server will be kept in this list
         protected readonly Dictionary<long, HashSet<string>> mapUserIds = new Dictionary<long, HashSet<string>>();
-        // Ack Id / Map-Server Transport Handler dictionary
-        private readonly Dictionary<uint, TransportHandler> requestSpawnMapTransportHandlers = new Dictionary<uint, TransportHandler>();
-        private readonly Dictionary<uint, uint> requestSpawnMapAckIds = new Dictionary<uint, uint>();
+        // <Ack Id, <Map-Server Transport Handler, Map-Server Ack Id> dictionary
+        private readonly Dictionary<uint, KeyValuePair<TransportHandler, uint>> requestSpawnMapHandlers = new Dictionary<uint, KeyValuePair<TransportHandler, uint>>();
 
         [Header("Account configuration")]
         public int minUsernameLength = 2;
@@ -84,7 +82,6 @@ namespace MultiplayerARPG.MMO
         {
             this.InvokeInstanceDevExtMethods("Clean");
             mapSpawnServerPeers.Clear();
-            spawningMapAcks.Clear();
             mapServerPeers.Clear();
             mapServerPeersBySceneName.Clear();
             instanceMapServerPeers.Clear();
@@ -93,8 +90,7 @@ namespace MultiplayerARPG.MMO
             userPeers.Clear();
             userPeersByUserId.Clear();
             mapUserIds.Clear();
-            requestSpawnMapTransportHandlers.Clear();
-            requestSpawnMapAckIds.Clear();
+            requestSpawnMapHandlers.Clear();
         }
 
         public override void OnStartServer()

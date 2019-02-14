@@ -94,6 +94,7 @@ namespace MultiplayerARPG.MMO
         public bool startChatOnAwake;
 
         private List<string> spawningMapIds;
+        private string startingMapId;
         private bool startingCentralServer;
         private bool startingMapSpawnServer;
         private bool startingMapServer;
@@ -248,15 +249,15 @@ namespace MultiplayerARPG.MMO
                 }
 
                 // Map scene name
-                string mapSceneName;
-                if (ConfigReader.ReadArgs(args, ARG_MAP_DATA_ID, out mapSceneName) ||
-                    ConfigReader.ReadConfigs(jsonConfig, CONFIG_MAP_DATA_ID, out mapSceneName))
+                string mapId = string.Empty;
+                if (ConfigReader.ReadArgs(args, ARG_MAP_DATA_ID, out mapId) ||
+                    ConfigReader.ReadConfigs(jsonConfig, CONFIG_MAP_DATA_ID, out mapId))
                 {
-                    mapNetworkManager.Assets.onlineScene.SceneName = mapSceneName;
+                    startingMapId = mapId;
                 }
 
                 // Instance Id
-                string instanceId;
+                string instanceId = string.Empty;
                 if (ConfigReader.ReadArgs(args, ARG_INSTANCE_ID, out instanceId))
                 {
                     mapNetworkManager.instanceId = instanceId;
@@ -305,7 +306,7 @@ namespace MultiplayerARPG.MMO
                 {
                     if (!string.IsNullOrEmpty(logFileName))
                         logFileName += "_";
-                    logFileName += "Map(" + mapNetworkManager.Assets.onlineScene.SceneName + ")";
+                    logFileName += "Map(" + mapId + ") Instance(" + instanceId + ")";
                     startLog = true;
                     gameInstance.SetOnGameDataLoadedCallback(OnGameDataLoaded);
                     startingMapServer = true;
@@ -367,7 +368,15 @@ namespace MultiplayerARPG.MMO
             }
 
             if (startingMapServer)
+            {
+                MapInfo tempMapInfo;
+                if (!string.IsNullOrEmpty(startingMapId) && GameInstance.MapInfos.TryGetValue(startingMapId, out tempMapInfo))
+                {
+                    mapNetworkManager.Assets.onlineScene.SceneName = tempMapInfo.scene.SceneName;
+                    mapNetworkManager.SetMapInfo(tempMapInfo);
+                }
                 StartMapServer();
+            }
 
             if (startingChatServer)
                 StartChatServer();

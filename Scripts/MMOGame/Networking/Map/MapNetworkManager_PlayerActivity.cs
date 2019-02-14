@@ -8,10 +8,10 @@ namespace MultiplayerARPG.MMO
 {
     public partial class MapNetworkManager
     {
-        public override string GetCurrentMapName(BasePlayerCharacterEntity playerCharacterEntity)
+        public override string GetCurrentMapId(BasePlayerCharacterEntity playerCharacterEntity)
         {
             if (!IsInstanceMap())
-                return base.GetCurrentMapName(playerCharacterEntity);
+                return base.GetCurrentMapId(playerCharacterEntity);
             return instanceMapCurrentLocations[playerCharacterEntity.ObjectId].Key;
         }
 
@@ -40,10 +40,13 @@ namespace MultiplayerARPG.MMO
             // If warping to different map
             long connectionId = playerCharacterEntity.ConnectionId;
             CentralServerPeerInfo peerInfo;
+            MapInfo mapInfo;
             if (!string.IsNullOrEmpty(mapName) &&
                 !mapName.Equals(playerCharacterEntity.CurrentMapName) &&
                 playerCharacters.ContainsKey(connectionId) &&
-                mapServerConnectionIdsBySceneName.TryGetValue(mapName, out peerInfo))
+                mapServerConnectionIdsBySceneName.TryGetValue(mapName, out peerInfo) &&
+                GameInstance.MapInfos.TryGetValue(mapName, out mapInfo) &&
+                mapInfo.IsSceneSet())
             {
                 // Add this character to warping list
                 warpingCharactersByObjectId.Add(playerCharacterEntity.ObjectId);
@@ -65,7 +68,7 @@ namespace MultiplayerARPG.MMO
                 playerCharacterEntity.NetworkDestroy();
                 // Send message to client to warp
                 MMOWarpMessage message = new MMOWarpMessage();
-                message.sceneName = mapName;
+                message.sceneName = mapInfo.scene;
                 message.networkAddress = peerInfo.networkAddress;
                 message.networkPort = peerInfo.networkPort;
                 message.connectKey = peerInfo.connectKey;
@@ -97,9 +100,12 @@ namespace MultiplayerARPG.MMO
             long connectionId = playerCharacterEntity.ConnectionId;
             CentralServerPeerInfo peerInfo;
             KeyValuePair<string, Vector3> warpingLocation;
+            MapInfo mapInfo;
             if (playerCharacters.ContainsKey(connectionId) &&
                 instanceMapWarpingLocations.TryGetValue(instanceId, out warpingLocation) &&
-                instanceMapServerConnectionIdsByInstanceId.TryGetValue(instanceId, out peerInfo))
+                instanceMapServerConnectionIdsByInstanceId.TryGetValue(instanceId, out peerInfo) &&
+                GameInstance.MapInfos.TryGetValue(warpingLocation.Key, out mapInfo) &&
+                mapInfo.IsSceneSet())
             {
                 // Add this character to warping list
                 warpingCharactersByObjectId.Add(playerCharacterEntity.ObjectId);
@@ -119,7 +125,7 @@ namespace MultiplayerARPG.MMO
                 playerCharacterEntity.NetworkDestroy();
                 // Send message to client to warp
                 MMOWarpMessage message = new MMOWarpMessage();
-                message.sceneName = warpingLocation.Key;
+                message.sceneName = mapInfo.scene;
                 message.networkAddress = peerInfo.networkAddress;
                 message.networkPort = peerInfo.networkPort;
                 message.connectKey = peerInfo.connectKey;

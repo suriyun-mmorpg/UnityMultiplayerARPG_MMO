@@ -27,15 +27,13 @@ namespace MultiplayerARPG.MMO
         /// <param name="messageHandler"></param>
         protected void HandleRequestSpawnMap(LiteNetLibMessageHandler messageHandler)
         {
-            TransportHandler mapServerTransportHandler = messageHandler.transportHandler;
             RequestSpawnMapMessage message = messageHandler.ReadMessage<RequestSpawnMapMessage>();
             List<long> connectionIds = new List<long>(mapSpawnServerPeers.Keys);
             // Random map-spawn server to spawn map, will use returning ackId as reference to map-server's transport handler and ackId
             uint ackId = RequestSpawnMap(connectionIds[Random.Range(0, connectionIds.Count)], message, OnRequestSpawnMap);
             // Add ack Id / transport handler to dictionary which will be used in OnRequestSpawnMap() function 
             // To send map spawn response to map-server
-            requestSpawnMapTransportHandlers.Add(ackId, mapServerTransportHandler);
-            requestSpawnMapAckIds.Add(ackId, message.ackId);
+            requestSpawnMapHandlers.Add(ackId, new KeyValuePair<TransportHandler, uint>(messageHandler.transportHandler, message.ackId));
         }
 
         protected void OnRequestSpawnMap(AckResponseCode responseCode, BaseAckMessage messageData)
@@ -44,11 +42,9 @@ namespace MultiplayerARPG.MMO
             if (LogInfo)
                 Debug.Log("Spawn Map Ack Id: " + messageData.ackId + "  Status: " + responseCode + " Error: " + castedMessage.error);
             // Forward responses to map server transport handler
-            TransportHandler mapServerTransportHandler;
-            uint mapServerAckId;
-            if (requestSpawnMapTransportHandlers.TryGetValue(castedMessage.ackId, out mapServerTransportHandler) &&
-                requestSpawnMapAckIds.TryGetValue(castedMessage.ackId, out mapServerAckId))
-                mapServerTransportHandler.TriggerAck(mapServerAckId, castedMessage.responseCode, castedMessage);
+            KeyValuePair<TransportHandler, uint> requestSpawnMapHandler;
+            if (requestSpawnMapHandlers.TryGetValue(castedMessage.ackId, out requestSpawnMapHandler))
+                requestSpawnMapHandler.Key.TriggerAck(requestSpawnMapHandler.Value, castedMessage.responseCode, castedMessage);
         }
 
         /// <summary>

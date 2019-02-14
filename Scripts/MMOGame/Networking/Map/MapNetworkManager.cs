@@ -91,9 +91,7 @@ namespace MultiplayerARPG.MMO
             {
                 if (IsInstanceMap())
                     return instanceId;
-                if (!string.IsNullOrEmpty(Assets.onlineScene.SceneName))
-                    return Assets.onlineScene.SceneName;
-                return SceneManager.GetActiveScene().name;
+                return CurrentMapInfo.Id;
             }
         }
         public CentralServerPeerType PeerType
@@ -235,12 +233,6 @@ namespace MultiplayerARPG.MMO
             base.OnPeerDisconnected(connectionId, disconnectInfo);
         }
 
-        public override void OnStartServer()
-        {
-            base.OnStartServer();
-            CentralAppServerRegister.OnStartServer();
-        }
-
         public override void OnStopServer()
         {
             base.OnStopServer();
@@ -286,6 +278,7 @@ namespace MultiplayerARPG.MMO
             {
                 harvestableSpawnArea.SpawnAll();
             }
+            CentralAppServerRegister.OnStartServer();
         }
 
         #region Character spawn function
