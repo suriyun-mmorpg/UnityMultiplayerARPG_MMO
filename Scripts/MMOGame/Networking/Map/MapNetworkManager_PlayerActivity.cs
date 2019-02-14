@@ -95,6 +95,8 @@ namespace MultiplayerARPG.MMO
                         instanceMapWarpingCharacters.Add(aliveAlly.ObjectId);
                         aliveAlly.IsWarping = true;
                     }
+                    instanceMapWarpingCharacters.Add(playerCharacterEntity.ObjectId);
+                    playerCharacterEntity.IsWarping = true;
                 }
             }
             else
