@@ -17,12 +17,24 @@ MonoBehaviour:
     - entityPrefab: {fileID: 0}
       position: {x: 0, y: 0, z: 3}
       warpPortalType: 0
-      warpToMap: {fileID: 11400000, guid: fbe2a93dfafee544cbeaf175d3491e33, type: 2}
+      warpToMapInfo: {fileID: 11400000, guid: fbe2a93dfafee544cbeaf175d3491e33, type: 2}
       warpToPosition: {x: 0, y: 0, z: 0}
+      warpToMap:
+        sceneAsset: {fileID: 0}
+        sceneName: 
+    map:
+      sceneAsset: {fileID: 0}
+      sceneName: 
   - mapInfo: {fileID: 11400000, guid: fbe2a93dfafee544cbeaf175d3491e33, type: 2}
     warpPortals:
     - entityPrefab: {fileID: 0}
       position: {x: 0, y: 0, z: 3}
       warpPortalType: 0
-      warpToMap: {fileID: 11400000, guid: de8b0e4099f8d444692e88f92309e90d, type: 2}
+      warpToMapInfo: {fileID: 11400000, guid: de8b0e4099f8d444692e88f92309e90d, type: 2}
       warpToPosition: {x: 0, y: 0, z: 0}
+      warpToMap:
+        sceneAsset: {fileID: 0}
+        sceneName: 
+    map:
+      sceneAsset: {fileID: 0}
+      sceneName: 
