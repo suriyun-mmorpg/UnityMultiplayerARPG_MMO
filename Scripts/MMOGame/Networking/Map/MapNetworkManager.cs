@@ -361,6 +361,14 @@ namespace MultiplayerARPG.MMO
                     }
                     else
                     {
+                        // Prepare saving location for this character
+                        string savingCurrentMapName = playerCharacterData.CurrentMapName;
+                        Vector3 savingCurrentPosition = playerCharacterData.CurrentPosition;
+
+                        // Move character to map info → start position
+                        if (IsInstanceMap())
+                            playerCharacterData.CurrentPosition = CurrentMapInfo.startPosition;
+
                         // Spawn character entity and set its data
                         LiteNetLibIdentity identity = Assets.NetworkSpawn(entityPrefab.Identity.HashAssetId, playerCharacterData.CurrentPosition, Quaternion.identity, 0, connectionId);
                         BasePlayerCharacterEntity playerCharacterEntity = identity.GetComponent<BasePlayerCharacterEntity>();
@@ -368,11 +376,7 @@ namespace MultiplayerARPG.MMO
 
                         // Prepare saving location for this character
                         if (IsInstanceMap())
-                        {
-                            instanceMapCurrentLocations.Add(playerCharacterEntity.ObjectId, new KeyValuePair<string, Vector3>(playerCharacterData.CurrentMapName, playerCharacterData.CurrentPosition));
-                            // Set position to map's start position
-                            playerCharacterEntity.CurrentPosition = CurrentMapInfo.startPosition;
-                        }
+                            instanceMapCurrentLocations.Add(playerCharacterEntity.ObjectId, new KeyValuePair<string, Vector3>(savingCurrentMapName, savingCurrentPosition));
 
                         // Summon saved summons
                         for (int i = 0; i < playerCharacterEntity.Summons.Count; ++i)
