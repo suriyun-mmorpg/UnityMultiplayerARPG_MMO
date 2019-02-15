@@ -126,10 +126,14 @@ namespace MultiplayerARPG.MMO
                     StartCoroutine(SaveCharactersRoutine());
                     lastSaveCharacterTime = tempUnscaledTime;
                 }
-                if (tempUnscaledTime - lastSaveBuildingTime > autoSaveDuration && !IsInstanceMap())
+                if (!IsInstanceMap())
                 {
-                    StartCoroutine(SaveBuildingsRoutine());
-                    lastSaveBuildingTime = tempUnscaledTime;
+                    // Don't save building if it's instance map
+                    if (tempUnscaledTime - lastSaveBuildingTime > autoSaveDuration && !IsInstanceMap())
+                    {
+                        StartCoroutine(SaveBuildingsRoutine());
+                        lastSaveBuildingTime = tempUnscaledTime;
+                    }
                 }
                 // Quitting application when no players
                 if (IsInstanceMap())
@@ -266,13 +270,17 @@ namespace MultiplayerARPG.MMO
         private IEnumerator OnServerOnlineSceneLoadedRoutine()
         {
             // Spawn buildings
-            ReadBuildingsJob job = new ReadBuildingsJob(Database, Assets.onlineScene.SceneName);
-            job.Start();
-            yield return StartCoroutine(job.WaitFor());
-            List<BuildingSaveData> buildings = job.result;
-            foreach (BuildingSaveData building in buildings)
+            if (!IsInstanceMap())
             {
-                CreateBuildingEntity(building, true);
+                // Don't load building if it's instance map
+                ReadBuildingsJob job = new ReadBuildingsJob(Database, Assets.onlineScene.SceneName);
+                job.Start();
+                yield return StartCoroutine(job.WaitFor());
+                List<BuildingSaveData> buildings = job.result;
+                foreach (BuildingSaveData building in buildings)
+                {
+                    CreateBuildingEntity(building, true);
+                }
             }
             // Spawn harvestables
             HarvestableSpawnArea[] harvestableSpawnAreas = FindObjectsOfType<HarvestableSpawnArea>();
