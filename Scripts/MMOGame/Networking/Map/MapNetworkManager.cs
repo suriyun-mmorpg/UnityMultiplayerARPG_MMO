@@ -135,9 +135,9 @@ namespace MultiplayerARPG.MMO
                         lastSaveBuildingTime = tempUnscaledTime;
                     }
                 }
-                // Quitting application when no players
                 if (IsInstanceMap())
                 {
+                    // Quitting application when no players
                     if (Players.Count > 0)
                         terminatingTime = tempUnscaledTime;
                     else if (tempUnscaledTime - terminatingTime >= TERMINATE_INSTANCE_DELAY)
