@@ -11,13 +11,14 @@ namespace MultiplayerARPG.MMO
     {
         public const float TERMINATE_INSTANCE_DELAY = 30f;  // Close instance when no clients connected within 30 seconds
 
+        public string mapInstanceId;
+
         [Header("Central Network Connection")]
         public BaseTransportFactory centralTransportFactory;
         public string centralConnectKey = "SampleConnectKey";
         public string centralNetworkAddress = "127.0.0.1";
         public int centralNetworkPort = 6000;
         public string machineAddress = "127.0.0.1";
-        public string instanceId;
 
         [Header("Database")]
         public float autoSaveDuration = 2f;
@@ -93,7 +94,7 @@ namespace MultiplayerARPG.MMO
             get
             {
                 if (IsInstanceMap())
-                    return instanceId;
+                    return mapInstanceId;
                 return CurrentMapInfo.Id;
             }
         }

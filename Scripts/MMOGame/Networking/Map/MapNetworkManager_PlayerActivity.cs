@@ -26,18 +26,42 @@ namespace MultiplayerARPG.MMO
         {
             if (!CanWarpCharacter(playerCharacterEntity))
                 return;
-            base.WarpCharacter(playerCharacterEntity, mapName, position);
-            StartCoroutine(WarpCharacterRoutine(playerCharacterEntity, mapName, position));
+            if (!IsInstanceMap())
+            {
+                base.WarpCharacter(playerCharacterEntity, mapName, position);
+                StartCoroutine(WarpCharacterRoutine(playerCharacterEntity, mapName, position, false));
+            }
+            else
+            {
+                if (string.IsNullOrEmpty(mapName))
+                {
+                    // Warp in the map
+                    base.WarpCharacter(playerCharacterEntity, mapName, position);
+                }
+                else
+                {
+                    // Warp to other map
+                    StartCoroutine(WarpCharacterRoutine(playerCharacterEntity, mapName, position, true));
+                }
+            }
         }
 
-        private IEnumerator WarpCharacterRoutine(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position)
+        /// <summary>
+        /// Warp to different map. if `forceChangeMap` is `TRUE` it will change map server, even if it is same map
+        /// </summary>
+        /// <param name="playerCharacterEntity"></param>
+        /// <param name="mapName"></param>
+        /// <param name="position"></param>
+        /// <param name="forceChangeMap"></param>
+        /// <returns></returns>
+        private IEnumerator WarpCharacterRoutine(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position, bool forceChangeMap)
         {
             // If warping to different map
             long connectionId = playerCharacterEntity.ConnectionId;
             CentralServerPeerInfo peerInfo;
             MapInfo mapInfo;
             if (!string.IsNullOrEmpty(mapName) &&
-                !mapName.Equals(playerCharacterEntity.CurrentMapName) &&
+                (!mapName.Equals(playerCharacterEntity.CurrentMapName) || forceChangeMap) &&
                 playerCharacters.ContainsKey(connectionId) &&
                 mapServerConnectionIdsBySceneName.TryGetValue(mapName, out peerInfo) &&
                 GameInstance.MapInfos.TryGetValue(mapName, out mapInfo) &&
@@ -174,7 +198,7 @@ namespace MultiplayerARPG.MMO
 
         protected override bool IsInstanceMap()
         {
-            return !string.IsNullOrEmpty(instanceId);
+            return !string.IsNullOrEmpty(mapInstanceId);
         }
 
         public override void CreateParty(BasePlayerCharacterEntity playerCharacterEntity, bool shareExp, bool shareItem)
