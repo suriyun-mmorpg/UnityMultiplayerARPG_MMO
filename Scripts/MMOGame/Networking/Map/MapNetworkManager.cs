@@ -37,16 +37,8 @@ namespace MultiplayerARPG.MMO
                 if (centralTransportFactory == null || !centralTransportFactory.CanUseWithWebGL)
                     centralTransportFactory = gameObject.AddComponent<WebSocketTransportFactory>();
 #else
-                if (useWebSocket)
-                {
-                    if (centralTransportFactory == null || !centralTransportFactory.CanUseWithWebGL)
-                        centralTransportFactory = gameObject.AddComponent<WebSocketTransportFactory>();
-                }
-                else
-                {
-                    if (centralTransportFactory == null)
-                        centralTransportFactory = gameObject.AddComponent<LiteNetLibTransportFactory>();
-                }
+                if (centralTransportFactory == null)
+                    centralTransportFactory = gameObject.AddComponent<LiteNetLibTransportFactory>();
 #endif
                 return centralTransportFactory;
             }
@@ -57,7 +49,7 @@ namespace MultiplayerARPG.MMO
         {
             get
             {
-                if (cacheCentralAppServerRegister == null)
+                if (cacheCentralAppServerRegister == null && CentralTransportFactory != null)
                 {
                     cacheCentralAppServerRegister = new CentralAppServerRegister(CentralTransportFactory.Build(), this);
                     cacheCentralAppServerRegister.onAppServerRegistered = OnAppServerRegistered;
