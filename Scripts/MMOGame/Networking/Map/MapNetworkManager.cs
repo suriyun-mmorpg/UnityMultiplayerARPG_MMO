@@ -108,6 +108,7 @@ namespace MultiplayerARPG.MMO
         private readonly Dictionary<string, HashSet<uint>> instanceMapWarpingCharactersByInstanceId = new Dictionary<string, HashSet<uint>>();
         private readonly Dictionary<string, KeyValuePair<string, Vector3>> instanceMapWarpingLocations = new Dictionary<string, KeyValuePair<string, Vector3>>();
         private readonly Dictionary<string, UserCharacterData> usersById = new Dictionary<string, UserCharacterData>();
+        private readonly Dictionary<string, List<CharacterItem>> storageItems = new Dictionary<string, List<CharacterItem>>();
         // Database operations
         private readonly HashSet<int> loadingPartyIds = new HashSet<int>();
         private readonly HashSet<int> loadingGuildIds = new HashSet<int>();
@@ -272,7 +273,8 @@ namespace MultiplayerARPG.MMO
             // Spawn buildings
             if (!IsInstanceMap())
             {
-                // Don't load building if it's instance map
+                // Load buildings
+                // Don't load buildings if it's instance map
                 ReadBuildingsJob job = new ReadBuildingsJob(Database, Assets.onlineScene.SceneName);
                 job.Start();
                 yield return StartCoroutine(job.WaitFor());
