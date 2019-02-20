@@ -551,5 +551,11 @@ namespace MultiplayerARPG.MMO
                 ChatNetworkManager.Client.SendGuildLevelExpSkillPoint(null, MMOMessageTypes.UpdateGuild, guildId, guild.level, guild.exp, guild.skillPoint);
             }
         }
+
+        // TODO: Implement this
+        public override IList<StorageCharacterItem> GetStorageItems(StorageType storageType, int storageDataId, string storageOwnerId)
+        {
+            return new List<StorageCharacterItem>();
+        }
     }
 }
