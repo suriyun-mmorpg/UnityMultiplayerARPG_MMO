@@ -7,16 +7,10 @@ namespace MultiplayerARPG.MMO
 {
     public partial class MySQLDatabase
     {
-        private string GetStorageItemId(StorageType storageType, int storageDataId, string storageOwnerId, int idx)
-        {
-            return (byte)storageType + "_" + storageDataId + "_" + storageOwnerId + "_" + idx;
-
-        }
-
         private void CreateStorageItem(MySqlConnection connection, MySqlTransaction transaction, int idx, StorageCharacterItem storageCharacterItem)
         {
             ExecuteNonQuery(connection, transaction, "INSERT INTO storageitem (id, idx, storageType, storageDataId, storageOwnerId, dataId, level, amount, durability, exp, lockRemainsDuration) VALUES (@id, @idx, @inventoryType, @characterId, @dataId, @level, @amount, @durability, @exp, @lockRemainsDuration)",
-                new MySqlParameter("@id", GetStorageItemId(storageCharacterItem.storageType, storageCharacterItem.storageDataId, storageCharacterItem.storageOwnerId, idx)),
+                new MySqlParameter("@id", StorageCharacterItem.GetStorageItemId(storageCharacterItem.storageType, storageCharacterItem.storageDataId, storageCharacterItem.storageOwnerId, idx)),
                 new MySqlParameter("@idx", idx),
                 new MySqlParameter("@storageType", (byte)storageCharacterItem.storageType),
                 new MySqlParameter("@storageDataId", storageCharacterItem.storageDataId),
@@ -29,39 +23,34 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@lockRemainsDuration", storageCharacterItem.characterItem.lockRemainsDuration));
         }
 
-        private bool ReadStorageItem(MySQLRowsReader reader, out StorageCharacterItem result, bool resetReader = true)
+        private bool ReadStorageItem(MySQLRowsReader reader, out CharacterItem result, bool resetReader = true)
         {
             if (resetReader)
                 reader.ResetReader();
 
             if (reader.Read())
             {
-                result = new StorageCharacterItem();
-                result.storageType = (StorageType)reader.GetSByte("storageType");
-                result.storageDataId = reader.GetInt32("storageDataId");
-                result.storageOwnerId = reader.GetString("storageOwnerId");
-                CharacterItem tempCharacterItem = new CharacterItem();
-                tempCharacterItem.dataId = reader.GetInt32("dataId");
-                tempCharacterItem.level = (short)reader.GetInt32("level");
-                tempCharacterItem.amount = (short)reader.GetInt32("amount");
-                tempCharacterItem.durability = reader.GetFloat("durability");
-                tempCharacterItem.exp = reader.GetInt32("exp");
-                tempCharacterItem.lockRemainsDuration = reader.GetFloat("lockRemainsDuration");
-                result.characterItem = tempCharacterItem;
+                result = new CharacterItem();
+                result.dataId = reader.GetInt32("dataId");
+                result.level = (short)reader.GetInt32("level");
+                result.amount = (short)reader.GetInt32("amount");
+                result.durability = reader.GetFloat("durability");
+                result.exp = reader.GetInt32("exp");
+                result.lockRemainsDuration = reader.GetFloat("lockRemainsDuration");
                 return true;
             }
-            result = StorageCharacterItem.Empty;
+            result = CharacterItem.Empty;
             return false;
         }
 
-        public override List<StorageCharacterItem> ReadStorageItems(StorageType storageType, int storageDataId, string storageOwnerId)
+        public override List<CharacterItem> ReadStorageItems(StorageType storageType, int storageDataId, string storageOwnerId)
         {
-            List<StorageCharacterItem> result = new List<StorageCharacterItem>();
+            List<CharacterItem> result = new List<CharacterItem>();
             MySQLRowsReader reader = ExecuteReader("SELECT * FROM storageitem WHERE storageType=@storageType AND storageDataId=@storageDataId AND storageOwnerId=@storageOwnerId ORDER BY idx ASC",
                 new MySqlParameter("@storageType", (byte)storageType),
                 new MySqlParameter("@storageDataId", storageDataId),
                 new MySqlParameter("@storageOwnerId", storageOwnerId));
-            StorageCharacterItem tempInventory;
+            CharacterItem tempInventory;
             while (ReadStorageItem(reader, out tempInventory, false))
             {
                 result.Add(tempInventory);
