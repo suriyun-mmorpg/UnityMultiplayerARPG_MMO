@@ -292,7 +292,7 @@ namespace MultiplayerARPG.MMO
             result = database.ReadGuild(id, defaultGuildRoles);
         }
     }
-    
+
     public class IncreaseGuildExpJob : DatabaseJob<bool>
     {
         private int id;
@@ -683,6 +683,46 @@ namespace MultiplayerARPG.MMO
         protected override void ThreadFunction()
         {
             result = database.FindCharacterName(characterName);
+        }
+    }
+    #endregion
+
+    #region Storage Items
+    public class ReadStorageItemsJob : DatabaseJob<List<CharacterItem>>
+    {
+        private StorageType storageType;
+        private int storageDataId;
+        private string storageOwnerId;
+        public ReadStorageItemsJob(BaseDatabase database, StorageType storageType, int storageDataId, string storageOwnerId, Action<List<CharacterItem>> onFinished = null) : base(database, onFinished)
+        {
+            this.storageType = storageType;
+            this.storageDataId = storageDataId;
+            this.storageOwnerId = storageOwnerId;
+        }
+
+        protected override void ThreadFunction()
+        {
+            result = database.ReadStorageItems(storageType, storageDataId, storageOwnerId);
+        }
+    }
+
+    public class UpdateStorageItemsJob : DatabaseJob
+    {
+        private StorageType storageType;
+        private int storageDataId;
+        private string storageOwnerId;
+        private List<CharacterItem> characterItems;
+        public UpdateStorageItemsJob(BaseDatabase database, StorageType storageType, int storageDataId, string storageOwnerId, List<CharacterItem> characterItems, Action onFinished = null) : base(database, onFinished)
+        {
+            this.storageType = storageType;
+            this.storageDataId = storageDataId;
+            this.storageOwnerId = storageOwnerId;
+            this.characterItems = characterItems;
+        }
+
+        protected override void ThreadFunction()
+        {
+            database.UpdateStorageItems(storageType, storageDataId, storageOwnerId, characterItems);
         }
     }
     #endregion
