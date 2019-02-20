@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG.MMO
@@ -66,5 +64,8 @@ namespace MultiplayerARPG.MMO
         public abstract void UpdateGuildSkillLevel(int id, int dataId, short level, short skillPoint);
         public abstract void DeleteGuild(int id);
         public abstract void UpdateCharacterGuild(string characterId, int guild, byte guildRole);
+        
+        public abstract void UpdateStorageItems(StorageType storageType, int storageDataId, string storageOwnerId, List<CharacterItem> storageCharacterItems);
+        public abstract List<StorageCharacterItem> ReadStorageItems(StorageType storageType, int storageDataId, string storageOwnerId);
     }
 }
