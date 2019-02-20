@@ -562,8 +562,8 @@ namespace MultiplayerARPG.MMO
         private IEnumerator GetStorageItemsRoutine(StorageType storageType, int storageDataId, string storageOwnerId, System.Action<IList<CharacterItem>> onGetStorageItems)
         {
             List<CharacterItem> result = new List<CharacterItem>();
-            string storageId = StorageCharacterItem.GetStorageId(storageType, storageDataId, storageOwnerId);
-            if (!storageItems.ContainsKey(storageId))
+            StorageId storageId = new StorageId(storageType, storageDataId, storageOwnerId);
+            if (!storages.ContainsKey(storageId))
             {
                 ReadStorageItemsJob storageItemsJob = new ReadStorageItemsJob(Database, storageType, storageDataId, storageOwnerId);
                 storageItemsJob.Start();
@@ -571,14 +571,14 @@ namespace MultiplayerARPG.MMO
                 if (storageItemsJob.result != null)
                 {
                     // Set storage items
-                    storageItems[storageId] = storageItemsJob.result;
+                    storages[storageId] = storageItemsJob.result;
                     result = storageItemsJob.result;
                 }
             }
             else
             {
                 // Get storage items from cached list
-                result = storageItems[storageId];
+                result = storages[storageId];
             }
             if (onGetStorageItems != null)
                 onGetStorageItems.Invoke(result);

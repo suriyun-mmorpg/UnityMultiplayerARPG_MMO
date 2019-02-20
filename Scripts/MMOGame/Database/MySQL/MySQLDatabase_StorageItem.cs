@@ -10,7 +10,7 @@ namespace MultiplayerARPG.MMO
         private void CreateStorageItem(MySqlConnection connection, MySqlTransaction transaction, int idx, StorageCharacterItem storageCharacterItem)
         {
             ExecuteNonQuery(connection, transaction, "INSERT INTO storageitem (id, idx, storageType, storageDataId, storageOwnerId, dataId, level, amount, durability, exp, lockRemainsDuration) VALUES (@id, @idx, @inventoryType, @characterId, @dataId, @level, @amount, @durability, @exp, @lockRemainsDuration)",
-                new MySqlParameter("@id", StorageCharacterItem.GetStorageItemId(storageCharacterItem.storageType, storageCharacterItem.storageDataId, storageCharacterItem.storageOwnerId, idx)),
+                new MySqlParameter("@id", new StorageItemId(storageCharacterItem.storageType, storageCharacterItem.storageDataId, storageCharacterItem.storageOwnerId, idx).GetId()),
                 new MySqlParameter("@idx", idx),
                 new MySqlParameter("@storageType", (byte)storageCharacterItem.storageType),
                 new MySqlParameter("@storageDataId", storageCharacterItem.storageDataId),
@@ -58,7 +58,7 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public override void UpdateStorageItems(StorageType storageType, int storageDataId, string storageOwnerId, List<CharacterItem> characterItems)
+        public override void UpdateStorageItems(StorageType storageType, int storageDataId, string storageOwnerId, IList<CharacterItem> characterItems)
         {
             MySqlConnection connection = NewConnection();
             connection.Open();

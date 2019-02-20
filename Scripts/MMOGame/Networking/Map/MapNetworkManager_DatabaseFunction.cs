@@ -107,6 +107,41 @@ namespace MultiplayerARPG.MMO
             }
         }
 
+        private IEnumerator SaveStorageRoutine(StorageType storageType, int storageDataId, string storageOwnerId, IList<CharacterItem> storageItemSaveData)
+        {
+            string storageId = new StorageId(storageType, storageDataId, storageOwnerId).GetId();
+            if (storageItemSaveData != null && !savingStorageItems.Contains(storageId))
+            {
+                savingStorageItems.Add(storageId);
+                UpdateStorageItemsJob job = new UpdateStorageItemsJob(Database, storageType, storageDataId, storageOwnerId, storageItemSaveData);
+                job.Start();
+                yield return StartCoroutine(job.WaitFor());
+                savingStorageItems.Remove(storageId);
+                if (LogInfo)
+                    Debug.Log("StorageItems [" + storageId + "] Saved");
+            }
+        }
+
+        private IEnumerator SaveStoragesRoutine()
+        {
+            if (savingStorageItems.Count == 0)
+            {
+                int i = 0;
+                List<StorageId> storageIds = new List<StorageId>(storages.Keys);
+                foreach (StorageId storageId in storageIds)
+                {
+                    StartCoroutine(SaveStorageRoutine(storageId.storageType, storageId.storageDataId, storageId.storageOwnerId, storages[storageId]));
+                    ++i;
+                }
+                while (savingStorageItems.Count > 0)
+                {
+                    yield return 0;
+                }
+                if (LogInfo)
+                    Debug.Log("Saved " + i + " storageItem(s)");
+            }
+        }
+
         public override BuildingEntity CreateBuildingEntity(BuildingSaveData saveData, bool initialize)
         {
             if (!initialize)

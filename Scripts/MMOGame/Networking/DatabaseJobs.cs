@@ -711,8 +711,8 @@ namespace MultiplayerARPG.MMO
         private StorageType storageType;
         private int storageDataId;
         private string storageOwnerId;
-        private List<CharacterItem> characterItems;
-        public UpdateStorageItemsJob(BaseDatabase database, StorageType storageType, int storageDataId, string storageOwnerId, List<CharacterItem> characterItems, Action onFinished = null) : base(database, onFinished)
+        private IList<CharacterItem> characterItems;
+        public UpdateStorageItemsJob(BaseDatabase database, StorageType storageType, int storageDataId, string storageOwnerId, IList<CharacterItem> characterItems, Action onFinished = null) : base(database, onFinished)
         {
             this.storageType = storageType;
             this.storageDataId = storageDataId;

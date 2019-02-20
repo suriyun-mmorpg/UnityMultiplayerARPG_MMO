@@ -99,8 +99,7 @@ namespace MultiplayerARPG.MMO
                 return CentralServerPeerType.MapServer;
             }
         }
-        private float lastSaveCharacterTime;
-        private float lastSaveBuildingTime;
+        private float lastSaveTime;
         // Listing
         private readonly Dictionary<uint, KeyValuePair<string, Vector3>> instanceMapCurrentLocations = new Dictionary<uint, KeyValuePair<string, Vector3>>();
         private readonly Dictionary<string, CentralServerPeerInfo> mapServerConnectionIdsBySceneName = new Dictionary<string, CentralServerPeerInfo>();
@@ -108,12 +107,13 @@ namespace MultiplayerARPG.MMO
         private readonly Dictionary<string, HashSet<uint>> instanceMapWarpingCharactersByInstanceId = new Dictionary<string, HashSet<uint>>();
         private readonly Dictionary<string, KeyValuePair<string, Vector3>> instanceMapWarpingLocations = new Dictionary<string, KeyValuePair<string, Vector3>>();
         private readonly Dictionary<string, UserCharacterData> usersById = new Dictionary<string, UserCharacterData>();
-        private readonly Dictionary<string, List<CharacterItem>> storageItems = new Dictionary<string, List<CharacterItem>>();
+        private readonly Dictionary<StorageId, List<CharacterItem>> storages = new Dictionary<StorageId, List<CharacterItem>>();
         // Database operations
         private readonly HashSet<int> loadingPartyIds = new HashSet<int>();
         private readonly HashSet<int> loadingGuildIds = new HashSet<int>();
         private readonly HashSet<string> savingCharacters = new HashSet<string>();
         private readonly HashSet<string> savingBuildings = new HashSet<string>();
+        private readonly HashSet<string> savingStorageItems = new HashSet<string>();
 
         protected override void Update()
         {
@@ -122,18 +122,15 @@ namespace MultiplayerARPG.MMO
             if (IsServer)
             {
                 CentralAppServerRegister.Update();
-                if (tempUnscaledTime - lastSaveCharacterTime > autoSaveDuration)
+                if (tempUnscaledTime - lastSaveTime > autoSaveDuration)
                 {
+                    lastSaveTime = tempUnscaledTime;
                     StartCoroutine(SaveCharactersRoutine());
-                    lastSaveCharacterTime = tempUnscaledTime;
-                }
-                if (!IsInstanceMap())
-                {
-                    // Don't save building if it's instance map
-                    if (tempUnscaledTime - lastSaveBuildingTime > autoSaveDuration && !IsInstanceMap())
+                    StartCoroutine(SaveStoragesRoutine());
+                    if (!IsInstanceMap())
                     {
+                        // Don't save building if it's instance map
                         StartCoroutine(SaveBuildingsRoutine());
-                        lastSaveBuildingTime = tempUnscaledTime;
                     }
                 }
                 if (IsInstanceMap())
@@ -160,6 +157,7 @@ namespace MultiplayerARPG.MMO
             loadingGuildIds.Clear();
             savingCharacters.Clear();
             savingBuildings.Clear();
+            savingStorageItems.Clear();
         }
 
         protected override void UpdateOnlineCharacter(long connectionId, BasePlayerCharacterEntity playerCharacterEntity, float time)

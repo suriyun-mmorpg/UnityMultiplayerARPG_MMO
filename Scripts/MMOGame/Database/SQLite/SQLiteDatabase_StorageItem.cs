@@ -10,7 +10,7 @@ namespace MultiplayerARPG.MMO
         private void CreateStorageItem(int idx, StorageCharacterItem storageCharacterItem)
         {
             ExecuteNonQuery("INSERT INTO storageitem (id, idx, storageType, storageDataId, storageOwnerId, dataId, level, amount, durability, exp, lockRemainsDuration) VALUES (@id, @idx, @inventoryType, @characterId, @dataId, @level, @amount, @durability, @exp, @lockRemainsDuration)",
-                new SqliteParameter("@id", StorageCharacterItem.GetStorageItemId(storageCharacterItem.storageType, storageCharacterItem.storageDataId, storageCharacterItem.storageOwnerId, idx)),
+                new SqliteParameter("@id", new StorageItemId(storageCharacterItem.storageType, storageCharacterItem.storageDataId, storageCharacterItem.storageOwnerId, idx).GetId()),
                 new SqliteParameter("@idx", idx),
                 new SqliteParameter("@storageType", (byte)storageCharacterItem.storageType),
                 new SqliteParameter("@storageDataId", storageCharacterItem.storageDataId),
@@ -58,7 +58,7 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public override void UpdateStorageItems(StorageType storageType, int storageDataId, string storageOwnerId, List<CharacterItem> characterItems)
+        public override void UpdateStorageItems(StorageType storageType, int storageDataId, string storageOwnerId, IList<CharacterItem> characterItems)
         {
             BeginTransaction();
             DeleteStorageItems(storageType, storageDataId, storageOwnerId);
