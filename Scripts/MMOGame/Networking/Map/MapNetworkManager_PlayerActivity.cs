@@ -553,9 +553,35 @@ namespace MultiplayerARPG.MMO
         }
 
         // TODO: Implement this
-        public override IList<StorageCharacterItem> GetStorageItems(StorageType storageType, int storageDataId, string storageOwnerId)
+        public override void GetStorageItems(StorageType storageType, int storageDataId, string storageOwnerId, System.Action<IList<CharacterItem>> onGetStorageItems)
         {
-            return new List<StorageCharacterItem>();
+            // Load storage items
+            StartCoroutine(GetStorageItemsRoutine(storageType, storageDataId, storageOwnerId, onGetStorageItems));
+        }
+
+        private IEnumerator GetStorageItemsRoutine(StorageType storageType, int storageDataId, string storageOwnerId, System.Action<IList<CharacterItem>> onGetStorageItems)
+        {
+            List<CharacterItem> result = new List<CharacterItem>();
+            string storageId = StorageCharacterItem.GetStorageId(storageType, storageDataId, storageOwnerId);
+            if (!storageItems.ContainsKey(storageId))
+            {
+                ReadStorageItemsJob storageItemsJob = new ReadStorageItemsJob(Database, storageType, storageDataId, storageOwnerId);
+                storageItemsJob.Start();
+                yield return StartCoroutine(storageItemsJob.WaitFor());
+                if (storageItemsJob.result != null)
+                {
+                    // Set storage items
+                    storageItems[storageId] = storageItemsJob.result;
+                    result = storageItemsJob.result;
+                }
+            }
+            else
+            {
+                // Get storage items from cached list
+                result = storageItems[storageId];
+            }
+            if (onGetStorageItems != null)
+                onGetStorageItems.Invoke(result);
         }
     }
 }
