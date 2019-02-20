@@ -107,11 +107,11 @@ namespace MultiplayerARPG.MMO
             }
         }
 
-        public override void CreateBuildingEntity(BuildingSaveData saveData, bool initialize)
+        public override BuildingEntity CreateBuildingEntity(BuildingSaveData saveData, bool initialize)
         {
-            base.CreateBuildingEntity(saveData, initialize);
             if (!initialize)
                 new CreateBuildingJob(Database, Assets.onlineScene.SceneName, saveData).Start();
+            return base.CreateBuildingEntity(saveData, initialize);
         }
 
         public override void DestroyBuildingEntity(string id)
