@@ -601,10 +601,11 @@ namespace MultiplayerARPG.MMO
                     storageItemList[storageItemIndex].dataId == movingItem.dataId)
                 {
                     // Add to storage or merge
-                    bool isLimitWeight = false;
-                    bool isLimitSlot = false;
-                    int weightLimit = 0;
-                    int slotLimit = 0;
+                    Storage storage = GetStorage(storageId);
+                    bool isLimitWeight = storage.weightLimit > 0;
+                    bool isLimitSlot = storage.slotLimit > 0;
+                    int weightLimit = storage.weightLimit;
+                    int slotLimit = storage.slotLimit;
                     bool isOverwhelming = CharacterDataExtension.IncreasingItemsWillOverwhelming(
                         storageItemList, movingItem.dataId, movingItem.amount, isLimitWeight, weightLimit,
                         CharacterDataExtension.GetTotalItemWeight(storageItemList), isLimitSlot, slotLimit);
