@@ -7,7 +7,7 @@ namespace MultiplayerARPG.MMO
     {
         private void CreateCharacterItem(int idx, string characterId, InventoryType inventoryType, CharacterItem characterItem)
         {
-            ExecuteNonQuery("INSERT INTO characteritem (id, idx, inventoryType, characterId, dataId, level, amount, durability, exp, lockRemainsDuration) VALUES (@id, @idx, @inventoryType, @characterId, @dataId, @level, @amount, @durability, @exp, @lockRemainsDuration)",
+            ExecuteNonQuery("INSERT INTO characteritem (id, idx, inventoryType, characterId, dataId, level, amount, durability, exp, lockRemainsDuration, ammo) VALUES (@id, @idx, @inventoryType, @characterId, @dataId, @level, @amount, @durability, @exp, @lockRemainsDuration, @ammo)",
                 new SqliteParameter("@id", characterId + "_" + (byte)inventoryType + "_" + idx),
                 new SqliteParameter("@idx", idx),
                 new SqliteParameter("@inventoryType", (byte)inventoryType),
@@ -17,7 +17,8 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@amount", characterItem.amount),
                 new SqliteParameter("@durability", characterItem.durability),
                 new SqliteParameter("@exp", characterItem.exp),
-                new SqliteParameter("@lockRemainsDuration", characterItem.lockRemainsDuration));
+                new SqliteParameter("@lockRemainsDuration", characterItem.lockRemainsDuration),
+                new SqliteParameter("@ammo", characterItem.ammo));
         }
 
         private bool ReadCharacterItem(SQLiteRowsReader reader, out CharacterItem result, bool resetReader = true)
@@ -34,6 +35,7 @@ namespace MultiplayerARPG.MMO
                 result.durability = reader.GetFloat("durability");
                 result.exp = reader.GetInt32("exp");
                 result.lockRemainsDuration = reader.GetFloat("lockRemainsDuration");
+                result.ammo = reader.GetInt32("ammo");
                 return true;
             }
             result = CharacterItem.Empty;

@@ -7,7 +7,7 @@ namespace MultiplayerARPG.MMO
     {
         private void CreateCharacterItem(MySqlConnection connection, MySqlTransaction transaction, int idx, string characterId, InventoryType inventoryType, CharacterItem characterItem)
         {
-            ExecuteNonQuery(connection, transaction, "INSERT INTO characteritem (id, idx, inventoryType, characterId, dataId, level, amount, durability, exp, lockRemainsDuration) VALUES (@id, @idx, @inventoryType, @characterId, @dataId, @level, @amount, @durability, @exp, @lockRemainsDuration)",
+            ExecuteNonQuery(connection, transaction, "INSERT INTO characteritem (id, idx, inventoryType, characterId, dataId, level, amount, durability, exp, lockRemainsDuration, ammo) VALUES (@id, @idx, @inventoryType, @characterId, @dataId, @level, @amount, @durability, @exp, @lockRemainsDuration, @ammo)",
                 new MySqlParameter("@id", characterId + "_" + (byte)inventoryType + "_" + idx),
                 new MySqlParameter("@idx", idx),
                 new MySqlParameter("@inventoryType", (byte)inventoryType),
@@ -17,7 +17,8 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@amount", characterItem.amount),
                 new MySqlParameter("@durability", characterItem.durability),
                 new MySqlParameter("@exp", characterItem.exp),
-                new MySqlParameter("@lockRemainsDuration", characterItem.lockRemainsDuration));
+                new MySqlParameter("@lockRemainsDuration", characterItem.lockRemainsDuration),
+                new MySqlParameter("@ammo", characterItem.ammo));
         }
 
         private bool ReadCharacterItem(MySQLRowsReader reader, out CharacterItem result, bool resetReader = true)
@@ -34,6 +35,7 @@ namespace MultiplayerARPG.MMO
                 result.durability = reader.GetFloat("durability");
                 result.exp = reader.GetInt32("exp");
                 result.lockRemainsDuration = reader.GetFloat("lockRemainsDuration");
+                result.ammo = reader.GetInt32("ammo");
                 return true;
             }
             result = CharacterItem.Empty;
