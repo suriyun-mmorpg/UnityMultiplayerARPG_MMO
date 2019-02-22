@@ -551,36 +551,140 @@ namespace MultiplayerARPG.MMO
                 ChatNetworkManager.Client.SendGuildLevelExpSkillPoint(null, MMOMessageTypes.UpdateGuild, guildId, guild.level, guild.exp, guild.skillPoint);
             }
         }
-
-        // TODO: Implement this
-        public override void GetStorageItems(StorageId storageId, System.Action<IList<CharacterItem>> onGetStorageItems)
+        
+        public override void GetStorageItems(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId)
         {
-            // Load storage items
-            StartCoroutine(GetStorageItemsRoutine(storageId, onGetStorageItems));
+            StartCoroutine(GetStorageItemsRoutine(playerCharacterEntity, storageId));
         }
 
-        private IEnumerator GetStorageItemsRoutine(StorageId storageId, System.Action<IList<CharacterItem>> onGetStorageItems)
+        private IEnumerator GetStorageItemsRoutine(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId)
         {
             List<CharacterItem> result = new List<CharacterItem>();
-            if (!storages.ContainsKey(storageId))
+            ReadStorageItemsJob storageItemsJob = new ReadStorageItemsJob(Database, storageId.storageType, storageId.storageOwnerId);
+            storageItemsJob.Start();
+            yield return StartCoroutine(storageItemsJob.WaitFor());
+            if (storageItemsJob.result != null)
             {
-                ReadStorageItemsJob storageItemsJob = new ReadStorageItemsJob(Database, storageId.storageType, storageId.storageOwnerId);
-                storageItemsJob.Start();
-                yield return StartCoroutine(storageItemsJob.WaitFor());
-                if (storageItemsJob.result != null)
-                {
-                    // Set storage items
-                    storages[storageId] = storageItemsJob.result;
-                    result = storageItemsJob.result;
-                }
+                // Set storage items
+                result = storageItemsJob.result;
+            }
+            playerCharacterEntity.StorageItems = result;
+        }
+
+        public override void MoveItemToStorage(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short nonEquipIndex, short amount, short storageItemIndex)
+        {
+            StartCoroutine(MoveItemToStorageRoutine(playerCharacterEntity, storageId, nonEquipIndex, amount, storageItemIndex));
+        }
+
+        private IEnumerator MoveItemToStorageRoutine(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short nonEquipIndex, short amount, short storageItemIndex)
+        {
+            List<CharacterItem> storageItemList = new List<CharacterItem>();
+            ReadStorageItemsJob readStorageItemsJob = new ReadStorageItemsJob(Database, storageId.storageType, storageId.storageOwnerId);
+            readStorageItemsJob.Start();
+            yield return StartCoroutine(readStorageItemsJob.WaitFor());
+            if (readStorageItemsJob.result != null)
+            {
+                // Set storage items
+                storageItemList = readStorageItemsJob.result;
+            }
+            if (nonEquipIndex < 0 || nonEquipIndex >= playerCharacterEntity.NonEquipItems.Count)
+            {
+                // Don't do anything, if non equip item index is invalid
             }
             else
             {
-                // Get storage items from cached list
-                result = storages[storageId];
+                CharacterItem movingItem = playerCharacterEntity.NonEquipItems[nonEquipIndex].Clone();
+                movingItem.amount = amount;
+                if (storageItemIndex < 0 ||
+                    storageItemIndex >= storageItemList.Count ||
+                    !storageItemList[storageItemIndex].IsEmptySlot() ||
+                    storageItemList[storageItemIndex].dataId == movingItem.dataId)
+                {
+                    // Add to storage or merge
+                    bool isLimitWeight = false;
+                    bool isLimitSlot = false;
+                    int weightLimit = 0;
+                    int slotLimit = 0;
+                    bool isOverwhelming = CharacterDataExtension.IncreasingItemsWillOverwhelming(
+                        storageItemList, movingItem.dataId, movingItem.amount, isLimitWeight, weightLimit,
+                        CharacterDataExtension.GetTotalItemWeight(storageItemList), isLimitSlot, slotLimit);
+                    if (!isOverwhelming && CharacterDataExtension.IncreaseItems(storageItemList, movingItem))
+                    {
+                        // Remove from inventory
+                        playerCharacterEntity.DecreaseItemsByIndex(nonEquipIndex, amount);
+                    }
+                }
+                else
+                {
+                    // Swapping
+                    CharacterItem storageItem = storageItemList[storageItemIndex];
+                    CharacterItem nonEquipItem = playerCharacterEntity.NonEquipItems[nonEquipIndex];
+
+                    storageItemList[storageItemIndex] = nonEquipItem;
+                    playerCharacterEntity.NonEquipItems[nonEquipIndex] = storageItem;
+                }
             }
-            if (onGetStorageItems != null)
-                onGetStorageItems.Invoke(result);
+            playerCharacterEntity.StorageItems = storageItemList;
+            // Update storage list immediately
+            // TODO: Have to test about race condition while running multiple-server
+            UpdateStorageItemsJob updateStorageItemsJob = new UpdateStorageItemsJob(Database, storageId.storageType, storageId.storageOwnerId, storageItemList);
+            updateStorageItemsJob.Start();
+            yield return StartCoroutine(updateStorageItemsJob.WaitFor());
+        }
+
+        public override void MoveItemFromStorage(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short storageItemIndex, short amount, short nonEquipIndex)
+        {
+            StartCoroutine(MoveItemFromStorageRoutine(playerCharacterEntity, storageId, storageItemIndex, amount, nonEquipIndex));
+        }
+
+        private IEnumerator MoveItemFromStorageRoutine(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short storageItemIndex, short amount, short nonEquipIndex)
+        {
+            List<CharacterItem> storageItemList = new List<CharacterItem>();
+            ReadStorageItemsJob readStorageItemsJob = new ReadStorageItemsJob(Database, storageId.storageType, storageId.storageOwnerId);
+            readStorageItemsJob.Start();
+            yield return StartCoroutine(readStorageItemsJob.WaitFor());
+            if (readStorageItemsJob.result != null)
+            {
+                // Set storage items
+                storageItemList = readStorageItemsJob.result;
+            }
+            if (storageItemIndex < 0 || storageItemIndex >= storageItemList.Count)
+            {
+                // Don't do anything, if storage item index is invalid
+            }
+            else
+            {
+                CharacterItem movingItem = storageItemList[storageItemIndex].Clone();
+                movingItem.amount = amount;
+                if (nonEquipIndex < 0 ||
+                    nonEquipIndex >= playerCharacterEntity.NonEquipItems.Count ||
+                    !playerCharacterEntity.NonEquipItems[nonEquipIndex].IsEmptySlot() ||
+                    playerCharacterEntity.NonEquipItems[nonEquipIndex].dataId == movingItem.dataId)
+                {
+                    // Add to inventory or merge
+                    bool isOverwhelming = playerCharacterEntity.IncreasingItemsWillOverwhelming(movingItem.dataId, movingItem.amount);
+                    if (!isOverwhelming && playerCharacterEntity.IncreaseItems(movingItem))
+                    {
+                        // Remove from storage
+                        CharacterDataExtension.DecreaseItemsByIndex(storageItemList, storageItemIndex, amount);
+                    }
+                }
+                else
+                {
+                    // Swapping
+                    CharacterItem storageItem = storageItemList[storageItemIndex];
+                    CharacterItem nonEquipItem = playerCharacterEntity.NonEquipItems[nonEquipIndex];
+
+                    storageItemList[storageItemIndex] = nonEquipItem;
+                    playerCharacterEntity.NonEquipItems[nonEquipIndex] = storageItem;
+                }
+            }
+            playerCharacterEntity.StorageItems = storageItemList;
+            // Update storage list immediately
+            // TODO: Have to test about race condition while running multiple-server
+            UpdateStorageItemsJob updateStorageItemsJob = new UpdateStorageItemsJob(Database, storageId.storageType, storageId.storageOwnerId, storageItemList);
+            updateStorageItemsJob.Start();
+            yield return StartCoroutine(updateStorageItemsJob.WaitFor());
         }
     }
 }

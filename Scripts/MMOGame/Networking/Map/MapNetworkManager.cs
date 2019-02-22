@@ -107,13 +107,11 @@ namespace MultiplayerARPG.MMO
         private readonly Dictionary<string, HashSet<uint>> instanceMapWarpingCharactersByInstanceId = new Dictionary<string, HashSet<uint>>();
         private readonly Dictionary<string, KeyValuePair<string, Vector3>> instanceMapWarpingLocations = new Dictionary<string, KeyValuePair<string, Vector3>>();
         private readonly Dictionary<string, UserCharacterData> usersById = new Dictionary<string, UserCharacterData>();
-        private readonly Dictionary<StorageId, List<CharacterItem>> storages = new Dictionary<StorageId, List<CharacterItem>>();
         // Database operations
         private readonly HashSet<int> loadingPartyIds = new HashSet<int>();
         private readonly HashSet<int> loadingGuildIds = new HashSet<int>();
         private readonly HashSet<string> savingCharacters = new HashSet<string>();
         private readonly HashSet<string> savingBuildings = new HashSet<string>();
-        private readonly HashSet<string> savingStorageItems = new HashSet<string>();
 
         protected override void Update()
         {
@@ -126,7 +124,6 @@ namespace MultiplayerARPG.MMO
                 {
                     lastSaveTime = tempUnscaledTime;
                     StartCoroutine(SaveCharactersRoutine());
-                    StartCoroutine(SaveStoragesRoutine());
                     if (!IsInstanceMap())
                     {
                         // Don't save building if it's instance map
@@ -157,7 +154,6 @@ namespace MultiplayerARPG.MMO
             loadingGuildIds.Clear();
             savingCharacters.Clear();
             savingBuildings.Clear();
-            savingStorageItems.Clear();
         }
 
         protected override void UpdateOnlineCharacter(long connectionId, BasePlayerCharacterEntity playerCharacterEntity, float time)
