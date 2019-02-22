@@ -65,7 +65,7 @@ namespace MultiplayerARPG.MMO
         public abstract void DeleteGuild(int id);
         public abstract void UpdateCharacterGuild(string characterId, int guild, byte guildRole);
         
-        public abstract void UpdateStorageItems(StorageType storageType, int storageDataId, string storageOwnerId, IList<CharacterItem> storageCharacterItems);
-        public abstract List<CharacterItem> ReadStorageItems(StorageType storageType, int storageDataId, string storageOwnerId);
+        public abstract void UpdateStorageItems(StorageType storageType, string storageOwnerId, IList<CharacterItem> storageCharacterItems);
+        public abstract List<CharacterItem> ReadStorageItems(StorageType storageType, string storageOwnerId);
     }
 }

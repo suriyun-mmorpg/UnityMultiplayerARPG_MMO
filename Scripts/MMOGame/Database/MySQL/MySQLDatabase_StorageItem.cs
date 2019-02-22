@@ -9,11 +9,10 @@ namespace MultiplayerARPG.MMO
     {
         private void CreateStorageItem(MySqlConnection connection, MySqlTransaction transaction, int idx, StorageCharacterItem storageCharacterItem)
         {
-            ExecuteNonQuery(connection, transaction, "INSERT INTO storageitem (id, idx, storageType, storageDataId, storageOwnerId, dataId, level, amount, durability, exp, lockRemainsDuration, ammo) VALUES (@id, @idx, @inventoryType, @characterId, @dataId, @level, @amount, @durability, @exp, @lockRemainsDuration, @ammo)",
-                new MySqlParameter("@id", new StorageItemId(storageCharacterItem.storageType, storageCharacterItem.storageDataId, storageCharacterItem.storageOwnerId, idx).GetId()),
+            ExecuteNonQuery(connection, transaction, "INSERT INTO storageitem (id, idx, storageType, storageOwnerId, dataId, level, amount, durability, exp, lockRemainsDuration, ammo) VALUES (@id, @idx, @storageType, @storageOwnerId, @dataId, @level, @amount, @durability, @exp, @lockRemainsDuration, @ammo)",
+                new MySqlParameter("@id", new StorageItemId(storageCharacterItem.storageType, storageCharacterItem.storageOwnerId, idx).GetId()),
                 new MySqlParameter("@idx", idx),
                 new MySqlParameter("@storageType", (byte)storageCharacterItem.storageType),
-                new MySqlParameter("@storageDataId", storageCharacterItem.storageDataId),
                 new MySqlParameter("@storageOwnerId", storageCharacterItem.storageOwnerId),
                 new MySqlParameter("@dataId", storageCharacterItem.characterItem.dataId),
                 new MySqlParameter("@level", storageCharacterItem.characterItem.level),
@@ -45,12 +44,11 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public override List<CharacterItem> ReadStorageItems(StorageType storageType, int storageDataId, string storageOwnerId)
+        public override List<CharacterItem> ReadStorageItems(StorageType storageType, string storageOwnerId)
         {
             List<CharacterItem> result = new List<CharacterItem>();
-            MySQLRowsReader reader = ExecuteReader("SELECT * FROM storageitem WHERE storageType=@storageType AND storageDataId=@storageDataId AND storageOwnerId=@storageOwnerId ORDER BY idx ASC",
+            MySQLRowsReader reader = ExecuteReader("SELECT * FROM storageitem WHERE storageType=@storageType AND storageOwnerId=@storageOwnerId ORDER BY idx ASC",
                 new MySqlParameter("@storageType", (byte)storageType),
-                new MySqlParameter("@storageDataId", storageDataId),
                 new MySqlParameter("@storageOwnerId", storageOwnerId));
             CharacterItem tempInventory;
             while (ReadStorageItem(reader, out tempInventory, false))
@@ -60,20 +58,19 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public override void UpdateStorageItems(StorageType storageType, int storageDataId, string storageOwnerId, IList<CharacterItem> characterItems)
+        public override void UpdateStorageItems(StorageType storageType, string storageOwnerId, IList<CharacterItem> characterItems)
         {
             MySqlConnection connection = NewConnection();
             connection.Open();
             MySqlTransaction transaction = connection.BeginTransaction();
             try
             {
-                DeleteStorageItems(connection, transaction, storageType, storageDataId, storageOwnerId);
+                DeleteStorageItems(connection, transaction, storageType, storageOwnerId);
                 StorageCharacterItem tempStorageItem;
                 for (int i = 0; i < characterItems.Count; ++i)
                 {
                     tempStorageItem = new StorageCharacterItem();
                     tempStorageItem.storageType = storageType;
-                    tempStorageItem.storageDataId = storageDataId;
                     tempStorageItem.storageOwnerId = storageOwnerId;
                     tempStorageItem.characterItem = characterItems[i];
                     CreateStorageItem(connection, transaction, i, tempStorageItem);
@@ -89,11 +86,10 @@ namespace MultiplayerARPG.MMO
             connection.Close();
         }
 
-        public void DeleteStorageItems(MySqlConnection connection, MySqlTransaction transaction, StorageType storageType, int storageDataId, string storageOwnerId)
+        public void DeleteStorageItems(MySqlConnection connection, MySqlTransaction transaction, StorageType storageType, string storageOwnerId)
         {
-            ExecuteNonQuery(connection, transaction, "DELETE FROM storageitem WHERE storageType=@storageType AND storageDataId=@storageDataId AND storageOwnerId=@storageOwnerId",
+            ExecuteNonQuery(connection, transaction, "DELETE FROM storageitem WHERE storageType=@storageType AND storageOwnerId=@storageOwnerId",
                 new MySqlParameter("@storageType", (byte)storageType),
-                new MySqlParameter("@storageDataId", storageDataId),
                 new MySqlParameter("@storageOwnerId", storageOwnerId));
         }
     }

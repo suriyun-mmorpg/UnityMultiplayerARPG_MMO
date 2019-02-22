@@ -9,11 +9,10 @@ namespace MultiplayerARPG.MMO
     {
         private void CreateStorageItem(int idx, StorageCharacterItem storageCharacterItem)
         {
-            ExecuteNonQuery("INSERT INTO storageitem (id, idx, storageType, storageDataId, storageOwnerId, dataId, level, amount, durability, exp, lockRemainsDuration, ammo) VALUES (@id, @idx, @inventoryType, @characterId, @dataId, @level, @amount, @durability, @exp, @lockRemainsDuration, @ammo)",
-                new SqliteParameter("@id", new StorageItemId(storageCharacterItem.storageType, storageCharacterItem.storageDataId, storageCharacterItem.storageOwnerId, idx).GetId()),
+            ExecuteNonQuery("INSERT INTO storageitem (id, idx, storageType, storageOwnerId, dataId, level, amount, durability, exp, lockRemainsDuration, ammo) VALUES (@id, @idx, @storageType, @storageOwnerId, @dataId, @level, @amount, @durability, @exp, @lockRemainsDuration, @ammo)",
+                new SqliteParameter("@id", new StorageItemId(storageCharacterItem.storageType, storageCharacterItem.storageOwnerId, idx).GetId()),
                 new SqliteParameter("@idx", idx),
                 new SqliteParameter("@storageType", (byte)storageCharacterItem.storageType),
-                new SqliteParameter("@storageDataId", storageCharacterItem.storageDataId),
                 new SqliteParameter("@storageOwnerId", storageCharacterItem.storageOwnerId),
                 new SqliteParameter("@dataId", storageCharacterItem.characterItem.dataId),
                 new SqliteParameter("@level", storageCharacterItem.characterItem.level),
@@ -45,12 +44,11 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public override List<CharacterItem> ReadStorageItems(StorageType storageType, int storageDataId, string storageOwnerId)
+        public override List<CharacterItem> ReadStorageItems(StorageType storageType, string storageOwnerId)
         {
             List<CharacterItem> result = new List<CharacterItem>();
-            SQLiteRowsReader reader = ExecuteReader("SELECT * FROM storageitem WHERE storageType=@storageType AND storageDataId=@storageDataId AND storageOwnerId=@storageOwnerId ORDER BY idx ASC",
+            SQLiteRowsReader reader = ExecuteReader("SELECT * FROM storageitem WHERE storageType=@storageType AND storageOwnerId=@storageOwnerId ORDER BY idx ASC",
                 new SqliteParameter("@storageType", (byte)storageType),
-                new SqliteParameter("@storageDataId", storageDataId),
                 new SqliteParameter("@storageOwnerId", storageOwnerId));
             CharacterItem tempInventory;
             while (ReadStorageItem(reader, out tempInventory, false))
@@ -60,16 +58,15 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public override void UpdateStorageItems(StorageType storageType, int storageDataId, string storageOwnerId, IList<CharacterItem> characterItems)
+        public override void UpdateStorageItems(StorageType storageType, string storageOwnerId, IList<CharacterItem> characterItems)
         {
             BeginTransaction();
-            DeleteStorageItems(storageType, storageDataId, storageOwnerId);
+            DeleteStorageItems(storageType, storageOwnerId);
             StorageCharacterItem tempStorageItem;
             for (int i = 0; i < characterItems.Count; ++i)
             {
                 tempStorageItem = new StorageCharacterItem();
                 tempStorageItem.storageType = storageType;
-                tempStorageItem.storageDataId = storageDataId;
                 tempStorageItem.storageOwnerId = storageOwnerId;
                 tempStorageItem.characterItem = characterItems[i];
                 CreateStorageItem(i, tempStorageItem);
@@ -77,11 +74,10 @@ namespace MultiplayerARPG.MMO
             EndTransaction();
         }
 
-        public void DeleteStorageItems(StorageType storageType, int storageDataId, string storageOwnerId)
+        public void DeleteStorageItems(StorageType storageType, string storageOwnerId)
         {
-            ExecuteNonQuery("DELETE FROM storageitem WHERE storageType=@storageType AND storageDataId=@storageDataId AND storageOwnerId=@storageOwnerId",
+            ExecuteNonQuery("DELETE FROM storageitem WHERE storageType=@storageType AND storageOwnerId=@storageOwnerId",
                 new SqliteParameter("@storageType", (byte)storageType),
-                new SqliteParameter("@storageDataId", storageDataId),
                 new SqliteParameter("@storageOwnerId", storageOwnerId));
         }
     }

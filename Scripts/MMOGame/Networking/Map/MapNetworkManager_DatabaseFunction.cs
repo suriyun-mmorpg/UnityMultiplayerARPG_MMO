@@ -107,13 +107,13 @@ namespace MultiplayerARPG.MMO
             }
         }
 
-        private IEnumerator SaveStorageRoutine(StorageType storageType, int storageDataId, string storageOwnerId, IList<CharacterItem> storageItemSaveData)
+        private IEnumerator SaveStorageRoutine(StorageType storageType, string storageOwnerId, IList<CharacterItem> storageItemSaveData)
         {
-            string storageId = new StorageId(storageType, storageDataId, storageOwnerId).GetId();
+            string storageId = new StorageId(storageType, storageOwnerId).GetId();
             if (storageItemSaveData != null && !savingStorageItems.Contains(storageId))
             {
                 savingStorageItems.Add(storageId);
-                UpdateStorageItemsJob job = new UpdateStorageItemsJob(Database, storageType, storageDataId, storageOwnerId, storageItemSaveData);
+                UpdateStorageItemsJob job = new UpdateStorageItemsJob(Database, storageType, storageOwnerId, storageItemSaveData);
                 job.Start();
                 yield return StartCoroutine(job.WaitFor());
                 savingStorageItems.Remove(storageId);
@@ -130,7 +130,7 @@ namespace MultiplayerARPG.MMO
                 List<StorageId> storageIds = new List<StorageId>(storages.Keys);
                 foreach (StorageId storageId in storageIds)
                 {
-                    StartCoroutine(SaveStorageRoutine(storageId.storageType, storageId.storageDataId, storageId.storageOwnerId, storages[storageId]));
+                    StartCoroutine(SaveStorageRoutine(storageId.storageType, storageId.storageOwnerId, storages[storageId]));
                     ++i;
                 }
                 while (savingStorageItems.Count > 0)

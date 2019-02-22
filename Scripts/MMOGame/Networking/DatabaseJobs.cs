@@ -691,38 +691,34 @@ namespace MultiplayerARPG.MMO
     public class ReadStorageItemsJob : DatabaseJob<List<CharacterItem>>
     {
         private StorageType storageType;
-        private int storageDataId;
         private string storageOwnerId;
-        public ReadStorageItemsJob(BaseDatabase database, StorageType storageType, int storageDataId, string storageOwnerId, Action<List<CharacterItem>> onFinished = null) : base(database, onFinished)
+        public ReadStorageItemsJob(BaseDatabase database, StorageType storageType, string storageOwnerId, Action<List<CharacterItem>> onFinished = null) : base(database, onFinished)
         {
             this.storageType = storageType;
-            this.storageDataId = storageDataId;
             this.storageOwnerId = storageOwnerId;
         }
 
         protected override void ThreadFunction()
         {
-            result = database.ReadStorageItems(storageType, storageDataId, storageOwnerId);
+            result = database.ReadStorageItems(storageType, storageOwnerId);
         }
     }
 
     public class UpdateStorageItemsJob : DatabaseJob
     {
         private StorageType storageType;
-        private int storageDataId;
         private string storageOwnerId;
         private IList<CharacterItem> characterItems;
-        public UpdateStorageItemsJob(BaseDatabase database, StorageType storageType, int storageDataId, string storageOwnerId, IList<CharacterItem> characterItems, Action onFinished = null) : base(database, onFinished)
+        public UpdateStorageItemsJob(BaseDatabase database, StorageType storageType, string storageOwnerId, IList<CharacterItem> characterItems, Action onFinished = null) : base(database, onFinished)
         {
             this.storageType = storageType;
-            this.storageDataId = storageDataId;
             this.storageOwnerId = storageOwnerId;
             this.characterItems = characterItems;
         }
 
         protected override void ThreadFunction()
         {
-            database.UpdateStorageItems(storageType, storageDataId, storageOwnerId, characterItems);
+            database.UpdateStorageItems(storageType, storageOwnerId, characterItems);
         }
     }
     #endregion

@@ -553,19 +553,18 @@ namespace MultiplayerARPG.MMO
         }
 
         // TODO: Implement this
-        public override void GetStorageItems(StorageType storageType, int storageDataId, string storageOwnerId, System.Action<IList<CharacterItem>> onGetStorageItems)
+        public override void GetStorageItems(StorageId storageId, System.Action<IList<CharacterItem>> onGetStorageItems)
         {
             // Load storage items
-            StartCoroutine(GetStorageItemsRoutine(storageType, storageDataId, storageOwnerId, onGetStorageItems));
+            StartCoroutine(GetStorageItemsRoutine(storageId, onGetStorageItems));
         }
 
-        private IEnumerator GetStorageItemsRoutine(StorageType storageType, int storageDataId, string storageOwnerId, System.Action<IList<CharacterItem>> onGetStorageItems)
+        private IEnumerator GetStorageItemsRoutine(StorageId storageId, System.Action<IList<CharacterItem>> onGetStorageItems)
         {
             List<CharacterItem> result = new List<CharacterItem>();
-            StorageId storageId = new StorageId(storageType, storageDataId, storageOwnerId);
             if (!storages.ContainsKey(storageId))
             {
-                ReadStorageItemsJob storageItemsJob = new ReadStorageItemsJob(Database, storageType, storageDataId, storageOwnerId);
+                ReadStorageItemsJob storageItemsJob = new ReadStorageItemsJob(Database, storageId.storageType, storageId.storageOwnerId);
                 storageItemsJob.Start();
                 yield return StartCoroutine(storageItemsJob.WaitFor());
                 if (storageItemsJob.result != null)
