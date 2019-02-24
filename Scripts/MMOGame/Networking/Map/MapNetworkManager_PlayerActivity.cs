@@ -552,15 +552,18 @@ namespace MultiplayerARPG.MMO
             }
         }
         
-        public override void GetStorageItems(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId)
+        public override void OpenStorage(BasePlayerCharacterEntity playerCharacterEntity)
         {
-            StartCoroutine(GetStorageItemsRoutine(playerCharacterEntity, storageId));
+            if (!usingStorageCharacters.ContainsKey(playerCharacterEntity.CurrentStorageId))
+                usingStorageCharacters[playerCharacterEntity.CurrentStorageId] = new HashSet<uint>();
+            usingStorageCharacters[playerCharacterEntity.CurrentStorageId].Add(playerCharacterEntity.ObjectId);
+            StartCoroutine(OpenStorageRoutine(playerCharacterEntity));
         }
 
-        private IEnumerator GetStorageItemsRoutine(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId)
+        private IEnumerator OpenStorageRoutine(BasePlayerCharacterEntity playerCharacterEntity)
         {
             List<CharacterItem> result = new List<CharacterItem>();
-            ReadStorageItemsJob storageItemsJob = new ReadStorageItemsJob(Database, storageId.storageType, storageId.storageOwnerId);
+            ReadStorageItemsJob storageItemsJob = new ReadStorageItemsJob(Database, playerCharacterEntity.CurrentStorageId.storageType, playerCharacterEntity.CurrentStorageId.storageOwnerId);
             storageItemsJob.Start();
             yield return StartCoroutine(storageItemsJob.WaitFor());
             if (storageItemsJob.result != null)
@@ -569,6 +572,12 @@ namespace MultiplayerARPG.MMO
                 result = storageItemsJob.result;
             }
             playerCharacterEntity.StorageItems = result;
+        }
+
+        public override void CloseStorage(BasePlayerCharacterEntity playerCharacterEntity)
+        {
+            usingStorageCharacters[playerCharacterEntity.CurrentStorageId].Remove(playerCharacterEntity.ObjectId);
+            playerCharacterEntity.StorageItems.Clear();
         }
 
         public override void MoveItemToStorage(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short nonEquipIndex, short amount, short storageItemIndex)
@@ -625,12 +634,14 @@ namespace MultiplayerARPG.MMO
                     playerCharacterEntity.NonEquipItems[nonEquipIndex] = storageItem;
                 }
             }
-            playerCharacterEntity.StorageItems = storageItemList;
             // Update storage list immediately
             // TODO: Have to test about race condition while running multiple-server
             UpdateStorageItemsJob updateStorageItemsJob = new UpdateStorageItemsJob(Database, storageId.storageType, storageId.storageOwnerId, storageItemList);
             updateStorageItemsJob.Start();
             yield return StartCoroutine(updateStorageItemsJob.WaitFor());
+            // Update storage items to characters that open the storage
+            playerCharacterEntity.StorageItems = storageItemList;
+            UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItemList);
         }
 
         public override void MoveItemFromStorage(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short storageItemIndex, short amount, short nonEquipIndex)
@@ -680,12 +691,27 @@ namespace MultiplayerARPG.MMO
                     playerCharacterEntity.NonEquipItems[nonEquipIndex] = storageItem;
                 }
             }
-            playerCharacterEntity.StorageItems = storageItemList;
             // Update storage list immediately
             // TODO: Have to test about race condition while running multiple-server
             UpdateStorageItemsJob updateStorageItemsJob = new UpdateStorageItemsJob(Database, storageId.storageType, storageId.storageOwnerId, storageItemList);
             updateStorageItemsJob.Start();
             yield return StartCoroutine(updateStorageItemsJob.WaitFor());
+            // Update storage items to characters that open the storage
+            playerCharacterEntity.StorageItems = storageItemList;
+            UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItemList);
+        }
+
+        private void UpdateStorageItemsToCharacters(HashSet<uint> objectIds, List<CharacterItem> storageItems)
+        {
+            PlayerCharacterEntity playerCharacterEntity;
+            foreach (uint objectId in objectIds)
+            {
+                if (Assets.TryGetSpawnedObject(objectId, out playerCharacterEntity))
+                {
+                    // Update storage items
+                    playerCharacterEntity.StorageItems = storageItems;
+                }
+            }
         }
     }
 }

@@ -107,6 +107,7 @@ namespace MultiplayerARPG.MMO
         private readonly Dictionary<string, HashSet<uint>> instanceMapWarpingCharactersByInstanceId = new Dictionary<string, HashSet<uint>>();
         private readonly Dictionary<string, KeyValuePair<string, Vector3>> instanceMapWarpingLocations = new Dictionary<string, KeyValuePair<string, Vector3>>();
         private readonly Dictionary<string, UserCharacterData> usersById = new Dictionary<string, UserCharacterData>();
+        private readonly Dictionary<StorageId, HashSet<uint>> usingStorageCharacters = new Dictionary<StorageId, HashSet<uint>>();
         // Database operations
         private readonly HashSet<int> loadingPartyIds = new HashSet<int>();
         private readonly HashSet<int> loadingGuildIds = new HashSet<int>();
@@ -193,6 +194,30 @@ namespace MultiplayerARPG.MMO
                 }
             }
             base.OnDestroy();
+        }
+
+        public override void RegisterPlayerCharacter(long connectionId, BasePlayerCharacterEntity playerCharacterEntity)
+        {
+            // Set user data to map server
+            if (!usersById.ContainsKey(playerCharacterEntity.Id))
+            {
+                UserCharacterData userData = new UserCharacterData();
+                userData.userId = playerCharacterEntity.UserId;
+                userData.id = playerCharacterEntity.Id;
+                userData.characterName = playerCharacterEntity.CharacterName;
+                userData.dataId = playerCharacterEntity.DataId;
+                userData.level = playerCharacterEntity.Level;
+                userData.currentHp = playerCharacterEntity.CurrentHp;
+                userData.maxHp = playerCharacterEntity.CacheMaxHp;
+                userData.currentMp = playerCharacterEntity.CurrentMp;
+                userData.maxMp = playerCharacterEntity.CacheMaxMp;
+                usersById.Add(userData.id, userData);
+                // Add map user to central server and chat server
+                UpdateMapUser(CentralAppServerRegister, UpdateUserCharacterMessage.UpdateType.Add, userData);
+                if (ChatNetworkManager.IsClientConnected)
+                    UpdateMapUser(ChatNetworkManager.Client, UpdateUserCharacterMessage.UpdateType.Add, userData);
+            }
+            base.RegisterPlayerCharacter(connectionId, playerCharacterEntity);
         }
 
         public override void UnregisterPlayerCharacter(long connectionId)
@@ -375,26 +400,14 @@ namespace MultiplayerARPG.MMO
                         if (IsInstanceMap())
                             instanceMapCurrentLocations.Add(playerCharacterEntity.ObjectId, new KeyValuePair<string, Vector3>(savingCurrentMapName, savingCurrentPosition));
 
-                        // Summon saved summons
-                        for (int i = 0; i < playerCharacterEntity.Summons.Count; ++i)
-                        {
-                            CharacterSummon summon = playerCharacterEntity.Summons[i];
-                            summon.Summon(playerCharacterEntity, summon.Level, summon.summonRemainsDuration, summon.Exp, summon.CurrentHp, summon.CurrentMp);
-                            playerCharacterEntity.Summons[i] = summon;
-                        }
+                        // Set user Id
+                        playerCharacterEntity.UserId = userId;
 
                         // Load user level
                         GetUserLevelJob loadUserLevelJob = new GetUserLevelJob(Database, userId);
                         loadUserLevelJob.Start();
                         yield return StartCoroutine(loadUserLevelJob.WaitFor());
                         playerCharacterEntity.UserLevel = loadUserLevelJob.result;
-
-                        // Notify clients that this character is spawn or dead
-                        if (!playerCharacterEntity.IsDead())
-                            playerCharacterEntity.RequestOnRespawn();
-                        else
-                            playerCharacterEntity.RequestOnDead();
-                        RegisterPlayerCharacter(connectionId, playerCharacterEntity);
 
                         // Load party data, if this map-server does not have party data
                         if (playerCharacterEntity.PartyId > 0)
@@ -433,24 +446,24 @@ namespace MultiplayerARPG.MMO
                                 playerCharacterEntity.ClearGuild();
                         }
 
-                        // Set user data to map server
-                        UserCharacterData userData = new UserCharacterData();
-                        userData.userId = userId;
-                        userData.id = playerCharacterEntity.Id;
-                        userData.characterName = playerCharacterEntity.CharacterName;
-                        userData.dataId = playerCharacterEntity.DataId;
-                        userData.level = playerCharacterEntity.Level;
-                        userData.currentHp = playerCharacterEntity.CurrentHp;
-                        userData.maxHp = playerCharacterEntity.CacheMaxHp;
-                        userData.currentMp = playerCharacterEntity.CurrentMp;
-                        userData.maxMp = playerCharacterEntity.CacheMaxMp;
-                        usersById[userData.id] = userData;
+                        // Summon saved summons
+                        for (int i = 0; i < playerCharacterEntity.Summons.Count; ++i)
+                        {
+                            CharacterSummon summon = playerCharacterEntity.Summons[i];
+                            summon.Summon(playerCharacterEntity, summon.Level, summon.summonRemainsDuration, summon.Exp, summon.CurrentHp, summon.CurrentMp);
+                            playerCharacterEntity.Summons[i] = summon;
+                        }
+                        
+                        // Notify clients that this character is spawn or dead
+                        if (!playerCharacterEntity.IsDead())
+                            playerCharacterEntity.RequestOnRespawn();
+                        else
+                            playerCharacterEntity.RequestOnDead();
 
-                        // Add map user to central server and chat server
-                        UpdateMapUser(CentralAppServerRegister, UpdateUserCharacterMessage.UpdateType.Add, userData);
-                        if (ChatNetworkManager.IsClientConnected)
-                            UpdateMapUser(ChatNetworkManager.Client, UpdateUserCharacterMessage.UpdateType.Add, userData);
+                        // Register player character entity to the server
+                        RegisterPlayerCharacter(connectionId, playerCharacterEntity);
 
+                        // Setup subscribers
                         LiteNetLibPlayer player = GetPlayer(connectionId);
                         foreach (LiteNetLibIdentity spawnedObject in Assets.GetSpawnedObjects())
                         {
