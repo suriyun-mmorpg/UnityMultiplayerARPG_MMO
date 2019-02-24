@@ -640,7 +640,6 @@ namespace MultiplayerARPG.MMO
             updateStorageItemsJob.Start();
             yield return StartCoroutine(updateStorageItemsJob.WaitFor());
             // Update storage items to characters that open the storage
-            playerCharacterEntity.StorageItems = storageItemList;
             UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItemList);
         }
 
@@ -697,7 +696,6 @@ namespace MultiplayerARPG.MMO
             updateStorageItemsJob.Start();
             yield return StartCoroutine(updateStorageItemsJob.WaitFor());
             // Update storage items to characters that open the storage
-            playerCharacterEntity.StorageItems = storageItemList;
             UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItemList);
         }
 
