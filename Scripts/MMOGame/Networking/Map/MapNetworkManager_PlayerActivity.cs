@@ -747,22 +747,89 @@ namespace MultiplayerARPG.MMO
 
         public override void DepositGold(BasePlayerCharacterEntity playerCharacterEntity, int amount)
         {
-            throw new System.NotImplementedException();
+            StartCoroutine(DepositGoldRoutine(playerCharacterEntity, amount));
+        }
+
+        private IEnumerator DepositGoldRoutine(BasePlayerCharacterEntity playerCharacterEntity, int amount)
+        {
+            if (playerCharacterEntity.Gold - amount >= 0)
+            {
+                playerCharacterEntity.Gold -= amount;
+                IncreaseGoldJob increaseGoldJob = new IncreaseGoldJob(Database, playerCharacterEntity.UserId, amount);
+                increaseGoldJob.Start();
+                yield return StartCoroutine(increaseGoldJob.WaitFor());
+                playerCharacterEntity.UserGold = increaseGoldJob.result;
+            }
         }
 
         public override void WithdrawGold(BasePlayerCharacterEntity playerCharacterEntity, int amount)
         {
-            throw new System.NotImplementedException();
+            StartCoroutine(WithdrawGoldRoutine(playerCharacterEntity, amount));
+        }
+
+        private IEnumerator WithdrawGoldRoutine(BasePlayerCharacterEntity playerCharacterEntity, int amount)
+        {
+            GetGoldJob getGoldJob = new GetGoldJob(Database, playerCharacterEntity.UserId);
+            getGoldJob.Start();
+            yield return StartCoroutine(getGoldJob.WaitFor());
+            if (getGoldJob.result - amount >= 0)
+            {
+                DecreaseGoldJob decreaseGoldJob = new DecreaseGoldJob(Database, playerCharacterEntity.UserId, amount);
+                decreaseGoldJob.Start();
+                yield return StartCoroutine(decreaseGoldJob.WaitFor());
+                playerCharacterEntity.UserGold = decreaseGoldJob.result;
+                playerCharacterEntity.Gold += amount;
+            }
         }
 
         public override void DepositGuildGold(BasePlayerCharacterEntity playerCharacterEntity, int amount)
         {
-            throw new System.NotImplementedException();
+            StartCoroutine(DepositGuildGoldRoutine(playerCharacterEntity, amount));
+        }
+
+        private IEnumerator DepositGuildGoldRoutine(BasePlayerCharacterEntity playerCharacterEntity, int amount)
+        {
+            GuildData guild;
+            if (guilds.TryGetValue(playerCharacterEntity.GuildId, out guild))
+            {
+                if (playerCharacterEntity.Gold - amount >= 0)
+                {
+                    playerCharacterEntity.Gold -= amount;
+                    IncreaseGuildGoldJob increaseGuildGoldJob = new IncreaseGuildGoldJob(Database, playerCharacterEntity.GuildId, amount);
+                    increaseGuildGoldJob.Start();
+                    yield return StartCoroutine(increaseGuildGoldJob.WaitFor());
+                    guild.gold = increaseGuildGoldJob.result;
+                    guilds[playerCharacterEntity.GuildId] = guild;
+                }
+            }
+            else
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotJoinedGuild);
         }
 
         public override void WithdrawGuildGold(BasePlayerCharacterEntity playerCharacterEntity, int amount)
         {
-            throw new System.NotImplementedException();
+            StartCoroutine(WithdrawGuildGoldRoutine(playerCharacterEntity, amount));
+        }
+
+        private IEnumerator WithdrawGuildGoldRoutine(BasePlayerCharacterEntity playerCharacterEntity, int amount)
+        {
+            GuildData guild;
+            if (guilds.TryGetValue(playerCharacterEntity.GuildId, out guild))
+            {
+                GetGuildGoldJob getGuildGoldJob = new GetGuildGoldJob(Database, playerCharacterEntity.GuildId);
+                getGuildGoldJob.Start();
+                yield return StartCoroutine(getGuildGoldJob.WaitFor());
+                if (getGuildGoldJob.result - amount >= 0)
+                {
+                    DecreaseGuildGoldJob decreaseGuildGoldJob = new DecreaseGuildGoldJob(Database, playerCharacterEntity.GuildId, amount);
+                    decreaseGuildGoldJob.Start();
+                    guild.gold = decreaseGuildGoldJob.result;
+                    playerCharacterEntity.Gold += amount;
+                    guilds[playerCharacterEntity.GuildId] = guild;
+                }
+            }
+            else
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotJoinedGuild);
         }
     }
 }

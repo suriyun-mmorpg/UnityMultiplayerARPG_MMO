@@ -442,9 +442,103 @@ namespace MultiplayerARPG.MMO
             database.UpdateCharacterGuild(characterId, id, guildRole);
         }
     }
+
+    public class GetGuildGoldJob : DatabaseJob<int>
+    {
+        private int guildId;
+        public GetGuildGoldJob(BaseDatabase database, int guildId, Action<int> onFinished = null) : base(database, onFinished)
+        {
+            this.guildId = guildId;
+        }
+
+        protected override void ThreadFunction()
+        {
+            result = database.GetGuildGold(guildId);
+        }
+    }
+
+    public class DecreaseGuildGoldJob : DatabaseJob<int>
+    {
+        private int guildId;
+        private int amount;
+        public DecreaseGuildGoldJob(BaseDatabase database, int guildId, int amount, Action<int> onFinished = null) : base(database, onFinished)
+        {
+            this.guildId = guildId;
+            this.amount = amount;
+        }
+
+        protected override void ThreadFunction()
+        {
+            result = database.DecreaseGuildGold(guildId, amount);
+        }
+    }
+
+    public class IncreaseGuildGoldJob : DatabaseJob<int>
+    {
+        private int guildId;
+        private int amount;
+        public IncreaseGuildGoldJob(BaseDatabase database, int guildId, int amount, Action<int> onFinished = null) : base(database, onFinished)
+        {
+            this.guildId = guildId;
+            this.amount = amount;
+        }
+
+        protected override void ThreadFunction()
+        {
+            result = database.IncreaseGuildGold(guildId, amount);
+        }
+    }
     #endregion
 
-    #region Cash
+    #region User Gold
+    public class GetGoldJob : DatabaseJob<int>
+    {
+        private string userId;
+        public GetGoldJob(BaseDatabase database, string userId, Action<int> onFinished = null) : base(database, onFinished)
+        {
+            this.userId = userId;
+        }
+
+        protected override void ThreadFunction()
+        {
+            result = database.GetGold(userId);
+        }
+    }
+
+    public class DecreaseGoldJob : DatabaseJob<int>
+    {
+        private string userId;
+        private int amount;
+        public DecreaseGoldJob(BaseDatabase database, string userId, int amount, Action<int> onFinished = null) : base(database, onFinished)
+        {
+            this.userId = userId;
+            this.amount = amount;
+        }
+
+        protected override void ThreadFunction()
+        {
+            result = database.DecreaseGold(userId, amount);
+        }
+    }
+
+    public class IncreaseGoldJob : DatabaseJob<int>
+    {
+        private string userId;
+        private int amount;
+        public IncreaseGoldJob(BaseDatabase database, string userId, int amount, Action<int> onFinished = null) : base(database, onFinished)
+        {
+            this.userId = userId;
+            this.amount = amount;
+        }
+
+        protected override void ThreadFunction()
+        {
+            result = database.IncreaseGold(userId, amount);
+        }
+    }
+    #endregion
+
+    #region User Cash
     public class GetCashJob : DatabaseJob<int>
     {
         private string userId;
