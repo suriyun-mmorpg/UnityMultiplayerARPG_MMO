@@ -231,7 +231,7 @@ namespace MultiplayerARPG.MMO
             if (dict.ContainsKey("id") && dict.ContainsKey("email"))
             {
                 string email = (string)dict["email"];
-                FacebookLoginJob job = new FacebookLoginJob(Database, message.id, message.accessToken, email);
+                FacebookLoginJob job = new FacebookLoginJob(Database, message.id, email);
                 job.Start();
                 yield return StartCoroutine(job.WaitFor());
                 userId = job.result;
@@ -289,7 +289,7 @@ namespace MultiplayerARPG.MMO
             {
                 string gId = (string)dict["sub"];
                 string email = (string)dict["email"];
-                GooglePlayLoginJob job = new GooglePlayLoginJob(Database, gId, message.idToken, email);
+                GooglePlayLoginJob job = new GooglePlayLoginJob(Database, gId, email);
                 job.Start();
                 yield return StartCoroutine(job.WaitFor());
                 userId = job.result;

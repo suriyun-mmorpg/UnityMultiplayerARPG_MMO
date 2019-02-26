@@ -513,7 +513,7 @@ namespace MultiplayerARPG.MMO
             return result != null ? (long)result : 0;
         }
 
-        public override string FacebookLogin(string fbId, string accessToken, string email)
+        public override string FacebookLogin(string fbId, string email)
         {
             string id = string.Empty;
             SQLiteRowsReader reader = ExecuteReader("SELECT id FROM userlogin WHERE username=@username AND password=@password AND authType=@authType LIMIT 1",
@@ -544,7 +544,7 @@ namespace MultiplayerARPG.MMO
             return id;
         }
 
-        public override string GooglePlayLogin(string gId, string idToken, string email)
+        public override string GooglePlayLogin(string gId, string email)
         {
             string id = string.Empty;
             SQLiteRowsReader reader = ExecuteReader("SELECT id FROM userlogin WHERE username=@username AND password=@password AND authType=@authType LIMIT 1",
