@@ -47,7 +47,7 @@ namespace MultiplayerARPG.MMO
             List<CharacterItem> result = new List<CharacterItem>();
             SQLiteRowsReader reader = ExecuteReader("SELECT * FROM characteritem WHERE characterId=@characterId AND inventoryType=@inventoryType ORDER BY idx ASC",
                 new SqliteParameter("@characterId", characterId),
-                new SqliteParameter("@inventoryType", inventoryType));
+                new SqliteParameter("@inventoryType", (byte)inventoryType));
             CharacterItem tempInventory;
             while (ReadCharacterItem(reader, out tempInventory, false))
             {
@@ -62,14 +62,14 @@ namespace MultiplayerARPG.MMO
             // Right hand weapon
             SQLiteRowsReader reader = ExecuteReader("SELECT * FROM characteritem WHERE characterId=@characterId AND inventoryType=@inventoryType LIMIT 1",
                 new SqliteParameter("@characterId", characterId),
-                new SqliteParameter("@inventoryType", InventoryType.EquipWeaponRight));
+                new SqliteParameter("@inventoryType", (byte)InventoryType.EquipWeaponRight));
             CharacterItem rightWeapon;
             if (ReadCharacterItem(reader, out rightWeapon))
                 result.rightHand = rightWeapon;
             // Left hand weapon
             reader = ExecuteReader("SELECT * FROM characteritem WHERE characterId=@characterId AND inventoryType=@inventoryType LIMIT 1",
                 new SqliteParameter("@characterId", characterId),
-                new SqliteParameter("@inventoryType", InventoryType.EquipWeaponLeft));
+                new SqliteParameter("@inventoryType", (byte)InventoryType.EquipWeaponLeft));
             CharacterItem leftWeapon;
             if (ReadCharacterItem(reader, out leftWeapon))
                 result.leftHand = leftWeapon;

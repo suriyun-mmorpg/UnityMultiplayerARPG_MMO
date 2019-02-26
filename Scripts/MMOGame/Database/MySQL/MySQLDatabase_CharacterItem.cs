@@ -47,7 +47,7 @@ namespace MultiplayerARPG.MMO
             List<CharacterItem> result = new List<CharacterItem>();
             MySQLRowsReader reader = ExecuteReader("SELECT * FROM characteritem WHERE characterId=@characterId AND inventoryType=@inventoryType ORDER BY idx ASC",
                 new MySqlParameter("@characterId", characterId),
-                new MySqlParameter("@inventoryType", inventoryType));
+                new MySqlParameter("@inventoryType", (byte)inventoryType));
             CharacterItem tempInventory;
             while (ReadCharacterItem(reader, out tempInventory, false))
             {
@@ -62,14 +62,14 @@ namespace MultiplayerARPG.MMO
             // Right hand weapon
             MySQLRowsReader reader = ExecuteReader("SELECT * FROM characteritem WHERE characterId=@characterId AND inventoryType=@inventoryType LIMIT 1",
                 new MySqlParameter("@characterId", characterId),
-                new MySqlParameter("@inventoryType", InventoryType.EquipWeaponRight));
+                new MySqlParameter("@inventoryType", (byte)InventoryType.EquipWeaponRight));
             CharacterItem rightWeapon;
             if (ReadCharacterItem(reader, out rightWeapon))
                 result.rightHand = rightWeapon;
             // Left hand weapon
             reader = ExecuteReader("SELECT * FROM characteritem WHERE characterId=@characterId AND inventoryType=@inventoryType LIMIT 1",
                 new MySqlParameter("@characterId", characterId),
-                new MySqlParameter("@inventoryType", InventoryType.EquipWeaponLeft));
+                new MySqlParameter("@inventoryType", (byte)InventoryType.EquipWeaponLeft));
             CharacterItem leftWeapon;
             if (ReadCharacterItem(reader, out leftWeapon))
                 result.leftHand = leftWeapon;
