@@ -760,6 +760,8 @@ namespace MultiplayerARPG.MMO
                 yield return StartCoroutine(increaseGoldJob.WaitFor());
                 playerCharacterEntity.UserGold = increaseGoldJob.result;
             }
+            else
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotEnoughGoldToDeposit);
         }
 
         public override void WithdrawGold(BasePlayerCharacterEntity playerCharacterEntity, int amount)
@@ -780,6 +782,8 @@ namespace MultiplayerARPG.MMO
                 playerCharacterEntity.UserGold = decreaseGoldJob.result;
                 playerCharacterEntity.Gold += amount;
             }
+            else
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotEnoughGoldToWithdraw);
         }
 
         public override void DepositGuildGold(BasePlayerCharacterEntity playerCharacterEntity, int amount)
@@ -801,6 +805,8 @@ namespace MultiplayerARPG.MMO
                     guild.gold = increaseGuildGoldJob.result;
                     guilds[playerCharacterEntity.GuildId] = guild;
                 }
+                else
+                    SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotEnoughGoldToDeposit);
             }
             else
                 SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotJoinedGuild);
@@ -827,6 +833,8 @@ namespace MultiplayerARPG.MMO
                     playerCharacterEntity.Gold += amount;
                     guilds[playerCharacterEntity.GuildId] = guild;
                 }
+                else
+                    SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotEnoughGoldToWithdraw);
             }
             else
                 SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotJoinedGuild);
