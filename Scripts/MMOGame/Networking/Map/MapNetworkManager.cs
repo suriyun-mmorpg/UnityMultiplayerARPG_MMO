@@ -402,11 +402,13 @@ namespace MultiplayerARPG.MMO
                             playerCharacterEntity.UserGold = amount;
                         });
                         getGoldJob.Start();
+                        StartCoroutine(getGoldJob.WaitFor());
                         GetCashJob getCashJob = new GetCashJob(Database, userId, (amount) =>
                         {
                             playerCharacterEntity.UserCash = amount;
                         });
                         getCashJob.Start();
+                        StartCoroutine(getCashJob.WaitFor());
 
                         // Prepare saving location for this character
                         if (IsInstanceMap())
@@ -421,6 +423,7 @@ namespace MultiplayerARPG.MMO
                             playerCharacterEntity.UserLevel = level;
                         });
                         loadUserLevelJob.Start();
+                        StartCoroutine(loadUserLevelJob.WaitFor());
 
                         // Load party data, if this map-server does not have party data
                         if (playerCharacterEntity.PartyId > 0)

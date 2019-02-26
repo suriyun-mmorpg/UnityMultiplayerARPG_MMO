@@ -349,6 +349,8 @@ namespace MultiplayerARPG.MMO
 
                 if (startMapOnAwake)
                 {
+                    // If run map-server, don't load home scene (home scene load in `Game Instance`)
+                    gameInstance.SetOnGameDataLoadedCallback(OnGameDataLoaded);
                     startingMapId = startingMap.Id;
                     startingMapServer = true;
                 }
