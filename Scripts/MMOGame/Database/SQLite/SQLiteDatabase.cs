@@ -47,8 +47,6 @@ namespace MultiplayerARPG.MMO
 
         private void Init()
         {
-            BeginTransaction();
-
             ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characterattribute (
               id TEXT NOT NULL PRIMARY KEY,
               idx INTEGER NOT NULL,
@@ -266,7 +264,7 @@ namespace MultiplayerARPG.MMO
                 ExecuteNonQuery("ALTER TABLE characteritem ADD lockRemainsDuration REAL NOT NULL DEFAULT 0;");
 
             if (!IsColumnExist("characteritem", "ammo"))
-                ExecuteNonQuery("ALTER TABLE guild ADD ammo INTEGER NOT NULL DEFAULT 0;");
+                ExecuteNonQuery("ALTER TABLE characteritem ADD ammo INTEGER NOT NULL DEFAULT 0;");
 
             if (!IsColumnExist("userlogin", "gold"))
                 ExecuteNonQuery("ALTER TABLE userlogin ADD gold INTEGER NOT NULL DEFAULT 0;");
@@ -294,8 +292,7 @@ namespace MultiplayerARPG.MMO
 
             if (!IsColumnExist("guild", "gold"))
                 ExecuteNonQuery("ALTER TABLE guild ADD gold INTEGER NOT NULL DEFAULT 0;");
-
-            EndTransaction();
+            
             this.InvokeInstanceDevExtMethods("Init");
         }
 
