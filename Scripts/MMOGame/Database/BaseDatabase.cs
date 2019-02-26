@@ -15,6 +15,9 @@ namespace MultiplayerARPG.MMO
         public abstract string ValidateUserLogin(string username, string password);
         public abstract bool ValidateAccessToken(string userId, string accessToken);
         public abstract byte GetUserLevel(string userId);
+        public abstract int GetGold(string userId);
+        public abstract int IncreaseGold(string userId, int amount);
+        public abstract int DecreaseGold(string userId, int amount);
         public abstract int GetCash(string userId);
         public abstract int IncreaseCash(string userId, int amount);
         public abstract int DecreaseCash(string userId, int amount);
@@ -64,7 +67,10 @@ namespace MultiplayerARPG.MMO
         public abstract void UpdateGuildSkillLevel(int id, int dataId, short level, short skillPoint);
         public abstract void DeleteGuild(int id);
         public abstract void UpdateCharacterGuild(string characterId, int guild, byte guildRole);
-        
+        public abstract int GetGuildGold(int guildId);
+        public abstract int IncreaseGuildGold(int guildId, int amount);
+        public abstract int DecreaseGuildGold(int guildId, int amount);
+
         public abstract void UpdateStorageItems(StorageType storageType, string storageOwnerId, IList<CharacterItem> storageCharacterItems);
         public abstract List<CharacterItem> ReadStorageItems(StorageType storageType, string storageOwnerId);
     }
