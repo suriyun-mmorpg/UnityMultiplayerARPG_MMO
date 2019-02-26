@@ -7,20 +7,20 @@ namespace MultiplayerARPG.MMO
 {
     public partial class SQLiteDatabase
     {
-        private void CreateStorageItem(int idx, StorageCharacterItem storageCharacterItem)
+        private void CreateStorageItem(int idx, StorageType storageType, string storageOwnerId, CharacterItem characterItem)
         {
             ExecuteNonQuery("INSERT INTO storageitem (id, idx, storageType, storageOwnerId, dataId, level, amount, durability, exp, lockRemainsDuration, ammo) VALUES (@id, @idx, @storageType, @storageOwnerId, @dataId, @level, @amount, @durability, @exp, @lockRemainsDuration, @ammo)",
-                new SqliteParameter("@id", new StorageItemId(storageCharacterItem.storageType, storageCharacterItem.storageOwnerId, idx).GetId()),
+                new SqliteParameter("@id", new StorageItemId(storageType, storageOwnerId, idx).GetId()),
                 new SqliteParameter("@idx", idx),
-                new SqliteParameter("@storageType", (byte)storageCharacterItem.storageType),
-                new SqliteParameter("@storageOwnerId", storageCharacterItem.storageOwnerId),
-                new SqliteParameter("@dataId", storageCharacterItem.characterItem.dataId),
-                new SqliteParameter("@level", storageCharacterItem.characterItem.level),
-                new SqliteParameter("@amount", storageCharacterItem.characterItem.amount),
-                new SqliteParameter("@durability", storageCharacterItem.characterItem.durability),
-                new SqliteParameter("@exp", storageCharacterItem.characterItem.exp),
-                new SqliteParameter("@lockRemainsDuration", storageCharacterItem.characterItem.lockRemainsDuration),
-                new SqliteParameter("@ammo", storageCharacterItem.characterItem.ammo));
+                new SqliteParameter("@storageType", (byte)storageType),
+                new SqliteParameter("@storageOwnerId", storageOwnerId),
+                new SqliteParameter("@dataId", characterItem.dataId),
+                new SqliteParameter("@level", characterItem.level),
+                new SqliteParameter("@amount", characterItem.amount),
+                new SqliteParameter("@durability", characterItem.durability),
+                new SqliteParameter("@exp", characterItem.exp),
+                new SqliteParameter("@lockRemainsDuration", characterItem.lockRemainsDuration),
+                new SqliteParameter("@ammo", characterItem.ammo));
         }
 
         private bool ReadStorageItem(SQLiteRowsReader reader, out CharacterItem result, bool resetReader = true)
@@ -62,14 +62,9 @@ namespace MultiplayerARPG.MMO
         {
             BeginTransaction();
             DeleteStorageItems(storageType, storageOwnerId);
-            StorageCharacterItem tempStorageItem;
             for (int i = 0; i < characterItems.Count; ++i)
             {
-                tempStorageItem = new StorageCharacterItem();
-                tempStorageItem.storageType = storageType;
-                tempStorageItem.storageOwnerId = storageOwnerId;
-                tempStorageItem.characterItem = characterItems[i];
-                CreateStorageItem(i, tempStorageItem);
+                CreateStorageItem(i, storageType, storageOwnerId, characterItems[i]);
             }
             EndTransaction();
         }

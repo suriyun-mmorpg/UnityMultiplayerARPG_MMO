@@ -7,20 +7,20 @@ namespace MultiplayerARPG.MMO
 {
     public partial class MySQLDatabase
     {
-        private void CreateStorageItem(MySqlConnection connection, MySqlTransaction transaction, int idx, StorageCharacterItem storageCharacterItem)
+        private void CreateStorageItem(MySqlConnection connection, MySqlTransaction transaction, int idx, StorageType storageType, string storageOwnerId, CharacterItem characterItem)
         {
             ExecuteNonQuery(connection, transaction, "INSERT INTO storageitem (id, idx, storageType, storageOwnerId, dataId, level, amount, durability, exp, lockRemainsDuration, ammo) VALUES (@id, @idx, @storageType, @storageOwnerId, @dataId, @level, @amount, @durability, @exp, @lockRemainsDuration, @ammo)",
-                new MySqlParameter("@id", new StorageItemId(storageCharacterItem.storageType, storageCharacterItem.storageOwnerId, idx).GetId()),
+                new MySqlParameter("@id", new StorageItemId(storageType, storageOwnerId, idx).GetId()),
                 new MySqlParameter("@idx", idx),
-                new MySqlParameter("@storageType", (byte)storageCharacterItem.storageType),
-                new MySqlParameter("@storageOwnerId", storageCharacterItem.storageOwnerId),
-                new MySqlParameter("@dataId", storageCharacterItem.characterItem.dataId),
-                new MySqlParameter("@level", storageCharacterItem.characterItem.level),
-                new MySqlParameter("@amount", storageCharacterItem.characterItem.amount),
-                new MySqlParameter("@durability", storageCharacterItem.characterItem.durability),
-                new MySqlParameter("@exp", storageCharacterItem.characterItem.exp),
-                new MySqlParameter("@lockRemainsDuration", storageCharacterItem.characterItem.lockRemainsDuration),
-                new MySqlParameter("@ammo", storageCharacterItem.characterItem.ammo));
+                new MySqlParameter("@storageType", (byte)storageType),
+                new MySqlParameter("@storageOwnerId", storageOwnerId),
+                new MySqlParameter("@dataId", characterItem.dataId),
+                new MySqlParameter("@level", characterItem.level),
+                new MySqlParameter("@amount", characterItem.amount),
+                new MySqlParameter("@durability", characterItem.durability),
+                new MySqlParameter("@exp", characterItem.exp),
+                new MySqlParameter("@lockRemainsDuration", characterItem.lockRemainsDuration),
+                new MySqlParameter("@ammo", characterItem.ammo));
         }
 
         private bool ReadStorageItem(MySQLRowsReader reader, out CharacterItem result, bool resetReader = true)
@@ -66,14 +66,9 @@ namespace MultiplayerARPG.MMO
             try
             {
                 DeleteStorageItems(connection, transaction, storageType, storageOwnerId);
-                StorageCharacterItem tempStorageItem;
                 for (int i = 0; i < characterItems.Count; ++i)
                 {
-                    tempStorageItem = new StorageCharacterItem();
-                    tempStorageItem.storageType = storageType;
-                    tempStorageItem.storageOwnerId = storageOwnerId;
-                    tempStorageItem.characterItem = characterItems[i];
-                    CreateStorageItem(connection, transaction, i, tempStorageItem);
+                    CreateStorageItem(connection, transaction, i, storageType, storageOwnerId, characterItems[i]);
                 }
             }
             catch (System.Exception ex)
