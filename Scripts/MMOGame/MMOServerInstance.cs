@@ -92,6 +92,8 @@ namespace MultiplayerARPG.MMO
         public bool startCentralOnAwake;
         public bool startMapSpawnOnAwake;
         public bool startChatOnAwake;
+        public bool startMapOnAwake;
+        public MapInfo startingMap;
 
         private List<string> spawningMapIds;
         private string startingMapId;
@@ -344,6 +346,12 @@ namespace MultiplayerARPG.MMO
 
                 if (startChatOnAwake)
                     startingChatServer = true;
+
+                if (startMapOnAwake)
+                {
+                    startingMapId = startingMap.Id;
+                    startingMapServer = true;
+                }
             }
         }
 
