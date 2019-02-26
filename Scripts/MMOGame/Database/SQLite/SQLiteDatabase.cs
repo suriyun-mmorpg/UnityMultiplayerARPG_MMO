@@ -91,6 +91,23 @@ namespace MultiplayerARPG.MMO
               durability REAL NOT NULL DEFAULT 0,
               exp INTEGER NOT NULL DEFAULT 0,
               lockRemainsDuration REAL NOT NULL DEFAULT 0,
+              ammo INTEGER NOT NULL DEFAULT 0,
+              createAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+              updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+            )");
+
+            ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS storageitem (
+              id TEXT NOT NULL PRIMARY KEY,
+              idx INTEGER NOT NULL,
+              storageType INTEGER NOT NULL,
+              storageOwnerId TEXT NOT NULL,
+              dataId INTERGER NOT NULL,
+              level INTEGER NOT NULL,
+              amount INTEGER NOT NULL,
+              durability REAL NOT NULL DEFAULT 0,
+              exp INTEGER NOT NULL DEFAULT 0,
+              lockRemainsDuration REAL NOT NULL DEFAULT 0,
+              ammo INTEGER NOT NULL DEFAULT 0,
               createAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
               updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
@@ -177,6 +194,7 @@ namespace MultiplayerARPG.MMO
               id TEXT NOT NULL PRIMARY KEY,
               username TEXT NOT NULL UNIQUE,
               password TEXT NOT NULL,
+              gold INTEGER NOT NULL DEFAULT 0,
               cash INTEGER NOT NULL DEFAULT 0,
               userLevel INTEGER NOT NULL DEFAULT 0,
               email TEXT NOT NULL,
@@ -211,7 +229,8 @@ namespace MultiplayerARPG.MMO
               level INTEGER NOT NULL DEFAULT 1,
               exp INTEGER NOT NULL DEFAULT 0,
               skillPoint INTEGER NOT NULL DEFAULT 0,
-              guildMessage TEXT NOT NULL DEFAULT ''
+              guildMessage TEXT NOT NULL DEFAULT '',
+              gold INTEGER NOT NULL DEFAULT 0
             )");
 
             ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS guildrole (
@@ -246,6 +265,12 @@ namespace MultiplayerARPG.MMO
             if (!IsColumnExist("characteritem", "lockRemainsDuration"))
                 ExecuteNonQuery("ALTER TABLE characteritem ADD lockRemainsDuration REAL NOT NULL DEFAULT 0;");
 
+            if (!IsColumnExist("characteritem", "ammo"))
+                ExecuteNonQuery("ALTER TABLE guild ADD ammo INTEGER NOT NULL DEFAULT 0;");
+
+            if (!IsColumnExist("userlogin", "gold"))
+                ExecuteNonQuery("ALTER TABLE userlogin ADD gold INTEGER NOT NULL DEFAULT 0;");
+
             if (!IsColumnExist("userlogin", "cash"))
                 ExecuteNonQuery("ALTER TABLE userlogin ADD cash INTEGER NOT NULL DEFAULT 0;");
 
@@ -266,6 +291,9 @@ namespace MultiplayerARPG.MMO
 
             if (!IsColumnExist("characters", "entityId"))
                 ExecuteNonQuery("ALTER TABLE characters ADD entityId INTEGER NOT NULL DEFAULT 0;");
+
+            if (!IsColumnExist("guild", "gold"))
+                ExecuteNonQuery("ALTER TABLE guild ADD gold INTEGER NOT NULL DEFAULT 0;");
 
             EndTransaction();
             this.InvokeInstanceDevExtMethods("Init");
@@ -393,6 +421,36 @@ namespace MultiplayerARPG.MMO
             if (reader.Read())
                 userLevel = (byte)reader.GetSByte("userLevel");
             return userLevel;
+        }
+
+        public override int GetGold(string userId)
+        {
+            int gold = 0;
+            SQLiteRowsReader reader = ExecuteReader("SELECT gold FROM userlogin WHERE id=@id LIMIT 1",
+                new SqliteParameter("@id", userId));
+            if (reader.Read())
+                gold = reader.GetInt32("gold");
+            return gold;
+        }
+
+        public override int IncreaseGold(string userId, int amount)
+        {
+            int gold = GetGold(userId);
+            gold += amount;
+            ExecuteNonQuery("UPDATE userlogin SET gold=@gold WHERE id=@id",
+                new SqliteParameter("@id", userId),
+                new SqliteParameter("@gold", gold));
+            return gold;
+        }
+
+        public override int DecreaseGold(string userId, int amount)
+        {
+            int gold = GetGold(userId);
+            gold -= amount;
+            ExecuteNonQuery("UPDATE userlogin SET gold=@gold WHERE id=@id",
+                new SqliteParameter("@id", userId),
+                new SqliteParameter("@gold", gold));
+            return gold;
         }
 
         public override int GetCash(string userId)

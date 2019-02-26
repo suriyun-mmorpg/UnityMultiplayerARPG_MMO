@@ -230,6 +230,36 @@ namespace MultiplayerARPG.MMO
             return userLevel;
         }
 
+        public override int GetGold(string userId)
+        {
+            int gold = 0;
+            MySQLRowsReader reader = ExecuteReader("SELECT gold FROM userlogin WHERE id=@id LIMIT 1",
+                new MySqlParameter("@id", userId));
+            if (reader.Read())
+                gold = reader.GetInt32("gold");
+            return gold;
+        }
+
+        public override int IncreaseGold(string userId, int amount)
+        {
+            int gold = GetGold(userId);
+            gold += amount;
+            ExecuteNonQuery("UPDATE userlogin SET gold=@gold WHERE id=@id",
+                new MySqlParameter("@id", userId),
+                new MySqlParameter("@gold", gold));
+            return gold;
+        }
+
+        public override int DecreaseGold(string userId, int amount)
+        {
+            int gold = GetGold(userId);
+            gold -= amount;
+            ExecuteNonQuery("UPDATE userlogin SET gold=@gold WHERE id=@id",
+                new MySqlParameter("@id", userId),
+                new MySqlParameter("@gold", gold));
+            return gold;
+        }
+
         public override int GetCash(string userId)
         {
             int cash = 0;

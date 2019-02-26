@@ -169,5 +169,35 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@guildId", guildId),
                 new MySqlParameter("@guildRole", guildRole));
         }
+
+        public override int GetGuildGold(int guildId)
+        {
+            int gold = 0;
+            MySQLRowsReader reader = ExecuteReader("SELECT gold FROM guild WHERE id=@id LIMIT 1",
+                new MySqlParameter("@id", guildId));
+            if (reader.Read())
+                gold = reader.GetInt32("gold");
+            return gold;
+        }
+
+        public override int IncreaseGuildGold(int guildId, int amount)
+        {
+            int gold = GetGuildGold(guildId);
+            gold += amount;
+            ExecuteNonQuery("UPDATE guild SET gold=@gold WHERE id=@id",
+                new MySqlParameter("@id", guildId),
+                new MySqlParameter("@gold", gold));
+            return gold;
+        }
+
+        public override int DecreaseGuildGold(int guildId, int amount)
+        {
+            int gold = GetGuildGold(guildId);
+            gold -= amount;
+            ExecuteNonQuery("UPDATE guild SET gold=@gold WHERE id=@id",
+                new MySqlParameter("@id", guildId),
+                new MySqlParameter("@gold", gold));
+            return gold;
+        }
     }
 }
