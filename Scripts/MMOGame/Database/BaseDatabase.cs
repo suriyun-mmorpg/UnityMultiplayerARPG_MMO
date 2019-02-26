@@ -24,8 +24,8 @@ namespace MultiplayerARPG.MMO
         public abstract void UpdateAccessToken(string userId, string accessToken);
         public abstract void CreateUserLogin(string username, string password);
         public abstract long FindUsername(string username);
-        public abstract string FacebookLogin(string fbId, string accessToken);
-        public abstract string GooglePlayLogin(string idToken);
+        public abstract string FacebookLogin(string fbId, string accessToken, string email);
+        public abstract string GooglePlayLogin(string gId, string idToken, string email);
 
         public abstract void CreateCharacter(string userId, IPlayerCharacterData characterData);
         public abstract PlayerCharacterData ReadCharacter(string userId, 

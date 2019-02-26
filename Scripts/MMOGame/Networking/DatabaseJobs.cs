@@ -121,29 +121,35 @@ namespace MultiplayerARPG.MMO
     {
         private string id;
         private string accessToken;
-        public FacebookLoginJob(BaseDatabase database, string id, string accessToken, Action<string> onFinished = null) : base(database, onFinished)
+        private string email;
+        public FacebookLoginJob(BaseDatabase database, string id, string accessToken, string email, Action<string> onFinished = null) : base(database, onFinished)
         {
             this.id = id;
             this.accessToken = accessToken;
+            this.email = email;
         }
 
         protected override void ThreadFunction()
         {
-            result = database.FacebookLogin(id, accessToken);
+            result = database.FacebookLogin(id, accessToken, email);
         }
     }
 
     public class GooglePlayLoginJob : DatabaseJob<string>
     {
+        private string gId;
         private string idToken;
-        public GooglePlayLoginJob(BaseDatabase database, string idToken, Action<string> onFinished = null) : base(database, onFinished)
+        private string email;
+        public GooglePlayLoginJob(BaseDatabase database, string gId, string idToken, string email, Action<string> onFinished = null) : base(database, onFinished)
         {
+            this.gId = gId;
             this.idToken = idToken;
+            this.email = email;
         }
 
         protected override void ThreadFunction()
         {
-            result = database.GooglePlayLogin(idToken);
+            result = database.GooglePlayLogin(gId, idToken, email);
         }
     }
 

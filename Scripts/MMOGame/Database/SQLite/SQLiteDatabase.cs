@@ -446,10 +446,13 @@ namespace MultiplayerARPG.MMO
         public override int DecreaseGold(string userId, int amount)
         {
             int gold = GetGold(userId);
-            gold -= amount;
-            ExecuteNonQuery("UPDATE userlogin SET gold=@gold WHERE id=@id",
-                new SqliteParameter("@id", userId),
-                new SqliteParameter("@gold", gold));
+            if (gold - amount >= 0)
+            {
+                gold -= amount;
+                ExecuteNonQuery("UPDATE userlogin SET gold=@gold WHERE id=@id",
+                    new SqliteParameter("@id", userId),
+                    new SqliteParameter("@gold", gold));
+            }
             return gold;
         }
 
@@ -476,10 +479,13 @@ namespace MultiplayerARPG.MMO
         public override int DecreaseCash(string userId, int amount)
         {
             int cash = GetCash(userId);
-            cash -= amount;
-            ExecuteNonQuery("UPDATE userlogin SET cash=@cash WHERE id=@id",
-                new SqliteParameter("@id", userId),
-                new SqliteParameter("@cash", cash));
+            if (cash - amount >= 0)
+            {
+                cash -= amount;
+                ExecuteNonQuery("UPDATE userlogin SET cash=@cash WHERE id=@id",
+                    new SqliteParameter("@id", userId),
+                    new SqliteParameter("@cash", cash));
+            }
             return cash;
         }
 
@@ -507,84 +513,64 @@ namespace MultiplayerARPG.MMO
             return result != null ? (long)result : 0;
         }
 
-        public override string FacebookLogin(string fbId, string accessToken)
+        public override string FacebookLogin(string fbId, string accessToken, string email)
         {
-            string url = "https://graph.facebook.com/" + fbId + "?access_token=" + accessToken + "&fields=id,name,email";
-            WebClient webClient = new WebClient();
-            string json = webClient.DownloadString(url);
-            json = json.Replace(@"\u0040", "@");
-
             string id = string.Empty;
-            Dictionary<string, object> dict = Json.Deserialize(json) as Dictionary<string, object>;
-            if (dict.ContainsKey("id") && dict.ContainsKey("email"))
+            SQLiteRowsReader reader = ExecuteReader("SELECT id FROM userlogin WHERE username=@username AND password=@password AND authType=@authType LIMIT 1",
+                new SqliteParameter("@username", "fb_" + fbId),
+                new SqliteParameter("@password", GenericUtils.GetMD5(fbId)),
+                new SqliteParameter("@authType", AUTH_TYPE_FACEBOOK));
+
+            if (reader.Read())
+                id = reader.GetString("id");
+            else
             {
-                string email = (string)dict["email"];
-                SQLiteRowsReader reader = ExecuteReader("SELECT id FROM userlogin WHERE username=@username AND password=@password AND authType=@authType LIMIT 1",
+                ExecuteNonQuery("INSERT INTO userlogin (id, username, password, email, authType) VALUES (@id, @username, @password, @email, @authType)",
+                    new SqliteParameter("@id", GenericUtils.GetUniqueId()),
+                    new SqliteParameter("@username", "fb_" + fbId),
+                    new SqliteParameter("@password", GenericUtils.GetMD5(fbId)),
+                    new SqliteParameter("@email", email),
+                    new SqliteParameter("@authType", AUTH_TYPE_FACEBOOK));
+
+                // Read last entry
+                reader = ExecuteReader("SELECT id FROM userlogin WHERE username=@username AND password=@password AND authType=@authType LIMIT 1",
                     new SqliteParameter("@username", "fb_" + fbId),
                     new SqliteParameter("@password", GenericUtils.GetMD5(fbId)),
                     new SqliteParameter("@authType", AUTH_TYPE_FACEBOOK));
 
                 if (reader.Read())
                     id = reader.GetString("id");
-                else
-                {
-                    ExecuteNonQuery("INSERT INTO userlogin (id, username, password, email, authType) VALUES (@id, @username, @password, @email, @authType)",
-                        new SqliteParameter("@id", GenericUtils.GetUniqueId()),
-                        new SqliteParameter("@username", "fb_" + fbId),
-                        new SqliteParameter("@password", GenericUtils.GetMD5(fbId)),
-                        new SqliteParameter("@email", email),
-                        new SqliteParameter("@authType", AUTH_TYPE_FACEBOOK));
-
-                    // Read last entry
-                    reader = ExecuteReader("SELECT id FROM userlogin WHERE username=@username AND password=@password AND authType=@authType LIMIT 1",
-                        new SqliteParameter("@username", "fb_" + fbId),
-                        new SqliteParameter("@password", GenericUtils.GetMD5(fbId)),
-                        new SqliteParameter("@authType", AUTH_TYPE_FACEBOOK));
-
-                    if (reader.Read())
-                        id = reader.GetString("id");
-                }
             }
             return id;
         }
 
-        public override string GooglePlayLogin(string idToken)
+        public override string GooglePlayLogin(string gId, string idToken, string email)
         {
-            string url = "https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=" + idToken;
-            WebClient webClient = new WebClient();
-            string json = webClient.DownloadString(url);
-
             string id = string.Empty;
-            Dictionary<string, object> dict = Json.Deserialize(json) as Dictionary<string, object>;
-            if (dict.ContainsKey("sub") && dict.ContainsKey("email"))
+            SQLiteRowsReader reader = ExecuteReader("SELECT id FROM userlogin WHERE username=@username AND password=@password AND authType=@authType LIMIT 1",
+                new SqliteParameter("@username", "g_" + gId),
+                new SqliteParameter("@password", GenericUtils.GetMD5(gId)),
+                new SqliteParameter("@authType", AUTH_TYPE_GOOGLE_PLAY));
+
+            if (reader.Read())
+                id = reader.GetString("id");
+            else
             {
-                string gId = (string)dict["sub"];
-                string email = (string)dict["email"];
-                SQLiteRowsReader reader = ExecuteReader("SELECT id FROM userlogin WHERE username=@username AND password=@password AND authType=@authType LIMIT 1",
+                ExecuteNonQuery("INSERT INTO userlogin (id, username, password, email, authType) VALUES (@id, @username, @password, @email, @authType)",
+                    new SqliteParameter("@id", GenericUtils.GetUniqueId()),
+                    new SqliteParameter("@username", "g_" + gId),
+                    new SqliteParameter("@password", GenericUtils.GetMD5(gId)),
+                    new SqliteParameter("@email", email),
+                    new SqliteParameter("@authType", AUTH_TYPE_GOOGLE_PLAY));
+
+                // Read last entry
+                reader = ExecuteReader("SELECT id FROM userlogin WHERE username=@username AND password=@password AND authType=@authType LIMIT 1",
                     new SqliteParameter("@username", "g_" + gId),
                     new SqliteParameter("@password", GenericUtils.GetMD5(gId)),
                     new SqliteParameter("@authType", AUTH_TYPE_GOOGLE_PLAY));
 
                 if (reader.Read())
                     id = reader.GetString("id");
-                else
-                {
-                    ExecuteNonQuery("INSERT INTO userlogin (id, username, password, email, authType) VALUES (@id, @username, @password, @email, @authType)",
-                        new SqliteParameter("@id", GenericUtils.GetUniqueId()),
-                        new SqliteParameter("@username", "g_" + gId),
-                        new SqliteParameter("@password", GenericUtils.GetMD5(gId)),
-                        new SqliteParameter("@email", email),
-                        new SqliteParameter("@authType", AUTH_TYPE_GOOGLE_PLAY));
-
-                    // Read last entry
-                    reader = ExecuteReader("SELECT id FROM userlogin WHERE username=@username AND password=@password AND authType=@authType LIMIT 1",
-                        new SqliteParameter("@username", "g_" + gId),
-                        new SqliteParameter("@password", GenericUtils.GetMD5(gId)),
-                        new SqliteParameter("@authType", AUTH_TYPE_GOOGLE_PLAY));
-
-                    if (reader.Read())
-                        id = reader.GetString("id");
-                }
             }
             return id;
         }
