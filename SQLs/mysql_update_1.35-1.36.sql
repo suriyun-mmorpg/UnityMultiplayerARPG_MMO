@@ -2,6 +2,22 @@ START TRANSACTION;
 
 ALTER TABLE `characteritem` ADD `exp` INT NOT NULL DEFAULT '0' AFTER `durability`, ADD `lockRemainsDuration` FLOAT NOT NULL DEFAULT '0' AFTER `exp`;
 ALTER TABLE `userlogin` ADD `userLevel` TINYINT(4) NOT NULL DEFAULT 0 AFTER `accessToken`;
-CREATE TABLE `mmorpgtemplate`.`charactersummon` ( `id` VARCHAR(50) NOT NULL , `characterId` VARCHAR(50) NOT NULL , `type` TINYINT NOT NULL DEFAULT '0' , `dataId` INT NOT NULL DEFAULT '0' , `summonRemainsDuration` FLOAT NOT NULL DEFAULT '0' , `level` INT NOT NULL DEFAULT '0' , `exp` INT NOT NULL DEFAULT '0' , `currentHp` INT NOT NULL DEFAULT '0' , `currentMp` INT NOT NULL DEFAULT '0' , `createAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , `updateAt` TIMESTAMP on update CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , PRIMARY KEY (`id`)) ENGINE = InnoDB CHARSET=utf8 COLLATE utf8_unicode_ci;
+
+CREATE TABLE `charactersummon` (
+  `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `characterId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `type` tinyint(4) NOT NULL DEFAULT '0',
+  `dataId` int(11) NOT NULL DEFAULT '0',
+  `summonRemainsDuration` float NOT NULL DEFAULT '0',
+  `level` int(11) NOT NULL DEFAULT '0',
+  `exp` int(11) NOT NULL DEFAULT '0',
+  `currentHp` int(11) NOT NULL DEFAULT '0',
+  `currentMp` int(11) NOT NULL DEFAULT '0',
+  `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+ALTER TABLE `charactersummon`
+  ADD PRIMARY KEY (`id`);
 
 COMMIT;
