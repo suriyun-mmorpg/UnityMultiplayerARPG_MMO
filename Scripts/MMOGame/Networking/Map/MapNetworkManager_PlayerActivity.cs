@@ -548,6 +548,7 @@ namespace MultiplayerARPG.MMO
             if (ChatNetworkManager.IsClientConnected)
             {
                 ChatNetworkManager.Client.SendSetGuildSkillLevel(null, MMOMessageTypes.UpdateGuild, guildId, dataId, guild.GetSkillLevel(dataId));
+                ChatNetworkManager.Client.SendSetGuildGold(null, MMOMessageTypes.UpdateGuild, guildId, guild.gold);
                 ChatNetworkManager.Client.SendGuildLevelExpSkillPoint(null, MMOMessageTypes.UpdateGuild, guildId, guild.level, guild.exp, guild.skillPoint);
             }
         }
@@ -804,6 +805,7 @@ namespace MultiplayerARPG.MMO
                     yield return StartCoroutine(increaseGuildGoldJob.WaitFor());
                     guild.gold = increaseGuildGoldJob.result;
                     guilds[playerCharacterEntity.GuildId] = guild;
+                    SendSetGuildGoldToClients(guild);
                 }
                 else
                     SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotEnoughGoldToDeposit);
@@ -832,6 +834,7 @@ namespace MultiplayerARPG.MMO
                     guild.gold = decreaseGuildGoldJob.result;
                     playerCharacterEntity.Gold += amount;
                     guilds[playerCharacterEntity.GuildId] = guild;
+                    SendSetGuildGoldToClients(guild);
                 }
                 else
                     SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotEnoughGoldToWithdraw);

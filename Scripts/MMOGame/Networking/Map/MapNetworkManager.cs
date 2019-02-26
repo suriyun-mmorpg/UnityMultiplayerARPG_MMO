@@ -396,6 +396,18 @@ namespace MultiplayerARPG.MMO
                         BasePlayerCharacterEntity playerCharacterEntity = identity.GetComponent<BasePlayerCharacterEntity>();
                         playerCharacterData.CloneTo(playerCharacterEntity);
 
+                        // Set currencies
+                        GetGoldJob getGoldJob = new GetGoldJob(Database, userId, (amount) =>
+                        {
+                            playerCharacterData.UserGold = amount;
+                        });
+                        getGoldJob.Start();
+                        GetCashJob getCashJob = new GetCashJob(Database, userId, (amount) =>
+                        {
+                            playerCharacterData.UserCash = amount;
+                        });
+                        getCashJob.Start();
+
                         // Prepare saving location for this character
                         if (IsInstanceMap())
                             instanceMapCurrentLocations.Add(playerCharacterEntity.ObjectId, new KeyValuePair<string, Vector3>(savingCurrentMapName, savingCurrentPosition));
@@ -404,10 +416,11 @@ namespace MultiplayerARPG.MMO
                         playerCharacterEntity.UserId = userId;
 
                         // Load user level
-                        GetUserLevelJob loadUserLevelJob = new GetUserLevelJob(Database, userId);
+                        GetUserLevelJob loadUserLevelJob = new GetUserLevelJob(Database, userId, (level) =>
+                        {
+                            playerCharacterEntity.UserLevel = level;
+                        });
                         loadUserLevelJob.Start();
-                        yield return StartCoroutine(loadUserLevelJob.WaitFor());
-                        playerCharacterEntity.UserLevel = loadUserLevelJob.result;
 
                         // Load party data, if this map-server does not have party data
                         if (playerCharacterEntity.PartyId > 0)
@@ -440,6 +453,7 @@ namespace MultiplayerARPG.MMO
                                 SendSetGuildRolesToClient(playerCharacterEntity.ConnectionId, guild);
                                 SendSetGuildMemberRolesToClient(playerCharacterEntity.ConnectionId, guild);
                                 SendSetGuildSkillLevelsToClient(playerCharacterEntity.ConnectionId, guild);
+                                SendSetGuildGoldToClient(playerCharacterEntity.ConnectionId, guild);
                                 SendGuildLevelExpSkillPointToClient(playerCharacterEntity.ConnectionId, guild);
                             }
                             else
@@ -923,6 +937,11 @@ namespace MultiplayerARPG.MMO
                         guild.SetSkillLevel(message.dataId, message.level);
                         guilds[message.id] = guild;
                         SendSetGuildSkillLevelToClients(guild, message.dataId);
+                        break;
+                    case UpdateGuildMessage.UpdateType.SetGold:
+                        guild.gold = message.gold;
+                        guilds[message.id] = guild;
+                        SendSetGuildGoldToClients(guild);
                         break;
                     case UpdateGuildMessage.UpdateType.LevelExpSkillPoint:
                         guild.level = message.level;
