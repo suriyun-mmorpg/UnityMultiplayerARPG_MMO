@@ -34,6 +34,7 @@ namespace MultiplayerARPG.MMO
                 result.exp = reader.GetInt32("exp");
                 result.skillPoint = (short)reader.GetInt32("skillPoint");
                 result.guildMessage = reader.GetString("guildMessage");
+                result.gold = reader.GetInt32("gold");
 
                 reader = ExecuteReader("SELECT * FROM guildrole WHERE guildId=@id",
                     new SqliteParameter("@id", id));
