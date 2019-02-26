@@ -13,6 +13,8 @@ namespace MultiplayerARPG.MMO
     {
         public static MMOServerInstance Singleton { get; protected set; }
 
+        public const string CONFIG_DATABASE_OPTION_INDEX = "databaseOptionIndex";
+        public const string ARG_DATABASE_OPTION_INDEX = "-" + CONFIG_DATABASE_OPTION_INDEX;
         public const string CONFIG_CENTRAL_ADDRESS = "centralAddress";
         public const string ARG_CENTRAL_ADDRESS = "-" + CONFIG_CENTRAL_ADDRESS;
         public const string CONFIG_CENTRAL_PORT = "centralPort";
@@ -69,6 +71,8 @@ namespace MultiplayerARPG.MMO
         private bool useWebSocket = false;
         [SerializeField]
         private BaseDatabase database;
+        [SerializeField]
+        private BaseDatabase[] databaseOptions;
 
         public CentralNetworkManager CentralNetworkManager { get { return centralNetworkManager; } }
         public MapSpawnNetworkManager MapSpawnNetworkManager { get { return mapSpawnNetworkManager; } }
@@ -94,6 +98,7 @@ namespace MultiplayerARPG.MMO
         public bool startChatOnAwake;
         public bool startMapOnAwake;
         public MapInfo startingMap;
+        public int databaseOptionIndex;
 
         private List<string> spawningMapIds;
         private string startingMapId;
@@ -112,9 +117,6 @@ namespace MultiplayerARPG.MMO
             DontDestroyOnLoad(gameObject);
             Singleton = this;
 
-            if (database != null)
-                database.Initialize();
-
             GameInstance gameInstance = FindObjectOfType<GameInstance>();
 
             // Always accept SSL
@@ -129,7 +131,6 @@ namespace MultiplayerARPG.MMO
             CacheLogGUI.enabled = false;
             if (!Application.isEditor)
             {
-
                 // Json file read
                 string configFilePath = "./config/serverConfig.json";
                 Dictionary<string, object> jsonConfig = new Dictionary<string, object>();
@@ -147,6 +148,18 @@ namespace MultiplayerARPG.MMO
                 // Android fix
                 if (args == null)
                     args = new string[0];
+
+                // Database option index
+                int dbOptionIndex;
+                if (ConfigReader.ReadArgs(args, ARG_DATABASE_OPTION_INDEX, out dbOptionIndex, -1) ||
+                    ConfigReader.ReadConfigs(jsonConfig, CONFIG_DATABASE_OPTION_INDEX, out dbOptionIndex, -1))
+                {
+                    if (databaseOptions != null &&
+                        databaseOptions.Length > 0 &&
+                        dbOptionIndex >= 0 &&
+                        dbOptionIndex < databaseOptions.Length)
+                        database = databaseOptions[dbOptionIndex];
+                }
 
                 // Central network address
                 string centralNetworkAddress;
@@ -338,6 +351,12 @@ namespace MultiplayerARPG.MMO
                     gameInstance.OnGameDataLoaded();
                 });
 
+                if (databaseOptions != null &&
+                    databaseOptions.Length > 0 &&
+                    databaseOptionIndex >= 0 &&
+                    databaseOptionIndex < databaseOptions.Length)
+                    database = databaseOptions[databaseOptionIndex];
+
                 if (startCentralOnAwake)
                     startingCentralServer = true;
 
@@ -354,6 +373,16 @@ namespace MultiplayerARPG.MMO
                     startingMapId = startingMap.Id;
                     startingMapServer = true;
                 }
+            }
+
+            // Initialize database when any server starting
+            if (startingCentralServer ||
+                startingMapSpawnServer ||
+                startingChatServer ||
+                startingMapServer)
+            {
+                if (database != null)
+                    database.Initialize();
             }
         }
 
