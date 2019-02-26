@@ -70,6 +70,7 @@ namespace MultiplayerARPG.MMO
                 {
                     CreateStorageItem(connection, transaction, i, storageType, storageOwnerId, characterItems[i]);
                 }
+                transaction.Commit();
             }
             catch (System.Exception ex)
             {
