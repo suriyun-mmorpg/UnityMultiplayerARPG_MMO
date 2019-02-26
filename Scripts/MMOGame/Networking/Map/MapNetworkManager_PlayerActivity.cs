@@ -606,15 +606,15 @@ namespace MultiplayerARPG.MMO
                 movingItem.amount = amount;
                 if (storageItemIndex < 0 ||
                     storageItemIndex >= storageItemList.Count ||
-                    !storageItemList[storageItemIndex].IsEmptySlot() ||
+                    !storageItemList[storageItemIndex].NotEmptySlot() ||
                     storageItemList[storageItemIndex].dataId == movingItem.dataId)
                 {
                     // Add to storage or merge
                     Storage storage = GetStorage(storageId);
                     bool isLimitWeight = storage.weightLimit > 0;
                     bool isLimitSlot = storage.slotLimit > 0;
-                    int weightLimit = storage.weightLimit;
-                    int slotLimit = storage.slotLimit;
+                    short weightLimit = storage.weightLimit;
+                    short slotLimit = storage.slotLimit;
                     bool isOverwhelming = CharacterDataExtension.IncreasingItemsWillOverwhelming(
                         storageItemList, movingItem.dataId, movingItem.amount, isLimitWeight, weightLimit,
                         CharacterDataExtension.GetTotalItemWeight(storageItemList), isLimitSlot, slotLimit);
@@ -669,7 +669,7 @@ namespace MultiplayerARPG.MMO
                 movingItem.amount = amount;
                 if (nonEquipIndex < 0 ||
                     nonEquipIndex >= playerCharacterEntity.NonEquipItems.Count ||
-                    !playerCharacterEntity.NonEquipItems[nonEquipIndex].IsEmptySlot() ||
+                    !playerCharacterEntity.NonEquipItems[nonEquipIndex].NotEmptySlot() ||
                     playerCharacterEntity.NonEquipItems[nonEquipIndex].dataId == movingItem.dataId)
                 {
                     // Add to inventory or merge
