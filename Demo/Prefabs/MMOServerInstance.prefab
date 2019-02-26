@@ -8,15 +8,15 @@ Prefab:
     m_TransformParent: {fileID: 0}
     m_Modifications: []
     m_RemovedComponents: []
-  m_ParentPrefab: {fileID: 0}
+  m_SourcePrefab: {fileID: 0}
   m_RootGameObject: {fileID: 1650234716345238}
-  m_IsPrefabParent: 1
+  m_IsPrefabAsset: 1
 --- !u!1 &1136011111669194
 GameObject:
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 5
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 4765183370109292}
   - component: {fileID: 114414512406587944}
@@ -30,9 +30,9 @@ GameObject:
 --- !u!1 &1250662783992638
 GameObject:
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 5
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 4689870637795574}
   - component: {fileID: 114543387092495668}
@@ -46,9 +46,9 @@ GameObject:
 --- !u!1 &1316728034786570
 GameObject:
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 5
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 4906125570589406}
   - component: {fileID: 114785914675753794}
@@ -62,9 +62,9 @@ GameObject:
 --- !u!1 &1454126604845530
 GameObject:
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 5
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 4889244740642296}
   - component: {fileID: 114715813743394434}
@@ -78,9 +78,9 @@ GameObject:
 --- !u!1 &1650234716345238
 GameObject:
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 5
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 4009622383931608}
   - component: {fileID: 114227780437250376}
@@ -95,9 +95,9 @@ GameObject:
 --- !u!1 &1773992668051484
 GameObject:
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 5
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 4281435147628774}
   - component: {fileID: 114788248445432888}
@@ -111,7 +111,7 @@ GameObject:
 --- !u!4 &4009622383931608
 Transform:
   m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1650234716345238}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -129,7 +129,7 @@ Transform:
 --- !u!4 &4281435147628774
 Transform:
   m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1773992668051484}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
@@ -142,7 +142,7 @@ Transform:
 --- !u!4 &4689870637795574
 Transform:
   m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1250662783992638}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
@@ -155,7 +155,7 @@ Transform:
 --- !u!4 &4765183370109292
 Transform:
   m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1136011111669194}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -168,7 +168,7 @@ Transform:
 --- !u!4 &4889244740642296
 Transform:
   m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1454126604845530}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -181,7 +181,7 @@ Transform:
 --- !u!4 &4906125570589406
 Transform:
   m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1316728034786570}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -194,7 +194,7 @@ Transform:
 --- !u!114 &114227780437250376
 MonoBehaviour:
   m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1650234716345238}
   m_Enabled: 1
@@ -209,7 +209,7 @@ MonoBehaviour:
 --- !u!114 &114414512406587944
 MonoBehaviour:
   m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1136011111669194}
   m_Enabled: 1
@@ -225,7 +225,7 @@ MonoBehaviour:
 --- !u!114 &114543387092495668
 MonoBehaviour:
   m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1250662783992638}
   m_Enabled: 1
@@ -237,23 +237,9 @@ MonoBehaviour:
   connectKey: SampleConnectKey
   networkAddress: localhost
   networkPort: 6000
-  unconnectedMessagesEnabled: 0
-  natPunchEnabled: 0
-  updateTime: 15
-  pingInterval: 1000
-  disconnectTimeout: 5000
-  mergeEnabled: 0
-  simulatePacketLoss: 0
-  simulateLatency: 0
-  simulationPacketLossChance: 10
-  simulationMinLatency: 30
-  simulationMaxLatency: 100
-  discoveryEnabled: 0
-  discoveryRequestData: 
-  discoveryResponseData: 
+  useWebSocket: 0
   maxConnections: 1100
-  reconnectDelay: 500
-  maxConnectAttempts: 10
+  transportFactory: {fileID: 0}
   minUsernameLength: 2
   maxUsernameLength: 24
   minPasswordLength: 2
@@ -262,7 +248,7 @@ MonoBehaviour:
 --- !u!114 &114715813743394434
 MonoBehaviour:
   m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1454126604845530}
   m_Enabled: 1
@@ -275,7 +261,7 @@ MonoBehaviour:
 --- !u!114 &114785914675753794
 MonoBehaviour:
   m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1316728034786570}
   m_Enabled: 1
@@ -287,23 +273,10 @@ MonoBehaviour:
   connectKey: SampleConnectKey
   networkAddress: localhost
   networkPort: 6002
-  unconnectedMessagesEnabled: 0
-  natPunchEnabled: 0
-  updateTime: 15
-  pingInterval: 1000
-  disconnectTimeout: 5000
-  mergeEnabled: 0
-  simulatePacketLoss: 0
-  simulateLatency: 0
-  simulationPacketLossChance: 10
-  simulationMinLatency: 30
-  simulationMaxLatency: 100
-  discoveryEnabled: 0
-  discoveryRequestData: 
-  discoveryResponseData: 
+  useWebSocket: 0
   maxConnections: 1100
-  reconnectDelay: 500
-  maxConnectAttempts: 10
+  transportFactory: {fileID: 0}
+  centralTransportFactory: {fileID: 0}
   centralConnectKey: SampleConnectKey
   centralNetworkAddress: 127.0.0.1
   centralNetworkPort: 6000
@@ -311,7 +284,7 @@ MonoBehaviour:
 --- !u!114 &114788248445432888
 MonoBehaviour:
   m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1773992668051484}
   m_Enabled: 1
@@ -323,23 +296,10 @@ MonoBehaviour:
   connectKey: SampleConnectKey
   networkAddress: localhost
   networkPort: 6001
-  unconnectedMessagesEnabled: 0
-  natPunchEnabled: 0
-  updateTime: 15
-  pingInterval: 1000
-  disconnectTimeout: 5000
-  mergeEnabled: 0
-  simulatePacketLoss: 0
-  simulateLatency: 0
-  simulationPacketLossChance: 10
-  simulationMinLatency: 30
-  simulationMaxLatency: 100
-  discoveryEnabled: 0
-  discoveryRequestData: 
-  discoveryResponseData: 
+  useWebSocket: 0
   maxConnections: 1100
-  reconnectDelay: 500
-  maxConnectAttempts: 10
+  transportFactory: {fileID: 0}
+  centralTransportFactory: {fileID: 0}
   centralConnectKey: SampleConnectKey
   centralNetworkAddress: 127.0.0.1
   centralNetworkPort: 6000
@@ -347,13 +307,14 @@ MonoBehaviour:
   exePath: ./Build.exe
   notSpawnInBatchMode: 0
   startPort: 8000
+  spawningMaps: []
   isOverrideExePath: 1
   overrideExePath: C:\Users\ITTIPON\Desktop\UnityBuilds\MultiplayerARPG\MultiplayerARPG.exe
   editorNotSpawnInBatchMode: 1
 --- !u!114 &114946005600446132
 MonoBehaviour:
   m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1650234716345238}
   m_Enabled: 1
@@ -365,7 +326,14 @@ MonoBehaviour:
   mapSpawnNetworkManager: {fileID: 114788248445432888}
   mapNetworkManager: {fileID: 0}
   chatNetworkManager: {fileID: 114785914675753794}
+  useWebSocket: 0
   database: {fileID: 114715813743394434}
+  databaseOptions:
+  - {fileID: 114715813743394434}
+  - {fileID: 114414512406587944}
   startCentralOnAwake: 0
   startMapSpawnOnAwake: 0
   startChatOnAwake: 0
+  startMapOnAwake: 0
+  startingMap: {fileID: 11400000, guid: de8b0e4099f8d444692e88f92309e90d, type: 2}
+  databaseOptionIndex: 0
