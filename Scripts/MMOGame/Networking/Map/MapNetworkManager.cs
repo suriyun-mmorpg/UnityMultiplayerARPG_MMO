@@ -399,12 +399,12 @@ namespace MultiplayerARPG.MMO
                         // Set currencies
                         GetGoldJob getGoldJob = new GetGoldJob(Database, userId, (amount) =>
                         {
-                            playerCharacterData.UserGold = amount;
+                            playerCharacterEntity.UserGold = amount;
                         });
                         getGoldJob.Start();
                         GetCashJob getCashJob = new GetCashJob(Database, userId, (amount) =>
                         {
-                            playerCharacterData.UserCash = amount;
+                            playerCharacterEntity.UserCash = amount;
                         });
                         getCashJob.Start();
 
