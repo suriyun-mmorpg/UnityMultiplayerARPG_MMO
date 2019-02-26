@@ -106,6 +106,7 @@ CREATE TABLE `characteritem` (
   `durability` float NOT NULL DEFAULT '0',
   `exp` int(11) NOT NULL DEFAULT '0',
   `lockRemainsDuration` float NOT NULL DEFAULT '0',
+  `ammo` int(11) NOT NULL DEFAULT '0',
   `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -231,7 +232,8 @@ CREATE TABLE `guild` (
   `level` int(11) NOT NULL DEFAULT '1',
   `exp` int(11) NOT NULL DEFAULT '0',
   `skillPoint` int(11) NOT NULL DEFAULT '0',
-  `guildMessage` varchar(160) COLLATE utf8_unicode_ci NOT NULL DEFAULT ''
+  `guildMessage` varchar(160) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  `gold` int(11) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -277,6 +279,28 @@ CREATE TABLE `party` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `characteritem`
+--
+
+CREATE TABLE `storageitem` (
+  `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `idx` int(11) NOT NULL,
+  `storageType` tinyint(4) NOT NULL DEFAULT '0',
+  `storageOwnerId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `dataId` int(11) NOT NULL DEFAULT '0',
+  `level` int(11) NOT NULL DEFAULT '1',
+  `amount` int(11) NOT NULL DEFAULT '0',
+  `durability` float NOT NULL DEFAULT '0',
+  `exp` int(11) NOT NULL DEFAULT '0',
+  `lockRemainsDuration` float NOT NULL DEFAULT '0',
+  `ammo` int(11) NOT NULL DEFAULT '0',
+  `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `userlogin`
 --
 
@@ -284,6 +308,7 @@ CREATE TABLE `userlogin` (
   `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `username` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
   `password` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
+  `gold` int(11) NOT NULL DEFAULT '0',
   `cash` int(11) NOT NULL DEFAULT '0',
   `email` varchar(50) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
   `authType` tinyint(4) NOT NULL DEFAULT '1',
@@ -403,4 +428,11 @@ ALTER TABLE `guild`
 --
 ALTER TABLE `party`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `storageitem`
+--
+ALTER TABLE `storageitem`
+  ADD PRIMARY KEY (`id`);
+  
 COMMIT;
