@@ -540,7 +540,7 @@ namespace MultiplayerARPG.MMO
             GuildData guild;
             if (!CanAddGuildSkill(playerCharacterEntity, dataId, out guildId, out guild))
                 return;
-            
+
             base.AddGuildSkill(playerCharacterEntity, dataId);
             // Save to database
             new UpdateGuildSkillLevelJob(Database, guildId, dataId, guild.GetSkillLevel(dataId), guild.skillPoint).Start();
@@ -551,9 +551,15 @@ namespace MultiplayerARPG.MMO
                 ChatNetworkManager.Client.SendGuildLevelExpSkillPoint(null, MMOMessageTypes.UpdateGuild, guildId, guild.level, guild.exp, guild.skillPoint);
             }
         }
-        
+
         public override void OpenStorage(BasePlayerCharacterEntity playerCharacterEntity)
         {
+            if (playerCharacterEntity.CurrentStorageId.storageType == StorageType.Guild &&
+                !guilds.ContainsKey(playerCharacterEntity.GuildId))
+            {
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotJoinedGuild);
+                return;
+            }
             if (!usingStorageCharacters.ContainsKey(playerCharacterEntity.CurrentStorageId))
                 usingStorageCharacters[playerCharacterEntity.CurrentStorageId] = new HashSet<uint>();
             usingStorageCharacters[playerCharacterEntity.CurrentStorageId].Add(playerCharacterEntity.ObjectId);
@@ -571,6 +577,12 @@ namespace MultiplayerARPG.MMO
                 // Set storage items
                 result = storageItemsJob.result;
             }
+            // Prepare storage data
+            Storage storage = GetStorage(playerCharacterEntity.CurrentStorageId);
+            bool isLimitSlot = storage.slotLimit > 0;
+            short slotLimit = storage.slotLimit;
+            CharacterDataExtension.FillEmptySlots(result, isLimitSlot, slotLimit);
+            // Update storage items
             playerCharacterEntity.StorageItems = result;
         }
 
@@ -582,6 +594,12 @@ namespace MultiplayerARPG.MMO
 
         public override void MoveItemToStorage(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short nonEquipIndex, short amount, short storageItemIndex)
         {
+            if (storageId.storageType == StorageType.Guild &&
+                !guilds.ContainsKey(playerCharacterEntity.GuildId))
+            {
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotJoinedGuild);
+                return;
+            }
             StartCoroutine(MoveItemToStorageRoutine(playerCharacterEntity, storageId, nonEquipIndex, amount, storageItemIndex));
         }
 
@@ -602,6 +620,13 @@ namespace MultiplayerARPG.MMO
             }
             else
             {
+                // Prepare storage data
+                Storage storage = GetStorage(storageId);
+                bool isLimitWeight = storage.weightLimit > 0;
+                bool isLimitSlot = storage.slotLimit > 0;
+                short weightLimit = storage.weightLimit;
+                short slotLimit = storage.slotLimit;
+                // Prepare item data
                 CharacterItem movingItem = playerCharacterEntity.NonEquipItems[nonEquipIndex].Clone();
                 movingItem.amount = amount;
                 if (storageItemIndex < 0 ||
@@ -610,11 +635,6 @@ namespace MultiplayerARPG.MMO
                     storageItemList[storageItemIndex].dataId == movingItem.dataId)
                 {
                     // Add to storage or merge
-                    Storage storage = GetStorage(storageId);
-                    bool isLimitWeight = storage.weightLimit > 0;
-                    bool isLimitSlot = storage.slotLimit > 0;
-                    short weightLimit = storage.weightLimit;
-                    short slotLimit = storage.slotLimit;
                     bool isOverwhelming = CharacterDataExtension.IncreasingItemsWillOverwhelming(
                         storageItemList, movingItem.dataId, movingItem.amount, isLimitWeight, weightLimit,
                         CharacterDataExtension.GetTotalItemWeight(storageItemList), isLimitSlot, slotLimit);
@@ -633,6 +653,7 @@ namespace MultiplayerARPG.MMO
                     storageItemList[storageItemIndex] = nonEquipItem;
                     playerCharacterEntity.NonEquipItems[nonEquipIndex] = storageItem;
                 }
+                CharacterDataExtension.FillEmptySlots(storageItemList, isLimitSlot, slotLimit);
             }
             // Update storage list immediately
             // TODO: Have to test about race condition while running multiple-server
@@ -645,6 +666,12 @@ namespace MultiplayerARPG.MMO
 
         public override void MoveItemFromStorage(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short storageItemIndex, short amount, short nonEquipIndex)
         {
+            if (storageId.storageType == StorageType.Guild &&
+                !guilds.ContainsKey(playerCharacterEntity.GuildId))
+            {
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotJoinedGuild);
+                return;
+            }
             StartCoroutine(MoveItemFromStorageRoutine(playerCharacterEntity, storageId, storageItemIndex, amount, nonEquipIndex));
         }
 
@@ -665,6 +692,11 @@ namespace MultiplayerARPG.MMO
             }
             else
             {
+                // Prepare storage data
+                Storage storage = GetStorage(storageId);
+                bool isLimitSlot = storage.slotLimit > 0;
+                short slotLimit = storage.slotLimit;
+                // Prepare item data
                 CharacterItem movingItem = storageItemList[storageItemIndex].Clone();
                 movingItem.amount = amount;
                 if (nonEquipIndex < 0 ||
@@ -689,6 +721,7 @@ namespace MultiplayerARPG.MMO
                     storageItemList[storageItemIndex] = nonEquipItem;
                     playerCharacterEntity.NonEquipItems[nonEquipIndex] = storageItem;
                 }
+                CharacterDataExtension.FillEmptySlots(storageItemList, isLimitSlot, slotLimit);
             }
             // Update storage list immediately
             // TODO: Have to test about race condition while running multiple-server
@@ -710,6 +743,26 @@ namespace MultiplayerARPG.MMO
                     playerCharacterEntity.StorageItems = storageItems;
                 }
             }
+        }
+
+        public override void DepositGold(BasePlayerCharacterEntity playerCharacterEntity, int amount)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override void WithdrawGold(BasePlayerCharacterEntity playerCharacterEntity, int amount)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override void DepositGuildGold(BasePlayerCharacterEntity playerCharacterEntity, int amount)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override void WithdrawGuildGold(BasePlayerCharacterEntity playerCharacterEntity, int amount)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }
