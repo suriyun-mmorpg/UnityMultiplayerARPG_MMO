@@ -193,10 +193,13 @@ namespace MultiplayerARPG.MMO
         public override int DecreaseGuildGold(int guildId, int amount)
         {
             int gold = GetGuildGold(guildId);
-            gold -= amount;
-            ExecuteNonQuery("UPDATE guild SET gold=@gold WHERE id=@id",
-                new MySqlParameter("@id", guildId),
-                new MySqlParameter("@gold", gold));
+            if (gold - amount >= 0)
+            {
+                gold -= amount;
+                ExecuteNonQuery("UPDATE guild SET gold=@gold WHERE id=@id",
+                    new MySqlParameter("@id", guildId),
+                    new MySqlParameter("@gold", gold));
+            }
             return gold;
         }
     }
