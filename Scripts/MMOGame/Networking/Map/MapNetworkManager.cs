@@ -151,6 +151,7 @@ namespace MultiplayerARPG.MMO
             instanceMapWarpingCharactersByInstanceId.Clear();
             instanceMapWarpingLocations.Clear();
             usersById.Clear();
+            usingStorageCharacters.Clear();
             loadingPartyIds.Clear();
             loadingGuildIds.Clear();
             savingCharacters.Clear();
