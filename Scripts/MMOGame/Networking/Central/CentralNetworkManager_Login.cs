@@ -16,7 +16,7 @@ namespace MultiplayerARPG.MMO
             RequestUserLoginMessage message = new RequestUserLoginMessage();
             message.username = username;
             message.password = password;
-            return Client.ClientSendAckPacket(SendOptions.ReliableOrdered, MMOMessageTypes.RequestUserLogin, message, callback);
+            return Client.ClientSendAckPacket(DeliveryMethod.ReliableOrdered, MMOMessageTypes.RequestUserLogin, message, callback);
         }
 
         public uint RequestUserRegister(string username, string password, AckMessageCallback callback)
@@ -24,13 +24,13 @@ namespace MultiplayerARPG.MMO
             RequestUserRegisterMessage message = new RequestUserRegisterMessage();
             message.username = username;
             message.password = password;
-            return Client.ClientSendAckPacket(SendOptions.ReliableOrdered, MMOMessageTypes.RequestUserRegister, message, callback);
+            return Client.ClientSendAckPacket(DeliveryMethod.ReliableOrdered, MMOMessageTypes.RequestUserRegister, message, callback);
         }
 
         public uint RequestUserLogout(AckMessageCallback callback)
         {
             BaseAckMessage message = new BaseAckMessage();
-            return Client.ClientSendAckPacket(SendOptions.ReliableOrdered, MMOMessageTypes.RequestUserLogout, message, callback);
+            return Client.ClientSendAckPacket(DeliveryMethod.ReliableOrdered, MMOMessageTypes.RequestUserLogout, message, callback);
         }
 
         public uint RequestValidateAccessToken(string userId, string accessToken, AckMessageCallback callback)
@@ -38,7 +38,7 @@ namespace MultiplayerARPG.MMO
             RequestValidateAccessTokenMessage message = new RequestValidateAccessTokenMessage();
             message.userId = userId;
             message.accessToken = accessToken;
-            return Client.ClientSendAckPacket(SendOptions.ReliableOrdered, MMOMessageTypes.RequestValidateAccessToken, message, callback);
+            return Client.ClientSendAckPacket(DeliveryMethod.ReliableOrdered, MMOMessageTypes.RequestValidateAccessToken, message, callback);
         }
 
         public uint RequestFacebookLogin(string id, string accessToken, AckMessageCallback callback)
@@ -46,14 +46,14 @@ namespace MultiplayerARPG.MMO
             RequestFacebookLoginMessage message = new RequestFacebookLoginMessage();
             message.id = id;
             message.accessToken = accessToken;
-            return Client.ClientSendAckPacket(SendOptions.ReliableOrdered, MMOMessageTypes.RequestFacebookLogin, message, callback);
+            return Client.ClientSendAckPacket(DeliveryMethod.ReliableOrdered, MMOMessageTypes.RequestFacebookLogin, message, callback);
         }
 
         public uint RequestGooglePlayLogin(string idToken, AckMessageCallback callback)
         {
             RequestGooglePlayLoginMessage message = new RequestGooglePlayLoginMessage();
             message.idToken = idToken;
-            return Client.ClientSendAckPacket(SendOptions.ReliableOrdered, MMOMessageTypes.RequestGooglePlayLogin, message, callback);
+            return Client.ClientSendAckPacket(DeliveryMethod.ReliableOrdered, MMOMessageTypes.RequestGooglePlayLogin, message, callback);
         }
 
         protected void HandleRequestUserLogin(LiteNetLibMessageHandler messageHandler)
@@ -99,7 +99,7 @@ namespace MultiplayerARPG.MMO
             responseMessage.error = error;
             responseMessage.userId = userId;
             responseMessage.accessToken = accessToken;
-            ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MMOMessageTypes.ResponseUserLogin, responseMessage);
+            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MMOMessageTypes.ResponseUserLogin, responseMessage);
         }
 
         protected void HandleRequestUserRegister(LiteNetLibMessageHandler messageHandler)
@@ -135,7 +135,7 @@ namespace MultiplayerARPG.MMO
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = error == ResponseUserRegisterMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
             responseMessage.error = error;
-            ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MMOMessageTypes.ResponseUserRegister, responseMessage);
+            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MMOMessageTypes.ResponseUserRegister, responseMessage);
         }
 
         protected void HandleRequestUserLogout(LiteNetLibMessageHandler messageHandler)
@@ -159,7 +159,7 @@ namespace MultiplayerARPG.MMO
             BaseAckMessage responseMessage = new BaseAckMessage();
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = AckResponseCode.Success;
-            ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MMOMessageTypes.ResponseUserLogout, responseMessage);
+            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MMOMessageTypes.ResponseUserLogout, responseMessage);
         }
 
         protected void HandleRequestValidateAccessToken(LiteNetLibMessageHandler messageHandler)
@@ -207,7 +207,7 @@ namespace MultiplayerARPG.MMO
             responseMessage.error = error;
             responseMessage.userId = userId;
             responseMessage.accessToken = accessToken;
-            ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MMOMessageTypes.ResponseValidateAccessToken, responseMessage);
+            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MMOMessageTypes.ResponseValidateAccessToken, responseMessage);
         }
 
         protected void HandleRequestFacebookLogin(LiteNetLibMessageHandler messageHandler)
@@ -265,7 +265,7 @@ namespace MultiplayerARPG.MMO
             responseMessage.error = error;
             responseMessage.userId = userId;
             responseMessage.accessToken = accessToken;
-            ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MMOMessageTypes.ResponseUserLogin, responseMessage);
+            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MMOMessageTypes.ResponseUserLogin, responseMessage);
         }
 
         protected void HandleRequestGooglePlayLogin(LiteNetLibMessageHandler messageHandler)
@@ -323,7 +323,7 @@ namespace MultiplayerARPG.MMO
             responseMessage.error = error;
             responseMessage.userId = userId;
             responseMessage.accessToken = accessToken;
-            ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MMOMessageTypes.ResponseUserLogin, responseMessage);
+            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MMOMessageTypes.ResponseUserLogin, responseMessage);
         }
 
         protected void HandleResponseUserLogin(LiteNetLibMessageHandler messageHandler)

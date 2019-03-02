@@ -90,7 +90,7 @@ namespace MultiplayerARPG.MMO
                 message.networkAddress = peerInfo.networkAddress;
                 message.networkPort = peerInfo.networkPort;
                 message.connectKey = peerInfo.connectKey;
-                ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MsgTypes.Warp, message);
+                ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.Warp, message);
             }
         }
 
@@ -131,7 +131,7 @@ namespace MultiplayerARPG.MMO
             }
             instanceMapWarpingCharactersByInstanceId.Add(instanceId, instanceMapWarpingCharacters);
             instanceMapWarpingLocations.Add(instanceId, new KeyValuePair<string, Vector3>(mapName, position));
-            CentralAppServerRegister.ClientSendAckPacket(SendOptions.ReliableOrdered, MMOMessageTypes.RequestSpawnMap, requestSpawnMapMessage, OnRequestSpawnMap);
+            CentralAppServerRegister.ClientSendAckPacket(DeliveryMethod.ReliableOrdered, MMOMessageTypes.RequestSpawnMap, requestSpawnMapMessage, OnRequestSpawnMap);
         }
 
         private IEnumerator WarpCharacterToInstanceRoutine(BasePlayerCharacterEntity playerCharacterEntity, string instanceId)
@@ -168,7 +168,7 @@ namespace MultiplayerARPG.MMO
                 message.networkAddress = peerInfo.networkAddress;
                 message.networkPort = peerInfo.networkPort;
                 message.connectKey = peerInfo.connectKey;
-                ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MsgTypes.Warp, message);
+                ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.Warp, message);
             }
         }
 

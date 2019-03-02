@@ -12,7 +12,7 @@ namespace MultiplayerARPG.MMO
         public uint RequestCharacters(AckMessageCallback callback)
         {
             RequestCharactersMessage message = new RequestCharactersMessage();
-            return Client.ClientSendAckPacket(SendOptions.ReliableOrdered, MMOMessageTypes.RequestCharacters, message, callback);
+            return Client.ClientSendAckPacket(DeliveryMethod.ReliableOrdered, MMOMessageTypes.RequestCharacters, message, callback);
         }
 
         public uint RequestCreateCharacter(PlayerCharacterData characterData, AckMessageCallback callback)
@@ -21,7 +21,7 @@ namespace MultiplayerARPG.MMO
             message.characterName = characterData.CharacterName;
             message.dataId = characterData.DataId;
             message.entityId = characterData.EntityId;
-            return Client.ClientSendAckPacket(SendOptions.ReliableOrdered, MMOMessageTypes.RequestCreateCharacter, message, callback, (writer) => SerializeCreateCharacterExtra(characterData, writer));
+            return Client.ClientSendAckPacket(DeliveryMethod.ReliableOrdered, MMOMessageTypes.RequestCreateCharacter, message, callback, (writer) => SerializeCreateCharacterExtra(characterData, writer));
         }
 
         private void SerializeCreateCharacterExtra(PlayerCharacterData characterData, NetDataWriter writer)
@@ -33,14 +33,14 @@ namespace MultiplayerARPG.MMO
         {
             RequestDeleteCharacterMessage message = new RequestDeleteCharacterMessage();
             message.characterId = characterId;
-            return Client.ClientSendAckPacket(SendOptions.ReliableOrdered, MMOMessageTypes.RequestDeleteCharacter, message, callback);
+            return Client.ClientSendAckPacket(DeliveryMethod.ReliableOrdered, MMOMessageTypes.RequestDeleteCharacter, message, callback);
         }
 
         public uint RequestSelectCharacter(string characterId, AckMessageCallback callback)
         {
             RequestSelectCharacterMessage message = new RequestSelectCharacterMessage();
             message.characterId = characterId;
-            return Client.ClientSendAckPacket(SendOptions.ReliableOrdered, MMOMessageTypes.RequestSelectCharacter, message, callback);
+            return Client.ClientSendAckPacket(DeliveryMethod.ReliableOrdered, MMOMessageTypes.RequestSelectCharacter, message, callback);
         }
 
         protected void HandleRequestCharacters(LiteNetLibMessageHandler messageHandler)
@@ -69,7 +69,7 @@ namespace MultiplayerARPG.MMO
             responseMessage.responseCode = error == ResponseCharactersMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
             responseMessage.error = error;
             responseMessage.characters = characters;
-            ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MMOMessageTypes.ResponseCharacters, responseMessage);
+            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MMOMessageTypes.ResponseCharacters, responseMessage);
         }
 
         protected void HandleRequestCreateCharacter(LiteNetLibMessageHandler messageHandler)
@@ -115,7 +115,7 @@ namespace MultiplayerARPG.MMO
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = error == ResponseCreateCharacterMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
             responseMessage.error = error;
-            ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MMOMessageTypes.ResponseCreateCharacter, responseMessage);
+            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MMOMessageTypes.ResponseCreateCharacter, responseMessage);
         }
 
         private void DeserializeCreateCharacterExtra(PlayerCharacterData characterData, NetDataReader reader)
@@ -146,7 +146,7 @@ namespace MultiplayerARPG.MMO
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = error == ResponseDeleteCharacterMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
             responseMessage.error = error;
-            ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MMOMessageTypes.ResponseDeleteCharacter, responseMessage);
+            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MMOMessageTypes.ResponseDeleteCharacter, responseMessage);
         }
 
         protected void HandleRequestSelectCharacter(LiteNetLibMessageHandler messageHandler)
@@ -185,7 +185,7 @@ namespace MultiplayerARPG.MMO
                 responseMessage.networkPort = mapServerPeerInfo.networkPort;
                 responseMessage.connectKey = mapServerPeerInfo.connectKey;
             }
-            ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MMOMessageTypes.ResponseSelectCharacter, responseMessage);
+            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MMOMessageTypes.ResponseSelectCharacter, responseMessage);
         }
 
         protected void HandleResponseCharacters(LiteNetLibMessageHandler messageHandler)

@@ -559,7 +559,7 @@ namespace MultiplayerARPG.MMO
             responseMessage.error = error;
             responseMessage.cash = cash;
             responseMessage.cashShopItemIds = cashShopItemIds.ToArray();
-            ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MsgTypes.CashShopInfo, responseMessage);
+            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.CashShopInfo, responseMessage);
         }
 
         protected override void HandleRequestCashShopBuy(LiteNetLibMessageHandler messageHandler)
@@ -613,7 +613,7 @@ namespace MultiplayerARPG.MMO
             responseMessage.error = error;
             responseMessage.dataId = dataId;
             responseMessage.cash = cash;
-            ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MsgTypes.CashShopBuy, responseMessage);
+            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.CashShopBuy, responseMessage);
         }
 
         protected override void HandleRequestCashPackageInfo(LiteNetLibMessageHandler messageHandler)
@@ -652,7 +652,7 @@ namespace MultiplayerARPG.MMO
             responseMessage.error = error;
             responseMessage.cash = cash;
             responseMessage.cashPackageIds = cashPackageIds.ToArray();
-            ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MsgTypes.CashPackageInfo, responseMessage);
+            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.CashPackageInfo, responseMessage);
         }
 
         protected override void HandleRequestCashPackageBuyValidation(LiteNetLibMessageHandler messageHandler)
@@ -699,7 +699,7 @@ namespace MultiplayerARPG.MMO
             responseMessage.error = error;
             responseMessage.dataId = dataId;
             responseMessage.cash = cash;
-            ServerSendPacket(connectionId, SendOptions.ReliableOrdered, MsgTypes.CashPackageBuyValidation, responseMessage);
+            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.CashPackageBuyValidation, responseMessage);
         }
 
         private void HandleResponseAppServerAddress(LiteNetLibMessageHandler messageHandler)
@@ -984,7 +984,7 @@ namespace MultiplayerARPG.MMO
             UpdateUserCharacterMessage updateMapUserMessage = new UpdateUserCharacterMessage();
             updateMapUserMessage.type = updateType;
             updateMapUserMessage.data = userData;
-            transportHandler.ClientSendPacket(SendOptions.ReliableOrdered, MMOMessageTypes.UpdateMapUser, updateMapUserMessage.Serialize);
+            transportHandler.ClientSendPacket(DeliveryMethod.ReliableOrdered, MMOMessageTypes.UpdateMapUser, updateMapUserMessage.Serialize);
         }
         #endregion
     }

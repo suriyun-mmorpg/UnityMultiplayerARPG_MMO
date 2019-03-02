@@ -38,7 +38,7 @@ namespace MultiplayerARPG.MMO
                     OnCentralServerDisconnected(eventData.disconnectInfo);
                     break;
                 case ENetworkEvent.ErrorEvent:
-                    Debug.LogError("CentralAppServerRegister::OnNetworkError endPoint: " + eventData.endPoint + " socketErrorCode " + eventData.socketErrorCode);
+                    Debug.LogError("CentralAppServerRegister::OnNetworkError endPoint: " + eventData.endPoint + " socketErrorCode " + eventData.socketError);
                     break;
             }
         }
@@ -79,7 +79,7 @@ namespace MultiplayerARPG.MMO
             // Send Request
             RequestAppServerRegisterMessage message = new RequestAppServerRegisterMessage();
             message.peerInfo = peerInfo;
-            ClientSendAckPacket(SendOptions.ReliableOrdered, MMOMessageTypes.RequestAppServerRegister, message, OnAppServerRegistered);
+            ClientSendAckPacket(DeliveryMethod.ReliableOrdered, MMOMessageTypes.RequestAppServerRegister, message, OnAppServerRegistered);
         }
 
         public async void OnCentralServerDisconnected(DisconnectInfo disconnectInfo)
