@@ -393,9 +393,10 @@ namespace MultiplayerARPG.MMO
                             playerCharacterData.CurrentPosition = CurrentMapInfo.startPosition;
 
                         // Spawn character entity and set its data
-                        LiteNetLibIdentity identity = Assets.NetworkSpawn(entityPrefab.Identity.HashAssetId, playerCharacterData.CurrentPosition, Quaternion.identity, 0, connectionId);
-                        BasePlayerCharacterEntity playerCharacterEntity = identity.GetComponent<BasePlayerCharacterEntity>();
+                        GameObject spawnObj = Instantiate(entityPrefab.gameObject, playerCharacterData.CurrentPosition, Quaternion.identity);
+                        BasePlayerCharacterEntity playerCharacterEntity = spawnObj.GetComponent<BasePlayerCharacterEntity>();
                         playerCharacterData.CloneTo(playerCharacterEntity);
+                        Assets.NetworkSpawn(spawnObj, 0, connectionId);
 
                         // Set currencies
                         GetGoldJob getGoldJob = new GetGoldJob(Database, userId, (amount) =>
