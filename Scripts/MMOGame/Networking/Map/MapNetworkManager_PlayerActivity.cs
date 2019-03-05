@@ -589,7 +589,8 @@ namespace MultiplayerARPG.MMO
 
         public override void CloseStorage(BasePlayerCharacterEntity playerCharacterEntity)
         {
-            usingStorageCharacters[playerCharacterEntity.CurrentStorageId].Remove(playerCharacterEntity.ObjectId);
+            if (usingStorageCharacters.ContainsKey(playerCharacterEntity.CurrentStorageId))
+                usingStorageCharacters[playerCharacterEntity.CurrentStorageId].Remove(playerCharacterEntity.ObjectId);
             playerCharacterEntity.StorageItems.Clear();
         }
 
@@ -731,6 +732,15 @@ namespace MultiplayerARPG.MMO
             yield return StartCoroutine(updateStorageItemsJob.WaitFor());
             // Update storage items to characters that open the storage
             UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItemList);
+        }
+
+        public override bool IsStorageEntityOpen(StorageEntity storageEntity)
+        {
+            if (storageEntity == null)
+                return false;
+            StorageId id = new StorageId(StorageType.Building, storageEntity.Id);
+            return usingStorageCharacters.ContainsKey(id) &&
+                usingStorageCharacters[id].Count > 0;
         }
 
         private void UpdateStorageItemsToCharacters(HashSet<uint> objectIds, List<CharacterItem> storageItems)
