@@ -814,6 +814,10 @@ MonoBehaviour:
     amount: 1
   - item: {fileID: 11400000, guid: 63ab6ffb9b0b1eb40958204ac1767f1b, type: 2}
     amount: 1
+  - item: {fileID: 11400000, guid: 6038b1c354df3654b9541fa590ffa8e1, type: 2}
+    amount: 25
+  - item: {fileID: 11400000, guid: 468bd5abf44aa1542bfd9e773a15447f, type: 2}
+    amount: 25
   homeScene:
     sceneAsset: {fileID: 102900000, guid: d529c814bb9fcd14289ac4141b27e951, type: 3}
     sceneName: 01Home_MMO
