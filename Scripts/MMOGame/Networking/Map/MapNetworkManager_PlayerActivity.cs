@@ -555,10 +555,9 @@ namespace MultiplayerARPG.MMO
 
         public override void OpenStorage(BasePlayerCharacterEntity playerCharacterEntity)
         {
-            if (playerCharacterEntity.CurrentStorageId.storageType == StorageType.Guild &&
-                !guilds.ContainsKey(playerCharacterEntity.GuildId))
+            if (!CanAccessStorage(playerCharacterEntity, playerCharacterEntity.CurrentStorageId))
             {
-                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotJoinedGuild);
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.CannotAccessStorage);
                 return;
             }
             if (!usingStorageCharacters.ContainsKey(playerCharacterEntity.CurrentStorageId))
@@ -596,10 +595,9 @@ namespace MultiplayerARPG.MMO
 
         public override void MoveItemToStorage(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short nonEquipIndex, short amount, short storageItemIndex)
         {
-            if (storageId.storageType == StorageType.Guild &&
-                !guilds.ContainsKey(playerCharacterEntity.GuildId))
+            if (!CanAccessStorage(playerCharacterEntity, storageId))
             {
-                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotJoinedGuild);
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.CannotAccessStorage);
                 return;
             }
             StartCoroutine(MoveItemToStorageRoutine(playerCharacterEntity, storageId, nonEquipIndex, amount, storageItemIndex));
@@ -668,10 +666,9 @@ namespace MultiplayerARPG.MMO
 
         public override void MoveItemFromStorage(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short storageItemIndex, short amount, short nonEquipIndex)
         {
-            if (storageId.storageType == StorageType.Guild &&
-                !guilds.ContainsKey(playerCharacterEntity.GuildId))
+            if (!CanAccessStorage(playerCharacterEntity, storageId))
             {
-                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotJoinedGuild);
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.CannotAccessStorage);
                 return;
             }
             StartCoroutine(MoveItemFromStorageRoutine(playerCharacterEntity, storageId, storageItemIndex, amount, nonEquipIndex));
