@@ -51,10 +51,14 @@ namespace MultiplayerARPG.MMO
         public const string CONFIG_CHAT_MAX_CONNECTIONS = "chatMaxConnections";
         public const string ARG_CHAT_MAX_CONNECTIONS = "-" + CONFIG_CHAT_MAX_CONNECTIONS;
         // Start servers
-        public const string ARG_START_CENTRAL_SERVER = "-startCentralServer";
-        public const string ARG_START_MAP_SPAWN_SERVER = "-startMapSpawnServer";
-        public const string ARG_START_MAP_SERVER = "-startMapServer";
-        public const string ARG_START_CHAT_SERVER = "-startChatServer";
+        public const string CONFIG_START_CENTRAL_SERVER = "startCentralServer";
+        public const string ARG_START_CENTRAL_SERVER = "-" + CONFIG_START_CENTRAL_SERVER;
+        public const string CONFIG_START_MAP_SPAWN_SERVER = "startMapSpawnServer";
+        public const string ARG_START_MAP_SPAWN_SERVER = "-" + CONFIG_START_MAP_SPAWN_SERVER;
+        public const string CONFIG_START_MAP_SERVER = "startMapServer";
+        public const string ARG_START_MAP_SERVER = "-" + CONFIG_START_MAP_SERVER;
+        public const string CONFIG_START_CHAT_SERVER = "startChatServer";
+        public const string ARG_START_CHAT_SERVER = "-" + CONFIG_START_CHAT_SERVER;
 
         [Header("Server Components")]
         [SerializeField]
@@ -296,8 +300,10 @@ namespace MultiplayerARPG.MMO
 
                 string logFileName = "Log";
                 bool startLog = false;
+                bool tempStartServer;
 
-                if (ConfigReader.IsArgsProvided(args, ARG_START_CENTRAL_SERVER))
+                if (ConfigReader.IsArgsProvided(args, ARG_START_CENTRAL_SERVER) ||
+                    (ConfigReader.ReadConfigs(jsonConfig, CONFIG_START_CENTRAL_SERVER, out tempStartServer) && tempStartServer))
                 {
                     if (!string.IsNullOrEmpty(logFileName))
                         logFileName += "_";
@@ -307,7 +313,8 @@ namespace MultiplayerARPG.MMO
                     startingCentralServer = true;
                 }
 
-                if (ConfigReader.IsArgsProvided(args, ARG_START_MAP_SPAWN_SERVER))
+                if (ConfigReader.IsArgsProvided(args, ARG_START_MAP_SPAWN_SERVER) ||
+                    (ConfigReader.ReadConfigs(jsonConfig, CONFIG_START_MAP_SPAWN_SERVER, out tempStartServer) && tempStartServer))
                 {
                     if (!string.IsNullOrEmpty(logFileName))
                         logFileName += "_";
@@ -317,7 +324,8 @@ namespace MultiplayerARPG.MMO
                     startingMapSpawnServer = true;
                 }
 
-                if (ConfigReader.IsArgsProvided(args, ARG_START_MAP_SERVER))
+                if (ConfigReader.IsArgsProvided(args, ARG_START_MAP_SERVER) ||
+                    (ConfigReader.ReadConfigs(jsonConfig, CONFIG_START_MAP_SERVER, out tempStartServer) && tempStartServer))
                 {
                     if (!string.IsNullOrEmpty(logFileName))
                         logFileName += "_";
@@ -327,7 +335,8 @@ namespace MultiplayerARPG.MMO
                     startingMapServer = true;
                 }
 
-                if (ConfigReader.IsArgsProvided(args, ARG_START_CHAT_SERVER))
+                if (ConfigReader.IsArgsProvided(args, ARG_START_CHAT_SERVER) ||
+                    (ConfigReader.ReadConfigs(jsonConfig, CONFIG_START_CHAT_SERVER, out tempStartServer) && tempStartServer))
                 {
                     if (!string.IsNullOrEmpty(logFileName))
                         logFileName += "_";
