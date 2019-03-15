@@ -860,6 +860,8 @@ MonoBehaviour:
     keyCode: 118
   - keyName: Jump
     keyCode: 32
+  - keyName: FindEnemy
+    keyCode: 9
 --- !u!114 &1379718505
 MonoBehaviour:
   m_ObjectHideFlags: 0

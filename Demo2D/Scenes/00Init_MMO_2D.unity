@@ -152,6 +152,8 @@ MonoBehaviour:
   doNotEnterGameOnConnect: 0
   doNotDestroyOnSceneChanges: 0
   writeAddonLog: 0
+  mapInstanceId: 
+  centralTransportFactory: {fileID: 0}
   centralConnectKey: SampleConnectKey
   centralNetworkAddress: 127.0.0.1
   centralNetworkPort: 6000
@@ -191,7 +193,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-    m_TypeName: LiteNetLibManager.LiteNetLibLoadSceneEvent, Assembly-CSharp, Version=0.0.0.0,
+    m_TypeName: LiteNetLibManager.LiteNetLibLoadSceneEvent, LiteNetLibManager, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
   onLoadSceneProgress:
     m_PersistentCalls:
@@ -207,7 +209,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-    m_TypeName: LiteNetLibManager.LiteNetLibLoadSceneEvent, Assembly-CSharp, Version=0.0.0.0,
+    m_TypeName: LiteNetLibManager.LiteNetLibLoadSceneEvent, LiteNetLibManager, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
   onLoadSceneFinish:
     m_PersistentCalls:
@@ -223,7 +225,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-    m_TypeName: LiteNetLibManager.LiteNetLibLoadSceneEvent, Assembly-CSharp, Version=0.0.0.0,
+    m_TypeName: LiteNetLibManager.LiteNetLibLoadSceneEvent, LiteNetLibManager, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!4 &25490649
 Transform:
@@ -669,6 +671,13 @@ MonoBehaviour:
   conversationDistance: 1
   buildDistance: 2
   localChatDistance: 10
+  inventorySystem: 0
+  playerStorage:
+    weightLimit: 0
+    slotLimit: 0
+  guildStorage:
+    weightLimit: 0
+    slotLimit: 0
   minSummonDistance: 2
   maxSummonDistance: 3
   enemySpottedNotifyDistance: 5
@@ -676,6 +685,7 @@ MonoBehaviour:
   maxFollowSummonerDistance: 10
   petDeadLockDuration: 60
   petUnSummonLockDuration: 30
+  joinInstanceMapDistance: 20
   levelUpEffect: {fileID: 114843870614705530, guid: 6f6e255b4877f874c985ed9fb46293a1,
     type: 2}
   startGold: 2000
@@ -748,6 +758,8 @@ MonoBehaviour:
     keyCode: 118
   - keyName: Jump
     keyCode: 32
+  - keyName: FindEnemy
+    keyCode: 9
 --- !u!114 &1379718505
 MonoBehaviour:
   m_ObjectHideFlags: 0
