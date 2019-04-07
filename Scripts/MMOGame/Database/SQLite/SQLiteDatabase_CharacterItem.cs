@@ -35,7 +35,7 @@ namespace MultiplayerARPG.MMO
                 result.durability = reader.GetFloat("durability");
                 result.exp = reader.GetInt32("exp");
                 result.lockRemainsDuration = reader.GetFloat("lockRemainsDuration");
-                result.ammo = reader.GetInt32("ammo");
+                result.ammo = reader.GetInt16("ammo");
                 return true;
             }
             result = CharacterItem.Empty;
