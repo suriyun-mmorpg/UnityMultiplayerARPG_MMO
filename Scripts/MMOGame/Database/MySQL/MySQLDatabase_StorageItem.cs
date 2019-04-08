@@ -9,7 +9,7 @@ namespace MultiplayerARPG.MMO
     {
         private void CreateStorageItem(MySqlConnection connection, MySqlTransaction transaction, int idx, StorageType storageType, string storageOwnerId, CharacterItem characterItem)
         {
-            ExecuteNonQuery(connection, transaction, "INSERT INTO storageitem (id, idx, storageType, storageOwnerId, dataId, level, amount, durability, exp, lockRemainsDuration, ammo) VALUES (@id, @idx, @storageType, @storageOwnerId, @dataId, @level, @amount, @durability, @exp, @lockRemainsDuration, @ammo)",
+            ExecuteNonQuery(connection, transaction, "INSERT INTO storageitem (id, idx, storageType, storageOwnerId, dataId, level, amount, durability, exp, lockRemainsDuration, ammo, sockets) VALUES (@id, @idx, @storageType, @storageOwnerId, @dataId, @level, @amount, @durability, @exp, @lockRemainsDuration, @ammo, @sockets)",
                 new MySqlParameter("@id", new StorageItemId(storageType, storageOwnerId, idx).GetId()),
                 new MySqlParameter("@idx", idx),
                 new MySqlParameter("@storageType", (byte)storageType),
@@ -20,7 +20,8 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@durability", characterItem.durability),
                 new MySqlParameter("@exp", characterItem.exp),
                 new MySqlParameter("@lockRemainsDuration", characterItem.lockRemainsDuration),
-                new MySqlParameter("@ammo", characterItem.ammo));
+                new MySqlParameter("@ammo", characterItem.ammo),
+                new MySqlParameter("@sockets", WriteSockets(characterItem.sockets)));
         }
 
         private bool ReadStorageItem(MySQLRowsReader reader, out CharacterItem result, bool resetReader = true)
@@ -38,6 +39,7 @@ namespace MultiplayerARPG.MMO
                 result.exp = reader.GetInt32("exp");
                 result.lockRemainsDuration = reader.GetFloat("lockRemainsDuration");
                 result.ammo = reader.GetInt16("ammo");
+                result.sockets = ReadSockets(reader.GetString("sockets"));
                 return true;
             }
             result = CharacterItem.Empty;

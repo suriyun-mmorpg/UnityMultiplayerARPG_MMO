@@ -9,7 +9,7 @@ namespace MultiplayerARPG.MMO
     {
         private void CreateStorageItem(int idx, StorageType storageType, string storageOwnerId, CharacterItem characterItem)
         {
-            ExecuteNonQuery("INSERT INTO storageitem (id, idx, storageType, storageOwnerId, dataId, level, amount, durability, exp, lockRemainsDuration, ammo) VALUES (@id, @idx, @storageType, @storageOwnerId, @dataId, @level, @amount, @durability, @exp, @lockRemainsDuration, @ammo)",
+            ExecuteNonQuery("INSERT INTO storageitem (id, idx, storageType, storageOwnerId, dataId, level, amount, durability, exp, lockRemainsDuration, ammo, sockets) VALUES (@id, @idx, @storageType, @storageOwnerId, @dataId, @level, @amount, @durability, @exp, @lockRemainsDuration, @ammo, @sockets)",
                 new SqliteParameter("@id", new StorageItemId(storageType, storageOwnerId, idx).GetId()),
                 new SqliteParameter("@idx", idx),
                 new SqliteParameter("@storageType", (byte)storageType),
@@ -20,7 +20,8 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@durability", characterItem.durability),
                 new SqliteParameter("@exp", characterItem.exp),
                 new SqliteParameter("@lockRemainsDuration", characterItem.lockRemainsDuration),
-                new SqliteParameter("@ammo", characterItem.ammo));
+                new SqliteParameter("@ammo", characterItem.ammo),
+                new SqliteParameter("@sockets", WriteSockets(characterItem.sockets)));
         }
 
         private bool ReadStorageItem(SQLiteRowsReader reader, out CharacterItem result, bool resetReader = true)
@@ -38,6 +39,7 @@ namespace MultiplayerARPG.MMO
                 result.exp = reader.GetInt32("exp");
                 result.lockRemainsDuration = reader.GetFloat("lockRemainsDuration");
                 result.ammo = reader.GetInt16("ammo");
+                result.sockets = ReadSockets(reader.GetString("sockets"));
                 return true;
             }
             result = CharacterItem.Empty;

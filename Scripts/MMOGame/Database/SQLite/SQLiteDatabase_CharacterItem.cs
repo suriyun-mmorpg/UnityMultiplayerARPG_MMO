@@ -5,9 +5,32 @@ namespace MultiplayerARPG.MMO
 {
     public partial class SQLiteDatabase
     {
+        private List<int> ReadSockets(string sockets)
+        {
+            List<int> result = new List<int>();
+            string[] splitTexts = sockets.Split(';');
+            foreach (string text in splitTexts)
+            {
+                if (string.IsNullOrEmpty(text))
+                    continue;
+                result.Add(int.Parse(text));
+            }
+            return result;
+        }
+
+        private string WriteSockets(List<int> killMonsters)
+        {
+            string result = "";
+            foreach (int killMonster in killMonsters)
+            {
+                result += killMonster + ";";
+            }
+            return result;
+        }
+
         private void CreateCharacterItem(int idx, string characterId, InventoryType inventoryType, CharacterItem characterItem)
         {
-            ExecuteNonQuery("INSERT INTO characteritem (id, idx, inventoryType, characterId, dataId, level, amount, durability, exp, lockRemainsDuration, ammo) VALUES (@id, @idx, @inventoryType, @characterId, @dataId, @level, @amount, @durability, @exp, @lockRemainsDuration, @ammo)",
+            ExecuteNonQuery("INSERT INTO characteritem (id, idx, inventoryType, characterId, dataId, level, amount, durability, exp, lockRemainsDuration, ammo, sockets) VALUES (@id, @idx, @inventoryType, @characterId, @dataId, @level, @amount, @durability, @exp, @lockRemainsDuration, @ammo, @sockets)",
                 new SqliteParameter("@id", characterId + "_" + (byte)inventoryType + "_" + idx),
                 new SqliteParameter("@idx", idx),
                 new SqliteParameter("@inventoryType", (byte)inventoryType),
@@ -18,7 +41,8 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@durability", characterItem.durability),
                 new SqliteParameter("@exp", characterItem.exp),
                 new SqliteParameter("@lockRemainsDuration", characterItem.lockRemainsDuration),
-                new SqliteParameter("@ammo", characterItem.ammo));
+                new SqliteParameter("@ammo", characterItem.ammo),
+                new SqliteParameter("@sockets", WriteSockets(characterItem.sockets)));
         }
 
         private bool ReadCharacterItem(SQLiteRowsReader reader, out CharacterItem result, bool resetReader = true)
@@ -36,6 +60,7 @@ namespace MultiplayerARPG.MMO
                 result.exp = reader.GetInt32("exp");
                 result.lockRemainsDuration = reader.GetFloat("lockRemainsDuration");
                 result.ammo = reader.GetInt16("ammo");
+                result.sockets = ReadSockets(reader.GetString("sockets"));
                 return true;
             }
             result = CharacterItem.Empty;

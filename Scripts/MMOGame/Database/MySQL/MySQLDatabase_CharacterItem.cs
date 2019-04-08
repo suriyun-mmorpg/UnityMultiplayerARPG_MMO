@@ -5,9 +5,32 @@ namespace MultiplayerARPG.MMO
 {
     public partial class MySQLDatabase
     {
+        private List<int> ReadSockets(string sockets)
+        {
+            List<int> result = new List<int>();
+            string[] splitTexts = sockets.Split(';');
+            foreach (string text in splitTexts)
+            {
+                if (string.IsNullOrEmpty(text))
+                    continue;
+                result.Add(int.Parse(text));
+            }
+            return result;
+        }
+
+        private string WriteSockets(List<int> killMonsters)
+        {
+            string result = "";
+            foreach (int killMonster in killMonsters)
+            {
+                result += killMonster + ";";
+            }
+            return result;
+        }
+
         private void CreateCharacterItem(MySqlConnection connection, MySqlTransaction transaction, int idx, string characterId, InventoryType inventoryType, CharacterItem characterItem)
         {
-            ExecuteNonQuery(connection, transaction, "INSERT INTO characteritem (id, idx, inventoryType, characterId, dataId, level, amount, durability, exp, lockRemainsDuration, ammo) VALUES (@id, @idx, @inventoryType, @characterId, @dataId, @level, @amount, @durability, @exp, @lockRemainsDuration, @ammo)",
+            ExecuteNonQuery(connection, transaction, "INSERT INTO characteritem (id, idx, inventoryType, characterId, dataId, level, amount, durability, exp, lockRemainsDuration, ammo, sockets) VALUES (@id, @idx, @inventoryType, @characterId, @dataId, @level, @amount, @durability, @exp, @lockRemainsDuration, @ammo, @sockets)",
                 new MySqlParameter("@id", characterId + "_" + (byte)inventoryType + "_" + idx),
                 new MySqlParameter("@idx", idx),
                 new MySqlParameter("@inventoryType", (byte)inventoryType),
@@ -18,7 +41,8 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@durability", characterItem.durability),
                 new MySqlParameter("@exp", characterItem.exp),
                 new MySqlParameter("@lockRemainsDuration", characterItem.lockRemainsDuration),
-                new MySqlParameter("@ammo", characterItem.ammo));
+                new MySqlParameter("@ammo", characterItem.ammo),
+                new MySqlParameter("@sockets", WriteSockets(characterItem.sockets)));
         }
 
         private bool ReadCharacterItem(MySQLRowsReader reader, out CharacterItem result, bool resetReader = true)
@@ -36,6 +60,7 @@ namespace MultiplayerARPG.MMO
                 result.exp = reader.GetInt32("exp");
                 result.lockRemainsDuration = reader.GetFloat("lockRemainsDuration");
                 result.ammo = reader.GetInt16("ammo");
+                result.sockets = ReadSockets(reader.GetString("sockets"));
                 return true;
             }
             result = CharacterItem.Empty;
