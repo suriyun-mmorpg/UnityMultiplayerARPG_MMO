@@ -90,6 +90,7 @@ namespace MultiplayerARPG.MMO
               exp INTEGER NOT NULL DEFAULT 0,
               lockRemainsDuration REAL NOT NULL DEFAULT 0,
               ammo INTEGER NOT NULL DEFAULT 0,
+              sockets TEXT NOT NULL,
               createAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
               updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
@@ -106,6 +107,7 @@ namespace MultiplayerARPG.MMO
               exp INTEGER NOT NULL DEFAULT 0,
               lockRemainsDuration REAL NOT NULL DEFAULT 0,
               ammo INTEGER NOT NULL DEFAULT 0,
+              sockets TEXT NOT NULL,
               createAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
               updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
@@ -266,6 +268,12 @@ namespace MultiplayerARPG.MMO
             if (!IsColumnExist("characteritem", "ammo"))
                 ExecuteNonQuery("ALTER TABLE characteritem ADD ammo INTEGER NOT NULL DEFAULT 0;");
 
+            if (!IsColumnExist("characteritem", "sockets"))
+                ExecuteNonQuery("ALTER TABLE characteritem ADD sockets TEXT NOT NULL;");
+
+            if (!IsColumnExist("storageitem", "sockets"))
+                ExecuteNonQuery("ALTER TABLE storageitem ADD sockets TEXT NOT NULL;");
+
             if (!IsColumnExist("userlogin", "gold"))
                 ExecuteNonQuery("ALTER TABLE userlogin ADD gold INTEGER NOT NULL DEFAULT 0;");
 
@@ -292,7 +300,7 @@ namespace MultiplayerARPG.MMO
 
             if (!IsColumnExist("guild", "gold"))
                 ExecuteNonQuery("ALTER TABLE guild ADD gold INTEGER NOT NULL DEFAULT 0;");
-            
+
             this.InvokeInstanceDevExtMethods("Init");
         }
 
