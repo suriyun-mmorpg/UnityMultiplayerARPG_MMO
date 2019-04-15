@@ -511,8 +511,7 @@ namespace MultiplayerARPG.MMO
         {
             ChatMessage message = FillChatChannelId(messageHandler.ReadMessage<ChatMessage>());
             // Local chat will processes immediately, not have to be sent to chat server
-            if (message.channel == ChatChannel.Local &&
-                !GMCommands.IsGMCommand(message.message))
+            if (message.channel == ChatChannel.Local)
             {
                 ReadChatMessage(message);
                 return;
