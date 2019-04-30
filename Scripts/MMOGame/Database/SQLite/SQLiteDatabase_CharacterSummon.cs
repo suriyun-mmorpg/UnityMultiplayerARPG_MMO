@@ -27,10 +27,10 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public void CreateCharacterSummon(string characterId, CharacterSummon characterSummon)
+        public void CreateCharacterSummon(int idx, string characterId, CharacterSummon characterSummon)
         {
             ExecuteNonQuery("INSERT INTO charactersummon (id, characterId, type, dataId, summonRemainsDuration, level, exp, currentHp, currentMp) VALUES (@id, @characterId, @type, @dataId, @summonRemainsDuration, @level, @exp, @currentHp, @currentMp)",
-                new SqliteParameter("@id", characterId + "_" + characterSummon.type + "_" + characterSummon.dataId),
+                new SqliteParameter("@id", characterId + "_" + characterSummon.type + "_" + idx),
                 new SqliteParameter("@characterId", characterId),
                 new SqliteParameter("@type", (byte)characterSummon.type),
                 new SqliteParameter("@dataId", characterSummon.dataId),

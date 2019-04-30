@@ -27,10 +27,10 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public void CreateCharacterSummon(MySqlConnection connection, MySqlTransaction transaction, string characterId, CharacterSummon characterSummon)
+        public void CreateCharacterSummon(MySqlConnection connection, MySqlTransaction transaction, int idx, string characterId, CharacterSummon characterSummon)
         {
             ExecuteNonQuery(connection, transaction, "INSERT INTO charactersummon (id, characterId, type, dataId, summonRemainsDuration, level, exp, currentHp, currentMp) VALUES (@id, @characterId, @type, @dataId, @summonRemainsDuration, @level, @exp, @currentHp, @currentMp)",
-                new MySqlParameter("@id", characterId + "_" + characterSummon.type + "_" + characterSummon.dataId),
+                new MySqlParameter("@id", characterId + "_" + characterSummon.type + "_" + idx),
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@type", (byte)characterSummon.type),
                 new MySqlParameter("@dataId", characterSummon.dataId),

@@ -45,9 +45,10 @@ namespace MultiplayerARPG.MMO
             {
                 CreateCharacterSkillUsage(characterId, skillUsage);
             }
+            i = 0;
             foreach (CharacterSummon summon in characterData.Summons)
             {
-                CreateCharacterSummon(characterId, summon);
+                CreateCharacterSummon(i++, characterId, summon);
             }
             i = 0;
             foreach (CharacterQuest quest in characterData.Quests)

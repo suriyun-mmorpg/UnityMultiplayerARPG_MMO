@@ -90,7 +90,7 @@ namespace MultiplayerARPG.MMO
               exp INTEGER NOT NULL DEFAULT 0,
               lockRemainsDuration REAL NOT NULL DEFAULT 0,
               ammo INTEGER NOT NULL DEFAULT 0,
-              sockets TEXT NOT NULL,
+              sockets TEXT NOT NULL DEFAULT '',
               createAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
               updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
@@ -107,7 +107,7 @@ namespace MultiplayerARPG.MMO
               exp INTEGER NOT NULL DEFAULT 0,
               lockRemainsDuration REAL NOT NULL DEFAULT 0,
               ammo INTEGER NOT NULL DEFAULT 0,
-              sockets TEXT NOT NULL,
+              sockets TEXT NOT NULL DEFAULT '',
               createAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
               updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
@@ -269,10 +269,10 @@ namespace MultiplayerARPG.MMO
                 ExecuteNonQuery("ALTER TABLE characteritem ADD ammo INTEGER NOT NULL DEFAULT 0;");
 
             if (!IsColumnExist("characteritem", "sockets"))
-                ExecuteNonQuery("ALTER TABLE characteritem ADD sockets TEXT NOT NULL;");
+                ExecuteNonQuery("ALTER TABLE characteritem ADD sockets TEXT NOT NULL DEFAULT '';");
 
             if (!IsColumnExist("storageitem", "sockets"))
-                ExecuteNonQuery("ALTER TABLE storageitem ADD sockets TEXT NOT NULL;");
+                ExecuteNonQuery("ALTER TABLE storageitem ADD sockets TEXT NOT NULL DEFAULT '';");
 
             if (!IsColumnExist("userlogin", "gold"))
                 ExecuteNonQuery("ALTER TABLE userlogin ADD gold INTEGER NOT NULL DEFAULT 0;");

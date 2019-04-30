@@ -193,9 +193,10 @@ namespace MultiplayerARPG.MMO
             try
             {
                 DeleteCharacterSummons(connection, transaction, characterData.Id);
+                int i = 0;
                 foreach (CharacterSummon skillUsage in characterData.Summons)
                 {
-                    CreateCharacterSummon(connection, transaction, characterData.Id, skillUsage);
+                    CreateCharacterSummon(connection, transaction, i++, characterData.Id, skillUsage);
                 }
                 transaction.Commit();
             }
