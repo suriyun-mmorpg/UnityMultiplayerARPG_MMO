@@ -597,6 +597,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca66ed5b09dc41447ad7cf901faa5e46, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  umaAvatarDatabase: {fileID: 0}
   dimensionType: 1
   gameplayRule: {fileID: 11400000, guid: 3bfe680a81b27ce4ba9642ddff7baa17, type: 2}
   networkSetting: {fileID: 11400000, guid: c0825e8ee894749459ab4c8dda26dfe6, type: 2}
@@ -663,6 +664,7 @@ MonoBehaviour:
     layerIndex: 14
   nonTargetingLayers:
   - layerIndex: 11
+  groundOrWallLayers: []
   itemAppearDuration: 60
   itemLootLockDuration: 5
   coCharacterActionDuration: 5
@@ -760,6 +762,8 @@ MonoBehaviour:
     keyCode: 32
   - keyName: FindEnemy
     keyCode: 9
+  - keyName: Reload
+    keyCode: 114
 --- !u!114 &1379718505
 MonoBehaviour:
   m_ObjectHideFlags: 0
