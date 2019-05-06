@@ -130,12 +130,6 @@ namespace MultiplayerARPG.MMO
                 CentralAppServerRegister.Update();
         }
 
-        protected override void OnDestroy()
-        {
-            CentralAppServerRegister.StopServer();
-            base.OnDestroy();
-        }
-
         public override void OnPeerConnected(long connectionId)
         {
             base.OnPeerConnected(connectionId);
