@@ -21,13 +21,13 @@ namespace MultiplayerARPG.MMO
             UISceneGlobal uiSceneGlobal = UISceneGlobal.Singleton;
             if (string.IsNullOrEmpty(Username))
             {
-                uiSceneGlobal.ShowMessageDialog("Cannot login", "Username is empty");
+                uiSceneGlobal.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_ERROR.ToString()), LanguageManager.GetText(UILocaleKeys.UI_USERNAME_IS_EMPTY.ToString()));
                 return;
             }
 
             if (string.IsNullOrEmpty(Password))
             {
-                uiSceneGlobal.ShowMessageDialog("Cannot login", "Password is empty");
+                uiSceneGlobal.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_ERROR.ToString()), LanguageManager.GetText(UILocaleKeys.UI_PASSWORD_IS_EMPTY.ToString()));
                 return;
             }
 
@@ -44,18 +44,18 @@ namespace MultiplayerARPG.MMO
                     switch (castedMessage.error)
                     {
                         case ResponseUserLoginMessage.Error.AlreadyLogin:
-                            errorMessage = "User already logged in";
+                            errorMessage = LanguageManager.GetText(UILocaleKeys.UI_ALREADY_LOGGED_IN.ToString());
                             break;
                         case ResponseUserLoginMessage.Error.InvalidUsernameOrPassword:
-                            errorMessage = "Invalid username or password";
+                            errorMessage = LanguageManager.GetText(UILocaleKeys.UI_INVALID_USERNAME_OR_PASSWORD.ToString());
                             break;
                     }
-                    UISceneGlobal.Singleton.ShowMessageDialog("Cannot Login", errorMessage);
+                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_ERROR.ToString()), errorMessage);
                     if (onLoginFail != null)
                         onLoginFail.Invoke();
                     break;
                 case AckResponseCode.Timeout:
-                    UISceneGlobal.Singleton.ShowMessageDialog("Cannot Login", "Connection timeout");
+                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_ERROR.ToString()), LanguageManager.GetText(UILocaleKeys.UI_CONNECTION_TIMEOUT.ToString()));
                     if (onLoginFail != null)
                         onLoginFail.Invoke();
                     break;

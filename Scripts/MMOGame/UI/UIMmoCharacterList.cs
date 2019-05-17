@@ -33,13 +33,13 @@ namespace MultiplayerARPG.MMO
                     switch (castedMessage.error)
                     {
                         case ResponseCharactersMessage.Error.NotLoggedin:
-                            errorMessage = "User not logged in";
+                            errorMessage = LanguageManager.GetText(UILocaleKeys.UI_NOT_LOGGED_IN.ToString());
                             break;
                     }
-                    UISceneGlobal.Singleton.ShowMessageDialog("Cannot Load Characters", errorMessage);
+                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_ERROR.ToString()), errorMessage);
                     break;
                 case AckResponseCode.Timeout:
-                    UISceneGlobal.Singleton.ShowMessageDialog("Cannot Load Characters", "Connection timeout");
+                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_ERROR.ToString()), LanguageManager.GetText(UILocaleKeys.UI_CONNECTION_TIMEOUT.ToString()));
                     break;
                 default:
                     selectableCharacters = castedMessage.characters;
@@ -78,7 +78,7 @@ namespace MultiplayerARPG.MMO
             UICharacter selectedUI = CacheCharacterSelectionManager.SelectedUI;
             if (selectedUI == null)
             {
-                UISceneGlobal.Singleton.ShowMessageDialog("Cannot start game", "Please choose character to start game");
+                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_ERROR.ToString()), LanguageManager.GetText(UILocaleKeys.UI_NO_CHOSEN_CHARACTER_TO_START.ToString()));
                 Debug.LogWarning("Cannot start game, No chosen character");
                 return;
             }
@@ -99,22 +99,22 @@ namespace MultiplayerARPG.MMO
                     switch (castedMessage.error)
                     {
                         case ResponseSelectCharacterMessage.Error.NotLoggedin:
-                            errorMessage = "User not logged in";
+                            errorMessage = LanguageManager.GetText(UILocaleKeys.UI_NOT_LOGGED_IN.ToString());
                             break;
                         case ResponseSelectCharacterMessage.Error.AlreadySelectCharacter:
-                            errorMessage = "Already select character";
+                            errorMessage = LanguageManager.GetText(UILocaleKeys.UI_ALREADY_SELECT_CHARACTER.ToString());
                             break;
                         case ResponseSelectCharacterMessage.Error.InvalidCharacterData:
-                            errorMessage = "Invalid character data";
+                            errorMessage = LanguageManager.GetText(UILocaleKeys.UI_INVALID_CHARACTER_DATA.ToString());
                             break;
                         case ResponseSelectCharacterMessage.Error.MapNotReady:
-                            errorMessage = "Map server is not ready";
+                            errorMessage = LanguageManager.GetText(UILocaleKeys.UI_MAP_SERVER_NOT_READY.ToString());
                             break;
                     }
-                    UISceneGlobal.Singleton.ShowMessageDialog("Cannot Select Character", errorMessage);
+                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_ERROR.ToString()), errorMessage);
                     break;
                 case AckResponseCode.Timeout:
-                    UISceneGlobal.Singleton.ShowMessageDialog("Cannot Select Character", "Connection timeout");
+                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_ERROR.ToString()), LanguageManager.GetText(UILocaleKeys.UI_CONNECTION_TIMEOUT.ToString()));
                     break;
                 default:
                     MMOClientInstance.Singleton.StartMapClient(castedMessage.sceneName, castedMessage.networkAddress, castedMessage.networkPort, castedMessage.connectKey);
@@ -127,7 +127,7 @@ namespace MultiplayerARPG.MMO
             UICharacter selectedUI = CacheCharacterSelectionManager.SelectedUI;
             if (selectedUI == null)
             {
-                UISceneGlobal.Singleton.ShowMessageDialog("Cannot delete character", "Please choose character to delete");
+                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_ERROR.ToString()), LanguageManager.GetText(UILocaleKeys.UI_NO_CHOSEN_CHARACTER_TO_DELETE.ToString()));
                 Debug.LogWarning("Cannot delete character, No chosen character");
                 return;
             }
@@ -147,13 +147,13 @@ namespace MultiplayerARPG.MMO
                     switch (castedMessage.error)
                     {
                         case ResponseDeleteCharacterMessage.Error.NotLoggedin:
-                            errorMessage = "User not logged in";
+                            errorMessage = LanguageManager.GetText(UILocaleKeys.UI_NOT_LOGGED_IN.ToString());
                             break;
                     }
-                    UISceneGlobal.Singleton.ShowMessageDialog("Cannot Delete Character", errorMessage);
+                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_ERROR.ToString()), errorMessage);
                     break;
                 case AckResponseCode.Timeout:
-                    UISceneGlobal.Singleton.ShowMessageDialog("Cannot Delete Character", "Connection timeout");
+                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_ERROR.ToString()), LanguageManager.GetText(UILocaleKeys.UI_CONNECTION_TIMEOUT.ToString()));
                     break;
                 default:
                     // Reload characters

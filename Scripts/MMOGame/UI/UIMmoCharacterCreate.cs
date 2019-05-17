@@ -24,25 +24,25 @@ namespace MultiplayerARPG.MMO
                     switch (castedMessage.error)
                     {
                         case ResponseCreateCharacterMessage.Error.NotLoggedin:
-                            errorMessage = "User not logged in";
+                            errorMessage = LanguageManager.GetText(UILocaleKeys.UI_NOT_LOGGED_IN.ToString());
                             break;
                         case ResponseCreateCharacterMessage.Error.InvalidData:
-                            errorMessage = "Invalid data";
+                            errorMessage = LanguageManager.GetText(UILocaleKeys.UI_INVALID_DATA.ToString());
                             break;
                         case ResponseCreateCharacterMessage.Error.TooShortCharacterName:
-                            errorMessage = "Character name is too short";
+                            errorMessage = LanguageManager.GetText(UILocaleKeys.UI_CHARACTER_NAME_TOO_SHORT.ToString());
                             break;
                         case ResponseCreateCharacterMessage.Error.TooLongCharacterName:
-                            errorMessage = "Character name is too long";
+                            errorMessage = LanguageManager.GetText(UILocaleKeys.UI_CHARACTER_NAME_TOO_LONG.ToString());
                             break;
                         case ResponseCreateCharacterMessage.Error.CharacterNameAlreadyExisted:
-                            errorMessage = "Character name is already existed";
+                            errorMessage = LanguageManager.GetText(UILocaleKeys.UI_CHARACTER_NAME_EXISTED.ToString());
                             break;
                     }
-                    UISceneGlobal.Singleton.ShowMessageDialog("Cannot Create Characters", errorMessage);
+                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_ERROR.ToString()), errorMessage);
                     break;
                 case AckResponseCode.Timeout:
-                    UISceneGlobal.Singleton.ShowMessageDialog("Cannot Create Characters", "Connection timeout");
+                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_ERROR.ToString()), LanguageManager.GetText(UILocaleKeys.UI_CONNECTION_TIMEOUT.ToString()));
                     break;
                 default:
                     if (eventOnCreateCharacter != null)

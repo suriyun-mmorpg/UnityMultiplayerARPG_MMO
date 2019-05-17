@@ -32,19 +32,19 @@ namespace MultiplayerARPG.MMO
             UISceneGlobal uiSceneGlobal = UISceneGlobal.Singleton;
             if (string.IsNullOrEmpty(Username))
             {
-                uiSceneGlobal.ShowMessageDialog("Cannot register", "Username is empty");
+                uiSceneGlobal.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_ERROR.ToString()), LanguageManager.GetText(UILocaleKeys.UI_USERNAME_IS_EMPTY.ToString()));
                 return;
             }
 
             if (string.IsNullOrEmpty(Password))
             {
-                uiSceneGlobal.ShowMessageDialog("Cannot register", "Password is empty");
+                uiSceneGlobal.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_ERROR.ToString()), LanguageManager.GetText(UILocaleKeys.UI_PASSWORD_IS_EMPTY.ToString()));
                 return;
             }
 
             if (!ValidatePassword())
             {
-                uiSceneGlobal.ShowMessageDialog("Cannot register", "Invalid confirm password");
+                uiSceneGlobal.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_ERROR.ToString()), LanguageManager.GetText(UILocaleKeys.UI_INVALID_CONFIRM_PASSWORD.ToString()));
                 return;
             }
 
@@ -61,24 +61,24 @@ namespace MultiplayerARPG.MMO
                     switch (castedMessage.error)
                     {
                         case ResponseUserRegisterMessage.Error.TooShortUsername:
-                            errorMessage = "Username is too short";
+                            errorMessage = LanguageManager.GetText(UILocaleKeys.UI_USERNAME_TOO_SHORT.ToString());
                             break;
                         case ResponseUserRegisterMessage.Error.TooLongUsername:
-                            errorMessage = "Username is too long";
+                            errorMessage = LanguageManager.GetText(UILocaleKeys.UI_USERNAME_TOO_LONG.ToString());
                             break;
                         case ResponseUserRegisterMessage.Error.TooShortPassword:
-                            errorMessage = "Password is too short";
+                            errorMessage = LanguageManager.GetText(UILocaleKeys.UI_PASSWORD_TOO_SHORT.ToString());
                             break;
                         case ResponseUserRegisterMessage.Error.UsernameAlreadyExisted:
-                            errorMessage = "Username is already existed";
+                            errorMessage = LanguageManager.GetText(UILocaleKeys.UI_USERNAME_EXISTED.ToString());
                             break;
                     }
-                    UISceneGlobal.Singleton.ShowMessageDialog("Cannot Register", errorMessage);
+                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_ERROR.ToString()), errorMessage);
                     if (onRegisterFail != null)
                         onRegisterFail.Invoke();
                     break;
                 case AckResponseCode.Timeout:
-                    UISceneGlobal.Singleton.ShowMessageDialog("Cannot Register", "Connection timeout");
+                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_ERROR.ToString()), LanguageManager.GetText(UILocaleKeys.UI_CONNECTION_TIMEOUT.ToString()));
                     if (onRegisterFail != null)
                         onRegisterFail.Invoke();
                     break;
