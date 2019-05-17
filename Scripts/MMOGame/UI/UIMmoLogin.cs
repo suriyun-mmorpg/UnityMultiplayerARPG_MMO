@@ -21,13 +21,13 @@ namespace MultiplayerARPG.MMO
             UISceneGlobal uiSceneGlobal = UISceneGlobal.Singleton;
             if (string.IsNullOrEmpty(Username))
             {
-                uiSceneGlobal.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_ERROR.ToString()), LanguageManager.GetText(UILocaleKeys.UI_USERNAME_IS_EMPTY.ToString()));
+                uiSceneGlobal.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UILocaleKeys.UI_USERNAME_IS_EMPTY.ToString()));
                 return;
             }
 
             if (string.IsNullOrEmpty(Password))
             {
-                uiSceneGlobal.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_ERROR.ToString()), LanguageManager.GetText(UILocaleKeys.UI_PASSWORD_IS_EMPTY.ToString()));
+                uiSceneGlobal.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UILocaleKeys.UI_PASSWORD_IS_EMPTY.ToString()));
                 return;
             }
 
@@ -50,12 +50,12 @@ namespace MultiplayerARPG.MMO
                             errorMessage = LanguageManager.GetText(UILocaleKeys.UI_INVALID_USERNAME_OR_PASSWORD.ToString());
                             break;
                     }
-                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_ERROR.ToString()), errorMessage);
+                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_LABEL_ERROR.ToString()), errorMessage);
                     if (onLoginFail != null)
                         onLoginFail.Invoke();
                     break;
                 case AckResponseCode.Timeout:
-                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_ERROR.ToString()), LanguageManager.GetText(UILocaleKeys.UI_CONNECTION_TIMEOUT.ToString()));
+                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UILocaleKeys.UI_CONNECTION_TIMEOUT.ToString()));
                     if (onLoginFail != null)
                         onLoginFail.Invoke();
                     break;
