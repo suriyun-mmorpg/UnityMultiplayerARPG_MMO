@@ -21,13 +21,13 @@ namespace MultiplayerARPG.MMO
             UISceneGlobal uiSceneGlobal = UISceneGlobal.Singleton;
             if (string.IsNullOrEmpty(Username))
             {
-                uiSceneGlobal.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UILocaleKeys.UI_USERNAME_IS_EMPTY.ToString()));
+                uiSceneGlobal.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UILocaleKeys.UI_ERROR_USERNAME_IS_EMPTY.ToString()));
                 return;
             }
 
             if (string.IsNullOrEmpty(Password))
             {
-                uiSceneGlobal.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UILocaleKeys.UI_PASSWORD_IS_EMPTY.ToString()));
+                uiSceneGlobal.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UILocaleKeys.UI_ERROR_PASSWORD_IS_EMPTY.ToString()));
                 return;
             }
 
@@ -44,10 +44,10 @@ namespace MultiplayerARPG.MMO
                     switch (castedMessage.error)
                     {
                         case ResponseUserLoginMessage.Error.AlreadyLogin:
-                            errorMessage = LanguageManager.GetText(UILocaleKeys.UI_ALREADY_LOGGED_IN.ToString());
+                            errorMessage = LanguageManager.GetText(UILocaleKeys.UI_ERROR_ALREADY_LOGGED_IN.ToString());
                             break;
                         case ResponseUserLoginMessage.Error.InvalidUsernameOrPassword:
-                            errorMessage = LanguageManager.GetText(UILocaleKeys.UI_INVALID_USERNAME_OR_PASSWORD.ToString());
+                            errorMessage = LanguageManager.GetText(UILocaleKeys.UI_ERROR_INVALID_USERNAME_OR_PASSWORD.ToString());
                             break;
                     }
                     UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_LABEL_ERROR.ToString()), errorMessage);
@@ -55,7 +55,7 @@ namespace MultiplayerARPG.MMO
                         onLoginFail.Invoke();
                     break;
                 case AckResponseCode.Timeout:
-                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UILocaleKeys.UI_CONNECTION_TIMEOUT.ToString()));
+                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UILocaleKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
                     if (onLoginFail != null)
                         onLoginFail.Invoke();
                     break;
