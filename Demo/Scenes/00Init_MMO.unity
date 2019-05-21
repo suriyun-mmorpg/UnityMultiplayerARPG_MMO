@@ -963,6 +963,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   defaultLanguageKey: ENG
   newLanguageKey: ENG
+  addNewLanguage: 0
   languageList:
   - languageKey: ENG
     dataList:
@@ -1044,6 +1045,396 @@ MonoBehaviour:
       value: Guild member reached limit
     - key: GuildRoleNotAvailable
       value: Guild role is not available
+    - key: GuildSkillReachedMaxLevel
+      value: Guild skill is reached max level
+    - key: NoGuildSkillPoint
+      value: No guild skill point
+    - key: UnknowGameDataTitle
+      value: Unknow
+    - key: UnknowGameDataDescription
+      value: N/A
+    - key: NotEnoughGoldToDeposit
+      value: Not enough gold to deposit
+    - key: NotEnoughGoldToWithdraw
+      value: Not enough gold to withdraw
+    - key: CannotAccessStorage
+      value: Cannot access storage
+    - key: NoAmmo
+      value: No Ammo
+    - key: UI_LABEL_DISCONNECTED
+      value: Disconnected
+    - key: UI_LABEL_SUCCESS
+      value: Success
+    - key: UI_LABEL_ERROR
+      value: Error
+    - key: UI_LABEL_NONE
+      value: None
+    - key: UI_FORMAT_SIMPLE
+      value: '{0}'
+    - key: UI_FORMAT_SIMPLE_PERCENTAGE
+      value: '{0}%'
+    - key: UI_FORMAT_SIMPLE_MIN_TO_MAX
+      value: '{0}~{1}'
+    - key: UI_FORMAT_SIMPLE_MIN_BY_MAX
+      value: '{0}/{1}'
+    - key: UI_FORMAT_LEVEL
+      value: 'Lv: {0}'
+    - key: UI_FORMAT_CURRENT_EXP
+      value: 'Exp: {0}'
+    - key: UI_FORMAT_STAT_POINTS
+      value: 'Stat Points: {0}'
+    - key: UI_FORMAT_SKILL_POINTS
+      value: 'Skill Points: {0}'
+    - key: UI_FORMAT_CURRENT_HP
+      value: 'Hp: {0}/{1}'
+    - key: UI_FORMAT_CURRENT_MP
+      value: 'Mp: {0}/{1}'
+    - key: UI_FORMAT_CURRENT_STAMINA
+      value: 'Stamina: {0}/{1}'
+    - key: UI_FORMAT_CURRENT_FOOD
+      value: 'Food: {0}/{1}'
+    - key: UI_FORMAT_CURRENT_WATER
+      value: 'Water: {0}/{1}'
+    - key: UI_FORMAT_CURRENT_WEIGHT
+      value: 'Weight: {0}/{1}'
+    - key: UI_FORMAT_CURRENT_SLOT
+      value: 'Slot: {0}/{1}'
+    - key: UI_LABEL_UNLIMIT_WEIGHT
+      value: Unlimit Weight
+    - key: UI_LABEL_UNLIMIT_SLOT
+      value: Unlimit Slot
+    - key: UI_FORMAT_HP
+      value: 'Hp: {0}'
+    - key: UI_FORMAT_MP
+      value: 'Mp: {0}'
+    - key: UI_FORMAT_STAMINA
+      value: 'Stamina: {0}'
+    - key: UI_FORMAT_FOOD
+      value: 'Food: {0}'
+    - key: UI_FORMAT_WATER
+      value: 'Water: {0}'
+    - key: UI_FORMAT_ARMOR
+      value: 'Armor: {0}'
+    - key: UI_FORMAT_ACCURACY
+      value: 'Accuracy: {0}'
+    - key: UI_FORMAT_EVASION
+      value: 'Evasion: {0}'
+    - key: UI_FORMAT_CRITICAL_RATE
+      value: 'Cri. Rate: {0}%'
+    - key: UI_FORMAT_CRITICAL_DAMAGE_RATE
+      value: 'Cri. Damage: {0}%'
+    - key: UI_FORMAT_BLOCK_RATE
+      value: 'Block Rate: {0}%'
+    - key: UI_FORMAT_BLOCK_DAMAGE_RATE
+      value: 'Block Damage: {0}%'
+    - key: UI_FORMAT_MOVE_SPEED
+      value: 'Move Speed: {0}'
+    - key: UI_FORMAT_ATTACK_SPEED
+      value: 'Attack Speed: {0}'
+    - key: UI_FORMAT_WEIGHT
+      value: 'Weight: {0}'
+    - key: UI_FORMAT_SLOT
+      value: 'Slot: {0}'
+    - key: UI_FORMAT_GOLD
+      value: 'Gold: {0}'
+    - key: UI_FORMAT_CASH
+      value: 'Cash: {0}'
+    - key: UI_FORMAT_SELL_PRICE
+      value: 'Sell Price: {0}'
+    - key: UI_FORMAT_REQUIRE_LEVEL
+      value: 'Require Level: {0}'
+    - key: UI_FORMAT_REQUIRE_CLASS
+      value: 'Require Class: {0}'
+    - key: UI_FORMAT_AVAILABLE_WEAPONS
+      value: 'Available Weapons: {0}'
+    - key: UI_FORMAT_CONSUME_MP
+      value: 'Consume Mp: {0}'
+    - key: UI_FORMAT_SKILL_COOLDOWN_DURATION
+      value: 'Cooldown: {0}'
+    - key: UI_FORMAT_SKILL_TYPE
+      value: 'Skill Type: {0}'
+    - key: UI_SKILL_TYPE_ACTIVE
+      value: Active
+    - key: UI_SKILL_TYPE_PASSIVE
+      value: Passive
+    - key: UI_SKILL_TYPE_CRAFT_ITEM
+      value: Craft Item
+    - key: UI_FORMAT_BUFF_DURATION
+      value: 'Duration: {0}'
+    - key: UI_FORMAT_BUFF_RECOVERY_HP
+      value: 'Recovery Hp: {0}'
+    - key: UI_FORMAT_BUFF_RECOVERY_MP
+      value: 'Recovery Mp: {0}'
+    - key: UI_FORMAT_BUFF_RECOVERY_STAMINA
+      value: 'Recovery Stamina: {0}'
+    - key: UI_FORMAT_BUFF_RECOVERY_FOOD
+      value: 'Recovery Food: {0}'
+    - key: UI_FORMAT_BUFF_RECOVERY_WATER
+      value: 'Recovery Water: {0}'
+    - key: UI_FORMAT_ITEM_REFINE_LEVEL
+      value: +{0}
+    - key: UI_FORMAT_ITEM_TITLE_WITH_REFINE_LEVEL
+      value: '{0} +{1}'
+    - key: UI_FORMAT_ITEM_TYPE
+      value: 'Item Type: {0}'
+    - key: UI_ITEM_TYPE_JUNK
+      value: Junk
+    - key: UI_ITEM_TYPE_SHIELD
+      value: Shield
+    - key: UI_ITEM_TYPE_POTION
+      value: Potion
+    - key: UI_ITEM_TYPE_AMMO
+      value: Ammo
+    - key: UI_ITEM_TYPE_BUILDING
+      value: Building
+    - key: UI_ITEM_TYPE_PET
+      value: Pet
+    - key: UI_ITEM_TYPE_SOCKET_ENHANCER
+      value: Socket Enhancer
+    - key: UI_FORMAT_ITEM_RARITY
+      value: 'Rarity: {0}'
+    - key: UI_FORMAT_ITEM_STACK
+      value: '{0}/{1}'
+    - key: UI_FORMAT_ITEM_DURABILITY
+      value: 'Durability: {0}'
+    - key: UI_FORMAT_SOCIAL_LEADER
+      value: 'Leader: {0}'
+    - key: UI_FORMAT_SOCIAL_MEMBER_AMOUNT
+      value: 'Member: {0}/{1}'
+    - key: UI_FORMAT_SOCIAL_MEMBER_AMOUNT_NO_LIMIT
+      value: 'Member: {0}'
+    - key: UI_FORMAT_SHARE_EXP_PERCENTAGE
+      value: 'Share Exp: {0}%'
+    - key: UI_FORMAT_REWARD_EXP
+      value: 'Reward Exp: {0}'
+    - key: UI_FORMAT_REWARD_GOLD
+      value: 'Reward Gold: {0}'
+    - key: UI_FORMAT_REWARD_CASH
+      value: 'Reward Cash: {0}'
+    - key: UI_FORMAT_CURRENT_ATTRIBUTE
+      value: '{0}: {1}/{2}'
+    - key: UI_FORMAT_CURRENT_ATTRIBUTE_NOT_ENOUGH
+      value: '{0}: <color=red>{1}/{2}</color>'
+    - key: UI_FORMAT_ATTRIBUTE_AMOUNT
+      value: '{0}: {1}'
+    - key: UI_FORMAT_RESISTANCE_AMOUNT
+      value: '{0}: {1}'
+    - key: UI_FORMAT_CURRENT_SKILL
+      value: '{0}: {1}/{2}'
+    - key: UI_FORMAT_CURRENT_SKILL_NOT_ENOUGH
+      value: '{0}: <color=red>{1}/{2}</color>'
+    - key: UI_FORMAT_SKILL_LEVEL
+      value: '{0}: {1}'
+    - key: UI_FORMAT_CURRENT_ITEM
+      value: '{0}: {1}/{2}'
+    - key: UI_FORMAT_CURRENT_ITEM_NOT_ENOUGH
+      value: '{0}: <color=red>{1}/{2}</color>'
+    - key: UI_FORMAT_ITEM_AMOUNT
+      value: '{0}: {1}'
+    - key: UI_FORMAT_DAMAGE_AMOUNT
+      value: '{0}~{1}'
+    - key: UI_FORMAT_DAMAGE_WITH_ELEMENTAL
+      value: '{0}: {1}~{2}'
+    - key: UI_FORMAT_DAMAGE_INFLICTION
+      value: Inflict {0}% damage
+    - key: UI_FORMAT_DAMAGE_INFLICTION_AS_ELEMENTAL
+      value: Inflict {1}% as {0} damage
+    - key: UI_FORMAT_REQUIRE_GOLD
+      value: 'Gold: {0}/{1}'
+    - key: UI_FORMAT_REQUIRE_GOLD_NOT_ENOUGH
+      value: 'Gold: <color=red>{0}/{1}</color>'
+    - key: UI_FORMAT_EQUIPMENT_SET
+      value: '<color=#ffa500ff>{0}</color>
+
+        {1}'
+    - key: UI_FORMAT_EQUIPMENT_SET_APPLIED_EFFECT
+      value: <color=#ffa500ff>({0}) {1}</color>
+    - key: UI_FORMAT_EQUIPMENT_SET_UNAPPLIED_EFFECT
+      value: ({0}) {1}
+    - key: UI_FORMAT_EQUIPMENT_SOCKET_FILLED
+      value: '<color=#800080ff>({0}) - {1}
+
+        {2}</color>'
+    - key: UI_FORMAT_EQUIPMENT_SOCKET_EMPTY
+      value: <color=#800080ff>({0}) - Empty</color>
+    - key: UI_FORMAT_REFINE_SUCCESS_RATE
+      value: 'Success Rate: {0}%'
+    - key: UI_FORMAT_REFINING_LEVEL
+      value: 'Refining Level: +{0}'
+    - key: UI_FORMAT_INCREASE_MAX_MEMBER
+      value: Max Member +{0}
+    - key: UI_FORMAT_INCREASE_EXP_GAIN_PERCENTAGE
+      value: Exp Gain +{0}%
+    - key: UI_FORMAT_INCREASE_GOLD_GAIN_PERCENTAGE
+      value: Gold Gain +{0}%
+    - key: UI_FORMAT_INCREASE_SHARE_EXP_GAIN_PERCENTAGE
+      value: Party Share Exp +{0}%
+    - key: UI_FORMAT_INCREASE_SHARE_GOLD_GAIN_PERCENTAGE
+      value: Party Share Gold +{0}%
+    - key: UI_FORMAT_DECREASE_EXP_PENALTY_PERCENTAGE
+      value: Exp Penalty -{0}%
+    - key: UI_FORMAT_QUEST_TITLE_ON_GOING
+      value: '{0} (Ongoing)'
+    - key: UI_FORMAT_QUEST_TITLE_TASKS_COMPLETE
+      value: '{0} (Task Completed)'
+    - key: UI_FORMAT_QUEST_TITLE_COMPLETE
+      value: '{0} (Completed)'
+    - key: UI_FORMAT_QUEST_TASK_KILL_MONSTER
+      value: 'Kills {0}: {1}/{2}'
+    - key: UI_FORMAT_QUEST_TASK_COLLECT_ITEM
+      value: 'Collects {0}: {1}/{2}'
+    - key: UI_FORMAT_QUEST_TASK_KILL_MONSTER_COMPLETE
+      value: 'Kills {0}: Complete'
+    - key: UI_FORMAT_QUEST_TASK_COLLECT_ITEM_COMPLETE
+      value: 'Collects {0}: Complete'
+    - key: UI_FORMAT_CHAT_LOCAL
+      value: '<color=white>(LOCAL) {0}: {1}</color>'
+    - key: UI_FORMAT_CHAT_GLOBAL
+      value: '<color=white>(GLOBAL) {0}: {1}</color>'
+    - key: UI_FORMAT_CHAT_WHISPER
+      value: '<color=green>(WHISPER) {0}: {1}</color>'
+    - key: UI_FORMAT_CHAT_PARTY
+      value: '<color=cyan>(PARTY) {0}: {1}</color>'
+    - key: UI_FORMAT_CHAT_GUILD
+      value: '<color=blue>(GUILD) {0}: {1}</color>'
+    - key: UI_ERROR_KICKED_FROM_SERVER
+      value: You have been kicked from server
+    - key: UI_ERROR_CONNECTION_FAILED
+      value: Cannot connect to the server
+    - key: UI_ERROR_CONNECTION_REJECTED
+      value: Connection rejected by server
+    - key: UI_ERROR_REMOTE_CONNECTION_CLOSE
+      value: Server has been closed
+    - key: UI_ERROR_INVALID_PROTOCOL
+      value: Invalid protocol
+    - key: UI_ERROR_HOST_UNREACHABLE
+      value: Host unreachable
+    - key: UI_ERROR_CONNECTION_TIMEOUT
+      value: Connection timeout
+    - key: UI_ERROR_USER_NOT_FOUND
+      value: User not found
+    - key: UI_ERROR_ITEM_NOT_FOUND
+      value: Item not found
+    - key: UI_ERROR_NOT_ENOUGH_GOLD
+      value: Not enough gold
+    - key: UI_ERROR_NOT_ENOUGH_CASH
+      value: Not enough cash
+    - key: UI_ERROR_INVALID_DATA
+      value: Invalid data
+    - key: UI_ERROR_INVALID_CHARACTER_DATA
+      value: Invalid character data
+    - key: UI_ERROR_USERNAME_IS_EMPTY
+      value: Username is empty
+    - key: UI_ERROR_PASSWORD_IS_EMPTY
+      value: Password is empty
+    - key: UI_ERROR_INVALID_USERNAME_OR_PASSWORD
+      value: Invalid username or password
+    - key: UI_ERROR_ALREADY_LOGGED_IN
+      value: User already logged in
+    - key: UI_ERROR_INVALID_CONFIRM_PASSWORD
+      value: Invalid confirm password
+    - key: UI_ERROR_USERNAME_TOO_SHORT
+      value: Username is too short
+    - key: UI_ERROR_USERNAME_TOO_LONG
+      value: Username is too long
+    - key: UI_ERROR_PASSWORD_TOO_SHORT
+      value: Password is too short
+    - key: UI_ERROR_USERNAME_EXISTED
+      value: Username is already existed
+    - key: UI_ERROR_NO_CHOSEN_CHARACTER_TO_START
+      value: Please choose character to start game
+    - key: UI_ERROR_NO_CHOSEN_CHARACTER_TO_DELETE
+      value: Please choose character to delete
+    - key: UI_ERROR_ALREADY_SELECT_CHARACTER
+      value: Already select character
+    - key: UI_ERROR_MAP_SERVER_NOT_READY
+      value: Map server is not ready
+    - key: UI_ERROR_CHARACTER_NAME_TOO_SHORT
+      value: Character name is too short
+    - key: UI_ERROR_CHARACTER_NAME_TOO_LONG
+      value: Character name is too long
+    - key: UI_ERROR_CHARACTER_NAME_EXISTED
+      value: Character name is already existed
+    - key: UI_ERROR_CANNOT_GET_CASH_PACKAGE_INFO
+      value: Cannot retrieve cash package info
+    - key: UI_ERROR_CANNOT_GET_CASH_SHOP_INFO
+      value: Cannot retrieve cash shop info
+    - key: UI_ERROR_GUILD_ROLE_NAME_IS_EMPTY
+      value: Role name must not empty
+    - key: UI_ERROR_GUILD_ROLE_SHARE_EXP_NOT_NUMBER
+      value: Share exp percentage must be number
+    - key: UI_ERROR_INVALID_GUILD_ROLE
+      value: Invalid role
+    - key: UI_SUCCESS_CASH_SHOP_BUY
+      value: Success, let's check your inventory
+    - key: UI_DROP_ITEM
+      value: Drop Item
+    - key: UI_DROP_ITEM_DESCRIPTION
+      value: Enter amount of item
+    - key: UI_SELL_ITEM
+      value: Sell Item
+    - key: UI_SELL_ITEM_DESCRIPTION
+      value: Enter amount of item
+    - key: UI_OFFER_ITEM
+      value: Offer Item
+    - key: UI_OFFER_ITEM_DESCRIPTION
+      value: Enter amount of item
+    - key: UI_MOVE_ITEM_TO_STORAGE
+      value: Move To Storage
+    - key: UI_MOVE_ITEM_TO_STORAGE_DESCRIPTION
+      value: Enter amount of item
+    - key: UI_MOVE_ITEM_FROM_STORAGE
+      value: Move From Storage
+    - key: UI_MOVE_ITEM_FROM_STORAGE_DESCRIPTION
+      value: Enter amount of item
+    - key: UI_BANK_DEPOSIT
+      value: Deposit
+    - key: UI_BANK_DEPOSIT_DESCRIPTION
+      value: Enter amount of gold
+    - key: UI_BANK_WITHDRAW
+      value: Withdraw
+    - key: UI_BANK_WITHDRAW_DESCRIPTION
+      value: Enter amount of gold
+    - key: UI_OFFER_GOLD
+      value: Offer Gold
+    - key: UI_OFFER_GOLD_DESCRIPTION
+      value: Enter amount of gold
+    - key: UI_BUY_ITEM
+      value: Buy Item
+    - key: UI_BUY_ITEM_DESCRIPTION
+      value: Enter amount of item
+    - key: UI_PARTY_CHANGE_LEADER
+      value: Change Leader
+    - key: UI_PARTY_CHANGE_LEADER_DESCRIPTION
+      value: You sure you want to promote {0} to party leader?
+    - key: UI_PARTY_KICK_MEMBER
+      value: Kick Member
+    - key: UI_PARTY_KICK_MEMBER_DESCRIPTION
+      value: You sure you want to kick {0} from party?
+    - key: UI_PARTY_LEAVE
+      value: Leave Party
+    - key: UI_PARTY_LEAVE_DESCRIPTION
+      value: You sure you want to leave party?
+    - key: UI_GUILD_CHANGE_LEADER
+      value: Change Leader
+    - key: UI_GUILD_CHANGE_LEADER_DESCRIPTION
+      value: You sure you want to promote {0} to guild leader?
+    - key: UI_GUILD_KICK_MEMBER
+      value: Kick Member
+    - key: UI_GUILD_KICK_MEMBER_DESCRIPTION
+      value: You sure you want to kick {0} from guild?
+    - key: UI_GUILD_LEAVE
+      value: Leave Guild
+    - key: UI_GUILD_LEAVE_DESCRIPTION
+      value: You sure you want to leave guild?
+    - key: UI_GUILD_ROLE_CAN_INVITE
+      value: Can invite
+    - key: UI_GUILD_ROLE_CANNOT_INVITE
+      value: Cannot invite
+    - key: UI_GUILD_ROLE_CAN_KICK
+      value: Can kick
+    - key: UI_GUILD_ROLE_CANNOT_KICK
+      value: Cannot kick
 --- !u!114 &1650493581 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 114462229916829746, guid: 16b2c0544b2d04c4c94eb1e5d854b997,
