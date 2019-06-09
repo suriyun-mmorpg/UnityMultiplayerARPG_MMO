@@ -290,6 +290,7 @@ namespace MultiplayerARPG.MMO
 
         private IEnumerator OnServerOnlineSceneLoadedRoutine()
         {
+            yield return new WaitForSecondsRealtime(1);
             // Spawn buildings
             if (!IsInstanceMap())
             {
