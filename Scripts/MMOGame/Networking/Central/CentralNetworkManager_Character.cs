@@ -183,7 +183,6 @@ namespace MultiplayerARPG.MMO
                 responseMessage.sceneName = mapServerPeerInfo.extra;
                 responseMessage.networkAddress = mapServerPeerInfo.networkAddress;
                 responseMessage.networkPort = mapServerPeerInfo.networkPort;
-                responseMessage.connectKey = mapServerPeerInfo.connectKey;
             }
             ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MMOMessageTypes.ResponseSelectCharacter, responseMessage);
         }

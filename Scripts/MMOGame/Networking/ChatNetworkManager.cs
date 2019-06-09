@@ -9,7 +9,6 @@ namespace MultiplayerARPG.MMO
     {
         [Header("Central Network Connection")]
         public BaseTransportFactory centralTransportFactory;
-        public string centralConnectKey = "SampleConnectKey";
         public string centralNetworkAddress = "127.0.0.1";
         public int centralNetworkPort = 6000;
         public string machineAddress = "127.0.0.1";
@@ -48,10 +47,8 @@ namespace MultiplayerARPG.MMO
 
         public string CentralNetworkAddress { get { return centralNetworkAddress; } }
         public int CentralNetworkPort { get { return centralNetworkPort; } }
-        public string CentralConnectKey { get { return centralConnectKey; } }
         public string AppAddress { get { return machineAddress; } }
         public int AppPort { get { return networkPort; } }
-        public string AppConnectKey { get { return connectKey; } }
         public string AppExtra { get { return string.Empty; } }
         public CentralServerPeerType PeerType { get { return CentralServerPeerType.Chat; } }
         private MapNetworkManager mapNetworkManager;
@@ -94,11 +91,11 @@ namespace MultiplayerARPG.MMO
             connectionIdsByCharacterName.Clear();
         }
 
-        public void StartClient(MapNetworkManager mapNetworkManager, string networkAddress, int networkPort, string connectKey)
+        public void StartClient(MapNetworkManager mapNetworkManager, string networkAddress, int networkPort)
         {
             // Start client as map server
             this.mapNetworkManager = mapNetworkManager;
-            base.StartClient(networkAddress, networkPort, connectKey);
+            base.StartClient(networkAddress, networkPort);
         }
 
         public override void OnStartServer()

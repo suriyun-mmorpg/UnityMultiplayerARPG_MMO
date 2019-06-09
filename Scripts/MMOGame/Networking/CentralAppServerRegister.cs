@@ -16,7 +16,7 @@ namespace MultiplayerARPG.MMO
         // Events
         public System.Action<AckResponseCode, BaseAckMessage> onAppServerRegistered;
 
-        public CentralAppServerRegister(ITransport transport, IAppServer appServer) : base(transport, appServer.CentralConnectKey)
+        public CentralAppServerRegister(ITransport transport, IAppServer appServer) : base(transport)
         {
             this.appServer = appServer;
             RegisterMessage(MMOMessageTypes.ResponseAppServerRegister, HandleResponseAppServerRegister);
@@ -57,7 +57,7 @@ namespace MultiplayerARPG.MMO
 
         public void ConnectToCentralServer()
         {
-            Debug.Log("[" + appServer.PeerType + "] Connecting to Central Server: " + appServer.CentralNetworkAddress + ":" + appServer.CentralNetworkPort + " " + appServer.CentralConnectKey);
+            Debug.Log("[" + appServer.PeerType + "] Connecting to Central Server: " + appServer.CentralNetworkAddress + ":" + appServer.CentralNetworkPort);
             StartClient(appServer.CentralNetworkAddress, appServer.CentralNetworkPort);
         }
 
@@ -74,7 +74,6 @@ namespace MultiplayerARPG.MMO
             peerInfo.peerType = appServer.PeerType;
             peerInfo.networkAddress = appServer.AppAddress;
             peerInfo.networkPort = appServer.AppPort;
-            peerInfo.connectKey = appServer.AppConnectKey;
             peerInfo.extra = appServer.AppExtra;
             // Send Request
             RequestAppServerRegisterMessage message = new RequestAppServerRegisterMessage();

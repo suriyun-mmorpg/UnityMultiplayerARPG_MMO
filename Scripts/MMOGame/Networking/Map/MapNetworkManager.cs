@@ -15,7 +15,6 @@ namespace MultiplayerARPG.MMO
 
         [Header("Central Network Connection")]
         public BaseTransportFactory centralTransportFactory;
-        public string centralConnectKey = "SampleConnectKey";
         public string centralNetworkAddress = "127.0.0.1";
         public int centralNetworkPort = 6000;
         public string machineAddress = "127.0.0.1";
@@ -77,10 +76,8 @@ namespace MultiplayerARPG.MMO
 
         public string CentralNetworkAddress { get { return centralNetworkAddress; } }
         public int CentralNetworkPort { get { return centralNetworkPort; } }
-        public string CentralConnectKey { get { return centralConnectKey; } }
         public string AppAddress { get { return machineAddress; } }
         public int AppPort { get { return networkPort; } }
-        public string AppConnectKey { get { return connectKey; } }
         public string AppExtra
         {
             get
@@ -505,7 +502,7 @@ namespace MultiplayerARPG.MMO
             MMOWarpMessage message = messageHandler.ReadMessage<MMOWarpMessage>();
             Assets.offlineScene.SceneName = string.Empty;
             StopClient();
-            StartClient(message.networkAddress, message.networkPort, message.connectKey);
+            StartClient(message.networkAddress, message.networkPort);
         }
 
         protected override void HandleChatAtServer(LiteNetLibMessageHandler messageHandler)
@@ -744,7 +741,7 @@ namespace MultiplayerARPG.MMO
                         {
                             if (LogInfo)
                                 Debug.Log("Connecting to chat server");
-                            ChatNetworkManager.StartClient(this, peerInfo.networkAddress, peerInfo.networkPort, peerInfo.connectKey);
+                            ChatNetworkManager.StartClient(this, peerInfo.networkAddress, peerInfo.networkPort);
                         }
                         break;
                 }

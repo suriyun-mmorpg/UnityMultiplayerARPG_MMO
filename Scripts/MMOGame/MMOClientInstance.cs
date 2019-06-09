@@ -119,10 +119,10 @@ namespace MultiplayerARPG.MMO
             centralNetworkManager.StopClient();
         }
 
-        public void StartMapClient(string sceneName, string address, int port, string connectKey)
+        public void StartMapClient(string sceneName, string address, int port)
         {
             mapNetworkManager.Assets.onlineScene.SceneName = sceneName;
-            mapNetworkManager.StartClient(address, port, connectKey);
+            mapNetworkManager.StartClient(address, port);
         }
 
         public void StopMapClient()

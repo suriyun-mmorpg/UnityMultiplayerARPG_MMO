@@ -19,7 +19,6 @@ namespace MultiplayerARPG.MMO
         public string sceneName;
         public string networkAddress;
         public int networkPort;
-        public string connectKey;
 
         public override void DeserializeData(NetDataReader reader)
         {
@@ -27,7 +26,6 @@ namespace MultiplayerARPG.MMO
             sceneName = reader.GetString();
             networkAddress = reader.GetString();
             networkPort = reader.GetInt();
-            connectKey = reader.GetString();
         }
 
         public override void SerializeData(NetDataWriter writer)
@@ -36,7 +34,6 @@ namespace MultiplayerARPG.MMO
             writer.Put(sceneName);
             writer.Put(networkAddress);
             writer.Put(networkPort);
-            writer.Put(connectKey);
         }
     }
 }

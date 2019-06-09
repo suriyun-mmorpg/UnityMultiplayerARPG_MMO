@@ -8,7 +8,6 @@ namespace MultiplayerARPG.MMO
         public CentralServerPeerType peerType;
         public string networkAddress;
         public int networkPort;
-        public string connectKey;
         public string extra;
 
         public void Deserialize(NetDataReader reader)
@@ -16,7 +15,6 @@ namespace MultiplayerARPG.MMO
             peerType = (CentralServerPeerType)reader.GetByte();
             networkAddress = reader.GetString();
             networkPort = reader.GetInt();
-            connectKey = reader.GetString();
             extra = reader.GetString();
         }
 
@@ -25,7 +23,6 @@ namespace MultiplayerARPG.MMO
             writer.Put((byte)peerType);
             writer.Put(networkAddress);
             writer.Put(networkPort);
-            writer.Put(connectKey);
             writer.Put(extra);
         }
     }

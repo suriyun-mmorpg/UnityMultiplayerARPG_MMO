@@ -117,7 +117,7 @@ namespace MultiplayerARPG.MMO
                     UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UILocaleKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
                     break;
                 default:
-                    MMOClientInstance.Singleton.StartMapClient(castedMessage.sceneName, castedMessage.networkAddress, castedMessage.networkPort, castedMessage.connectKey);
+                    MMOClientInstance.Singleton.StartMapClient(castedMessage.sceneName, castedMessage.networkAddress, castedMessage.networkPort);
                     break;
             }
         }
