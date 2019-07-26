@@ -17,7 +17,7 @@ namespace MultiplayerARPG.MMO
                 result = new CharacterHotkey();
                 result.hotkeyId = reader.GetString("hotkeyId");
                 result.type = (HotkeyType)reader.GetSByte("type");
-                result.id = reader.GetString("id");
+                result.relateId = reader.GetString("relateId");
                 return true;
             }
             result = CharacterHotkey.Empty;
@@ -31,7 +31,7 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@characterId", characterId),
                 new SqliteParameter("@hotkeyId", characterHotkey.hotkeyId),
                 new SqliteParameter("@type", characterHotkey.type),
-                new SqliteParameter("@id", characterHotkey.id));
+                new SqliteParameter("@relateId", characterHotkey.relateId));
         }
 
         public List<CharacterHotkey> ReadCharacterHotkeys(string characterId)
