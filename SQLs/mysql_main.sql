@@ -84,7 +84,7 @@ CREATE TABLE `characterhotkey` (
   `characterId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `hotkeyId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `type` tinyint(4) NOT NULL DEFAULT '0',
-  `dataId` int(11) NOT NULL DEFAULT '0',
+  `relateId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
