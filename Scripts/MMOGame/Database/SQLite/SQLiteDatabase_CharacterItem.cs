@@ -31,7 +31,7 @@ namespace MultiplayerARPG.MMO
         private void CreateCharacterItem(int idx, string characterId, InventoryType inventoryType, CharacterItem characterItem)
         {
             ExecuteNonQuery("INSERT INTO characteritem (id, idx, inventoryType, characterId, dataId, level, amount, durability, exp, lockRemainsDuration, ammo, sockets) VALUES (@id, @idx, @inventoryType, @characterId, @dataId, @level, @amount, @durability, @exp, @lockRemainsDuration, @ammo, @sockets)",
-                new SqliteParameter("@id", characterId + "_" + (byte)inventoryType + "_" + idx),
+                new SqliteParameter("@id", characterItem.id),
                 new SqliteParameter("@idx", idx),
                 new SqliteParameter("@inventoryType", (byte)inventoryType),
                 new SqliteParameter("@characterId", characterId),
@@ -53,6 +53,7 @@ namespace MultiplayerARPG.MMO
             if (reader.Read())
             {
                 result = new CharacterItem();
+                result.id = reader.GetString("id");
                 result.dataId = reader.GetInt32("dataId");
                 result.level = (short)reader.GetInt32("level");
                 result.amount = (short)reader.GetInt32("amount");
