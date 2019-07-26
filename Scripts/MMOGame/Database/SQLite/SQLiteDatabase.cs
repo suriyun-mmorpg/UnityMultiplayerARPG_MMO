@@ -73,7 +73,7 @@ namespace MultiplayerARPG.MMO
               characterId TEXT NOT NULL,
               hotkeyId TEXT NOT NULL,
               type INTEGER NOT NULL,
-              dataId INTEGER NOT NULL,
+              relateId TEXT NOT NULL DEFAULT '',
               createAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
               updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
@@ -256,6 +256,9 @@ namespace MultiplayerARPG.MMO
             )");
 
             // Update data
+            if (!IsColumnExist("characterhotkey", "relateId"))
+                ExecuteNonQuery("ALTER TABLE characterhotkey ADD relateId TEXT NOT NULL DEFAULT '';");
+
             if (!IsColumnExist("characteritem", "durability"))
                 ExecuteNonQuery("ALTER TABLE characteritem ADD durability REAL NOT NULL DEFAULT 0;");
 
