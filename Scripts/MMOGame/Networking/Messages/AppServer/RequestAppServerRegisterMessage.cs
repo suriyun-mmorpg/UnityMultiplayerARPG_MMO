@@ -13,7 +13,6 @@ namespace MultiplayerARPG.MMO
 
         public override void DeserializeData(NetDataReader reader)
         {
-            peerInfo = new CentralServerPeerInfo();
             peerInfo.Deserialize(reader);
             time = reader.GetInt();
             hash = reader.GetString();
@@ -21,8 +20,6 @@ namespace MultiplayerARPG.MMO
 
         public override void SerializeData(NetDataWriter writer)
         {
-            if (peerInfo == null)
-                peerInfo = new CentralServerPeerInfo();
             time = (int)(System.DateTime.Now.Ticks / System.TimeSpan.TicksPerMillisecond);
             hash = CentralNetworkManager.GetAppServerRegisterHash(peerInfo.peerType, time);
             peerInfo.Serialize(writer);
@@ -32,7 +29,7 @@ namespace MultiplayerARPG.MMO
 
         public bool ValidateHash()
         {
-            if (string.IsNullOrEmpty(hash) || peerInfo == null)
+            if (string.IsNullOrEmpty(hash))
                 return false;
             return hash.Equals(CentralNetworkManager.GetAppServerRegisterHash(peerInfo.peerType, time));
         }

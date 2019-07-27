@@ -25,8 +25,6 @@ namespace MultiplayerARPG.MMO
         public override void SerializeData(NetDataWriter writer)
         {
             writer.Put((byte)error);
-            if (peerInfo == null)
-                peerInfo = new CentralServerPeerInfo();
             peerInfo.Serialize(writer);
         }
     }

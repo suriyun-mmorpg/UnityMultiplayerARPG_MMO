@@ -159,7 +159,7 @@ namespace MultiplayerARPG.MMO
             long connectionId = messageHandler.connectionId;
             RequestSelectCharacterMessage message = messageHandler.ReadMessage<RequestSelectCharacterMessage>();
             ResponseSelectCharacterMessage.Error error = ResponseSelectCharacterMessage.Error.None;
-            CentralServerPeerInfo mapServerPeerInfo = null;
+            CentralServerPeerInfo mapServerPeerInfo = default(CentralServerPeerInfo);
             CentralUserPeerInfo userPeerInfo;
             if (!userPeers.TryGetValue(connectionId, out userPeerInfo))
                 error = ResponseSelectCharacterMessage.Error.NotLoggedin;
@@ -178,7 +178,7 @@ namespace MultiplayerARPG.MMO
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = error == ResponseSelectCharacterMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
             responseMessage.error = error;
-            if (mapServerPeerInfo != null)
+            if (error != ResponseSelectCharacterMessage.Error.MapNotReady)
             {
                 responseMessage.sceneName = mapServerPeerInfo.extra;
                 responseMessage.networkAddress = mapServerPeerInfo.networkAddress;

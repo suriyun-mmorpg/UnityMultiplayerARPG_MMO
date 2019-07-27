@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG.MMO
 {
-    public class CentralUserPeerInfo : INetSerializable
+    public struct CentralUserPeerInfo : INetSerializable
     {
         public long connectionId;
         public string userId;

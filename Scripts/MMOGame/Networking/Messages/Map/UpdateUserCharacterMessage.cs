@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG.MMO
 {
-    public class UpdateUserCharacterMessage : INetSerializable
+    public struct UpdateUserCharacterMessage : INetSerializable
     {
         public enum UpdateType : byte
         {
@@ -11,7 +11,7 @@ namespace MultiplayerARPG.MMO
             Online,
         }
         public UpdateType type;
-        public UserCharacterData data = new UserCharacterData();
+        public UserCharacterData data;
 
         public void Deserialize(NetDataReader reader)
         {

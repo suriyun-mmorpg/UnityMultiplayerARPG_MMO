@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG.MMO
 {
-    public class MMOWarpMessage : INetSerializable
+    public struct MMOWarpMessage : INetSerializable
     {
         public string networkAddress;
         public int networkPort;
