@@ -745,7 +745,6 @@ MonoBehaviour:
     layerIndex: 14
   nonTargetingLayers:
   - layerIndex: 11
-  groundOrWallLayers: []
   itemAppearDuration: 60
   itemLootLockDuration: 5
   coCharacterActionDuration: 5
@@ -755,6 +754,7 @@ MonoBehaviour:
   buildDistance: 10
   localChatDistance: 10
   inventorySystem: 0
+  baseSlotLimit: 0
   playerStorage:
     weightLimit: 0
     slotLimit: 0
@@ -839,6 +839,26 @@ MonoBehaviour:
     amount: 1
   - item: {fileID: 11400000, guid: cef25d7570c129340a039818a8fca7c6, type: 2}
     amount: 1
+  - item: {fileID: 11400000, guid: 8cd5dd5a92938384984839b652edf203, type: 2}
+    amount: 1
+  - item: {fileID: 11400000, guid: 77e595407b0920e47b26996f042b758d, type: 2}
+    amount: 99
+  - item: {fileID: 11400000, guid: d49d8d8518aed8f4db28cbf1fdd0dc63, type: 2}
+    amount: 99
+  - item: {fileID: 11400000, guid: a7612cb4cbb2ec74b9d41409dacff791, type: 2}
+    amount: 99
+  - item: {fileID: 11400000, guid: 29915ca929a14214baec7de15f1af758, type: 2}
+    amount: 99
+  - item: {fileID: 11400000, guid: 620467d42dba7b344ab2159462ce3b23, type: 2}
+    amount: 99
+  - item: {fileID: 11400000, guid: 526ec951a3646104eabc7ed548e89726, type: 2}
+    amount: 99
+  - item: {fileID: 11400000, guid: cb8adb55fb513f54fa8d9b619540d1d4, type: 2}
+    amount: 99
+  - item: {fileID: 11400000, guid: 71c16926d2dc33343ab0727be3d5341e, type: 2}
+    amount: 99
+  - item: {fileID: 11400000, guid: 52d2c6fb152031542b7798e45c786553, type: 2}
+    amount: 25
   homeScene:
     sceneAsset: {fileID: 102900000, guid: d529c814bb9fcd14289ac4141b27e951, type: 3}
     sceneName: 01Home_MMO
