@@ -579,7 +579,7 @@ namespace MultiplayerARPG.MMO
             Storage storage = GetStorage(playerCharacterEntity.CurrentStorageId);
             bool isLimitSlot = storage.slotLimit > 0;
             short slotLimit = storage.slotLimit;
-            CharacterDataExtension.FillEmptySlots(result, isLimitSlot, slotLimit);
+            result.FillEmptySlots(isLimitSlot, slotLimit);
             // Update storage items
             playerCharacterEntity.StorageItems = result;
         }
@@ -633,10 +633,10 @@ namespace MultiplayerARPG.MMO
                     storageItemList[storageItemIndex].dataId == movingItem.dataId)
                 {
                     // Add to storage or merge
-                    bool isOverwhelming = CharacterDataExtension.IncreasingItemsWillOverwhelming(
-                        storageItemList, movingItem.dataId, movingItem.amount, isLimitWeight, weightLimit,
-                        CharacterDataExtension.GetTotalItemWeight(storageItemList), isLimitSlot, slotLimit);
-                    if (!isOverwhelming && CharacterDataExtension.IncreaseItems(storageItemList, movingItem))
+                    bool isOverwhelming = storageItemList.IncreasingItemsWillOverwhelming(
+                        movingItem.dataId, movingItem.amount, isLimitWeight, weightLimit,
+                        storageItemList.GetTotalItemWeight(), isLimitSlot, slotLimit);
+                    if (!isOverwhelming && storageItemList.IncreaseItems(movingItem))
                     {
                         // Remove from inventory
                         playerCharacterEntity.DecreaseItemsByIndex(nonEquipIndex, amount);
@@ -651,7 +651,7 @@ namespace MultiplayerARPG.MMO
                     storageItemList[storageItemIndex] = nonEquipItem;
                     playerCharacterEntity.NonEquipItems[nonEquipIndex] = storageItem;
                 }
-                CharacterDataExtension.FillEmptySlots(storageItemList, isLimitSlot, slotLimit);
+                storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
             }
             // Update storage list immediately
             // TODO: Have to test about race condition while running multiple-server
@@ -706,7 +706,7 @@ namespace MultiplayerARPG.MMO
                     if (!isOverwhelming && playerCharacterEntity.IncreaseItems(movingItem))
                     {
                         // Remove from storage
-                        CharacterDataExtension.DecreaseItemsByIndex(storageItemList, storageItemIndex, amount);
+                        storageItemList.DecreaseItemsByIndex(storageItemIndex, amount);
                     }
                 }
                 else
@@ -718,7 +718,7 @@ namespace MultiplayerARPG.MMO
                     storageItemList[storageItemIndex] = nonEquipItem;
                     playerCharacterEntity.NonEquipItems[nonEquipIndex] = storageItem;
                 }
-                CharacterDataExtension.FillEmptySlots(storageItemList, isLimitSlot, slotLimit);
+                storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
             }
             // Update storage list immediately
             // TODO: Have to test about race condition while running multiple-server
