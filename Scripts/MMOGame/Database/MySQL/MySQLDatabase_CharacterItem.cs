@@ -30,6 +30,9 @@ namespace MultiplayerARPG.MMO
 
         private void CreateCharacterItem(MySqlConnection connection, MySqlTransaction transaction, int idx, string characterId, InventoryType inventoryType, CharacterItem characterItem)
         {
+            if (string.IsNullOrEmpty(characterItem.id))
+                return;
+
             ExecuteNonQuery(connection, transaction, "INSERT INTO characteritem (id, idx, inventoryType, characterId, dataId, level, amount, durability, exp, lockRemainsDuration, ammo, sockets) VALUES (@id, @idx, @inventoryType, @characterId, @dataId, @level, @amount, @durability, @exp, @lockRemainsDuration, @ammo, @sockets)",
                 new MySqlParameter("@id", characterItem.id),
                 new MySqlParameter("@idx", idx),

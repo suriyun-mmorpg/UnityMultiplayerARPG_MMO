@@ -30,6 +30,9 @@ namespace MultiplayerARPG.MMO
 
         private void CreateCharacterItem(int idx, string characterId, InventoryType inventoryType, CharacterItem characterItem)
         {
+            if (string.IsNullOrEmpty(characterItem.id))
+                return;
+
             ExecuteNonQuery("INSERT INTO characteritem (id, idx, inventoryType, characterId, dataId, level, amount, durability, exp, lockRemainsDuration, ammo, sockets) VALUES (@id, @idx, @inventoryType, @characterId, @dataId, @level, @amount, @durability, @exp, @lockRemainsDuration, @ammo, @sockets)",
                 new SqliteParameter("@id", characterItem.id),
                 new SqliteParameter("@idx", idx),
