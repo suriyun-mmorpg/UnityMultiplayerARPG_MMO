@@ -753,8 +753,8 @@ MonoBehaviour:
   conversationDistance: 3
   buildDistance: 10
   localChatDistance: 10
-  inventorySystem: 0
-  baseSlotLimit: 0
+  inventorySystem: 1
+  baseSlotLimit: 60
   playerStorage:
     weightLimit: 0
     slotLimit: 0
