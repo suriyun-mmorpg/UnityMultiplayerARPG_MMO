@@ -69,12 +69,13 @@ namespace MultiplayerARPG.MMO
         {
             BeginTransaction();
             ExecuteNonQuery("INSERT INTO characters " +
-                "(id, userId, dataId, entityId, characterName, level, exp, currentHp, currentMp, currentStamina, currentFood, currentWater, statPoint, skillPoint, gold, currentMapName, currentPositionX, currentPositionY, currentPositionZ, respawnMapName, respawnPositionX, respawnPositionY, respawnPositionZ) VALUES " +
-                "(@id, @userId, @dataId, @entityId, @characterName, @level, @exp, @currentHp, @currentMp, @currentStamina, @currentFood, @currentWater, @statPoint, @skillPoint, @gold, @currentMapName, @currentPositionX, @currentPositionY, @currentPositionZ, @respawnMapName, @respawnPositionX, @respawnPositionY, @respawnPositionZ)",
+                "(id, userId, dataId, entityId, factionId, characterName, level, exp, currentHp, currentMp, currentStamina, currentFood, currentWater, statPoint, skillPoint, gold, currentMapName, currentPositionX, currentPositionY, currentPositionZ, respawnMapName, respawnPositionX, respawnPositionY, respawnPositionZ) VALUES " +
+                "(@id, @userId, @dataId, @entityId, @factionId, @characterName, @level, @exp, @currentHp, @currentMp, @currentStamina, @currentFood, @currentWater, @statPoint, @skillPoint, @gold, @currentMapName, @currentPositionX, @currentPositionY, @currentPositionZ, @respawnMapName, @respawnPositionX, @respawnPositionY, @respawnPositionZ)",
                 new SqliteParameter("@id", characterData.Id),
                 new SqliteParameter("@userId", userId),
                 new SqliteParameter("@dataId", characterData.DataId),
                 new SqliteParameter("@entityId", characterData.EntityId),
+                new SqliteParameter("@factionId", characterData.FactionId),
                 new SqliteParameter("@characterName", characterData.CharacterName),
                 new SqliteParameter("@level", characterData.Level),
                 new SqliteParameter("@exp", characterData.Exp),
@@ -110,6 +111,7 @@ namespace MultiplayerARPG.MMO
                 result.Id = reader.GetString("id");
                 result.DataId = reader.GetInt32("dataId");
                 result.EntityId = reader.GetInt32("entityId");
+                result.FactionId = reader.GetInt32("factionId");
                 result.CharacterName = reader.GetString("characterName");
                 result.Level = (short)reader.GetInt32("level");
                 result.Exp = reader.GetInt32("exp");
@@ -213,6 +215,7 @@ namespace MultiplayerARPG.MMO
             ExecuteNonQuery("UPDATE characters SET " +
                 "dataId=@dataId, " +
                 "entityId=@entityId, " +
+                "factionId=@factionId, " +
                 "characterName=@characterName, " +
                 "level=@level, " +
                 "exp=@exp, " +
@@ -235,6 +238,7 @@ namespace MultiplayerARPG.MMO
                 "WHERE id=@id",
                 new SqliteParameter("@dataId", character.DataId),
                 new SqliteParameter("@entityId", character.EntityId),
+                new SqliteParameter("@factionId", character.FactionId),
                 new SqliteParameter("@characterName", character.CharacterName),
                 new SqliteParameter("@level", character.Level),
                 new SqliteParameter("@exp", character.Exp),

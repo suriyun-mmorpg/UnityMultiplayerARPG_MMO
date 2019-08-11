@@ -128,6 +128,7 @@ namespace MultiplayerARPG.MMO
               userId TEXT NOT NULL,
               dataId INGETER NOT NULL DEFAULT 0,
               entityId INGETER NOT NULL DEFAULT 0,
+              factionId INGETER NOT NULL DEFAULT 0,
               characterName TEXT NOT NULL UNIQUE,
               level INTEGER NOT NULL,
               exp INTEGER NOT NULL,
@@ -300,6 +301,9 @@ namespace MultiplayerARPG.MMO
 
             if (!IsColumnExist("characters", "entityId"))
                 ExecuteNonQuery("ALTER TABLE characters ADD entityId INTEGER NOT NULL DEFAULT 0;");
+
+            if (!IsColumnExist("characters", "factionId"))
+                ExecuteNonQuery("ALTER TABLE characters ADD factionId INTEGER NOT NULL DEFAULT 0;");
 
             if (!IsColumnExist("guild", "gold"))
                 ExecuteNonQuery("ALTER TABLE guild ADD gold INTEGER NOT NULL DEFAULT 0;");
