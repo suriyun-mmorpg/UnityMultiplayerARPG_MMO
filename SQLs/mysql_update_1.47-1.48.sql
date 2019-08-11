@@ -1,0 +1,5 @@
+START TRANSACTION;
+
+ALTER TABLE `characters` ADD `factionId` INT(11) NOT NULL DEFAULT 0 AFTER `entityId`;
+
+COMMIT;
