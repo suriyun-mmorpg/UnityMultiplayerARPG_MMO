@@ -21,6 +21,7 @@ namespace MultiplayerARPG.MMO
             message.characterName = characterData.CharacterName;
             message.dataId = characterData.DataId;
             message.entityId = characterData.EntityId;
+            message.factionId = characterData.FactionId;
             return Client.ClientSendAckPacket(DeliveryMethod.ReliableOrdered, MMOMessageTypes.RequestCreateCharacter, message, callback, (writer) => SerializeCreateCharacterExtra(characterData, writer));
         }
 
@@ -85,6 +86,7 @@ namespace MultiplayerARPG.MMO
             string characterName = message.characterName;
             int dataId = message.dataId;
             int entityId = message.entityId;
+            int factionId = message.factionId;
             CentralUserPeerInfo userPeerInfo;
             FindCharacterNameJob findCharacterNameJob = new FindCharacterNameJob(Database, characterName);
             findCharacterNameJob.Start();
@@ -98,7 +100,8 @@ namespace MultiplayerARPG.MMO
             else if (characterName.Length > maxCharacterNameLength)
                 error = ResponseCreateCharacterMessage.Error.TooLongCharacterName;
             else if (!GameInstance.PlayerCharacters.ContainsKey(dataId) ||
-                !GameInstance.PlayerCharacterEntities.ContainsKey(entityId))
+                !GameInstance.PlayerCharacterEntities.ContainsKey(entityId) ||
+                !GameInstance.Factions.ContainsKey(factionId))
                 error = ResponseCreateCharacterMessage.Error.InvalidData;
             else
             {
@@ -106,6 +109,7 @@ namespace MultiplayerARPG.MMO
                 PlayerCharacterData characterData = new PlayerCharacterData();
                 characterData.Id = characterId;
                 characterData.SetNewPlayerCharacterData(characterName, dataId, entityId);
+                characterData.FactionId = factionId;
                 DeserializeCreateCharacterExtra(characterData, messageHandler.reader);
                 CreateCharacterJob createCharacterJob = new CreateCharacterJob(Database, userPeerInfo.userId, characterData);
                 createCharacterJob.Start();
