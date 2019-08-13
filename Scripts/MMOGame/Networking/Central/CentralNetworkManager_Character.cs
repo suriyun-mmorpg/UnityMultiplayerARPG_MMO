@@ -101,8 +101,11 @@ namespace MultiplayerARPG.MMO
                 error = ResponseCreateCharacterMessage.Error.TooLongCharacterName;
             else if (!GameInstance.PlayerCharacters.ContainsKey(dataId) ||
                 !GameInstance.PlayerCharacterEntities.ContainsKey(entityId) ||
-                !GameInstance.Factions.ContainsKey(factionId))
+                (GameInstance.Factions.Count > 0 && !GameInstance.Factions.ContainsKey(factionId)))
+            {
+                // If there is factions, it must have faction with the id stored in faction dictionary
                 error = ResponseCreateCharacterMessage.Error.InvalidData;
+            }
             else
             {
                 string characterId = GenericUtils.GetUniqueId();
