@@ -191,6 +191,14 @@ namespace MultiplayerARPG.MMO
               updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
 
+            ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS friend (
+              id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+              characterId1 TEXT NOT NULL,
+              characterId2 TEXT NOT NULL,
+              createAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+              updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+            )");
+
             ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS userlogin (
               id TEXT NOT NULL PRIMARY KEY,
               username TEXT NOT NULL UNIQUE,
