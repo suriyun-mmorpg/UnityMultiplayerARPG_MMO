@@ -315,6 +315,7 @@ namespace MultiplayerARPG.MMO
 
         public override void CreateFriend(string id1, string id2)
         {
+            DeleteFriend(id1, id2);
             ExecuteNonQuery("INSERT INTO friend " +
                 "(characterId1, characterId2) VALUES " +
                 "(@characterId1, @characterId2)",

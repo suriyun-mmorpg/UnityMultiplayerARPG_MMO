@@ -847,5 +847,57 @@ namespace MultiplayerARPG.MMO
             else
                 SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotJoinedGuild);
         }
+
+        public override void FindCharacters(BasePlayerCharacterEntity playerCharacterEntity, string characterName)
+        {
+            StartCoroutine(FindCharactersRoutine(playerCharacterEntity, characterName));
+        }
+
+        private IEnumerator FindCharactersRoutine(BasePlayerCharacterEntity playerCharacterEntity, string characterName)
+        {
+            FindCharactersJob job = new FindCharactersJob(Database, characterName);
+            job.Start();
+            yield return StartCoroutine(job.WaitFor());
+            SendUpdateFoundCharactersToClient(playerCharacterEntity.ConnectionId, job.result.ToArray());
+        }
+
+        public override void AddFriend(BasePlayerCharacterEntity playerCharacterEntity, string friendCharacterId)
+        {
+            StartCoroutine(AddFriendRoutine(playerCharacterEntity, friendCharacterId));
+        }
+
+        private IEnumerator AddFriendRoutine(BasePlayerCharacterEntity playerCharacterEntity, string friendCharacterId)
+        {
+            CreateFriendJob job = new CreateFriendJob(Database, playerCharacterEntity.Id, friendCharacterId);
+            job.Start();
+            yield return StartCoroutine(job.WaitFor());
+            GetFriends(playerCharacterEntity);
+        }
+
+        public override void RemoveFriend(BasePlayerCharacterEntity playerCharacterEntity, string friendCharacterId)
+        {
+            StartCoroutine(RemoveFriendRoutine(playerCharacterEntity, friendCharacterId));
+        }
+
+        private IEnumerator RemoveFriendRoutine(BasePlayerCharacterEntity playerCharacterEntity, string friendCharacterId)
+        {
+            DeleteFriendJob job = new DeleteFriendJob(Database, playerCharacterEntity.Id, friendCharacterId);
+            job.Start();
+            yield return StartCoroutine(job.WaitFor());
+            GetFriends(playerCharacterEntity);
+        }
+
+        public override void GetFriends(BasePlayerCharacterEntity playerCharacterEntity)
+        {
+            StartCoroutine(GetFriendsRoutine(playerCharacterEntity));
+        }
+
+        private IEnumerator GetFriendsRoutine(BasePlayerCharacterEntity playerCharacterEntity)
+        {
+            ReadFriendsJob job = new ReadFriendsJob(Database, playerCharacterEntity.Id);
+            job.Start();
+            yield return StartCoroutine(job.WaitFor());
+            SendUpdateFriendsToClient(playerCharacterEntity.ConnectionId, job.result.ToArray());
+        }
     }
 }
