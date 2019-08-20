@@ -510,7 +510,7 @@ namespace MultiplayerARPG.MMO
             while (reader.Read())
             {
                 characterId = reader.GetString("id2");
-                reader2 = ExecuteReader("SELECT id, dataId, characterName, level FROM characters WHERE id LIKE @id",
+                reader2 = ExecuteReader("SELECT id, dataId, characterName, level FROM characters WHERE BINARY id = @id",
                     new MySqlParameter("@id", characterId));
                 while (reader2.Read())
                 {
