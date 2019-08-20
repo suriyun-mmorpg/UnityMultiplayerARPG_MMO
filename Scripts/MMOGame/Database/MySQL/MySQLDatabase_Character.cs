@@ -463,7 +463,7 @@ namespace MultiplayerARPG.MMO
         public override List<SocialCharacterData> FindCharacters(string characterName)
         {
             List<SocialCharacterData> result = new List<SocialCharacterData>();
-            MySQLRowsReader reader = ExecuteReader("SELECT id, dataId, characterName, level FROM characters WHERE characterName LIKE @characterName",
+            MySQLRowsReader reader = ExecuteReader("SELECT id, dataId, characterName, level FROM characters WHERE characterName LIKE @characterName LIMIT 0, 20",
                 new MySqlParameter("@characterName", "%" + characterName + "%"));
             SocialCharacterData socialCharacterData;
             while (reader.Read())
