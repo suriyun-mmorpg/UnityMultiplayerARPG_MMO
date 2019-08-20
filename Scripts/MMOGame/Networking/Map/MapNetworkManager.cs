@@ -155,9 +155,9 @@ namespace MultiplayerARPG.MMO
             savingBuildings.Clear();
         }
 
-        protected override void UpdateOnlineCharacter(long connectionId, BasePlayerCharacterEntity playerCharacterEntity)
+        protected override void UpdateOnlineCharacter(BasePlayerCharacterEntity playerCharacterEntity)
         {
-            base.UpdateOnlineCharacter(connectionId, playerCharacterEntity);
+            base.UpdateOnlineCharacter(playerCharacterEntity);
 
             UserCharacterData tempUserData;
             if (ChatNetworkManager.IsClientConnected && usersById.TryGetValue(playerCharacterEntity.Id, out tempUserData))
@@ -194,7 +194,7 @@ namespace MultiplayerARPG.MMO
             base.OnDestroy();
         }
 
-        public override void RegisterPlayerCharacter(long connectionId, BasePlayerCharacterEntity playerCharacterEntity)
+        public override void RegisterPlayerCharacter(BasePlayerCharacterEntity playerCharacterEntity)
         {
             // Set user data to map server
             if (!usersById.ContainsKey(playerCharacterEntity.Id))
@@ -215,7 +215,7 @@ namespace MultiplayerARPG.MMO
                 if (ChatNetworkManager.IsClientConnected)
                     UpdateMapUser(ChatNetworkManager.Client, UpdateUserCharacterMessage.UpdateType.Add, userData);
             }
-            base.RegisterPlayerCharacter(connectionId, playerCharacterEntity);
+            base.RegisterPlayerCharacter(playerCharacterEntity);
         }
 
         public override void UnregisterPlayerCharacter(long connectionId)
