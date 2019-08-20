@@ -155,9 +155,9 @@ namespace MultiplayerARPG.MMO
             savingBuildings.Clear();
         }
 
-        protected override void UpdateOnlineCharacter(long connectionId, BasePlayerCharacterEntity playerCharacterEntity, float time)
+        protected override void UpdateOnlineCharacter(long connectionId, BasePlayerCharacterEntity playerCharacterEntity)
         {
-            base.UpdateOnlineCharacter(connectionId, playerCharacterEntity, time);
+            base.UpdateOnlineCharacter(connectionId, playerCharacterEntity);
 
             UserCharacterData tempUserData;
             if (ChatNetworkManager.IsClientConnected && usersById.TryGetValue(playerCharacterEntity.Id, out tempUserData))
