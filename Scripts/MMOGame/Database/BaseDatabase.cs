@@ -44,6 +44,10 @@ namespace MultiplayerARPG.MMO
         public abstract void UpdateCharacter(IPlayerCharacterData character);
         public abstract void DeleteCharacter(string userId, string id);
         public abstract long FindCharacterName(string characterName);
+        public abstract List<SocialCharacterData> FindCharacters(string characterName);
+        public abstract void CreateFriend(string id1, string id2);
+        public abstract void DeleteFriend(string id1, string id2);
+        public abstract List<SocialCharacterData> ReadFriends(string id1);
 
         public abstract void CreateBuilding(string mapName, IBuildingSaveData saveData);
         public abstract List<BuildingSaveData> ReadBuildings(string mapName);

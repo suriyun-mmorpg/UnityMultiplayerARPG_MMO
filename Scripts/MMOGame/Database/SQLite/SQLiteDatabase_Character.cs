@@ -19,7 +19,7 @@ namespace MultiplayerARPG.MMO
             DeleteCharacterSkills(characterId);
             DeleteCharacterSkillUsages(characterId);
             DeleteCharacterSummons(characterId);
-            
+
             CreateCharacterEquipWeapons(characterId, characterData.EquipWeapons);
             int i = 0;
             foreach (CharacterItem equipItem in characterData.EquipItems)
@@ -292,6 +292,71 @@ namespace MultiplayerARPG.MMO
             object result = ExecuteScalar("SELECT COUNT(*) FROM characters WHERE characterName LIKE @characterName",
                 new SqliteParameter("@characterName", characterName));
             return result != null ? (long)result : 0;
+        }
+
+        public override List<SocialCharacterData> FindCharacters(string characterName)
+        {
+            List<SocialCharacterData> result = new List<SocialCharacterData>();
+            SQLiteRowsReader reader = ExecuteReader("SELECT id, dataId, characterName, level FROM characters WHERE characterName LIKE @characterName",
+                new SqliteParameter("@characterName", "%" + characterName + "%"));
+            SocialCharacterData socialCharacterData;
+            while (reader.Read())
+            {
+                // Get some required data, other data will be set at server side
+                socialCharacterData = new SocialCharacterData();
+                socialCharacterData.id = reader.GetString("id");
+                socialCharacterData.characterName = reader.GetString("characterName");
+                socialCharacterData.dataId = reader.GetInt32("dataId");
+                socialCharacterData.level = (short)reader.GetInt32("level");
+                result.Add(socialCharacterData);
+            }
+            return result;
+        }
+
+        public override void CreateFriend(string id1, string id2)
+        {
+            ExecuteNonQuery("INSERT INTO friend " +
+                "(characterId1, characterId2) VALUES " +
+                "(@characterId1, @characterId2)",
+                new SqliteParameter("@characterId1", id1),
+                new SqliteParameter("@characterId2", id2));
+        }
+
+        public override void DeleteFriend(string id1, string id2)
+        {
+            ExecuteNonQuery("DELETE FROM friend WHERE " +
+                "characterId1 LIKE @characterId1 AND " +
+                "characterId2 LIKE @characterId2",
+                new SqliteParameter("@characterId1", id1),
+                new SqliteParameter("@characterId2", id2));
+        }
+
+        public override List<SocialCharacterData> ReadFriends(string id1)
+        {
+            List<SocialCharacterData> result = new List<SocialCharacterData>();
+
+            SQLiteRowsReader reader = ExecuteReader("SELECT characterId2 FROM friend WHERE characterId1=@id1",
+                new SqliteParameter("@id1", id1));
+            string characterId;
+            SocialCharacterData socialCharacterData;
+            SQLiteRowsReader reader2;
+            while (reader.Read())
+            {
+                characterId = reader.GetString("id2");
+                reader2 = ExecuteReader("SELECT id, dataId, characterName, level FROM characters WHERE id LIKE @id",
+                    new SqliteParameter("@id", characterId));
+                while (reader2.Read())
+                {
+                    // Get some required data, other data will be set at server side
+                    socialCharacterData = new SocialCharacterData();
+                    socialCharacterData.id = reader2.GetString("id");
+                    socialCharacterData.characterName = reader2.GetString("characterName");
+                    socialCharacterData.dataId = reader2.GetInt32("dataId");
+                    socialCharacterData.level = (short)reader2.GetInt32("level");
+                    result.Add(socialCharacterData);
+                }
+            }
+            return result;
         }
     }
 }

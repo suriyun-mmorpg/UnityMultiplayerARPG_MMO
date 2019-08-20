@@ -781,6 +781,66 @@ namespace MultiplayerARPG.MMO
             result = database.FindCharacterName(characterName);
         }
     }
+
+    public class FindCharactersJob : DatabaseJob<List<SocialCharacterData>>
+    {
+        private string characterName;
+        public FindCharactersJob(BaseDatabase database, string characterName, Action<List<SocialCharacterData>> onFinished = null) : base(database, onFinished)
+        {
+            this.characterName = characterName;
+        }
+
+        protected override void ThreadFunction()
+        {
+            result = database.FindCharacters(characterName);
+        }
+    }
+
+    public class CreateFriendJob : DatabaseJob
+    {
+        private string id1;
+        private string id2;
+        public CreateFriendJob(BaseDatabase database, string id1, string id2, Action onFinished = null) : base(database, onFinished)
+        {
+            this.id1 = id1;
+            this.id2 = id2;
+        }
+
+        protected override void ThreadFunction()
+        {
+            database.CreateFriend(id1, id2);
+        }
+    }
+
+    public class DeleteFriendJob : DatabaseJob
+    {
+        private string id1;
+        private string id2;
+        public DeleteFriendJob(BaseDatabase database, string id1, string id2, Action onFinished = null) : base(database, onFinished)
+        {
+            this.id1 = id1;
+            this.id2 = id2;
+        }
+
+        protected override void ThreadFunction()
+        {
+            database.DeleteFriend(id1, id2);
+        }
+    }
+
+    public class ReadFriendsJob : DatabaseJob<List<SocialCharacterData>>
+    {
+        private string id1;
+        public ReadFriendsJob(BaseDatabase database, string id1, Action<List<SocialCharacterData>> onFinished = null) : base(database, onFinished)
+        {
+            this.id1 = id1;
+        }
+
+        protected override void ThreadFunction()
+        {
+            result = database.ReadFriends(id1);
+        }
+    }
     #endregion
 
     #region Storage Items
