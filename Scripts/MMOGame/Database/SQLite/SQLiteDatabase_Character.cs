@@ -343,7 +343,7 @@ namespace MultiplayerARPG.MMO
             SQLiteRowsReader reader2;
             while (reader.Read())
             {
-                characterId = reader.GetString("id2");
+                characterId = reader.GetString("characterId2");
                 reader2 = ExecuteReader("SELECT id, dataId, characterName, level FROM characters WHERE id LIKE @id",
                     new SqliteParameter("@id", characterId));
                 while (reader2.Read())
