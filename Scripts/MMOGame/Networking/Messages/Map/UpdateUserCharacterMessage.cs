@@ -56,9 +56,5 @@ namespace MultiplayerARPG.MMO
                 writer.Put(data.maxMp);
             }
         }
-
-        public string CharacterId { get { return data.id; } set { data.id = value; } }
-        public string UserId { get { return data.userId; } set { data.userId = value; } }
-        public string CharacterName { get { return data.characterName; } set { data.characterName = value; } }
     }
 }

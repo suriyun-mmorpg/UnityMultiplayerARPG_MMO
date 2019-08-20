@@ -858,7 +858,14 @@ namespace MultiplayerARPG.MMO
             FindCharactersJob job = new FindCharactersJob(Database, characterName);
             job.Start();
             yield return StartCoroutine(job.WaitFor());
-            SendUpdateFoundCharactersToClient(playerCharacterEntity.ConnectionId, job.result.ToArray());
+            SocialCharacterData[] characters = new SocialCharacterData[job.result.Count];
+            SocialCharacterData tempCharacter;
+            for (int i = 0; i < job.result.Count; ++i)
+            {
+                tempCharacter = job.result[i];
+                characters[i] = tempCharacter;
+            }
+            SendUpdateFoundCharactersToClient(playerCharacterEntity.ConnectionId, characters);
         }
 
         public override void AddFriend(BasePlayerCharacterEntity playerCharacterEntity, string friendCharacterId)

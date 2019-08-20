@@ -780,30 +780,29 @@ namespace MultiplayerARPG.MMO
             switch (message.type)
             {
                 case UpdateUserCharacterMessage.UpdateType.Add:
-                    if (!usersById.ContainsKey(message.CharacterId))
-                        usersById.Add(message.CharacterId, message.data);
+                    if (!usersById.ContainsKey(message.data.id))
+                        usersById.Add(message.data.id, message.data);
                     break;
                 case UpdateUserCharacterMessage.UpdateType.Remove:
-                    usersById.Remove(message.CharacterId);
+                    usersById.Remove(message.data.id);
                     break;
                 case UpdateUserCharacterMessage.UpdateType.Online:
-                    if (usersById.ContainsKey(message.CharacterId))
+                    if (usersById.ContainsKey(message.data.id))
                     {
+                        NotifyOnlineCharacter(message.data.id);
                         socialId = message.data.partyId;
                         if (socialId > 0 && parties.TryGetValue(socialId, out party))
                         {
                             party.UpdateMember(message.data.ToSocialCharacterData());
-                            party.NotifyOnlineMember(message.CharacterId);
                             parties[socialId] = party;
                         }
                         socialId = message.data.guildId;
                         if (socialId > 0 && guilds.TryGetValue(socialId, out guild))
                         {
                             guild.UpdateMember(message.data.ToSocialCharacterData());
-                            guild.NotifyOnlineMember(message.CharacterId);
                             guilds[socialId] = guild;
                         }
-                        usersById[message.CharacterId] = message.data;
+                        usersById[message.data.id] = message.data;
                     }
                     break;
             }
@@ -818,21 +817,21 @@ namespace MultiplayerARPG.MMO
                 switch (message.type)
                 {
                     case UpdateSocialMemberMessage.UpdateType.Add:
-                        if (playerCharactersById.TryGetValue(message.CharacterId, out playerCharacterEntity))
+                        if (playerCharactersById.TryGetValue(message.data.id, out playerCharacterEntity))
                         {
                             playerCharacterEntity.PartyId = message.id;
                             SendCreatePartyToClient(playerCharacterEntity.ConnectionId, party);
                             SendAddPartyMembersToClient(playerCharacterEntity.ConnectionId, party);
                         }
-                        SendAddPartyMemberToClients(party, message.CharacterId, message.data.id, message.data.dataId, message.data.level);
+                        SendAddPartyMemberToClients(party, message.data.id, message.data.characterName, message.data.dataId, message.data.level);
                         break;
                     case UpdateSocialMemberMessage.UpdateType.Remove:
-                        if (playerCharactersById.TryGetValue(message.CharacterId, out playerCharacterEntity))
+                        if (playerCharactersById.TryGetValue(message.data.id, out playerCharacterEntity))
                         {
                             playerCharacterEntity.ClearParty();
                             SendPartyTerminateToClient(playerCharacterEntity.ConnectionId, message.id);
                         }
-                        SendRemovePartyMemberToClients(party, message.CharacterId);
+                        SendRemovePartyMemberToClients(party, message.data.id);
                         break;
                 }
             }
@@ -880,7 +879,7 @@ namespace MultiplayerARPG.MMO
                 switch (message.type)
                 {
                     case UpdateSocialMemberMessage.UpdateType.Add:
-                        if (playerCharactersById.TryGetValue(message.CharacterId, out playerCharacterEntity))
+                        if (playerCharactersById.TryGetValue(message.data.id, out playerCharacterEntity))
                         {
                             playerCharacterEntity.GuildId = message.id;
                             playerCharacterEntity.GuildName = guild.guildName;
@@ -888,15 +887,15 @@ namespace MultiplayerARPG.MMO
                             SendCreateGuildToClient(playerCharacterEntity.ConnectionId, guild);
                             SendAddGuildMembersToClient(playerCharacterEntity.ConnectionId, guild);
                         }
-                        SendAddGuildMemberToClients(guild, message.CharacterId, message.data.id, message.data.dataId, message.data.level);
+                        SendAddGuildMemberToClients(guild, message.data.id, message.data.characterName, message.data.dataId, message.data.level);
                         break;
                     case UpdateSocialMemberMessage.UpdateType.Remove:
-                        if (playerCharactersById.TryGetValue(message.CharacterId, out playerCharacterEntity))
+                        if (playerCharactersById.TryGetValue(message.data.id, out playerCharacterEntity))
                         {
                             playerCharacterEntity.ClearGuild();
                             SendGuildTerminateToClient(playerCharacterEntity.ConnectionId, message.id);
                         }
-                        SendRemoveGuildMemberToClients(guild, message.CharacterId);
+                        SendRemoveGuildMemberToClients(guild, message.data.id);
                         break;
                 }
             }

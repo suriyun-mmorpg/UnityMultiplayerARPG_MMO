@@ -256,34 +256,34 @@ namespace MultiplayerARPG.MMO
                 switch (message.type)
                 {
                     case UpdateUserCharacterMessage.UpdateType.Add:
-                        if (!mapUsersById.ContainsKey(message.CharacterId))
+                        if (!mapUsersById.ContainsKey(message.data.id))
                         {
-                            mapUsersById[message.CharacterId] = message.data;
-                            connectionIdsByCharacterId[message.CharacterId] = connectionId;
-                            connectionIdsByCharacterName[message.CharacterName] = connectionId;
+                            mapUsersById[message.data.id] = message.data;
+                            connectionIdsByCharacterId[message.data.id] = connectionId;
+                            connectionIdsByCharacterName[message.data.characterName] = connectionId;
                             UpdateMapUser(UpdateUserCharacterMessage.UpdateType.Add, message.data, connectionId);
                             if (LogInfo)
-                                Debug.Log("[Chat] Add map user: " + message.UserId + " by " + connectionId);
+                                Debug.Log("[Chat] Add map user: " + message.data.userId + " by " + connectionId);
                         }
                         break;
                     case UpdateUserCharacterMessage.UpdateType.Remove:
-                        if (mapUsersById.TryGetValue(message.CharacterId, out userData))
+                        if (mapUsersById.TryGetValue(message.data.id, out userData))
                         {
                             mapUsersById.Remove(userData.id);
                             connectionIdsByCharacterId.Remove(userData.id);
                             connectionIdsByCharacterName.Remove(userData.characterName);
                             UpdateMapUser(UpdateUserCharacterMessage.UpdateType.Remove, userData, connectionId);
                             if (LogInfo)
-                                Debug.Log("[Chat] Remove map user: " + message.UserId + " by " + connectionId);
+                                Debug.Log("[Chat] Remove map user: " + message.data.userId + " by " + connectionId);
                         }
                         break;
                     case UpdateUserCharacterMessage.UpdateType.Online:
-                        if (mapUsersById.ContainsKey(message.CharacterId))
+                        if (mapUsersById.ContainsKey(message.data.id))
                         {
-                            mapUsersById[message.CharacterId] = message.data;
+                            mapUsersById[message.data.id] = message.data;
                             UpdateMapUser(UpdateUserCharacterMessage.UpdateType.Online, message.data, connectionId);
                             if (LogInfo)
-                                Debug.Log("[Chat] Update map user: " + message.UserId + " by " + connectionId);
+                                Debug.Log("[Chat] Update map user: " + message.data.userId + " by " + connectionId);
                         }
                         break;
                 }

@@ -223,17 +223,17 @@ namespace MultiplayerARPG.MMO
                 switch (message.type)
                 {
                     case UpdateUserCharacterMessage.UpdateType.Add:
-                        if (!mapUserIds[connectionId].Contains(message.UserId))
+                        if (!mapUserIds[connectionId].Contains(message.data.userId))
                         {
-                            mapUserIds[connectionId].Add(message.UserId);
+                            mapUserIds[connectionId].Add(message.data.userId);
                             if (LogInfo)
-                                Debug.Log("[Central] Add map user: " + message.UserId + " by " + connectionId);
+                                Debug.Log("[Central] Add map user: " + message.data.userId + " by " + connectionId);
                         }
                         break;
                     case UpdateUserCharacterMessage.UpdateType.Remove:
-                        mapUserIds[connectionId].Remove(message.UserId);
+                        mapUserIds[connectionId].Remove(message.data.userId);
                         if (LogInfo)
-                            Debug.Log("[Central] Remove map user: " + message.UserId + " by " + connectionId);
+                            Debug.Log("[Central] Remove map user: " + message.data.userId + " by " + connectionId);
                         break;
                 }
             }
