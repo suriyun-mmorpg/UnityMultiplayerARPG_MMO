@@ -747,12 +747,13 @@ MonoBehaviour:
   - layerIndex: 11
   itemAppearDuration: 60
   itemLootLockDuration: 5
-  coCharacterActionDuration: 5
+  dealingRequestDuration: 5
   pickUpItemDistance: 2
   dropDistance: 1
   conversationDistance: 3
   buildDistance: 10
   localChatDistance: 10
+  maxEquipWeaponSet: 2
   inventorySystem: 1
   baseSlotLimit: 60
   playerStorage:
@@ -859,6 +860,14 @@ MonoBehaviour:
     amount: 99
   - item: {fileID: 11400000, guid: 52d2c6fb152031542b7798e45c786553, type: 2}
     amount: 25
+  - item: {fileID: 11400000, guid: 93c389fe9d40638469bffd9de26d31ba, type: 2}
+    amount: 1
+  - item: {fileID: 11400000, guid: f54641aa78cbb5b4fa49b2edbba4f295, type: 2}
+    amount: 1
+  - item: {fileID: 11400000, guid: f54641aa78cbb5b4fa49b2edbba4f295, type: 2}
+    amount: 1
+  - item: {fileID: 11400000, guid: f54641aa78cbb5b4fa49b2edbba4f295, type: 2}
+    amount: 1
   homeScene:
     sceneAsset: {fileID: 102900000, guid: d529c814bb9fcd14289ac4141b27e951, type: 3}
     sceneName: 01Home_MMO
