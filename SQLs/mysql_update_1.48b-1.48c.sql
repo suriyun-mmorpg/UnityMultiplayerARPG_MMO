@@ -1,0 +1,5 @@
+START TRANSACTION;
+
+ALTER TABLE `characteritem` ADD `equipSlotIndex` TINYINT UNSIGNED NOT NULL DEFAULT '0' AFTER `amount`;
+
+COMMIT;
