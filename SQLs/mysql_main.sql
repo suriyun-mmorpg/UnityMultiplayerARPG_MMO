@@ -103,6 +103,7 @@ CREATE TABLE `characteritem` (
   `dataId` int(11) NOT NULL DEFAULT '0',
   `level` int(11) NOT NULL DEFAULT '1',
   `amount` int(11) NOT NULL DEFAULT '0',
+  `equipSlotIndex` tinyint(3) UNSIGNED NOT NULL DEFAULT '0',
   `durability` float NOT NULL DEFAULT '0',
   `exp` int(11) NOT NULL DEFAULT '0',
   `lockRemainsDuration` float NOT NULL DEFAULT '0',
@@ -403,7 +404,7 @@ ALTER TABLE `charactersummon`
 -- Indexes for table `friend`
 --
 ALTER TABLE `friend`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `guild`
@@ -439,6 +440,12 @@ ALTER TABLE `userlogin`
 --
 -- AUTO_INCREMENT for dumped tables
 --
+
+--
+-- AUTO_INCREMENT for table `friend`
+--
+ALTER TABLE `friend`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `guild`
