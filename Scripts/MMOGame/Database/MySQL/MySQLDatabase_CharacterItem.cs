@@ -33,7 +33,7 @@ namespace MultiplayerARPG.MMO
             if (string.IsNullOrEmpty(characterItem.id))
                 return;
 
-            ExecuteNonQuery(connection, transaction, "INSERT INTO characteritem (id, idx, inventoryType, characterId, dataId, level, amount, durability, exp, lockRemainsDuration, ammo, sockets) VALUES (@id, @idx, @inventoryType, @characterId, @dataId, @level, @amount, @durability, @exp, @lockRemainsDuration, @ammo, @sockets)",
+            ExecuteNonQuery(connection, transaction, "INSERT INTO characteritem (id, idx, inventoryType, characterId, dataId, level, amount, equipSlotIndex, durability, exp, lockRemainsDuration, ammo, sockets) VALUES (@id, @idx, @inventoryType, @characterId, @dataId, @level, @amount, @equipSlotIndex, @durability, @exp, @lockRemainsDuration, @ammo, @sockets)",
                 new MySqlParameter("@id", characterItem.id),
                 new MySqlParameter("@idx", idx),
                 new MySqlParameter("@inventoryType", (byte)inventoryType),
@@ -41,6 +41,7 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@dataId", characterItem.dataId),
                 new MySqlParameter("@level", characterItem.level),
                 new MySqlParameter("@amount", characterItem.amount),
+                new MySqlParameter("@equipSlotIndex", characterItem.equipSlotIndex),
                 new MySqlParameter("@durability", characterItem.durability),
                 new MySqlParameter("@exp", characterItem.exp),
                 new MySqlParameter("@lockRemainsDuration", characterItem.lockRemainsDuration),
@@ -60,6 +61,7 @@ namespace MultiplayerARPG.MMO
                 result.dataId = reader.GetInt32("dataId");
                 result.level = (short)reader.GetInt32("level");
                 result.amount = (short)reader.GetInt32("amount");
+                result.equipSlotIndex = (byte)reader.GetInt32("equipSlotIndex");
                 result.durability = reader.GetFloat("durability");
                 result.exp = reader.GetInt32("exp");
                 result.lockRemainsDuration = reader.GetFloat("lockRemainsDuration");
@@ -85,30 +87,38 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public EquipWeapons ReadCharacterEquipWeapons(string characterId)
+        public List<EquipWeapons> ReadCharacterEquipWeapons(string characterId)
         {
-            EquipWeapons result = new EquipWeapons();
-            // Right hand weapon
-            MySQLRowsReader reader = ExecuteReader("SELECT * FROM characteritem WHERE characterId=@characterId AND inventoryType=@inventoryType LIMIT 1",
+            List<EquipWeapons> result = new List<EquipWeapons>();
+
+            MySQLRowsReader reader = ExecuteReader("SELECT * FROM characteritem WHERE characterId=@characterId AND (inventoryType=@inventoryType1 OR inventoryType=@inventoryType2) ORDER BY idx ASC",
                 new MySqlParameter("@characterId", characterId),
-                new MySqlParameter("@inventoryType", (byte)InventoryType.EquipWeaponRight));
-            CharacterItem rightWeapon;
-            if (ReadCharacterItem(reader, out rightWeapon))
-                result.rightHand = rightWeapon;
-            // Left hand weapon
-            reader = ExecuteReader("SELECT * FROM characteritem WHERE characterId=@characterId AND inventoryType=@inventoryType LIMIT 1",
-                new MySqlParameter("@characterId", characterId),
-                new MySqlParameter("@inventoryType", (byte)InventoryType.EquipWeaponLeft));
-            CharacterItem leftWeapon;
-            if (ReadCharacterItem(reader, out leftWeapon))
-                result.leftHand = leftWeapon;
+                new MySqlParameter("@inventoryType1", (byte)InventoryType.EquipWeaponRight),
+                new MySqlParameter("@inventoryType2", (byte)InventoryType.EquipWeaponLeft));
+
+            CharacterItem tempInventory;
+            byte equipWeaponSet;
+            InventoryType inventoryType;
+            while (ReadCharacterItem(reader, out tempInventory, false))
+            {
+                equipWeaponSet = (byte)reader.GetInt32("idx");
+                inventoryType = (InventoryType)reader.GetInt32("inventoryType");
+                // Fill weapon sets if needed
+                while (result.Count <= equipWeaponSet)
+                    result.Add(new EquipWeapons());
+                // Get equip weapon set
+                if (inventoryType == InventoryType.EquipWeaponRight)
+                    result[equipWeaponSet].rightHand = tempInventory;
+                if (inventoryType == InventoryType.EquipWeaponLeft)
+                    result[equipWeaponSet].leftHand = tempInventory;
+            }
             return result;
         }
 
-        public void CreateCharacterEquipWeapons(MySqlConnection connection, MySqlTransaction transaction, string characterId, EquipWeapons equipWeapons)
+        public void CreateCharacterEquipWeapons(MySqlConnection connection, MySqlTransaction transaction, byte equipWeaponSet, string characterId, EquipWeapons equipWeapons)
         {
-            CreateCharacterItem(connection, transaction, 0, characterId, InventoryType.EquipWeaponRight, equipWeapons.rightHand);
-            CreateCharacterItem(connection, transaction, 0, characterId, InventoryType.EquipWeaponLeft, equipWeapons.leftHand);
+            CreateCharacterItem(connection, transaction, equipWeaponSet, characterId, InventoryType.EquipWeaponRight, equipWeapons.rightHand);
+            CreateCharacterItem(connection, transaction, equipWeaponSet, characterId, InventoryType.EquipWeaponLeft, equipWeapons.leftHand);
         }
 
         public void CreateCharacterEquipItem(MySqlConnection connection, MySqlTransaction transaction, int idx, string characterId, CharacterItem characterItem)

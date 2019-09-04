@@ -86,6 +86,7 @@ namespace MultiplayerARPG.MMO
               dataId INTERGER NOT NULL,
               level INTEGER NOT NULL,
               amount INTEGER NOT NULL,
+              equipSlotIndex INTEGER NOT NULL DEFAULT 0,
               durability REAL NOT NULL DEFAULT 0,
               exp INTEGER NOT NULL DEFAULT 0,
               lockRemainsDuration REAL NOT NULL DEFAULT 0,
@@ -267,6 +268,9 @@ namespace MultiplayerARPG.MMO
             // Update data
             if (!IsColumnExist("characterhotkey", "relateId"))
                 ExecuteNonQuery("ALTER TABLE characterhotkey ADD relateId TEXT NOT NULL DEFAULT '';");
+
+            if (!IsColumnExist("characteritem", "equipSlotIndex"))
+                ExecuteNonQuery("ALTER TABLE characteritem ADD equipSlotIndex INTEGER NOT NULL DEFAULT 0;");
 
             if (!IsColumnExist("characteritem", "durability"))
                 ExecuteNonQuery("ALTER TABLE characteritem ADD durability REAL NOT NULL DEFAULT 0;");

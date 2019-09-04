@@ -20,48 +20,46 @@ namespace MultiplayerARPG.MMO
             DeleteCharacterSkillUsages(characterId);
             DeleteCharacterSummons(characterId);
 
-            CreateCharacterEquipWeapons(characterId, characterData.EquipWeapons);
-            int i = 0;
-            foreach (CharacterItem equipItem in characterData.EquipItems)
+            int i;
+            for (i = 0; i < characterData.SelectableWeaponSets.Count; ++i)
             {
-                CreateCharacterEquipItem(i++, characterId, equipItem);
+                CreateCharacterEquipWeapons((byte)i, characterData.Id, characterData.SelectableWeaponSets[i]);
             }
-            i = 0;
-            foreach (CharacterItem nonEquipItem in characterData.NonEquipItems)
+            for (i = 0; i < characterData.EquipItems.Count; ++i)
             {
-                CreateCharacterNonEquipItem(i++, characterId, nonEquipItem);
+                CreateCharacterEquipItem(i, characterData.Id, characterData.EquipItems[i]);
             }
-            i = 0;
-            foreach (CharacterAttribute attribute in characterData.Attributes)
+            for (i = 0; i < characterData.NonEquipItems.Count; ++i)
             {
-                CreateCharacterAttribute(i++, characterId, attribute);
+                CreateCharacterNonEquipItem(i, characterData.Id, characterData.NonEquipItems[i]);
             }
-            i = 0;
-            foreach (CharacterSkill skill in characterData.Skills)
+            for (i = 0; i < characterData.Attributes.Count; ++i)
             {
-                CreateCharacterSkill(i++, characterId, skill);
+                CreateCharacterAttribute(i, characterData.Id, characterData.Attributes[i]);
             }
-            foreach (CharacterSkillUsage skillUsage in characterData.SkillUsages)
+            for (i = 0; i < characterData.Skills.Count; ++i)
             {
-                CreateCharacterSkillUsage(characterId, skillUsage);
+                CreateCharacterSkill(i, characterData.Id, characterData.Skills[i]);
             }
-            i = 0;
-            foreach (CharacterSummon summon in characterData.Summons)
+            for (i = 0; i < characterData.SkillUsages.Count; ++i)
             {
-                CreateCharacterSummon(i++, characterId, summon);
+                CreateCharacterSkillUsage(characterData.Id, characterData.SkillUsages[i]);
             }
-            i = 0;
-            foreach (CharacterQuest quest in characterData.Quests)
+            for (i = 0; i < characterData.Summons.Count; ++i)
             {
-                CreateCharacterQuest(i++, characterId, quest);
+                CreateCharacterSummon(i, characterData.Id, characterData.Summons[i]);
             }
-            foreach (CharacterBuff buff in characterData.Buffs)
+            for (i = 0; i < characterData.Quests.Count; ++i)
             {
-                CreateCharacterBuff(characterId, buff);
+                CreateCharacterQuest(i, characterData.Id, characterData.Quests[i]);
             }
-            foreach (CharacterHotkey hotkey in characterData.Hotkeys)
+            for (i = 0; i < characterData.Buffs.Count; ++i)
             {
-                CreateCharacterHotkey(characterId, hotkey);
+                CreateCharacterBuff(characterData.Id, characterData.Buffs[i]);
+            }
+            for (i = 0; i < characterData.Hotkeys.Count; ++i)
+            {
+                CreateCharacterHotkey(characterData.Id, characterData.Hotkeys[i]);
             }
         }
 
@@ -159,7 +157,7 @@ namespace MultiplayerARPG.MMO
             if (ReadCharacter(reader, out result))
             {
                 if (withEquipWeapons)
-                    result.EquipWeapons = ReadCharacterEquipWeapons(id);
+                    result.SelectableWeaponSets = ReadCharacterEquipWeapons(id);
                 if (withAttributes)
                     result.Attributes = ReadCharacterAttributes(id);
                 if (withSkills)

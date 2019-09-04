@@ -15,10 +15,10 @@ namespace MultiplayerARPG.MMO
             try
             {
                 DeleteCharacterAttributes(connection, transaction, characterData.Id);
-                int i = 0;
-                foreach (CharacterAttribute attribute in characterData.Attributes)
+                int i;
+                for (i = 0; i < characterData.Attributes.Count; ++i)
                 {
-                    CreateCharacterAttribute(connection, transaction, i++, characterData.Id, attribute);
+                    CreateCharacterAttribute(connection, transaction, i, characterData.Id, characterData.Attributes[i]);
                 }
                 transaction.Commit();
             }
@@ -40,9 +40,10 @@ namespace MultiplayerARPG.MMO
             try
             {
                 DeleteCharacterBuffs(connection, transaction, characterData.Id);
-                foreach (CharacterBuff buff in characterData.Buffs)
+                int i;
+                for (i = 0; i < characterData.Buffs.Count; ++i)
                 {
-                    CreateCharacterBuff(connection, transaction, characterData.Id, buff);
+                    CreateCharacterBuff(connection, transaction, characterData.Id, characterData.Buffs[i]);
                 }
                 transaction.Commit();
             }
@@ -64,9 +65,10 @@ namespace MultiplayerARPG.MMO
             try
             {
                 DeleteCharacterHotkeys(connection, transaction, characterData.Id);
-                foreach (CharacterHotkey hotkey in characterData.Hotkeys)
+                int i;
+                for (i = 0; i < characterData.Hotkeys.Count; ++i)
                 {
-                    CreateCharacterHotkey(connection, transaction, characterData.Id, hotkey);
+                    CreateCharacterHotkey(connection, transaction, characterData.Id, characterData.Hotkeys[i]);
                 }
                 transaction.Commit();
             }
@@ -88,16 +90,18 @@ namespace MultiplayerARPG.MMO
             try
             {
                 DeleteCharacterItems(connection, transaction, characterData.Id);
-                CreateCharacterEquipWeapons(connection, transaction, characterData.Id, characterData.EquipWeapons);
-                int i = 0;
-                foreach (CharacterItem equipItem in characterData.EquipItems)
+                int i;
+                for (i = 0; i < characterData.SelectableWeaponSets.Count; ++i)
                 {
-                    CreateCharacterEquipItem(connection, transaction, i++, characterData.Id, equipItem);
+                    CreateCharacterEquipWeapons(connection, transaction, (byte)i, characterData.Id, characterData.SelectableWeaponSets[i]);
                 }
-                i = 0;
-                foreach (CharacterItem nonEquipItem in characterData.NonEquipItems)
+                for (i = 0; i < characterData.EquipItems.Count; ++i)
                 {
-                    CreateCharacterNonEquipItem(connection, transaction, i++, characterData.Id, nonEquipItem);
+                    CreateCharacterEquipItem(connection, transaction, i, characterData.Id, characterData.EquipItems[i]);
+                }
+                for (i = 0; i < characterData.NonEquipItems.Count; ++i)
+                {
+                    CreateCharacterNonEquipItem(connection, transaction, i, characterData.Id, characterData.NonEquipItems[i]);
                 }
                 transaction.Commit();
             }
@@ -119,10 +123,10 @@ namespace MultiplayerARPG.MMO
             try
             {
                 DeleteCharacterQuests(connection, transaction, characterData.Id);
-                int i = 0;
-                foreach (CharacterQuest quest in characterData.Quests)
+                int i;
+                for (i = 0; i < characterData.Quests.Count; ++i)
                 {
-                    CreateCharacterQuest(connection, transaction, i++, characterData.Id, quest);
+                    CreateCharacterQuest(connection, transaction, i, characterData.Id, characterData.Quests[i]);
                 }
                 transaction.Commit();
             }
@@ -144,10 +148,10 @@ namespace MultiplayerARPG.MMO
             try
             {
                 DeleteCharacterSkills(connection, transaction, characterData.Id);
-                int i = 0;
-                foreach (CharacterSkill skill in characterData.Skills)
+                int i;
+                for (i = 0; i < characterData.Skills.Count; ++i)
                 {
-                    CreateCharacterSkill(connection, transaction, i++, characterData.Id, skill);
+                    CreateCharacterSkill(connection, transaction, i, characterData.Id, characterData.Skills[i]);
                 }
                 transaction.Commit();
             }
@@ -169,9 +173,10 @@ namespace MultiplayerARPG.MMO
             try
             {
                 DeleteCharacterSkillUsages(connection, transaction, characterData.Id);
-                foreach (CharacterSkillUsage skillUsage in characterData.SkillUsages)
+                int i;
+                for (i = 0; i < characterData.SkillUsages.Count; ++i)
                 {
-                    CreateCharacterSkillUsage(connection, transaction, characterData.Id, skillUsage);
+                    CreateCharacterSkillUsage(connection, transaction, characterData.Id, characterData.SkillUsages[i]);
                 }
                 transaction.Commit();
             }
@@ -193,10 +198,10 @@ namespace MultiplayerARPG.MMO
             try
             {
                 DeleteCharacterSummons(connection, transaction, characterData.Id);
-                int i = 0;
-                foreach (CharacterSummon skillUsage in characterData.Summons)
+                int i;
+                for (i = 0; i < characterData.Summons.Count; ++i)
                 {
-                    CreateCharacterSummon(connection, transaction, i++, characterData.Id, skillUsage);
+                    CreateCharacterSummon(connection, transaction, i, characterData.Id, characterData.Summons[i]);
                 }
                 transaction.Commit();
             }
@@ -314,7 +319,7 @@ namespace MultiplayerARPG.MMO
             if (ReadCharacter(reader, out result))
             {
                 if (withEquipWeapons)
-                    result.EquipWeapons = ReadCharacterEquipWeapons(id);
+                    result.SelectableWeaponSets = ReadCharacterEquipWeapons(id);
                 if (withAttributes)
                     result.Attributes = ReadCharacterAttributes(id);
                 if (withSkills)

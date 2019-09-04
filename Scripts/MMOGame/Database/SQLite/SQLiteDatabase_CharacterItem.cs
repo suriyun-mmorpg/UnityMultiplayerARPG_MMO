@@ -33,7 +33,7 @@ namespace MultiplayerARPG.MMO
             if (string.IsNullOrEmpty(characterItem.id))
                 return;
 
-            ExecuteNonQuery("INSERT INTO characteritem (id, idx, inventoryType, characterId, dataId, level, amount, durability, exp, lockRemainsDuration, ammo, sockets) VALUES (@id, @idx, @inventoryType, @characterId, @dataId, @level, @amount, @durability, @exp, @lockRemainsDuration, @ammo, @sockets)",
+            ExecuteNonQuery("INSERT INTO characteritem (id, idx, inventoryType, characterId, dataId, level, amount, equipSlotIndex, durability, exp, lockRemainsDuration, ammo, sockets) VALUES (@id, @idx, @inventoryType, @characterId, @dataId, @level, @amount, @equipSlotIndex, @durability, @exp, @lockRemainsDuration, @ammo, @sockets)",
                 new SqliteParameter("@id", characterItem.id),
                 new SqliteParameter("@idx", idx),
                 new SqliteParameter("@inventoryType", (byte)inventoryType),
@@ -41,6 +41,7 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@dataId", characterItem.dataId),
                 new SqliteParameter("@level", characterItem.level),
                 new SqliteParameter("@amount", characterItem.amount),
+                new SqliteParameter("@equipSlotIndex", characterItem.equipSlotIndex),
                 new SqliteParameter("@durability", characterItem.durability),
                 new SqliteParameter("@exp", characterItem.exp),
                 new SqliteParameter("@lockRemainsDuration", characterItem.lockRemainsDuration),
@@ -60,6 +61,7 @@ namespace MultiplayerARPG.MMO
                 result.dataId = reader.GetInt32("dataId");
                 result.level = (short)reader.GetInt32("level");
                 result.amount = (short)reader.GetInt32("amount");
+                result.equipSlotIndex = (byte)reader.GetInt32("equipSlotIndex");
                 result.durability = reader.GetFloat("durability");
                 result.exp = reader.GetInt32("exp");
                 result.lockRemainsDuration = reader.GetFloat("lockRemainsDuration");
@@ -84,31 +86,39 @@ namespace MultiplayerARPG.MMO
             }
             return result;
         }
-
-        public EquipWeapons ReadCharacterEquipWeapons(string characterId)
+        
+        public List<EquipWeapons> ReadCharacterEquipWeapons(string characterId)
         {
-            EquipWeapons result = new EquipWeapons();
-            // Right hand weapon
-            SQLiteRowsReader reader = ExecuteReader("SELECT * FROM characteritem WHERE characterId=@characterId AND inventoryType=@inventoryType LIMIT 1",
+            List<EquipWeapons> result = new List<EquipWeapons>();
+
+            SQLiteRowsReader reader = ExecuteReader("SELECT * FROM characteritem WHERE characterId=@characterId AND (inventoryType=@inventoryType1 OR inventoryType=@inventoryType2) ORDER BY idx ASC",
                 new SqliteParameter("@characterId", characterId),
-                new SqliteParameter("@inventoryType", (byte)InventoryType.EquipWeaponRight));
-            CharacterItem rightWeapon;
-            if (ReadCharacterItem(reader, out rightWeapon))
-                result.rightHand = rightWeapon;
-            // Left hand weapon
-            reader = ExecuteReader("SELECT * FROM characteritem WHERE characterId=@characterId AND inventoryType=@inventoryType LIMIT 1",
-                new SqliteParameter("@characterId", characterId),
-                new SqliteParameter("@inventoryType", (byte)InventoryType.EquipWeaponLeft));
-            CharacterItem leftWeapon;
-            if (ReadCharacterItem(reader, out leftWeapon))
-                result.leftHand = leftWeapon;
+                new SqliteParameter("@inventoryType1", (byte)InventoryType.EquipWeaponRight),
+                new SqliteParameter("@inventoryType2", (byte)InventoryType.EquipWeaponLeft));
+
+            CharacterItem tempInventory;
+            byte equipWeaponSet;
+            InventoryType inventoryType;
+            while (ReadCharacterItem(reader, out tempInventory, false))
+            {
+                equipWeaponSet = (byte)reader.GetInt32("idx");
+                inventoryType = (InventoryType)reader.GetInt32("inventoryType");
+                // Fill weapon sets if needed
+                while (result.Count <= equipWeaponSet)
+                    result.Add(new EquipWeapons());
+                // Get equip weapon set
+                if (inventoryType == InventoryType.EquipWeaponRight)
+                    result[equipWeaponSet].rightHand = tempInventory;
+                if (inventoryType == InventoryType.EquipWeaponLeft)
+                    result[equipWeaponSet].leftHand = tempInventory;
+            }
             return result;
         }
 
-        public void CreateCharacterEquipWeapons(string characterId, EquipWeapons equipWeapons)
+        public void CreateCharacterEquipWeapons(byte equipWeaponSet, string characterId, EquipWeapons equipWeapons)
         {
-            CreateCharacterItem(0, characterId, InventoryType.EquipWeaponRight, equipWeapons.rightHand);
-            CreateCharacterItem(0, characterId, InventoryType.EquipWeaponLeft, equipWeapons.leftHand);
+            CreateCharacterItem(equipWeaponSet, characterId, InventoryType.EquipWeaponRight, equipWeapons.rightHand);
+            CreateCharacterItem(equipWeaponSet, characterId, InventoryType.EquipWeaponLeft, equipWeapons.leftHand);
         }
 
         public void CreateCharacterEquipItem(int idx, string characterId, CharacterItem characterItem)
