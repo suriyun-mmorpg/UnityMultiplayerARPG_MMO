@@ -273,19 +273,19 @@ namespace MultiplayerARPG.MMO
                 result.EntityId = reader.GetInt32("entityId");
                 result.FactionId = reader.GetInt32("factionId");
                 result.CharacterName = reader.GetString("characterName");
-                result.Level = (short)reader.GetInt32("level");
+                result.Level = reader.GetInt16("level");
                 result.Exp = reader.GetInt32("exp");
                 result.CurrentHp = reader.GetInt32("currentHp");
                 result.CurrentMp = reader.GetInt32("currentMp");
                 result.CurrentStamina = reader.GetInt32("currentStamina");
                 result.CurrentFood = reader.GetInt32("currentFood");
                 result.CurrentWater = reader.GetInt32("currentWater");
-                result.StatPoint = (short)reader.GetInt32("statPoint");
-                result.SkillPoint = (short)reader.GetInt32("skillPoint");
+                result.StatPoint = reader.GetInt16("statPoint");
+                result.SkillPoint = reader.GetInt16("skillPoint");
                 result.Gold = reader.GetInt32("gold");
                 result.PartyId = reader.GetInt32("partyId");
                 result.GuildId = reader.GetInt32("guildId");
-                result.GuildRole = (byte)reader.GetInt32("guildRole");
+                result.GuildRole = reader.GetByte("guildRole");
                 result.SharedGuildExp = reader.GetInt32("sharedGuildExp");
                 result.CurrentMapName = reader.GetString("currentMapName");
                 result.CurrentPosition = new Vector3(reader.GetFloat("currentPositionX"), reader.GetFloat("currentPositionY"), reader.GetFloat("currentPositionZ"));
@@ -478,7 +478,7 @@ namespace MultiplayerARPG.MMO
                 socialCharacterData.id = reader.GetString("id");
                 socialCharacterData.characterName = reader.GetString("characterName");
                 socialCharacterData.dataId = reader.GetInt32("dataId");
-                socialCharacterData.level = (short)reader.GetInt32("level");
+                socialCharacterData.level = reader.GetInt16("level");
                 result.Add(socialCharacterData);
             }
             return result;
@@ -524,7 +524,7 @@ namespace MultiplayerARPG.MMO
                     socialCharacterData.id = reader2.GetString("id");
                     socialCharacterData.characterName = reader2.GetString("characterName");
                     socialCharacterData.dataId = reader2.GetInt32("dataId");
-                    socialCharacterData.level = (short)reader2.GetInt32("level");
+                    socialCharacterData.level = reader2.GetInt16("level");
                     result.Add(socialCharacterData);
                 }
             }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data.Common;
 
 namespace MultiplayerARPG.MMO
@@ -43,14 +44,14 @@ namespace MultiplayerARPG.MMO
             return true;
         }
 
-        public System.DateTime GetDateTime(int index)
+        public DateTime GetDateTime(int index)
         {
-            return (System.DateTime)data[currentRow][index];
+            return (DateTime)data[currentRow][index];
         }
 
-        public System.DateTime GetDateTime(string columnName)
+        public DateTime GetDateTime(string columnName)
         {
-            return (System.DateTime)dataDict[currentRow][columnName];
+            return (DateTime)dataDict[currentRow][columnName];
         }
 
         public object GetObject(int index)
@@ -65,142 +66,142 @@ namespace MultiplayerARPG.MMO
 
         public byte GetByte(int index)
         {
-            return (byte)(long)data[currentRow][index];
+            return Convert.ToByte(data[currentRow][index]);
         }
 
         public byte GetByte(string columnName)
         {
-            return (byte)(long)dataDict[currentRow][columnName];
+            return Convert.ToByte(dataDict[currentRow][columnName]);
         }
 
         public sbyte GetSByte(int index)
         {
-            return (sbyte)(long)data[currentRow][index];
+            return Convert.ToSByte(data[currentRow][index]);
         }
 
         public sbyte GetSByte(string columnName)
         {
-            return (sbyte)(long)dataDict[currentRow][columnName];
+            return Convert.ToSByte(dataDict[currentRow][columnName]);
         }
 
         public char GetChar(int index)
         {
-            return (char)data[currentRow][index];
+            return Convert.ToChar(data[currentRow][index]);
         }
 
         public char GetChar(string columnName)
         {
-            return (char)dataDict[currentRow][columnName];
+            return Convert.ToChar(dataDict[currentRow][columnName]);
         }
 
         public string GetString(int index)
         {
-            return (string)data[currentRow][index];
+            return Convert.ToString(data[currentRow][index]);
         }
 
         public string GetString(string columnName)
         {
-            return (string)dataDict[currentRow][columnName];
+            return Convert.ToString(dataDict[currentRow][columnName]);
         }
 
         public bool GetBoolean(int index)
         {
-            return ((long)data[currentRow][index]) != 0;
+            return Convert.ToBoolean(data[currentRow][index]);
         }
 
         public bool GetBoolean(string columnName)
         {
-            return ((long)dataDict[currentRow][columnName]) != 0;
+            return Convert.ToBoolean(dataDict[currentRow][columnName]);
         }
 
         public short GetInt16(int index)
         {
-            try { return (short)(long)data[currentRow][index]; } catch { return 0; }
+            return Convert.ToInt16(data[currentRow][index]);
         }
 
         public short GetInt16(string columnName)
         {
-            try { return (short)(long)dataDict[currentRow][columnName]; } catch { return 0; }
+            return Convert.ToInt16(dataDict[currentRow][columnName]);
         }
 
         public int GetInt32(int index)
         {
-            try { return (int)(long)data[currentRow][index]; } catch { return 0; }
+            return Convert.ToInt32(data[currentRow][index]);
         }
 
         public int GetInt32(string columnName)
         {
-            try { return (int)(long)dataDict[currentRow][columnName]; } catch { return 0; }
+            return Convert.ToInt32(dataDict[currentRow][columnName]);
         }
 
         public long GetInt64(int index)
         {
-            try { return (long)data[currentRow][index]; } catch { return 0; }
+            return Convert.ToInt64(data[currentRow][index]);
         }
 
         public long GetInt64(string columnName)
         {
-            try { return (long)dataDict[currentRow][columnName]; } catch { return 0; }
+            return Convert.ToInt64(dataDict[currentRow][columnName]);
         }
 
         public ushort GetUInt16(int index)
         {
-            try { return (ushort)(long)data[currentRow][index]; } catch { return 0; }
+            return Convert.ToUInt16(data[currentRow][index]);
         }
 
         public ushort GetUInt16(string columnName)
         {
-            try { return (ushort)(long)dataDict[currentRow][columnName]; } catch { return 0; }
+            return Convert.ToUInt16(dataDict[currentRow][columnName]);
         }
 
         public uint GetUInt32(int index)
         {
-            try { return (uint)(long)data[currentRow][index]; } catch { return 0; }
+            return Convert.ToUInt32(data[currentRow][index]);
         }
 
         public uint GetUInt32(string columnName)
         {
-            try { return (uint)(long)dataDict[currentRow][columnName]; } catch { return 0; }
+            return Convert.ToUInt32(dataDict[currentRow][columnName]);
         }
 
         public ulong GetUInt64(int index)
         {
-            try { return (ulong)(long)data[currentRow][index]; } catch { return 0; }
+            return Convert.ToUInt64(data[currentRow][index]);
         }
 
         public ulong GetUInt64(string columnName)
         {
-            try { return (ulong)(long)dataDict[currentRow][columnName]; } catch { return 0; }
+            return Convert.ToUInt64(dataDict[currentRow][columnName]);
         }
 
         public decimal GetDecimal(int index)
         {
-            try { return (decimal)(float)data[currentRow][index]; } catch { return 0; }
+            return Convert.ToDecimal(data[currentRow][index]);
         }
 
         public decimal GetDecimal(string columnName)
         {
-            try { return (decimal)(float)dataDict[currentRow][columnName]; } catch { return 0; }
+            return Convert.ToDecimal(dataDict[currentRow][columnName]);
         }
 
         public float GetFloat(int index)
         {
-            try { return (float)data[currentRow][index]; } catch { return 0; }
+            return Convert.ToSingle(data[currentRow][index]);
         }
 
         public float GetFloat(string columnName)
         {
-            try { return (float)dataDict[currentRow][columnName]; } catch { return 0; }
+            return Convert.ToSingle(dataDict[currentRow][columnName]);
         }
 
         public double GetDouble(int index)
         {
-            try { return (float)data[currentRow][index]; } catch { return 0; }
+            return Convert.ToDouble(data[currentRow][index]);
         }
 
         public double GetDouble(string columnName)
         {
-            try { return (float)dataDict[currentRow][columnName]; } catch { return 0; }
+            return Convert.ToDouble(dataDict[currentRow][columnName]);
         }
 
         public void ResetReader()

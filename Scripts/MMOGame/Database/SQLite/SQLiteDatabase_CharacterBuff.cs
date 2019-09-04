@@ -17,7 +17,7 @@ namespace MultiplayerARPG.MMO
                 result = new CharacterBuff();
                 result.type = (BuffType)reader.GetSByte("type");
                 result.dataId = reader.GetInt32("dataId");
-                result.level = (short)reader.GetInt32("level");
+                result.level = reader.GetInt16("level");
                 result.buffRemainsDuration = reader.GetFloat("buffRemainsDuration");
                 return true;
             }

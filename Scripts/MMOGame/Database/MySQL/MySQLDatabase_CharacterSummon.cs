@@ -17,7 +17,7 @@ namespace MultiplayerARPG.MMO
                 result.type = (SummonType)reader.GetSByte("type");
                 result.dataId = reader.GetInt32("dataId");
                 result.summonRemainsDuration = reader.GetFloat("summonRemainsDuration");
-                result.level = (short)reader.GetInt32("level");
+                result.level = reader.GetInt16("level");
                 result.exp = reader.GetInt32("exp");
                 result.currentHp = reader.GetInt32("currentHp");
                 result.currentMp = reader.GetInt32("currentMp");

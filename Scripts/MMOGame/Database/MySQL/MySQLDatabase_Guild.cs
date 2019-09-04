@@ -30,9 +30,9 @@ namespace MultiplayerARPG.MMO
             if (reader.Read())
             {
                 result = new GuildData(id, reader.GetString("guildName"), reader.GetString("leaderId"), defaultGuildRoles);
-                result.level = (short)reader.GetInt32("level");
+                result.level = reader.GetInt16("level");
                 result.exp = reader.GetInt32("exp");
-                result.skillPoint = (short)reader.GetInt32("skillPoint");
+                result.skillPoint = reader.GetInt16("skillPoint");
                 result.guildMessage = reader.GetString("guildMessage");
                 result.gold = reader.GetInt32("gold");
 
@@ -42,12 +42,12 @@ namespace MultiplayerARPG.MMO
                 GuildRoleData guildRoleData;
                 while (reader.Read())
                 {
-                    guildRole = (byte)reader.GetInt32("guildRole");
+                    guildRole = reader.GetByte("guildRole");
                     guildRoleData = new GuildRoleData();
                     guildRoleData.roleName = reader.GetString("name");
                     guildRoleData.canInvite = reader.GetBoolean("canInvite");
                     guildRoleData.canKick = reader.GetBoolean("canKick");
-                    guildRoleData.shareExpPercentage = (byte)reader.GetInt32("shareExpPercentage");
+                    guildRoleData.shareExpPercentage = reader.GetByte("shareExpPercentage");
                     result.SetRole(guildRole, guildRoleData);
                 }
 
@@ -61,15 +61,15 @@ namespace MultiplayerARPG.MMO
                     guildMemberData.id = reader.GetString("id");
                     guildMemberData.characterName = reader.GetString("characterName");
                     guildMemberData.dataId = reader.GetInt32("dataId");
-                    guildMemberData.level = (short)reader.GetInt32("level");
-                    result.AddMember(guildMemberData, (byte)reader.GetInt32("guildRole"));
+                    guildMemberData.level = reader.GetInt16("level");
+                    result.AddMember(guildMemberData, reader.GetByte("guildRole"));
                 }
 
                 reader = ExecuteReader("SELECT dataId, level FROM guildskill WHERE guildId=@id",
                     new MySqlParameter("@id", id));
                 while (reader.Read())
                 {
-                    result.SetSkillLevel(reader.GetInt32("dataId"), (short)reader.GetInt32("level"));
+                    result.SetSkillLevel(reader.GetInt32("dataId"), reader.GetInt16("level"));
                 }
             }
             return result;
@@ -87,9 +87,9 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@id", id));
             if (reader.Read())
             {
-                resultLevel = (short)reader.GetInt32("level");
+                resultLevel = reader.GetInt16("level");
                 resultExp = reader.GetInt32("exp");
-                resultSkillPoint = (short)reader.GetInt32("skillPoint");
+                resultSkillPoint = reader.GetInt16("skillPoint");
                 // Update when guild level is increase
                 if (SocialSystemSetting.CalculateIncreasedGuildExp(expTree, resultLevel, resultExp, resultSkillPoint, out resultLevel, out resultExp, out resultSkillPoint))
                 {
