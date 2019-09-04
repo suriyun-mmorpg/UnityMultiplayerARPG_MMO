@@ -916,6 +916,8 @@ MonoBehaviour:
     keyCode: 114
   - keyName: ExitVehicle
     keyCode: 120
+  - keyName: SwitchEquipWeaponSet
+    keyCode: 96
 --- !u!114 &1379718505
 MonoBehaviour:
   m_ObjectHideFlags: 0
