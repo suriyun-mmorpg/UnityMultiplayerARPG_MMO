@@ -230,8 +230,8 @@ namespace MultiplayerARPG.MMO
         public override void CreateCharacter(string userId, IPlayerCharacterData characterData)
         {
             ExecuteNonQuery("INSERT INTO characters " +
-                "(id, userId, dataId, entityId, factionId, characterName, level, exp, currentHp, currentMp, currentStamina, currentFood, currentWater, statPoint, skillPoint, gold, currentMapName, currentPositionX, currentPositionY, currentPositionZ, respawnMapName, respawnPositionX, respawnPositionY, respawnPositionZ) VALUES " +
-                "(@id, @userId, @dataId, @entityId, @factionId, @characterName, @level, @exp, @currentHp, @currentMp, @currentStamina, @currentFood, @currentWater, @statPoint, @skillPoint, @gold, @currentMapName, @currentPositionX, @currentPositionY, @currentPositionZ, @respawnMapName, @respawnPositionX, @respawnPositionY, @respawnPositionZ)",
+                "(id, userId, dataId, entityId, factionId, characterName, level, exp, currentHp, currentMp, currentStamina, currentFood, currentWater, equipWeaponSet, statPoint, skillPoint, gold, currentMapName, currentPositionX, currentPositionY, currentPositionZ, respawnMapName, respawnPositionX, respawnPositionY, respawnPositionZ) VALUES " +
+                "(@id, @userId, @dataId, @entityId, @factionId, @characterName, @level, @exp, @currentHp, @currentMp, @currentStamina, @currentFood, @currentWater, @equipWeaponSet, @statPoint, @skillPoint, @gold, @currentMapName, @currentPositionX, @currentPositionY, @currentPositionZ, @respawnMapName, @respawnPositionX, @respawnPositionY, @respawnPositionZ)",
                 new MySqlParameter("@id", characterData.Id),
                 new MySqlParameter("@userId", userId),
                 new MySqlParameter("@dataId", characterData.DataId),
@@ -245,6 +245,7 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@currentStamina", characterData.CurrentStamina),
                 new MySqlParameter("@currentFood", characterData.CurrentFood),
                 new MySqlParameter("@currentWater", characterData.CurrentWater),
+                new MySqlParameter("@equipWeaponSet", characterData.EquipWeaponSet),
                 new MySqlParameter("@statPoint", characterData.StatPoint),
                 new MySqlParameter("@skillPoint", characterData.SkillPoint),
                 new MySqlParameter("@gold", characterData.Gold),
@@ -280,6 +281,7 @@ namespace MultiplayerARPG.MMO
                 result.CurrentStamina = reader.GetInt32("currentStamina");
                 result.CurrentFood = reader.GetInt32("currentFood");
                 result.CurrentWater = reader.GetInt32("currentWater");
+                result.EquipWeaponSet = reader.GetByte("equipWeaponSet");
                 result.StatPoint = reader.GetInt16("statPoint");
                 result.SkillPoint = reader.GetInt16("skillPoint");
                 result.Gold = reader.GetInt32("gold");
@@ -383,6 +385,7 @@ namespace MultiplayerARPG.MMO
                 "currentStamina=@currentStamina, " +
                 "currentFood=@currentFood, " +
                 "currentWater=@currentWater, " +
+                "equipWeaponSet=@equipWeaponSet, " +
                 "statPoint=@statPoint, " +
                 "skillPoint=@skillPoint, " +
                 "gold=@gold, " +
@@ -406,6 +409,7 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@currentStamina", character.CurrentStamina),
                 new MySqlParameter("@currentFood", character.CurrentFood),
                 new MySqlParameter("@currentWater", character.CurrentWater),
+                new MySqlParameter("@equipWeaponSet", character.EquipWeaponSet),
                 new MySqlParameter("@statPoint", character.StatPoint),
                 new MySqlParameter("@skillPoint", character.SkillPoint),
                 new MySqlParameter("@gold", character.Gold),

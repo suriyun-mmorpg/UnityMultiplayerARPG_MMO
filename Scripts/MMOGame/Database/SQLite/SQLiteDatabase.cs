@@ -138,6 +138,7 @@ namespace MultiplayerARPG.MMO
               currentStamina INTEGER NOT NULL,
               currentFood INTEGER NOT NULL,
               currentWater INTEGER NOT NULL,
+              equipWeaponSet INTEGER NOT NULL DEFAULT 0,
               statPoint INTEGER NOT NULL,
               skillPoint INTEGER NOT NULL,
               gold INTEGER NOT NULL,
@@ -316,6 +317,9 @@ namespace MultiplayerARPG.MMO
 
             if (!IsColumnExist("characters", "factionId"))
                 ExecuteNonQuery("ALTER TABLE characters ADD factionId INTEGER NOT NULL DEFAULT 0;");
+
+            if (!IsColumnExist("characters", "equipWeaponSet"))
+                ExecuteNonQuery("ALTER TABLE characters ADD equipWeaponSet INTEGER NOT NULL DEFAULT 0;");
 
             if (!IsColumnExist("guild", "gold"))
                 ExecuteNonQuery("ALTER TABLE guild ADD gold INTEGER NOT NULL DEFAULT 0;");

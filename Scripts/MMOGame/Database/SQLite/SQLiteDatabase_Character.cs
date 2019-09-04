@@ -67,8 +67,8 @@ namespace MultiplayerARPG.MMO
         {
             BeginTransaction();
             ExecuteNonQuery("INSERT INTO characters " +
-                "(id, userId, dataId, entityId, factionId, characterName, level, exp, currentHp, currentMp, currentStamina, currentFood, currentWater, statPoint, skillPoint, gold, currentMapName, currentPositionX, currentPositionY, currentPositionZ, respawnMapName, respawnPositionX, respawnPositionY, respawnPositionZ) VALUES " +
-                "(@id, @userId, @dataId, @entityId, @factionId, @characterName, @level, @exp, @currentHp, @currentMp, @currentStamina, @currentFood, @currentWater, @statPoint, @skillPoint, @gold, @currentMapName, @currentPositionX, @currentPositionY, @currentPositionZ, @respawnMapName, @respawnPositionX, @respawnPositionY, @respawnPositionZ)",
+                "(id, userId, dataId, entityId, factionId, characterName, level, exp, currentHp, currentMp, currentStamina, currentFood, currentWater, equipWeaponSet, statPoint, skillPoint, gold, currentMapName, currentPositionX, currentPositionY, currentPositionZ, respawnMapName, respawnPositionX, respawnPositionY, respawnPositionZ) VALUES " +
+                "(@id, @userId, @dataId, @entityId, @factionId, @characterName, @level, @exp, @currentHp, @currentMp, @currentStamina, @currentFood, @currentWater, @equipWeaponSet, @statPoint, @skillPoint, @gold, @currentMapName, @currentPositionX, @currentPositionY, @currentPositionZ, @respawnMapName, @respawnPositionX, @respawnPositionY, @respawnPositionZ)",
                 new SqliteParameter("@id", characterData.Id),
                 new SqliteParameter("@userId", userId),
                 new SqliteParameter("@dataId", characterData.DataId),
@@ -82,6 +82,7 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@currentStamina", characterData.CurrentStamina),
                 new SqliteParameter("@currentFood", characterData.CurrentFood),
                 new SqliteParameter("@currentWater", characterData.CurrentWater),
+                new SqliteParameter("@equipWeaponSet", characterData.EquipWeaponSet),
                 new SqliteParameter("@statPoint", characterData.StatPoint),
                 new SqliteParameter("@skillPoint", characterData.SkillPoint),
                 new SqliteParameter("@gold", characterData.Gold),
@@ -118,6 +119,7 @@ namespace MultiplayerARPG.MMO
                 result.CurrentStamina = reader.GetInt32("currentStamina");
                 result.CurrentFood = reader.GetInt32("currentFood");
                 result.CurrentWater = reader.GetInt32("currentWater");
+                result.EquipWeaponSet = reader.GetByte("equipWeaponSet");
                 result.StatPoint = reader.GetInt16("statPoint");
                 result.SkillPoint = reader.GetInt16("skillPoint");
                 result.Gold = reader.GetInt32("gold");
@@ -222,6 +224,7 @@ namespace MultiplayerARPG.MMO
                 "currentStamina=@currentStamina, " +
                 "currentFood=@currentFood, " +
                 "currentWater=@currentWater, " +
+                "equipWeaponSet=@equipWeaponSet, " +
                 "statPoint=@statPoint, " +
                 "skillPoint=@skillPoint, " +
                 "gold=@gold, " +
@@ -245,6 +248,7 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@currentStamina", character.CurrentStamina),
                 new SqliteParameter("@currentFood", character.CurrentFood),
                 new SqliteParameter("@currentWater", character.CurrentWater),
+                new SqliteParameter("@equipWeaponSet", character.EquipWeaponSet),
                 new SqliteParameter("@statPoint", character.StatPoint),
                 new SqliteParameter("@skillPoint", character.SkillPoint),
                 new SqliteParameter("@gold", character.Gold),

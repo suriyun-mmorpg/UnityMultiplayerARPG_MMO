@@ -150,6 +150,7 @@ CREATE TABLE `characters` (
   `currentStamina` int(11) NOT NULL DEFAULT '0',
   `currentFood` int(11) NOT NULL DEFAULT '0',
   `currentWater` int(11) NOT NULL DEFAULT '0',
+  `equipWeaponSet` tinyint(3) UNSIGNED NOT NULL DEFAULT '0',
   `statPoint` int(11) NOT NULL DEFAULT '0',
   `skillPoint` int(11) NOT NULL DEFAULT '0',
   `gold` int(11) NOT NULL DEFAULT '0',
