@@ -165,9 +165,9 @@ namespace MultiplayerARPG.MMO
                 tempUserData.dataId = playerCharacterEntity.DataId;
                 tempUserData.level = playerCharacterEntity.Level;
                 tempUserData.currentHp = playerCharacterEntity.CurrentHp;
-                tempUserData.maxHp = playerCharacterEntity.CacheMaxHp;
+                tempUserData.maxHp = playerCharacterEntity.MaxHp;
                 tempUserData.currentMp = playerCharacterEntity.CurrentMp;
-                tempUserData.maxMp = playerCharacterEntity.CacheMaxMp;
+                tempUserData.maxMp = playerCharacterEntity.MaxMp;
                 tempUserData.partyId = playerCharacterEntity.PartyId;
                 tempUserData.guildId = playerCharacterEntity.GuildId;
                 usersById[playerCharacterEntity.Id] = tempUserData;
@@ -206,9 +206,9 @@ namespace MultiplayerARPG.MMO
                 userData.dataId = playerCharacterEntity.DataId;
                 userData.level = playerCharacterEntity.Level;
                 userData.currentHp = playerCharacterEntity.CurrentHp;
-                userData.maxHp = playerCharacterEntity.CacheMaxHp;
+                userData.maxHp = playerCharacterEntity.MaxHp;
                 userData.currentMp = playerCharacterEntity.CurrentMp;
-                userData.maxMp = playerCharacterEntity.CacheMaxMp;
+                userData.maxMp = playerCharacterEntity.MaxMp;
                 usersById.Add(userData.id, userData);
                 // Add map user to central server and chat server
                 UpdateMapUser(CentralAppServerRegister, UpdateUserCharacterMessage.UpdateType.Add, userData);
