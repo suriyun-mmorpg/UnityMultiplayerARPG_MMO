@@ -34,13 +34,13 @@ namespace MultiplayerARPG.MMO
                     switch (castedMessage.error)
                     {
                         case ResponseCharactersMessage.Error.NotLoggedin:
-                            errorMessage = LanguageManager.GetText(UILocaleKeys.UI_ERROR_NOT_LOGGED_IN.ToString());
+                            errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_NOT_LOGGED_IN.ToString());
                             break;
                     }
-                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_LABEL_ERROR.ToString()), errorMessage);
+                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), errorMessage);
                     break;
                 case AckResponseCode.Timeout:
-                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UILocaleKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
+                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
                     break;
                 default:
                     selectableCharacters = castedMessage.characters;
@@ -94,7 +94,7 @@ namespace MultiplayerARPG.MMO
             UICharacter selectedUI = CacheCharacterSelectionManager.SelectedUI;
             if (selectedUI == null)
             {
-                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UILocaleKeys.UI_ERROR_NO_CHOSEN_CHARACTER_TO_START.ToString()));
+                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_NO_CHOSEN_CHARACTER_TO_START.ToString()));
                 Debug.LogWarning("Cannot start game, No chosen character");
                 return;
             }
@@ -115,22 +115,22 @@ namespace MultiplayerARPG.MMO
                     switch (castedMessage.error)
                     {
                         case ResponseSelectCharacterMessage.Error.NotLoggedin:
-                            errorMessage = LanguageManager.GetText(UILocaleKeys.UI_ERROR_NOT_LOGGED_IN.ToString());
+                            errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_NOT_LOGGED_IN.ToString());
                             break;
                         case ResponseSelectCharacterMessage.Error.AlreadySelectCharacter:
-                            errorMessage = LanguageManager.GetText(UILocaleKeys.UI_ERROR_ALREADY_SELECT_CHARACTER.ToString());
+                            errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_ALREADY_SELECT_CHARACTER.ToString());
                             break;
                         case ResponseSelectCharacterMessage.Error.InvalidCharacterData:
-                            errorMessage = LanguageManager.GetText(UILocaleKeys.UI_ERROR_INVALID_CHARACTER_DATA.ToString());
+                            errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_INVALID_CHARACTER_DATA.ToString());
                             break;
                         case ResponseSelectCharacterMessage.Error.MapNotReady:
-                            errorMessage = LanguageManager.GetText(UILocaleKeys.UI_ERROR_MAP_SERVER_NOT_READY.ToString());
+                            errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_MAP_SERVER_NOT_READY.ToString());
                             break;
                     }
-                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_LABEL_ERROR.ToString()), errorMessage);
+                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), errorMessage);
                     break;
                 case AckResponseCode.Timeout:
-                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UILocaleKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
+                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
                     break;
                 default:
                     MMOClientInstance.Singleton.StartMapClient(castedMessage.sceneName, castedMessage.networkAddress, castedMessage.networkPort);
@@ -143,7 +143,7 @@ namespace MultiplayerARPG.MMO
             UICharacter selectedUI = CacheCharacterSelectionManager.SelectedUI;
             if (selectedUI == null)
             {
-                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UILocaleKeys.UI_ERROR_NO_CHOSEN_CHARACTER_TO_DELETE.ToString()));
+                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_NO_CHOSEN_CHARACTER_TO_DELETE.ToString()));
                 Debug.LogWarning("Cannot delete character, No chosen character");
                 return;
             }
@@ -163,13 +163,13 @@ namespace MultiplayerARPG.MMO
                     switch (castedMessage.error)
                     {
                         case ResponseDeleteCharacterMessage.Error.NotLoggedin:
-                            errorMessage = LanguageManager.GetText(UILocaleKeys.UI_ERROR_NOT_LOGGED_IN.ToString());
+                            errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_NOT_LOGGED_IN.ToString());
                             break;
                     }
-                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_LABEL_ERROR.ToString()), errorMessage);
+                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), errorMessage);
                     break;
                 case AckResponseCode.Timeout:
-                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UILocaleKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
+                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
                     break;
                 default:
                     // Reload characters

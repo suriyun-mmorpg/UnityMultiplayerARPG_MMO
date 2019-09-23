@@ -32,19 +32,19 @@ namespace MultiplayerARPG.MMO
             UISceneGlobal uiSceneGlobal = UISceneGlobal.Singleton;
             if (string.IsNullOrEmpty(Username))
             {
-                uiSceneGlobal.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UILocaleKeys.UI_ERROR_USERNAME_IS_EMPTY.ToString()));
+                uiSceneGlobal.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_USERNAME_IS_EMPTY.ToString()));
                 return;
             }
 
             if (string.IsNullOrEmpty(Password))
             {
-                uiSceneGlobal.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UILocaleKeys.UI_ERROR_PASSWORD_IS_EMPTY.ToString()));
+                uiSceneGlobal.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_PASSWORD_IS_EMPTY.ToString()));
                 return;
             }
 
             if (!ValidatePassword())
             {
-                uiSceneGlobal.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UILocaleKeys.UI_ERROR_INVALID_CONFIRM_PASSWORD.ToString()));
+                uiSceneGlobal.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_INVALID_CONFIRM_PASSWORD.ToString()));
                 return;
             }
 
@@ -61,24 +61,24 @@ namespace MultiplayerARPG.MMO
                     switch (castedMessage.error)
                     {
                         case ResponseUserRegisterMessage.Error.TooShortUsername:
-                            errorMessage = LanguageManager.GetText(UILocaleKeys.UI_ERROR_USERNAME_TOO_SHORT.ToString());
+                            errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_USERNAME_TOO_SHORT.ToString());
                             break;
                         case ResponseUserRegisterMessage.Error.TooLongUsername:
-                            errorMessage = LanguageManager.GetText(UILocaleKeys.UI_ERROR_USERNAME_TOO_LONG.ToString());
+                            errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_USERNAME_TOO_LONG.ToString());
                             break;
                         case ResponseUserRegisterMessage.Error.TooShortPassword:
-                            errorMessage = LanguageManager.GetText(UILocaleKeys.UI_ERROR_PASSWORD_TOO_SHORT.ToString());
+                            errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_PASSWORD_TOO_SHORT.ToString());
                             break;
                         case ResponseUserRegisterMessage.Error.UsernameAlreadyExisted:
-                            errorMessage = LanguageManager.GetText(UILocaleKeys.UI_ERROR_USERNAME_EXISTED.ToString());
+                            errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_USERNAME_EXISTED.ToString());
                             break;
                     }
-                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_LABEL_ERROR.ToString()), errorMessage);
+                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), errorMessage);
                     if (onRegisterFail != null)
                         onRegisterFail.Invoke();
                     break;
                 case AckResponseCode.Timeout:
-                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UILocaleKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
+                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
                     if (onRegisterFail != null)
                         onRegisterFail.Invoke();
                     break;

@@ -25,25 +25,25 @@ namespace MultiplayerARPG.MMO
                     switch (castedMessage.error)
                     {
                         case ResponseCreateCharacterMessage.Error.NotLoggedin:
-                            errorMessage = LanguageManager.GetText(UILocaleKeys.UI_ERROR_NOT_LOGGED_IN.ToString());
+                            errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_NOT_LOGGED_IN.ToString());
                             break;
                         case ResponseCreateCharacterMessage.Error.InvalidData:
-                            errorMessage = LanguageManager.GetText(UILocaleKeys.UI_ERROR_INVALID_DATA.ToString());
+                            errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_INVALID_DATA.ToString());
                             break;
                         case ResponseCreateCharacterMessage.Error.TooShortCharacterName:
-                            errorMessage = LanguageManager.GetText(UILocaleKeys.UI_ERROR_CHARACTER_NAME_TOO_SHORT.ToString());
+                            errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_CHARACTER_NAME_TOO_SHORT.ToString());
                             break;
                         case ResponseCreateCharacterMessage.Error.TooLongCharacterName:
-                            errorMessage = LanguageManager.GetText(UILocaleKeys.UI_ERROR_CHARACTER_NAME_TOO_LONG.ToString());
+                            errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_CHARACTER_NAME_TOO_LONG.ToString());
                             break;
                         case ResponseCreateCharacterMessage.Error.CharacterNameAlreadyExisted:
-                            errorMessage = LanguageManager.GetText(UILocaleKeys.UI_ERROR_CHARACTER_NAME_EXISTED.ToString());
+                            errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_CHARACTER_NAME_EXISTED.ToString());
                             break;
                     }
-                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_LABEL_ERROR.ToString()), errorMessage);
+                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), errorMessage);
                     break;
                 case AckResponseCode.Timeout:
-                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UILocaleKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UILocaleKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
+                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
                     break;
                 default:
                     if (eventOnCreateCharacter != null)
