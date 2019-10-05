@@ -332,7 +332,7 @@ namespace MultiplayerARPG.MMO
 
         public override void CreateGuild(BasePlayerCharacterEntity playerCharacterEntity, string guildName)
         {
-            if (!CanCreateGuild(playerCharacterEntity))
+            if (!CanCreateGuild(playerCharacterEntity, guildName))
                 return;
             StartCoroutine(CreateGuildRoutine(playerCharacterEntity, guildName));
         }
@@ -375,7 +375,7 @@ namespace MultiplayerARPG.MMO
         {
             int guildId;
             GuildData guild;
-            if (!CanSetGuildMessage(playerCharacterEntity, out guildId, out guild))
+            if (!CanSetGuildMessage(playerCharacterEntity, guildMessage, out guildId, out guild))
                 return;
 
             base.SetGuildMessage(playerCharacterEntity, guildMessage);
@@ -390,7 +390,7 @@ namespace MultiplayerARPG.MMO
         {
             int guildId;
             GuildData guild;
-            if (!CanSetGuildRole(playerCharacterEntity, guildRole, out guildId, out guild))
+            if (!CanSetGuildRole(playerCharacterEntity, guildRole, roleName, out guildId, out guild))
                 return;
 
             guild.SetRole(guildRole, roleName, canInvite, canKick, shareExpPercentage);
