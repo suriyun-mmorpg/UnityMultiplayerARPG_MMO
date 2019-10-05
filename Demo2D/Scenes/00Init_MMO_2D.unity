@@ -632,6 +632,7 @@ MonoBehaviour:
   npcQuestIndicator: {fileID: 114612624042908474, guid: 4acaa26309bf3094094eec89f99e2972,
     type: 2}
   defaultWeaponItem: {fileID: 11400000, guid: 951f241c113481643989fbb969a3976d, type: 2}
+  defaultDamageElement: {fileID: 0}
   defaultHitEffects:
     effects:
     - {fileID: 114984786077298016, guid: fa67f0b7f994d9548821d15fbf67531d, type: 2}
@@ -690,32 +691,10 @@ MonoBehaviour:
   joinInstanceMapDistance: 20
   levelUpEffect: {fileID: 114843870614705530, guid: 6f6e255b4877f874c985ed9fb46293a1,
     type: 2}
-  startGold: 2000
-  startItems:
-  - item: {fileID: 11400000, guid: 92590ae44dc681048807c2d146bb6e49, type: 2}
-    amount: 1
-  - item: {fileID: 11400000, guid: 6c9ab98dc1c58684a83cc9ee2a48a916, type: 2}
-    amount: 1
-  - item: {fileID: 11400000, guid: 1230e4aa45b34cb458b4d050a01becf2, type: 2}
-    amount: 1
-  - item: {fileID: 11400000, guid: 0dd707ca4beceae4b97b1e88e5b9d2a2, type: 2}
-    amount: 1
-  - item: {fileID: 11400000, guid: 9270ca8d8eb4a434c9a2f75e251a46f2, type: 2}
-    amount: 1
-  - item: {fileID: 11400000, guid: 8bd578d0c184e7d4aadb6630d66cca54, type: 2}
-    amount: 1
-  - item: {fileID: 11400000, guid: b1f20ff31fcefe846b026293b3f06990, type: 2}
-    amount: 1
-  - item: {fileID: 11400000, guid: 48822f45127a59349ba74528f7757a5f, type: 2}
-    amount: 1
-  - item: {fileID: 11400000, guid: d3ed0354e5601ff4cbb18cd2e9917efc, type: 2}
-    amount: 1
-  - item: {fileID: 11400000, guid: 8bd578d0c184e7d4aadb6630d66cca54, type: 2}
-    amount: 1
-  - item: {fileID: 11400000, guid: b1f20ff31fcefe846b026293b3f06990, type: 2}
-    amount: 1
-  - item: {fileID: 11400000, guid: 0caf4971c0b182947929728a15827506, type: 2}
-    amount: 99
+  newCharacterSetting: {fileID: 11400000, guid: 664e0661401c41149b61c8f9d56f4b9f,
+    type: 2}
+  startGold: 0
+  startItems: []
   homeScene:
     sceneAsset: {fileID: 102900000, guid: c72cf1eb6d846864fb28e9ae741876a3, type: 3}
     sceneName: 01Home_MMO_2D
