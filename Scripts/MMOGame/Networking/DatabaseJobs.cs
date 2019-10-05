@@ -425,6 +425,20 @@ namespace MultiplayerARPG.MMO
         }
     }
 
+    public class FindGuildNameJob : DatabaseJob<long>
+    {
+        private string guildName;
+        public FindGuildNameJob(BaseDatabase database, string guildName, Action<long> onFinished = null) : base(database, onFinished)
+        {
+            this.guildName = guildName;
+        }
+
+        protected override void ThreadFunction()
+        {
+            result = database.FindGuildName(guildName);
+        }
+    }
+
     public class SetCharacterGuildJob : DatabaseJob
     {
         private string characterId;

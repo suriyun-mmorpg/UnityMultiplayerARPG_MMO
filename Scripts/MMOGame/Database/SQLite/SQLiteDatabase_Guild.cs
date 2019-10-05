@@ -163,6 +163,13 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@id", id));
         }
 
+        public override long FindGuildName(string guildName)
+        {
+            object result = ExecuteScalar("SELECT COUNT(*) FROM guild WHERE guildName LIKE @guildName",
+                new SqliteParameter("@guildName", guildName));
+            return result != null ? (long)result : 0;
+        }
+
         public override void UpdateCharacterGuild(string characterId, int guildId, byte guildRole)
         {
             ExecuteNonQuery("UPDATE characters SET guildId=@guildId, guildRole=@guildRole WHERE id=@characterId",

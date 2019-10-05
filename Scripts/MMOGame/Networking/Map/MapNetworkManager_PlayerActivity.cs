@@ -339,19 +339,30 @@ namespace MultiplayerARPG.MMO
 
         private IEnumerator CreateGuildRoutine(BasePlayerCharacterEntity playerCharacterEntity, string guildName)
         {
-            CreateGuildJob createGuildJob = new CreateGuildJob(Database, guildName, playerCharacterEntity.Id);
-            createGuildJob.Start();
-            yield return StartCoroutine(createGuildJob.WaitFor());
-            int guildId = createGuildJob.result;
-            // Create guild
-            base.CreateGuild(playerCharacterEntity, guildName, guildId);
-            // Save to database
-            new SetCharacterGuildJob(Database, playerCharacterEntity.Id, guildId, guilds[guildId].GetMemberRole(playerCharacterEntity.Id)).Start();
-            // Broadcast via chat server
-            if (ChatNetworkManager.IsClientConnected)
+            FindGuildNameJob findGuildNameJob = new FindGuildNameJob(Database, guildName);
+            findGuildNameJob.Start();
+            yield return StartCoroutine(findGuildNameJob.WaitFor());
+            if (findGuildNameJob.result > 0)
             {
-                ChatNetworkManager.Client.SendCreateGuild(null, MMOMessageTypes.UpdateGuild, guildId, guildName, playerCharacterEntity.Id);
-                ChatNetworkManager.Client.SendAddSocialMember(null, MMOMessageTypes.UpdateGuildMember, guildId, playerCharacterEntity.Id, playerCharacterEntity.CharacterName, playerCharacterEntity.DataId, playerCharacterEntity.Level);
+                // Cannot create guild because guild name is already existed
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.ExistedGuildName);
+            }
+            else
+            {
+                CreateGuildJob createGuildJob = new CreateGuildJob(Database, guildName, playerCharacterEntity.Id);
+                createGuildJob.Start();
+                yield return StartCoroutine(createGuildJob.WaitFor());
+                int guildId = createGuildJob.result;
+                // Create guild
+                base.CreateGuild(playerCharacterEntity, guildName, guildId);
+                // Save to database
+                new SetCharacterGuildJob(Database, playerCharacterEntity.Id, guildId, guilds[guildId].GetMemberRole(playerCharacterEntity.Id)).Start();
+                // Broadcast via chat server
+                if (ChatNetworkManager.IsClientConnected)
+                {
+                    ChatNetworkManager.Client.SendCreateGuild(null, MMOMessageTypes.UpdateGuild, guildId, guildName, playerCharacterEntity.Id);
+                    ChatNetworkManager.Client.SendAddSocialMember(null, MMOMessageTypes.UpdateGuildMember, guildId, playerCharacterEntity.Id, playerCharacterEntity.CharacterName, playerCharacterEntity.DataId, playerCharacterEntity.Level);
+                }
             }
         }
 
