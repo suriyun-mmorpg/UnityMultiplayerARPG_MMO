@@ -542,17 +542,19 @@ namespace MultiplayerARPG.MMO
             UserCharacterData userData;
             if (!playerCharacters.TryGetValue(connectionId, out playerCharacter) ||
                 !usersById.TryGetValue(playerCharacter.Id, out userData))
+            {
+                // Canot find user
                 error = ResponseCashShopInfoMessage.Error.UserNotFound;
+            }
             else
             {
+                // Get user cash amount
                 GetCashJob job = new GetCashJob(Database, userData.userId);
                 job.Start();
                 yield return StartCoroutine(job.WaitFor());
                 cash = job.result;
-                foreach (int cashShopItemId in GameInstance.CashShopItems.Keys)
-                {
-                    cashShopItemIds.Add(cashShopItemId);
-                }
+                // Set cash shop item ids
+                cashShopItemIds.AddRange(GameInstance.CashShopItems.Keys);
             }
             // Send response message
             ResponseCashShopInfoMessage responseMessage = new ResponseCashShopInfoMessage();
@@ -581,26 +583,44 @@ namespace MultiplayerARPG.MMO
             UserCharacterData userData;
             if (!playerCharacters.TryGetValue(connectionId, out playerCharacter) ||
                 !usersById.TryGetValue(playerCharacter.Id, out userData))
+            {
+                // Canot find user
                 error = ResponseCashShopBuyMessage.Error.UserNotFound;
+            }
             else
             {
-                // Request cash, reduce, send item info messages to map server
+                // Get user cash amount
                 GetCashJob job = new GetCashJob(Database, userData.userId);
                 job.Start();
                 yield return StartCoroutine(job.WaitFor());
                 cash = job.result;
                 CashShopItem cashShopItem;
                 if (!GameInstance.CashShopItems.TryGetValue(dataId, out cashShopItem))
+                {
+                    // Cannot find item
                     error = ResponseCashShopBuyMessage.Error.ItemNotFound;
+                }
                 else if (cash < cashShopItem.sellPrice)
+                {
+                    // Not enough cash
                     error = ResponseCashShopBuyMessage.Error.NotEnoughCash;
+                }
+                else if (playerCharacter.IncreasingItemsWillOverwhelming(cashShopItem.receiveItems))
+                {
+                    // Cannot carry all rewards
+                    error = ResponseCashShopBuyMessage.Error.CannotCarryAllRewards;
+                }
                 else
                 {
+                    // Decrease cash amount
                     DecreaseCashJob decreaseCashJob = new DecreaseCashJob(Database, userData.userId, cashShopItem.sellPrice);
                     decreaseCashJob.Start();
                     yield return StartCoroutine(decreaseCashJob.WaitFor());
                     cash = decreaseCashJob.result;
+                    playerCharacter.UserCash = cash;
+                    // Increase character gold
                     playerCharacter.Gold += cashShopItem.receiveGold;
+                    // Increase character item
                     foreach (ItemAmount receiveItem in cashShopItem.receiveItems)
                     {
                         if (receiveItem.item == null || receiveItem.amount <= 0) continue;
@@ -635,17 +655,19 @@ namespace MultiplayerARPG.MMO
             UserCharacterData userData;
             if (!playerCharacters.TryGetValue(connectionId, out playerCharacter) ||
                 !usersById.TryGetValue(playerCharacter.Id, out userData))
+            {
+                // Canot find user
                 error = ResponseCashPackageInfoMessage.Error.UserNotFound;
+            }
             else
             {
+                // Get user cash amount
                 GetCashJob job = new GetCashJob(Database, userData.userId);
                 job.Start();
                 yield return StartCoroutine(job.WaitFor());
                 cash = job.result;
-                foreach (int cashShopItemId in GameInstance.CashPackages.Keys)
-                {
-                    cashPackageIds.Add(cashShopItemId);
-                }
+                // Set cash package ids
+                cashPackageIds.AddRange(GameInstance.CashPackages.Keys);
             }
             // Send response message
             ResponseCashPackageInfoMessage responseMessage = new ResponseCashPackageInfoMessage();
@@ -675,23 +697,31 @@ namespace MultiplayerARPG.MMO
             UserCharacterData userData;
             if (!playerCharacters.TryGetValue(connectionId, out playerCharacter) ||
                 !usersById.TryGetValue(playerCharacter.Id, out userData))
+            {
+                // Canot find user
                 error = ResponseCashPackageBuyValidationMessage.Error.UserNotFound;
+            }
             else
             {
-                // Get current cash will return this in case it cannot increase cash
+                // Get user cash amount
                 GetCashJob job = new GetCashJob(Database, userData.userId);
                 job.Start();
                 yield return StartCoroutine(job.WaitFor());
                 cash = job.result;
                 CashPackage cashPackage;
                 if (!GameInstance.CashPackages.TryGetValue(dataId, out cashPackage))
+                {
+                    // Cannot find package
                     error = ResponseCashPackageBuyValidationMessage.Error.PackageNotFound;
+                }
                 else
                 {
+                    // Increase cash amount
                     IncreaseCashJob increaseCashJob = new IncreaseCashJob(Database, userData.userId, cashPackage.cashAmount);
                     increaseCashJob.Start();
                     yield return StartCoroutine(increaseCashJob.WaitFor());
                     cash = increaseCashJob.result;
+                    playerCharacter.UserCash = cash;
                 }
             }
             // Send response message
