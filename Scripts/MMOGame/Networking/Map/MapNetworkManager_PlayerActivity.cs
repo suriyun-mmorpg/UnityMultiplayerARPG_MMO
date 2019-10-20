@@ -740,6 +740,78 @@ namespace MultiplayerARPG.MMO
             UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItemList);
         }
 
+        public override void SwapOrMergeStorageItem(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short fromIndex, short toIndex)
+        {
+            if (!CanAccessStorage(playerCharacterEntity, storageId))
+            {
+                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.CannotAccessStorage);
+                return;
+            }
+            // TODO: Implement this
+        }
+
+        private IEnumerator SwapOrMergeStorageItemRoutine(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short fromIndex, short toIndex)
+        {
+            List<CharacterItem> storageItemList = new List<CharacterItem>();
+            ReadStorageItemsJob readStorageItemsJob = new ReadStorageItemsJob(Database, storageId.storageType, storageId.storageOwnerId);
+            readStorageItemsJob.Start();
+            yield return StartCoroutine(readStorageItemsJob.WaitFor());
+            if (readStorageItemsJob.result != null)
+            {
+                // Set storage items
+                storageItemList = readStorageItemsJob.result;
+            }
+            if (fromIndex >= storageItemList.Count ||
+                toIndex >= storageItemList.Count)
+            {
+                // Don't do anything, if storage item index is invalid
+            }
+            else
+            {
+                // Prepare storage data
+                Storage storage = GetStorage(storageId);
+                bool isLimitSlot = storage.slotLimit > 0;
+                short slotLimit = storage.slotLimit;
+                // Prepare item data
+                CharacterItem fromItem = storageItemList[fromIndex];
+                CharacterItem toItem = storageItemList[toIndex];
+
+                if (fromItem.dataId.Equals(toItem.dataId) && !fromItem.IsFull() && !toItem.IsFull())
+                {
+                    // Merge if same id and not full
+                    short maxStack = toItem.GetMaxStack();
+                    if (toItem.amount + fromItem.amount <= maxStack)
+                    {
+                        toItem.amount += fromItem.amount;
+                        storageItemList[fromIndex] = CharacterItem.Empty;
+                        storageItemList[toIndex] = toItem;
+                    }
+                    else
+                    {
+                        short remains = (short)(toItem.amount + fromItem.amount - maxStack);
+                        toItem.amount = maxStack;
+                        fromItem.amount = remains;
+                        storageItemList[fromIndex] = fromItem;
+                        storageItemList[toIndex] = toItem;
+                    }
+                }
+                else
+                {
+                    // Swap
+                    storageItemList[fromIndex] = toItem;
+                    storageItemList[toIndex] = fromItem;
+                }
+                storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
+            }
+            // Update storage list immediately
+            // TODO: Have to test about race condition while running multiple-server
+            UpdateStorageItemsJob updateStorageItemsJob = new UpdateStorageItemsJob(Database, storageId.storageType, storageId.storageOwnerId, storageItemList);
+            updateStorageItemsJob.Start();
+            yield return StartCoroutine(updateStorageItemsJob.WaitFor());
+            // Update storage items to characters that open the storage
+            UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItemList);
+        }
+
         public override bool IsStorageEntityOpen(StorageEntity storageEntity)
         {
             if (storageEntity == null)
