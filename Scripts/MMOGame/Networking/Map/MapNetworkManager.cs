@@ -624,8 +624,9 @@ namespace MultiplayerARPG.MMO
                     foreach (ItemAmount receiveItem in cashShopItem.receiveItems)
                     {
                         if (receiveItem.item == null || receiveItem.amount <= 0) continue;
-                        playerCharacter.AddOrInsertNonEquipItems(CharacterItem.Create(receiveItem.item, 1, receiveItem.amount));
+                        playerCharacter.AddOrSetNonEquipItems(CharacterItem.Create(receiveItem.item, 1, receiveItem.amount));
                     }
+                    playerCharacter.FillEmptySlots();
                 }
             }
             // Send response message
