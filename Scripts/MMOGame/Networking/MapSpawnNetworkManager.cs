@@ -92,6 +92,7 @@ namespace MultiplayerARPG.MMO
                     cacheCentralAppServerRegister = new CentralAppServerRegister(CentralTransportFactory.Build(), this);
                     cacheCentralAppServerRegister.onAppServerRegistered = OnAppServerRegistered;
                     cacheCentralAppServerRegister.RegisterMessage(MMOMessageTypes.RequestSpawnMap, HandleRequestSpawnMap);
+                    this.InvokeInstanceDevExtMethods("OnInitCentralAppServerRegister");
                 }
                 return cacheCentralAppServerRegister;
             }

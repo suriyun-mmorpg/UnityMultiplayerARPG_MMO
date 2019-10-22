@@ -40,7 +40,10 @@ namespace MultiplayerARPG.MMO
             get
             {
                 if (cacheCentralAppServerRegister == null && CentralTransportFactory != null)
+                {
                     cacheCentralAppServerRegister = new CentralAppServerRegister(CentralTransportFactory.Build(), this);
+                    this.InvokeInstanceDevExtMethods("OnInitCentralAppServerRegister");
+                }
                 return cacheCentralAppServerRegister;
             }
         }
