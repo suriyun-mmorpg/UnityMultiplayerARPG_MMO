@@ -70,14 +70,16 @@ namespace MultiplayerARPG.MMO
         {
             get
             {
-#if UNITY_WEBGL && !UNITY_EDITOR
-                // Force to use websocket transport if it's running as webgl
-                if (centralTransportFactory == null || !centralTransportFactory.CanUseWithWebGL)
-                    centralTransportFactory = gameObject.AddComponent<WebSocketTransportFactory>();
-#else
-                if (centralTransportFactory == null)
-                    centralTransportFactory = gameObject.AddComponent<LiteNetLibTransportFactory>();
-#endif
+                if (useWebSocket)
+                {
+                    if (centralTransportFactory == null || !centralTransportFactory.CanUseWithWebGL)
+                        centralTransportFactory = gameObject.AddComponent<WebSocketTransportFactory>();
+                }
+                else
+                {
+                    if (centralTransportFactory == null)
+                        centralTransportFactory = gameObject.AddComponent<LiteNetLibTransportFactory>();
+                }
                 return centralTransportFactory;
             }
         }
