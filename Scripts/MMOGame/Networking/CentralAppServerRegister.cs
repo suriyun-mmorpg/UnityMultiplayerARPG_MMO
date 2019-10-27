@@ -35,6 +35,7 @@ namespace MultiplayerARPG.MMO
                     break;
                 case ENetworkEvent.DisconnectEvent:
                     Debug.Log("CentralAppServerRegister::OnPeerDisconnected. disconnectInfo.Reason: " + eventData.disconnectInfo.Reason);
+                    StopClient();
                     OnCentralServerDisconnected(eventData.disconnectInfo);
                     break;
                 case ENetworkEvent.ErrorEvent:
@@ -111,7 +112,7 @@ namespace MultiplayerARPG.MMO
             if (responseCode == AckResponseCode.Success)
                 IsRegisteredToCentralServer = true;
             if (onAppServerRegistered != null)
-                onAppServerRegistered(responseCode, message);
+                onAppServerRegistered.Invoke(responseCode, message);
         }
     }
 }
