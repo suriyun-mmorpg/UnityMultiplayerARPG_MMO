@@ -11,6 +11,15 @@ namespace MultiplayerARPG.MMO
     {
         public const float TERMINATE_INSTANCE_DELAY = 30f;  // Close instance when no clients connected within 30 seconds
 
+        public struct PendingSpawnPlayerCharacter
+        {
+            public long connectionId;
+            public string userId;
+            public string accessToken;
+            public string selectCharacterId;
+        }
+        private readonly List<PendingSpawnPlayerCharacter> pendingSpawnPlayerCharacters = new List<PendingSpawnPlayerCharacter>();
+
         public string mapInstanceId;
 
         [Header("Central Network Connection")]
@@ -138,6 +147,16 @@ namespace MultiplayerARPG.MMO
                         terminatingTime = tempUnscaledTime;
                     else if (tempUnscaledTime - terminatingTime >= TERMINATE_INSTANCE_DELAY)
                         Application.Quit();
+                }
+
+                if (pendingSpawnPlayerCharacters.Count > 0 && IsReadyToInstantiateObjects())
+                {
+                    // Spawn pending player characters
+                    foreach (PendingSpawnPlayerCharacter spawnPlayerCharacter in pendingSpawnPlayerCharacters)
+                    {
+                        SetPlayerReady(spawnPlayerCharacter.connectionId, spawnPlayerCharacter.userId, spawnPlayerCharacter.accessToken, spawnPlayerCharacter.selectCharacterId);
+                    }
+                    pendingSpawnPlayerCharacters.Clear();
                 }
             }
         }
@@ -290,7 +309,10 @@ namespace MultiplayerARPG.MMO
 
         private IEnumerator OnServerOnlineSceneLoadedRoutine()
         {
-            yield return new WaitForSecondsRealtime(1);
+            while (!IsReadyToInstantiateObjects())
+            {
+                yield return null;
+            }
             // Spawn buildings
             if (!IsInstanceMap())
             {
@@ -326,16 +348,26 @@ namespace MultiplayerARPG.MMO
         {
             if (!IsServer)
                 return;
+            
+            SetPlayerReady(connectionId, reader.GetString(), reader.GetString(), reader.GetString());
+        }
 
-            LiteNetLibPlayer player = GetPlayer(connectionId);
-            if (player.IsReady)
+        private void SetPlayerReady(long connectionId, string userId, string accessToken, string selectCharacterId)
+        {
+            if (!IsReadyToInstantiateObjects())
+            {
+                if (LogError)
+                    Debug.LogError("[Map Server] Not ready to spawn player: " + userId);
+                // Add to pending list to spawn player later when map server is ready to instantiate object
+                pendingSpawnPlayerCharacters.Add(new PendingSpawnPlayerCharacter()
+                {
+                    connectionId = connectionId,
+                    userId = userId,
+                    accessToken = accessToken,
+                    selectCharacterId = selectCharacterId
+                });
                 return;
-
-            player.IsReady = true;
-
-            string userId = reader.GetString();
-            string accessToken = reader.GetString();
-            string selectCharacterId = reader.GetString();
+            }
 
             if (playerCharacters.ContainsKey(connectionId))
             {
@@ -344,6 +376,12 @@ namespace MultiplayerARPG.MMO
                 Transport.ServerDisconnect(connectionId);
                 return;
             }
+
+            LiteNetLibPlayer player = GetPlayer(connectionId);
+            if (player.IsReady)
+                return;
+
+            player.IsReady = true;
 
             StartCoroutine(SetPlayerReadyRoutine(connectionId, userId, accessToken, selectCharacterId));
         }
