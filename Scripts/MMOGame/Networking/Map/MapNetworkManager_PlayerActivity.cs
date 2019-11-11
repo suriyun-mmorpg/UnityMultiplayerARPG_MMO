@@ -640,7 +640,6 @@ namespace MultiplayerARPG.MMO
                 movingItem.amount = amount;
                 if (storageItemIndex < 0 ||
                     storageItemIndex >= storageItemList.Count ||
-                    storageItemList[storageItemIndex].IsEmptySlot() ||
                     storageItemList[storageItemIndex].dataId == movingItem.dataId)
                 {
                     // Add to storage or merge
@@ -709,7 +708,6 @@ namespace MultiplayerARPG.MMO
                 movingItem.amount = amount;
                 if (nonEquipIndex < 0 ||
                     nonEquipIndex >= playerCharacterEntity.NonEquipItems.Count ||
-                    playerCharacterEntity.NonEquipItems[nonEquipIndex].IsEmptySlot() ||
                     playerCharacterEntity.NonEquipItems[nonEquipIndex].dataId == movingItem.dataId)
                 {
                     // Add to inventory or merge
