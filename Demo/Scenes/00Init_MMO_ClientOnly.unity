@@ -692,6 +692,7 @@ MonoBehaviour:
   npcDatabase: {fileID: 11400000, guid: dae14f7f7d125fc4096ba7ac1f68d581, type: 2}
   socialSystemSetting: {fileID: 11400000, guid: afad462dae207414f91b207f6882dad2,
     type: 2}
+  currentPositionSaveMode: 0
   playerTag:
     tag: PlayerTag
   monsterTag:
@@ -795,6 +796,8 @@ MonoBehaviour:
     keyCode: 120
   - keyName: SwitchEquipWeaponSet
     keyCode: 96
+  - keyName: Sprint
+    keyCode: 304
 --- !u!114 &1379718505
 MonoBehaviour:
   m_ObjectHideFlags: 0
