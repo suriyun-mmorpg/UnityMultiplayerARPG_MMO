@@ -26,42 +26,31 @@ namespace MultiplayerARPG.MMO
         {
             if (!CanWarpCharacter(playerCharacterEntity))
                 return;
-            if (!IsInstanceMap())
+
+            // If map name is empty, just teleport character to target position
+            if (string.IsNullOrEmpty(mapName))
             {
-                base.WarpCharacter(playerCharacterEntity, mapName, position);
-                StartCoroutine(WarpCharacterRoutine(playerCharacterEntity, mapName, position, false));
+                playerCharacterEntity.Teleport(position);
+                return;
             }
-            else
-            {
-                if (string.IsNullOrEmpty(mapName))
-                {
-                    // Warp in the map
-                    base.WarpCharacter(playerCharacterEntity, mapName, position);
-                }
-                else
-                {
-                    // Warp to other map
-                    StartCoroutine(WarpCharacterRoutine(playerCharacterEntity, mapName, position, true));
-                }
-            }
+
+            StartCoroutine(WarpCharacterRoutine(playerCharacterEntity, mapName, position));
         }
 
         /// <summary>
-        /// Warp to different map. if `forceChangeMap` is `TRUE` it will change map server, even if it is same map
+        /// Warp to different map.
         /// </summary>
         /// <param name="playerCharacterEntity"></param>
         /// <param name="mapName"></param>
         /// <param name="position"></param>
-        /// <param name="forceChangeMap"></param>
         /// <returns></returns>
-        private IEnumerator WarpCharacterRoutine(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position, bool forceChangeMap)
+        private IEnumerator WarpCharacterRoutine(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position)
         {
             // If warping to different map
             long connectionId = playerCharacterEntity.ConnectionId;
             CentralServerPeerInfo peerInfo;
             MapInfo mapInfo;
             if (!string.IsNullOrEmpty(mapName) &&
-                (!mapName.Equals(playerCharacterEntity.CurrentMapName) || forceChangeMap) &&
                 playerCharacters.ContainsKey(connectionId) &&
                 mapServerConnectionIdsBySceneName.TryGetValue(mapName, out peerInfo) &&
                 GameInstance.MapInfos.TryGetValue(mapName, out mapInfo) &&
@@ -78,7 +67,7 @@ namespace MultiplayerARPG.MMO
                 savingCharacterData.CurrentPosition = position;
                 while (savingCharacters.Contains(savingCharacterData.Id))
                 {
-                    yield return 0;
+                    yield return null;
                 }
                 yield return StartCoroutine(SaveCharacterRoutine(savingCharacterData));
                 // Remove this character from warping list
