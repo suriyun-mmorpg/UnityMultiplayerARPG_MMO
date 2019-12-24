@@ -29,7 +29,7 @@ namespace MultiplayerARPG.MMO
             if (id > 0 && !loadingGuildIds.Contains(id))
             {
                 loadingGuildIds.Add(id);
-                ReadGuildJob job = new ReadGuildJob(Database, id, gameInstance.SocialSystemSetting.GuildMemberRoles);
+                ReadGuildJob job = new ReadGuildJob(Database, id, CurrentGameInstance.SocialSystemSetting.GuildMemberRoles);
                 job.Start();
                 yield return StartCoroutine(job.WaitFor());
                 if (job.result != null)

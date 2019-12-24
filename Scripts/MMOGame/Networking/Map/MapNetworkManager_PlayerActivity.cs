@@ -99,7 +99,7 @@ namespace MultiplayerARPG.MMO
                 // If character is party member, will bring party member to join instance
                 if (party.IsLeader(playerCharacterEntity))
                 {
-                    List<BasePlayerCharacterEntity> aliveAllies = playerCharacterEntity.FindAliveCharacters<BasePlayerCharacterEntity>(gameInstance.joinInstanceMapDistance, true, false, false);
+                    List<BasePlayerCharacterEntity> aliveAllies = playerCharacterEntity.FindAliveCharacters<BasePlayerCharacterEntity>(CurrentGameInstance.joinInstanceMapDistance, true, false, false);
                     foreach (BasePlayerCharacterEntity aliveAlly in aliveAllies)
                     {
                         if (!party.IsMember(aliveAlly))
@@ -516,7 +516,7 @@ namespace MultiplayerARPG.MMO
 
         private IEnumerator IncreaseGuildExpRoutine(BasePlayerCharacterEntity playerCharacterEntity, int exp, int guildId, GuildData guild)
         {
-            IncreaseGuildExpJob job = new IncreaseGuildExpJob(Database, guildId, exp, gameInstance.SocialSystemSetting.GuildExpTree);
+            IncreaseGuildExpJob job = new IncreaseGuildExpJob(Database, guildId, exp, CurrentGameInstance.SocialSystemSetting.GuildExpTree);
             job.Start();
             yield return StartCoroutine(job.WaitFor());
             if (job.result)
