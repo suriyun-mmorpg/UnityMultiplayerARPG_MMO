@@ -65,40 +65,13 @@ namespace MultiplayerARPG.MMO
                     return notSpawnInBatchMode;
             }
         }
-        
+
         public BaseTransportFactory CentralTransportFactory
         {
-            get
-            {
-                if (useWebSocket)
-                {
-                    if (centralTransportFactory == null || !centralTransportFactory.CanUseWithWebGL)
-                        centralTransportFactory = gameObject.AddComponent<WebSocketTransportFactory>();
-                }
-                else
-                {
-                    if (centralTransportFactory == null)
-                        centralTransportFactory = gameObject.AddComponent<LiteNetLibTransportFactory>();
-                }
-                return centralTransportFactory;
-            }
+            get { return centralTransportFactory; }
         }
 
-        private CentralAppServerRegister cacheCentralAppServerRegister;
-        public CentralAppServerRegister CentralAppServerRegister
-        {
-            get
-            {
-                if (cacheCentralAppServerRegister == null && CentralTransportFactory != null)
-                {
-                    cacheCentralAppServerRegister = new CentralAppServerRegister(CentralTransportFactory.Build(), this);
-                    cacheCentralAppServerRegister.onAppServerRegistered = OnAppServerRegistered;
-                    cacheCentralAppServerRegister.RegisterMessage(MMOMessageTypes.RequestSpawnMap, HandleRequestSpawnMap);
-                    this.InvokeInstanceDevExtMethods("OnInitCentralAppServerRegister");
-                }
-                return cacheCentralAppServerRegister;
-            }
-        }
+        public CentralAppServerRegister CentralAppServerRegister { get; private set; }
 
         public string CentralNetworkAddress { get { return centralNetworkAddress; } }
         public int CentralNetworkPort { get { return centralNetworkPort; } }
@@ -106,6 +79,25 @@ namespace MultiplayerARPG.MMO
         public int AppPort { get { return networkPort; } }
         public string AppExtra { get { return string.Empty; } }
         public CentralServerPeerType PeerType { get { return CentralServerPeerType.MapSpawnServer; } }
+
+        protected override void Awake()
+        {
+            base.Awake();
+            if (useWebSocket)
+            {
+                if (centralTransportFactory == null || !centralTransportFactory.CanUseWithWebGL)
+                    centralTransportFactory = gameObject.AddComponent<WebSocketTransportFactory>();
+            }
+            else
+            {
+                if (centralTransportFactory == null)
+                    centralTransportFactory = gameObject.AddComponent<LiteNetLibTransportFactory>();
+            }
+            CentralAppServerRegister = new CentralAppServerRegister(CentralTransportFactory.Build(), this);
+            CentralAppServerRegister.onAppServerRegistered = OnAppServerRegistered;
+            CentralAppServerRegister.RegisterMessage(MMOMessageTypes.RequestSpawnMap, HandleRequestSpawnMap);
+            this.InvokeInstanceDevExtMethods("OnInitCentralAppServerRegister");
+        }
 
         protected virtual void Clean()
         {

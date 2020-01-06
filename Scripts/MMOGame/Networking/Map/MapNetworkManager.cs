@@ -38,48 +38,12 @@ namespace MultiplayerARPG.MMO
 
         public BaseTransportFactory CentralTransportFactory
         {
-            get
-            {
-                if (useWebSocket)
-                {
-                    if (centralTransportFactory == null || !centralTransportFactory.CanUseWithWebGL)
-                        centralTransportFactory = gameObject.AddComponent<WebSocketTransportFactory>();
-                }
-                else
-                {
-                    if (centralTransportFactory == null)
-                        centralTransportFactory = gameObject.AddComponent<LiteNetLibTransportFactory>();
-                }
-                return centralTransportFactory;
-            }
+            get { return centralTransportFactory; }
         }
 
-        private CentralAppServerRegister cacheCentralAppServerRegister;
-        public CentralAppServerRegister CentralAppServerRegister
-        {
-            get
-            {
-                if (cacheCentralAppServerRegister == null && CentralTransportFactory != null)
-                {
-                    cacheCentralAppServerRegister = new CentralAppServerRegister(CentralTransportFactory.Build(), this);
-                    cacheCentralAppServerRegister.onAppServerRegistered = OnAppServerRegistered;
-                    cacheCentralAppServerRegister.RegisterMessage(MMOMessageTypes.ResponseAppServerAddress, HandleResponseAppServerAddress);
-                    this.InvokeInstanceDevExtMethods("OnInitCentralAppServerRegister");
-                }
-                return cacheCentralAppServerRegister;
-            }
-        }
+        public CentralAppServerRegister CentralAppServerRegister { get; private set; }
 
-        private ChatNetworkManager cacheChatNetworkManager;
-        public ChatNetworkManager ChatNetworkManager
-        {
-            get
-            {
-                if (cacheChatNetworkManager == null)
-                    cacheChatNetworkManager = gameObject.AddComponent<ChatNetworkManager>();
-                return cacheChatNetworkManager;
-            }
-        }
+        public ChatNetworkManager ChatNetworkManager { get; private set; }
 
         public BaseDatabase Database
         {
@@ -122,6 +86,26 @@ namespace MultiplayerARPG.MMO
         private readonly HashSet<int> loadingGuildIds = new HashSet<int>();
         private readonly HashSet<string> savingCharacters = new HashSet<string>();
         private readonly HashSet<string> savingBuildings = new HashSet<string>();
+
+        protected override void Awake()
+        {
+            base.Awake();
+            if (useWebSocket)
+            {
+                if (centralTransportFactory == null || !centralTransportFactory.CanUseWithWebGL)
+                    centralTransportFactory = gameObject.AddComponent<WebSocketTransportFactory>();
+            }
+            else
+            {
+                if (centralTransportFactory == null)
+                    centralTransportFactory = gameObject.AddComponent<LiteNetLibTransportFactory>();
+            }
+            CentralAppServerRegister = new CentralAppServerRegister(CentralTransportFactory.Build(), this);
+            CentralAppServerRegister.onAppServerRegistered = OnAppServerRegistered;
+            CentralAppServerRegister.RegisterMessage(MMOMessageTypes.ResponseAppServerAddress, HandleResponseAppServerAddress);
+            this.InvokeInstanceDevExtMethods("OnInitCentralAppServerRegister");
+            ChatNetworkManager = gameObject.AddComponent<ChatNetworkManager>();
+        }
 
         protected override void Update()
         {
@@ -348,7 +332,7 @@ namespace MultiplayerARPG.MMO
         {
             if (!IsServer)
                 return;
-            
+
             SetPlayerReady(connectionId, reader.GetString(), reader.GetString(), reader.GetString());
         }
 

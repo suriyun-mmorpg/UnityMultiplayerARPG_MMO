@@ -17,38 +17,13 @@ namespace MultiplayerARPG.MMO
         {
             get { return MMOServerInstance.Singleton.Database; }
         }
-        
+
         public BaseTransportFactory CentralTransportFactory
         {
-            get
-            {
-                if (useWebSocket)
-                {
-                    if (centralTransportFactory == null || !centralTransportFactory.CanUseWithWebGL)
-                        centralTransportFactory = gameObject.AddComponent<WebSocketTransportFactory>();
-                }
-                else
-                {
-                    if (centralTransportFactory == null)
-                        centralTransportFactory = gameObject.AddComponent<LiteNetLibTransportFactory>();
-                }
-                return centralTransportFactory;
-            }
+            get { return centralTransportFactory; }
         }
 
-        private CentralAppServerRegister cacheCentralAppServerRegister;
-        public CentralAppServerRegister CentralAppServerRegister
-        {
-            get
-            {
-                if (cacheCentralAppServerRegister == null && CentralTransportFactory != null)
-                {
-                    cacheCentralAppServerRegister = new CentralAppServerRegister(CentralTransportFactory.Build(), this);
-                    this.InvokeInstanceDevExtMethods("OnInitCentralAppServerRegister");
-                }
-                return cacheCentralAppServerRegister;
-            }
-        }
+        public CentralAppServerRegister CentralAppServerRegister { get; private set; }
 
         public string CentralNetworkAddress { get { return centralNetworkAddress; } }
         public int CentralNetworkPort { get { return centralNetworkPort; } }
@@ -61,6 +36,23 @@ namespace MultiplayerARPG.MMO
         private readonly Dictionary<string, UserCharacterData> mapUsersById = new Dictionary<string, UserCharacterData>();
         private readonly Dictionary<string, long> connectionIdsByCharacterId = new Dictionary<string, long>();
         private readonly Dictionary<string, long> connectionIdsByCharacterName = new Dictionary<string, long>();
+
+        protected override void Awake()
+        {
+            base.Awake();
+            if (useWebSocket)
+            {
+                if (centralTransportFactory == null || !centralTransportFactory.CanUseWithWebGL)
+                    centralTransportFactory = gameObject.AddComponent<WebSocketTransportFactory>();
+            }
+            else
+            {
+                if (centralTransportFactory == null)
+                    centralTransportFactory = gameObject.AddComponent<LiteNetLibTransportFactory>();
+            }
+            CentralAppServerRegister = new CentralAppServerRegister(CentralTransportFactory.Build(), this);
+            this.InvokeInstanceDevExtMethods("OnInitCentralAppServerRegister");
+        }
 
         protected override void RegisterClientMessages()
         {
