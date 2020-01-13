@@ -756,6 +756,7 @@ MonoBehaviour:
   conversationDistance: 3
   buildDistance: 10
   localChatDistance: 10
+  combatTextDistance: 20
   maxEquipWeaponSet: 2
   inventorySystem: 1
   baseSlotLimit: 60
@@ -834,6 +835,8 @@ MonoBehaviour:
     keyCode: 306
   - keyName: Crawl
     keyCode: 122
+  - keyName: SwitchViewMode
+    keyCode: 282
 --- !u!114 &1379718505
 MonoBehaviour:
   m_ObjectHideFlags: 0
