@@ -107,9 +107,9 @@ namespace MultiplayerARPG.MMO
             ChatNetworkManager = gameObject.AddComponent<ChatNetworkManager>();
         }
 
-        protected override void Update()
+        protected override void LateUpdate()
         {
-            base.Update();
+            base.LateUpdate();
             float tempUnscaledTime = Time.unscaledTime;
             if (IsServer)
             {

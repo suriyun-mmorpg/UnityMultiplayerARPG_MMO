@@ -144,9 +144,9 @@ namespace MultiplayerARPG.MMO
             base.OnStopClient();
         }
 
-        protected override void Update()
+        protected override void LateUpdate()
         {
-            base.Update();
+            base.LateUpdate();
             if (IsServer)
             {
                 CentralAppServerRegister.Update();
