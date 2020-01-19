@@ -1,0 +1,5 @@
+START TRANSACTION;
+
+ALTER TABLE `buildings` ADD `isLocked` BOOLEAN NOT NULL DEFAULT FALSE AFTER `rotationZ`, ADD `lockPassword` VARCHAR(6) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT '' AFTER `isLocked`;
+
+COMMIT;

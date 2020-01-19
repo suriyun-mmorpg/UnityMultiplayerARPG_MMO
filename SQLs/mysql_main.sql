@@ -34,6 +34,8 @@ CREATE TABLE `buildings` (
   `rotationX` float NOT NULL DEFAULT '0',
   `rotationY` float NOT NULL DEFAULT '0',
   `rotationZ` float NOT NULL DEFAULT '0',
+  `isLocked` tinyint(1) NOT NULL DEFAULT '0',
+  `lockPassword` varchar(6) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
   `creatorId` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
   `creatorName` varchar(32) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
   `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,

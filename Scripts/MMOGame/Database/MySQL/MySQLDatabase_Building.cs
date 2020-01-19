@@ -21,6 +21,8 @@ namespace MultiplayerARPG.MMO
                 result.CurrentHp = reader.GetInt32("currentHp");
                 result.Position = new Vector3(reader.GetFloat("positionX"), reader.GetFloat("positionY"), reader.GetFloat("positionZ"));
                 result.Rotation = Quaternion.Euler(reader.GetFloat("rotationX"), reader.GetFloat("rotationY"), reader.GetFloat("rotationZ"));
+                result.IsLocked = reader.GetBoolean("isLocked");
+                result.LockPassword = reader.GetString("lockPassword");
                 result.CreatorId = reader.GetString("creatorId");
                 result.CreatorName = reader.GetString("creatorName");
                 return true;
@@ -33,7 +35,7 @@ namespace MultiplayerARPG.MMO
         {
             MySqlConnection connection = NewConnection();
             connection.Open();
-            ExecuteNonQuery(connection, null, "INSERT INTO buildings (id, parentId, dataId, currentHp, mapName, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, creatorId, creatorName) VALUES (@id, @parentId, @dataId, @currentHp, @mapName, @positionX, @positionY, @positionZ, @rotationX, @rotationY, @rotationZ, @creatorId, @creatorName)",
+            ExecuteNonQuery(connection, null, "INSERT INTO buildings (id, parentId, dataId, currentHp, mapName, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, isLocked, lockPassword, creatorId, creatorName) VALUES (@id, @parentId, @dataId, @currentHp, @mapName, @positionX, @positionY, @positionZ, @rotationX, @rotationY, @rotationZ, @isLocked, @lockPassword, @creatorId, @creatorName)",
                 new MySqlParameter("@id", saveData.Id),
                 new MySqlParameter("@parentId", saveData.ParentId),
                 new MySqlParameter("@dataId", saveData.DataId),
@@ -45,6 +47,8 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@rotationX", saveData.Rotation.eulerAngles.x),
                 new MySqlParameter("@rotationY", saveData.Rotation.eulerAngles.y),
                 new MySqlParameter("@rotationZ", saveData.Rotation.eulerAngles.z),
+                new MySqlParameter("@isLocked", saveData.IsLocked),
+                new MySqlParameter("@lockPassword", saveData.LockPassword),
                 new MySqlParameter("@creatorId", saveData.CreatorId),
                 new MySqlParameter("@creatorName", saveData.CreatorName));
             connection.Close();
@@ -76,6 +80,8 @@ namespace MultiplayerARPG.MMO
                 "rotationX=@rotationX, " +
                 "rotationY=@rotationY, " +
                 "rotationZ=@rotationZ, " +
+                "isLocked=@isLocked, " +
+                "lockPassword=@lockPassword, " +
                 "creatorId=@creatorId, " +
                 "creatorName=@creatorName " +
                 "WHERE id=@id AND mapName=@mapName",
@@ -90,6 +96,8 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@rotationX", building.Rotation.eulerAngles.x),
                 new MySqlParameter("@rotationY", building.Rotation.eulerAngles.y),
                 new MySqlParameter("@rotationZ", building.Rotation.eulerAngles.z),
+                new MySqlParameter("@isLocked", building.IsLocked),
+                new MySqlParameter("@lockPassword", building.LockPassword),
                 new MySqlParameter("@creatorId", building.CreatorId),
                 new MySqlParameter("@creatorName", building.CreatorName));
             connection.Close();

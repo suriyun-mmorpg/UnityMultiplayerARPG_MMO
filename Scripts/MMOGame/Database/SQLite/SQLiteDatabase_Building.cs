@@ -21,6 +21,8 @@ namespace MultiplayerARPG.MMO
                 result.CurrentHp = reader.GetInt32("currentHp");
                 result.Position = new Vector3(reader.GetFloat("positionX"), reader.GetFloat("positionY"), reader.GetFloat("positionZ"));
                 result.Rotation = Quaternion.Euler(reader.GetFloat("rotationX"), reader.GetFloat("rotationY"), reader.GetFloat("rotationZ"));
+                result.IsLocked = reader.GetBoolean("isLocked");
+                result.LockPassword = reader.GetString("lockPassword");
                 result.CreatorId = reader.GetString("creatorId");
                 result.CreatorName = reader.GetString("creatorName");
                 return true;
@@ -31,7 +33,7 @@ namespace MultiplayerARPG.MMO
 
         public override void CreateBuilding(string mapName, IBuildingSaveData saveData)
         {
-            ExecuteNonQuery("INSERT INTO buildings (id, parentId, dataId, currentHp, mapName, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, creatorId, creatorName) VALUES (@id, @parentId, @dataId, @currentHp, @mapName, @positionX, @positionY, @positionZ, @rotationX, @rotationY, @rotationZ, @creatorId, @creatorName)",
+            ExecuteNonQuery("INSERT INTO buildings (id, parentId, dataId, currentHp, mapName, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, isLocked, lockPassword, creatorId, creatorName) VALUES (@id, @parentId, @dataId, @currentHp, @mapName, @positionX, @positionY, @positionZ, @rotationX, @rotationY, @rotationZ, @isLocked, @lockPassword, @creatorId, @creatorName)",
                 new SqliteParameter("@id", saveData.Id),
                 new SqliteParameter("@parentId", saveData.ParentId),
                 new SqliteParameter("@dataId", saveData.DataId),
@@ -43,6 +45,8 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@rotationX", saveData.Rotation.eulerAngles.x),
                 new SqliteParameter("@rotationY", saveData.Rotation.eulerAngles.y),
                 new SqliteParameter("@rotationZ", saveData.Rotation.eulerAngles.z),
+                new SqliteParameter("@isLocked", saveData.IsLocked),
+                new SqliteParameter("@lockPassword", saveData.LockPassword),
                 new SqliteParameter("@creatorId", saveData.CreatorId),
                 new SqliteParameter("@creatorName", saveData.CreatorName));
         }
@@ -71,6 +75,8 @@ namespace MultiplayerARPG.MMO
                 "rotationX=@rotationX, " +
                 "rotationY=@rotationY, " +
                 "rotationZ=@rotationZ, " +
+                "isLocked=@isLocked, " +
+                "lockPassword=@lockPassword, " +
                 "creatorId=@creatorId, " +
                 "creatorName=@creatorName " +
                 "WHERE id=@id AND mapName=@mapName",
@@ -85,6 +91,8 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@rotationX", building.Rotation.eulerAngles.x),
                 new SqliteParameter("@rotationY", building.Rotation.eulerAngles.y),
                 new SqliteParameter("@rotationZ", building.Rotation.eulerAngles.z),
+                new SqliteParameter("@isLocked", building.IsLocked),
+                new SqliteParameter("@lockPassword", building.LockPassword),
                 new SqliteParameter("@creatorId", building.CreatorId),
                 new SqliteParameter("@creatorName", building.CreatorName));
         }

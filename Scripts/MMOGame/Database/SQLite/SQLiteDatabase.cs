@@ -118,8 +118,8 @@ namespace MultiplayerARPG.MMO
               idx INTEGER NOT NULL,
               characterId TEXT NOT NULL,
               dataId INTEGER NOT NULL,
-              isComplete INTEGER NOT NULL,
-              killedMonsters TEXT NOT NULL,
+              isComplete INTEGER NOT NULL DEFAULT 0,
+              killedMonsters TEXT NOT NULL DEFAULT '',
               createAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
               updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
@@ -227,6 +227,8 @@ namespace MultiplayerARPG.MMO
               rotationX REAL NOT NULL,
               rotationY REAL NOT NULL,
               rotationZ REAL NOT NULL,
+              isLocked INTEGER NOT NULL DEFAULT 0,
+              lockPassword TEXT NOT NULL DEFAULT '',
               creatorId TEXT NOT NULL,
               creatorName TEXT NOT NULL,
               createAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -299,6 +301,12 @@ namespace MultiplayerARPG.MMO
 
             if (!IsColumnExist("userlogin", "userLevel"))
                 ExecuteNonQuery("ALTER TABLE userlogin ADD userLevel INTEGER NOT NULL DEFAULT 0;");
+
+            if (!IsColumnExist("buildings", "isLocked"))
+                ExecuteNonQuery("ALTER TABLE buildings ADD isLocked INTEGER NOT NULL DEFAULT 0;");
+
+            if (!IsColumnExist("buildings", "lockPassword"))
+                ExecuteNonQuery("ALTER TABLE buildings ADD lockPassword TEXT NOT NULL DEFAULT '';");
 
             if (!IsColumnExist("characters", "partyId"))
                 ExecuteNonQuery("ALTER TABLE characters ADD partyId INTEGER NOT NULL DEFAULT 0;");
