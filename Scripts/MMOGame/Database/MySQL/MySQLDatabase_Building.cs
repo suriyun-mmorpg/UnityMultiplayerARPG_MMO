@@ -35,7 +35,7 @@ namespace MultiplayerARPG.MMO
         {
             MySqlConnection connection = NewConnection();
             connection.Open();
-            ExecuteNonQuery(connection, null, "INSERT INTO buildings (id, parentId, dataId, currentHp, mapName, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, isLocked, lockPassword, creatorId, creatorName) VALUES (@id, @parentId, @dataId, @currentHp, @mapName, @positionX, @positionY, @positionZ, @rotationX, @rotationY, @rotationZ, @isLocked, @lockPassword, @creatorId, @creatorName)",
+            ExecuteNonQuery(connection, null, "INSERT INTO buildings (id, parentId, dataId, currentHp, mapName, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, creatorId, creatorName) VALUES (@id, @parentId, @dataId, @currentHp, @mapName, @positionX, @positionY, @positionZ, @rotationX, @rotationY, @rotationZ, @creatorId, @creatorName)",
                 new MySqlParameter("@id", saveData.Id),
                 new MySqlParameter("@parentId", saveData.ParentId),
                 new MySqlParameter("@dataId", saveData.DataId),
@@ -47,8 +47,6 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@rotationX", saveData.Rotation.eulerAngles.x),
                 new MySqlParameter("@rotationY", saveData.Rotation.eulerAngles.y),
                 new MySqlParameter("@rotationZ", saveData.Rotation.eulerAngles.z),
-                new MySqlParameter("@isLocked", saveData.IsLocked),
-                new MySqlParameter("@lockPassword", saveData.LockPassword),
                 new MySqlParameter("@creatorId", saveData.CreatorId),
                 new MySqlParameter("@creatorName", saveData.CreatorName));
             connection.Close();

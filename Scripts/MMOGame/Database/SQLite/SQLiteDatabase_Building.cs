@@ -33,7 +33,7 @@ namespace MultiplayerARPG.MMO
 
         public override void CreateBuilding(string mapName, IBuildingSaveData saveData)
         {
-            ExecuteNonQuery("INSERT INTO buildings (id, parentId, dataId, currentHp, mapName, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, isLocked, lockPassword, creatorId, creatorName) VALUES (@id, @parentId, @dataId, @currentHp, @mapName, @positionX, @positionY, @positionZ, @rotationX, @rotationY, @rotationZ, @isLocked, @lockPassword, @creatorId, @creatorName)",
+            ExecuteNonQuery("INSERT INTO buildings (id, parentId, dataId, currentHp, mapName, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, creatorId, creatorName) VALUES (@id, @parentId, @dataId, @currentHp, @mapName, @positionX, @positionY, @positionZ, @rotationX, @rotationY, @rotationZ, @creatorId, @creatorName)",
                 new SqliteParameter("@id", saveData.Id),
                 new SqliteParameter("@parentId", saveData.ParentId),
                 new SqliteParameter("@dataId", saveData.DataId),
@@ -45,8 +45,6 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@rotationX", saveData.Rotation.eulerAngles.x),
                 new SqliteParameter("@rotationY", saveData.Rotation.eulerAngles.y),
                 new SqliteParameter("@rotationZ", saveData.Rotation.eulerAngles.z),
-                new SqliteParameter("@isLocked", saveData.IsLocked),
-                new SqliteParameter("@lockPassword", saveData.LockPassword),
                 new SqliteParameter("@creatorId", saveData.CreatorId),
                 new SqliteParameter("@creatorName", saveData.CreatorName));
         }
