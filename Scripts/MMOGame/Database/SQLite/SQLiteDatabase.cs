@@ -451,7 +451,7 @@ namespace MultiplayerARPG.MMO
 
         public override byte GetUserLevel(string userId)
         {
-            byte userLevel = (byte)0;
+            byte userLevel = 0;
             SQLiteRowsReader reader = ExecuteReader("SELECT userLevel FROM userlogin WHERE id=@id LIMIT 1",
                 new SqliteParameter("@id", userId));
             if (reader.Read())

@@ -222,7 +222,7 @@ namespace MultiplayerARPG.MMO
 
         public override byte GetUserLevel(string userId)
         {
-            byte userLevel = (byte)0;
+            byte userLevel = 0;
             MySQLRowsReader reader = ExecuteReader("SELECT userLevel FROM userlogin WHERE id=@id LIMIT 1",
                 new MySqlParameter("@id", userId));
             if (reader.Read())
