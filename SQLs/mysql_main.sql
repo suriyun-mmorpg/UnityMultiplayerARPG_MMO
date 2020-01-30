@@ -168,6 +168,7 @@ CREATE TABLE `characters` (
   `respawnPositionX` float NOT NULL DEFAULT '0',
   `respawnPositionY` float NOT NULL DEFAULT '0',
   `respawnPositionZ` float NOT NULL DEFAULT '0',
+  `mountDataId` int(11) NOT NULL DEFAULT '0',
   `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;

@@ -1,0 +1,5 @@
+START TRANSACTION;
+
+ALTER TABLE `characters` ADD `mountDataId` INT NOT NULL DEFAULT '0' AFTER `respawnPositionZ`;
+
+COMMIT;
