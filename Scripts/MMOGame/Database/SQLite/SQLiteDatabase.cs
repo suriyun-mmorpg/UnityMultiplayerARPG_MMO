@@ -154,6 +154,7 @@ namespace MultiplayerARPG.MMO
               respawnPositionX REAL NOT NULL,
               respawnPositionY REAL NOT NULL,
               respawnPositionZ REAL NOT NULL,
+              mountDataId INTEGER NOT NULL DEFAULT 0,
               createAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
               updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
@@ -328,6 +329,9 @@ namespace MultiplayerARPG.MMO
 
             if (!IsColumnExist("characters", "equipWeaponSet"))
                 ExecuteNonQuery("ALTER TABLE characters ADD equipWeaponSet INTEGER NOT NULL DEFAULT 0;");
+
+            if (!IsColumnExist("characters", "mountDataId"))
+                ExecuteNonQuery("ALTER TABLE characters ADD mountDataId INTEGER NOT NULL DEFAULT 0;");
 
             if (!IsColumnExist("guild", "gold"))
                 ExecuteNonQuery("ALTER TABLE guild ADD gold INTEGER NOT NULL DEFAULT 0;");

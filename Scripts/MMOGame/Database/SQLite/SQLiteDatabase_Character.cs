@@ -67,8 +67,8 @@ namespace MultiplayerARPG.MMO
         {
             BeginTransaction();
             ExecuteNonQuery("INSERT INTO characters " +
-                "(id, userId, dataId, entityId, factionId, characterName, level, exp, currentHp, currentMp, currentStamina, currentFood, currentWater, equipWeaponSet, statPoint, skillPoint, gold, currentMapName, currentPositionX, currentPositionY, currentPositionZ, respawnMapName, respawnPositionX, respawnPositionY, respawnPositionZ) VALUES " +
-                "(@id, @userId, @dataId, @entityId, @factionId, @characterName, @level, @exp, @currentHp, @currentMp, @currentStamina, @currentFood, @currentWater, @equipWeaponSet, @statPoint, @skillPoint, @gold, @currentMapName, @currentPositionX, @currentPositionY, @currentPositionZ, @respawnMapName, @respawnPositionX, @respawnPositionY, @respawnPositionZ)",
+                "(id, userId, dataId, entityId, factionId, characterName, level, exp, currentHp, currentMp, currentStamina, currentFood, currentWater, equipWeaponSet, statPoint, skillPoint, gold, currentMapName, currentPositionX, currentPositionY, currentPositionZ, respawnMapName, respawnPositionX, respawnPositionY, respawnPositionZ, mountDataId) VALUES " +
+                "(@id, @userId, @dataId, @entityId, @factionId, @characterName, @level, @exp, @currentHp, @currentMp, @currentStamina, @currentFood, @currentWater, @equipWeaponSet, @statPoint, @skillPoint, @gold, @currentMapName, @currentPositionX, @currentPositionY, @currentPositionZ, @respawnMapName, @respawnPositionX, @respawnPositionY, @respawnPositionZ, @mountDataId)",
                 new SqliteParameter("@id", characterData.Id),
                 new SqliteParameter("@userId", userId),
                 new SqliteParameter("@dataId", characterData.DataId),
@@ -93,7 +93,8 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@respawnMapName", characterData.RespawnMapName),
                 new SqliteParameter("@respawnPositionX", characterData.RespawnPosition.x),
                 new SqliteParameter("@respawnPositionY", characterData.RespawnPosition.y),
-                new SqliteParameter("@respawnPositionZ", characterData.RespawnPosition.z));
+                new SqliteParameter("@respawnPositionZ", characterData.RespawnPosition.z),
+                new SqliteParameter("@mountDataId", characterData.MountDataId));
             FillCharacterRelatesData(characterData);
             this.InvokeInstanceDevExtMethods("CreateCharacter", userId, characterData);
             EndTransaction();
@@ -131,6 +132,7 @@ namespace MultiplayerARPG.MMO
                 result.CurrentPosition = new Vector3(reader.GetFloat("currentPositionX"), reader.GetFloat("currentPositionY"), reader.GetFloat("currentPositionZ"));
                 result.RespawnMapName = reader.GetString("respawnMapName");
                 result.RespawnPosition = new Vector3(reader.GetFloat("respawnPositionX"), reader.GetFloat("respawnPositionY"), reader.GetFloat("respawnPositionZ"));
+                result.MountDataId = reader.GetInt32("mountDataId");
                 result.LastUpdate = (int)(reader.GetDateTime("updateAt").Ticks / System.TimeSpan.TicksPerMillisecond);
                 return true;
             }
@@ -235,7 +237,8 @@ namespace MultiplayerARPG.MMO
                 "respawnMapName=@respawnMapName, " +
                 "respawnPositionX=@respawnPositionX, " +
                 "respawnPositionY=@respawnPositionY, " +
-                "respawnPositionZ=@respawnPositionZ " +
+                "respawnPositionZ=@respawnPositionZ, " +
+                "mountDataId=@mountDataId " +
                 "WHERE id=@id",
                 new SqliteParameter("@dataId", character.DataId),
                 new SqliteParameter("@entityId", character.EntityId),
@@ -260,6 +263,7 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@respawnPositionX", character.RespawnPosition.x),
                 new SqliteParameter("@respawnPositionY", character.RespawnPosition.y),
                 new SqliteParameter("@respawnPositionZ", character.RespawnPosition.z),
+                new SqliteParameter("@mountDataId", character.MountDataId),
                 new SqliteParameter("@id", character.Id));
             FillCharacterRelatesData(character);
             this.InvokeInstanceDevExtMethods("UpdateCharacter", character);
