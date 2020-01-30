@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657844, g: 0.49641222, b: 0.57481694, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -2159,8 +2159,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   firstUI: {fileID: 188923194}
   uiLogin: {fileID: 1247651354}
-  uiCharacterList: {fileID: 751957294}
-  uiCharacterCreate: {fileID: 1519229497}
   onValidateAccessTokenSuccess:
     m_PersistentCalls:
       m_Calls:
@@ -2220,7 +2218,7 @@ MonoBehaviour:
   m_ScaleFactor: 1
   m_ReferenceResolution: {x: 800, y: 600}
   m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 0
+  m_MatchWidthOrHeight: 1
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
@@ -3873,8 +3871,12 @@ MonoBehaviour:
   objectSelected: {fileID: 0}
   selectionManager: {fileID: 0}
   updateUIRepeatRate: 0.5
-  titleFormat: '{0}'
-  descriptionFormat: '{0}'
+  formatKeyTitle:
+    localeKey: 5
+    customKey: 
+  formatKeyDescription:
+    localeKey: 5
+    customKey: 
   uiTextTitle: {fileID: 0}
   uiTextDescription: {fileID: 749938038}
   imageIcon: {fileID: 0}
@@ -4013,10 +4015,10 @@ MonoBehaviour:
   characterModelContainer: {fileID: 1620260896}
   buttonStart: {fileID: 1864635002}
   buttonDelete: {fileID: 368132745}
-  eventOnSelectCharacter:
+  eventOnNoCharacter:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: MultiplayerARPG.CharacterDataEvent, Assembly-CSharp, Version=0.0.0.0,
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!224 &751957295
 RectTransform:
@@ -6780,6 +6782,8 @@ MonoBehaviour:
   uiCharacterContainer: {fileID: 2702980}
   uiCharacterClassPrefab: {fileID: 0}
   uiCharacterClassContainer: {fileID: 0}
+  uiFactionPrefab: {fileID: 0}
+  uiFactionContainer: {fileID: 0}
   characterModelContainer: {fileID: 1620260896}
   inputCharacterName: {fileID: 928588034}
   buttonCreate: {fileID: 1069450846}
@@ -6804,6 +6808,11 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: MultiplayerARPG.CharacterDataEvent, Assembly-CSharp, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
+  eventOnSelectFaction:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: MultiplayerARPG.FactionEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
   eventOnSelectCharacterClass:
     m_PersistentCalls:
       m_Calls:
