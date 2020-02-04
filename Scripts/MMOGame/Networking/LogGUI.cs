@@ -29,16 +29,13 @@ public class LogGUI : MonoBehaviour
     private void OnEnable()
     {
         Application.logMessageReceived += HandleLog;
-        if (string.IsNullOrEmpty(logSavePath))
+        logSavePath = Application.persistentDataPath + "/" + logFileName + ".txt";
+        if (openLogDir)
+            Application.OpenURL(Application.persistentDataPath);
+        // Write log file header
+        using (StreamWriter writer = new StreamWriter(logSavePath, true, Encoding.UTF8))
         {
-            logSavePath = Application.persistentDataPath + "/" + logFileName + ".txt";
-            if (openLogDir)
-                Application.OpenURL(Application.persistentDataPath);
-            // Write log file header
-            using (StreamWriter writer = new StreamWriter(logSavePath, true, Encoding.UTF8))
-            {
-                writer.WriteLine("\n\n -- Log Start: " + System.DateTime.Now);
-            }
+            writer.WriteLine("\n\n -- Log Start: " + System.DateTime.Now);
         }
     }
 
