@@ -1,5 +1,6 @@
 ﻿using LiteNetLib;
 using LiteNetLibManager;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -718,6 +719,77 @@ namespace MultiplayerARPG.MMO
                 }
                 storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
             }
+            // Update storage list immediately
+            // TODO: Have to test about race condition while running multiple-server
+            UpdateStorageItemsJob updateStorageItemsJob = new UpdateStorageItemsJob(Database, storageId.storageType, storageId.storageOwnerId, storageItemList);
+            updateStorageItemsJob.Start();
+            yield return StartCoroutine(updateStorageItemsJob.WaitFor());
+            // Update storage items to characters that open the storage
+            UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItemList);
+        }
+
+        public override void IncreaseStorageItems(StorageId storageId, CharacterItem addingItem, Action<bool> callback)
+        {
+            StartCoroutine(IncreaseStorageItemsRoutine(storageId, addingItem, callback));
+        }
+
+        private IEnumerator IncreaseStorageItemsRoutine(StorageId storageId, CharacterItem addingItem, Action<bool> callback)
+        {
+            List<CharacterItem> storageItemList = new List<CharacterItem>();
+            ReadStorageItemsJob readStorageItemsJob = new ReadStorageItemsJob(Database, storageId.storageType, storageId.storageOwnerId);
+            readStorageItemsJob.Start();
+            yield return StartCoroutine(readStorageItemsJob.WaitFor());
+            if (readStorageItemsJob.result != null)
+            {
+                // Set storage items
+                storageItemList = readStorageItemsJob.result;
+            }
+            // Prepare storage data
+            Storage storage = GetStorage(storageId);
+            bool isLimitSlot = storage.slotLimit > 0;
+            short slotLimit = storage.slotLimit;
+            // Increase item to storage
+            bool increaseResult = storageItemList.IncreaseItems(addingItem);
+            if (callback != null)
+                callback.Invoke(increaseResult);
+            // Update slots
+            storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
+            // Update storage list immediately
+            // TODO: Have to test about race condition while running multiple-server
+            UpdateStorageItemsJob updateStorageItemsJob = new UpdateStorageItemsJob(Database, storageId.storageType, storageId.storageOwnerId, storageItemList);
+            updateStorageItemsJob.Start();
+            yield return StartCoroutine(updateStorageItemsJob.WaitFor());
+            // Update storage items to characters that open the storage
+            UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItemList);
+        }
+
+        public override void DecreaseStorageItems(StorageId storageId, int dataId, short amount, Action<bool, Dictionary<CharacterItem, short>> callback)
+        {
+            StartCoroutine(DecreaseStorageItemsRoutine(storageId, dataId, amount, callback));
+        }
+
+        private IEnumerator DecreaseStorageItemsRoutine(StorageId storageId, int dataId, short amount, Action<bool, Dictionary<CharacterItem, short>> callback)
+        {
+            List<CharacterItem> storageItemList = new List<CharacterItem>();
+            ReadStorageItemsJob readStorageItemsJob = new ReadStorageItemsJob(Database, storageId.storageType, storageId.storageOwnerId);
+            readStorageItemsJob.Start();
+            yield return StartCoroutine(readStorageItemsJob.WaitFor());
+            if (readStorageItemsJob.result != null)
+            {
+                // Set storage items
+                storageItemList = readStorageItemsJob.result;
+            }
+            // Prepare storage data
+            Storage storage = GetStorage(storageId);
+            bool isLimitSlot = storage.slotLimit > 0;
+            short slotLimit = storage.slotLimit;
+            // Increase item to storage
+            Dictionary<CharacterItem, short> decreaseItems;
+            bool decreaseResult = storageItemList.DecreaseItems(dataId, amount, out decreaseItems);
+            if (callback != null)
+                callback.Invoke(decreaseResult, decreaseItems);
+            // Update slots
+            storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
             // Update storage list immediately
             // TODO: Have to test about race condition while running multiple-server
             UpdateStorageItemsJob updateStorageItemsJob = new UpdateStorageItemsJob(Database, storageId.storageType, storageId.storageOwnerId, storageItemList);
