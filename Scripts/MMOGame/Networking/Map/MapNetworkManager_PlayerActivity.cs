@@ -647,7 +647,8 @@ namespace MultiplayerARPG.MMO
                     // Swapping
                     CharacterItem storageItem = storageItemList[storageItemIndex];
                     CharacterItem nonEquipItem = playerCharacterEntity.NonEquipItems[nonEquipIndex];
-
+                    storageItem.id = GenericUtils.GetUniqueId();
+                    nonEquipItem.id = GenericUtils.GetUniqueId();
                     storageItemList[storageItemIndex] = nonEquipItem;
                     playerCharacterEntity.NonEquipItems[nonEquipIndex] = storageItem;
                 }
@@ -713,7 +714,8 @@ namespace MultiplayerARPG.MMO
                     // Swapping
                     CharacterItem storageItem = storageItemList[storageItemIndex];
                     CharacterItem nonEquipItem = playerCharacterEntity.NonEquipItems[nonEquipIndex];
-
+                    storageItem.id = GenericUtils.GetUniqueId();
+                    nonEquipItem.id = GenericUtils.GetUniqueId();
                     storageItemList[storageItemIndex] = nonEquipItem;
                     playerCharacterEntity.NonEquipItems[nonEquipIndex] = storageItem;
                 }
@@ -834,7 +836,8 @@ namespace MultiplayerARPG.MMO
                 // Prepare item data
                 CharacterItem fromItem = storageItemList[fromIndex];
                 CharacterItem toItem = storageItemList[toIndex];
-
+                fromItem.id = GenericUtils.GetUniqueId();
+                toItem.id = GenericUtils.GetUniqueId();
                 if (fromItem.dataId.Equals(toItem.dataId) && !fromItem.IsFull() && !toItem.IsFull())
                 {
                     // Merge if same id and not full
