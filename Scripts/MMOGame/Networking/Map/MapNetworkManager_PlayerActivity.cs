@@ -806,7 +806,7 @@ namespace MultiplayerARPG.MMO
                 SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.CannotAccessStorage);
                 return;
             }
-            // TODO: Implement this
+            StartCoroutine(SwapOrMergeStorageItemRoutine(playerCharacterEntity, storageId, fromIndex, toIndex));
         }
 
         private IEnumerator SwapOrMergeStorageItemRoutine(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short fromIndex, short toIndex)
