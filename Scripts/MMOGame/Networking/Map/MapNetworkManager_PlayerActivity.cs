@@ -728,12 +728,12 @@ namespace MultiplayerARPG.MMO
             UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItemList);
         }
 
-        public override void IncreaseStorageItems(StorageId storageId, CharacterItem addingItem, Action<bool> callback)
+        public override void IncreaseStorageItems(StorageId storageId, CharacterItem addingItem, Action<bool> callback, int minSlotIndex = 0)
         {
-            StartCoroutine(IncreaseStorageItemsRoutine(storageId, addingItem, callback));
+            StartCoroutine(IncreaseStorageItemsRoutine(storageId, addingItem, callback, minSlotIndex));
         }
 
-        private IEnumerator IncreaseStorageItemsRoutine(StorageId storageId, CharacterItem addingItem, Action<bool> callback)
+        private IEnumerator IncreaseStorageItemsRoutine(StorageId storageId, CharacterItem addingItem, Action<bool> callback, int minSlotIndex = 0)
         {
             List<CharacterItem> storageItemList = new List<CharacterItem>();
             ReadStorageItemsJob readStorageItemsJob = new ReadStorageItemsJob(Database, storageId.storageType, storageId.storageOwnerId);
@@ -749,7 +749,7 @@ namespace MultiplayerARPG.MMO
             bool isLimitSlot = storage.slotLimit > 0;
             short slotLimit = storage.slotLimit;
             // Increase item to storage
-            bool increaseResult = storageItemList.IncreaseItems(addingItem);
+            bool increaseResult = storageItemList.IncreaseItems(addingItem, minSlotIndex);
             if (callback != null)
                 callback.Invoke(increaseResult);
             // Update slots
