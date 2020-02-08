@@ -86,7 +86,6 @@ namespace MultiplayerARPG.MMO
         private readonly HashSet<StorageId> loadingStorageIds = new HashSet<StorageId>();
         private readonly HashSet<int> loadingPartyIds = new HashSet<int>();
         private readonly HashSet<int> loadingGuildIds = new HashSet<int>();
-        private readonly HashSet<StorageId> savingStorageIds = new HashSet<StorageId>();
         private readonly HashSet<string> savingCharacters = new HashSet<string>();
         private readonly HashSet<string> savingBuildings = new HashSet<string>();
 
