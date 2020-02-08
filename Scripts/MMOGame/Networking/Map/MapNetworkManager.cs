@@ -160,7 +160,6 @@ namespace MultiplayerARPG.MMO
             loadingStorageIds.Clear();
             loadingPartyIds.Clear();
             loadingGuildIds.Clear();
-            savingStorageIds.Clear();
             savingCharacters.Clear();
             savingBuildings.Clear();
         }
