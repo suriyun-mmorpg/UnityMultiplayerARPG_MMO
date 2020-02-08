@@ -902,6 +902,16 @@ namespace MultiplayerARPG.MMO
                 usingStorageCharacters[id].Count > 0;
         }
 
+        public override List<CharacterItem> GetStorageEntityItems(StorageEntity storageEntity)
+        {
+            if (storageEntity == null)
+                return new List<CharacterItem>();
+            StorageId id = new StorageId(StorageType.Building, storageEntity.Id);
+            if (!storageItems.ContainsKey(id))
+                storageItems[id] = new List<CharacterItem>();
+            return storageItems[id];
+        }
+
         private void UpdateStorageItemsToCharacters(HashSet<uint> objectIds, List<CharacterItem> storageItems)
         {
             PlayerCharacterEntity playerCharacterEntity;
