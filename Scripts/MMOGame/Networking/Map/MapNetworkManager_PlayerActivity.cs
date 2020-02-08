@@ -70,7 +70,7 @@ namespace MultiplayerARPG.MMO
                 {
                     yield return null;
                 }
-                yield return StartCoroutine(SaveCharacterRoutine(savingCharacterData));
+                yield return StartCoroutine(SaveCharacterRoutine(savingCharacterData, playerCharacterEntity.UserId));
                 // Remove this character from warping list
                 playerCharacterEntity.IsWarping = false;
                 // Destroy character from server
@@ -147,7 +147,7 @@ namespace MultiplayerARPG.MMO
                 {
                     yield return 0;
                 }
-                yield return StartCoroutine(SaveCharacterRoutine(savingCharacterData));
+                yield return StartCoroutine(SaveCharacterRoutine(savingCharacterData, playerCharacterEntity.UserId));
                 // Remove this character from warping list
                 playerCharacterEntity.IsWarping = false;
                 // Destroy character from server
@@ -568,14 +568,12 @@ namespace MultiplayerARPG.MMO
         private IEnumerator OpenStorageRoutine(BasePlayerCharacterEntity playerCharacterEntity)
         {
             List<CharacterItem> result = new List<CharacterItem>();
-            ReadStorageItemsJob storageItemsJob = new ReadStorageItemsJob(Database, playerCharacterEntity.CurrentStorageId.storageType, playerCharacterEntity.CurrentStorageId.storageOwnerId);
-            storageItemsJob.Start();
-            yield return StartCoroutine(storageItemsJob.WaitFor());
-            if (storageItemsJob.result != null)
+            if (playerCharacterEntity.CurrentStorageId.storageType == StorageType.Guild)
             {
-                // Set storage items
-                result = storageItemsJob.result;
+                // Have to reload guild storage because it can be changed by other players in other map-server
+                yield return StartCoroutine(LoadStorageRoutine(playerCharacterEntity.CurrentStorageId));
             }
+            result = storageItems[playerCharacterEntity.CurrentStorageId];
             // Prepare storage data
             Storage storage = GetStorage(playerCharacterEntity.CurrentStorageId);
             bool isLimitSlot = storage.slotLimit > 0;
@@ -605,14 +603,13 @@ namespace MultiplayerARPG.MMO
         private IEnumerator MoveItemToStorageRoutine(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short nonEquipIndex, short amount, short storageItemIndex)
         {
             List<CharacterItem> storageItemList = new List<CharacterItem>();
-            ReadStorageItemsJob readStorageItemsJob = new ReadStorageItemsJob(Database, storageId.storageType, storageId.storageOwnerId);
-            readStorageItemsJob.Start();
-            yield return StartCoroutine(readStorageItemsJob.WaitFor());
-            if (readStorageItemsJob.result != null)
+            if (storageId.storageType == StorageType.Guild)
             {
-                // Set storage items
-                storageItemList = readStorageItemsJob.result;
+                // Have to reload guild storage because it can be changed by other players in other map-server
+                yield return StartCoroutine(LoadStorageRoutine(storageId));
             }
+            storageItemList = storageItems[storageId];
+
             if (nonEquipIndex < 0 || nonEquipIndex >= playerCharacterEntity.NonEquipItems.Count)
             {
                 // Don't do anything, if non equip item index is invalid
@@ -653,14 +650,17 @@ namespace MultiplayerARPG.MMO
                     playerCharacterEntity.NonEquipItems[nonEquipIndex] = storageItem;
                 }
                 storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
+                // Update storage list immediately
+                if (storageId.storageType == StorageType.Guild)
+                {
+                    // TODO: Have to test about race condition while running multiple-server
+                    UpdateStorageItemsJob updateStorageItemsJob = new UpdateStorageItemsJob(Database, storageId.storageType, storageId.storageOwnerId, storageItemList);
+                    updateStorageItemsJob.Start();
+                    yield return StartCoroutine(updateStorageItemsJob.WaitFor());
+                }
+                // Update storage items to characters that open the storage
+                UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItemList);
             }
-            // Update storage list immediately
-            // TODO: Have to test about race condition while running multiple-server
-            UpdateStorageItemsJob updateStorageItemsJob = new UpdateStorageItemsJob(Database, storageId.storageType, storageId.storageOwnerId, storageItemList);
-            updateStorageItemsJob.Start();
-            yield return StartCoroutine(updateStorageItemsJob.WaitFor());
-            // Update storage items to characters that open the storage
-            UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItemList);
         }
 
         public override void MoveItemFromStorage(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short storageItemIndex, short amount, short nonEquipIndex)
@@ -676,14 +676,13 @@ namespace MultiplayerARPG.MMO
         private IEnumerator MoveItemFromStorageRoutine(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short storageItemIndex, short amount, short nonEquipIndex)
         {
             List<CharacterItem> storageItemList = new List<CharacterItem>();
-            ReadStorageItemsJob readStorageItemsJob = new ReadStorageItemsJob(Database, storageId.storageType, storageId.storageOwnerId);
-            readStorageItemsJob.Start();
-            yield return StartCoroutine(readStorageItemsJob.WaitFor());
-            if (readStorageItemsJob.result != null)
+            if (storageId.storageType == StorageType.Guild)
             {
-                // Set storage items
-                storageItemList = readStorageItemsJob.result;
+                // Have to reload guild storage because it can be changed by other players in other map-server
+                yield return StartCoroutine(LoadStorageRoutine(storageId));
             }
+            storageItemList = storageItems[storageId];
+
             if (storageItemIndex < 0 || storageItemIndex >= storageItemList.Count)
             {
                 // Don't do anything, if storage item index is invalid
@@ -720,14 +719,17 @@ namespace MultiplayerARPG.MMO
                     playerCharacterEntity.NonEquipItems[nonEquipIndex] = storageItem;
                 }
                 storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
+                // Update storage list immediately
+                if (storageId.storageType == StorageType.Guild)
+                {
+                    // TODO: Have to test about race condition while running multiple-server
+                    UpdateStorageItemsJob updateStorageItemsJob = new UpdateStorageItemsJob(Database, storageId.storageType, storageId.storageOwnerId, storageItemList);
+                    updateStorageItemsJob.Start();
+                    yield return StartCoroutine(updateStorageItemsJob.WaitFor());
+                }
+                // Update storage items to characters that open the storage
+                UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItemList);
             }
-            // Update storage list immediately
-            // TODO: Have to test about race condition while running multiple-server
-            UpdateStorageItemsJob updateStorageItemsJob = new UpdateStorageItemsJob(Database, storageId.storageType, storageId.storageOwnerId, storageItemList);
-            updateStorageItemsJob.Start();
-            yield return StartCoroutine(updateStorageItemsJob.WaitFor());
-            // Update storage items to characters that open the storage
-            UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItemList);
         }
 
         public override void IncreaseStorageItems(StorageId storageId, CharacterItem addingItem, Action<bool> callback, int minSlotIndex = 0)
@@ -738,14 +740,13 @@ namespace MultiplayerARPG.MMO
         private IEnumerator IncreaseStorageItemsRoutine(StorageId storageId, CharacterItem addingItem, Action<bool> callback, int minSlotIndex = 0)
         {
             List<CharacterItem> storageItemList = new List<CharacterItem>();
-            ReadStorageItemsJob readStorageItemsJob = new ReadStorageItemsJob(Database, storageId.storageType, storageId.storageOwnerId);
-            readStorageItemsJob.Start();
-            yield return StartCoroutine(readStorageItemsJob.WaitFor());
-            if (readStorageItemsJob.result != null)
+            if (storageId.storageType == StorageType.Guild)
             {
-                // Set storage items
-                storageItemList = readStorageItemsJob.result;
+                // Have to reload guild storage because it can be changed by other players in other map-server
+                yield return StartCoroutine(LoadStorageRoutine(storageId));
             }
+            storageItemList = storageItems[storageId];
+
             // Prepare storage data
             Storage storage = GetStorage(storageId);
             bool isLimitSlot = storage.slotLimit > 0;
@@ -757,10 +758,13 @@ namespace MultiplayerARPG.MMO
             // Update slots
             storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
             // Update storage list immediately
-            // TODO: Have to test about race condition while running multiple-server
-            UpdateStorageItemsJob updateStorageItemsJob = new UpdateStorageItemsJob(Database, storageId.storageType, storageId.storageOwnerId, storageItemList);
-            updateStorageItemsJob.Start();
-            yield return StartCoroutine(updateStorageItemsJob.WaitFor());
+            if (storageId.storageType == StorageType.Guild)
+            {
+                // TODO: Have to test about race condition while running multiple-server
+                UpdateStorageItemsJob updateStorageItemsJob = new UpdateStorageItemsJob(Database, storageId.storageType, storageId.storageOwnerId, storageItemList);
+                updateStorageItemsJob.Start();
+                yield return StartCoroutine(updateStorageItemsJob.WaitFor());
+            }
             // Update storage items to characters that open the storage
             UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItemList);
         }
@@ -773,14 +777,13 @@ namespace MultiplayerARPG.MMO
         private IEnumerator DecreaseStorageItemsRoutine(StorageId storageId, int dataId, short amount, Action<bool, Dictionary<CharacterItem, short>> callback)
         {
             List<CharacterItem> storageItemList = new List<CharacterItem>();
-            ReadStorageItemsJob readStorageItemsJob = new ReadStorageItemsJob(Database, storageId.storageType, storageId.storageOwnerId);
-            readStorageItemsJob.Start();
-            yield return StartCoroutine(readStorageItemsJob.WaitFor());
-            if (readStorageItemsJob.result != null)
+            if (storageId.storageType == StorageType.Guild)
             {
-                // Set storage items
-                storageItemList = readStorageItemsJob.result;
+                // Have to reload guild storage because it can be changed by other players in other map-server
+                yield return StartCoroutine(LoadStorageRoutine(storageId));
             }
+            storageItemList = storageItems[storageId];
+
             // Prepare storage data
             Storage storage = GetStorage(storageId);
             bool isLimitSlot = storage.slotLimit > 0;
@@ -793,10 +796,13 @@ namespace MultiplayerARPG.MMO
             // Update slots
             storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
             // Update storage list immediately
-            // TODO: Have to test about race condition while running multiple-server
-            UpdateStorageItemsJob updateStorageItemsJob = new UpdateStorageItemsJob(Database, storageId.storageType, storageId.storageOwnerId, storageItemList);
-            updateStorageItemsJob.Start();
-            yield return StartCoroutine(updateStorageItemsJob.WaitFor());
+            if (storageId.storageType == StorageType.Guild)
+            {
+                // TODO: Have to test about race condition while running multiple-server
+                UpdateStorageItemsJob updateStorageItemsJob = new UpdateStorageItemsJob(Database, storageId.storageType, storageId.storageOwnerId, storageItemList);
+                updateStorageItemsJob.Start();
+                yield return StartCoroutine(updateStorageItemsJob.WaitFor());
+            }
             // Update storage items to characters that open the storage
             UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItemList);
         }
@@ -814,16 +820,14 @@ namespace MultiplayerARPG.MMO
         private IEnumerator SwapOrMergeStorageItemRoutine(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short fromIndex, short toIndex)
         {
             List<CharacterItem> storageItemList = new List<CharacterItem>();
-            ReadStorageItemsJob readStorageItemsJob = new ReadStorageItemsJob(Database, storageId.storageType, storageId.storageOwnerId);
-            readStorageItemsJob.Start();
-            yield return StartCoroutine(readStorageItemsJob.WaitFor());
-            if (readStorageItemsJob.result != null)
+            if (storageId.storageType == StorageType.Guild)
             {
-                // Set storage items
-                storageItemList = readStorageItemsJob.result;
+                // Have to reload guild storage because it can be changed by other players in other map-server
+                yield return StartCoroutine(LoadStorageRoutine(storageId));
             }
-            if (fromIndex >= storageItemList.Count ||
-                toIndex >= storageItemList.Count)
+            storageItemList = storageItems[storageId];
+
+            if (fromIndex >= storageItemList.Count || toIndex >= storageItemList.Count)
             {
                 // Don't do anything, if storage item index is invalid
             }
@@ -864,14 +868,17 @@ namespace MultiplayerARPG.MMO
                     storageItemList[toIndex] = fromItem;
                 }
                 storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
+                // Update storage list immediately
+                if (storageId.storageType == StorageType.Guild)
+                {
+                    // TODO: Have to test about race condition while running multiple-server
+                    UpdateStorageItemsJob updateStorageItemsJob = new UpdateStorageItemsJob(Database, storageId.storageType, storageId.storageOwnerId, storageItemList);
+                    updateStorageItemsJob.Start();
+                    yield return StartCoroutine(updateStorageItemsJob.WaitFor());
+                }
+                // Update storage items to characters that open the storage
+                UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItemList);
             }
-            // Update storage list immediately
-            // TODO: Have to test about race condition while running multiple-server
-            UpdateStorageItemsJob updateStorageItemsJob = new UpdateStorageItemsJob(Database, storageId.storageType, storageId.storageOwnerId, storageItemList);
-            updateStorageItemsJob.Start();
-            yield return StartCoroutine(updateStorageItemsJob.WaitFor());
-            // Update storage items to characters that open the storage
-            UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItemList);
         }
 
         public override bool IsStorageEntityOpen(StorageEntity storageEntity)

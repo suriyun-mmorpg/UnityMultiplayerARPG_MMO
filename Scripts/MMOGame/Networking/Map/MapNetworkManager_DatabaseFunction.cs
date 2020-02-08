@@ -8,6 +8,22 @@ namespace MultiplayerARPG.MMO
 {
     public partial class MapNetworkManager
     {
+        private IEnumerator LoadStorageRoutine(StorageId storageId)
+        {
+            if (!loadingStorageIds.Contains(storageId))
+            {
+                loadingStorageIds.Add(storageId);
+                ReadStorageItemsJob job = new ReadStorageItemsJob(Database, storageId.storageType, storageId.storageOwnerId);
+                job.Start();
+                yield return StartCoroutine(job.WaitFor());
+                if (job.result != null)
+                    storageItems[storageId] = job.result;
+                else
+                    storageItems.Remove(storageId);
+                loadingStorageIds.Remove(storageId);
+            }
+        }
+
         private IEnumerator LoadPartyRoutine(int id)
         {
             if (id > 0 && !loadingPartyIds.Contains(id))
@@ -40,7 +56,7 @@ namespace MultiplayerARPG.MMO
             }
         }
 
-        private IEnumerator SaveCharacterRoutine(IPlayerCharacterData playerCharacterData)
+        private IEnumerator SaveCharacterRoutine(IPlayerCharacterData playerCharacterData, string userId)
         {
             if (playerCharacterData != null && !savingCharacters.Contains(playerCharacterData.Id))
             {
@@ -48,6 +64,13 @@ namespace MultiplayerARPG.MMO
                 UpdateCharacterJob job = new UpdateCharacterJob(Database, playerCharacterData);
                 job.Start();
                 yield return StartCoroutine(job.WaitFor());
+                StorageId storageId = new StorageId(StorageType.Player, userId);
+                if (storageItems.ContainsKey(storageId))
+                {
+                    UpdateStorageItemsJob updateStorageItemsJob = new UpdateStorageItemsJob(Database, storageId.storageType, storageId.storageOwnerId, storageItems[storageId]);
+                    updateStorageItemsJob.Start();
+                    yield return StartCoroutine(updateStorageItemsJob.WaitFor());
+                }
                 savingCharacters.Remove(playerCharacterData.Id);
                 if (LogInfo)
                     Debug.Log("Character [" + playerCharacterData.Id + "] Saved");
@@ -61,7 +84,7 @@ namespace MultiplayerARPG.MMO
                 int i = 0;
                 foreach (BasePlayerCharacterEntity playerCharacter in playerCharacters.Values)
                 {
-                    StartCoroutine(SaveCharacterRoutine(playerCharacter.CloneTo(new PlayerCharacterData())));
+                    StartCoroutine(SaveCharacterRoutine(playerCharacter.CloneTo(new PlayerCharacterData()), playerCharacter.UserId));
                     ++i;
                 }
                 while (savingCharacters.Count > 0)
@@ -81,6 +104,13 @@ namespace MultiplayerARPG.MMO
                 UpdateBuildingJob job = new UpdateBuildingJob(Database, Assets.onlineScene.SceneName, buildingSaveData);
                 job.Start();
                 yield return StartCoroutine(job.WaitFor());
+                StorageId storageId = new StorageId(StorageType.Building, buildingSaveData.Id);
+                if (storageItems.ContainsKey(storageId))
+                {
+                    UpdateStorageItemsJob updateStorageItemsJob = new UpdateStorageItemsJob(Database, storageId.storageType, storageId.storageOwnerId, storageItems[storageId]);
+                    updateStorageItemsJob.Start();
+                    yield return StartCoroutine(updateStorageItemsJob.WaitFor());
+                }
                 savingBuildings.Remove(buildingSaveData.Id);
                 if (LogInfo)
                     Debug.Log("Building [" + buildingSaveData.Id + "] Saved");

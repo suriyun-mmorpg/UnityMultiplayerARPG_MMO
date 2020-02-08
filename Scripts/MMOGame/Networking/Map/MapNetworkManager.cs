@@ -80,10 +80,13 @@ namespace MultiplayerARPG.MMO
         private readonly Dictionary<string, HashSet<uint>> instanceMapWarpingCharactersByInstanceId = new Dictionary<string, HashSet<uint>>();
         private readonly Dictionary<string, KeyValuePair<string, Vector3>> instanceMapWarpingLocations = new Dictionary<string, KeyValuePair<string, Vector3>>();
         private readonly Dictionary<string, UserCharacterData> usersById = new Dictionary<string, UserCharacterData>();
+        private readonly Dictionary<StorageId, List<CharacterItem>> storageItems = new Dictionary<StorageId, List<CharacterItem>>();
         private readonly Dictionary<StorageId, HashSet<uint>> usingStorageCharacters = new Dictionary<StorageId, HashSet<uint>>();
         // Database operations
+        private readonly HashSet<StorageId> loadingStorageIds = new HashSet<StorageId>();
         private readonly HashSet<int> loadingPartyIds = new HashSet<int>();
         private readonly HashSet<int> loadingGuildIds = new HashSet<int>();
+        private readonly HashSet<StorageId> savingStorageIds = new HashSet<StorageId>();
         private readonly HashSet<string> savingCharacters = new HashSet<string>();
         private readonly HashSet<string> savingBuildings = new HashSet<string>();
 
@@ -155,8 +158,10 @@ namespace MultiplayerARPG.MMO
             instanceMapWarpingLocations.Clear();
             usersById.Clear();
             usingStorageCharacters.Clear();
+            loadingStorageIds.Clear();
             loadingPartyIds.Clear();
             loadingGuildIds.Clear();
+            savingStorageIds.Clear();
             savingCharacters.Clear();
             savingBuildings.Clear();
         }
@@ -257,7 +262,7 @@ namespace MultiplayerARPG.MMO
                 {
                     yield return 0;
                 }
-                yield return StartCoroutine(SaveCharacterRoutine(saveCharacterData));
+                yield return StartCoroutine(SaveCharacterRoutine(saveCharacterData, playerCharacterEntity.UserId));
             }
             UnregisterPlayerCharacter(connectionId);
             base.OnPeerDisconnected(connectionId, disconnectInfo);
@@ -305,10 +310,24 @@ namespace MultiplayerARPG.MMO
                 ReadBuildingsJob job = new ReadBuildingsJob(Database, Assets.onlineScene.SceneName);
                 job.Start();
                 yield return StartCoroutine(job.WaitFor());
+                HashSet<StorageId> storageIds = new HashSet<StorageId>();
                 List<BuildingSaveData> buildings = job.result;
+                BuildingEntity buildingEntity;
                 foreach (BuildingSaveData building in buildings)
                 {
-                    CreateBuildingEntity(building, true);
+                    buildingEntity = CreateBuildingEntity(building, true);
+                    if (buildingEntity is StorageEntity)
+                        storageIds.Add(new StorageId(StorageType.Building, (buildingEntity as StorageEntity).Id));
+                }
+                // Load building storage
+                foreach (StorageId storageId in storageIds)
+                {
+                    StartCoroutine(LoadStorageRoutine(storageId));
+                }
+                // Wait until all building storage loaded
+                while (loadingStorageIds.Count > 0)
+                {
+                    yield return 0;
                 }
             }
             // Spawn harvestables
@@ -448,7 +467,10 @@ namespace MultiplayerARPG.MMO
                             playerCharacterEntity.UserLevel = level;
                         });
                         loadUserLevelJob.Start();
-                        StartCoroutine(loadUserLevelJob.WaitFor());
+                        yield return loadUserLevelJob.WaitFor();
+
+                        // Load storage
+                        yield return StartCoroutine(LoadStorageRoutine(new StorageId(StorageType.Player, userId)));
 
                         // Load party data, if this map-server does not have party data
                         if (playerCharacterEntity.PartyId > 0)
