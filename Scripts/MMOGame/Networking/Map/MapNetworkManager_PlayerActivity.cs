@@ -559,6 +559,8 @@ namespace MultiplayerARPG.MMO
                 SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.CannotAccessStorage);
                 return;
             }
+            if (!storageItems.ContainsKey(playerCharacterEntity.CurrentStorageId))
+                storageItems[playerCharacterEntity.CurrentStorageId] = new List<CharacterItem>();
             if (!usingStorageCharacters.ContainsKey(playerCharacterEntity.CurrentStorageId))
                 usingStorageCharacters[playerCharacterEntity.CurrentStorageId] = new HashSet<uint>();
             usingStorageCharacters[playerCharacterEntity.CurrentStorageId].Add(playerCharacterEntity.ObjectId);
@@ -597,6 +599,8 @@ namespace MultiplayerARPG.MMO
                 SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.CannotAccessStorage);
                 return;
             }
+            if (!storageItems.ContainsKey(storageId))
+                storageItems[storageId] = new List<CharacterItem>();
             StartCoroutine(MoveItemToStorageRoutine(playerCharacterEntity, storageId, nonEquipIndex, amount, storageItemIndex));
         }
 
@@ -670,6 +674,8 @@ namespace MultiplayerARPG.MMO
                 SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.CannotAccessStorage);
                 return;
             }
+            if (!storageItems.ContainsKey(storageId))
+                storageItems[storageId] = new List<CharacterItem>();
             StartCoroutine(MoveItemFromStorageRoutine(playerCharacterEntity, storageId, storageItemIndex, amount, nonEquipIndex));
         }
 
@@ -734,6 +740,8 @@ namespace MultiplayerARPG.MMO
 
         public override void IncreaseStorageItems(StorageId storageId, CharacterItem addingItem, Action<bool> callback, int minSlotIndex = 0)
         {
+            if (!storageItems.ContainsKey(storageId))
+                storageItems[storageId] = new List<CharacterItem>();
             StartCoroutine(IncreaseStorageItemsRoutine(storageId, addingItem, callback, minSlotIndex));
         }
 
@@ -771,6 +779,8 @@ namespace MultiplayerARPG.MMO
 
         public override void DecreaseStorageItems(StorageId storageId, int dataId, short amount, Action<bool, Dictionary<CharacterItem, short>> callback)
         {
+            if (!storageItems.ContainsKey(storageId))
+                storageItems[storageId] = new List<CharacterItem>();
             StartCoroutine(DecreaseStorageItemsRoutine(storageId, dataId, amount, callback));
         }
 
@@ -814,6 +824,8 @@ namespace MultiplayerARPG.MMO
                 SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.CannotAccessStorage);
                 return;
             }
+            if (!storageItems.ContainsKey(storageId))
+                storageItems[storageId] = new List<CharacterItem>();
             StartCoroutine(SwapOrMergeStorageItemRoutine(playerCharacterEntity, storageId, fromIndex, toIndex));
         }
 

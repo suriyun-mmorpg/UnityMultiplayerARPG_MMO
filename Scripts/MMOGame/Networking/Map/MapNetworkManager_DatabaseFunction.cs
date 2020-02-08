@@ -19,7 +19,7 @@ namespace MultiplayerARPG.MMO
                 if (job.result != null)
                     storageItems[storageId] = job.result;
                 else
-                    storageItems.Remove(storageId);
+                    storageItems[storageId] = new List<CharacterItem>();
                 loadingStorageIds.Remove(storageId);
             }
         }
