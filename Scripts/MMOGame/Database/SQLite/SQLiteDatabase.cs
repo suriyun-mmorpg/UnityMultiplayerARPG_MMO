@@ -42,7 +42,8 @@ namespace MultiplayerARPG.MMO
 
         public override void Destroy()
         {
-            connection.Close();
+            if (connection != null)
+                connection.Close();
         }
 
         private void Init()
