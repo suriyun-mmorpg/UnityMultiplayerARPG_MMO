@@ -725,6 +725,7 @@ namespace MultiplayerARPG.MMO
                     playerCharacterEntity.NonEquipItems[nonEquipIndex] = storageItem;
                 }
                 storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
+                playerCharacterEntity.FillEmptySlots();
                 // Update storage list immediately
                 if (storageId.storageType == StorageType.Guild)
                 {
