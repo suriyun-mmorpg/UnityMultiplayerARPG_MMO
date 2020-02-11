@@ -628,6 +628,7 @@ namespace MultiplayerARPG.MMO
                 short slotLimit = storage.slotLimit;
                 // Prepare item data
                 CharacterItem movingItem = playerCharacterEntity.NonEquipItems[nonEquipIndex].Clone();
+                movingItem.id = GenericUtils.GetUniqueId();
                 movingItem.amount = amount;
                 if (storageItemIndex < 0 ||
                     storageItemIndex >= storageItemList.Count ||
@@ -701,6 +702,7 @@ namespace MultiplayerARPG.MMO
                 short slotLimit = storage.slotLimit;
                 // Prepare item data
                 CharacterItem movingItem = storageItemList[storageItemIndex].Clone();
+                movingItem.id = GenericUtils.GetUniqueId();
                 movingItem.amount = amount;
                 if (nonEquipIndex < 0 ||
                     nonEquipIndex >= playerCharacterEntity.NonEquipItems.Count ||
