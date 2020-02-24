@@ -8,6 +8,7 @@ namespace MultiplayerARPG.MMO
     {
         protected override void LoadCharacters()
         {
+            eventOnNotAbleToCreateCharacter.Invoke();
             MMOClientInstance.Singleton.RequestCharacters(OnRequestedCharacters);
         }
 
@@ -62,6 +63,12 @@ namespace MultiplayerARPG.MMO
 
             if (selectableCharacters.Count > 0)
             {
+
+                if (selectableCharacters.Count > GameInstance.Singleton.maxCharacterSaves)
+                    eventOnNotAbleToCreateCharacter.Invoke();
+                else
+                    eventOnAbleToCreateCharacter.Invoke();
+
                 selectableCharacters.Sort(new PlayerCharacterDataLastUpdateComparer().Desc());
                 CacheCharacterList.Generate(selectableCharacters, (index, characterData, ui) =>
                 {
@@ -84,8 +91,7 @@ namespace MultiplayerARPG.MMO
             }
             else
             {
-                if (eventOnNoCharacter != null)
-                    eventOnNoCharacter.Invoke();
+                eventOnNoCharacter.Invoke();
             }
         }
 
