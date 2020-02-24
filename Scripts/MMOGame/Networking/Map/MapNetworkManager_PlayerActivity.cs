@@ -713,7 +713,7 @@ namespace MultiplayerARPG.MMO
                     if (!isOverwhelming && playerCharacterEntity.IncreaseItems(movingItem))
                     {
                         // Remove from storage
-                        storageItemList.DecreaseItemsByIndex(storageItemIndex, amount);
+                        storageItemList.DecreaseItemsByIndex(storageItemIndex, amount, isLimitSlot);
                     }
                 }
                 else
@@ -803,7 +803,7 @@ namespace MultiplayerARPG.MMO
             short slotLimit = storage.slotLimit;
             // Increase item to storage
             Dictionary<CharacterItem, short> decreaseItems;
-            bool decreaseResult = storageItemList.DecreaseItems(dataId, amount, out decreaseItems);
+            bool decreaseResult = storageItemList.DecreaseItems(dataId, amount, isLimitSlot, out decreaseItems);
             if (callback != null)
                 callback.Invoke(decreaseResult, decreaseItems);
             // Update slots
