@@ -917,7 +917,7 @@ namespace MultiplayerARPG.MMO
 
         private void UpdateStorageItemsToCharacters(HashSet<uint> objectIds, List<CharacterItem> storageItems)
         {
-            PlayerCharacterEntity playerCharacterEntity;
+            BasePlayerCharacterEntity playerCharacterEntity;
             foreach (uint objectId in objectIds)
             {
                 if (Assets.TryGetSpawnedObject(objectId, out playerCharacterEntity))
