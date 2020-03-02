@@ -61,14 +61,14 @@ namespace MultiplayerARPG.MMO
                 }
             }
 
+            if (GameInstance.Singleton.maxCharacterSaves > 0 &&
+                selectableCharacters.Count >= GameInstance.Singleton.maxCharacterSaves)
+                eventOnNotAbleToCreateCharacter.Invoke();
+            else
+                eventOnAbleToCreateCharacter.Invoke();
+
             if (selectableCharacters.Count > 0)
             {
-                if (GameInstance.Singleton.maxCharacterSaves > 0 &&
-                    selectableCharacters.Count >= GameInstance.Singleton.maxCharacterSaves)
-                    eventOnNotAbleToCreateCharacter.Invoke();
-                else
-                    eventOnAbleToCreateCharacter.Invoke();
-
                 selectableCharacters.Sort(new PlayerCharacterDataLastUpdateComparer().Desc());
                 CacheCharacterList.Generate(selectableCharacters, (index, characterData, ui) =>
                 {
