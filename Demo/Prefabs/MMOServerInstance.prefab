@@ -221,7 +221,7 @@ MonoBehaviour:
   port: 3306
   username: root
   password: 
-  dbName: mmorpgtemplate
+  dbName: mmorpg_kit
 --- !u!114 &114543387092495668
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -234,7 +234,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentLogLevel: 2
-  connectKey: SampleConnectKey
   networkAddress: localhost
   networkPort: 6000
   useWebSocket: 0
@@ -270,14 +269,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentLogLevel: 2
-  connectKey: SampleConnectKey
   networkAddress: localhost
   networkPort: 6002
   useWebSocket: 0
   maxConnections: 1100
   transportFactory: {fileID: 0}
+  enablePendingGMCommands: 0
   centralTransportFactory: {fileID: 0}
-  centralConnectKey: SampleConnectKey
   centralNetworkAddress: 127.0.0.1
   centralNetworkPort: 6000
   machineAddress: 127.0.0.1
@@ -293,14 +291,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentLogLevel: 2
-  connectKey: SampleConnectKey
   networkAddress: localhost
   networkPort: 6001
   useWebSocket: 0
   maxConnections: 1100
   transportFactory: {fileID: 0}
   centralTransportFactory: {fileID: 0}
-  centralConnectKey: SampleConnectKey
   centralNetworkAddress: 127.0.0.1
   centralNetworkPort: 6000
   machineAddress: 127.0.0.1
