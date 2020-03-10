@@ -4,6 +4,7 @@ using UnityEngine;
 using LiteNetLib;
 using LiteNetLib.Utils;
 using LiteNetLibManager;
+using System.Threading.Tasks;
 
 namespace MultiplayerARPG.MMO
 {
@@ -288,19 +289,9 @@ namespace MultiplayerARPG.MMO
             if (onClientDisconnected != null)
                 onClientDisconnected.Invoke(disconnectInfo);
         }
-
-        public override void OnServerOnlineSceneLoaded()
+        
+        protected override async Task PreSpawnEntities()
         {
-            base.OnServerOnlineSceneLoaded();
-            StartCoroutine(OnServerOnlineSceneLoadedRoutine());
-        }
-
-        private IEnumerator OnServerOnlineSceneLoadedRoutine()
-        {
-            while (!IsReadyToInstantiateObjects())
-            {
-                yield return null;
-            }
             // Spawn buildings
             if (!IsInstanceMap())
             {
@@ -308,7 +299,11 @@ namespace MultiplayerARPG.MMO
                 // Don't load buildings if it's instance map
                 ReadBuildingsJob job = new ReadBuildingsJob(Database, Assets.onlineScene.SceneName);
                 job.Start();
-                yield return StartCoroutine(job.WaitFor());
+                // Wait until all building loaded
+                while (!job.IsDone)
+                {
+                    await Task.Yield();
+                }
                 HashSet<StorageId> storageIds = new HashSet<StorageId>();
                 List<BuildingSaveData> buildings = job.result;
                 BuildingEntity buildingEntity;
@@ -326,15 +321,14 @@ namespace MultiplayerARPG.MMO
                 // Wait until all building storage loaded
                 while (loadingStorageIds.Count > 0)
                 {
-                    yield return 0;
+                    await Task.Yield();
                 }
             }
-            // Spawn harvestables
-            HarvestableSpawnArea[] harvestableSpawnAreas = FindObjectsOfType<HarvestableSpawnArea>();
-            foreach (HarvestableSpawnArea harvestableSpawnArea in harvestableSpawnAreas)
-            {
-                harvestableSpawnArea.SpawnAll();
-            }
+        }
+
+        protected override async Task PostSpawnEntities()
+        {
+            await Task.Yield();
             CentralAppServerRegister.OnStartServer();
         }
 
