@@ -6,8 +6,6 @@ namespace MultiplayerARPG.MMO
     public abstract partial class BaseDatabase : MonoBehaviour
     {
         public const byte AUTH_TYPE_NORMAL = 1;
-        public const byte AUTH_TYPE_FACEBOOK = 2;
-        public const byte AUTH_TYPE_GOOGLE_PLAY = 3;
 
         public virtual void Initialize() { }
         public virtual void Destroy() { }
@@ -24,8 +22,6 @@ namespace MultiplayerARPG.MMO
         public abstract void UpdateAccessToken(string userId, string accessToken);
         public abstract void CreateUserLogin(string username, string password);
         public abstract long FindUsername(string username);
-        public abstract string FacebookLogin(string fbId, string email);
-        public abstract string GooglePlayLogin(string gId, string email);
 
         public abstract void CreateCharacter(string userId, IPlayerCharacterData characterData);
         public abstract PlayerCharacterData ReadCharacter(string userId, 
