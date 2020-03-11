@@ -425,7 +425,7 @@ namespace MultiplayerARPG.MMO
 
                         // Move character to map info → start position
                         if (IsInstanceMap())
-                            playerCharacterData.CurrentPosition = CurrentMapInfo.startPosition;
+                            playerCharacterData.CurrentPosition = CurrentMapInfo.StartPosition;
 
                         // Spawn character entity and set its data
                         GameObject spawnObj = Instantiate(entityPrefab.gameObject, playerCharacterData.CurrentPosition, Quaternion.identity);

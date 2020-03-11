@@ -50,7 +50,7 @@ namespace MultiplayerARPG.MMO
             // If warping to different map
             long connectionId = playerCharacterEntity.ConnectionId;
             CentralServerPeerInfo peerInfo;
-            MapInfo mapInfo;
+            BaseMapInfo mapInfo;
             if (!string.IsNullOrEmpty(mapName) &&
                 playerCharacters.ContainsKey(connectionId) &&
                 mapServerConnectionIdsBySceneName.TryGetValue(mapName, out peerInfo) &&
@@ -129,7 +129,7 @@ namespace MultiplayerARPG.MMO
             long connectionId = playerCharacterEntity.ConnectionId;
             CentralServerPeerInfo peerInfo;
             KeyValuePair<string, Vector3> warpingLocation;
-            MapInfo mapInfo;
+            BaseMapInfo mapInfo;
             if (playerCharacters.ContainsKey(connectionId) &&
                 instanceMapWarpingLocations.TryGetValue(instanceId, out warpingLocation) &&
                 instanceMapServerConnectionIdsByInstanceId.TryGetValue(instanceId, out peerInfo) &&

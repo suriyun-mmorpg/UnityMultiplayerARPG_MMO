@@ -101,7 +101,7 @@ namespace MultiplayerARPG.MMO
         public bool startMapSpawnOnAwake;
         public bool startChatOnAwake;
         public bool startMapOnAwake;
-        public MapInfo startingMap;
+        public BaseMapInfo startingMap;
         public int databaseOptionIndex;
 
         private List<string> spawningMapIds;
@@ -404,8 +404,8 @@ namespace MultiplayerARPG.MMO
             {
                 if (spawningMapIds != null && spawningMapIds.Count > 0)
                 {
-                    mapSpawnNetworkManager.spawningMaps = new List<MapInfo>();
-                    MapInfo tempMapInfo;
+                    mapSpawnNetworkManager.spawningMaps = new List<BaseMapInfo>();
+                    BaseMapInfo tempMapInfo;
                     foreach (string spawningMapId in spawningMapIds)
                     {
                         if (GameInstance.MapInfos.TryGetValue(spawningMapId, out tempMapInfo))
@@ -417,10 +417,10 @@ namespace MultiplayerARPG.MMO
 
             if (startingMapServer)
             {
-                MapInfo tempMapInfo;
+                BaseMapInfo tempMapInfo;
                 if (!string.IsNullOrEmpty(startingMapId) && GameInstance.MapInfos.TryGetValue(startingMapId, out tempMapInfo))
                 {
-                    mapNetworkManager.Assets.onlineScene.SceneName = tempMapInfo.scene.SceneName;
+                    mapNetworkManager.Assets.onlineScene.SceneName = tempMapInfo.Scene.SceneName;
                     mapNetworkManager.SetMapInfo(tempMapInfo);
                 }
                 StartMapServer();

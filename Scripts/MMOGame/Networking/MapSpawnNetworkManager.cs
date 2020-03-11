@@ -21,7 +21,7 @@ namespace MultiplayerARPG.MMO
         public string exePath = "./Build.exe";
         public bool notSpawnInBatchMode = false;
         public int startPort = 8000;
-        public List<MapInfo> spawningMaps;
+        public List<BaseMapInfo> spawningMaps;
 
         [Header("Running In Editor")]
         public bool isOverrideExePath;
@@ -203,10 +203,10 @@ namespace MultiplayerARPG.MMO
             {
                 if (spawningMaps == null || spawningMaps.Count == 0)
                 {
-                    spawningMaps = new List<MapInfo>();
+                    spawningMaps = new List<BaseMapInfo>();
                     spawningMaps.AddRange(GameInstance.MapInfos.Values);
                 }
-                foreach (MapInfo map in spawningMaps)
+                foreach (BaseMapInfo map in spawningMaps)
                 {
                     SpawnMap(map.Id, true);
                 }
