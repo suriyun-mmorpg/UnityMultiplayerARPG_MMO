@@ -8,7 +8,7 @@ using LiteNetLibManager;
 
 namespace MultiplayerARPG.MMO
 {
-    public class MMOClientInstance : MonoBehaviour
+    public partial class MMOClientInstance : MonoBehaviour
     {
         public static MMOClientInstance Singleton { get; protected set; }
         // Client data, May keep these data in player prefs to do auto login system
@@ -162,16 +162,6 @@ namespace MultiplayerARPG.MMO
         public void RequestValidateAccessToken(string userId, string accessToken, AckMessageCallback callback)
         {
             centralNetworkManager.RequestValidateAccessToken(userId, accessToken, (responseCode, messageData) => OnRequestValidateAccessToken(responseCode, messageData, callback));
-        }
-
-        public void RequestFacebookLogin(string id, string accessToken, AckMessageCallback callback)
-        {
-            centralNetworkManager.RequestFacebookLogin(id, accessToken, (responseCode, messageData) => OnRequestUserLogin(responseCode, messageData, callback));
-        }
-
-        public void RequestGooglePlayLogin(string idToken, AckMessageCallback callback)
-        {
-            centralNetworkManager.RequestGooglePlayLogin(idToken, (responseCode, messageData) => OnRequestUserLogin(responseCode, messageData, callback));
         }
 
         public void RequestCharacters(AckMessageCallback callback)

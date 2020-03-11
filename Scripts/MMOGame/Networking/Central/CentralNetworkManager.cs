@@ -74,8 +74,6 @@ namespace MultiplayerARPG.MMO
             RegisterServerMessage(MMOMessageTypes.ResponseSpawnMap, HandleResponseSpawnMap);
             RegisterServerMessage(MMOMessageTypes.RequestValidateAccessToken, HandleRequestValidateAccessToken);
             RegisterServerMessage(MMOMessageTypes.UpdateMapUser, HandleUpdateMapUser);
-            RegisterServerMessage(MMOMessageTypes.RequestFacebookLogin, HandleRequestFacebookLogin);
-            RegisterServerMessage(MMOMessageTypes.RequestGooglePlayLogin, HandleRequestGooglePlayLogin);
         }
 
         protected virtual void Clean()
