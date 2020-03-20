@@ -438,8 +438,24 @@ MonoBehaviour:
   maxConnections: 1100
   transportFactory: {fileID: 0}
   updateServerTimeDuration: 5
+  pingDuration: 1
   doNotEnterGameOnConnect: 0
   doNotDestroyOnSceneChanges: 0
+  onSpawnEntitiesStart:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: LiteNetLibManager.LiteNetLibLoadSceneEvent, LiteNetLibManager, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  onSpawnEntitiesProgress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: LiteNetLibManager.LiteNetLibLoadSceneEvent, LiteNetLibManager, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  onSpawnEntitiesFinish:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: LiteNetLibManager.LiteNetLibLoadSceneEvent, LiteNetLibManager, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
   sampleMessageToCentralServer: QWERTY
   writeAddonLog: 0
   mapInstanceId: 
@@ -648,6 +664,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   umaAvatarDatabase: {fileID: 0}
   dimensionType: 0
+  saveSystem: {fileID: 0}
   gameplayRule: {fileID: 11400000, guid: 3bfe680a81b27ce4ba9642ddff7baa17, type: 2}
   networkSetting: {fileID: 11400000, guid: c0825e8ee894749459ab4c8dda26dfe6, type: 2}
   itemDropEntityPrefab: {fileID: 114247390284341630, guid: 611b907cf80c87a4eb9e0d5d4a8688f5,
@@ -683,8 +700,6 @@ MonoBehaviour:
     type: 2}
   defaultWeaponItem: {fileID: 11400000, guid: 7a97cfad0e4b1ee49ba6f735b4b1b0d9, type: 2}
   defaultDamageElement: {fileID: 0}
-  defaultHitEffects:
-    effects: []
   defaultDamageHitEffects:
   - {fileID: 114984786077298016, guid: fa67f0b7f994d9548821d15fbf67531d, type: 2}
   expTree: 140000001e00000031000000490000006500000086000000aa000000d1000000fa000000270100005601000087010000bb010000f10100002902000064020000a0020000de0200001e0300005f030000a3030000e80300002f04000077040000c10400000d0500005a050000a9050000f90500004a0600009d060000f1060000470700009e070000f707000050080000ab0800000809000065090000c4090000240a0000850a0000e80a00004b0b0000b00b0000160c00007d0c0000e50c00004e0d0000b90d0000240e0000910e0000fe0e00006d0f0000dd0f00004d100000bf10000032110000a61100001b12000090120000071300007f130000f813000071140000ec14000068150000e415000062160000e01600005f170000e017000061180000e318000066190000ea1900006e1a0000f41a00007a1b0000021c00008a1c0000131d00009d1d0000281e0000b31e0000401f0000cd1f00005b200000ea200000792100000a2200009b2200002d230000c023000054240000e82400007e25000014260000aa26000042270000
@@ -722,10 +737,23 @@ MonoBehaviour:
   pickUpItemDistance: 2
   dropDistance: 1
   conversationDistance: 3
-  buildDistance: 10
   localChatDistance: 10
   combatTextDistance: 20
   maxEquipWeaponSet: 2
+  dismantleFilter:
+    includeJunk: 0
+    includeArmor: 1
+    includeWeapon: 1
+    includeShield: 1
+    includePotion: 0
+    includeAmmo: 0
+    includeBuilding: 0
+    includePet: 0
+    includeSocketEnhancer: 0
+    includeMount: 0
+    includeSkill: 0
+  canRefineItemByPlayer: 0
+  canDismantleItemByPlayer: 0
   inventorySystem: 0
   baseSlotLimit: 0
   playerStorage:
@@ -750,9 +778,13 @@ MonoBehaviour:
   homeScene:
     sceneAsset: {fileID: 102900000, guid: d529c814bb9fcd14289ac4141b27e951, type: 3}
     sceneName: 01Home_MMO
+  homeMobileScene:
+    sceneAsset: {fileID: 0}
+    sceneName: 
   minCharacterNameLength: 2
   maxCharacterNameLength: 16
-  useMobileInEditor: 0
+  maxCharacterSaves: 5
+  testInEditorMode: 0
   cashShopDatabase: {fileID: 11400000, guid: 677c37c598e6c1045b66de68f1f546f6, type: 2}
 --- !u!4 &1379718503
 Transform:
@@ -803,8 +835,10 @@ MonoBehaviour:
     keyCode: 306
   - keyName: Crawl
     keyCode: 122
-  - keyName: SwitchViewMode
-    keyCode: 282
+  - keyName: RotateLeft
+    keyCode: 106
+  - keyName: RotateRight
+    keyCode: 107
 --- !u!114 &1379718505
 MonoBehaviour:
   m_ObjectHideFlags: 0

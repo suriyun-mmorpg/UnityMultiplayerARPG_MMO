@@ -151,6 +151,21 @@ MonoBehaviour:
   pingDuration: 1
   doNotEnterGameOnConnect: 0
   doNotDestroyOnSceneChanges: 0
+  onSpawnEntitiesStart:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: LiteNetLibManager.LiteNetLibLoadSceneEvent, LiteNetLibManager, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  onSpawnEntitiesProgress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: LiteNetLibManager.LiteNetLibLoadSceneEvent, LiteNetLibManager, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  onSpawnEntitiesFinish:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: LiteNetLibManager.LiteNetLibLoadSceneEvent, LiteNetLibManager, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
   sampleMessageToCentralServer: QWERTY
   writeAddonLog: 0
   mapInstanceId: 
@@ -672,7 +687,6 @@ MonoBehaviour:
   pickUpItemDistance: 0.5
   dropDistance: 0.5
   conversationDistance: 1
-  buildDistance: 2
   localChatDistance: 10
   combatTextDistance: 20
   maxEquipWeaponSet: 2
@@ -773,8 +787,10 @@ MonoBehaviour:
     keyCode: 306
   - keyName: Crawl
     keyCode: 122
-  - keyName: SwitchViewMode
-    keyCode: 282
+  - keyName: RotateLeft
+    keyCode: 106
+  - keyName: RotateRight
+    keyCode: 107
 --- !u!114 &1379718505
 MonoBehaviour:
   m_ObjectHideFlags: 0
