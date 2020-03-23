@@ -1060,7 +1060,7 @@ namespace MultiplayerARPG.MMO
             UpdateUserCharacterMessage updateMapUserMessage = new UpdateUserCharacterMessage();
             updateMapUserMessage.type = updateType;
             updateMapUserMessage.data = userData;
-            Client.SendPacket(DeliveryMethod.ReliableOrdered, MMOMessageTypes.UpdateMapUser, updateMapUserMessage.Serialize);
+            (transportHandler as LiteNetLibClient).SendPacket(DeliveryMethod.ReliableOrdered, MMOMessageTypes.UpdateMapUser, updateMapUserMessage.Serialize);
         }
         #endregion
     }
