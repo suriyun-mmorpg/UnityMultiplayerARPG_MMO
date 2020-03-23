@@ -354,7 +354,7 @@ namespace MultiplayerARPG.MMO
             responseMessage.ackId = ackId;
             responseMessage.responseCode = error == ResponseSpawnMapMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
             responseMessage.error = error;
-            CentralAppServerRegister.ClientSendPacket(DeliveryMethod.ReliableOrdered, MMOMessageTypes.ResponseSpawnMap, responseMessage.Serialize);
+            CentralAppServerRegister.SendResponse(MMOMessageTypes.ResponseSpawnMap, responseMessage);
         }
 
         private void ExecuteOnMainThread(Action action)
