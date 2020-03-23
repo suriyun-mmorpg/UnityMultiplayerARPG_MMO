@@ -13,7 +13,7 @@ namespace MultiplayerARPG.MMO
             RequestUserLoginMessage message = new RequestUserLoginMessage();
             message.username = username;
             message.password = password;
-            return Client.ClientSendAckPacket(DeliveryMethod.ReliableOrdered, MMOMessageTypes.RequestUserLogin, message, callback);
+            return ClientSendRequest(MMOMessageTypes.RequestUserLogin, message, callback);
         }
 
         public uint RequestUserRegister(string username, string password, AckMessageCallback callback)
@@ -21,13 +21,13 @@ namespace MultiplayerARPG.MMO
             RequestUserRegisterMessage message = new RequestUserRegisterMessage();
             message.username = username;
             message.password = password;
-            return Client.ClientSendAckPacket(DeliveryMethod.ReliableOrdered, MMOMessageTypes.RequestUserRegister, message, callback);
+            return ClientSendRequest(MMOMessageTypes.RequestUserRegister, message, callback);
         }
 
         public uint RequestUserLogout(AckMessageCallback callback)
         {
             BaseAckMessage message = new BaseAckMessage();
-            return Client.ClientSendAckPacket(DeliveryMethod.ReliableOrdered, MMOMessageTypes.RequestUserLogout, message, callback);
+            return ClientSendRequest(MMOMessageTypes.RequestUserLogout, message, callback);
         }
 
         public uint RequestValidateAccessToken(string userId, string accessToken, AckMessageCallback callback)
@@ -35,7 +35,7 @@ namespace MultiplayerARPG.MMO
             RequestValidateAccessTokenMessage message = new RequestValidateAccessTokenMessage();
             message.userId = userId;
             message.accessToken = accessToken;
-            return Client.ClientSendAckPacket(DeliveryMethod.ReliableOrdered, MMOMessageTypes.RequestValidateAccessToken, message, callback);
+            return ClientSendRequest(MMOMessageTypes.RequestValidateAccessToken, message, callback);
         }
 
         protected void HandleRequestUserLogin(LiteNetLibMessageHandler messageHandler)
@@ -81,7 +81,7 @@ namespace MultiplayerARPG.MMO
             responseMessage.error = error;
             responseMessage.userId = userId;
             responseMessage.accessToken = accessToken;
-            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MMOMessageTypes.ResponseUserLogin, responseMessage);
+            ServerSendResponse(connectionId, MMOMessageTypes.ResponseUserLogin, responseMessage);
         }
 
         protected void HandleRequestUserRegister(LiteNetLibMessageHandler messageHandler)
@@ -117,7 +117,7 @@ namespace MultiplayerARPG.MMO
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = error == ResponseUserRegisterMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
             responseMessage.error = error;
-            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MMOMessageTypes.ResponseUserRegister, responseMessage);
+            ServerSendResponse(connectionId, MMOMessageTypes.ResponseUserRegister, responseMessage);
         }
 
         protected void HandleRequestUserLogout(LiteNetLibMessageHandler messageHandler)
@@ -141,7 +141,7 @@ namespace MultiplayerARPG.MMO
             BaseAckMessage responseMessage = new BaseAckMessage();
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = AckResponseCode.Success;
-            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MMOMessageTypes.ResponseUserLogout, responseMessage);
+            ServerSendResponse(connectionId, MMOMessageTypes.ResponseUserLogout, responseMessage);
         }
 
         protected void HandleRequestValidateAccessToken(LiteNetLibMessageHandler messageHandler)
@@ -189,35 +189,35 @@ namespace MultiplayerARPG.MMO
             responseMessage.error = error;
             responseMessage.userId = userId;
             responseMessage.accessToken = accessToken;
-            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MMOMessageTypes.ResponseValidateAccessToken, responseMessage);
+            ServerSendResponse(connectionId, MMOMessageTypes.ResponseValidateAccessToken, responseMessage);
         }
 
         protected void HandleResponseUserLogin(LiteNetLibMessageHandler messageHandler)
         {
             TransportHandler transportHandler = messageHandler.transportHandler;
             ResponseUserLoginMessage message = messageHandler.ReadMessage<ResponseUserLoginMessage>();
-            transportHandler.TriggerAck(message.ackId, message.responseCode, message);
+            transportHandler.ReadResponse(message.ackId, message.responseCode, message);
         }
 
         protected void HandleResponseUserRegister(LiteNetLibMessageHandler messageHandler)
         {
             TransportHandler transportHandler = messageHandler.transportHandler;
             ResponseUserRegisterMessage message = messageHandler.ReadMessage<ResponseUserRegisterMessage>();
-            transportHandler.TriggerAck(message.ackId, message.responseCode, message);
+            transportHandler.ReadResponse(message.ackId, message.responseCode, message);
         }
 
         protected void HandleResponseUserLogout(LiteNetLibMessageHandler messageHandler)
         {
             TransportHandler transportHandler = messageHandler.transportHandler;
             BaseAckMessage message = messageHandler.ReadMessage<BaseAckMessage>();
-            transportHandler.TriggerAck(message.ackId, message.responseCode, message);
+            transportHandler.ReadResponse(message.ackId, message.responseCode, message);
         }
 
         protected void HandleResponseValidateAccessToken(LiteNetLibMessageHandler messageHandler)
         {
             TransportHandler transportHandler = messageHandler.transportHandler;
             ResponseValidateAccessTokenMessage message = messageHandler.ReadMessage<ResponseValidateAccessTokenMessage>();
-            transportHandler.TriggerAck(message.ackId, message.responseCode, message);
+            transportHandler.ReadResponse(message.ackId, message.responseCode, message);
         }
     }
 }
