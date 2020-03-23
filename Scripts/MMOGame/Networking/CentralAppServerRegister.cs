@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MultiplayerARPG.MMO
 {
-    public class CentralAppServerRegister : TransportHandler
+    public class CentralAppServerRegister : LiteNetLibClient
     {
         private IAppServer appServer;
 
@@ -79,7 +79,7 @@ namespace MultiplayerARPG.MMO
             // Send Request
             RequestAppServerRegisterMessage message = new RequestAppServerRegisterMessage();
             message.peerInfo = peerInfo;
-            ClientSendAckPacket(DeliveryMethod.ReliableOrdered, MMOMessageTypes.RequestAppServerRegister, message, OnAppServerRegistered);
+            SendRequest(MMOMessageTypes.RequestAppServerRegister, message, OnAppServerRegistered);
         }
 
         public async void OnCentralServerDisconnected(DisconnectInfo disconnectInfo)
@@ -104,7 +104,7 @@ namespace MultiplayerARPG.MMO
         {
             TransportHandler peerHandler = messageHandler.transportHandler;
             ResponseAppServerRegisterMessage message = messageHandler.ReadMessage<ResponseAppServerRegisterMessage>();
-            peerHandler.TriggerAck(message.ackId, message.responseCode, message);
+            peerHandler.ReadResponse(message.ackId, message.responseCode, message);
         }
 
         public void OnAppServerRegistered(AckResponseCode responseCode, BaseAckMessage message)
