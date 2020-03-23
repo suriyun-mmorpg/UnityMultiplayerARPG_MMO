@@ -289,7 +289,7 @@ namespace MultiplayerARPG.MMO
             if (onClientDisconnected != null)
                 onClientDisconnected.Invoke(disconnectInfo);
         }
-        
+
         protected override async Task PreSpawnEntities()
         {
             // Spawn buildings
@@ -565,7 +565,7 @@ namespace MultiplayerARPG.MMO
             // Send chat message to chat server, for MMO mode chat message handling by chat server
             if (ChatNetworkManager.IsClientConnected)
             {
-                ChatNetworkManager.Client.SendEnterChat(null, MMOMessageTypes.Chat, message.channel, message.message, message.sender, message.receiver, message.channelId);
+                ChatNetworkManager.SendEnterChat(null, MMOMessageTypes.Chat, message.channel, message.message, message.sender, message.receiver, message.channelId);
             }
         }
 
@@ -1060,7 +1060,7 @@ namespace MultiplayerARPG.MMO
             UpdateUserCharacterMessage updateMapUserMessage = new UpdateUserCharacterMessage();
             updateMapUserMessage.type = updateType;
             updateMapUserMessage.data = userData;
-            transportHandler.ClientSendPacket(DeliveryMethod.ReliableOrdered, MMOMessageTypes.UpdateMapUser, updateMapUserMessage.Serialize);
+            Client.SendPacket(DeliveryMethod.ReliableOrdered, MMOMessageTypes.UpdateMapUser, updateMapUserMessage.Serialize);
         }
         #endregion
     }
