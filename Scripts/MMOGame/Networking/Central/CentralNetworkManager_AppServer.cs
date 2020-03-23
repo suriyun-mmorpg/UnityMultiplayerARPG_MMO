@@ -15,7 +15,7 @@ namespace MultiplayerARPG.MMO
         {
             RequestAppServerRegisterMessage message = new RequestAppServerRegisterMessage();
             message.peerInfo = peerInfo;
-            return Client.ClientSendAckPacket(DeliveryMethod.ReliableOrdered, MMOMessageTypes.RequestAppServerRegister, message, callback);
+            return ClientSendRequest(MMOMessageTypes.RequestAppServerRegister, message, callback);
         }
 
         public uint RequestAppServerAddress(CentralServerPeerType peerType, string extra, AckMessageCallback callback)
@@ -23,7 +23,7 @@ namespace MultiplayerARPG.MMO
             RequestAppServerAddressMessage message = new RequestAppServerAddressMessage();
             message.peerType = peerType;
             message.extra = extra;
-            return Client.ClientSendAckPacket(DeliveryMethod.ReliableOrdered, MMOMessageTypes.RequestAppServerAddress, message, callback);
+            return ClientSendRequest(MMOMessageTypes.RequestAppServerAddress, message, callback);
         }
 
         protected void HandleRequestAppServerRegister(LiteNetLibMessageHandler messageHandler)
@@ -89,7 +89,7 @@ namespace MultiplayerARPG.MMO
                             responseChatAddressMessage.responseCode = AckResponseCode.Success;
                             responseChatAddressMessage.error = ResponseAppServerAddressMessage.Error.None;
                             responseChatAddressMessage.peerInfo = peerInfo;
-                            ServerSendPacket(mapServerPeer.connectionId, DeliveryMethod.ReliableOrdered, MMOMessageTypes.ResponseAppServerAddress, responseChatAddressMessage);
+                            ServerSendResponse(mapServerPeer.connectionId, MMOMessageTypes.ResponseAppServerAddress, responseChatAddressMessage);
                         }
                         if (LogInfo)
                             Debug.Log("[Central] Register Chat Server: [" + connectionId + "]");
@@ -107,7 +107,7 @@ namespace MultiplayerARPG.MMO
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = error == ResponseAppServerRegisterMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
             responseMessage.error = error;
-            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MMOMessageTypes.ResponseAppServerRegister, responseMessage);
+            ServerSendResponse(connectionId, MMOMessageTypes.ResponseAppServerRegister, responseMessage);
         }
 
         /// <summary>
@@ -125,13 +125,13 @@ namespace MultiplayerARPG.MMO
                 responseMapAddressMessage.responseCode = AckResponseCode.Success;
                 responseMapAddressMessage.error = ResponseAppServerAddressMessage.Error.None;
                 responseMapAddressMessage.peerInfo = mapServerPeer;
-                ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MMOMessageTypes.ResponseAppServerAddress, responseMapAddressMessage);
+                ServerSendResponse(connectionId, MMOMessageTypes.ResponseAppServerAddress, responseMapAddressMessage);
                 // Send current info to other peer
                 responseMapAddressMessage = new ResponseAppServerAddressMessage();
                 responseMapAddressMessage.responseCode = AckResponseCode.Success;
                 responseMapAddressMessage.error = ResponseAppServerAddressMessage.Error.None;
                 responseMapAddressMessage.peerInfo = peerInfo;
-                ServerSendPacket(mapServerPeer.connectionId, DeliveryMethod.ReliableOrdered, MMOMessageTypes.ResponseAppServerAddress, responseMapAddressMessage);
+                ServerSendResponse(mapServerPeer.connectionId, MMOMessageTypes.ResponseAppServerAddress, responseMapAddressMessage);
             }
             // Send chat peer info to new map server
             if (chatServerPeers.Count > 0)
@@ -141,7 +141,7 @@ namespace MultiplayerARPG.MMO
                 responseChatAddressMessage.responseCode = AckResponseCode.Success;
                 responseChatAddressMessage.error = ResponseAppServerAddressMessage.Error.None;
                 responseChatAddressMessage.peerInfo = chatPeerInfo;
-                ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MMOMessageTypes.ResponseAppServerAddress, responseChatAddressMessage);
+                ServerSendResponse(connectionId, MMOMessageTypes.ResponseAppServerAddress, responseChatAddressMessage);
             }
         }
 
@@ -197,21 +197,21 @@ namespace MultiplayerARPG.MMO
             responseMessage.responseCode = error == ResponseAppServerAddressMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
             responseMessage.error = error;
             responseMessage.peerInfo = peerInfo;
-            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MMOMessageTypes.ResponseAppServerAddress, responseMessage);
+            ServerSendResponse(connectionId, MMOMessageTypes.ResponseAppServerAddress, responseMessage);
         }
 
         protected void HandleResponseAppServerRegister(LiteNetLibMessageHandler messageHandler)
         {
             TransportHandler transportHandler = messageHandler.transportHandler;
             ResponseAppServerRegisterMessage message = messageHandler.ReadMessage<ResponseAppServerRegisterMessage>();
-            transportHandler.TriggerAck(message.ackId, message.responseCode, message);
+            transportHandler.ReadResponse(message.ackId, message.responseCode, message);
         }
 
         protected void HandleResponseAppServerAddress(LiteNetLibMessageHandler messageHandler)
         {
             TransportHandler transportHandler = messageHandler.transportHandler;
             ResponseAppServerAddressMessage message = messageHandler.ReadMessage<ResponseAppServerAddressMessage>();
-            transportHandler.TriggerAck(message.ackId, message.responseCode, message);
+            transportHandler.ReadResponse(message.ackId, message.responseCode, message);
         }
 
         protected void HandleUpdateMapUser(LiteNetLibMessageHandler messageHandler)
