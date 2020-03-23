@@ -12,7 +12,7 @@ namespace MultiplayerARPG.MMO
         public uint RequestCharacters(AckMessageCallback callback)
         {
             RequestCharactersMessage message = new RequestCharactersMessage();
-            return Client.ClientSendAckPacket(DeliveryMethod.ReliableOrdered, MMOMessageTypes.RequestCharacters, message, callback);
+            return ClientSendRequest(MMOMessageTypes.RequestCharacters, message, callback);
         }
 
         public uint RequestCreateCharacter(PlayerCharacterData characterData, AckMessageCallback callback)
@@ -22,7 +22,7 @@ namespace MultiplayerARPG.MMO
             message.dataId = characterData.DataId;
             message.entityId = characterData.EntityId;
             message.factionId = characterData.FactionId;
-            return Client.ClientSendAckPacket(DeliveryMethod.ReliableOrdered, MMOMessageTypes.RequestCreateCharacter, message, callback, (writer) => SerializeCreateCharacterExtra(characterData, writer));
+            return ClientSendRequest(MMOMessageTypes.RequestCreateCharacter, message, callback, (writer) => SerializeCreateCharacterExtra(characterData, writer));
         }
 
         private void SerializeCreateCharacterExtra(PlayerCharacterData characterData, NetDataWriter writer)
@@ -34,14 +34,14 @@ namespace MultiplayerARPG.MMO
         {
             RequestDeleteCharacterMessage message = new RequestDeleteCharacterMessage();
             message.characterId = characterId;
-            return Client.ClientSendAckPacket(DeliveryMethod.ReliableOrdered, MMOMessageTypes.RequestDeleteCharacter, message, callback);
+            return ClientSendRequest(MMOMessageTypes.RequestDeleteCharacter, message, callback);
         }
 
         public uint RequestSelectCharacter(string characterId, AckMessageCallback callback)
         {
             RequestSelectCharacterMessage message = new RequestSelectCharacterMessage();
             message.characterId = characterId;
-            return Client.ClientSendAckPacket(DeliveryMethod.ReliableOrdered, MMOMessageTypes.RequestSelectCharacter, message, callback);
+            return ClientSendRequest(MMOMessageTypes.RequestSelectCharacter, message, callback);
         }
 
         protected void HandleRequestCharacters(LiteNetLibMessageHandler messageHandler)
@@ -70,7 +70,7 @@ namespace MultiplayerARPG.MMO
             responseMessage.responseCode = error == ResponseCharactersMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
             responseMessage.error = error;
             responseMessage.characters = characters;
-            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MMOMessageTypes.ResponseCharacters, responseMessage);
+            ServerSendResponse(connectionId, MMOMessageTypes.ResponseCharacters, responseMessage);
         }
 
         protected void HandleRequestCreateCharacter(LiteNetLibMessageHandler messageHandler)
@@ -122,7 +122,7 @@ namespace MultiplayerARPG.MMO
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = error == ResponseCreateCharacterMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
             responseMessage.error = error;
-            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MMOMessageTypes.ResponseCreateCharacter, responseMessage);
+            ServerSendResponse(connectionId, MMOMessageTypes.ResponseCreateCharacter, responseMessage);
         }
 
         private void DeserializeCreateCharacterExtra(PlayerCharacterData characterData, NetDataReader reader)
@@ -153,7 +153,7 @@ namespace MultiplayerARPG.MMO
             responseMessage.ackId = message.ackId;
             responseMessage.responseCode = error == ResponseDeleteCharacterMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
             responseMessage.error = error;
-            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MMOMessageTypes.ResponseDeleteCharacter, responseMessage);
+            ServerSendResponse(connectionId, MMOMessageTypes.ResponseDeleteCharacter, responseMessage);
         }
 
         protected void HandleRequestSelectCharacter(LiteNetLibMessageHandler messageHandler)
@@ -191,35 +191,35 @@ namespace MultiplayerARPG.MMO
                 responseMessage.networkAddress = mapServerPeerInfo.networkAddress;
                 responseMessage.networkPort = mapServerPeerInfo.networkPort;
             }
-            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MMOMessageTypes.ResponseSelectCharacter, responseMessage);
+            ServerSendResponse(connectionId, MMOMessageTypes.ResponseSelectCharacter, responseMessage);
         }
 
         protected void HandleResponseCharacters(LiteNetLibMessageHandler messageHandler)
         {
             TransportHandler transportHandler = messageHandler.transportHandler;
             ResponseCharactersMessage message = messageHandler.ReadMessage<ResponseCharactersMessage>();
-            transportHandler.TriggerAck(message.ackId, message.responseCode, message);
+            transportHandler.ReadResponse(message.ackId, message.responseCode, message);
         }
 
         protected void HandleResponseCreateCharacter(LiteNetLibMessageHandler messageHandler)
         {
             TransportHandler transportHandler = messageHandler.transportHandler;
             ResponseCreateCharacterMessage message = messageHandler.ReadMessage<ResponseCreateCharacterMessage>();
-            transportHandler.TriggerAck(message.ackId, message.responseCode, message);
+            transportHandler.ReadResponse(message.ackId, message.responseCode, message);
         }
 
         protected void HandleResponseDeleteCharacter(LiteNetLibMessageHandler messageHandler)
         {
             TransportHandler transportHandler = messageHandler.transportHandler;
             ResponseDeleteCharacterMessage message = messageHandler.ReadMessage<ResponseDeleteCharacterMessage>();
-            transportHandler.TriggerAck(message.ackId, message.responseCode, message);
+            transportHandler.ReadResponse(message.ackId, message.responseCode, message);
         }
 
         protected void HandleResponseSelectCharacter(LiteNetLibMessageHandler messageHandler)
         {
             TransportHandler transportHandler = messageHandler.transportHandler;
             ResponseSelectCharacterMessage message = messageHandler.ReadMessage<ResponseSelectCharacterMessage>();
-            transportHandler.TriggerAck(message.ackId, message.responseCode, message);
+            transportHandler.ReadResponse(message.ackId, message.responseCode, message);
         }
     }
 }
