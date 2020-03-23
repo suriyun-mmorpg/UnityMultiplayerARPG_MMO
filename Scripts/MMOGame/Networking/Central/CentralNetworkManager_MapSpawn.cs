@@ -17,7 +17,7 @@ namespace MultiplayerARPG.MMO
 
         public uint RequestSpawnMap(long connectionId, RequestSpawnMapMessage message, AckMessageCallback callback)
         {
-            return Server.ServerSendAckPacket(connectionId, DeliveryMethod.ReliableOrdered, MMOMessageTypes.RequestSpawnMap, message, callback);
+            return ServerSendRequest(connectionId, MMOMessageTypes.RequestSpawnMap, message, callback);
         }
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace MultiplayerARPG.MMO
             // Forward responses to map server transport handler
             KeyValuePair<TransportHandler, uint> requestSpawnMapHandler;
             if (requestSpawnMapHandlers.TryGetValue(castedMessage.ackId, out requestSpawnMapHandler))
-                requestSpawnMapHandler.Key.TriggerAck(requestSpawnMapHandler.Value, castedMessage.responseCode, castedMessage);
+                requestSpawnMapHandler.Key.ReadResponse(requestSpawnMapHandler.Value, castedMessage.responseCode, castedMessage);
         }
 
         /// <summary>
@@ -55,7 +55,7 @@ namespace MultiplayerARPG.MMO
         {
             TransportHandler transportHandler = messageHandler.transportHandler;
             ResponseSpawnMapMessage message = messageHandler.ReadMessage<ResponseSpawnMapMessage>();
-            transportHandler.TriggerAck(message.ackId, message.responseCode, message);
+            transportHandler.ReadResponse(message.ackId, message.responseCode, message);
         }
     }
 }
