@@ -1047,7 +1047,7 @@ namespace MultiplayerARPG.MMO
         #endregion
 
         #region Update map user functions
-        private void UpdateMapUsers(TransportHandler transportHandler, UpdateUserCharacterMessage.UpdateType updateType)
+        private void UpdateMapUsers(LiteNetLibClient transportHandler, UpdateUserCharacterMessage.UpdateType updateType)
         {
             foreach (UserCharacterData user in usersById.Values)
             {
@@ -1055,12 +1055,12 @@ namespace MultiplayerARPG.MMO
             }
         }
 
-        private void UpdateMapUser(TransportHandler transportHandler, UpdateUserCharacterMessage.UpdateType updateType, UserCharacterData userData)
+        private void UpdateMapUser(LiteNetLibClient transportHandler, UpdateUserCharacterMessage.UpdateType updateType, UserCharacterData userData)
         {
             UpdateUserCharacterMessage updateMapUserMessage = new UpdateUserCharacterMessage();
             updateMapUserMessage.type = updateType;
             updateMapUserMessage.data = userData;
-            (transportHandler as LiteNetLibClient).SendPacket(DeliveryMethod.ReliableOrdered, MMOMessageTypes.UpdateMapUser, updateMapUserMessage.Serialize);
+            transportHandler.SendPacket(DeliveryMethod.ReliableOrdered, MMOMessageTypes.UpdateMapUser, updateMapUserMessage.Serialize);
         }
         #endregion
     }
