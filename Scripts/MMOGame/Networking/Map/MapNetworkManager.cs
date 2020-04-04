@@ -353,7 +353,7 @@ namespace MultiplayerARPG.MMO
             if (!IsReadyToInstantiateObjects())
             {
                 if (LogError)
-                    Debug.LogError("[Map Server] Not ready to spawn player: " + userId);
+                    Logging.LogError(LogTag, "Not ready to spawn player: " + userId);
                 // Add to pending list to spawn player later when map server is ready to instantiate object
                 pendingSpawnPlayerCharacters.Add(new PendingSpawnPlayerCharacter()
                 {
@@ -368,7 +368,7 @@ namespace MultiplayerARPG.MMO
             if (playerCharacters.ContainsKey(connectionId))
             {
                 if (LogError)
-                    Debug.LogError("[Map Server] User trying to hack: " + userId);
+                    Logging.LogError(LogTag, "User trying to hack: " + userId);
                 Transport.ServerDisconnect(connectionId);
                 return;
             }
@@ -391,7 +391,7 @@ namespace MultiplayerARPG.MMO
             if (!validateAccessTokenJob.result)
             {
                 if (LogError)
-                    Debug.LogError("[Map Server] Invalid access token for user: " + userId);
+                    Logging.LogError(LogTag, "Invalid access token for user: " + userId);
                 Transport.ServerDisconnect(connectionId);
             }
             else
@@ -404,7 +404,7 @@ namespace MultiplayerARPG.MMO
                 if (playerCharacterData == null)
                 {
                     if (LogError)
-                        Debug.LogError("[Map Server] Cannot find select character: " + selectCharacterId + " for user: " + userId);
+                        Logging.LogError(LogTag, "Cannot find select character: " + selectCharacterId + " for user: " + userId);
                     Transport.ServerDisconnect(connectionId);
                 }
                 else
@@ -414,7 +414,7 @@ namespace MultiplayerARPG.MMO
                     if (entityPrefab == null)
                     {
                         if (LogError)
-                            Debug.LogError("[Map Server] Cannot find player character with entity Id: " + playerCharacterData.EntityId);
+                            Logging.LogError(LogTag, "Cannot find player character with entity Id: " + playerCharacterData.EntityId);
                         Transport.ServerDisconnect(connectionId);
                     }
                     else
@@ -791,7 +791,7 @@ namespace MultiplayerARPG.MMO
                         if (!string.IsNullOrEmpty(peerInfo.extra))
                         {
                             if (LogInfo)
-                                Debug.Log("Register map server: " + peerInfo.extra);
+                                Logging.Log(LogTag, "Register map server: " + peerInfo.extra);
                             mapServerConnectionIdsBySceneName[peerInfo.extra] = peerInfo;
                         }
                         break;
@@ -799,7 +799,7 @@ namespace MultiplayerARPG.MMO
                         if (!string.IsNullOrEmpty(peerInfo.extra))
                         {
                             if (LogInfo)
-                                Debug.Log("Register instance map server: " + peerInfo.extra);
+                                Logging.Log(LogTag, "Register instance map server: " + peerInfo.extra);
                             instanceMapServerConnectionIdsByInstanceId[peerInfo.extra] = peerInfo;
                             // Warp characters
                             HashSet<uint> warpingCharacters = new HashSet<uint>();
@@ -819,7 +819,7 @@ namespace MultiplayerARPG.MMO
                         if (!ChatNetworkManager.IsClientConnected)
                         {
                             if (LogInfo)
-                                Debug.Log("Connecting to chat server");
+                                Logging.Log(LogTag, "Connecting to chat server");
                             ChatNetworkManager.StartClient(this, peerInfo.networkAddress, peerInfo.networkPort);
                         }
                         break;
@@ -838,7 +838,7 @@ namespace MultiplayerARPG.MMO
         public void OnChatServerConnected()
         {
             if (LogInfo)
-                Debug.Log("Connected to chat server");
+                Logging.Log(LogTag, "Connected to chat server");
             UpdateMapUsers(ChatNetworkManager.Client, UpdateUserCharacterMessage.UpdateType.Add);
         }
 

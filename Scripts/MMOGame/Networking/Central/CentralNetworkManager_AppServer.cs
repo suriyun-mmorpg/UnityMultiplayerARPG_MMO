@@ -40,7 +40,7 @@ namespace MultiplayerARPG.MMO
                     case CentralServerPeerType.MapSpawnServer:
                         mapSpawnServerPeers[connectionId] = peerInfo;
                         if (LogInfo)
-                            Debug.Log("[Central] Register Map Spawn Server: [" + connectionId + "]");
+                            Logging.Log(LogTag, "Register Map Spawn Server: [" + connectionId + "]");
                         break;
                     case CentralServerPeerType.MapServer:
                         string sceneName = peerInfo.extra;
@@ -52,13 +52,13 @@ namespace MultiplayerARPG.MMO
                             mapServerPeers[connectionId] = peerInfo;
                             mapUserIds[connectionId] = new HashSet<string>();
                             if (LogInfo)
-                                Debug.Log("[Central] Register Map Server: [" + connectionId + "] [" + sceneName + "]");
+                                Logging.Log(LogTag, "Register Map Server: [" + connectionId + "] [" + sceneName + "]");
                         }
                         else
                         {
                             error = ResponseAppServerRegisterMessage.Error.MapAlreadyExisted;
                             if (LogInfo)
-                                Debug.Log("[Central] Register Map Server Failed: [" + connectionId + "] [" + sceneName + "] [" + error + "]");
+                                Logging.Log(LogTag, "Register Map Server Failed: [" + connectionId + "] [" + sceneName + "] [" + error + "]");
                         }
                         break;
                     case CentralServerPeerType.InstanceMapServer:
@@ -71,13 +71,13 @@ namespace MultiplayerARPG.MMO
                             instanceMapServerPeers[connectionId] = peerInfo;
                             mapUserIds[connectionId] = new HashSet<string>();
                             if (LogInfo)
-                                Debug.Log("[Central] Register Instance Map Server: [" + connectionId + "] [" + instanceId + "]");
+                                Logging.Log(LogTag, "Register Instance Map Server: [" + connectionId + "] [" + instanceId + "]");
                         }
                         else
                         {
                             error = ResponseAppServerRegisterMessage.Error.EventAlreadyExisted;
                             if (LogInfo)
-                                Debug.Log("[Central] Register Instance Map Server Failed: [" + connectionId + "] [" + instanceId + "] [" + error + "]");
+                                Logging.Log(LogTag, "Register Instance Map Server Failed: [" + connectionId + "] [" + instanceId + "] [" + error + "]");
                         }
                         break;
                     case CentralServerPeerType.Chat:
@@ -92,7 +92,7 @@ namespace MultiplayerARPG.MMO
                             ServerSendResponse(mapServerPeer.connectionId, MMOMessageTypes.ResponseAppServerAddress, responseChatAddressMessage);
                         }
                         if (LogInfo)
-                            Debug.Log("[Central] Register Chat Server: [" + connectionId + "]");
+                            Logging.Log(LogTag, "Register Chat Server: [" + connectionId + "]");
                         break;
                 }
             }
@@ -100,7 +100,7 @@ namespace MultiplayerARPG.MMO
             {
                 error = ResponseAppServerRegisterMessage.Error.InvalidHash;
                 if (LogInfo)
-                    Debug.Log("[Central] Register Server Failed: [" + connectionId + "] [" + error + "]");
+                    Logging.Log(LogTag, "Register Server Failed: [" + connectionId + "] [" + error + "]");
             }
 
             ResponseAppServerRegisterMessage responseMessage = new ResponseAppServerRegisterMessage();
@@ -159,13 +159,13 @@ namespace MultiplayerARPG.MMO
                     {
                         peerInfo = mapSpawnServerPeers.Values.First();
                         if (LogInfo)
-                            Debug.Log("[Central] Request Map Spawn Address: [" + connectionId + "]");
+                            Logging.Log(LogTag, "Request Map Spawn Address: [" + connectionId + "]");
                     }
                     else
                     {
                         error = ResponseAppServerAddressMessage.Error.ServerNotFound;
                         if (LogInfo)
-                            Debug.Log("[Central] Request Map Spawn Address: [" + connectionId + "] [" + error + "]");
+                            Logging.Log(LogTag, "Request Map Spawn Address: [" + connectionId + "] [" + error + "]");
                     }
                     break;
                 case CentralServerPeerType.MapServer:
@@ -174,7 +174,7 @@ namespace MultiplayerARPG.MMO
                     {
                         error = ResponseAppServerAddressMessage.Error.ServerNotFound;
                         if (LogInfo)
-                            Debug.Log("[Central] Request Map Address: [" + connectionId + "] [" + mapName + "] [" + error + "]");
+                            Logging.Log(LogTag, "Request Map Address: [" + connectionId + "] [" + mapName + "] [" + error + "]");
                     }
                     break;
                 case CentralServerPeerType.Chat:
@@ -182,13 +182,13 @@ namespace MultiplayerARPG.MMO
                     {
                         peerInfo = chatServerPeers.Values.First();
                         if (LogInfo)
-                            Debug.Log("[Central] Request Chat Address: [" + connectionId + "]");
+                            Logging.Log(LogTag, "Request Chat Address: [" + connectionId + "]");
                     }
                     else
                     {
                         error = ResponseAppServerAddressMessage.Error.ServerNotFound;
                         if (LogInfo)
-                            Debug.Log("[Central] Request Chat Address: [" + connectionId + "] [" + error + "]");
+                            Logging.Log(LogTag, "Request Chat Address: [" + connectionId + "] [" + error + "]");
                     }
                     break;
             }
@@ -227,13 +227,13 @@ namespace MultiplayerARPG.MMO
                         {
                             mapUserIds[connectionId].Add(message.data.userId);
                             if (LogInfo)
-                                Debug.Log("[Central] Add map user: " + message.data.userId + " by " + connectionId);
+                                Logging.Log(LogTag, "Add map user: " + message.data.userId + " by " + connectionId);
                         }
                         break;
                     case UpdateUserCharacterMessage.UpdateType.Remove:
                         mapUserIds[connectionId].Remove(message.data.userId);
                         if (LogInfo)
-                            Debug.Log("[Central] Remove map user: " + message.data.userId + " by " + connectionId);
+                            Logging.Log(LogTag, "Remove map user: " + message.data.userId + " by " + connectionId);
                         break;
                 }
             }

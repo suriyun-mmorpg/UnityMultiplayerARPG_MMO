@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using MySql.Data.MySqlClient;
-using UnityEngine;
+using LiteNetLibManager;
 
 namespace MultiplayerARPG.MMO
 {
@@ -76,8 +76,8 @@ namespace MultiplayerARPG.MMO
             }
             catch (System.Exception ex)
             {
-                Debug.LogError("Transaction, Error occurs while replacing storage items");
-                Debug.LogException(ex);
+                Logging.LogError(ToString(), "Transaction, Error occurs while replacing storage items");
+                Logging.LogException(ToString(), ex);
                 transaction.Rollback();
             }
             transaction.Dispose();

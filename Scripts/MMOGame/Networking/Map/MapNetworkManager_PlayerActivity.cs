@@ -164,7 +164,7 @@ namespace MultiplayerARPG.MMO
         {
             ResponseSpawnMapMessage castedMessage = messageData as ResponseSpawnMapMessage;
             if (LogInfo)
-                Debug.Log("Spawn Map Ack Id: " + messageData.ackId + "  Status: " + responseCode + " Error: " + castedMessage.error);
+                Logging.Log(LogTag, "Spawn Map Ack Id: " + messageData.ackId + "  Status: " + responseCode + " Error: " + castedMessage.error);
             if (responseCode == AckResponseCode.Error ||
                 responseCode == AckResponseCode.Timeout)
             {

@@ -40,7 +40,7 @@ namespace MultiplayerARPG.MMO
         {
             ResponseSpawnMapMessage castedMessage = messageData as ResponseSpawnMapMessage;
             if (LogInfo)
-                Debug.Log("Spawn Map Ack Id: " + messageData.ackId + "  Status: " + responseCode + " Error: " + castedMessage.error);
+                Logging.Log(LogTag, "Spawn Map Ack Id: " + messageData.ackId + "  Status: " + responseCode + " Error: " + castedMessage.error);
             // Forward responses to map server transport handler
             KeyValuePair<TransportHandler, uint> requestSpawnMapHandler;
             if (requestSpawnMapHandlers.TryGetValue(castedMessage.ackId, out requestSpawnMapHandler))

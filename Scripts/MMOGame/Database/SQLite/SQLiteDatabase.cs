@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
+using LiteNetLibManager;
 using UnityEngine;
 using MiniJSON;
 
@@ -23,10 +24,10 @@ namespace MultiplayerARPG.MMO
             // Json file read
             string configFilePath = "./config/sqliteConfig.json";
             Dictionary<string, object> jsonConfig = new Dictionary<string, object>();
-            Debug.Log("[SQLiteDatabase] Reading config file from " + configFilePath);
+            Logging.Log(ToString(), "Reading config file from " + configFilePath);
             if (File.Exists(configFilePath))
             {
-                Debug.Log("[SQLiteDatabase] Found config file");
+                Logging.Log(ToString(), "Found config file");
                 string dataAsJson = File.ReadAllText(configFilePath);
                 jsonConfig = Json.Deserialize(dataAsJson) as Dictionary<string, object>;
             }

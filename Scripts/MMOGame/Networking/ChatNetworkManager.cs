@@ -217,7 +217,7 @@ namespace MultiplayerARPG.MMO
             long connectionId = messageHandler.connectionId;
             ChatMessage message = messageHandler.ReadMessage<ChatMessage>();
             if (LogInfo)
-                Debug.Log("Handle chat: " + message.channel + " sender: " + message.sender + " receiver: " + message.receiver + " message: " + message.message);
+                Logging.Log(LogTag, "Handle chat: " + message.channel + " sender: " + message.sender + " receiver: " + message.receiver + " message: " + message.message);
             switch (message.channel)
             {
                 case ChatChannel.Global:
@@ -260,7 +260,7 @@ namespace MultiplayerARPG.MMO
                             connectionIdsByCharacterName[message.data.characterName] = connectionId;
                             UpdateMapUser(UpdateUserCharacterMessage.UpdateType.Add, message.data, connectionId);
                             if (LogInfo)
-                                Debug.Log("[Chat] Add map user: " + message.data.userId + " by " + connectionId);
+                                Logging.Log(LogTag, "Add map user: " + message.data.userId + " by " + connectionId);
                         }
                         break;
                     case UpdateUserCharacterMessage.UpdateType.Remove:
@@ -271,7 +271,7 @@ namespace MultiplayerARPG.MMO
                             connectionIdsByCharacterName.Remove(userData.characterName);
                             UpdateMapUser(UpdateUserCharacterMessage.UpdateType.Remove, userData, connectionId);
                             if (LogInfo)
-                                Debug.Log("[Chat] Remove map user: " + message.data.userId + " by " + connectionId);
+                                Logging.Log(LogTag, "Remove map user: " + message.data.userId + " by " + connectionId);
                         }
                         break;
                     case UpdateUserCharacterMessage.UpdateType.Online:
@@ -280,7 +280,7 @@ namespace MultiplayerARPG.MMO
                             mapUsersById[message.data.id] = message.data;
                             UpdateMapUser(UpdateUserCharacterMessage.UpdateType.Online, message.data, connectionId);
                             if (LogInfo)
-                                Debug.Log("[Chat] Update map user: " + message.data.userId + " by " + connectionId);
+                                Logging.Log(LogTag, "Update map user: " + message.data.userId + " by " + connectionId);
                         }
                         break;
                 }

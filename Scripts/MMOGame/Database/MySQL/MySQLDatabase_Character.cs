@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using LiteNetLibManager;
 using UnityEngine;
 using MySql.Data.MySqlClient;
 
@@ -24,8 +25,8 @@ namespace MultiplayerARPG.MMO
             }
             catch (System.Exception ex)
             {
-                Debug.LogError("Transaction, Error occurs while replacing attributes of character: " + characterData.Id);
-                Debug.LogException(ex);
+                Logging.LogError(ToString(), "Transaction, Error occurs while replacing attributes of character: " + characterData.Id);
+                Logging.LogException(ToString(), ex);
                 transaction.Rollback();
             }
             transaction.Dispose();
@@ -49,8 +50,8 @@ namespace MultiplayerARPG.MMO
             }
             catch (System.Exception ex)
             {
-                Debug.LogError("Transaction, Error occurs while replacing buffs of character: " + characterData.Id);
-                Debug.LogException(ex);
+                Logging.LogError(ToString(), "Transaction, Error occurs while replacing buffs of character: " + characterData.Id);
+                Logging.LogException(ToString(), ex);
                 transaction.Rollback();
             }
             transaction.Dispose();
@@ -74,8 +75,8 @@ namespace MultiplayerARPG.MMO
             }
             catch (System.Exception ex)
             {
-                Debug.LogError("Transaction, Error occurs while replacing hotkeys of character: " + characterData.Id);
-                Debug.LogException(ex);
+                Logging.LogError(ToString(), "Transaction, Error occurs while replacing hotkeys of character: " + characterData.Id);
+                Logging.LogException(ToString(), ex);
                 transaction.Rollback();
             }
             transaction.Dispose();
@@ -107,8 +108,8 @@ namespace MultiplayerARPG.MMO
             }
             catch (System.Exception ex)
             {
-                Debug.LogError("Transaction, Error occurs while replacing items of character: " + characterData.Id);
-                Debug.LogException(ex);
+                Logging.LogError(ToString(), "Transaction, Error occurs while replacing items of character: " + characterData.Id);
+                Logging.LogException(ToString(), ex);
                 transaction.Rollback();
             }
             transaction.Dispose();
@@ -132,8 +133,8 @@ namespace MultiplayerARPG.MMO
             }
             catch (System.Exception ex)
             {
-                Debug.LogError("Transaction, Error occurs while replacing quests of character: " + characterData.Id);
-                Debug.LogException(ex);
+                Logging.LogError(ToString(), "Transaction, Error occurs while replacing quests of character: " + characterData.Id);
+                Logging.LogException(ToString(), ex);
                 transaction.Rollback();
             }
             transaction.Dispose();
@@ -157,8 +158,8 @@ namespace MultiplayerARPG.MMO
             }
             catch (System.Exception ex)
             {
-                Debug.LogError("Transaction, Error occurs while replacing skills of character: " + characterData.Id);
-                Debug.LogException(ex);
+                Logging.LogError(ToString(), "Transaction, Error occurs while replacing skills of character: " + characterData.Id);
+                Logging.LogException(ToString(), ex);
                 transaction.Rollback();
             }
             transaction.Dispose();
@@ -182,8 +183,8 @@ namespace MultiplayerARPG.MMO
             }
             catch (System.Exception ex)
             {
-                Debug.LogError("Transaction, Error occurs while replacing skill usages of character: " + characterData.Id);
-                Debug.LogException(ex);
+                Logging.LogError(ToString(), "Transaction, Error occurs while replacing skill usages of character: " + characterData.Id);
+                Logging.LogException(ToString(), ex);
                 transaction.Rollback();
             }
             transaction.Dispose();
@@ -207,8 +208,8 @@ namespace MultiplayerARPG.MMO
             }
             catch (System.Exception ex)
             {
-                Debug.LogError("Transaction, Error occurs while replacing skill usages of character: " + characterData.Id);
-                Debug.LogException(ex);
+                Logging.LogError(ToString(), "Transaction, Error occurs while replacing skill usages of character: " + characterData.Id);
+                Logging.LogException(ToString(), ex);
                 transaction.Rollback();
             }
             transaction.Dispose();
@@ -456,8 +457,8 @@ namespace MultiplayerARPG.MMO
                 }
                 catch (System.Exception ex)
                 {
-                    Debug.LogError("Transaction, Error occurs while deleting character: " + id);
-                    Debug.LogException(ex);
+                    Logging.LogError(ToString(), "Transaction, Error occurs while deleting character: " + id);
+                    Logging.LogException(ToString(), ex);
                     transaction.Rollback();
                 }
                 transaction.Dispose();

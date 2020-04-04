@@ -242,7 +242,7 @@ namespace MultiplayerARPG.MMO
             }
 
             if (LogInfo)
-                UnityEngine.Debug.Log("Starting process from: " + path);
+                Logging.Log(LogTag, "Starting process from: " + path);
 
             // Spawning Process Info
             ProcessStartInfo startProcessInfo = new ProcessStartInfo(path)
@@ -261,7 +261,7 @@ namespace MultiplayerARPG.MMO
             };
 
             if (LogInfo)
-                UnityEngine.Debug.Log("Starting process with args: " + startProcessInfo.Arguments);
+                Logging.Log(LogTag, "Starting process with args: " + startProcessInfo.Arguments);
 
             uint processId = ++processIdCounter;
             bool processStarted = false;
@@ -284,7 +284,7 @@ namespace MultiplayerARPG.MMO
                             ExecuteOnMainThread(() =>
                             {
                                 if (LogInfo)
-                                    UnityEngine.Debug.Log("Process started. Spawn Id: " + processId + ", pid: " + process.Id);
+                                    Logging.Log(LogTag, "Process started. Spawn Id: " + processId + ", pid: " + process.Id);
                                 // Notify server that it's successfully handled the request
                                 if (message != null)
                                     ReponseMapSpawn(message.ackId, ResponseSpawnMapMessage.Error.None);
@@ -300,8 +300,8 @@ namespace MultiplayerARPG.MMO
                             {
                                 if (LogFatal)
                                 {
-                                    UnityEngine.Debug.LogError("Tried to start a process at: '" + path + "' but it failed. Make sure that you have set correct the 'exePath' in 'MapSpawnNetworkManager' component");
-                                    UnityEngine.Debug.LogException(e);
+                                    Logging.LogError(LogTag, "Tried to start a process at: '" + path + "' but it failed. Make sure that you have set correct the 'exePath' in 'MapSpawnNetworkManager' component");
+                                    Logging.LogException(LogTag, e);
                                 }
 
                                 // Notify server that it failed to spawn map scene handled the request
@@ -328,7 +328,7 @@ namespace MultiplayerARPG.MMO
                             FreePort(port);
 
                             if (LogInfo)
-                                UnityEngine.Debug.Log("Process spawn id: " + processId + " killed.");
+                                Logging.Log(LogTag, "Process spawn id: " + processId + " killed.");
                         });
                     }
 
@@ -344,7 +344,7 @@ namespace MultiplayerARPG.MMO
                     restartingScenes.Add(mapId);
 
                 if (LogFatal)
-                    UnityEngine.Debug.LogException(e);
+                    Logging.LogException(LogTag, e);
             }
         }
 
