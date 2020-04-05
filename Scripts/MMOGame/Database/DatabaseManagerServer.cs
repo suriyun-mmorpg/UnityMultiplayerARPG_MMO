@@ -4,16 +4,16 @@ using Grpc.Core;
 
 namespace MultiplayerARPG.MMO
 {
-    public class DatabaseServer
+    public class DatabaseManagerServer
     {
         private Server server;
 
-        public DatabaseServer(int port) : this(port, ServerCredentials.Insecure)
+        public DatabaseManagerServer(int port) : this(port, ServerCredentials.Insecure)
         {
 
         }
 
-        public DatabaseServer(int port, ServerCredentials credentials)
+        public DatabaseManagerServer(int port, ServerCredentials credentials)
         {
             server = new Server
             {

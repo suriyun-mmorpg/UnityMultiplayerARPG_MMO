@@ -5,17 +5,17 @@ using Client = DatabaseService.DatabaseServiceClient;
 
 namespace MultiplayerARPG.MMO
 {
-    public class DatabaseClient
+    public class DatabaseManagerClient
     {
         private Channel channel;
         private Client client;
 
-        public DatabaseClient(string serverHost, int serverPort) : this(serverHost, serverPort, ChannelCredentials.Insecure)
+        public DatabaseManagerClient(string serverHost, int serverPort) : this(serverHost, serverPort, ChannelCredentials.Insecure)
         {
 
         }
 
-        public DatabaseClient(string serverHost, int serverPort, ChannelCredentials credentials)
+        public DatabaseManagerClient(string serverHost, int serverPort, ChannelCredentials credentials)
         {
             channel = new Channel(serverHost, serverPort, credentials);
             client = new Client(channel);
