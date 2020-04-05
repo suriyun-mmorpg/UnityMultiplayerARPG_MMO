@@ -1,0 +1,371 @@
+syntax = "proto3";
+
+service DatabaseService {
+    rpc ValidateUserLogin (ValidateUserLoginReq) returns (ValidateUserLoginResp);
+    rpc ValidateAccessToken (ValidateAccessTokenReq) returns (ValidateAccessTokenResp);
+    rpc GetUserLevel (GetUserLevelReq) returns (GetUserLevelResp);
+    rpc GetGold (GetGoldReq) returns (GoldResp);
+    rpc IncreaseGold (IncreaseGoldReq) returns (GoldResp);
+    rpc DecreaseGold (DecreaseGoldReq) returns (GoldResp);
+    rpc GetCash (GetCashReq) returns (CashResp);
+    rpc IncreaseCash (IncreaseCashReq) returns (CashResp);
+    rpc DecreaseCash (DecreaseCashReq) returns (CashResp);
+    rpc UpdateAccessToken (UpdateAccessTokenReq) returns (VoidResp);
+    rpc CreateUserLogin (CreateUserLoginReq) returns (VoidResp);
+    rpc FindUsername (FindUsernameReq) returns (FindUsernameResp);
+    rpc CreateCharacter (CreateCharacterReq) returns (VoidResp);
+    rpc ReadCharacter (ReadCharacterReq) returns (ReadCharacterResp);
+    rpc ReadCharacters (ReadCharactersReq) returns (ReadCharactersResp);
+    rpc UpdateCharacter (UpdateCharacterReq) returns (VoidResp);
+    rpc DeleteCharacter (DeleteCharacterReq) returns (VoidResp);
+    rpc FindCharacterName (FindCharacterNameReq) returns (FindCharacterNameResp);
+    rpc FindCharacters (FindCharactersReq) returns (FindCharactersResp);
+    rpc CreateFriend (CreateFriendReq) returns (VoidResp);
+    rpc DeleteFriend (DeleteFriendReq) returns (VoidResp);
+    rpc ReadFriends (ReadFriendsReq) returns (ReadFriendsResp);
+    rpc CreateBuilding (CreateBuildingReq) returns (VoidResp);
+    rpc UpdateBuilding (UpdateBuildingReq) returns (VoidResp);
+    rpc DeleteBuilding (DeleteBuildingReq) returns (VoidResp);
+    rpc ReadBuildings (ReadBuildingsReq) returns (ReadBuildingsResp);
+    rpc CreateParty (CreatePartyReq) returns (CreatePartyResp);
+    rpc UpdateParty (UpdatePartyReq) returns (VoidResp);
+    rpc UpdatePartyLeader (UpdatePartyLeaderReq) returns (VoidResp);
+    rpc DeleteParty (DeletePartyReq) returns (VoidResp);
+    rpc UpdateCharacterParty (UpdateCharacterPartyReq) returns (VoidResp);
+    rpc ReadParty (ReadPartyReq) returns (ReadPartyResp);
+    rpc CreateGuild (CreateGuildReq) returns (CreateGuildResp);
+    rpc IncreaseGuildExp (IncreaseGuildExpReq) returns (IncreaseGuildExpResp);
+    rpc UpdateGuildLeader (UpdateGuildLeaderReq) returns (VoidResp);
+    rpc UpdateGuildMessage (UpdateGuildMessageReq) returns (VoidResp);
+    rpc UpdateGuildRole (UpdateGuildRoleReq) returns (VoidResp);
+    rpc UpdateGuildMemberRole (UpdateGuildMemberRoleReq) returns (VoidResp);
+    rpc UpdateGuildSkillLevel (UpdateGuildSkillLevelReq) returns (VoidResp);
+    rpc UpdateCharacterGuild (UpdateCharacterGuildReq) returns (VoidResp);
+    rpc DeleteGuild (DeleteGuildReq) returns (VoidResp);
+    rpc FindGuildName (FindGuildNameReq) returns (FindGuildNameResp);
+    rpc ReadGuild (ReadGuildReq) returns (ReadGuildResp);
+    rpc GetGuildGold (GetGuildGoldReq) returns (GuildGoldResp);
+    rpc IncreaseGuildGold (IncreaseGuildGoldReq) returns (GuildGoldResp);
+    rpc DecreaseGuildGold (DecreaseGuildGoldReq) returns (GuildGoldResp);
+    rpc UpdateStorageItems (UpdateStorageItemsReq) returns (VoidResp);
+    rpc ReadStorageItems (ReadStorageItemsReq) returns (ReadStorageItemsResp);
+}
+enum EStorageType
+{
+    NONE = 0;
+    PLAYER = 1;
+    GUILD = 2;
+    BUILDING = 3;
+}
+// Generic response
+message VoidResp {
+}
+message GoldResp {
+    int32 gold = 1;
+}
+message CashResp {
+    int32 cash = 1;
+}
+message GuildGoldResp {
+    int32 guild_gold = 1;
+}
+// Validate user login
+message ValidateUserLoginReq {
+    string username = 1;
+    string password = 2;
+}
+message ValidateUserLoginResp {
+    string user_id = 1;
+}
+// Validate access token
+message ValidateAccessTokenReq {
+    string user_id = 1;
+    string access_token = 2;
+}
+message ValidateAccessTokenResp {
+    bool is_pass = 1;
+}
+// Get user level
+message GetUserLevelReq {
+    string user_id = 1;
+}
+message GetUserLevelResp {
+    uint32 user_level = 1;
+}
+// Get gold
+message GetGoldReq {
+    string user_id = 1;
+}
+// Increase gold
+message IncreaseGoldReq {
+    string user_id = 1;
+    int32 amount = 2;
+}
+// Decrease gold
+message DecreaseGoldReq {
+    string user_id = 1;
+    int32 amount = 2;
+}
+// Get cash
+message GetCashReq {
+    string user_id = 1;
+}
+// Increase cash
+message IncreaseCashReq {
+    string user_id = 1;
+    int32 amount = 2;
+}
+// Decrease cash
+message DecreaseCashReq {
+    string user_id = 1;
+    int32 amount = 2;
+}
+// Update access token
+message UpdateAccessTokenReq {
+    string user_id = 1;
+    string access_token = 2;
+}
+// Create user login
+message CreateUserLoginReq {
+    string username = 1;
+    string password = 2;
+}
+// Find username
+message FindUsernameReq {
+    string username = 1;
+}
+message FindUsernameResp {
+    int64 found_amount = 1;
+}
+// Create character
+message CreateCharacterReq {
+    string user_id = 1;
+    bytes character_data = 2;
+}
+// Read character
+message ReadCharacterReq {
+    string user_id = 1;
+    string character_id = 2;
+    bool with_equip_weapons = 3;
+    bool with_attributes = 4;
+    bool with_skills = 5;
+    bool with_skill_usages = 6;
+    bool with_buffs = 7;
+    bool with_equip_items = 8;
+    bool with_non_equip_items = 9;
+    bool with_summons = 10;
+    bool with_hotkeys = 11;
+    bool with_quests = 12;
+}
+message ReadCharacterResp {
+    bytes character_data = 1;
+}
+// Read characters
+message ReadCharactersReq {
+    string user_id = 1;
+}
+message ReadCharactersResp {
+    repeated bytes character_data = 1;
+}
+// Update character
+message UpdateCharacterReq {
+    bytes character_data = 1;
+}
+// Delete character
+message DeleteCharacterReq {
+    string user_id = 1;
+    string character_id = 2;
+}
+// Find character name
+message FindCharacterNameReq {
+    string character_name = 1;
+}
+message FindCharacterNameResp {
+    int64 found_amount = 1;
+}
+// Find characters
+message FindCharactersReq {
+    string character_name = 1;
+}
+message FindCharactersResp {
+    repeated bytes social_character_data = 1;
+}
+// Create friend
+message CreateFriendReq {
+    string character_id_1 = 1;
+    string character_id_2 = 2;
+}
+// Delete friend
+message DeleteFriendReq {
+    string character_id_1 = 1;
+    string character_id_2 = 2;
+}
+// Read friends
+message ReadFriendsReq {
+    string character_id = 1;
+}
+message ReadFriendsResp {
+    repeated bytes social_character_data = 1;
+}
+// Create building
+message CreateBuildingReq {
+    string map_name = 1;
+    bytes building_data = 2;
+}
+// Update building
+message UpdateBuildingReq {
+    string map_name = 1;
+    bytes building_data = 2;
+}
+// Delete building
+message DeleteBuildingReq {
+    string map_name = 1;
+    string building_id = 2;
+}
+// Read buildings
+message ReadBuildingsReq {
+    string map_name = 1;
+}
+message ReadBuildingsResp {
+    repeated bytes building_data = 1;
+}
+// Create party
+message CreatePartyReq {
+    bool share_exp = 1;
+    bool share_item = 2;
+    string leader_character_id = 3;
+}
+message CreatePartyResp {
+    int32 party_id = 1;
+}
+// Update party
+message UpdatePartyReq {
+    int32 party_id = 1;
+    bool share_exp = 2;
+    bool share_item = 3;
+}
+// Update party leader
+message UpdatePartyLeaderReq {
+    int32 party_id = 1;
+    string leader_character_id = 2;
+}
+// Delete party
+message DeletePartyReq {
+    int32 party_id = 1;
+}
+// Update character party
+message UpdateCharacterPartyReq {
+    string character_id = 1;
+    int32 party_id = 2;
+}
+// Read party
+message ReadPartyReq {
+    int32 party_id = 1;
+}
+message ReadPartyResp {
+    bytes party_id = 1;
+}
+// Create guild
+message CreateGuildReq {
+    string guild_name = 1;
+    string leader_character_id = 2;
+}
+message CreateGuildResp {
+    int32 guild_id = 1;
+}
+// Increase guild exp
+message IncreaseGuildExpReq {
+    int32 guild_id = 1;
+    int32 increase_exp = 2;
+    repeated int32 exp_tree = 3;
+}
+message IncreaseGuildExpResp {
+    bool is_success = 1;
+    int32 result_level = 2;
+    int32 result_exp = 3;
+    int32 result_skill_point = 4;
+}
+// Update guild leader
+message UpdateGuildLeaderReq {
+    int32 guild_id = 1;
+    string leader_character_id = 2;
+}
+// Update guild message
+message UpdateGuildMessageReq {
+    int32 guild_id = 1;
+    string guild_message = 2;
+}
+// Update guild role
+message UpdateGuildRoleReq {
+    int32 guild_id = 1;
+    uint32 guild_role = 2;
+    string role_name = 3;
+    bool can_invite = 4;
+    bool can_kick = 5;
+    uint32 share_exp_percentage = 6;
+}
+// Update guild member role
+message UpdateGuildMemberRoleReq {
+    string member_character_id = 1;
+    uint32 guild_role = 2;
+}
+// Update guild skill level
+message UpdateGuildSkillLevelReq {
+    int32 guild_id = 1;
+    int32 data_id = 2;
+    int32 level = 3;
+    int32 skill_point = 4;
+}
+// Update character guild
+message UpdateCharacterGuildReq {
+    string character_id = 1;
+    int32 guild_id = 2;
+    uint32 guild_role = 3;
+}
+// Delete guild
+message DeleteGuildReq {
+    int32 guild_id = 1;
+}
+// Find guild name
+message FindGuildNameReq {
+    string guild_name = 1;
+}
+message FindGuildNameResp {
+    int64 found_amount = 1;
+}
+// Read guild
+message ReadGuildReq {
+    int32 guild_id = 1;
+    repeated bytes default_guild_roles = 2;
+}
+message ReadGuildResp {
+    bytes guild_data = 1;
+}
+// Get guild gold
+message GetGuildGoldReq {
+    int32 guild_id = 1;
+}
+// Increase guild gold
+message IncreaseGuildGoldReq {
+    int32 guild_id = 1;
+    int32 amount = 2;
+}
+// Decrease guild gold
+message DecreaseGuildGoldReq {
+    int32 guild_id = 1;
+    int32 amount = 2;
+}
+// Update storage items
+message UpdateStorageItemsReq {
+    EStorageType storage_type = 1;
+    string storage_owner_id = 2;
+    repeated bytes storage_character_items = 3;
+}
+// Read storage items
+message ReadStorageItemsReq {
+    EStorageType storage_type = 1;
+    string storage_owner_id = 2;
+}
+message ReadStorageItemsResp {
+    repeated bytes storage_character_items = 1;
+}
