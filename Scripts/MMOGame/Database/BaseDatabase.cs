@@ -67,7 +67,7 @@ namespace MultiplayerARPG.MMO
         public abstract void UpdateGuildSkillLevel(int id, int dataId, short level, short skillPoint);
         public abstract void DeleteGuild(int id);
         public abstract long FindGuildName(string guildName);
-        public abstract void UpdateCharacterGuild(string characterId, int guild, byte guildRole);
+        public abstract void UpdateCharacterGuild(string characterId, int guildId, byte guildRole);
         public abstract int GetGuildGold(int guildId);
         public abstract int IncreaseGuildGold(int guildId, int amount);
         public abstract int DecreaseGuildGold(int guildId, int amount);
