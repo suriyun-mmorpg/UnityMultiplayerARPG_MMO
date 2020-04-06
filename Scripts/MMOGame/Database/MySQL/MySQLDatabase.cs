@@ -240,11 +240,27 @@ namespace MultiplayerARPG.MMO
             return gold;
         }
 
-        public override void UpdateGold(string userId, int gold)
+        public override int IncreaseGold(string userId, int amount)
         {
+            int gold = GetGold(userId);
+            gold += amount;
             ExecuteNonQuery("UPDATE userlogin SET gold=@gold WHERE id=@id",
                 new MySqlParameter("@id", userId),
                 new MySqlParameter("@gold", gold));
+            return gold;
+        }
+
+        public override int DecreaseGold(string userId, int amount)
+        {
+            int gold = GetGold(userId);
+            if (gold - amount >= 0)
+            {
+                gold -= amount;
+                ExecuteNonQuery("UPDATE userlogin SET gold=@gold WHERE id=@id",
+                    new MySqlParameter("@id", userId),
+                    new MySqlParameter("@gold", gold));
+            }
+            return gold;
         }
 
         public override int GetCash(string userId)
@@ -257,11 +273,27 @@ namespace MultiplayerARPG.MMO
             return cash;
         }
 
-        public override void UpdateCash(string userId, int cash)
+        public override int IncreaseCash(string userId, int amount)
         {
+            int cash = GetCash(userId);
+            cash += amount;
             ExecuteNonQuery("UPDATE userlogin SET cash=@cash WHERE id=@id",
                 new MySqlParameter("@id", userId),
                 new MySqlParameter("@cash", cash));
+            return cash;
+        }
+
+        public override int DecreaseCash(string userId, int amount)
+        {
+            int cash = GetCash(userId);
+            if (cash - amount >= 0)
+            {
+                cash -= amount;
+                ExecuteNonQuery("UPDATE userlogin SET cash=@cash WHERE id=@id",
+                    new MySqlParameter("@id", userId),
+                    new MySqlParameter("@cash", cash));
+            }
+            return cash;
         }
 
         public override void UpdateAccessToken(string userId, string accessToken)
