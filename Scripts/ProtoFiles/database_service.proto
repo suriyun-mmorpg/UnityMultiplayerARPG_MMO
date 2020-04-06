@@ -5,11 +5,9 @@ service DatabaseService {
     rpc ValidateAccessToken (ValidateAccessTokenReq) returns (ValidateAccessTokenResp);
     rpc GetUserLevel (GetUserLevelReq) returns (GetUserLevelResp);
     rpc GetGold (GetGoldReq) returns (GoldResp);
-    rpc IncreaseGold (IncreaseGoldReq) returns (GoldResp);
-    rpc DecreaseGold (DecreaseGoldReq) returns (GoldResp);
+    rpc UpdateGold (UpdateGoldReq) returns (VoidResp);
     rpc GetCash (GetCashReq) returns (CashResp);
-    rpc IncreaseCash (IncreaseCashReq) returns (CashResp);
-    rpc DecreaseCash (DecreaseCashReq) returns (CashResp);
+    rpc UpdateCash (UpdateCashReq) returns (VoidResp);
     rpc UpdateAccessToken (UpdateAccessTokenReq) returns (VoidResp);
     rpc CreateUserLogin (CreateUserLoginReq) returns (VoidResp);
     rpc FindUsername (FindUsernameReq) returns (FindUsernameResp);
@@ -34,7 +32,7 @@ service DatabaseService {
     rpc UpdateCharacterParty (UpdateCharacterPartyReq) returns (VoidResp);
     rpc ReadParty (ReadPartyReq) returns (ReadPartyResp);
     rpc CreateGuild (CreateGuildReq) returns (CreateGuildResp);
-    rpc IncreaseGuildExp (IncreaseGuildExpReq) returns (IncreaseGuildExpResp);
+    rpc UpdateGuildLevel (UpdateGuildLevelReq) returns (VoidResp);
     rpc UpdateGuildLeader (UpdateGuildLeaderReq) returns (VoidResp);
     rpc UpdateGuildMessage (UpdateGuildMessageReq) returns (VoidResp);
     rpc UpdateGuildRole (UpdateGuildRoleReq) returns (VoidResp);
@@ -45,8 +43,7 @@ service DatabaseService {
     rpc FindGuildName (FindGuildNameReq) returns (FindGuildNameResp);
     rpc ReadGuild (ReadGuildReq) returns (ReadGuildResp);
     rpc GetGuildGold (GetGuildGoldReq) returns (GuildGoldResp);
-    rpc IncreaseGuildGold (IncreaseGuildGoldReq) returns (GuildGoldResp);
-    rpc DecreaseGuildGold (DecreaseGuildGoldReq) returns (GuildGoldResp);
+    rpc UpdateGuildGold (UpdateGuildGoldReq) returns (VoidResp);
     rpc UpdateStorageItems (UpdateStorageItemsReq) returns (VoidResp);
     rpc ReadStorageItems (ReadStorageItemsReq) returns (ReadStorageItemsResp);
 }
@@ -97,7 +94,7 @@ message GetGoldReq {
     string user_id = 1;
 }
 // Increase gold
-message IncreaseGoldReq {
+message UpdateGoldReq {
     string user_id = 1;
     int32 amount = 2;
 }
@@ -111,7 +108,7 @@ message GetCashReq {
     string user_id = 1;
 }
 // Increase cash
-message IncreaseCashReq {
+message UpdateCashReq {
     string user_id = 1;
     int32 amount = 2;
 }
@@ -263,7 +260,7 @@ message ReadPartyReq {
     int32 party_id = 1;
 }
 message ReadPartyResp {
-    bytes party_id = 1;
+    bytes party_data = 1;
 }
 // Create guild
 message CreateGuildReq {
@@ -274,16 +271,11 @@ message CreateGuildResp {
     int32 guild_id = 1;
 }
 // Increase guild exp
-message IncreaseGuildExpReq {
+message UpdateGuildLevelReq {
     int32 guild_id = 1;
-    int32 increase_exp = 2;
-    repeated int32 exp_tree = 3;
-}
-message IncreaseGuildExpResp {
-    bool is_success = 1;
-    int32 result_level = 2;
-    int32 result_exp = 3;
-    int32 result_skill_point = 4;
+    int32 level = 2;
+    int32 exp = 3;
+    int32 skill_point = 4;
 }
 // Update guild leader
 message UpdateGuildLeaderReq {
@@ -313,7 +305,7 @@ message UpdateGuildMemberRoleReq {
 message UpdateGuildSkillLevelReq {
     int32 guild_id = 1;
     int32 data_id = 2;
-    int32 level = 3;
+    int32 skill_level = 3;
     int32 skill_point = 4;
 }
 // Update character guild
@@ -346,7 +338,7 @@ message GetGuildGoldReq {
     int32 guild_id = 1;
 }
 // Increase guild gold
-message IncreaseGuildGoldReq {
+message UpdateGuildGoldReq {
     int32 guild_id = 1;
     int32 amount = 2;
 }
