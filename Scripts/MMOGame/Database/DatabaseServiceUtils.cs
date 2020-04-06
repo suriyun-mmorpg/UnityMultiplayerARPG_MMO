@@ -42,7 +42,7 @@ namespace MultiplayerARPG.MMO
             }
         }
 
-        public static T[] MakeFromRepeatedBytes<T>(RepeatedField<ByteString> from)
+        public static T[] MakeArrayFromRepeatedBytes<T>(RepeatedField<ByteString> from)
             where T : INetSerializable
         {
             T[] to = new T[from.Count];
@@ -53,7 +53,7 @@ namespace MultiplayerARPG.MMO
             return to;
         }
 
-        public static List<T> MakeFromRepeatedBytes<T>(RepeatedField<ByteString> from)
+        public static List<T> MakeListFromRepeatedBytes<T>(RepeatedField<ByteString> from)
             where T : INetSerializable
         {
             List<T> to = new List<T>();
