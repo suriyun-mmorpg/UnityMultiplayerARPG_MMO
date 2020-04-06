@@ -2,259 +2,387 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Grpc.Core;
-using UnityEngine;
 
 namespace MultiplayerARPG.MMO
 {
     public class DatabaseServiceImplement : DatabaseService.DatabaseServiceBase
     {
+        public BaseDatabase Database { get; private set; }
         // TODO: I'm going to make in-memory database without Redis for now
         // In the future it may implements Redis
         // It's going to get some data from all tables but not every records
         // Just some records that players were requested
         public DatabaseServiceImplement(BaseDatabase database)
         {
-
+            Database = database;
         }
 
-        public override Task<ValidateUserLoginResp> ValidateUserLogin(ValidateUserLoginReq request, ServerCallContext context)
+        public override async Task<ValidateUserLoginResp> ValidateUserLogin(ValidateUserLoginReq request, ServerCallContext context)
         {
-            return base.ValidateUserLogin(request, context);
+            await Task.Yield();
+            string userId = Database.ValidateUserLogin(request.Username, request.Password);
+            return new ValidateUserLoginResp()
+            {
+                UserId = userId
+            };
         }
 
-        public override Task<ValidateAccessTokenResp> ValidateAccessToken(ValidateAccessTokenReq request, ServerCallContext context)
+        public override async Task<ValidateAccessTokenResp> ValidateAccessToken(ValidateAccessTokenReq request, ServerCallContext context)
         {
-            return base.ValidateAccessToken(request, context);
+            await Task.Yield();
+            bool isPass = Database.ValidateAccessToken(request.UserId, request.AccessToken);
+            return new ValidateAccessTokenResp()
+            {
+                IsPass = isPass
+            };
         }
 
-        public override Task<GetUserLevelResp> GetUserLevel(GetUserLevelReq request, ServerCallContext context)
+        public override async Task<GetUserLevelResp> GetUserLevel(GetUserLevelReq request, ServerCallContext context)
         {
-            return base.GetUserLevel(request, context);
+            await Task.Yield();
+            byte userLevel = Database.GetUserLevel(request.UserId);
+            return new GetUserLevelResp()
+            {
+                UserLevel = userLevel
+            };
         }
 
-        public override Task<GoldResp> GetGold(GetGoldReq request, ServerCallContext context)
+        public override async Task<GoldResp> GetGold(GetGoldReq request, ServerCallContext context)
         {
-            return base.GetGold(request, context);
+            await Task.Yield();
+            int gold = Database.GetGold(request.UserId);
+            return new GoldResp()
+            {
+                Gold = gold
+            };
         }
 
-        public override Task<GoldResp> IncreaseGold(IncreaseGoldReq request, ServerCallContext context)
+        public override async Task<VoidResp> UpdateGold(UpdateGoldReq request, ServerCallContext context)
         {
-            return base.IncreaseGold(request, context);
+            await Task.Yield();
+            Database.UpdateGold(request.UserId, request.Amount);
+            return new VoidResp();
         }
 
-        public override Task<GoldResp> DecreaseGold(DecreaseGoldReq request, ServerCallContext context)
+        public override async Task<CashResp> GetCash(GetCashReq request, ServerCallContext context)
         {
-            return base.DecreaseGold(request, context);
+            await Task.Yield();
+            int cash = Database.GetCash(request.UserId);
+            return new CashResp()
+            {
+                Cash = cash
+            };
         }
 
-        public override Task<CashResp> GetCash(GetCashReq request, ServerCallContext context)
+        public override async Task<VoidResp> UpdateCash(UpdateCashReq request, ServerCallContext context)
         {
-            return base.GetCash(request, context);
+            await Task.Yield();
+            Database.UpdateCash(request.UserId, request.Amount);
+            return new VoidResp();
         }
 
-        public override Task<CashResp> IncreaseCash(IncreaseCashReq request, ServerCallContext context)
+        public override async Task<VoidResp> UpdateAccessToken(UpdateAccessTokenReq request, ServerCallContext context)
         {
-            return base.IncreaseCash(request, context);
+            await Task.Yield();
+            Database.UpdateAccessToken(request.UserId, request.AccessToken);
+            return new VoidResp();
         }
 
-        public override Task<CashResp> DecreaseCash(DecreaseCashReq request, ServerCallContext context)
+        public override async Task<VoidResp> CreateUserLogin(CreateUserLoginReq request, ServerCallContext context)
         {
-            return base.DecreaseCash(request, context);
+            await Task.Yield();
+            Database.CreateUserLogin(request.Username, request.Password);
+            return new VoidResp();
         }
 
-        public override Task<VoidResp> UpdateAccessToken(UpdateAccessTokenReq request, ServerCallContext context)
+        public override async Task<FindUsernameResp> FindUsername(FindUsernameReq request, ServerCallContext context)
         {
-            return base.UpdateAccessToken(request, context);
+            await Task.Yield();
+            long foundAmount = Database.FindUsername(request.Username);
+            return new FindUsernameResp()
+            {
+                FoundAmount = foundAmount
+            };
         }
 
-        public override Task<VoidResp> CreateUserLogin(CreateUserLoginReq request, ServerCallContext context)
+        public override async Task<VoidResp> CreateCharacter(CreateCharacterReq request, ServerCallContext context)
         {
-            return base.CreateUserLogin(request, context);
+            await Task.Yield();
+            Database.CreateCharacter(request.UserId, DatabaseServiceUtils.FromBytes<PlayerCharacterData>(request.CharacterData));
+            return new VoidResp();
         }
 
-        public override Task<FindUsernameResp> FindUsername(FindUsernameReq request, ServerCallContext context)
+        public override async Task<ReadCharacterResp> ReadCharacter(ReadCharacterReq request, ServerCallContext context)
         {
-            return base.FindUsername(request, context);
+            await Task.Yield();
+            PlayerCharacterData characterData = Database.ReadCharacter(
+                request.UserId,
+                request.CharacterId,
+                request.WithEquipWeapons,
+                request.WithAttributes,
+                request.WithSkills,
+                request.WithSkillUsages,
+                request.WithBuffs,
+                request.WithEquipItems,
+                request.WithNonEquipItems,
+                request.WithSummons,
+                request.WithHotkeys,
+                request.WithQuests);
+            return new ReadCharacterResp()
+            {
+                CharacterData = DatabaseServiceUtils.ToBytes(characterData)
+            };
         }
 
-        public override Task<VoidResp> CreateCharacter(CreateCharacterReq request, ServerCallContext context)
+        public override async Task<ReadCharactersResp> ReadCharacters(ReadCharactersReq request, ServerCallContext context)
         {
-            return base.CreateCharacter(request, context);
+            await Task.Yield();
+            ReadCharactersResp resp = new ReadCharactersResp();
+            DatabaseServiceUtils.CopyToRepeatedBytes(Database.ReadCharacters(request.UserId), resp.List);
+            return resp;
         }
 
-        public override Task<ReadCharacterResp> ReadCharacter(ReadCharacterReq request, ServerCallContext context)
+        public override async Task<VoidResp> UpdateCharacter(UpdateCharacterReq request, ServerCallContext context)
         {
-            return base.ReadCharacter(request, context);
+            await Task.Yield();
+            Database.UpdateCharacter(DatabaseServiceUtils.FromBytes<PlayerCharacterData>(request.CharacterData));
+            return new VoidResp();
         }
 
-        public override Task<ReadCharactersResp> ReadCharacters(ReadCharactersReq request, ServerCallContext context)
+        public override async Task<VoidResp> DeleteCharacter(DeleteCharacterReq request, ServerCallContext context)
         {
-            return base.ReadCharacters(request, context);
+            await Task.Yield();
+            Database.DeleteCharacter(request.UserId, request.CharacterId);
+            return new VoidResp();
         }
 
-        public override Task<VoidResp> UpdateCharacter(UpdateCharacterReq request, ServerCallContext context)
+        public override async Task<FindCharacterNameResp> FindCharacterName(FindCharacterNameReq request, ServerCallContext context)
         {
-            return base.UpdateCharacter(request, context);
+            await Task.Yield();
+            long foundAmount = Database.FindCharacterName(request.CharacterName);
+            return new FindCharacterNameResp()
+            {
+                FoundAmount = foundAmount
+            };
         }
 
-        public override Task<VoidResp> DeleteCharacter(DeleteCharacterReq request, ServerCallContext context)
+        public override async Task<FindCharactersResp> FindCharacters(FindCharactersReq request, ServerCallContext context)
         {
-            return base.DeleteCharacter(request, context);
+            await Task.Yield();
+            FindCharactersResp resp = new FindCharactersResp();
+            DatabaseServiceUtils.CopyToRepeatedBytes(Database.FindCharacters(request.CharacterName), resp.List);
+            return resp;
         }
 
-        public override Task<FindCharacterNameResp> FindCharacterName(FindCharacterNameReq request, ServerCallContext context)
+        public override async Task<VoidResp> CreateFriend(CreateFriendReq request, ServerCallContext context)
         {
-            return base.FindCharacterName(request, context);
+            await Task.Yield();
+            Database.CreateFriend(request.CharacterId1, request.CharacterId2);
+            return new VoidResp();
         }
 
-        public override Task<FindCharactersResp> FindCharacters(FindCharactersReq request, ServerCallContext context)
+        public override async Task<VoidResp> DeleteFriend(DeleteFriendReq request, ServerCallContext context)
         {
-            return base.FindCharacters(request, context);
+            await Task.Yield();
+            Database.DeleteFriend(request.CharacterId1, request.CharacterId2);
+            return new VoidResp();
         }
 
-        public override Task<VoidResp> CreateFriend(CreateFriendReq request, ServerCallContext context)
+        public override async Task<ReadFriendsResp> ReadFriends(ReadFriendsReq request, ServerCallContext context)
         {
-            return base.CreateFriend(request, context);
+            await Task.Yield();
+            ReadFriendsResp resp = new ReadFriendsResp();
+            DatabaseServiceUtils.CopyToRepeatedBytes(Database.ReadFriends(request.CharacterId), resp.List);
+            return resp;
         }
 
-        public override Task<VoidResp> DeleteFriend(DeleteFriendReq request, ServerCallContext context)
+        public override async Task<VoidResp> CreateBuilding(CreateBuildingReq request, ServerCallContext context)
         {
-            return base.DeleteFriend(request, context);
+            await Task.Yield();
+            Database.CreateBuilding(request.MapName, DatabaseServiceUtils.FromBytes<BuildingSaveData>(request.BuildingData));
+            return new VoidResp();
         }
 
-        public override Task<ReadFriendsResp> ReadFriends(ReadFriendsReq request, ServerCallContext context)
+        public override async Task<VoidResp> UpdateBuilding(UpdateBuildingReq request, ServerCallContext context)
         {
-            return base.ReadFriends(request, context);
+            await Task.Yield();
+            Database.UpdateBuilding(request.MapName, DatabaseServiceUtils.FromBytes<BuildingSaveData>(request.BuildingData));
+            return new VoidResp();
         }
 
-        public override Task<VoidResp> CreateBuilding(CreateBuildingReq request, ServerCallContext context)
+        public override async Task<VoidResp> DeleteBuilding(DeleteBuildingReq request, ServerCallContext context)
         {
-            return base.CreateBuilding(request, context);
+            await Task.Yield();
+            Database.DeleteBuilding(request.MapName, request.BuildingId);
+            return new VoidResp();
         }
 
-        public override Task<VoidResp> UpdateBuilding(UpdateBuildingReq request, ServerCallContext context)
+        public override async Task<ReadBuildingsResp> ReadBuildings(ReadBuildingsReq request, ServerCallContext context)
         {
-            return base.UpdateBuilding(request, context);
+            await Task.Yield();
+            ReadBuildingsResp resp = new ReadBuildingsResp();
+            DatabaseServiceUtils.CopyToRepeatedBytes(Database.ReadBuildings(request.MapName), resp.List);
+            return resp;
         }
 
-        public override Task<VoidResp> DeleteBuilding(DeleteBuildingReq request, ServerCallContext context)
+        public override async Task<CreatePartyResp> CreateParty(CreatePartyReq request, ServerCallContext context)
         {
-            return base.DeleteBuilding(request, context);
+            await Task.Yield();
+            return new CreatePartyResp()
+            {
+                PartyId = Database.CreateParty(request.ShareExp, request.ShareItem, request.LeaderCharacterId)
+            };
         }
 
-        public override Task<ReadBuildingsResp> ReadBuildings(ReadBuildingsReq request, ServerCallContext context)
+        public override async Task<VoidResp> UpdateParty(UpdatePartyReq request, ServerCallContext context)
         {
-            return base.ReadBuildings(request, context);
+            await Task.Yield();
+            Database.UpdateParty(request.PartyId, request.ShareExp, request.ShareItem);
+            return new VoidResp();
         }
 
-        public override Task<CreatePartyResp> CreateParty(CreatePartyReq request, ServerCallContext context)
+        public override async Task<VoidResp> UpdatePartyLeader(UpdatePartyLeaderReq request, ServerCallContext context)
         {
-            return base.CreateParty(request, context);
+            await Task.Yield();
+            Database.UpdatePartyLeader(request.PartyId, request.LeaderCharacterId);
+            return new VoidResp();
         }
 
-        public override Task<VoidResp> UpdateParty(UpdatePartyReq request, ServerCallContext context)
+        public override async Task<VoidResp> DeleteParty(DeletePartyReq request, ServerCallContext context)
         {
-            return base.UpdateParty(request, context);
+            await Task.Yield();
+            Database.DeleteParty(request.PartyId);
+            return new VoidResp();
         }
 
-        public override Task<VoidResp> UpdatePartyLeader(UpdatePartyLeaderReq request, ServerCallContext context)
+        public override async Task<VoidResp> UpdateCharacterParty(UpdateCharacterPartyReq request, ServerCallContext context)
         {
-            return base.UpdatePartyLeader(request, context);
+            await Task.Yield();
+            Database.UpdateCharacterParty(request.CharacterId, request.PartyId);
+            return new VoidResp();
         }
 
-        public override Task<VoidResp> DeleteParty(DeletePartyReq request, ServerCallContext context)
+        public override async Task<ReadPartyResp> ReadParty(ReadPartyReq request, ServerCallContext context)
         {
-            return base.DeleteParty(request, context);
+            await Task.Yield();
+            return new ReadPartyResp()
+            {
+                PartyData = DatabaseServiceUtils.ToBytes(Database.ReadParty(request.PartyId))
+            };
         }
 
-        public override Task<VoidResp> UpdateCharacterParty(UpdateCharacterPartyReq request, ServerCallContext context)
+        public override async Task<CreateGuildResp> CreateGuild(CreateGuildReq request, ServerCallContext context)
         {
-            return base.UpdateCharacterParty(request, context);
+            await Task.Yield();
+            return new CreateGuildResp()
+            {
+                GuildId = Database.CreateGuild(request.GuildName, request.LeaderCharacterId)
+            };
         }
 
-        public override Task<ReadPartyResp> ReadParty(ReadPartyReq request, ServerCallContext context)
+        public override async Task<VoidResp> UpdateGuildLevel(UpdateGuildLevelReq request, ServerCallContext context)
         {
-            return base.ReadParty(request, context);
+            await Task.Yield();
+            Database.UpdateGuildLevel(request.GuildId, (short)request.Level, request.Exp, (short)request.SkillPoint);
+            return new VoidResp();
         }
 
-        public override Task<CreateGuildResp> CreateGuild(CreateGuildReq request, ServerCallContext context)
+        public override async Task<VoidResp> UpdateGuildLeader(UpdateGuildLeaderReq request, ServerCallContext context)
         {
-            return base.CreateGuild(request, context);
+            await Task.Yield();
+            Database.UpdateGuildLeader(request.GuildId, request.LeaderCharacterId);
+            return new VoidResp();
         }
 
-        public override Task<IncreaseGuildExpResp> IncreaseGuildExp(IncreaseGuildExpReq request, ServerCallContext context)
+        public override async Task<VoidResp> UpdateGuildMessage(UpdateGuildMessageReq request, ServerCallContext context)
         {
-            return base.IncreaseGuildExp(request, context);
+            await Task.Yield();
+            Database.UpdateGuildMessage(request.GuildId, request.GuildMessage);
+            return new VoidResp();
         }
 
-        public override Task<VoidResp> UpdateGuildLeader(UpdateGuildLeaderReq request, ServerCallContext context)
+        public override async Task<VoidResp> UpdateGuildRole(UpdateGuildRoleReq request, ServerCallContext context)
         {
-            return base.UpdateGuildLeader(request, context);
+            await Task.Yield();
+            Database.UpdateGuildRole(request.GuildId, (byte)request.GuildRole, request.RoleName, request.CanInvite, request.CanKick, (byte)request.ShareExpPercentage);
+            return new VoidResp();
         }
 
-        public override Task<VoidResp> UpdateGuildMessage(UpdateGuildMessageReq request, ServerCallContext context)
+        public override async Task<VoidResp> UpdateGuildMemberRole(UpdateGuildMemberRoleReq request, ServerCallContext context)
         {
-            return base.UpdateGuildMessage(request, context);
+            await Task.Yield();
+            Database.UpdateGuildMemberRole(request.MemberCharacterId, (byte)request.GuildRole);
+            return new VoidResp();
         }
 
-        public override Task<VoidResp> UpdateGuildRole(UpdateGuildRoleReq request, ServerCallContext context)
+        public override async Task<VoidResp> UpdateGuildSkillLevel(UpdateGuildSkillLevelReq request, ServerCallContext context)
         {
-            return base.UpdateGuildRole(request, context);
+            await Task.Yield();
+            Database.UpdateGuildSkillLevel(request.GuildId, request.DataId, (short)request.SkillLevel, (short)request.SkillPoint);
+            return new VoidResp();
         }
 
-        public override Task<VoidResp> UpdateGuildMemberRole(UpdateGuildMemberRoleReq request, ServerCallContext context)
+        public override async Task<VoidResp> UpdateCharacterGuild(UpdateCharacterGuildReq request, ServerCallContext context)
         {
-            return base.UpdateGuildMemberRole(request, context);
+            await Task.Yield();
+            Database.UpdateCharacterGuild(request.CharacterId, request.GuildId, (byte)request.GuildRole);
+            return new VoidResp();
         }
 
-        public override Task<VoidResp> UpdateGuildSkillLevel(UpdateGuildSkillLevelReq request, ServerCallContext context)
+        public override async Task<VoidResp> DeleteGuild(DeleteGuildReq request, ServerCallContext context)
         {
-            return base.UpdateGuildSkillLevel(request, context);
+            await Task.Yield();
+            Database.DeleteGuild(request.GuildId);
+            return new VoidResp();
         }
 
-        public override Task<VoidResp> UpdateCharacterGuild(UpdateCharacterGuildReq request, ServerCallContext context)
+        public override async Task<FindGuildNameResp> FindGuildName(FindGuildNameReq request, ServerCallContext context)
         {
-            return base.UpdateCharacterGuild(request, context);
+            await Task.Yield();
+            return new FindGuildNameResp()
+            {
+                FoundAmount = Database.FindGuildName(request.GuildName)
+            };
         }
 
-        public override Task<VoidResp> DeleteGuild(DeleteGuildReq request, ServerCallContext context)
+        public override async Task<ReadGuildResp> ReadGuild(ReadGuildReq request, ServerCallContext context)
         {
-            return base.DeleteGuild(request, context);
+            await Task.Yield();
+            return new ReadGuildResp()
+            {
+                GuildData = DatabaseServiceUtils.ToBytes(Database.ReadGuild(request.GuildId, DatabaseServiceUtils.MakeArrayFromRepeatedBytes<GuildRoleData>(request.DefaultGuildRoles)))
+            };
         }
 
-        public override Task<FindGuildNameResp> FindGuildName(FindGuildNameReq request, ServerCallContext context)
+        public override async Task<GuildGoldResp> GetGuildGold(GetGuildGoldReq request, ServerCallContext context)
         {
-            return base.FindGuildName(request, context);
+            await Task.Yield();
+            return new GuildGoldResp()
+            {
+                GuildGold = Database.GetGuildGold(request.GuildId)
+            };
         }
 
-        public override Task<ReadGuildResp> ReadGuild(ReadGuildReq request, ServerCallContext context)
+        public override async Task<VoidResp> UpdateGuildGold(UpdateGuildGoldReq request, ServerCallContext context)
         {
-            return base.ReadGuild(request, context);
+            await Task.Yield();
+            Database.UpdateGuildGold(request.GuildId, request.Amount);
+            return new VoidResp();
         }
 
-        public override Task<GuildGoldResp> GetGuildGold(GetGuildGoldReq request, ServerCallContext context)
+        public override async Task<VoidResp> UpdateStorageItems(UpdateStorageItemsReq request, ServerCallContext context)
         {
-            return base.GetGuildGold(request, context);
+            await Task.Yield();
+            Database.UpdateStorageItems((StorageType)request.StorageType, request.StorageOwnerId, DatabaseServiceUtils.MakeListFromRepeatedBytes<CharacterItem>(request.StorageCharacterItems));
+            return new VoidResp();
         }
 
-        public override Task<GuildGoldResp> IncreaseGuildGold(IncreaseGuildGoldReq request, ServerCallContext context)
+        public override async Task<ReadStorageItemsResp> ReadStorageItems(ReadStorageItemsReq request, ServerCallContext context)
         {
-            return base.IncreaseGuildGold(request, context);
-        }
-
-        public override Task<GuildGoldResp> DecreaseGuildGold(DecreaseGuildGoldReq request, ServerCallContext context)
-        {
-            return base.DecreaseGuildGold(request, context);
-        }
-
-        public override Task<VoidResp> UpdateStorageItems(UpdateStorageItemsReq request, ServerCallContext context)
-        {
-            return base.UpdateStorageItems(request, context);
-        }
-
-        public override Task<ReadStorageItemsResp> ReadStorageItems(ReadStorageItemsReq request, ServerCallContext context)
-        {
-            return base.ReadStorageItems(request, context);
+            await Task.Yield();
+            ReadStorageItemsResp resp = new ReadStorageItemsResp();
+            DatabaseServiceUtils.CopyToRepeatedBytes(Database.ReadStorageItems((StorageType)request.StorageType, request.StorageOwnerId), resp.StorageCharacterItems);
+            return resp;
         }
     }
 }
