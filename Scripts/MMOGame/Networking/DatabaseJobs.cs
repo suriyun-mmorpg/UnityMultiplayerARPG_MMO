@@ -263,27 +263,23 @@ namespace MultiplayerARPG.MMO
         }
     }
 
-    public class IncreaseGuildExpJob : DatabaseJob<bool>
+    public class UpdateGuildLevelJob : DatabaseJob
     {
         private int id;
-        private int increaseExp;
-        private int[] expTree;
-        private short tempResultLevel;
-        public short resultLevel { get { return tempResultLevel; } }
-        private int tempResultExp;
-        public int resultExp { get { return tempResultExp; } }
-        private short tempResultSkillPoint;
-        public short resultSkillPoint { get { return tempResultSkillPoint; } }
-        public IncreaseGuildExpJob(BaseDatabase database, int id, int increaseExp, int[] expTree, Action<bool> onFinished = null) : base(database, onFinished)
+        private short level;
+        private int exp;
+        private short skillPoint;
+        public UpdateGuildLevelJob(BaseDatabase database, int id, short level, int exp, short skillPoint, Action onFinished = null) : base(database, onFinished)
         {
             this.id = id;
-            this.increaseExp = increaseExp;
-            this.expTree = expTree;
+            this.level = level;
+            this.exp = exp;
+            this.skillPoint = skillPoint;
         }
 
         protected override void ThreadFunction()
         {
-            result = database.IncreaseGuildExp(id, increaseExp, expTree, out tempResultLevel, out tempResultExp, out tempResultSkillPoint);
+            database.UpdateGuildLevel(id, level, exp, skillPoint);
         }
     }
 
@@ -439,35 +435,19 @@ namespace MultiplayerARPG.MMO
         }
     }
 
-    public class DecreaseGuildGoldJob : DatabaseJob<int>
+    public class UpdateGuildGoldJob : DatabaseJob
     {
         private int guildId;
-        private int amount;
-        public DecreaseGuildGoldJob(BaseDatabase database, int guildId, int amount, Action<int> onFinished = null) : base(database, onFinished)
+        private int gold;
+        public UpdateGuildGoldJob(BaseDatabase database, int guildId, int gold, Action onFinished = null) : base(database, onFinished)
         {
             this.guildId = guildId;
-            this.amount = amount;
+            this.gold = gold;
         }
 
         protected override void ThreadFunction()
         {
-            result = database.DecreaseGuildGold(guildId, amount);
-        }
-    }
-
-    public class IncreaseGuildGoldJob : DatabaseJob<int>
-    {
-        private int guildId;
-        private int amount;
-        public IncreaseGuildGoldJob(BaseDatabase database, int guildId, int amount, Action<int> onFinished = null) : base(database, onFinished)
-        {
-            this.guildId = guildId;
-            this.amount = amount;
-        }
-
-        protected override void ThreadFunction()
-        {
-            result = database.IncreaseGuildGold(guildId, amount);
+            database.UpdateGuildGold(guildId, gold);
         }
     }
     #endregion
@@ -487,35 +467,19 @@ namespace MultiplayerARPG.MMO
         }
     }
 
-    public class DecreaseGoldJob : DatabaseJob<int>
+    public class UpdateGoldJob : DatabaseJob
     {
         private string userId;
-        private int amount;
-        public DecreaseGoldJob(BaseDatabase database, string userId, int amount, Action<int> onFinished = null) : base(database, onFinished)
+        private int gold;
+        public UpdateGoldJob(BaseDatabase database, string userId, int gold, Action onFinished = null) : base(database, onFinished)
         {
             this.userId = userId;
-            this.amount = amount;
+            this.gold = gold;
         }
 
         protected override void ThreadFunction()
         {
-            result = database.DecreaseGold(userId, amount);
-        }
-    }
-
-    public class IncreaseGoldJob : DatabaseJob<int>
-    {
-        private string userId;
-        private int amount;
-        public IncreaseGoldJob(BaseDatabase database, string userId, int amount, Action<int> onFinished = null) : base(database, onFinished)
-        {
-            this.userId = userId;
-            this.amount = amount;
-        }
-
-        protected override void ThreadFunction()
-        {
-            result = database.IncreaseGold(userId, amount);
+            database.UpdateGold(userId, gold);
         }
     }
     #endregion
@@ -535,35 +499,19 @@ namespace MultiplayerARPG.MMO
         }
     }
 
-    public class DecreaseCashJob : DatabaseJob<int>
+    public class UpdateCashJob : DatabaseJob
     {
         private string userId;
-        private int amount;
-        public DecreaseCashJob(BaseDatabase database, string userId, int amount, Action<int> onFinished = null) : base(database, onFinished)
+        private int cash;
+        public UpdateCashJob(BaseDatabase database, string userId, int cash, Action onFinished = null) : base(database, onFinished)
         {
             this.userId = userId;
-            this.amount = amount;
+            this.cash = cash;
         }
 
         protected override void ThreadFunction()
         {
-            result = database.DecreaseCash(userId, amount);
-        }
-    }
-
-    public class IncreaseCashJob : DatabaseJob<int>
-    {
-        private string userId;
-        private int amount;
-        public IncreaseCashJob(BaseDatabase database, string userId, int amount, Action<int> onFinished = null) : base(database, onFinished)
-        {
-            this.userId = userId;
-            this.amount = amount;
-        }
-
-        protected override void ThreadFunction()
-        {
-            result = database.IncreaseCash(userId, amount);
+            database.UpdateCash(userId, cash);
         }
     }
     #endregion
