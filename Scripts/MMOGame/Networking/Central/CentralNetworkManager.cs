@@ -34,9 +34,9 @@ namespace MultiplayerARPG.MMO
         public System.Action onClientConnected;
         public System.Action<DisconnectInfo> onClientDisconnected;
 
-        public BaseDatabase Database
+        public DatabaseService.DatabaseServiceClient DbServiceClient
         {
-            get { return MMOServerInstance.Singleton.Database; }
+            get { return MMOServerInstance.Singleton.DatabaseNetworkManager.ServiceClient; }
         }
 
         // This server will collect servers data

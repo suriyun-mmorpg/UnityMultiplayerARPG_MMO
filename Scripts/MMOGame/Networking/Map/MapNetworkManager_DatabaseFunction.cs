@@ -2,74 +2,78 @@
 using LiteNetLibManager;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace MultiplayerARPG.MMO
 {
     public partial class MapNetworkManager
     {
-        private IEnumerator LoadStorageRoutine(StorageId storageId)
+        private async Task LoadStorageRoutine(StorageId storageId)
         {
             if (!loadingStorageIds.Contains(storageId))
             {
                 loadingStorageIds.Add(storageId);
-                ReadStorageItemsJob job = new ReadStorageItemsJob(Database, storageId.storageType, storageId.storageOwnerId);
-                job.Start();
-                yield return StartCoroutine(job.WaitFor());
-                if (job.result != null)
-                    storageItems[storageId] = job.result;
-                else
-                    storageItems[storageId] = new List<CharacterItem>();
+                ReadStorageItemsResp readStorageItemsResp = await DbServiceClient.ReadStorageItemsAsync(new ReadStorageItemsReq()
+                {
+                    StorageType = (EStorageType)storageId.storageType,
+                    StorageOwnerId = storageId.storageOwnerId
+                });
+
+                storageItems[storageId] = readStorageItemsResp.StorageCharacterItems.MakeListFromRepeatedBytes<CharacterItem>();
                 loadingStorageIds.Remove(storageId);
             }
         }
 
-        private IEnumerator LoadPartyRoutine(int id)
+        private async Task LoadPartyRoutine(int id)
         {
             if (id > 0 && !loadingPartyIds.Contains(id))
             {
                 loadingPartyIds.Add(id);
-                ReadPartyJob job = new ReadPartyJob(Database, id);
-                job.Start();
-                yield return StartCoroutine(job.WaitFor());
-                if (job.result != null)
-                    parties[id] = job.result;
-                else
-                    parties.Remove(id);
+                ReadPartyResp resp = await DbServiceClient.ReadPartyAsync(new ReadPartyReq()
+                {
+                    PartyId = id
+                });
+                parties[id] = resp.PartyData.FromBytes<PartyData>();
                 loadingPartyIds.Remove(id);
             }
         }
 
-        private IEnumerator LoadGuildRoutine(int id)
+        private async Task LoadGuildRoutine(int id)
         {
             if (id > 0 && !loadingGuildIds.Contains(id))
             {
                 loadingGuildIds.Add(id);
-                ReadGuildJob job = new ReadGuildJob(Database, id, CurrentGameInstance.SocialSystemSetting.GuildMemberRoles);
-                job.Start();
-                yield return StartCoroutine(job.WaitFor());
-                if (job.result != null)
-                    guilds[id] = job.result;
-                else
-                    guilds.Remove(id);
+                ReadGuildResp resp = await DbServiceClient.ReadGuildAsync(new ReadGuildReq()
+                {
+                    GuildId = id
+                });
+                guilds[id] = resp.GuildData.FromBytes<GuildData>();
                 loadingGuildIds.Remove(id);
             }
         }
 
-        private IEnumerator SaveCharacterRoutine(IPlayerCharacterData playerCharacterData, string userId)
+        private async Task SaveCharacterRoutine(PlayerCharacterData playerCharacterData, string userId)
         {
             if (playerCharacterData != null && !savingCharacters.Contains(playerCharacterData.Id))
             {
                 savingCharacters.Add(playerCharacterData.Id);
-                UpdateCharacterJob job = new UpdateCharacterJob(Database, playerCharacterData);
-                job.Start();
-                yield return StartCoroutine(job.WaitFor());
+                // Update character
+                await DbServiceClient.UpdateCharacterAsync(new UpdateCharacterReq()
+                {
+                    CharacterData = playerCharacterData.ToBytes()
+                });
+                // Update storage items
                 StorageId storageId = new StorageId(StorageType.Player, userId);
                 if (storageItems.ContainsKey(storageId))
                 {
-                    UpdateStorageItemsJob updateStorageItemsJob = new UpdateStorageItemsJob(Database, storageId.storageType, storageId.storageOwnerId, storageItems[storageId]);
-                    updateStorageItemsJob.Start();
-                    yield return StartCoroutine(updateStorageItemsJob.WaitFor());
+                    UpdateStorageItemsReq req = new UpdateStorageItemsReq()
+                    {
+                        StorageType = (EStorageType)storageId.storageType,
+                        StorageOwnerId = storageId.storageOwnerId
+                    };
+                    DatabaseServiceUtils.CopyToRepeatedBytes(storageItems[storageId], req.StorageCharacterItems);
+                    await DbServiceClient.UpdateStorageItemsAsync(req);
                 }
                 savingCharacters.Remove(playerCharacterData.Id);
                 if (LogInfo)
@@ -77,39 +81,47 @@ namespace MultiplayerARPG.MMO
             }
         }
 
-        private IEnumerator SaveCharactersRoutine()
+        private async void SaveCharactersRoutine()
         {
             if (savingCharacters.Count == 0)
             {
                 int i = 0;
                 foreach (BasePlayerCharacterEntity playerCharacter in playerCharacters.Values)
                 {
-                    StartCoroutine(SaveCharacterRoutine(playerCharacter.CloneTo(new PlayerCharacterData()), playerCharacter.UserId));
+                    await SaveCharacterRoutine(playerCharacter.CloneTo(new PlayerCharacterData()), playerCharacter.UserId);
                     ++i;
                 }
                 while (savingCharacters.Count > 0)
                 {
-                    yield return 0;
+                    await Task.Yield();
                 }
                 if (LogInfo)
                     Logging.Log(LogTag, "Saved " + i + " character(s)");
             }
         }
 
-        private IEnumerator SaveBuildingRoutine(IBuildingSaveData buildingSaveData)
+        private async Task SaveBuildingRoutine(BuildingSaveData buildingSaveData)
         {
-            if (buildingSaveData != null && !savingBuildings.Contains(buildingSaveData.Id))
+            if (!savingBuildings.Contains(buildingSaveData.Id))
             {
                 savingBuildings.Add(buildingSaveData.Id);
-                UpdateBuildingJob job = new UpdateBuildingJob(Database, Assets.onlineScene.SceneName, buildingSaveData);
-                job.Start();
-                yield return StartCoroutine(job.WaitFor());
+                // Update building
+                await DbServiceClient.UpdateBuildingAsync(new UpdateBuildingReq()
+                {
+                    MapName = Assets.onlineScene.SceneName,
+                    BuildingData = buildingSaveData.ToBytes()
+                });
+                // Update storage items
                 StorageId storageId = new StorageId(StorageType.Building, buildingSaveData.Id);
                 if (storageItems.ContainsKey(storageId))
                 {
-                    UpdateStorageItemsJob updateStorageItemsJob = new UpdateStorageItemsJob(Database, storageId.storageType, storageId.storageOwnerId, storageItems[storageId]);
-                    updateStorageItemsJob.Start();
-                    yield return StartCoroutine(updateStorageItemsJob.WaitFor());
+                    UpdateStorageItemsReq req = new UpdateStorageItemsReq()
+                    {
+                        StorageType = (EStorageType)storageId.storageType,
+                        StorageOwnerId = storageId.storageOwnerId
+                    };
+                    DatabaseServiceUtils.CopyToRepeatedBytes(storageItems[storageId], req.StorageCharacterItems);
+                    await DbServiceClient.UpdateStorageItemsAsync(req);
                 }
                 savingBuildings.Remove(buildingSaveData.Id);
                 if (LogInfo)
@@ -117,7 +129,7 @@ namespace MultiplayerARPG.MMO
             }
         }
 
-        private IEnumerator SaveBuildingsRoutine()
+        private async void SaveBuildingsRoutine()
         {
             if (savingBuildings.Count == 0)
             {
@@ -125,12 +137,12 @@ namespace MultiplayerARPG.MMO
                 foreach (BuildingEntity buildingEntity in buildingEntities.Values)
                 {
                     if (buildingEntity == null) continue;
-                    StartCoroutine(SaveBuildingRoutine(buildingEntity.CloneTo(new BuildingSaveData())));
+                    await SaveBuildingRoutine(buildingEntity.CloneTo(new BuildingSaveData()));
                     ++i;
                 }
                 while (savingBuildings.Count > 0)
                 {
-                    yield return 0;
+                    await Task.Yield();
                 }
                 if (LogInfo)
                     Logging.Log(LogTag, "Saved " + i + " building(s)");
@@ -140,14 +152,24 @@ namespace MultiplayerARPG.MMO
         public override BuildingEntity CreateBuildingEntity(BuildingSaveData saveData, bool initialize)
         {
             if (!initialize)
-                new CreateBuildingJob(Database, Assets.onlineScene.SceneName, saveData).Start();
+            {
+                DbServiceClient.CreateBuildingAsync(new CreateBuildingReq()
+                {
+                    MapName = Assets.onlineScene.SceneName,
+                    BuildingData = saveData.ToBytes()
+                });
+            }
             return base.CreateBuildingEntity(saveData, initialize);
         }
 
         public override void DestroyBuildingEntity(string id)
         {
             base.DestroyBuildingEntity(id);
-            new DeleteBuildingJob(Database, Assets.onlineScene.SceneName, id).Start();
+            DbServiceClient.DeleteBuildingAsync(new DeleteBuildingReq()
+            {
+                MapName = Assets.onlineScene.SceneName,
+                BuildingId = id
+            });
         }
     }
 }

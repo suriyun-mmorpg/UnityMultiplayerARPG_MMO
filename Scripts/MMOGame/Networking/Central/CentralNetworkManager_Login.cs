@@ -40,18 +40,20 @@ namespace MultiplayerARPG.MMO
 
         protected void HandleRequestUserLogin(LiteNetLibMessageHandler messageHandler)
         {
-            StartCoroutine(HandleRequestUserLoginRoutine(messageHandler));
+            HandleRequestUserLoginRoutine(messageHandler);
         }
 
-        private IEnumerator HandleRequestUserLoginRoutine(LiteNetLibMessageHandler messageHandler)
+        private async void HandleRequestUserLoginRoutine(LiteNetLibMessageHandler messageHandler)
         {
             long connectionId = messageHandler.connectionId;
             RequestUserLoginMessage message = messageHandler.ReadMessage<RequestUserLoginMessage>();
             ResponseUserLoginMessage.Error error = ResponseUserLoginMessage.Error.None;
-            ValidateUserLoginJob validateJob = new ValidateUserLoginJob(Database, message.username, message.password);
-            validateJob.Start();
-            yield return StartCoroutine(validateJob.WaitFor());
-            string userId = validateJob.result;
+            ValidateUserLoginResp validateUserLoginResp = await DbServiceClient.ValidateUserLoginAsync(new ValidateUserLoginReq()
+            {
+                Username = message.username,
+                Password = message.password
+            });
+            string userId = validateUserLoginResp.UserId;
             string accessToken = string.Empty;
             if (string.IsNullOrEmpty(userId))
             {
@@ -71,9 +73,11 @@ namespace MultiplayerARPG.MMO
                 userPeerInfo.accessToken = accessToken = Regex.Replace(Convert.ToBase64String(Guid.NewGuid().ToByteArray()), "[/+=]", "");
                 userPeersByUserId[userId] = userPeerInfo;
                 userPeers[connectionId] = userPeerInfo;
-                UpdateAccessTokenJob updateAccessTokenJob = new UpdateAccessTokenJob(Database, userId, accessToken);
-                updateAccessTokenJob.Start();
-                yield return StartCoroutine(updateAccessTokenJob.WaitFor());
+                await DbServiceClient.UpdateAccessTokenAsync(new UpdateAccessTokenReq()
+                {
+                    UserId = userId,
+                    AccessToken = accessToken
+                });
             }
             ResponseUserLoginMessage responseMessage = new ResponseUserLoginMessage();
             responseMessage.ackId = message.ackId;
@@ -86,20 +90,21 @@ namespace MultiplayerARPG.MMO
 
         protected void HandleRequestUserRegister(LiteNetLibMessageHandler messageHandler)
         {
-            StartCoroutine(HandleRequestUserRegisterRoutine(messageHandler));
+            HandleRequestUserRegisterRoutine(messageHandler);
         }
 
-        private IEnumerator HandleRequestUserRegisterRoutine(LiteNetLibMessageHandler messageHandler)
+        private async void HandleRequestUserRegisterRoutine(LiteNetLibMessageHandler messageHandler)
         {
             long connectionId = messageHandler.connectionId;
             RequestUserRegisterMessage message = messageHandler.ReadMessage<RequestUserRegisterMessage>();
             ResponseUserRegisterMessage.Error error = ResponseUserRegisterMessage.Error.None;
             string username = message.username;
             string password = message.password;
-            FindUsernameJob findUsernameJob = new FindUsernameJob(Database, username);
-            findUsernameJob.Start();
-            yield return StartCoroutine(findUsernameJob.WaitFor());
-            if (findUsernameJob.result > 0)
+            FindUsernameResp findUsernameResp = await DbServiceClient.FindUsernameAsync(new FindUsernameReq()
+            {
+                Username = username
+            });
+            if (findUsernameResp.FoundAmount > 0)
                 error = ResponseUserRegisterMessage.Error.UsernameAlreadyExisted;
             else if (string.IsNullOrEmpty(username) || username.Length < minUsernameLength)
                 error = ResponseUserRegisterMessage.Error.TooShortUsername;
@@ -109,9 +114,11 @@ namespace MultiplayerARPG.MMO
                 error = ResponseUserRegisterMessage.Error.TooShortPassword;
             else
             {
-                CreateUserLoginJob createUserLoginJob = new CreateUserLoginJob(Database, username, password);
-                createUserLoginJob.Start();
-                yield return StartCoroutine(createUserLoginJob.WaitFor());
+                await DbServiceClient.CreateUserLoginAsync(new CreateUserLoginReq()
+                {
+                    Username = username,
+                    Password = password
+                });
             }
             ResponseUserRegisterMessage responseMessage = new ResponseUserRegisterMessage();
             responseMessage.ackId = message.ackId;
@@ -122,10 +129,10 @@ namespace MultiplayerARPG.MMO
 
         protected void HandleRequestUserLogout(LiteNetLibMessageHandler messageHandler)
         {
-            StartCoroutine(HandleRequestUserLogoutRoutine(messageHandler));
+            HandleRequestUserLogoutRoutine(messageHandler);
         }
 
-        private IEnumerator HandleRequestUserLogoutRoutine(LiteNetLibMessageHandler messageHandler)
+        private async void HandleRequestUserLogoutRoutine(LiteNetLibMessageHandler messageHandler)
         {
             long connectionId = messageHandler.connectionId;
             BaseAckMessage message = messageHandler.ReadMessage<BaseAckMessage>();
@@ -134,9 +141,11 @@ namespace MultiplayerARPG.MMO
             {
                 userPeersByUserId.Remove(userPeerInfo.userId);
                 userPeers.Remove(connectionId);
-                UpdateAccessTokenJob updateAccessTokenJob = new UpdateAccessTokenJob(Database, userPeerInfo.userId, string.Empty);
-                updateAccessTokenJob.Start();
-                yield return StartCoroutine(updateAccessTokenJob.WaitFor());
+                await DbServiceClient.UpdateAccessTokenAsync(new UpdateAccessTokenReq()
+                {
+                    UserId = userPeerInfo.userId,
+                    AccessToken = string.Empty
+                });
             }
             BaseAckMessage responseMessage = new BaseAckMessage();
             responseMessage.ackId = message.ackId;
@@ -146,20 +155,22 @@ namespace MultiplayerARPG.MMO
 
         protected void HandleRequestValidateAccessToken(LiteNetLibMessageHandler messageHandler)
         {
-            StartCoroutine(HandleRequestValidateAccessTokenRoutine(messageHandler));
+            HandleRequestValidateAccessTokenRoutine(messageHandler);
         }
 
-        private IEnumerator HandleRequestValidateAccessTokenRoutine(LiteNetLibMessageHandler messageHandler)
+        private async void HandleRequestValidateAccessTokenRoutine(LiteNetLibMessageHandler messageHandler)
         {
             long connectionId = messageHandler.connectionId;
             RequestValidateAccessTokenMessage message = messageHandler.ReadMessage<RequestValidateAccessTokenMessage>();
             ResponseValidateAccessTokenMessage.Error error = ResponseValidateAccessTokenMessage.Error.None;
             string userId = message.userId;
             string accessToken = message.accessToken;
-            ValidateAccessTokenJob validateAccessTokenJob = new ValidateAccessTokenJob(Database, userId, accessToken);
-            validateAccessTokenJob.Start();
-            yield return StartCoroutine(validateAccessTokenJob.WaitFor());
-            if (!validateAccessTokenJob.result)
+            ValidateAccessTokenResp validateAccessTokenResp = await DbServiceClient.ValidateAccessTokenAsync(new ValidateAccessTokenReq()
+            {
+                UserId = userId,
+                AccessToken = accessToken
+            });
+            if (!validateAccessTokenResp.IsPass)
             {
                 error = ResponseValidateAccessTokenMessage.Error.InvalidAccessToken;
                 userId = string.Empty;
@@ -179,9 +190,11 @@ namespace MultiplayerARPG.MMO
                 userPeerInfo.accessToken = accessToken = Regex.Replace(Convert.ToBase64String(Guid.NewGuid().ToByteArray()), "[/+=]", "");
                 userPeersByUserId[userId] = userPeerInfo;
                 userPeers[connectionId] = userPeerInfo;
-                UpdateAccessTokenJob updateAccessTokenJob = new UpdateAccessTokenJob(Database, userId, accessToken);
-                updateAccessTokenJob.Start();
-                yield return StartCoroutine(updateAccessTokenJob.WaitFor());
+                await DbServiceClient.UpdateAccessTokenAsync(new UpdateAccessTokenReq()
+                {
+                    UserId = userPeerInfo.userId,
+                    AccessToken = accessToken
+                });
             }
             ResponseValidateAccessTokenMessage responseMessage = new ResponseValidateAccessTokenMessage();
             responseMessage.ackId = message.ackId;

@@ -3,6 +3,7 @@ using LiteNetLibManager;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace MultiplayerARPG.MMO
@@ -35,7 +36,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
 
-            StartCoroutine(WarpCharacterRoutine(playerCharacterEntity, mapName, position));
+            WarpCharacterRoutine(playerCharacterEntity, mapName, position);
         }
 
         /// <summary>
@@ -45,7 +46,7 @@ namespace MultiplayerARPG.MMO
         /// <param name="mapName"></param>
         /// <param name="position"></param>
         /// <returns></returns>
-        private IEnumerator WarpCharacterRoutine(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position)
+        private async void WarpCharacterRoutine(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position)
         {
             // If warping to different map
             long connectionId = playerCharacterEntity.ConnectionId;
@@ -68,9 +69,9 @@ namespace MultiplayerARPG.MMO
                 savingCharacterData.CurrentPosition = position;
                 while (savingCharacters.Contains(savingCharacterData.Id))
                 {
-                    yield return null;
+                    await Task.Yield();
                 }
-                yield return StartCoroutine(SaveCharacterRoutine(savingCharacterData, playerCharacterEntity.UserId));
+                await SaveCharacterRoutine(savingCharacterData, playerCharacterEntity.UserId);
                 // Remove this character from warping list
                 playerCharacterEntity.IsWarping = false;
                 // Destroy character from server
@@ -123,7 +124,7 @@ namespace MultiplayerARPG.MMO
             CentralAppServerRegister.SendRequest(MMOMessageTypes.RequestSpawnMap, requestSpawnMapMessage, OnRequestSpawnMap);
         }
 
-        private IEnumerator WarpCharacterToInstanceRoutine(BasePlayerCharacterEntity playerCharacterEntity, string instanceId)
+        private async void WarpCharacterToInstanceRoutine(BasePlayerCharacterEntity playerCharacterEntity, string instanceId)
         {
             // If warping to different map
             long connectionId = playerCharacterEntity.ConnectionId;
@@ -145,9 +146,9 @@ namespace MultiplayerARPG.MMO
                 playerCharacterEntity.CloneTo(savingCharacterData);
                 while (savingCharacters.Contains(savingCharacterData.Id))
                 {
-                    yield return 0;
+                    await Task.Yield();
                 }
-                yield return StartCoroutine(SaveCharacterRoutine(savingCharacterData, playerCharacterEntity.UserId));
+                await SaveCharacterRoutine(savingCharacterData, playerCharacterEntity.UserId);
                 // Remove this character from warping list
                 playerCharacterEntity.IsWarping = false;
                 // Destroy character from server
@@ -193,19 +194,26 @@ namespace MultiplayerARPG.MMO
         {
             if (!CanCreateParty(playerCharacterEntity))
                 return;
-            StartCoroutine(CreatePartyRoutine(playerCharacterEntity, shareExp, shareItem));
+            CreatePartyRoutine(playerCharacterEntity, shareExp, shareItem);
         }
 
-        private IEnumerator CreatePartyRoutine(BasePlayerCharacterEntity playerCharacterEntity, bool shareExp, bool shareItem)
+        private async void CreatePartyRoutine(BasePlayerCharacterEntity playerCharacterEntity, bool shareExp, bool shareItem)
         {
-            CreatePartyJob createPartyJob = new CreatePartyJob(Database, shareExp, shareItem, playerCharacterEntity.Id);
-            createPartyJob.Start();
-            yield return StartCoroutine(createPartyJob.WaitFor());
-            int partyId = createPartyJob.result;
+            CreatePartyResp createPartyResp = await DbServiceClient.CreatePartyAsync(new CreatePartyReq()
+            {
+                LeaderCharacterId = playerCharacterEntity.Id,
+                ShareExp = shareExp,
+                ShareItem = shareItem
+            });
+            int partyId = createPartyResp.PartyId;
             // Create party
             base.CreateParty(playerCharacterEntity, shareExp, shareItem, partyId);
             // Save to database
-            new SetCharacterPartyJob(Database, playerCharacterEntity.Id, partyId).Start();
+            await DbServiceClient.UpdateCharacterPartyAsync(new UpdateCharacterPartyReq()
+            {
+                CharacterId = playerCharacterEntity.Id,
+                PartyId = partyId
+            });
             // Broadcast via chat server
             if (ChatNetworkManager.IsClientConnected)
             {
@@ -223,7 +231,11 @@ namespace MultiplayerARPG.MMO
 
             base.ChangePartyLeader(playerCharacterEntity, characterId);
             // Save to database
-            new UpdatePartyLeaderJob(Database, partyId, characterId).Start();
+            DbServiceClient.UpdatePartyLeaderAsync(new UpdatePartyLeaderReq()
+            {
+                PartyId = partyId,
+                LeaderCharacterId = characterId
+            });
             // Broadcast via chat server
             if (ChatNetworkManager.IsClientConnected)
                 ChatNetworkManager.SendChangePartyLeader(null, MMOMessageTypes.UpdateParty, partyId, characterId);
@@ -238,7 +250,12 @@ namespace MultiplayerARPG.MMO
 
             base.PartySetting(playerCharacterEntity, shareExp, shareItem);
             // Save to database
-            new UpdatePartyJob(Database, partyId, shareExp, shareItem).Start();
+            DbServiceClient.UpdatePartyAsync(new UpdatePartyReq()
+            {
+                PartyId = partyId,
+                ShareExp = shareExp,
+                ShareItem = shareItem
+            });
             // Broadcast via chat server
             if (ChatNetworkManager.IsClientConnected)
                 ChatNetworkManager.SendPartySetting(null, MMOMessageTypes.UpdateParty, partyId, shareExp, shareItem);
@@ -253,7 +270,11 @@ namespace MultiplayerARPG.MMO
 
             base.AddPartyMember(inviteCharacterEntity, acceptCharacterEntity);
             // Save to database
-            new SetCharacterPartyJob(Database, acceptCharacterEntity.Id, partyId).Start();
+            DbServiceClient.UpdateCharacterPartyAsync(new UpdateCharacterPartyReq()
+            {
+                CharacterId = acceptCharacterEntity.Id,
+                PartyId = partyId
+            });
             // Broadcast via chat server
             if (ChatNetworkManager.IsClientConnected)
                 ChatNetworkManager.SendAddSocialMember(null, MMOMessageTypes.UpdatePartyMember, partyId, acceptCharacterEntity.Id, acceptCharacterEntity.CharacterName, acceptCharacterEntity.DataId, acceptCharacterEntity.Level);
@@ -268,7 +289,11 @@ namespace MultiplayerARPG.MMO
 
             base.KickFromParty(playerCharacterEntity, characterId);
             // Save to database
-            new SetCharacterPartyJob(Database, characterId, 0).Start();
+            DbServiceClient.UpdateCharacterPartyAsync(new UpdateCharacterPartyReq()
+            {
+                CharacterId = characterId,
+                PartyId = 0
+            });
             // Broadcast via chat server
             if (ChatNetworkManager.IsClientConnected)
                 ChatNetworkManager.SendRemoveSocialMember(null, MMOMessageTypes.UpdatePartyMember, partyId, characterId);
@@ -293,14 +318,21 @@ namespace MultiplayerARPG.MMO
                         SendPartyTerminateToClient(memberCharacterEntity.ConnectionId, partyId);
                     }
                     // Save to database
-                    new SetCharacterPartyJob(Database, memberId, 0).Start();
+                    DbServiceClient.UpdateCharacterPartyAsync(new UpdateCharacterPartyReq()
+                    {
+                        CharacterId = memberId,
+                        PartyId = 0
+                    });
                     // Broadcast via chat server
                     if (ChatNetworkManager.IsClientConnected)
                         ChatNetworkManager.SendRemoveSocialMember(null, MMOMessageTypes.UpdatePartyMember, partyId, memberId);
                 }
                 parties.Remove(partyId);
                 // Save to database
-                new DeletePartyJob(Database, partyId).Start();
+                DbServiceClient.DeletePartyAsync(new DeletePartyReq()
+                {
+                    PartyId = partyId
+                });
                 // Broadcast via chat server
                 if (ChatNetworkManager.IsClientConnected)
                     ChatNetworkManager.SendPartyTerminate(null, MMOMessageTypes.UpdateParty, partyId);
@@ -313,7 +345,11 @@ namespace MultiplayerARPG.MMO
                 parties[partyId] = party;
                 SendRemovePartyMemberToClients(party, playerCharacterEntity.Id);
                 // Save to database
-                new SetCharacterPartyJob(Database, playerCharacterEntity.Id, 0).Start();
+                DbServiceClient.UpdateCharacterPartyAsync(new UpdateCharacterPartyReq()
+                {
+                    CharacterId = playerCharacterEntity.Id,
+                    PartyId = 0
+                });
                 // Broadcast via chat server
                 if (ChatNetworkManager.IsClientConnected)
                     ChatNetworkManager.SendRemoveSocialMember(null, MMOMessageTypes.UpdatePartyMember, partyId, playerCharacterEntity.Id);
@@ -324,29 +360,37 @@ namespace MultiplayerARPG.MMO
         {
             if (!CanCreateGuild(playerCharacterEntity, guildName))
                 return;
-            StartCoroutine(CreateGuildRoutine(playerCharacterEntity, guildName));
+            CreateGuildRoutine(playerCharacterEntity, guildName);
         }
 
-        private IEnumerator CreateGuildRoutine(BasePlayerCharacterEntity playerCharacterEntity, string guildName)
+        private async void CreateGuildRoutine(BasePlayerCharacterEntity playerCharacterEntity, string guildName)
         {
-            FindGuildNameJob findGuildNameJob = new FindGuildNameJob(Database, guildName);
-            findGuildNameJob.Start();
-            yield return StartCoroutine(findGuildNameJob.WaitFor());
-            if (findGuildNameJob.result > 0)
+            FindGuildNameResp findGuildNameResp = await DbServiceClient.FindGuildNameAsync(new FindGuildNameReq()
+            {
+                GuildName = guildName
+            });
+            if (findGuildNameResp.FoundAmount > 0)
             {
                 // Cannot create guild because guild name is already existed
                 SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.ExistedGuildName);
             }
             else
             {
-                CreateGuildJob createGuildJob = new CreateGuildJob(Database, guildName, playerCharacterEntity.Id);
-                createGuildJob.Start();
-                yield return StartCoroutine(createGuildJob.WaitFor());
-                int guildId = createGuildJob.result;
+                CreateGuildResp createGuildResp = await DbServiceClient.CreateGuildAsync(new CreateGuildReq()
+                {
+                    LeaderCharacterId = playerCharacterEntity.Id,
+                    GuildName = guildName
+                });
+                int guildId = createGuildResp.GuildId;
                 // Create guild
                 base.CreateGuild(playerCharacterEntity, guildName, guildId);
                 // Save to database
-                new SetCharacterGuildJob(Database, playerCharacterEntity.Id, guildId, guilds[guildId].GetMemberRole(playerCharacterEntity.Id)).Start();
+                await DbServiceClient.UpdateCharacterGuildAsync(new UpdateCharacterGuildReq()
+                {
+                    CharacterId = playerCharacterEntity.Id,
+                    GuildId = guildId,
+                    GuildRole = guilds[guildId].GetMemberRole(playerCharacterEntity.Id)
+                });
                 // Broadcast via chat server
                 if (ChatNetworkManager.IsClientConnected)
                 {
@@ -365,8 +409,16 @@ namespace MultiplayerARPG.MMO
 
             base.ChangeGuildLeader(playerCharacterEntity, characterId);
             // Save to database
-            new UpdateGuildLeaderJob(Database, guildId, characterId).Start();
-            new UpdateGuildMemberRoleJob(Database, characterId, guild.GetMemberRole(characterId)).Start();
+            DbServiceClient.UpdateGuildLeaderAsync(new UpdateGuildLeaderReq()
+            {
+                GuildId = guildId,
+                LeaderCharacterId = characterId
+            });
+            DbServiceClient.UpdateGuildMemberRoleAsync(new UpdateGuildMemberRoleReq()
+            {
+                MemberCharacterId = characterId,
+                GuildRole = guild.GetMemberRole(characterId)
+            });
             // Broadcast via chat server
             if (ChatNetworkManager.IsClientConnected)
                 ChatNetworkManager.SendChangeGuildLeader(null, MMOMessageTypes.UpdateGuild, guildId, characterId);
@@ -381,7 +433,11 @@ namespace MultiplayerARPG.MMO
 
             base.SetGuildMessage(playerCharacterEntity, guildMessage);
             // Save to database
-            new UpdateGuildMessageJob(Database, guildId, guildMessage).Start();
+            DbServiceClient.UpdateGuildMessageAsync(new UpdateGuildMessageReq()
+            {
+                GuildId = guildId,
+                GuildMessage = guildMessage
+            });
             // Broadcast via chat server
             if (ChatNetworkManager.IsClientConnected)
                 ChatNetworkManager.SendSetGuildMessage(null, MMOMessageTypes.UpdateGuild, guildId, guildMessage);
@@ -404,12 +460,24 @@ namespace MultiplayerARPG.MMO
                 {
                     memberCharacterEntity.GuildRole = guildRole;
                     // Save to database
-                    new UpdateGuildMemberRoleJob(Database, memberId, guildRole).Start();
+                    DbServiceClient.UpdateGuildMemberRoleAsync(new UpdateGuildMemberRoleReq()
+                    {
+                        MemberCharacterId = memberId,
+                        GuildRole = guildRole
+                    });
                 }
             }
             SendSetGuildRoleToClients(guild, guildRole, roleName, canInvite, canKick, shareExpPercentage);
             // Save to database
-            new UpdateGuildRoleJob(Database, guildId, guildRole, roleName, canInvite, canKick, shareExpPercentage).Start();
+            DbServiceClient.UpdateGuildRoleAsync(new UpdateGuildRoleReq()
+            {
+                GuildId = guildId,
+                GuildRole = guildRole,
+                RoleName = roleName,
+                CanInvite = canInvite,
+                CanKick = canKick,
+                ShareExpPercentage = shareExpPercentage
+            });
             // Broadcast via chat server
             if (ChatNetworkManager.IsClientConnected)
                 ChatNetworkManager.SendSetGuildRole(null, MMOMessageTypes.UpdateGuild, guildId, guildRole, roleName, canInvite, canKick, shareExpPercentage);
@@ -424,7 +492,11 @@ namespace MultiplayerARPG.MMO
 
             base.SetGuildMemberRole(playerCharacterEntity, characterId, guildRole);
             // Save to database
-            new UpdateGuildMemberRoleJob(Database, characterId, guildRole).Start();
+            DbServiceClient.UpdateGuildMemberRoleAsync(new UpdateGuildMemberRoleReq()
+            {
+                MemberCharacterId = characterId,
+                GuildRole = guildRole
+            });
             // Broadcast via chat server
             if (ChatNetworkManager.IsClientConnected)
                 ChatNetworkManager.SendSetGuildMemberRole(null, MMOMessageTypes.UpdateGuild, guildId, characterId, guildRole);
@@ -439,7 +511,12 @@ namespace MultiplayerARPG.MMO
 
             base.AddGuildMember(inviteCharacterEntity, acceptCharacterEntity);
             // Save to database
-            new SetCharacterGuildJob(Database, acceptCharacterEntity.Id, guildId, guild.GetMemberRole(acceptCharacterEntity.Id)).Start();
+            DbServiceClient.UpdateCharacterGuildAsync(new UpdateCharacterGuildReq()
+            {
+                CharacterId = acceptCharacterEntity.Id,
+                GuildId = guildId,
+                GuildRole = guild.GetMemberRole(acceptCharacterEntity.Id)
+            });
             // Broadcast via chat server
             if (ChatNetworkManager.IsClientConnected)
                 ChatNetworkManager.SendAddSocialMember(null, MMOMessageTypes.UpdateGuildMember, guildId, acceptCharacterEntity.Id, acceptCharacterEntity.CharacterName, acceptCharacterEntity.DataId, acceptCharacterEntity.Level);
@@ -454,7 +531,12 @@ namespace MultiplayerARPG.MMO
 
             base.KickFromGuild(playerCharacterEntity, characterId);
             // Save to database
-            new SetCharacterGuildJob(Database, characterId, 0, 0).Start();
+            DbServiceClient.UpdateCharacterGuildAsync(new UpdateCharacterGuildReq()
+            {
+                CharacterId = characterId,
+                GuildId = 0,
+                GuildRole = 0
+            });
             // Broadcast via chat server
             if (ChatNetworkManager.IsClientConnected)
                 ChatNetworkManager.SendRemoveSocialMember(null, MMOMessageTypes.UpdateGuildMember, guildId, characterId);
@@ -479,14 +561,22 @@ namespace MultiplayerARPG.MMO
                         SendGuildTerminateToClient(memberCharacterEntity.ConnectionId, guildId);
                     }
                     // Save to database
-                    new SetCharacterGuildJob(Database, memberId, 0, 0).Start();
+                    DbServiceClient.UpdateCharacterGuildAsync(new UpdateCharacterGuildReq()
+                    {
+                        CharacterId = memberId,
+                        GuildId = 0,
+                        GuildRole = 0
+                    });
                     // Broadcast via chat server
                     if (ChatNetworkManager.IsClientConnected)
                         ChatNetworkManager.SendRemoveSocialMember(null, MMOMessageTypes.UpdateGuildMember, guildId, memberId);
                 }
                 guilds.Remove(guildId);
                 // Save to database
-                new DeleteGuildJob(Database, guildId).Start();
+                DbServiceClient.DeleteGuildAsync(new DeleteGuildReq()
+                {
+                    GuildId = guildId
+                });
                 // Broadcast via chat server
                 if (ChatNetworkManager.IsClientConnected)
                     ChatNetworkManager.SendGuildTerminate(null, MMOMessageTypes.UpdateGuild, guildId);
@@ -499,7 +589,12 @@ namespace MultiplayerARPG.MMO
                 guilds[guildId] = guild;
                 SendRemoveGuildMemberToClients(guild, playerCharacterEntity.Id);
                 // Save to database
-                new SetCharacterGuildJob(Database, playerCharacterEntity.Id, 0, 0).Start();
+                DbServiceClient.UpdateCharacterGuildAsync(new UpdateCharacterGuildReq()
+                {
+                    CharacterId = playerCharacterEntity.Id,
+                    GuildId = 0,
+                    GuildRole = 0
+                });
                 // Broadcast via chat server
                 if (ChatNetworkManager.IsClientConnected)
                     ChatNetworkManager.SendRemoveSocialMember(null, MMOMessageTypes.UpdateGuildMember, guildId, playerCharacterEntity.Id);
@@ -512,25 +607,18 @@ namespace MultiplayerARPG.MMO
             GuildData guild;
             if (!CanIncreaseGuildExp(playerCharacterEntity, exp, out guildId, out guild))
                 return;
-            StartCoroutine(IncreaseGuildExpRoutine(playerCharacterEntity, exp, guildId, guild));
-        }
-
-        private IEnumerator IncreaseGuildExpRoutine(BasePlayerCharacterEntity playerCharacterEntity, int exp, int guildId, GuildData guild)
-        {
-            IncreaseGuildExpJob job = new IncreaseGuildExpJob(Database, guildId, exp, CurrentGameInstance.SocialSystemSetting.GuildExpTree);
-            job.Start();
-            yield return StartCoroutine(job.WaitFor());
-            if (job.result)
+            base.IncreaseGuildExp(playerCharacterEntity, exp);
+            // Save to database
+            DbServiceClient.UpdateGuildLevelAsync(new UpdateGuildLevelReq()
             {
-                guild.level = job.resultLevel;
-                guild.exp = job.resultExp;
-                guild.skillPoint = job.resultSkillPoint;
-                guilds[guildId] = guild;
-                SendGuildLevelExpSkillPointToClients(guild);
-                // Broadcast via chat server
-                if (ChatNetworkManager.IsClientConnected)
-                    ChatNetworkManager.SendGuildLevelExpSkillPoint(null, MMOMessageTypes.UpdateGuild, guildId, guild.level, guild.exp, guild.skillPoint);
-            }
+                GuildId = guildId,
+                Level = guild.level,
+                Exp = guild.exp,
+                SkillPoint = guild.skillPoint
+            });
+            // Broadcast via chat server
+            if (ChatNetworkManager.IsClientConnected)
+                ChatNetworkManager.SendGuildLevelExpSkillPoint(null, MMOMessageTypes.UpdateGuild, guildId, guild.level, guild.exp, guild.skillPoint);
         }
 
         public override void AddGuildSkill(BasePlayerCharacterEntity playerCharacterEntity, int dataId)
@@ -539,10 +627,15 @@ namespace MultiplayerARPG.MMO
             GuildData guild;
             if (!CanAddGuildSkill(playerCharacterEntity, dataId, out guildId, out guild))
                 return;
-
             base.AddGuildSkill(playerCharacterEntity, dataId);
             // Save to database
-            new UpdateGuildSkillLevelJob(Database, guildId, dataId, guild.GetSkillLevel(dataId), guild.skillPoint).Start();
+            DbServiceClient.UpdateGuildSkillLevelAsync(new UpdateGuildSkillLevelReq()
+            {
+                GuildId = guildId,
+                DataId = dataId,
+                SkillLevel = guild.GetSkillLevel(dataId),
+                SkillPoint = guild.skillPoint
+            });
             // Broadcast via chat server
             if (ChatNetworkManager.IsClientConnected)
             {
@@ -564,16 +657,16 @@ namespace MultiplayerARPG.MMO
             if (!usingStorageCharacters.ContainsKey(playerCharacterEntity.CurrentStorageId))
                 usingStorageCharacters[playerCharacterEntity.CurrentStorageId] = new HashSet<uint>();
             usingStorageCharacters[playerCharacterEntity.CurrentStorageId].Add(playerCharacterEntity.ObjectId);
-            StartCoroutine(OpenStorageRoutine(playerCharacterEntity));
+            OpenStorageRoutine(playerCharacterEntity);
         }
 
-        private IEnumerator OpenStorageRoutine(BasePlayerCharacterEntity playerCharacterEntity)
+        private async void OpenStorageRoutine(BasePlayerCharacterEntity playerCharacterEntity)
         {
             List<CharacterItem> result = new List<CharacterItem>();
             if (playerCharacterEntity.CurrentStorageId.storageType == StorageType.Guild)
             {
                 // Have to reload guild storage because it can be changed by other players in other map-server
-                yield return StartCoroutine(LoadStorageRoutine(playerCharacterEntity.CurrentStorageId));
+                await LoadStorageRoutine(playerCharacterEntity.CurrentStorageId);
             }
             result = storageItems[playerCharacterEntity.CurrentStorageId];
             // Prepare storage data
@@ -601,16 +694,16 @@ namespace MultiplayerARPG.MMO
             }
             if (!storageItems.ContainsKey(storageId))
                 storageItems[storageId] = new List<CharacterItem>();
-            StartCoroutine(MoveItemToStorageRoutine(playerCharacterEntity, storageId, nonEquipIndex, amount, storageItemIndex));
+            MoveItemToStorageRoutine(playerCharacterEntity, storageId, nonEquipIndex, amount, storageItemIndex);
         }
 
-        private IEnumerator MoveItemToStorageRoutine(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short nonEquipIndex, short amount, short storageItemIndex)
+        private async void MoveItemToStorageRoutine(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short nonEquipIndex, short amount, short storageItemIndex)
         {
             List<CharacterItem> storageItemList = new List<CharacterItem>();
             if (storageId.storageType == StorageType.Guild)
             {
                 // Have to reload guild storage because it can be changed by other players in other map-server
-                yield return StartCoroutine(LoadStorageRoutine(storageId));
+                await LoadStorageRoutine(storageId);
             }
             storageItemList = storageItems[storageId];
 
@@ -659,9 +752,13 @@ namespace MultiplayerARPG.MMO
                 if (storageId.storageType == StorageType.Guild)
                 {
                     // TODO: Have to test about race condition while running multiple-server
-                    UpdateStorageItemsJob updateStorageItemsJob = new UpdateStorageItemsJob(Database, storageId.storageType, storageId.storageOwnerId, storageItemList);
-                    updateStorageItemsJob.Start();
-                    yield return StartCoroutine(updateStorageItemsJob.WaitFor());
+                    UpdateStorageItemsReq req = new UpdateStorageItemsReq()
+                    {
+                        StorageType = (EStorageType)storageId.storageType,
+                        StorageOwnerId = storageId.storageOwnerId
+                    };
+                    DatabaseServiceUtils.CopyToRepeatedBytes(storageItemList, req.StorageCharacterItems);
+                    await DbServiceClient.UpdateStorageItemsAsync(req);
                 }
                 // Update storage items to characters that open the storage
                 UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItemList);
@@ -677,16 +774,16 @@ namespace MultiplayerARPG.MMO
             }
             if (!storageItems.ContainsKey(storageId))
                 storageItems[storageId] = new List<CharacterItem>();
-            StartCoroutine(MoveItemFromStorageRoutine(playerCharacterEntity, storageId, storageItemIndex, amount, nonEquipIndex));
+            MoveItemFromStorageRoutine(playerCharacterEntity, storageId, storageItemIndex, amount, nonEquipIndex);
         }
 
-        private IEnumerator MoveItemFromStorageRoutine(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short storageItemIndex, short amount, short nonEquipIndex)
+        private async void MoveItemFromStorageRoutine(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short storageItemIndex, short amount, short nonEquipIndex)
         {
             List<CharacterItem> storageItemList = new List<CharacterItem>();
             if (storageId.storageType == StorageType.Guild)
             {
                 // Have to reload guild storage because it can be changed by other players in other map-server
-                yield return StartCoroutine(LoadStorageRoutine(storageId));
+                await LoadStorageRoutine(storageId);
             }
             storageItemList = storageItems[storageId];
 
@@ -732,9 +829,13 @@ namespace MultiplayerARPG.MMO
                 if (storageId.storageType == StorageType.Guild)
                 {
                     // TODO: Have to test about race condition while running multiple-server
-                    UpdateStorageItemsJob updateStorageItemsJob = new UpdateStorageItemsJob(Database, storageId.storageType, storageId.storageOwnerId, storageItemList);
-                    updateStorageItemsJob.Start();
-                    yield return StartCoroutine(updateStorageItemsJob.WaitFor());
+                    UpdateStorageItemsReq req = new UpdateStorageItemsReq()
+                    {
+                        StorageType = (EStorageType)storageId.storageType,
+                        StorageOwnerId = storageId.storageOwnerId
+                    };
+                    DatabaseServiceUtils.CopyToRepeatedBytes(storageItemList, req.StorageCharacterItems);
+                    await DbServiceClient.UpdateStorageItemsAsync(req);
                 }
                 // Update storage items to characters that open the storage
                 UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItemList);
@@ -745,16 +846,16 @@ namespace MultiplayerARPG.MMO
         {
             if (!storageItems.ContainsKey(storageId))
                 storageItems[storageId] = new List<CharacterItem>();
-            StartCoroutine(IncreaseStorageItemsRoutine(storageId, addingItem, callback, minSlotIndex));
+            IncreaseStorageItemsRoutine(storageId, addingItem, callback, minSlotIndex);
         }
 
-        private IEnumerator IncreaseStorageItemsRoutine(StorageId storageId, CharacterItem addingItem, Action<bool> callback, int minSlotIndex = 0)
+        private async void IncreaseStorageItemsRoutine(StorageId storageId, CharacterItem addingItem, Action<bool> callback, int minSlotIndex = 0)
         {
             List<CharacterItem> storageItemList = new List<CharacterItem>();
             if (storageId.storageType == StorageType.Guild)
             {
                 // Have to reload guild storage because it can be changed by other players in other map-server
-                yield return StartCoroutine(LoadStorageRoutine(storageId));
+                await LoadStorageRoutine(storageId);
             }
             storageItemList = storageItems[storageId];
 
@@ -772,9 +873,13 @@ namespace MultiplayerARPG.MMO
             if (storageId.storageType == StorageType.Guild)
             {
                 // TODO: Have to test about race condition while running multiple-server
-                UpdateStorageItemsJob updateStorageItemsJob = new UpdateStorageItemsJob(Database, storageId.storageType, storageId.storageOwnerId, storageItemList);
-                updateStorageItemsJob.Start();
-                yield return StartCoroutine(updateStorageItemsJob.WaitFor());
+                UpdateStorageItemsReq req = new UpdateStorageItemsReq()
+                {
+                    StorageType = (EStorageType)storageId.storageType,
+                    StorageOwnerId = storageId.storageOwnerId
+                };
+                DatabaseServiceUtils.CopyToRepeatedBytes(storageItemList, req.StorageCharacterItems);
+                await DbServiceClient.UpdateStorageItemsAsync(req);
             }
             // Update storage items to characters that open the storage
             UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItemList);
@@ -784,16 +889,16 @@ namespace MultiplayerARPG.MMO
         {
             if (!storageItems.ContainsKey(storageId))
                 storageItems[storageId] = new List<CharacterItem>();
-            StartCoroutine(DecreaseStorageItemsRoutine(storageId, dataId, amount, callback));
+            DecreaseStorageItemsRoutine(storageId, dataId, amount, callback);
         }
 
-        private IEnumerator DecreaseStorageItemsRoutine(StorageId storageId, int dataId, short amount, Action<bool, Dictionary<CharacterItem, short>> callback)
+        private async void DecreaseStorageItemsRoutine(StorageId storageId, int dataId, short amount, Action<bool, Dictionary<CharacterItem, short>> callback)
         {
             List<CharacterItem> storageItemList = new List<CharacterItem>();
             if (storageId.storageType == StorageType.Guild)
             {
                 // Have to reload guild storage because it can be changed by other players in other map-server
-                yield return StartCoroutine(LoadStorageRoutine(storageId));
+                await LoadStorageRoutine(storageId);
             }
             storageItemList = storageItems[storageId];
 
@@ -812,9 +917,13 @@ namespace MultiplayerARPG.MMO
             if (storageId.storageType == StorageType.Guild)
             {
                 // TODO: Have to test about race condition while running multiple-server
-                UpdateStorageItemsJob updateStorageItemsJob = new UpdateStorageItemsJob(Database, storageId.storageType, storageId.storageOwnerId, storageItemList);
-                updateStorageItemsJob.Start();
-                yield return StartCoroutine(updateStorageItemsJob.WaitFor());
+                UpdateStorageItemsReq req = new UpdateStorageItemsReq()
+                {
+                    StorageType = (EStorageType)storageId.storageType,
+                    StorageOwnerId = storageId.storageOwnerId
+                };
+                DatabaseServiceUtils.CopyToRepeatedBytes(storageItemList, req.StorageCharacterItems);
+                await DbServiceClient.UpdateStorageItemsAsync(req);
             }
             // Update storage items to characters that open the storage
             UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItemList);
@@ -829,16 +938,16 @@ namespace MultiplayerARPG.MMO
             }
             if (!storageItems.ContainsKey(storageId))
                 storageItems[storageId] = new List<CharacterItem>();
-            StartCoroutine(SwapOrMergeStorageItemRoutine(playerCharacterEntity, storageId, fromIndex, toIndex));
+            SwapOrMergeStorageItemRoutine(playerCharacterEntity, storageId, fromIndex, toIndex);
         }
 
-        private IEnumerator SwapOrMergeStorageItemRoutine(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short fromIndex, short toIndex)
+        private async void SwapOrMergeStorageItemRoutine(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short fromIndex, short toIndex)
         {
             List<CharacterItem> storageItemList = new List<CharacterItem>();
             if (storageId.storageType == StorageType.Guild)
             {
                 // Have to reload guild storage because it can be changed by other players in other map-server
-                yield return StartCoroutine(LoadStorageRoutine(storageId));
+                await LoadStorageRoutine(storageId);
             }
             storageItemList = storageItems[storageId];
 
@@ -887,9 +996,13 @@ namespace MultiplayerARPG.MMO
                 if (storageId.storageType == StorageType.Guild)
                 {
                     // TODO: Have to test about race condition while running multiple-server
-                    UpdateStorageItemsJob updateStorageItemsJob = new UpdateStorageItemsJob(Database, storageId.storageType, storageId.storageOwnerId, storageItemList);
-                    updateStorageItemsJob.Start();
-                    yield return StartCoroutine(updateStorageItemsJob.WaitFor());
+                    UpdateStorageItemsReq req = new UpdateStorageItemsReq()
+                    {
+                        StorageType = (EStorageType)storageId.storageType,
+                        StorageOwnerId = storageId.storageOwnerId
+                    };
+                    DatabaseServiceUtils.CopyToRepeatedBytes(storageItemList, req.StorageCharacterItems);
+                    await DbServiceClient.UpdateStorageItemsAsync(req);
                 }
                 // Update storage items to characters that open the storage
                 UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItemList);
@@ -930,18 +1043,27 @@ namespace MultiplayerARPG.MMO
 
         public override void DepositGold(BasePlayerCharacterEntity playerCharacterEntity, int amount)
         {
-            StartCoroutine(DepositGoldRoutine(playerCharacterEntity, amount));
+            DepositGoldRoutine(playerCharacterEntity, amount);
         }
 
-        private IEnumerator DepositGoldRoutine(BasePlayerCharacterEntity playerCharacterEntity, int amount)
+        private async void DepositGoldRoutine(BasePlayerCharacterEntity playerCharacterEntity, int amount)
         {
             if (playerCharacterEntity.Gold - amount >= 0)
             {
+                // Get gold amount
+                GoldResp goldResp = await DbServiceClient.GetGoldAsync(new GetGoldReq()
+                {
+                    UserId = playerCharacterEntity.UserId
+                });
+                int gold = goldResp.Gold + amount;
+                // Update gold amount
+                await DbServiceClient.UpdateGoldAsync(new UpdateGoldReq()
+                {
+                    UserId = playerCharacterEntity.UserId,
+                    Amount = gold
+                });
+                playerCharacterEntity.UserGold = gold;
                 playerCharacterEntity.Gold -= amount;
-                IncreaseGoldJob increaseGoldJob = new IncreaseGoldJob(Database, playerCharacterEntity.UserId, amount);
-                increaseGoldJob.Start();
-                yield return StartCoroutine(increaseGoldJob.WaitFor());
-                playerCharacterEntity.UserGold = increaseGoldJob.result;
             }
             else
                 SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotEnoughGoldToDeposit);
@@ -949,20 +1071,26 @@ namespace MultiplayerARPG.MMO
 
         public override void WithdrawGold(BasePlayerCharacterEntity playerCharacterEntity, int amount)
         {
-            StartCoroutine(WithdrawGoldRoutine(playerCharacterEntity, amount));
+            WithdrawGoldRoutine(playerCharacterEntity, amount);
         }
 
-        private IEnumerator WithdrawGoldRoutine(BasePlayerCharacterEntity playerCharacterEntity, int amount)
+        private async void WithdrawGoldRoutine(BasePlayerCharacterEntity playerCharacterEntity, int amount)
         {
-            GetGoldJob getGoldJob = new GetGoldJob(Database, playerCharacterEntity.UserId);
-            getGoldJob.Start();
-            yield return StartCoroutine(getGoldJob.WaitFor());
-            if (getGoldJob.result - amount >= 0)
+            // Get gold amount
+            GoldResp goldResp = await DbServiceClient.GetGoldAsync(new GetGoldReq()
             {
-                DecreaseGoldJob decreaseGoldJob = new DecreaseGoldJob(Database, playerCharacterEntity.UserId, amount);
-                decreaseGoldJob.Start();
-                yield return StartCoroutine(decreaseGoldJob.WaitFor());
-                playerCharacterEntity.UserGold = decreaseGoldJob.result;
+                UserId = playerCharacterEntity.UserId
+            });
+            int gold = goldResp.Gold - amount;
+            if (gold >= 0)
+            {
+                // Update gold amount
+                await DbServiceClient.UpdateGoldAsync(new UpdateGoldReq()
+                {
+                    UserId = playerCharacterEntity.UserId,
+                    Amount = gold
+                });
+                playerCharacterEntity.UserGold = gold;
                 playerCharacterEntity.Gold += amount;
             }
             else
@@ -971,21 +1099,30 @@ namespace MultiplayerARPG.MMO
 
         public override void DepositGuildGold(BasePlayerCharacterEntity playerCharacterEntity, int amount)
         {
-            StartCoroutine(DepositGuildGoldRoutine(playerCharacterEntity, amount));
+            DepositGuildGoldRoutine(playerCharacterEntity, amount);
         }
 
-        private IEnumerator DepositGuildGoldRoutine(BasePlayerCharacterEntity playerCharacterEntity, int amount)
+        private async void DepositGuildGoldRoutine(BasePlayerCharacterEntity playerCharacterEntity, int amount)
         {
             GuildData guild;
             if (guilds.TryGetValue(playerCharacterEntity.GuildId, out guild))
             {
                 if (playerCharacterEntity.Gold - amount >= 0)
                 {
+                    // Get gold amount
+                    GuildGoldResp goldResp = await DbServiceClient.GetGuildGoldAsync(new GetGuildGoldReq()
+                    {
+                        GuildId = playerCharacterEntity.GuildId
+                    });
+                    int gold = goldResp.GuildGold + amount;
+                    // Update gold amount
+                    await DbServiceClient.UpdateGuildGoldAsync(new UpdateGuildGoldReq()
+                    {
+                        GuildId = playerCharacterEntity.GuildId,
+                        Amount = gold
+                    });
+                    guild.gold = gold;
                     playerCharacterEntity.Gold -= amount;
-                    IncreaseGuildGoldJob increaseGuildGoldJob = new IncreaseGuildGoldJob(Database, playerCharacterEntity.GuildId, amount);
-                    increaseGuildGoldJob.Start();
-                    yield return StartCoroutine(increaseGuildGoldJob.WaitFor());
-                    guild.gold = increaseGuildGoldJob.result;
                     guilds[playerCharacterEntity.GuildId] = guild;
                     SendSetGuildGoldToClients(guild);
                 }
@@ -998,22 +1135,29 @@ namespace MultiplayerARPG.MMO
 
         public override void WithdrawGuildGold(BasePlayerCharacterEntity playerCharacterEntity, int amount)
         {
-            StartCoroutine(WithdrawGuildGoldRoutine(playerCharacterEntity, amount));
+            WithdrawGuildGoldRoutine(playerCharacterEntity, amount);
         }
 
-        private IEnumerator WithdrawGuildGoldRoutine(BasePlayerCharacterEntity playerCharacterEntity, int amount)
+        private async void WithdrawGuildGoldRoutine(BasePlayerCharacterEntity playerCharacterEntity, int amount)
         {
             GuildData guild;
             if (guilds.TryGetValue(playerCharacterEntity.GuildId, out guild))
             {
-                GetGuildGoldJob getGuildGoldJob = new GetGuildGoldJob(Database, playerCharacterEntity.GuildId);
-                getGuildGoldJob.Start();
-                yield return StartCoroutine(getGuildGoldJob.WaitFor());
-                if (getGuildGoldJob.result - amount >= 0)
+                // Get gold amount
+                GuildGoldResp goldResp = await DbServiceClient.GetGuildGoldAsync(new GetGuildGoldReq()
                 {
-                    DecreaseGuildGoldJob decreaseGuildGoldJob = new DecreaseGuildGoldJob(Database, playerCharacterEntity.GuildId, amount);
-                    decreaseGuildGoldJob.Start();
-                    guild.gold = decreaseGuildGoldJob.result;
+                    GuildId = playerCharacterEntity.GuildId
+                });
+                int gold = goldResp.GuildGold - amount;
+                if (gold >= 0)
+                {
+                    // Update gold amount
+                    await DbServiceClient.UpdateGoldAsync(new UpdateGoldReq()
+                    {
+                        UserId = playerCharacterEntity.UserId,
+                        Amount = gold
+                    });
+                    guild.gold = gold;
                     playerCharacterEntity.Gold += amount;
                     guilds[playerCharacterEntity.GuildId] = guild;
                     SendSetGuildGoldToClients(guild);
@@ -1027,61 +1171,60 @@ namespace MultiplayerARPG.MMO
 
         public override void FindCharacters(BasePlayerCharacterEntity playerCharacterEntity, string characterName)
         {
-            StartCoroutine(FindCharactersRoutine(playerCharacterEntity, characterName));
+            FindCharactersRoutine(playerCharacterEntity, characterName);
         }
 
-        private IEnumerator FindCharactersRoutine(BasePlayerCharacterEntity playerCharacterEntity, string characterName)
+        private async void FindCharactersRoutine(BasePlayerCharacterEntity playerCharacterEntity, string characterName)
         {
-            FindCharactersJob job = new FindCharactersJob(Database, characterName);
-            job.Start();
-            yield return StartCoroutine(job.WaitFor());
-            SocialCharacterData[] characters = new SocialCharacterData[job.result.Count];
-            SocialCharacterData tempCharacter;
-            for (int i = 0; i < job.result.Count; ++i)
+            FindCharactersResp resp = await DbServiceClient.FindCharactersAsync(new FindCharactersReq()
             {
-                tempCharacter = job.result[i];
-                characters[i] = tempCharacter;
-            }
-            SendUpdateFoundCharactersToClient(playerCharacterEntity.ConnectionId, characters);
+                CharacterName = characterName
+            });
+            SendUpdateFoundCharactersToClient(playerCharacterEntity.ConnectionId, resp.List.MakeArrayFromRepeatedBytes<SocialCharacterData>());
         }
 
         public override void AddFriend(BasePlayerCharacterEntity playerCharacterEntity, string friendCharacterId)
         {
-            StartCoroutine(AddFriendRoutine(playerCharacterEntity, friendCharacterId));
+            AddFriendRoutine(playerCharacterEntity, friendCharacterId);
         }
 
-        private IEnumerator AddFriendRoutine(BasePlayerCharacterEntity playerCharacterEntity, string friendCharacterId)
+        private async void AddFriendRoutine(BasePlayerCharacterEntity playerCharacterEntity, string friendCharacterId)
         {
-            CreateFriendJob job = new CreateFriendJob(Database, playerCharacterEntity.Id, friendCharacterId);
-            job.Start();
-            yield return StartCoroutine(job.WaitFor());
+            await DbServiceClient.CreateFriendAsync(new CreateFriendReq()
+            {
+                CharacterId1 = playerCharacterEntity.Id,
+                CharacterId2 = friendCharacterId
+            });
             GetFriends(playerCharacterEntity);
         }
 
         public override void RemoveFriend(BasePlayerCharacterEntity playerCharacterEntity, string friendCharacterId)
         {
-            StartCoroutine(RemoveFriendRoutine(playerCharacterEntity, friendCharacterId));
+            RemoveFriendRoutine(playerCharacterEntity, friendCharacterId);
         }
 
-        private IEnumerator RemoveFriendRoutine(BasePlayerCharacterEntity playerCharacterEntity, string friendCharacterId)
+        private async void RemoveFriendRoutine(BasePlayerCharacterEntity playerCharacterEntity, string friendCharacterId)
         {
-            DeleteFriendJob job = new DeleteFriendJob(Database, playerCharacterEntity.Id, friendCharacterId);
-            job.Start();
-            yield return StartCoroutine(job.WaitFor());
+            await DbServiceClient.DeleteFriendAsync(new DeleteFriendReq()
+            {
+                CharacterId1 = playerCharacterEntity.Id,
+                CharacterId2 = friendCharacterId
+            });
             GetFriends(playerCharacterEntity);
         }
 
         public override void GetFriends(BasePlayerCharacterEntity playerCharacterEntity)
         {
-            StartCoroutine(GetFriendsRoutine(playerCharacterEntity));
+            GetFriendsRoutine(playerCharacterEntity);
         }
 
-        private IEnumerator GetFriendsRoutine(BasePlayerCharacterEntity playerCharacterEntity)
+        private async void GetFriendsRoutine(BasePlayerCharacterEntity playerCharacterEntity)
         {
-            ReadFriendsJob job = new ReadFriendsJob(Database, playerCharacterEntity.Id);
-            job.Start();
-            yield return StartCoroutine(job.WaitFor());
-            SendUpdateFriendsToClient(playerCharacterEntity.ConnectionId, job.result.ToArray());
+            ReadFriendsResp readFriendsResp = await DbServiceClient.ReadFriendsAsync(new ReadFriendsReq()
+            {
+                CharacterId = playerCharacterEntity.Id
+            });
+            SendUpdateFriendsToClient(playerCharacterEntity.ConnectionId, readFriendsResp.List.MakeArrayFromRepeatedBytes<SocialCharacterData>());
         }
     }
 }

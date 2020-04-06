@@ -51,6 +51,11 @@ namespace MultiplayerARPG.MMO
         public const string ARG_CHAT_PORT = "-" + CONFIG_CHAT_PORT;
         public const string CONFIG_CHAT_MAX_CONNECTIONS = "chatMaxConnections";
         public const string ARG_CHAT_MAX_CONNECTIONS = "-" + CONFIG_CHAT_MAX_CONNECTIONS;
+        // Database manager server
+        public const string CONFIG_DATABASE_MANAGER_ADDRESS = "databaseManagerAddress";
+        public const string ARG_DATABASE_MANAGER_ADDRESS = "-" + CONFIG_DATABASE_MANAGER_ADDRESS;
+        public const string CONFIG_DATABASE_MANAGER_PORT = "databaseManagerPort";
+        public const string ARG_DATABASE_MANAGER_PORT = "-" + CONFIG_DATABASE_MANAGER_PORT;
         // Start servers
         public const string CONFIG_START_CENTRAL_SERVER = "startCentralServer";
         public const string ARG_START_CENTRAL_SERVER = "-" + CONFIG_START_CENTRAL_SERVER;
@@ -60,6 +65,8 @@ namespace MultiplayerARPG.MMO
         public const string ARG_START_MAP_SERVER = "-" + CONFIG_START_MAP_SERVER;
         public const string CONFIG_START_CHAT_SERVER = "startChatServer";
         public const string ARG_START_CHAT_SERVER = "-" + CONFIG_START_CHAT_SERVER;
+        public const string CONFIG_START_DATABASE_MANAGER_SERVER = "startDatabaseManagerServer";
+        public const string ARG_START_DATABASE_MANAGER_SERVER = "-" + CONFIG_START_DATABASE_MANAGER_SERVER;
 
         [Header("Server Components")]
         [SerializeField]
@@ -70,20 +77,18 @@ namespace MultiplayerARPG.MMO
         private MapNetworkManager mapNetworkManager;
         [SerializeField]
         private ChatNetworkManager chatNetworkManager;
+        [SerializeField]
+        private DatabaseNetworkManager databaseNetworkManager;
 
         [Header("Settings")]
         [SerializeField]
         private bool useWebSocket = false;
-        [SerializeField]
-        private BaseDatabase database;
-        [SerializeField]
-        private BaseDatabase[] databaseOptions;
 
         public CentralNetworkManager CentralNetworkManager { get { return centralNetworkManager; } }
         public MapSpawnNetworkManager MapSpawnNetworkManager { get { return mapSpawnNetworkManager; } }
         public MapNetworkManager MapNetworkManager { get { return mapNetworkManager; } }
         public ChatNetworkManager ChatNetworkManager { get { return chatNetworkManager; } }
-        public BaseDatabase Database { get { return database; } }
+        public DatabaseNetworkManager DatabaseNetworkManager { get { return databaseNetworkManager; } }
         public bool UseWebSocket { get { return useWebSocket; } }
 
         private LogGUI cacheLogGUI;
@@ -101,6 +106,7 @@ namespace MultiplayerARPG.MMO
         public bool startCentralOnAwake;
         public bool startMapSpawnOnAwake;
         public bool startChatOnAwake;
+        public bool startDatabaseManagerOnAwake;
         public bool startMapOnAwake;
         public BaseMapInfo startingMap;
         public int databaseOptionIndex;
@@ -111,6 +117,7 @@ namespace MultiplayerARPG.MMO
         private bool startingMapSpawnServer;
         private bool startingMapServer;
         private bool startingChatServer;
+        private bool startingDatabaseServer;
 
         private void Awake()
         {
@@ -159,11 +166,7 @@ namespace MultiplayerARPG.MMO
                 if (ConfigReader.ReadArgs(args, ARG_DATABASE_OPTION_INDEX, out dbOptionIndex, -1) ||
                     ConfigReader.ReadConfigs(jsonConfig, CONFIG_DATABASE_OPTION_INDEX, out dbOptionIndex, -1))
                 {
-                    if (databaseOptions != null &&
-                        databaseOptions.Length > 0 &&
-                        dbOptionIndex >= 0 &&
-                        dbOptionIndex < databaseOptions.Length)
-                        database = databaseOptions[dbOptionIndex];
+                    DatabaseNetworkManager.SetDatabaseByOptionIndex(dbOptionIndex);
                 }
 
                 // Central network address
@@ -361,11 +364,7 @@ namespace MultiplayerARPG.MMO
                     gameInstance.OnGameDataLoaded();
                 });
 
-                if (databaseOptions != null &&
-                    databaseOptions.Length > 0 &&
-                    databaseOptionIndex >= 0 &&
-                    databaseOptionIndex < databaseOptions.Length)
-                    database = databaseOptions[databaseOptionIndex];
+                DatabaseNetworkManager.SetDatabaseByOptionIndex(databaseOptionIndex);
 
                 if (startCentralOnAwake)
                     startingCentralServer = true;
@@ -383,16 +382,6 @@ namespace MultiplayerARPG.MMO
                     startingMapId = startingMap.Id;
                     startingMapServer = true;
                 }
-            }
-
-            // Initialize database when any server starting
-            if (startingCentralServer ||
-                startingMapSpawnServer ||
-                startingChatServer ||
-                startingMapServer)
-            {
-                if (database != null)
-                    database.Initialize();
             }
         }
 
@@ -429,12 +418,19 @@ namespace MultiplayerARPG.MMO
 
             if (startingChatServer)
                 StartChatServer();
-        }
 
-        private void OnDestroy()
-        {
-            if (database != null)
-                database.Destroy();
+            if (startingDatabaseServer)
+                StartDatabaseManagerServer();
+
+            if (startingCentralServer ||
+                startingMapSpawnServer ||
+                startingChatServer ||
+                startingMapServer)
+            {
+                // Start database manager client, it will connect to database manager server
+                // To request database functions
+                StartDatabaseManagerClient();
+            }
         }
 
         #region Server functions
@@ -456,6 +452,16 @@ namespace MultiplayerARPG.MMO
         public void StartChatServer()
         {
             chatNetworkManager.StartServer();
+        }
+
+        public void StartDatabaseManagerServer()
+        {
+            DatabaseNetworkManager.StartServer();
+        }
+
+        public void StartDatabaseManagerClient()
+        {
+            DatabaseNetworkManager.StartClient();
         }
         #endregion
     }

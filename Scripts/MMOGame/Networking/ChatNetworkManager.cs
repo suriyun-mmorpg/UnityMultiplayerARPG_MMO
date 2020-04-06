@@ -13,11 +13,6 @@ namespace MultiplayerARPG.MMO
         public int centralNetworkPort = 6000;
         public string machineAddress = "127.0.0.1";
 
-        public BaseDatabase Database
-        {
-            get { return MMOServerInstance.Singleton.Database; }
-        }
-
         public BaseTransportFactory CentralTransportFactory
         {
             get { return centralTransportFactory; }
