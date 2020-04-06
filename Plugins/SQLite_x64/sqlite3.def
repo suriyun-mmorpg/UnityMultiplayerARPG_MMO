@@ -74,6 +74,7 @@ sqlite3_create_function_v2
 sqlite3_create_function16
 sqlite3_create_module
 sqlite3_create_module_v2
+sqlite3_create_window_function
 sqlite3_data_count
 sqlite3_data_directory
 sqlite3_db_cacheflush
@@ -85,6 +86,8 @@ sqlite3_db_readonly
 sqlite3_db_release_memory
 sqlite3_db_status
 sqlite3_declare_vtab
+sqlite3_deserialize
+sqlite3_drop_modules
 sqlite3_enable_load_extension
 sqlite3_enable_shared_cache
 sqlite3_errcode
@@ -97,14 +100,19 @@ sqlite3_expired
 sqlite3_extended_errcode
 sqlite3_extended_result_codes
 sqlite3_file_control
+sqlite3_filename_database
+sqlite3_filename_journal
+sqlite3_filename_wal
 sqlite3_finalize
 sqlite3_free
 sqlite3_free_table
+sqlite3_fts3_may_be_corrupt
 sqlite3_fts5_may_be_corrupt
 sqlite3_get_autocommit
 sqlite3_get_auxdata
 sqlite3_get_table
 sqlite3_global_recover
+sqlite3_hard_heap_limit64
 sqlite3_initialize
 sqlite3_interrupt
 sqlite3_keyword_check
@@ -173,6 +181,7 @@ sqlite3_result_zeroblob64
 sqlite3_rollback_hook
 sqlite3_rtree_geometry_callback
 sqlite3_rtree_query_callback
+sqlite3_serialize
 sqlite3_set_authorizer
 sqlite3_set_auxdata
 sqlite3_set_last_insert_rowid
@@ -187,6 +196,7 @@ sqlite3_status
 sqlite3_status64
 sqlite3_step
 sqlite3_stmt_busy
+sqlite3_stmt_isexplain
 sqlite3_stmt_readonly
 sqlite3_stmt_status
 sqlite3_str_append
@@ -217,6 +227,7 @@ sqlite3_transfer_bindings
 sqlite3_update_hook
 sqlite3_uri_boolean
 sqlite3_uri_int64
+sqlite3_uri_key
 sqlite3_uri_parameter
 sqlite3_user_data
 sqlite3_value_blob
@@ -225,6 +236,7 @@ sqlite3_value_bytes16
 sqlite3_value_double
 sqlite3_value_dup
 sqlite3_value_free
+sqlite3_value_frombind
 sqlite3_value_int
 sqlite3_value_int64
 sqlite3_value_nochange
