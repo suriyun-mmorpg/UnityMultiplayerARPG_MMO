@@ -75,34 +75,13 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public override bool IncreaseGuildExp(int id, int increaseExp, int[] expTree, out short resultLevel, out int resultExp, out short resultSkillPoint)
+        public override void UpdateGuildLevel(int id, short level, int exp, short skillPoint)
         {
-            resultLevel = 1;
-            resultExp = 0;
-            resultSkillPoint = 0;
-
-            SQLiteRowsReader reader = ExecuteReader("UPDATE guild SET exp=exp+@increaseExp WHERE id=@id;" +
-                "SELECT level, exp, skillPoint FROM guild WHERE id=@id LIMIT 1;",
-                new SqliteParameter("@increaseExp", increaseExp),
+            ExecuteNonQuery("UPDATE guild SET level=@level, exp=@exp, skillPoint=@skillPoint WHERE id=@id",
+                new SqliteParameter("@level", level),
+                new SqliteParameter("@exp", exp),
+                new SqliteParameter("@skillPoint", skillPoint),
                 new SqliteParameter("@id", id));
-            if (reader.Read())
-            {
-                resultLevel = reader.GetInt16("level");
-                resultExp = reader.GetInt32("exp");
-                resultSkillPoint = reader.GetInt16("skillPoint");
-                // Update when guild level is increase
-                if (SocialSystemSetting.CalculateIncreasedGuildExp(expTree, resultLevel, resultExp, resultSkillPoint, out resultLevel, out resultExp, out resultSkillPoint))
-                {
-                    ExecuteNonQuery("UPDATE guild SET level=@level, exp=@exp, skillPoint=@skillPoint WHERE id=@id",
-                        new SqliteParameter("@level", resultLevel),
-                        new SqliteParameter("@exp", resultExp),
-                        new SqliteParameter("@skillPoint", resultSkillPoint),
-                        new SqliteParameter("@id", id));
-                }
-                // Return true if success
-                return true;
-            }
-            return false;
         }
 
         public override void UpdateGuildLeader(int id, string leaderId)
@@ -188,27 +167,11 @@ namespace MultiplayerARPG.MMO
             return gold;
         }
 
-        public override int IncreaseGuildGold(int guildId, int amount)
+        public override void UpdateGuildGold(int guildId, int gold)
         {
-            int gold = GetGuildGold(guildId);
-            gold += amount;
             ExecuteNonQuery("UPDATE guild SET gold=@gold WHERE id=@id",
                 new SqliteParameter("@id", guildId),
                 new SqliteParameter("@gold", gold));
-            return gold;
-        }
-
-        public override int DecreaseGuildGold(int guildId, int amount)
-        {
-            int gold = GetGuildGold(guildId);
-            if (gold - amount >= 0)
-            {
-                gold -= amount;
-                ExecuteNonQuery("UPDATE guild SET gold=@gold WHERE id=@id",
-                    new SqliteParameter("@id", guildId),
-                    new SqliteParameter("@gold", gold));
-            }
-            return gold;
         }
     }
 }
