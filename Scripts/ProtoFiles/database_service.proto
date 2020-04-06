@@ -165,7 +165,7 @@ message ReadCharactersReq {
     string user_id = 1;
 }
 message ReadCharactersResp {
-    repeated bytes character_data = 1;
+    repeated bytes list = 1;
 }
 // Update character
 message UpdateCharacterReq {
@@ -188,7 +188,7 @@ message FindCharactersReq {
     string character_name = 1;
 }
 message FindCharactersResp {
-    repeated bytes social_character_data = 1;
+    repeated bytes list = 1;
 }
 // Create friend
 message CreateFriendReq {
@@ -205,7 +205,7 @@ message ReadFriendsReq {
     string character_id = 1;
 }
 message ReadFriendsResp {
-    repeated bytes social_character_data = 1;
+    repeated bytes list = 1;
 }
 // Create building
 message CreateBuildingReq {
@@ -227,7 +227,7 @@ message ReadBuildingsReq {
     string map_name = 1;
 }
 message ReadBuildingsResp {
-    repeated bytes building_data = 1;
+    repeated bytes list = 1;
 }
 // Create party
 message CreatePartyReq {
