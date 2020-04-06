@@ -5,16 +5,16 @@ using LiteNetLib.Utils;
 
 namespace MultiplayerARPG.MMO
 {
-    public class DatabaseServiceUtils
+    public static class DatabaseServiceUtils
     {
-        public static T FromBytes<T>(ByteString byteStr)
+        public static T FromBytes<T>(this ByteString byteStr)
             where T : INetSerializable
         {
             NetDataReader reader = new NetDataReader(byteStr.ToByteArray());
             return reader.GetValue<T>();
         }
 
-        public static ByteString ToBytes<T>(T data)
+        public static ByteString ToBytes<T>(this T data)
             where T : INetSerializable
         {
             NetDataWriter writer = new NetDataWriter();
@@ -22,7 +22,7 @@ namespace MultiplayerARPG.MMO
             return ByteString.CopyFrom(writer.Data);
         }
 
-        public static void CopyToRepeatedBytes<T>(T[] from, RepeatedField<ByteString> to)
+        public static void CopyToRepeatedBytes<T>(this T[] from, RepeatedField<ByteString> to)
             where T : INetSerializable
         {
             to.Clear();
@@ -32,7 +32,7 @@ namespace MultiplayerARPG.MMO
             }
         }
 
-        public static void CopyToRepeatedBytes<T>(List<T> from, RepeatedField<ByteString> to)
+        public static void CopyToRepeatedBytes<T>(this List<T> from, RepeatedField<ByteString> to)
             where T : INetSerializable
         {
             to.Clear();
@@ -42,7 +42,7 @@ namespace MultiplayerARPG.MMO
             }
         }
 
-        public static T[] MakeArrayFromRepeatedBytes<T>(RepeatedField<ByteString> from)
+        public static T[] MakeArrayFromRepeatedBytes<T>(this RepeatedField<ByteString> from)
             where T : INetSerializable
         {
             T[] to = new T[from.Count];
@@ -53,7 +53,7 @@ namespace MultiplayerARPG.MMO
             return to;
         }
 
-        public static List<T> MakeListFromRepeatedBytes<T>(RepeatedField<ByteString> from)
+        public static List<T> MakeListFromRepeatedBytes<T>(this RepeatedField<ByteString> from)
             where T : INetSerializable
         {
             List<T> to = new List<T>();
