@@ -19,14 +19,12 @@ public static partial class DatabaseService
   static readonly grpc::Marshaller<global::GetUserLevelResp> __Marshaller_GetUserLevelResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::GetUserLevelResp.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::GetGoldReq> __Marshaller_GetGoldReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::GetGoldReq.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::GoldResp> __Marshaller_GoldResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::GoldResp.Parser.ParseFrom);
-  static readonly grpc::Marshaller<global::IncreaseGoldReq> __Marshaller_IncreaseGoldReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::IncreaseGoldReq.Parser.ParseFrom);
-  static readonly grpc::Marshaller<global::DecreaseGoldReq> __Marshaller_DecreaseGoldReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::DecreaseGoldReq.Parser.ParseFrom);
+  static readonly grpc::Marshaller<global::UpdateGoldReq> __Marshaller_UpdateGoldReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::UpdateGoldReq.Parser.ParseFrom);
+  static readonly grpc::Marshaller<global::VoidResp> __Marshaller_VoidResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::VoidResp.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::GetCashReq> __Marshaller_GetCashReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::GetCashReq.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::CashResp> __Marshaller_CashResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::CashResp.Parser.ParseFrom);
-  static readonly grpc::Marshaller<global::IncreaseCashReq> __Marshaller_IncreaseCashReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::IncreaseCashReq.Parser.ParseFrom);
-  static readonly grpc::Marshaller<global::DecreaseCashReq> __Marshaller_DecreaseCashReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::DecreaseCashReq.Parser.ParseFrom);
+  static readonly grpc::Marshaller<global::UpdateCashReq> __Marshaller_UpdateCashReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::UpdateCashReq.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::UpdateAccessTokenReq> __Marshaller_UpdateAccessTokenReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::UpdateAccessTokenReq.Parser.ParseFrom);
-  static readonly grpc::Marshaller<global::VoidResp> __Marshaller_VoidResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::VoidResp.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::CreateUserLoginReq> __Marshaller_CreateUserLoginReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::CreateUserLoginReq.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::FindUsernameReq> __Marshaller_FindUsernameReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::FindUsernameReq.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::FindUsernameResp> __Marshaller_FindUsernameResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::FindUsernameResp.Parser.ParseFrom);
@@ -60,8 +58,7 @@ public static partial class DatabaseService
   static readonly grpc::Marshaller<global::ReadPartyResp> __Marshaller_ReadPartyResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::ReadPartyResp.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::CreateGuildReq> __Marshaller_CreateGuildReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::CreateGuildReq.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::CreateGuildResp> __Marshaller_CreateGuildResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::CreateGuildResp.Parser.ParseFrom);
-  static readonly grpc::Marshaller<global::IncreaseGuildExpReq> __Marshaller_IncreaseGuildExpReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::IncreaseGuildExpReq.Parser.ParseFrom);
-  static readonly grpc::Marshaller<global::IncreaseGuildExpResp> __Marshaller_IncreaseGuildExpResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::IncreaseGuildExpResp.Parser.ParseFrom);
+  static readonly grpc::Marshaller<global::UpdateGuildLevelReq> __Marshaller_UpdateGuildLevelReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::UpdateGuildLevelReq.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::UpdateGuildLeaderReq> __Marshaller_UpdateGuildLeaderReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::UpdateGuildLeaderReq.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::UpdateGuildMessageReq> __Marshaller_UpdateGuildMessageReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::UpdateGuildMessageReq.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::UpdateGuildRoleReq> __Marshaller_UpdateGuildRoleReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::UpdateGuildRoleReq.Parser.ParseFrom);
@@ -75,8 +72,7 @@ public static partial class DatabaseService
   static readonly grpc::Marshaller<global::ReadGuildResp> __Marshaller_ReadGuildResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::ReadGuildResp.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::GetGuildGoldReq> __Marshaller_GetGuildGoldReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::GetGuildGoldReq.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::GuildGoldResp> __Marshaller_GuildGoldResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::GuildGoldResp.Parser.ParseFrom);
-  static readonly grpc::Marshaller<global::IncreaseGuildGoldReq> __Marshaller_IncreaseGuildGoldReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::IncreaseGuildGoldReq.Parser.ParseFrom);
-  static readonly grpc::Marshaller<global::DecreaseGuildGoldReq> __Marshaller_DecreaseGuildGoldReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::DecreaseGuildGoldReq.Parser.ParseFrom);
+  static readonly grpc::Marshaller<global::UpdateGuildGoldReq> __Marshaller_UpdateGuildGoldReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::UpdateGuildGoldReq.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::UpdateStorageItemsReq> __Marshaller_UpdateStorageItemsReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::UpdateStorageItemsReq.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::ReadStorageItemsReq> __Marshaller_ReadStorageItemsReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::ReadStorageItemsReq.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::ReadStorageItemsResp> __Marshaller_ReadStorageItemsResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::ReadStorageItemsResp.Parser.ParseFrom);
@@ -109,19 +105,12 @@ public static partial class DatabaseService
       __Marshaller_GetGoldReq,
       __Marshaller_GoldResp);
 
-  static readonly grpc::Method<global::IncreaseGoldReq, global::GoldResp> __Method_IncreaseGold = new grpc::Method<global::IncreaseGoldReq, global::GoldResp>(
+  static readonly grpc::Method<global::UpdateGoldReq, global::VoidResp> __Method_UpdateGold = new grpc::Method<global::UpdateGoldReq, global::VoidResp>(
       grpc::MethodType.Unary,
       __ServiceName,
-      "IncreaseGold",
-      __Marshaller_IncreaseGoldReq,
-      __Marshaller_GoldResp);
-
-  static readonly grpc::Method<global::DecreaseGoldReq, global::GoldResp> __Method_DecreaseGold = new grpc::Method<global::DecreaseGoldReq, global::GoldResp>(
-      grpc::MethodType.Unary,
-      __ServiceName,
-      "DecreaseGold",
-      __Marshaller_DecreaseGoldReq,
-      __Marshaller_GoldResp);
+      "UpdateGold",
+      __Marshaller_UpdateGoldReq,
+      __Marshaller_VoidResp);
 
   static readonly grpc::Method<global::GetCashReq, global::CashResp> __Method_GetCash = new grpc::Method<global::GetCashReq, global::CashResp>(
       grpc::MethodType.Unary,
@@ -130,19 +119,12 @@ public static partial class DatabaseService
       __Marshaller_GetCashReq,
       __Marshaller_CashResp);
 
-  static readonly grpc::Method<global::IncreaseCashReq, global::CashResp> __Method_IncreaseCash = new grpc::Method<global::IncreaseCashReq, global::CashResp>(
+  static readonly grpc::Method<global::UpdateCashReq, global::VoidResp> __Method_UpdateCash = new grpc::Method<global::UpdateCashReq, global::VoidResp>(
       grpc::MethodType.Unary,
       __ServiceName,
-      "IncreaseCash",
-      __Marshaller_IncreaseCashReq,
-      __Marshaller_CashResp);
-
-  static readonly grpc::Method<global::DecreaseCashReq, global::CashResp> __Method_DecreaseCash = new grpc::Method<global::DecreaseCashReq, global::CashResp>(
-      grpc::MethodType.Unary,
-      __ServiceName,
-      "DecreaseCash",
-      __Marshaller_DecreaseCashReq,
-      __Marshaller_CashResp);
+      "UpdateCash",
+      __Marshaller_UpdateCashReq,
+      __Marshaller_VoidResp);
 
   static readonly grpc::Method<global::UpdateAccessTokenReq, global::VoidResp> __Method_UpdateAccessToken = new grpc::Method<global::UpdateAccessTokenReq, global::VoidResp>(
       grpc::MethodType.Unary,
@@ -312,12 +294,12 @@ public static partial class DatabaseService
       __Marshaller_CreateGuildReq,
       __Marshaller_CreateGuildResp);
 
-  static readonly grpc::Method<global::IncreaseGuildExpReq, global::IncreaseGuildExpResp> __Method_IncreaseGuildExp = new grpc::Method<global::IncreaseGuildExpReq, global::IncreaseGuildExpResp>(
+  static readonly grpc::Method<global::UpdateGuildLevelReq, global::VoidResp> __Method_UpdateGuildLevel = new grpc::Method<global::UpdateGuildLevelReq, global::VoidResp>(
       grpc::MethodType.Unary,
       __ServiceName,
-      "IncreaseGuildExp",
-      __Marshaller_IncreaseGuildExpReq,
-      __Marshaller_IncreaseGuildExpResp);
+      "UpdateGuildLevel",
+      __Marshaller_UpdateGuildLevelReq,
+      __Marshaller_VoidResp);
 
   static readonly grpc::Method<global::UpdateGuildLeaderReq, global::VoidResp> __Method_UpdateGuildLeader = new grpc::Method<global::UpdateGuildLeaderReq, global::VoidResp>(
       grpc::MethodType.Unary,
@@ -389,19 +371,12 @@ public static partial class DatabaseService
       __Marshaller_GetGuildGoldReq,
       __Marshaller_GuildGoldResp);
 
-  static readonly grpc::Method<global::IncreaseGuildGoldReq, global::GuildGoldResp> __Method_IncreaseGuildGold = new grpc::Method<global::IncreaseGuildGoldReq, global::GuildGoldResp>(
+  static readonly grpc::Method<global::UpdateGuildGoldReq, global::VoidResp> __Method_UpdateGuildGold = new grpc::Method<global::UpdateGuildGoldReq, global::VoidResp>(
       grpc::MethodType.Unary,
       __ServiceName,
-      "IncreaseGuildGold",
-      __Marshaller_IncreaseGuildGoldReq,
-      __Marshaller_GuildGoldResp);
-
-  static readonly grpc::Method<global::DecreaseGuildGoldReq, global::GuildGoldResp> __Method_DecreaseGuildGold = new grpc::Method<global::DecreaseGuildGoldReq, global::GuildGoldResp>(
-      grpc::MethodType.Unary,
-      __ServiceName,
-      "DecreaseGuildGold",
-      __Marshaller_DecreaseGuildGoldReq,
-      __Marshaller_GuildGoldResp);
+      "UpdateGuildGold",
+      __Marshaller_UpdateGuildGoldReq,
+      __Marshaller_VoidResp);
 
   static readonly grpc::Method<global::UpdateStorageItemsReq, global::VoidResp> __Method_UpdateStorageItems = new grpc::Method<global::UpdateStorageItemsReq, global::VoidResp>(
       grpc::MethodType.Unary,
@@ -447,12 +422,7 @@ public static partial class DatabaseService
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
 
-    public virtual global::System.Threading.Tasks.Task<global::GoldResp> IncreaseGold(global::IncreaseGoldReq request, grpc::ServerCallContext context)
-    {
-      throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
-    }
-
-    public virtual global::System.Threading.Tasks.Task<global::GoldResp> DecreaseGold(global::DecreaseGoldReq request, grpc::ServerCallContext context)
+    public virtual global::System.Threading.Tasks.Task<global::VoidResp> UpdateGold(global::UpdateGoldReq request, grpc::ServerCallContext context)
     {
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
@@ -462,12 +432,7 @@ public static partial class DatabaseService
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
 
-    public virtual global::System.Threading.Tasks.Task<global::CashResp> IncreaseCash(global::IncreaseCashReq request, grpc::ServerCallContext context)
-    {
-      throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
-    }
-
-    public virtual global::System.Threading.Tasks.Task<global::CashResp> DecreaseCash(global::DecreaseCashReq request, grpc::ServerCallContext context)
+    public virtual global::System.Threading.Tasks.Task<global::VoidResp> UpdateCash(global::UpdateCashReq request, grpc::ServerCallContext context)
     {
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
@@ -592,7 +557,7 @@ public static partial class DatabaseService
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
 
-    public virtual global::System.Threading.Tasks.Task<global::IncreaseGuildExpResp> IncreaseGuildExp(global::IncreaseGuildExpReq request, grpc::ServerCallContext context)
+    public virtual global::System.Threading.Tasks.Task<global::VoidResp> UpdateGuildLevel(global::UpdateGuildLevelReq request, grpc::ServerCallContext context)
     {
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
@@ -647,12 +612,7 @@ public static partial class DatabaseService
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
 
-    public virtual global::System.Threading.Tasks.Task<global::GuildGoldResp> IncreaseGuildGold(global::IncreaseGuildGoldReq request, grpc::ServerCallContext context)
-    {
-      throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
-    }
-
-    public virtual global::System.Threading.Tasks.Task<global::GuildGoldResp> DecreaseGuildGold(global::DecreaseGuildGoldReq request, grpc::ServerCallContext context)
+    public virtual global::System.Threading.Tasks.Task<global::VoidResp> UpdateGuildGold(global::UpdateGuildGoldReq request, grpc::ServerCallContext context)
     {
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
@@ -756,37 +716,21 @@ public static partial class DatabaseService
     {
       return CallInvoker.AsyncUnaryCall(__Method_GetGold, null, options, request);
     }
-    public virtual global::GoldResp IncreaseGold(global::IncreaseGoldReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    public virtual global::VoidResp UpdateGold(global::UpdateGoldReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
-      return IncreaseGold(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      return UpdateGold(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual global::GoldResp IncreaseGold(global::IncreaseGoldReq request, grpc::CallOptions options)
+    public virtual global::VoidResp UpdateGold(global::UpdateGoldReq request, grpc::CallOptions options)
     {
-      return CallInvoker.BlockingUnaryCall(__Method_IncreaseGold, null, options, request);
+      return CallInvoker.BlockingUnaryCall(__Method_UpdateGold, null, options, request);
     }
-    public virtual grpc::AsyncUnaryCall<global::GoldResp> IncreaseGoldAsync(global::IncreaseGoldReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    public virtual grpc::AsyncUnaryCall<global::VoidResp> UpdateGoldAsync(global::UpdateGoldReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
-      return IncreaseGoldAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      return UpdateGoldAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual grpc::AsyncUnaryCall<global::GoldResp> IncreaseGoldAsync(global::IncreaseGoldReq request, grpc::CallOptions options)
+    public virtual grpc::AsyncUnaryCall<global::VoidResp> UpdateGoldAsync(global::UpdateGoldReq request, grpc::CallOptions options)
     {
-      return CallInvoker.AsyncUnaryCall(__Method_IncreaseGold, null, options, request);
-    }
-    public virtual global::GoldResp DecreaseGold(global::DecreaseGoldReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
-    {
-      return DecreaseGold(request, new grpc::CallOptions(headers, deadline, cancellationToken));
-    }
-    public virtual global::GoldResp DecreaseGold(global::DecreaseGoldReq request, grpc::CallOptions options)
-    {
-      return CallInvoker.BlockingUnaryCall(__Method_DecreaseGold, null, options, request);
-    }
-    public virtual grpc::AsyncUnaryCall<global::GoldResp> DecreaseGoldAsync(global::DecreaseGoldReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
-    {
-      return DecreaseGoldAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
-    }
-    public virtual grpc::AsyncUnaryCall<global::GoldResp> DecreaseGoldAsync(global::DecreaseGoldReq request, grpc::CallOptions options)
-    {
-      return CallInvoker.AsyncUnaryCall(__Method_DecreaseGold, null, options, request);
+      return CallInvoker.AsyncUnaryCall(__Method_UpdateGold, null, options, request);
     }
     public virtual global::CashResp GetCash(global::GetCashReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
@@ -804,37 +748,21 @@ public static partial class DatabaseService
     {
       return CallInvoker.AsyncUnaryCall(__Method_GetCash, null, options, request);
     }
-    public virtual global::CashResp IncreaseCash(global::IncreaseCashReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    public virtual global::VoidResp UpdateCash(global::UpdateCashReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
-      return IncreaseCash(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      return UpdateCash(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual global::CashResp IncreaseCash(global::IncreaseCashReq request, grpc::CallOptions options)
+    public virtual global::VoidResp UpdateCash(global::UpdateCashReq request, grpc::CallOptions options)
     {
-      return CallInvoker.BlockingUnaryCall(__Method_IncreaseCash, null, options, request);
+      return CallInvoker.BlockingUnaryCall(__Method_UpdateCash, null, options, request);
     }
-    public virtual grpc::AsyncUnaryCall<global::CashResp> IncreaseCashAsync(global::IncreaseCashReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    public virtual grpc::AsyncUnaryCall<global::VoidResp> UpdateCashAsync(global::UpdateCashReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
-      return IncreaseCashAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      return UpdateCashAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual grpc::AsyncUnaryCall<global::CashResp> IncreaseCashAsync(global::IncreaseCashReq request, grpc::CallOptions options)
+    public virtual grpc::AsyncUnaryCall<global::VoidResp> UpdateCashAsync(global::UpdateCashReq request, grpc::CallOptions options)
     {
-      return CallInvoker.AsyncUnaryCall(__Method_IncreaseCash, null, options, request);
-    }
-    public virtual global::CashResp DecreaseCash(global::DecreaseCashReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
-    {
-      return DecreaseCash(request, new grpc::CallOptions(headers, deadline, cancellationToken));
-    }
-    public virtual global::CashResp DecreaseCash(global::DecreaseCashReq request, grpc::CallOptions options)
-    {
-      return CallInvoker.BlockingUnaryCall(__Method_DecreaseCash, null, options, request);
-    }
-    public virtual grpc::AsyncUnaryCall<global::CashResp> DecreaseCashAsync(global::DecreaseCashReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
-    {
-      return DecreaseCashAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
-    }
-    public virtual grpc::AsyncUnaryCall<global::CashResp> DecreaseCashAsync(global::DecreaseCashReq request, grpc::CallOptions options)
-    {
-      return CallInvoker.AsyncUnaryCall(__Method_DecreaseCash, null, options, request);
+      return CallInvoker.AsyncUnaryCall(__Method_UpdateCash, null, options, request);
     }
     public virtual global::VoidResp UpdateAccessToken(global::UpdateAccessTokenReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
@@ -1220,21 +1148,21 @@ public static partial class DatabaseService
     {
       return CallInvoker.AsyncUnaryCall(__Method_CreateGuild, null, options, request);
     }
-    public virtual global::IncreaseGuildExpResp IncreaseGuildExp(global::IncreaseGuildExpReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    public virtual global::VoidResp UpdateGuildLevel(global::UpdateGuildLevelReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
-      return IncreaseGuildExp(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      return UpdateGuildLevel(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual global::IncreaseGuildExpResp IncreaseGuildExp(global::IncreaseGuildExpReq request, grpc::CallOptions options)
+    public virtual global::VoidResp UpdateGuildLevel(global::UpdateGuildLevelReq request, grpc::CallOptions options)
     {
-      return CallInvoker.BlockingUnaryCall(__Method_IncreaseGuildExp, null, options, request);
+      return CallInvoker.BlockingUnaryCall(__Method_UpdateGuildLevel, null, options, request);
     }
-    public virtual grpc::AsyncUnaryCall<global::IncreaseGuildExpResp> IncreaseGuildExpAsync(global::IncreaseGuildExpReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    public virtual grpc::AsyncUnaryCall<global::VoidResp> UpdateGuildLevelAsync(global::UpdateGuildLevelReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
-      return IncreaseGuildExpAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      return UpdateGuildLevelAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual grpc::AsyncUnaryCall<global::IncreaseGuildExpResp> IncreaseGuildExpAsync(global::IncreaseGuildExpReq request, grpc::CallOptions options)
+    public virtual grpc::AsyncUnaryCall<global::VoidResp> UpdateGuildLevelAsync(global::UpdateGuildLevelReq request, grpc::CallOptions options)
     {
-      return CallInvoker.AsyncUnaryCall(__Method_IncreaseGuildExp, null, options, request);
+      return CallInvoker.AsyncUnaryCall(__Method_UpdateGuildLevel, null, options, request);
     }
     public virtual global::VoidResp UpdateGuildLeader(global::UpdateGuildLeaderReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
@@ -1396,37 +1324,21 @@ public static partial class DatabaseService
     {
       return CallInvoker.AsyncUnaryCall(__Method_GetGuildGold, null, options, request);
     }
-    public virtual global::GuildGoldResp IncreaseGuildGold(global::IncreaseGuildGoldReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    public virtual global::VoidResp UpdateGuildGold(global::UpdateGuildGoldReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
-      return IncreaseGuildGold(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      return UpdateGuildGold(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual global::GuildGoldResp IncreaseGuildGold(global::IncreaseGuildGoldReq request, grpc::CallOptions options)
+    public virtual global::VoidResp UpdateGuildGold(global::UpdateGuildGoldReq request, grpc::CallOptions options)
     {
-      return CallInvoker.BlockingUnaryCall(__Method_IncreaseGuildGold, null, options, request);
+      return CallInvoker.BlockingUnaryCall(__Method_UpdateGuildGold, null, options, request);
     }
-    public virtual grpc::AsyncUnaryCall<global::GuildGoldResp> IncreaseGuildGoldAsync(global::IncreaseGuildGoldReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    public virtual grpc::AsyncUnaryCall<global::VoidResp> UpdateGuildGoldAsync(global::UpdateGuildGoldReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
-      return IncreaseGuildGoldAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      return UpdateGuildGoldAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual grpc::AsyncUnaryCall<global::GuildGoldResp> IncreaseGuildGoldAsync(global::IncreaseGuildGoldReq request, grpc::CallOptions options)
+    public virtual grpc::AsyncUnaryCall<global::VoidResp> UpdateGuildGoldAsync(global::UpdateGuildGoldReq request, grpc::CallOptions options)
     {
-      return CallInvoker.AsyncUnaryCall(__Method_IncreaseGuildGold, null, options, request);
-    }
-    public virtual global::GuildGoldResp DecreaseGuildGold(global::DecreaseGuildGoldReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
-    {
-      return DecreaseGuildGold(request, new grpc::CallOptions(headers, deadline, cancellationToken));
-    }
-    public virtual global::GuildGoldResp DecreaseGuildGold(global::DecreaseGuildGoldReq request, grpc::CallOptions options)
-    {
-      return CallInvoker.BlockingUnaryCall(__Method_DecreaseGuildGold, null, options, request);
-    }
-    public virtual grpc::AsyncUnaryCall<global::GuildGoldResp> DecreaseGuildGoldAsync(global::DecreaseGuildGoldReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
-    {
-      return DecreaseGuildGoldAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
-    }
-    public virtual grpc::AsyncUnaryCall<global::GuildGoldResp> DecreaseGuildGoldAsync(global::DecreaseGuildGoldReq request, grpc::CallOptions options)
-    {
-      return CallInvoker.AsyncUnaryCall(__Method_DecreaseGuildGold, null, options, request);
+      return CallInvoker.AsyncUnaryCall(__Method_UpdateGuildGold, null, options, request);
     }
     public virtual global::VoidResp UpdateStorageItems(global::UpdateStorageItemsReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
@@ -1476,11 +1388,9 @@ public static partial class DatabaseService
         .AddMethod(__Method_ValidateAccessToken, serviceImpl.ValidateAccessToken)
         .AddMethod(__Method_GetUserLevel, serviceImpl.GetUserLevel)
         .AddMethod(__Method_GetGold, serviceImpl.GetGold)
-        .AddMethod(__Method_IncreaseGold, serviceImpl.IncreaseGold)
-        .AddMethod(__Method_DecreaseGold, serviceImpl.DecreaseGold)
+        .AddMethod(__Method_UpdateGold, serviceImpl.UpdateGold)
         .AddMethod(__Method_GetCash, serviceImpl.GetCash)
-        .AddMethod(__Method_IncreaseCash, serviceImpl.IncreaseCash)
-        .AddMethod(__Method_DecreaseCash, serviceImpl.DecreaseCash)
+        .AddMethod(__Method_UpdateCash, serviceImpl.UpdateCash)
         .AddMethod(__Method_UpdateAccessToken, serviceImpl.UpdateAccessToken)
         .AddMethod(__Method_CreateUserLogin, serviceImpl.CreateUserLogin)
         .AddMethod(__Method_FindUsername, serviceImpl.FindUsername)
@@ -1505,7 +1415,7 @@ public static partial class DatabaseService
         .AddMethod(__Method_UpdateCharacterParty, serviceImpl.UpdateCharacterParty)
         .AddMethod(__Method_ReadParty, serviceImpl.ReadParty)
         .AddMethod(__Method_CreateGuild, serviceImpl.CreateGuild)
-        .AddMethod(__Method_IncreaseGuildExp, serviceImpl.IncreaseGuildExp)
+        .AddMethod(__Method_UpdateGuildLevel, serviceImpl.UpdateGuildLevel)
         .AddMethod(__Method_UpdateGuildLeader, serviceImpl.UpdateGuildLeader)
         .AddMethod(__Method_UpdateGuildMessage, serviceImpl.UpdateGuildMessage)
         .AddMethod(__Method_UpdateGuildRole, serviceImpl.UpdateGuildRole)
@@ -1516,8 +1426,7 @@ public static partial class DatabaseService
         .AddMethod(__Method_FindGuildName, serviceImpl.FindGuildName)
         .AddMethod(__Method_ReadGuild, serviceImpl.ReadGuild)
         .AddMethod(__Method_GetGuildGold, serviceImpl.GetGuildGold)
-        .AddMethod(__Method_IncreaseGuildGold, serviceImpl.IncreaseGuildGold)
-        .AddMethod(__Method_DecreaseGuildGold, serviceImpl.DecreaseGuildGold)
+        .AddMethod(__Method_UpdateGuildGold, serviceImpl.UpdateGuildGold)
         .AddMethod(__Method_UpdateStorageItems, serviceImpl.UpdateStorageItems)
         .AddMethod(__Method_ReadStorageItems, serviceImpl.ReadStorageItems).Build();
   }
@@ -1532,11 +1441,9 @@ public static partial class DatabaseService
     serviceBinder.AddMethod(__Method_ValidateAccessToken, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::ValidateAccessTokenReq, global::ValidateAccessTokenResp>(serviceImpl.ValidateAccessToken));
     serviceBinder.AddMethod(__Method_GetUserLevel, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::GetUserLevelReq, global::GetUserLevelResp>(serviceImpl.GetUserLevel));
     serviceBinder.AddMethod(__Method_GetGold, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::GetGoldReq, global::GoldResp>(serviceImpl.GetGold));
-    serviceBinder.AddMethod(__Method_IncreaseGold, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::IncreaseGoldReq, global::GoldResp>(serviceImpl.IncreaseGold));
-    serviceBinder.AddMethod(__Method_DecreaseGold, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::DecreaseGoldReq, global::GoldResp>(serviceImpl.DecreaseGold));
+    serviceBinder.AddMethod(__Method_UpdateGold, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::UpdateGoldReq, global::VoidResp>(serviceImpl.UpdateGold));
     serviceBinder.AddMethod(__Method_GetCash, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::GetCashReq, global::CashResp>(serviceImpl.GetCash));
-    serviceBinder.AddMethod(__Method_IncreaseCash, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::IncreaseCashReq, global::CashResp>(serviceImpl.IncreaseCash));
-    serviceBinder.AddMethod(__Method_DecreaseCash, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::DecreaseCashReq, global::CashResp>(serviceImpl.DecreaseCash));
+    serviceBinder.AddMethod(__Method_UpdateCash, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::UpdateCashReq, global::VoidResp>(serviceImpl.UpdateCash));
     serviceBinder.AddMethod(__Method_UpdateAccessToken, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::UpdateAccessTokenReq, global::VoidResp>(serviceImpl.UpdateAccessToken));
     serviceBinder.AddMethod(__Method_CreateUserLogin, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::CreateUserLoginReq, global::VoidResp>(serviceImpl.CreateUserLogin));
     serviceBinder.AddMethod(__Method_FindUsername, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::FindUsernameReq, global::FindUsernameResp>(serviceImpl.FindUsername));
@@ -1561,7 +1468,7 @@ public static partial class DatabaseService
     serviceBinder.AddMethod(__Method_UpdateCharacterParty, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::UpdateCharacterPartyReq, global::VoidResp>(serviceImpl.UpdateCharacterParty));
     serviceBinder.AddMethod(__Method_ReadParty, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::ReadPartyReq, global::ReadPartyResp>(serviceImpl.ReadParty));
     serviceBinder.AddMethod(__Method_CreateGuild, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::CreateGuildReq, global::CreateGuildResp>(serviceImpl.CreateGuild));
-    serviceBinder.AddMethod(__Method_IncreaseGuildExp, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::IncreaseGuildExpReq, global::IncreaseGuildExpResp>(serviceImpl.IncreaseGuildExp));
+    serviceBinder.AddMethod(__Method_UpdateGuildLevel, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::UpdateGuildLevelReq, global::VoidResp>(serviceImpl.UpdateGuildLevel));
     serviceBinder.AddMethod(__Method_UpdateGuildLeader, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::UpdateGuildLeaderReq, global::VoidResp>(serviceImpl.UpdateGuildLeader));
     serviceBinder.AddMethod(__Method_UpdateGuildMessage, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::UpdateGuildMessageReq, global::VoidResp>(serviceImpl.UpdateGuildMessage));
     serviceBinder.AddMethod(__Method_UpdateGuildRole, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::UpdateGuildRoleReq, global::VoidResp>(serviceImpl.UpdateGuildRole));
@@ -1572,8 +1479,7 @@ public static partial class DatabaseService
     serviceBinder.AddMethod(__Method_FindGuildName, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::FindGuildNameReq, global::FindGuildNameResp>(serviceImpl.FindGuildName));
     serviceBinder.AddMethod(__Method_ReadGuild, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::ReadGuildReq, global::ReadGuildResp>(serviceImpl.ReadGuild));
     serviceBinder.AddMethod(__Method_GetGuildGold, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::GetGuildGoldReq, global::GuildGoldResp>(serviceImpl.GetGuildGold));
-    serviceBinder.AddMethod(__Method_IncreaseGuildGold, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::IncreaseGuildGoldReq, global::GuildGoldResp>(serviceImpl.IncreaseGuildGold));
-    serviceBinder.AddMethod(__Method_DecreaseGuildGold, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::DecreaseGuildGoldReq, global::GuildGoldResp>(serviceImpl.DecreaseGuildGold));
+    serviceBinder.AddMethod(__Method_UpdateGuildGold, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::UpdateGuildGoldReq, global::VoidResp>(serviceImpl.UpdateGuildGold));
     serviceBinder.AddMethod(__Method_UpdateStorageItems, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::UpdateStorageItemsReq, global::VoidResp>(serviceImpl.UpdateStorageItems));
     serviceBinder.AddMethod(__Method_ReadStorageItems, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::ReadStorageItemsReq, global::ReadStorageItemsResp>(serviceImpl.ReadStorageItems));
   }

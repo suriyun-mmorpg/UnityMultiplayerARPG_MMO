@@ -98,22 +98,12 @@ message UpdateGoldReq {
     string user_id = 1;
     int32 amount = 2;
 }
-// Decrease gold
-message DecreaseGoldReq {
-    string user_id = 1;
-    int32 amount = 2;
-}
 // Get cash
 message GetCashReq {
     string user_id = 1;
 }
 // Increase cash
 message UpdateCashReq {
-    string user_id = 1;
-    int32 amount = 2;
-}
-// Decrease cash
-message DecreaseCashReq {
     string user_id = 1;
     int32 amount = 2;
 }

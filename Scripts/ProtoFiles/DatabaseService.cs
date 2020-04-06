@@ -31,146 +31,137 @@ public static partial class DatabaseServiceReflection {
           "EhQKDGFjY2Vzc190b2tlbhgCIAEoCSIqChdWYWxpZGF0ZUFjY2Vzc1Rva2Vu",
           "UmVzcBIPCgdpc19wYXNzGAEgASgIIiIKD0dldFVzZXJMZXZlbFJlcRIPCgd1",
           "c2VyX2lkGAEgASgJIiYKEEdldFVzZXJMZXZlbFJlc3ASEgoKdXNlcl9sZXZl",
-          "bBgBIAEoDSIdCgpHZXRHb2xkUmVxEg8KB3VzZXJfaWQYASABKAkiMgoPSW5j",
-          "cmVhc2VHb2xkUmVxEg8KB3VzZXJfaWQYASABKAkSDgoGYW1vdW50GAIgASgF",
-          "IjIKD0RlY3JlYXNlR29sZFJlcRIPCgd1c2VyX2lkGAEgASgJEg4KBmFtb3Vu",
-          "dBgCIAEoBSIdCgpHZXRDYXNoUmVxEg8KB3VzZXJfaWQYASABKAkiMgoPSW5j",
-          "cmVhc2VDYXNoUmVxEg8KB3VzZXJfaWQYASABKAkSDgoGYW1vdW50GAIgASgF",
-          "IjIKD0RlY3JlYXNlQ2FzaFJlcRIPCgd1c2VyX2lkGAEgASgJEg4KBmFtb3Vu",
-          "dBgCIAEoBSI9ChRVcGRhdGVBY2Nlc3NUb2tlblJlcRIPCgd1c2VyX2lkGAEg",
-          "ASgJEhQKDGFjY2Vzc190b2tlbhgCIAEoCSI4ChJDcmVhdGVVc2VyTG9naW5S",
-          "ZXESEAoIdXNlcm5hbWUYASABKAkSEAoIcGFzc3dvcmQYAiABKAkiIwoPRmlu",
-          "ZFVzZXJuYW1lUmVxEhAKCHVzZXJuYW1lGAEgASgJIigKEEZpbmRVc2VybmFt",
-          "ZVJlc3ASFAoMZm91bmRfYW1vdW50GAEgASgDIj0KEkNyZWF0ZUNoYXJhY3Rl",
-          "clJlcRIPCgd1c2VyX2lkGAEgASgJEhYKDmNoYXJhY3Rlcl9kYXRhGAIgASgM",
-          "IqsCChBSZWFkQ2hhcmFjdGVyUmVxEg8KB3VzZXJfaWQYASABKAkSFAoMY2hh",
-          "cmFjdGVyX2lkGAIgASgJEhoKEndpdGhfZXF1aXBfd2VhcG9ucxgDIAEoCBIX",
-          "Cg93aXRoX2F0dHJpYnV0ZXMYBCABKAgSEwoLd2l0aF9za2lsbHMYBSABKAgS",
-          "GQoRd2l0aF9za2lsbF91c2FnZXMYBiABKAgSEgoKd2l0aF9idWZmcxgHIAEo",
-          "CBIYChB3aXRoX2VxdWlwX2l0ZW1zGAggASgIEhwKFHdpdGhfbm9uX2VxdWlw",
-          "X2l0ZW1zGAkgASgIEhQKDHdpdGhfc3VtbW9ucxgKIAEoCBIUCgx3aXRoX2hv",
-          "dGtleXMYCyABKAgSEwoLd2l0aF9xdWVzdHMYDCABKAgiKwoRUmVhZENoYXJh",
-          "Y3RlclJlc3ASFgoOY2hhcmFjdGVyX2RhdGEYASABKAwiJAoRUmVhZENoYXJh",
-          "Y3RlcnNSZXESDwoHdXNlcl9pZBgBIAEoCSIiChJSZWFkQ2hhcmFjdGVyc1Jl",
-          "c3ASDAoEbGlzdBgBIAMoDCIsChJVcGRhdGVDaGFyYWN0ZXJSZXESFgoOY2hh",
-          "cmFjdGVyX2RhdGEYASABKAwiOwoSRGVsZXRlQ2hhcmFjdGVyUmVxEg8KB3Vz",
-          "ZXJfaWQYASABKAkSFAoMY2hhcmFjdGVyX2lkGAIgASgJIi4KFEZpbmRDaGFy",
-          "YWN0ZXJOYW1lUmVxEhYKDmNoYXJhY3Rlcl9uYW1lGAEgASgJIi0KFUZpbmRD",
-          "aGFyYWN0ZXJOYW1lUmVzcBIUCgxmb3VuZF9hbW91bnQYASABKAMiKwoRRmlu",
-          "ZENoYXJhY3RlcnNSZXESFgoOY2hhcmFjdGVyX25hbWUYASABKAkiIgoSRmlu",
-          "ZENoYXJhY3RlcnNSZXNwEgwKBGxpc3QYASADKAwiQQoPQ3JlYXRlRnJpZW5k",
-          "UmVxEhYKDmNoYXJhY3Rlcl9pZF8xGAEgASgJEhYKDmNoYXJhY3Rlcl9pZF8y",
-          "GAIgASgJIkEKD0RlbGV0ZUZyaWVuZFJlcRIWCg5jaGFyYWN0ZXJfaWRfMRgB",
-          "IAEoCRIWCg5jaGFyYWN0ZXJfaWRfMhgCIAEoCSImCg5SZWFkRnJpZW5kc1Jl",
-          "cRIUCgxjaGFyYWN0ZXJfaWQYASABKAkiHwoPUmVhZEZyaWVuZHNSZXNwEgwK",
-          "BGxpc3QYASADKAwiPAoRQ3JlYXRlQnVpbGRpbmdSZXESEAoIbWFwX25hbWUY",
-          "ASABKAkSFQoNYnVpbGRpbmdfZGF0YRgCIAEoDCI8ChFVcGRhdGVCdWlsZGlu",
-          "Z1JlcRIQCghtYXBfbmFtZRgBIAEoCRIVCg1idWlsZGluZ19kYXRhGAIgASgM",
-          "IjoKEURlbGV0ZUJ1aWxkaW5nUmVxEhAKCG1hcF9uYW1lGAEgASgJEhMKC2J1",
-          "aWxkaW5nX2lkGAIgASgJIiQKEFJlYWRCdWlsZGluZ3NSZXESEAoIbWFwX25h",
-          "bWUYASABKAkiIQoRUmVhZEJ1aWxkaW5nc1Jlc3ASDAoEbGlzdBgBIAMoDCJU",
-          "Cg5DcmVhdGVQYXJ0eVJlcRIRCglzaGFyZV9leHAYASABKAgSEgoKc2hhcmVf",
-          "aXRlbRgCIAEoCBIbChNsZWFkZXJfY2hhcmFjdGVyX2lkGAMgASgJIiMKD0Ny",
-          "ZWF0ZVBhcnR5UmVzcBIQCghwYXJ0eV9pZBgBIAEoBSJJCg5VcGRhdGVQYXJ0",
-          "eVJlcRIQCghwYXJ0eV9pZBgBIAEoBRIRCglzaGFyZV9leHAYAiABKAgSEgoK",
-          "c2hhcmVfaXRlbRgDIAEoCCJFChRVcGRhdGVQYXJ0eUxlYWRlclJlcRIQCghw",
-          "YXJ0eV9pZBgBIAEoBRIbChNsZWFkZXJfY2hhcmFjdGVyX2lkGAIgASgJIiIK",
-          "DkRlbGV0ZVBhcnR5UmVxEhAKCHBhcnR5X2lkGAEgASgFIkEKF1VwZGF0ZUNo",
-          "YXJhY3RlclBhcnR5UmVxEhQKDGNoYXJhY3Rlcl9pZBgBIAEoCRIQCghwYXJ0",
-          "eV9pZBgCIAEoBSIgCgxSZWFkUGFydHlSZXESEAoIcGFydHlfaWQYASABKAUi",
-          "IQoNUmVhZFBhcnR5UmVzcBIQCghwYXJ0eV9pZBgBIAEoDCJBCg5DcmVhdGVH",
-          "dWlsZFJlcRISCgpndWlsZF9uYW1lGAEgASgJEhsKE2xlYWRlcl9jaGFyYWN0",
-          "ZXJfaWQYAiABKAkiIwoPQ3JlYXRlR3VpbGRSZXNwEhAKCGd1aWxkX2lkGAEg",
-          "ASgFIk8KE0luY3JlYXNlR3VpbGRFeHBSZXESEAoIZ3VpbGRfaWQYASABKAUS",
-          "FAoMaW5jcmVhc2VfZXhwGAIgASgFEhAKCGV4cF90cmVlGAMgAygFInAKFElu",
-          "Y3JlYXNlR3VpbGRFeHBSZXNwEhIKCmlzX3N1Y2Nlc3MYASABKAgSFAoMcmVz",
-          "dWx0X2xldmVsGAIgASgFEhIKCnJlc3VsdF9leHAYAyABKAUSGgoScmVzdWx0",
-          "X3NraWxsX3BvaW50GAQgASgFIkUKFFVwZGF0ZUd1aWxkTGVhZGVyUmVxEhAK",
-          "CGd1aWxkX2lkGAEgASgFEhsKE2xlYWRlcl9jaGFyYWN0ZXJfaWQYAiABKAki",
-          "QAoVVXBkYXRlR3VpbGRNZXNzYWdlUmVxEhAKCGd1aWxkX2lkGAEgASgFEhUK",
-          "DWd1aWxkX21lc3NhZ2UYAiABKAkikQEKElVwZGF0ZUd1aWxkUm9sZVJlcRIQ",
-          "CghndWlsZF9pZBgBIAEoBRISCgpndWlsZF9yb2xlGAIgASgNEhEKCXJvbGVf",
-          "bmFtZRgDIAEoCRISCgpjYW5faW52aXRlGAQgASgIEhAKCGNhbl9raWNrGAUg",
-          "ASgIEhwKFHNoYXJlX2V4cF9wZXJjZW50YWdlGAYgASgNIksKGFVwZGF0ZUd1",
-          "aWxkTWVtYmVyUm9sZVJlcRIbChNtZW1iZXJfY2hhcmFjdGVyX2lkGAEgASgJ",
-          "EhIKCmd1aWxkX3JvbGUYAiABKA0iYQoYVXBkYXRlR3VpbGRTa2lsbExldmVs",
-          "UmVxEhAKCGd1aWxkX2lkGAEgASgFEg8KB2RhdGFfaWQYAiABKAUSDQoFbGV2",
-          "ZWwYAyABKAUSEwoLc2tpbGxfcG9pbnQYBCABKAUiVQoXVXBkYXRlQ2hhcmFj",
-          "dGVyR3VpbGRSZXESFAoMY2hhcmFjdGVyX2lkGAEgASgJEhAKCGd1aWxkX2lk",
-          "GAIgASgFEhIKCmd1aWxkX3JvbGUYAyABKA0iIgoORGVsZXRlR3VpbGRSZXES",
-          "EAoIZ3VpbGRfaWQYASABKAUiJgoQRmluZEd1aWxkTmFtZVJlcRISCgpndWls",
-          "ZF9uYW1lGAEgASgJIikKEUZpbmRHdWlsZE5hbWVSZXNwEhQKDGZvdW5kX2Ft",
-          "b3VudBgBIAEoAyI9CgxSZWFkR3VpbGRSZXESEAoIZ3VpbGRfaWQYASABKAUS",
-          "GwoTZGVmYXVsdF9ndWlsZF9yb2xlcxgCIAMoDCIjCg1SZWFkR3VpbGRSZXNw",
-          "EhIKCmd1aWxkX2RhdGEYASABKAwiIwoPR2V0R3VpbGRHb2xkUmVxEhAKCGd1",
-          "aWxkX2lkGAEgASgFIjgKFEluY3JlYXNlR3VpbGRHb2xkUmVxEhAKCGd1aWxk",
-          "X2lkGAEgASgFEg4KBmFtb3VudBgCIAEoBSI4ChREZWNyZWFzZUd1aWxkR29s",
-          "ZFJlcRIQCghndWlsZF9pZBgBIAEoBRIOCgZhbW91bnQYAiABKAUidwoVVXBk",
-          "YXRlU3RvcmFnZUl0ZW1zUmVxEiMKDHN0b3JhZ2VfdHlwZRgBIAEoDjINLkVT",
-          "dG9yYWdlVHlwZRIYChBzdG9yYWdlX293bmVyX2lkGAIgASgJEh8KF3N0b3Jh",
-          "Z2VfY2hhcmFjdGVyX2l0ZW1zGAMgAygMIlQKE1JlYWRTdG9yYWdlSXRlbXNS",
-          "ZXESIwoMc3RvcmFnZV90eXBlGAEgASgOMg0uRVN0b3JhZ2VUeXBlEhgKEHN0",
-          "b3JhZ2Vfb3duZXJfaWQYAiABKAkiNwoUUmVhZFN0b3JhZ2VJdGVtc1Jlc3AS",
-          "HwoXc3RvcmFnZV9jaGFyYWN0ZXJfaXRlbXMYASADKAwqPQoMRVN0b3JhZ2VU",
-          "eXBlEggKBE5PTkUQABIKCgZQTEFZRVIQARIJCgVHVUlMRBACEgwKCEJVSUxE",
-          "SU5HEAMy+xMKD0RhdGFiYXNlU2VydmljZRJCChFWYWxpZGF0ZVVzZXJMb2dp",
-          "bhIVLlZhbGlkYXRlVXNlckxvZ2luUmVxGhYuVmFsaWRhdGVVc2VyTG9naW5S",
-          "ZXNwEkgKE1ZhbGlkYXRlQWNjZXNzVG9rZW4SFy5WYWxpZGF0ZUFjY2Vzc1Rv",
-          "a2VuUmVxGhguVmFsaWRhdGVBY2Nlc3NUb2tlblJlc3ASMwoMR2V0VXNlckxl",
-          "dmVsEhAuR2V0VXNlckxldmVsUmVxGhEuR2V0VXNlckxldmVsUmVzcBIhCgdH",
-          "ZXRHb2xkEgsuR2V0R29sZFJlcRoJLkdvbGRSZXNwEisKDEluY3JlYXNlR29s",
-          "ZBIQLkluY3JlYXNlR29sZFJlcRoJLkdvbGRSZXNwEisKDERlY3JlYXNlR29s",
-          "ZBIQLkRlY3JlYXNlR29sZFJlcRoJLkdvbGRSZXNwEiEKB0dldENhc2gSCy5H",
-          "ZXRDYXNoUmVxGgkuQ2FzaFJlc3ASKwoMSW5jcmVhc2VDYXNoEhAuSW5jcmVh",
-          "c2VDYXNoUmVxGgkuQ2FzaFJlc3ASKwoMRGVjcmVhc2VDYXNoEhAuRGVjcmVh",
-          "c2VDYXNoUmVxGgkuQ2FzaFJlc3ASNQoRVXBkYXRlQWNjZXNzVG9rZW4SFS5V",
-          "cGRhdGVBY2Nlc3NUb2tlblJlcRoJLlZvaWRSZXNwEjEKD0NyZWF0ZVVzZXJM",
-          "b2dpbhITLkNyZWF0ZVVzZXJMb2dpblJlcRoJLlZvaWRSZXNwEjMKDEZpbmRV",
-          "c2VybmFtZRIQLkZpbmRVc2VybmFtZVJlcRoRLkZpbmRVc2VybmFtZVJlc3AS",
-          "MQoPQ3JlYXRlQ2hhcmFjdGVyEhMuQ3JlYXRlQ2hhcmFjdGVyUmVxGgkuVm9p",
-          "ZFJlc3ASNgoNUmVhZENoYXJhY3RlchIRLlJlYWRDaGFyYWN0ZXJSZXEaEi5S",
-          "ZWFkQ2hhcmFjdGVyUmVzcBI5Cg5SZWFkQ2hhcmFjdGVycxISLlJlYWRDaGFy",
-          "YWN0ZXJzUmVxGhMuUmVhZENoYXJhY3RlcnNSZXNwEjEKD1VwZGF0ZUNoYXJh",
-          "Y3RlchITLlVwZGF0ZUNoYXJhY3RlclJlcRoJLlZvaWRSZXNwEjEKD0RlbGV0",
-          "ZUNoYXJhY3RlchITLkRlbGV0ZUNoYXJhY3RlclJlcRoJLlZvaWRSZXNwEkIK",
-          "EUZpbmRDaGFyYWN0ZXJOYW1lEhUuRmluZENoYXJhY3Rlck5hbWVSZXEaFi5G",
-          "aW5kQ2hhcmFjdGVyTmFtZVJlc3ASOQoORmluZENoYXJhY3RlcnMSEi5GaW5k",
-          "Q2hhcmFjdGVyc1JlcRoTLkZpbmRDaGFyYWN0ZXJzUmVzcBIrCgxDcmVhdGVG",
-          "cmllbmQSEC5DcmVhdGVGcmllbmRSZXEaCS5Wb2lkUmVzcBIrCgxEZWxldGVG",
-          "cmllbmQSEC5EZWxldGVGcmllbmRSZXEaCS5Wb2lkUmVzcBIwCgtSZWFkRnJp",
-          "ZW5kcxIPLlJlYWRGcmllbmRzUmVxGhAuUmVhZEZyaWVuZHNSZXNwEi8KDkNy",
-          "ZWF0ZUJ1aWxkaW5nEhIuQ3JlYXRlQnVpbGRpbmdSZXEaCS5Wb2lkUmVzcBIv",
-          "Cg5VcGRhdGVCdWlsZGluZxISLlVwZGF0ZUJ1aWxkaW5nUmVxGgkuVm9pZFJl",
-          "c3ASLwoORGVsZXRlQnVpbGRpbmcSEi5EZWxldGVCdWlsZGluZ1JlcRoJLlZv",
-          "aWRSZXNwEjYKDVJlYWRCdWlsZGluZ3MSES5SZWFkQnVpbGRpbmdzUmVxGhIu",
-          "UmVhZEJ1aWxkaW5nc1Jlc3ASMAoLQ3JlYXRlUGFydHkSDy5DcmVhdGVQYXJ0",
-          "eVJlcRoQLkNyZWF0ZVBhcnR5UmVzcBIpCgtVcGRhdGVQYXJ0eRIPLlVwZGF0",
-          "ZVBhcnR5UmVxGgkuVm9pZFJlc3ASNQoRVXBkYXRlUGFydHlMZWFkZXISFS5V",
-          "cGRhdGVQYXJ0eUxlYWRlclJlcRoJLlZvaWRSZXNwEikKC0RlbGV0ZVBhcnR5",
-          "Eg8uRGVsZXRlUGFydHlSZXEaCS5Wb2lkUmVzcBI7ChRVcGRhdGVDaGFyYWN0",
-          "ZXJQYXJ0eRIYLlVwZGF0ZUNoYXJhY3RlclBhcnR5UmVxGgkuVm9pZFJlc3AS",
-          "KgoJUmVhZFBhcnR5Eg0uUmVhZFBhcnR5UmVxGg4uUmVhZFBhcnR5UmVzcBIw",
-          "CgtDcmVhdGVHdWlsZBIPLkNyZWF0ZUd1aWxkUmVxGhAuQ3JlYXRlR3VpbGRS",
-          "ZXNwEj8KEEluY3JlYXNlR3VpbGRFeHASFC5JbmNyZWFzZUd1aWxkRXhwUmVx",
-          "GhUuSW5jcmVhc2VHdWlsZEV4cFJlc3ASNQoRVXBkYXRlR3VpbGRMZWFkZXIS",
-          "FS5VcGRhdGVHdWlsZExlYWRlclJlcRoJLlZvaWRSZXNwEjcKElVwZGF0ZUd1",
-          "aWxkTWVzc2FnZRIWLlVwZGF0ZUd1aWxkTWVzc2FnZVJlcRoJLlZvaWRSZXNw",
-          "EjEKD1VwZGF0ZUd1aWxkUm9sZRITLlVwZGF0ZUd1aWxkUm9sZVJlcRoJLlZv",
-          "aWRSZXNwEj0KFVVwZGF0ZUd1aWxkTWVtYmVyUm9sZRIZLlVwZGF0ZUd1aWxk",
-          "TWVtYmVyUm9sZVJlcRoJLlZvaWRSZXNwEj0KFVVwZGF0ZUd1aWxkU2tpbGxM",
-          "ZXZlbBIZLlVwZGF0ZUd1aWxkU2tpbGxMZXZlbFJlcRoJLlZvaWRSZXNwEjsK",
-          "FFVwZGF0ZUNoYXJhY3Rlckd1aWxkEhguVXBkYXRlQ2hhcmFjdGVyR3VpbGRS",
-          "ZXEaCS5Wb2lkUmVzcBIpCgtEZWxldGVHdWlsZBIPLkRlbGV0ZUd1aWxkUmVx",
-          "GgkuVm9pZFJlc3ASNgoNRmluZEd1aWxkTmFtZRIRLkZpbmRHdWlsZE5hbWVS",
-          "ZXEaEi5GaW5kR3VpbGROYW1lUmVzcBIqCglSZWFkR3VpbGQSDS5SZWFkR3Vp",
-          "bGRSZXEaDi5SZWFkR3VpbGRSZXNwEjAKDEdldEd1aWxkR29sZBIQLkdldEd1",
-          "aWxkR29sZFJlcRoOLkd1aWxkR29sZFJlc3ASOgoRSW5jcmVhc2VHdWlsZEdv",
-          "bGQSFS5JbmNyZWFzZUd1aWxkR29sZFJlcRoOLkd1aWxkR29sZFJlc3ASOgoR",
-          "RGVjcmVhc2VHdWlsZEdvbGQSFS5EZWNyZWFzZUd1aWxkR29sZFJlcRoOLkd1",
-          "aWxkR29sZFJlc3ASNwoSVXBkYXRlU3RvcmFnZUl0ZW1zEhYuVXBkYXRlU3Rv",
-          "cmFnZUl0ZW1zUmVxGgkuVm9pZFJlc3ASPwoQUmVhZFN0b3JhZ2VJdGVtcxIU",
-          "LlJlYWRTdG9yYWdlSXRlbXNSZXEaFS5SZWFkU3RvcmFnZUl0ZW1zUmVzcGIG",
-          "cHJvdG8z"));
+          "bBgBIAEoDSIdCgpHZXRHb2xkUmVxEg8KB3VzZXJfaWQYASABKAkiMAoNVXBk",
+          "YXRlR29sZFJlcRIPCgd1c2VyX2lkGAEgASgJEg4KBmFtb3VudBgCIAEoBSId",
+          "CgpHZXRDYXNoUmVxEg8KB3VzZXJfaWQYASABKAkiMAoNVXBkYXRlQ2FzaFJl",
+          "cRIPCgd1c2VyX2lkGAEgASgJEg4KBmFtb3VudBgCIAEoBSI9ChRVcGRhdGVB",
+          "Y2Nlc3NUb2tlblJlcRIPCgd1c2VyX2lkGAEgASgJEhQKDGFjY2Vzc190b2tl",
+          "bhgCIAEoCSI4ChJDcmVhdGVVc2VyTG9naW5SZXESEAoIdXNlcm5hbWUYASAB",
+          "KAkSEAoIcGFzc3dvcmQYAiABKAkiIwoPRmluZFVzZXJuYW1lUmVxEhAKCHVz",
+          "ZXJuYW1lGAEgASgJIigKEEZpbmRVc2VybmFtZVJlc3ASFAoMZm91bmRfYW1v",
+          "dW50GAEgASgDIj0KEkNyZWF0ZUNoYXJhY3RlclJlcRIPCgd1c2VyX2lkGAEg",
+          "ASgJEhYKDmNoYXJhY3Rlcl9kYXRhGAIgASgMIqsCChBSZWFkQ2hhcmFjdGVy",
+          "UmVxEg8KB3VzZXJfaWQYASABKAkSFAoMY2hhcmFjdGVyX2lkGAIgASgJEhoK",
+          "EndpdGhfZXF1aXBfd2VhcG9ucxgDIAEoCBIXCg93aXRoX2F0dHJpYnV0ZXMY",
+          "BCABKAgSEwoLd2l0aF9za2lsbHMYBSABKAgSGQoRd2l0aF9za2lsbF91c2Fn",
+          "ZXMYBiABKAgSEgoKd2l0aF9idWZmcxgHIAEoCBIYChB3aXRoX2VxdWlwX2l0",
+          "ZW1zGAggASgIEhwKFHdpdGhfbm9uX2VxdWlwX2l0ZW1zGAkgASgIEhQKDHdp",
+          "dGhfc3VtbW9ucxgKIAEoCBIUCgx3aXRoX2hvdGtleXMYCyABKAgSEwoLd2l0",
+          "aF9xdWVzdHMYDCABKAgiKwoRUmVhZENoYXJhY3RlclJlc3ASFgoOY2hhcmFj",
+          "dGVyX2RhdGEYASABKAwiJAoRUmVhZENoYXJhY3RlcnNSZXESDwoHdXNlcl9p",
+          "ZBgBIAEoCSIiChJSZWFkQ2hhcmFjdGVyc1Jlc3ASDAoEbGlzdBgBIAMoDCIs",
+          "ChJVcGRhdGVDaGFyYWN0ZXJSZXESFgoOY2hhcmFjdGVyX2RhdGEYASABKAwi",
+          "OwoSRGVsZXRlQ2hhcmFjdGVyUmVxEg8KB3VzZXJfaWQYASABKAkSFAoMY2hh",
+          "cmFjdGVyX2lkGAIgASgJIi4KFEZpbmRDaGFyYWN0ZXJOYW1lUmVxEhYKDmNo",
+          "YXJhY3Rlcl9uYW1lGAEgASgJIi0KFUZpbmRDaGFyYWN0ZXJOYW1lUmVzcBIU",
+          "Cgxmb3VuZF9hbW91bnQYASABKAMiKwoRRmluZENoYXJhY3RlcnNSZXESFgoO",
+          "Y2hhcmFjdGVyX25hbWUYASABKAkiIgoSRmluZENoYXJhY3RlcnNSZXNwEgwK",
+          "BGxpc3QYASADKAwiQQoPQ3JlYXRlRnJpZW5kUmVxEhYKDmNoYXJhY3Rlcl9p",
+          "ZF8xGAEgASgJEhYKDmNoYXJhY3Rlcl9pZF8yGAIgASgJIkEKD0RlbGV0ZUZy",
+          "aWVuZFJlcRIWCg5jaGFyYWN0ZXJfaWRfMRgBIAEoCRIWCg5jaGFyYWN0ZXJf",
+          "aWRfMhgCIAEoCSImCg5SZWFkRnJpZW5kc1JlcRIUCgxjaGFyYWN0ZXJfaWQY",
+          "ASABKAkiHwoPUmVhZEZyaWVuZHNSZXNwEgwKBGxpc3QYASADKAwiPAoRQ3Jl",
+          "YXRlQnVpbGRpbmdSZXESEAoIbWFwX25hbWUYASABKAkSFQoNYnVpbGRpbmdf",
+          "ZGF0YRgCIAEoDCI8ChFVcGRhdGVCdWlsZGluZ1JlcRIQCghtYXBfbmFtZRgB",
+          "IAEoCRIVCg1idWlsZGluZ19kYXRhGAIgASgMIjoKEURlbGV0ZUJ1aWxkaW5n",
+          "UmVxEhAKCG1hcF9uYW1lGAEgASgJEhMKC2J1aWxkaW5nX2lkGAIgASgJIiQK",
+          "EFJlYWRCdWlsZGluZ3NSZXESEAoIbWFwX25hbWUYASABKAkiIQoRUmVhZEJ1",
+          "aWxkaW5nc1Jlc3ASDAoEbGlzdBgBIAMoDCJUCg5DcmVhdGVQYXJ0eVJlcRIR",
+          "CglzaGFyZV9leHAYASABKAgSEgoKc2hhcmVfaXRlbRgCIAEoCBIbChNsZWFk",
+          "ZXJfY2hhcmFjdGVyX2lkGAMgASgJIiMKD0NyZWF0ZVBhcnR5UmVzcBIQCghw",
+          "YXJ0eV9pZBgBIAEoBSJJCg5VcGRhdGVQYXJ0eVJlcRIQCghwYXJ0eV9pZBgB",
+          "IAEoBRIRCglzaGFyZV9leHAYAiABKAgSEgoKc2hhcmVfaXRlbRgDIAEoCCJF",
+          "ChRVcGRhdGVQYXJ0eUxlYWRlclJlcRIQCghwYXJ0eV9pZBgBIAEoBRIbChNs",
+          "ZWFkZXJfY2hhcmFjdGVyX2lkGAIgASgJIiIKDkRlbGV0ZVBhcnR5UmVxEhAK",
+          "CHBhcnR5X2lkGAEgASgFIkEKF1VwZGF0ZUNoYXJhY3RlclBhcnR5UmVxEhQK",
+          "DGNoYXJhY3Rlcl9pZBgBIAEoCRIQCghwYXJ0eV9pZBgCIAEoBSIgCgxSZWFk",
+          "UGFydHlSZXESEAoIcGFydHlfaWQYASABKAUiIwoNUmVhZFBhcnR5UmVzcBIS",
+          "CgpwYXJ0eV9kYXRhGAEgASgMIkEKDkNyZWF0ZUd1aWxkUmVxEhIKCmd1aWxk",
+          "X25hbWUYASABKAkSGwoTbGVhZGVyX2NoYXJhY3Rlcl9pZBgCIAEoCSIjCg9D",
+          "cmVhdGVHdWlsZFJlc3ASEAoIZ3VpbGRfaWQYASABKAUiWAoTVXBkYXRlR3Vp",
+          "bGRMZXZlbFJlcRIQCghndWlsZF9pZBgBIAEoBRINCgVsZXZlbBgCIAEoBRIL",
+          "CgNleHAYAyABKAUSEwoLc2tpbGxfcG9pbnQYBCABKAUiRQoUVXBkYXRlR3Vp",
+          "bGRMZWFkZXJSZXESEAoIZ3VpbGRfaWQYASABKAUSGwoTbGVhZGVyX2NoYXJh",
+          "Y3Rlcl9pZBgCIAEoCSJAChVVcGRhdGVHdWlsZE1lc3NhZ2VSZXESEAoIZ3Vp",
+          "bGRfaWQYASABKAUSFQoNZ3VpbGRfbWVzc2FnZRgCIAEoCSKRAQoSVXBkYXRl",
+          "R3VpbGRSb2xlUmVxEhAKCGd1aWxkX2lkGAEgASgFEhIKCmd1aWxkX3JvbGUY",
+          "AiABKA0SEQoJcm9sZV9uYW1lGAMgASgJEhIKCmNhbl9pbnZpdGUYBCABKAgS",
+          "EAoIY2FuX2tpY2sYBSABKAgSHAoUc2hhcmVfZXhwX3BlcmNlbnRhZ2UYBiAB",
+          "KA0iSwoYVXBkYXRlR3VpbGRNZW1iZXJSb2xlUmVxEhsKE21lbWJlcl9jaGFy",
+          "YWN0ZXJfaWQYASABKAkSEgoKZ3VpbGRfcm9sZRgCIAEoDSJnChhVcGRhdGVH",
+          "dWlsZFNraWxsTGV2ZWxSZXESEAoIZ3VpbGRfaWQYASABKAUSDwoHZGF0YV9p",
+          "ZBgCIAEoBRITCgtza2lsbF9sZXZlbBgDIAEoBRITCgtza2lsbF9wb2ludBgE",
+          "IAEoBSJVChdVcGRhdGVDaGFyYWN0ZXJHdWlsZFJlcRIUCgxjaGFyYWN0ZXJf",
+          "aWQYASABKAkSEAoIZ3VpbGRfaWQYAiABKAUSEgoKZ3VpbGRfcm9sZRgDIAEo",
+          "DSIiCg5EZWxldGVHdWlsZFJlcRIQCghndWlsZF9pZBgBIAEoBSImChBGaW5k",
+          "R3VpbGROYW1lUmVxEhIKCmd1aWxkX25hbWUYASABKAkiKQoRRmluZEd1aWxk",
+          "TmFtZVJlc3ASFAoMZm91bmRfYW1vdW50GAEgASgDIj0KDFJlYWRHdWlsZFJl",
+          "cRIQCghndWlsZF9pZBgBIAEoBRIbChNkZWZhdWx0X2d1aWxkX3JvbGVzGAIg",
+          "AygMIiMKDVJlYWRHdWlsZFJlc3ASEgoKZ3VpbGRfZGF0YRgBIAEoDCIjCg9H",
+          "ZXRHdWlsZEdvbGRSZXESEAoIZ3VpbGRfaWQYASABKAUiNgoSVXBkYXRlR3Vp",
+          "bGRHb2xkUmVxEhAKCGd1aWxkX2lkGAEgASgFEg4KBmFtb3VudBgCIAEoBSI4",
+          "ChREZWNyZWFzZUd1aWxkR29sZFJlcRIQCghndWlsZF9pZBgBIAEoBRIOCgZh",
+          "bW91bnQYAiABKAUidwoVVXBkYXRlU3RvcmFnZUl0ZW1zUmVxEiMKDHN0b3Jh",
+          "Z2VfdHlwZRgBIAEoDjINLkVTdG9yYWdlVHlwZRIYChBzdG9yYWdlX293bmVy",
+          "X2lkGAIgASgJEh8KF3N0b3JhZ2VfY2hhcmFjdGVyX2l0ZW1zGAMgAygMIlQK",
+          "E1JlYWRTdG9yYWdlSXRlbXNSZXESIwoMc3RvcmFnZV90eXBlGAEgASgOMg0u",
+          "RVN0b3JhZ2VUeXBlEhgKEHN0b3JhZ2Vfb3duZXJfaWQYAiABKAkiNwoUUmVh",
+          "ZFN0b3JhZ2VJdGVtc1Jlc3ASHwoXc3RvcmFnZV9jaGFyYWN0ZXJfaXRlbXMY",
+          "ASADKAwqPQoMRVN0b3JhZ2VUeXBlEggKBE5PTkUQABIKCgZQTEFZRVIQARIJ",
+          "CgVHVUlMRBACEgwKCEJVSUxESU5HEAMyyBIKD0RhdGFiYXNlU2VydmljZRJC",
+          "ChFWYWxpZGF0ZVVzZXJMb2dpbhIVLlZhbGlkYXRlVXNlckxvZ2luUmVxGhYu",
+          "VmFsaWRhdGVVc2VyTG9naW5SZXNwEkgKE1ZhbGlkYXRlQWNjZXNzVG9rZW4S",
+          "Fy5WYWxpZGF0ZUFjY2Vzc1Rva2VuUmVxGhguVmFsaWRhdGVBY2Nlc3NUb2tl",
+          "blJlc3ASMwoMR2V0VXNlckxldmVsEhAuR2V0VXNlckxldmVsUmVxGhEuR2V0",
+          "VXNlckxldmVsUmVzcBIhCgdHZXRHb2xkEgsuR2V0R29sZFJlcRoJLkdvbGRS",
+          "ZXNwEicKClVwZGF0ZUdvbGQSDi5VcGRhdGVHb2xkUmVxGgkuVm9pZFJlc3AS",
+          "IQoHR2V0Q2FzaBILLkdldENhc2hSZXEaCS5DYXNoUmVzcBInCgpVcGRhdGVD",
+          "YXNoEg4uVXBkYXRlQ2FzaFJlcRoJLlZvaWRSZXNwEjUKEVVwZGF0ZUFjY2Vz",
+          "c1Rva2VuEhUuVXBkYXRlQWNjZXNzVG9rZW5SZXEaCS5Wb2lkUmVzcBIxCg9D",
+          "cmVhdGVVc2VyTG9naW4SEy5DcmVhdGVVc2VyTG9naW5SZXEaCS5Wb2lkUmVz",
+          "cBIzCgxGaW5kVXNlcm5hbWUSEC5GaW5kVXNlcm5hbWVSZXEaES5GaW5kVXNl",
+          "cm5hbWVSZXNwEjEKD0NyZWF0ZUNoYXJhY3RlchITLkNyZWF0ZUNoYXJhY3Rl",
+          "clJlcRoJLlZvaWRSZXNwEjYKDVJlYWRDaGFyYWN0ZXISES5SZWFkQ2hhcmFj",
+          "dGVyUmVxGhIuUmVhZENoYXJhY3RlclJlc3ASOQoOUmVhZENoYXJhY3RlcnMS",
+          "Ei5SZWFkQ2hhcmFjdGVyc1JlcRoTLlJlYWRDaGFyYWN0ZXJzUmVzcBIxCg9V",
+          "cGRhdGVDaGFyYWN0ZXISEy5VcGRhdGVDaGFyYWN0ZXJSZXEaCS5Wb2lkUmVz",
+          "cBIxCg9EZWxldGVDaGFyYWN0ZXISEy5EZWxldGVDaGFyYWN0ZXJSZXEaCS5W",
+          "b2lkUmVzcBJCChFGaW5kQ2hhcmFjdGVyTmFtZRIVLkZpbmRDaGFyYWN0ZXJO",
+          "YW1lUmVxGhYuRmluZENoYXJhY3Rlck5hbWVSZXNwEjkKDkZpbmRDaGFyYWN0",
+          "ZXJzEhIuRmluZENoYXJhY3RlcnNSZXEaEy5GaW5kQ2hhcmFjdGVyc1Jlc3AS",
+          "KwoMQ3JlYXRlRnJpZW5kEhAuQ3JlYXRlRnJpZW5kUmVxGgkuVm9pZFJlc3AS",
+          "KwoMRGVsZXRlRnJpZW5kEhAuRGVsZXRlRnJpZW5kUmVxGgkuVm9pZFJlc3AS",
+          "MAoLUmVhZEZyaWVuZHMSDy5SZWFkRnJpZW5kc1JlcRoQLlJlYWRGcmllbmRz",
+          "UmVzcBIvCg5DcmVhdGVCdWlsZGluZxISLkNyZWF0ZUJ1aWxkaW5nUmVxGgku",
+          "Vm9pZFJlc3ASLwoOVXBkYXRlQnVpbGRpbmcSEi5VcGRhdGVCdWlsZGluZ1Jl",
+          "cRoJLlZvaWRSZXNwEi8KDkRlbGV0ZUJ1aWxkaW5nEhIuRGVsZXRlQnVpbGRp",
+          "bmdSZXEaCS5Wb2lkUmVzcBI2Cg1SZWFkQnVpbGRpbmdzEhEuUmVhZEJ1aWxk",
+          "aW5nc1JlcRoSLlJlYWRCdWlsZGluZ3NSZXNwEjAKC0NyZWF0ZVBhcnR5Eg8u",
+          "Q3JlYXRlUGFydHlSZXEaEC5DcmVhdGVQYXJ0eVJlc3ASKQoLVXBkYXRlUGFy",
+          "dHkSDy5VcGRhdGVQYXJ0eVJlcRoJLlZvaWRSZXNwEjUKEVVwZGF0ZVBhcnR5",
+          "TGVhZGVyEhUuVXBkYXRlUGFydHlMZWFkZXJSZXEaCS5Wb2lkUmVzcBIpCgtE",
+          "ZWxldGVQYXJ0eRIPLkRlbGV0ZVBhcnR5UmVxGgkuVm9pZFJlc3ASOwoUVXBk",
+          "YXRlQ2hhcmFjdGVyUGFydHkSGC5VcGRhdGVDaGFyYWN0ZXJQYXJ0eVJlcRoJ",
+          "LlZvaWRSZXNwEioKCVJlYWRQYXJ0eRINLlJlYWRQYXJ0eVJlcRoOLlJlYWRQ",
+          "YXJ0eVJlc3ASMAoLQ3JlYXRlR3VpbGQSDy5DcmVhdGVHdWlsZFJlcRoQLkNy",
+          "ZWF0ZUd1aWxkUmVzcBIzChBVcGRhdGVHdWlsZExldmVsEhQuVXBkYXRlR3Vp",
+          "bGRMZXZlbFJlcRoJLlZvaWRSZXNwEjUKEVVwZGF0ZUd1aWxkTGVhZGVyEhUu",
+          "VXBkYXRlR3VpbGRMZWFkZXJSZXEaCS5Wb2lkUmVzcBI3ChJVcGRhdGVHdWls",
+          "ZE1lc3NhZ2USFi5VcGRhdGVHdWlsZE1lc3NhZ2VSZXEaCS5Wb2lkUmVzcBIx",
+          "Cg9VcGRhdGVHdWlsZFJvbGUSEy5VcGRhdGVHdWlsZFJvbGVSZXEaCS5Wb2lk",
+          "UmVzcBI9ChVVcGRhdGVHdWlsZE1lbWJlclJvbGUSGS5VcGRhdGVHdWlsZE1l",
+          "bWJlclJvbGVSZXEaCS5Wb2lkUmVzcBI9ChVVcGRhdGVHdWlsZFNraWxsTGV2",
+          "ZWwSGS5VcGRhdGVHdWlsZFNraWxsTGV2ZWxSZXEaCS5Wb2lkUmVzcBI7ChRV",
+          "cGRhdGVDaGFyYWN0ZXJHdWlsZBIYLlVwZGF0ZUNoYXJhY3Rlckd1aWxkUmVx",
+          "GgkuVm9pZFJlc3ASKQoLRGVsZXRlR3VpbGQSDy5EZWxldGVHdWlsZFJlcRoJ",
+          "LlZvaWRSZXNwEjYKDUZpbmRHdWlsZE5hbWUSES5GaW5kR3VpbGROYW1lUmVx",
+          "GhIuRmluZEd1aWxkTmFtZVJlc3ASKgoJUmVhZEd1aWxkEg0uUmVhZEd1aWxk",
+          "UmVxGg4uUmVhZEd1aWxkUmVzcBIwCgxHZXRHdWlsZEdvbGQSEC5HZXRHdWls",
+          "ZEdvbGRSZXEaDi5HdWlsZEdvbGRSZXNwEjEKD1VwZGF0ZUd1aWxkR29sZBIT",
+          "LlVwZGF0ZUd1aWxkR29sZFJlcRoJLlZvaWRSZXNwEjcKElVwZGF0ZVN0b3Jh",
+          "Z2VJdGVtcxIWLlVwZGF0ZVN0b3JhZ2VJdGVtc1JlcRoJLlZvaWRSZXNwEj8K",
+          "EFJlYWRTdG9yYWdlSXRlbXMSFC5SZWFkU3RvcmFnZUl0ZW1zUmVxGhUuUmVh",
+          "ZFN0b3JhZ2VJdGVtc1Jlc3BiBnByb3RvMw=="));
     descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
         new pbr::FileDescriptor[] { },
         new pbr::GeneratedClrTypeInfo(new[] {typeof(global::EStorageType), }, null, new pbr::GeneratedClrTypeInfo[] {
@@ -185,11 +176,9 @@ public static partial class DatabaseServiceReflection {
           new pbr::GeneratedClrTypeInfo(typeof(global::GetUserLevelReq), global::GetUserLevelReq.Parser, new[]{ "UserId" }, null, null, null, null),
           new pbr::GeneratedClrTypeInfo(typeof(global::GetUserLevelResp), global::GetUserLevelResp.Parser, new[]{ "UserLevel" }, null, null, null, null),
           new pbr::GeneratedClrTypeInfo(typeof(global::GetGoldReq), global::GetGoldReq.Parser, new[]{ "UserId" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::IncreaseGoldReq), global::IncreaseGoldReq.Parser, new[]{ "UserId", "Amount" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::DecreaseGoldReq), global::DecreaseGoldReq.Parser, new[]{ "UserId", "Amount" }, null, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::UpdateGoldReq), global::UpdateGoldReq.Parser, new[]{ "UserId", "Amount" }, null, null, null, null),
           new pbr::GeneratedClrTypeInfo(typeof(global::GetCashReq), global::GetCashReq.Parser, new[]{ "UserId" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::IncreaseCashReq), global::IncreaseCashReq.Parser, new[]{ "UserId", "Amount" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::DecreaseCashReq), global::DecreaseCashReq.Parser, new[]{ "UserId", "Amount" }, null, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::UpdateCashReq), global::UpdateCashReq.Parser, new[]{ "UserId", "Amount" }, null, null, null, null),
           new pbr::GeneratedClrTypeInfo(typeof(global::UpdateAccessTokenReq), global::UpdateAccessTokenReq.Parser, new[]{ "UserId", "AccessToken" }, null, null, null, null),
           new pbr::GeneratedClrTypeInfo(typeof(global::CreateUserLoginReq), global::CreateUserLoginReq.Parser, new[]{ "Username", "Password" }, null, null, null, null),
           new pbr::GeneratedClrTypeInfo(typeof(global::FindUsernameReq), global::FindUsernameReq.Parser, new[]{ "Username" }, null, null, null, null),
@@ -221,16 +210,15 @@ public static partial class DatabaseServiceReflection {
           new pbr::GeneratedClrTypeInfo(typeof(global::DeletePartyReq), global::DeletePartyReq.Parser, new[]{ "PartyId" }, null, null, null, null),
           new pbr::GeneratedClrTypeInfo(typeof(global::UpdateCharacterPartyReq), global::UpdateCharacterPartyReq.Parser, new[]{ "CharacterId", "PartyId" }, null, null, null, null),
           new pbr::GeneratedClrTypeInfo(typeof(global::ReadPartyReq), global::ReadPartyReq.Parser, new[]{ "PartyId" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::ReadPartyResp), global::ReadPartyResp.Parser, new[]{ "PartyId" }, null, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::ReadPartyResp), global::ReadPartyResp.Parser, new[]{ "PartyData" }, null, null, null, null),
           new pbr::GeneratedClrTypeInfo(typeof(global::CreateGuildReq), global::CreateGuildReq.Parser, new[]{ "GuildName", "LeaderCharacterId" }, null, null, null, null),
           new pbr::GeneratedClrTypeInfo(typeof(global::CreateGuildResp), global::CreateGuildResp.Parser, new[]{ "GuildId" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::IncreaseGuildExpReq), global::IncreaseGuildExpReq.Parser, new[]{ "GuildId", "IncreaseExp", "ExpTree" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::IncreaseGuildExpResp), global::IncreaseGuildExpResp.Parser, new[]{ "IsSuccess", "ResultLevel", "ResultExp", "ResultSkillPoint" }, null, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::UpdateGuildLevelReq), global::UpdateGuildLevelReq.Parser, new[]{ "GuildId", "Level", "Exp", "SkillPoint" }, null, null, null, null),
           new pbr::GeneratedClrTypeInfo(typeof(global::UpdateGuildLeaderReq), global::UpdateGuildLeaderReq.Parser, new[]{ "GuildId", "LeaderCharacterId" }, null, null, null, null),
           new pbr::GeneratedClrTypeInfo(typeof(global::UpdateGuildMessageReq), global::UpdateGuildMessageReq.Parser, new[]{ "GuildId", "GuildMessage" }, null, null, null, null),
           new pbr::GeneratedClrTypeInfo(typeof(global::UpdateGuildRoleReq), global::UpdateGuildRoleReq.Parser, new[]{ "GuildId", "GuildRole", "RoleName", "CanInvite", "CanKick", "ShareExpPercentage" }, null, null, null, null),
           new pbr::GeneratedClrTypeInfo(typeof(global::UpdateGuildMemberRoleReq), global::UpdateGuildMemberRoleReq.Parser, new[]{ "MemberCharacterId", "GuildRole" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::UpdateGuildSkillLevelReq), global::UpdateGuildSkillLevelReq.Parser, new[]{ "GuildId", "DataId", "Level", "SkillPoint" }, null, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::UpdateGuildSkillLevelReq), global::UpdateGuildSkillLevelReq.Parser, new[]{ "GuildId", "DataId", "SkillLevel", "SkillPoint" }, null, null, null, null),
           new pbr::GeneratedClrTypeInfo(typeof(global::UpdateCharacterGuildReq), global::UpdateCharacterGuildReq.Parser, new[]{ "CharacterId", "GuildId", "GuildRole" }, null, null, null, null),
           new pbr::GeneratedClrTypeInfo(typeof(global::DeleteGuildReq), global::DeleteGuildReq.Parser, new[]{ "GuildId" }, null, null, null, null),
           new pbr::GeneratedClrTypeInfo(typeof(global::FindGuildNameReq), global::FindGuildNameReq.Parser, new[]{ "GuildName" }, null, null, null, null),
@@ -238,7 +226,7 @@ public static partial class DatabaseServiceReflection {
           new pbr::GeneratedClrTypeInfo(typeof(global::ReadGuildReq), global::ReadGuildReq.Parser, new[]{ "GuildId", "DefaultGuildRoles" }, null, null, null, null),
           new pbr::GeneratedClrTypeInfo(typeof(global::ReadGuildResp), global::ReadGuildResp.Parser, new[]{ "GuildData" }, null, null, null, null),
           new pbr::GeneratedClrTypeInfo(typeof(global::GetGuildGoldReq), global::GetGuildGoldReq.Parser, new[]{ "GuildId" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::IncreaseGuildGoldReq), global::IncreaseGuildGoldReq.Parser, new[]{ "GuildId", "Amount" }, null, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::UpdateGuildGoldReq), global::UpdateGuildGoldReq.Parser, new[]{ "GuildId", "Amount" }, null, null, null, null),
           new pbr::GeneratedClrTypeInfo(typeof(global::DecreaseGuildGoldReq), global::DecreaseGuildGoldReq.Parser, new[]{ "GuildId", "Amount" }, null, null, null, null),
           new pbr::GeneratedClrTypeInfo(typeof(global::UpdateStorageItemsReq), global::UpdateStorageItemsReq.Parser, new[]{ "StorageType", "StorageOwnerId", "StorageCharacterItems" }, null, null, null, null),
           new pbr::GeneratedClrTypeInfo(typeof(global::ReadStorageItemsReq), global::ReadStorageItemsReq.Parser, new[]{ "StorageType", "StorageOwnerId" }, null, null, null, null),
@@ -1724,11 +1712,11 @@ public sealed partial class GetGoldReq : pb::IMessage<GetGoldReq> {
 /// <summary>
 /// Increase gold
 /// </summary>
-public sealed partial class IncreaseGoldReq : pb::IMessage<IncreaseGoldReq> {
-  private static readonly pb::MessageParser<IncreaseGoldReq> _parser = new pb::MessageParser<IncreaseGoldReq>(() => new IncreaseGoldReq());
+public sealed partial class UpdateGoldReq : pb::IMessage<UpdateGoldReq> {
+  private static readonly pb::MessageParser<UpdateGoldReq> _parser = new pb::MessageParser<UpdateGoldReq>(() => new UpdateGoldReq());
   private pb::UnknownFieldSet _unknownFields;
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public static pb::MessageParser<IncreaseGoldReq> Parser { get { return _parser; } }
+  public static pb::MessageParser<UpdateGoldReq> Parser { get { return _parser; } }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
@@ -1741,22 +1729,22 @@ public sealed partial class IncreaseGoldReq : pb::IMessage<IncreaseGoldReq> {
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public IncreaseGoldReq() {
+  public UpdateGoldReq() {
     OnConstruction();
   }
 
   partial void OnConstruction();
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public IncreaseGoldReq(IncreaseGoldReq other) : this() {
+  public UpdateGoldReq(UpdateGoldReq other) : this() {
     userId_ = other.userId_;
     amount_ = other.amount_;
     _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public IncreaseGoldReq Clone() {
-    return new IncreaseGoldReq(this);
+  public UpdateGoldReq Clone() {
+    return new UpdateGoldReq(this);
   }
 
   /// <summary>Field number for the "user_id" field.</summary>
@@ -1783,11 +1771,11 @@ public sealed partial class IncreaseGoldReq : pb::IMessage<IncreaseGoldReq> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public override bool Equals(object other) {
-    return Equals(other as IncreaseGoldReq);
+    return Equals(other as UpdateGoldReq);
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public bool Equals(IncreaseGoldReq other) {
+  public bool Equals(UpdateGoldReq other) {
     if (ReferenceEquals(other, null)) {
       return false;
     }
@@ -1846,167 +1834,7 @@ public sealed partial class IncreaseGoldReq : pb::IMessage<IncreaseGoldReq> {
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public void MergeFrom(IncreaseGoldReq other) {
-    if (other == null) {
-      return;
-    }
-    if (other.UserId.Length != 0) {
-      UserId = other.UserId;
-    }
-    if (other.Amount != 0) {
-      Amount = other.Amount;
-    }
-    _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
-  }
-
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public void MergeFrom(pb::CodedInputStream input) {
-    uint tag;
-    while ((tag = input.ReadTag()) != 0) {
-      switch(tag) {
-        default:
-          _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
-          break;
-        case 10: {
-          UserId = input.ReadString();
-          break;
-        }
-        case 16: {
-          Amount = input.ReadInt32();
-          break;
-        }
-      }
-    }
-  }
-
-}
-
-/// <summary>
-/// Decrease gold
-/// </summary>
-public sealed partial class DecreaseGoldReq : pb::IMessage<DecreaseGoldReq> {
-  private static readonly pb::MessageParser<DecreaseGoldReq> _parser = new pb::MessageParser<DecreaseGoldReq>(() => new DecreaseGoldReq());
-  private pb::UnknownFieldSet _unknownFields;
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public static pb::MessageParser<DecreaseGoldReq> Parser { get { return _parser; } }
-
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[12]; }
-  }
-
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  pbr::MessageDescriptor pb::IMessage.Descriptor {
-    get { return Descriptor; }
-  }
-
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public DecreaseGoldReq() {
-    OnConstruction();
-  }
-
-  partial void OnConstruction();
-
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public DecreaseGoldReq(DecreaseGoldReq other) : this() {
-    userId_ = other.userId_;
-    amount_ = other.amount_;
-    _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
-  }
-
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public DecreaseGoldReq Clone() {
-    return new DecreaseGoldReq(this);
-  }
-
-  /// <summary>Field number for the "user_id" field.</summary>
-  public const int UserIdFieldNumber = 1;
-  private string userId_ = "";
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public string UserId {
-    get { return userId_; }
-    set {
-      userId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
-    }
-  }
-
-  /// <summary>Field number for the "amount" field.</summary>
-  public const int AmountFieldNumber = 2;
-  private int amount_;
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public int Amount {
-    get { return amount_; }
-    set {
-      amount_ = value;
-    }
-  }
-
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public override bool Equals(object other) {
-    return Equals(other as DecreaseGoldReq);
-  }
-
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public bool Equals(DecreaseGoldReq other) {
-    if (ReferenceEquals(other, null)) {
-      return false;
-    }
-    if (ReferenceEquals(other, this)) {
-      return true;
-    }
-    if (UserId != other.UserId) return false;
-    if (Amount != other.Amount) return false;
-    return Equals(_unknownFields, other._unknownFields);
-  }
-
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public override int GetHashCode() {
-    int hash = 1;
-    if (UserId.Length != 0) hash ^= UserId.GetHashCode();
-    if (Amount != 0) hash ^= Amount.GetHashCode();
-    if (_unknownFields != null) {
-      hash ^= _unknownFields.GetHashCode();
-    }
-    return hash;
-  }
-
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public override string ToString() {
-    return pb::JsonFormatter.ToDiagnosticString(this);
-  }
-
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public void WriteTo(pb::CodedOutputStream output) {
-    if (UserId.Length != 0) {
-      output.WriteRawTag(10);
-      output.WriteString(UserId);
-    }
-    if (Amount != 0) {
-      output.WriteRawTag(16);
-      output.WriteInt32(Amount);
-    }
-    if (_unknownFields != null) {
-      _unknownFields.WriteTo(output);
-    }
-  }
-
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public int CalculateSize() {
-    int size = 0;
-    if (UserId.Length != 0) {
-      size += 1 + pb::CodedOutputStream.ComputeStringSize(UserId);
-    }
-    if (Amount != 0) {
-      size += 1 + pb::CodedOutputStream.ComputeInt32Size(Amount);
-    }
-    if (_unknownFields != null) {
-      size += _unknownFields.CalculateSize();
-    }
-    return size;
-  }
-
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public void MergeFrom(DecreaseGoldReq other) {
+  public void MergeFrom(UpdateGoldReq other) {
     if (other == null) {
       return;
     }
@@ -2052,7 +1880,7 @@ public sealed partial class GetCashReq : pb::IMessage<GetCashReq> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[13]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[12]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -2176,15 +2004,15 @@ public sealed partial class GetCashReq : pb::IMessage<GetCashReq> {
 /// <summary>
 /// Increase cash
 /// </summary>
-public sealed partial class IncreaseCashReq : pb::IMessage<IncreaseCashReq> {
-  private static readonly pb::MessageParser<IncreaseCashReq> _parser = new pb::MessageParser<IncreaseCashReq>(() => new IncreaseCashReq());
+public sealed partial class UpdateCashReq : pb::IMessage<UpdateCashReq> {
+  private static readonly pb::MessageParser<UpdateCashReq> _parser = new pb::MessageParser<UpdateCashReq>(() => new UpdateCashReq());
   private pb::UnknownFieldSet _unknownFields;
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public static pb::MessageParser<IncreaseCashReq> Parser { get { return _parser; } }
+  public static pb::MessageParser<UpdateCashReq> Parser { get { return _parser; } }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[14]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[13]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -2193,22 +2021,22 @@ public sealed partial class IncreaseCashReq : pb::IMessage<IncreaseCashReq> {
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public IncreaseCashReq() {
+  public UpdateCashReq() {
     OnConstruction();
   }
 
   partial void OnConstruction();
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public IncreaseCashReq(IncreaseCashReq other) : this() {
+  public UpdateCashReq(UpdateCashReq other) : this() {
     userId_ = other.userId_;
     amount_ = other.amount_;
     _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public IncreaseCashReq Clone() {
-    return new IncreaseCashReq(this);
+  public UpdateCashReq Clone() {
+    return new UpdateCashReq(this);
   }
 
   /// <summary>Field number for the "user_id" field.</summary>
@@ -2235,11 +2063,11 @@ public sealed partial class IncreaseCashReq : pb::IMessage<IncreaseCashReq> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public override bool Equals(object other) {
-    return Equals(other as IncreaseCashReq);
+    return Equals(other as UpdateCashReq);
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public bool Equals(IncreaseCashReq other) {
+  public bool Equals(UpdateCashReq other) {
     if (ReferenceEquals(other, null)) {
       return false;
     }
@@ -2298,167 +2126,7 @@ public sealed partial class IncreaseCashReq : pb::IMessage<IncreaseCashReq> {
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public void MergeFrom(IncreaseCashReq other) {
-    if (other == null) {
-      return;
-    }
-    if (other.UserId.Length != 0) {
-      UserId = other.UserId;
-    }
-    if (other.Amount != 0) {
-      Amount = other.Amount;
-    }
-    _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
-  }
-
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public void MergeFrom(pb::CodedInputStream input) {
-    uint tag;
-    while ((tag = input.ReadTag()) != 0) {
-      switch(tag) {
-        default:
-          _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
-          break;
-        case 10: {
-          UserId = input.ReadString();
-          break;
-        }
-        case 16: {
-          Amount = input.ReadInt32();
-          break;
-        }
-      }
-    }
-  }
-
-}
-
-/// <summary>
-/// Decrease cash
-/// </summary>
-public sealed partial class DecreaseCashReq : pb::IMessage<DecreaseCashReq> {
-  private static readonly pb::MessageParser<DecreaseCashReq> _parser = new pb::MessageParser<DecreaseCashReq>(() => new DecreaseCashReq());
-  private pb::UnknownFieldSet _unknownFields;
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public static pb::MessageParser<DecreaseCashReq> Parser { get { return _parser; } }
-
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[15]; }
-  }
-
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  pbr::MessageDescriptor pb::IMessage.Descriptor {
-    get { return Descriptor; }
-  }
-
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public DecreaseCashReq() {
-    OnConstruction();
-  }
-
-  partial void OnConstruction();
-
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public DecreaseCashReq(DecreaseCashReq other) : this() {
-    userId_ = other.userId_;
-    amount_ = other.amount_;
-    _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
-  }
-
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public DecreaseCashReq Clone() {
-    return new DecreaseCashReq(this);
-  }
-
-  /// <summary>Field number for the "user_id" field.</summary>
-  public const int UserIdFieldNumber = 1;
-  private string userId_ = "";
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public string UserId {
-    get { return userId_; }
-    set {
-      userId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
-    }
-  }
-
-  /// <summary>Field number for the "amount" field.</summary>
-  public const int AmountFieldNumber = 2;
-  private int amount_;
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public int Amount {
-    get { return amount_; }
-    set {
-      amount_ = value;
-    }
-  }
-
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public override bool Equals(object other) {
-    return Equals(other as DecreaseCashReq);
-  }
-
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public bool Equals(DecreaseCashReq other) {
-    if (ReferenceEquals(other, null)) {
-      return false;
-    }
-    if (ReferenceEquals(other, this)) {
-      return true;
-    }
-    if (UserId != other.UserId) return false;
-    if (Amount != other.Amount) return false;
-    return Equals(_unknownFields, other._unknownFields);
-  }
-
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public override int GetHashCode() {
-    int hash = 1;
-    if (UserId.Length != 0) hash ^= UserId.GetHashCode();
-    if (Amount != 0) hash ^= Amount.GetHashCode();
-    if (_unknownFields != null) {
-      hash ^= _unknownFields.GetHashCode();
-    }
-    return hash;
-  }
-
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public override string ToString() {
-    return pb::JsonFormatter.ToDiagnosticString(this);
-  }
-
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public void WriteTo(pb::CodedOutputStream output) {
-    if (UserId.Length != 0) {
-      output.WriteRawTag(10);
-      output.WriteString(UserId);
-    }
-    if (Amount != 0) {
-      output.WriteRawTag(16);
-      output.WriteInt32(Amount);
-    }
-    if (_unknownFields != null) {
-      _unknownFields.WriteTo(output);
-    }
-  }
-
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public int CalculateSize() {
-    int size = 0;
-    if (UserId.Length != 0) {
-      size += 1 + pb::CodedOutputStream.ComputeStringSize(UserId);
-    }
-    if (Amount != 0) {
-      size += 1 + pb::CodedOutputStream.ComputeInt32Size(Amount);
-    }
-    if (_unknownFields != null) {
-      size += _unknownFields.CalculateSize();
-    }
-    return size;
-  }
-
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public void MergeFrom(DecreaseCashReq other) {
+  public void MergeFrom(UpdateCashReq other) {
     if (other == null) {
       return;
     }
@@ -2504,7 +2172,7 @@ public sealed partial class UpdateAccessTokenReq : pb::IMessage<UpdateAccessToke
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[16]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[14]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -2664,7 +2332,7 @@ public sealed partial class CreateUserLoginReq : pb::IMessage<CreateUserLoginReq
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[17]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[15]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -2824,7 +2492,7 @@ public sealed partial class FindUsernameReq : pb::IMessage<FindUsernameReq> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[18]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[16]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -2953,7 +2621,7 @@ public sealed partial class FindUsernameResp : pb::IMessage<FindUsernameResp> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[19]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[17]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -3085,7 +2753,7 @@ public sealed partial class CreateCharacterReq : pb::IMessage<CreateCharacterReq
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[20]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[18]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -3245,7 +2913,7 @@ public sealed partial class ReadCharacterReq : pb::IMessage<ReadCharacterReq> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[21]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[19]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -3682,7 +3350,7 @@ public sealed partial class ReadCharacterResp : pb::IMessage<ReadCharacterResp> 
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[22]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[20]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -3814,7 +3482,7 @@ public sealed partial class ReadCharactersReq : pb::IMessage<ReadCharactersReq> 
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[23]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[21]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -3943,7 +3611,7 @@ public sealed partial class ReadCharactersResp : pb::IMessage<ReadCharactersResp
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[24]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[22]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -4067,7 +3735,7 @@ public sealed partial class UpdateCharacterReq : pb::IMessage<UpdateCharacterReq
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[25]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[23]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -4199,7 +3867,7 @@ public sealed partial class DeleteCharacterReq : pb::IMessage<DeleteCharacterReq
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[26]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[24]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -4359,7 +4027,7 @@ public sealed partial class FindCharacterNameReq : pb::IMessage<FindCharacterNam
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[27]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[25]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -4488,7 +4156,7 @@ public sealed partial class FindCharacterNameResp : pb::IMessage<FindCharacterNa
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[28]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[26]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -4620,7 +4288,7 @@ public sealed partial class FindCharactersReq : pb::IMessage<FindCharactersReq> 
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[29]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[27]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -4749,7 +4417,7 @@ public sealed partial class FindCharactersResp : pb::IMessage<FindCharactersResp
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[30]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[28]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -4873,7 +4541,7 @@ public sealed partial class CreateFriendReq : pb::IMessage<CreateFriendReq> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[31]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[29]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -5033,7 +4701,7 @@ public sealed partial class DeleteFriendReq : pb::IMessage<DeleteFriendReq> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[32]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[30]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -5193,7 +4861,7 @@ public sealed partial class ReadFriendsReq : pb::IMessage<ReadFriendsReq> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[33]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[31]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -5322,7 +4990,7 @@ public sealed partial class ReadFriendsResp : pb::IMessage<ReadFriendsResp> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[34]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[32]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -5446,7 +5114,7 @@ public sealed partial class CreateBuildingReq : pb::IMessage<CreateBuildingReq> 
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[35]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[33]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -5606,7 +5274,7 @@ public sealed partial class UpdateBuildingReq : pb::IMessage<UpdateBuildingReq> 
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[36]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[34]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -5766,7 +5434,7 @@ public sealed partial class DeleteBuildingReq : pb::IMessage<DeleteBuildingReq> 
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[37]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[35]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -5926,7 +5594,7 @@ public sealed partial class ReadBuildingsReq : pb::IMessage<ReadBuildingsReq> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[38]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[36]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -6055,7 +5723,7 @@ public sealed partial class ReadBuildingsResp : pb::IMessage<ReadBuildingsResp> 
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[39]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[37]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -6179,7 +5847,7 @@ public sealed partial class CreatePartyReq : pb::IMessage<CreatePartyReq> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[40]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[38]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -6364,7 +6032,7 @@ public sealed partial class CreatePartyResp : pb::IMessage<CreatePartyResp> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[41]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[39]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -6496,7 +6164,7 @@ public sealed partial class UpdatePartyReq : pb::IMessage<UpdatePartyReq> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[42]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[40]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -6684,7 +6352,7 @@ public sealed partial class UpdatePartyLeaderReq : pb::IMessage<UpdatePartyLeade
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[43]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[41]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -6844,7 +6512,7 @@ public sealed partial class DeletePartyReq : pb::IMessage<DeletePartyReq> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[44]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[42]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -6976,7 +6644,7 @@ public sealed partial class UpdateCharacterPartyReq : pb::IMessage<UpdateCharact
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[45]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[43]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -7136,7 +6804,7 @@ public sealed partial class ReadPartyReq : pb::IMessage<ReadPartyReq> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[46]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[44]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -7265,7 +6933,7 @@ public sealed partial class ReadPartyResp : pb::IMessage<ReadPartyResp> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[47]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[45]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -7282,7 +6950,7 @@ public sealed partial class ReadPartyResp : pb::IMessage<ReadPartyResp> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public ReadPartyResp(ReadPartyResp other) : this() {
-    partyId_ = other.partyId_;
+    partyData_ = other.partyData_;
     _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
   }
 
@@ -7291,14 +6959,14 @@ public sealed partial class ReadPartyResp : pb::IMessage<ReadPartyResp> {
     return new ReadPartyResp(this);
   }
 
-  /// <summary>Field number for the "party_id" field.</summary>
-  public const int PartyIdFieldNumber = 1;
-  private pb::ByteString partyId_ = pb::ByteString.Empty;
+  /// <summary>Field number for the "party_data" field.</summary>
+  public const int PartyDataFieldNumber = 1;
+  private pb::ByteString partyData_ = pb::ByteString.Empty;
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public pb::ByteString PartyId {
-    get { return partyId_; }
+  public pb::ByteString PartyData {
+    get { return partyData_; }
     set {
-      partyId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      partyData_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
     }
   }
 
@@ -7315,14 +6983,14 @@ public sealed partial class ReadPartyResp : pb::IMessage<ReadPartyResp> {
     if (ReferenceEquals(other, this)) {
       return true;
     }
-    if (PartyId != other.PartyId) return false;
+    if (PartyData != other.PartyData) return false;
     return Equals(_unknownFields, other._unknownFields);
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public override int GetHashCode() {
     int hash = 1;
-    if (PartyId.Length != 0) hash ^= PartyId.GetHashCode();
+    if (PartyData.Length != 0) hash ^= PartyData.GetHashCode();
     if (_unknownFields != null) {
       hash ^= _unknownFields.GetHashCode();
     }
@@ -7336,9 +7004,9 @@ public sealed partial class ReadPartyResp : pb::IMessage<ReadPartyResp> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public void WriteTo(pb::CodedOutputStream output) {
-    if (PartyId.Length != 0) {
+    if (PartyData.Length != 0) {
       output.WriteRawTag(10);
-      output.WriteBytes(PartyId);
+      output.WriteBytes(PartyData);
     }
     if (_unknownFields != null) {
       _unknownFields.WriteTo(output);
@@ -7348,8 +7016,8 @@ public sealed partial class ReadPartyResp : pb::IMessage<ReadPartyResp> {
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public int CalculateSize() {
     int size = 0;
-    if (PartyId.Length != 0) {
-      size += 1 + pb::CodedOutputStream.ComputeBytesSize(PartyId);
+    if (PartyData.Length != 0) {
+      size += 1 + pb::CodedOutputStream.ComputeBytesSize(PartyData);
     }
     if (_unknownFields != null) {
       size += _unknownFields.CalculateSize();
@@ -7362,8 +7030,8 @@ public sealed partial class ReadPartyResp : pb::IMessage<ReadPartyResp> {
     if (other == null) {
       return;
     }
-    if (other.PartyId.Length != 0) {
-      PartyId = other.PartyId;
+    if (other.PartyData.Length != 0) {
+      PartyData = other.PartyData;
     }
     _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
   }
@@ -7377,7 +7045,7 @@ public sealed partial class ReadPartyResp : pb::IMessage<ReadPartyResp> {
           _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
           break;
         case 10: {
-          PartyId = input.ReadBytes();
+          PartyData = input.ReadBytes();
           break;
         }
       }
@@ -7397,7 +7065,7 @@ public sealed partial class CreateGuildReq : pb::IMessage<CreateGuildReq> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[48]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[46]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -7554,7 +7222,7 @@ public sealed partial class CreateGuildResp : pb::IMessage<CreateGuildResp> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[49]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[47]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -7678,15 +7346,15 @@ public sealed partial class CreateGuildResp : pb::IMessage<CreateGuildResp> {
 /// <summary>
 /// Increase guild exp
 /// </summary>
-public sealed partial class IncreaseGuildExpReq : pb::IMessage<IncreaseGuildExpReq> {
-  private static readonly pb::MessageParser<IncreaseGuildExpReq> _parser = new pb::MessageParser<IncreaseGuildExpReq>(() => new IncreaseGuildExpReq());
+public sealed partial class UpdateGuildLevelReq : pb::IMessage<UpdateGuildLevelReq> {
+  private static readonly pb::MessageParser<UpdateGuildLevelReq> _parser = new pb::MessageParser<UpdateGuildLevelReq>(() => new UpdateGuildLevelReq());
   private pb::UnknownFieldSet _unknownFields;
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public static pb::MessageParser<IncreaseGuildExpReq> Parser { get { return _parser; } }
+  public static pb::MessageParser<UpdateGuildLevelReq> Parser { get { return _parser; } }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[50]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[48]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -7695,23 +7363,24 @@ public sealed partial class IncreaseGuildExpReq : pb::IMessage<IncreaseGuildExpR
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public IncreaseGuildExpReq() {
+  public UpdateGuildLevelReq() {
     OnConstruction();
   }
 
   partial void OnConstruction();
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public IncreaseGuildExpReq(IncreaseGuildExpReq other) : this() {
+  public UpdateGuildLevelReq(UpdateGuildLevelReq other) : this() {
     guildId_ = other.guildId_;
-    increaseExp_ = other.increaseExp_;
-    expTree_ = other.expTree_.Clone();
+    level_ = other.level_;
+    exp_ = other.exp_;
+    skillPoint_ = other.skillPoint_;
     _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public IncreaseGuildExpReq Clone() {
-    return new IncreaseGuildExpReq(this);
+  public UpdateGuildLevelReq Clone() {
+    return new UpdateGuildLevelReq(this);
   }
 
   /// <summary>Field number for the "guild_id" field.</summary>
@@ -7725,34 +7394,46 @@ public sealed partial class IncreaseGuildExpReq : pb::IMessage<IncreaseGuildExpR
     }
   }
 
-  /// <summary>Field number for the "increase_exp" field.</summary>
-  public const int IncreaseExpFieldNumber = 2;
-  private int increaseExp_;
+  /// <summary>Field number for the "level" field.</summary>
+  public const int LevelFieldNumber = 2;
+  private int level_;
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public int IncreaseExp {
-    get { return increaseExp_; }
+  public int Level {
+    get { return level_; }
     set {
-      increaseExp_ = value;
+      level_ = value;
     }
   }
 
-  /// <summary>Field number for the "exp_tree" field.</summary>
-  public const int ExpTreeFieldNumber = 3;
-  private static readonly pb::FieldCodec<int> _repeated_expTree_codec
-      = pb::FieldCodec.ForInt32(26);
-  private readonly pbc::RepeatedField<int> expTree_ = new pbc::RepeatedField<int>();
+  /// <summary>Field number for the "exp" field.</summary>
+  public const int ExpFieldNumber = 3;
+  private int exp_;
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public pbc::RepeatedField<int> ExpTree {
-    get { return expTree_; }
+  public int Exp {
+    get { return exp_; }
+    set {
+      exp_ = value;
+    }
+  }
+
+  /// <summary>Field number for the "skill_point" field.</summary>
+  public const int SkillPointFieldNumber = 4;
+  private int skillPoint_;
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public int SkillPoint {
+    get { return skillPoint_; }
+    set {
+      skillPoint_ = value;
+    }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public override bool Equals(object other) {
-    return Equals(other as IncreaseGuildExpReq);
+    return Equals(other as UpdateGuildLevelReq);
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public bool Equals(IncreaseGuildExpReq other) {
+  public bool Equals(UpdateGuildLevelReq other) {
     if (ReferenceEquals(other, null)) {
       return false;
     }
@@ -7760,8 +7441,9 @@ public sealed partial class IncreaseGuildExpReq : pb::IMessage<IncreaseGuildExpR
       return true;
     }
     if (GuildId != other.GuildId) return false;
-    if (IncreaseExp != other.IncreaseExp) return false;
-    if(!expTree_.Equals(other.expTree_)) return false;
+    if (Level != other.Level) return false;
+    if (Exp != other.Exp) return false;
+    if (SkillPoint != other.SkillPoint) return false;
     return Equals(_unknownFields, other._unknownFields);
   }
 
@@ -7769,8 +7451,9 @@ public sealed partial class IncreaseGuildExpReq : pb::IMessage<IncreaseGuildExpR
   public override int GetHashCode() {
     int hash = 1;
     if (GuildId != 0) hash ^= GuildId.GetHashCode();
-    if (IncreaseExp != 0) hash ^= IncreaseExp.GetHashCode();
-    hash ^= expTree_.GetHashCode();
+    if (Level != 0) hash ^= Level.GetHashCode();
+    if (Exp != 0) hash ^= Exp.GetHashCode();
+    if (SkillPoint != 0) hash ^= SkillPoint.GetHashCode();
     if (_unknownFields != null) {
       hash ^= _unknownFields.GetHashCode();
     }
@@ -7788,11 +7471,18 @@ public sealed partial class IncreaseGuildExpReq : pb::IMessage<IncreaseGuildExpR
       output.WriteRawTag(8);
       output.WriteInt32(GuildId);
     }
-    if (IncreaseExp != 0) {
+    if (Level != 0) {
       output.WriteRawTag(16);
-      output.WriteInt32(IncreaseExp);
+      output.WriteInt32(Level);
     }
-    expTree_.WriteTo(output, _repeated_expTree_codec);
+    if (Exp != 0) {
+      output.WriteRawTag(24);
+      output.WriteInt32(Exp);
+    }
+    if (SkillPoint != 0) {
+      output.WriteRawTag(32);
+      output.WriteInt32(SkillPoint);
+    }
     if (_unknownFields != null) {
       _unknownFields.WriteTo(output);
     }
@@ -7804,10 +7494,15 @@ public sealed partial class IncreaseGuildExpReq : pb::IMessage<IncreaseGuildExpR
     if (GuildId != 0) {
       size += 1 + pb::CodedOutputStream.ComputeInt32Size(GuildId);
     }
-    if (IncreaseExp != 0) {
-      size += 1 + pb::CodedOutputStream.ComputeInt32Size(IncreaseExp);
+    if (Level != 0) {
+      size += 1 + pb::CodedOutputStream.ComputeInt32Size(Level);
     }
-    size += expTree_.CalculateSize(_repeated_expTree_codec);
+    if (Exp != 0) {
+      size += 1 + pb::CodedOutputStream.ComputeInt32Size(Exp);
+    }
+    if (SkillPoint != 0) {
+      size += 1 + pb::CodedOutputStream.ComputeInt32Size(SkillPoint);
+    }
     if (_unknownFields != null) {
       size += _unknownFields.CalculateSize();
     }
@@ -7815,17 +7510,22 @@ public sealed partial class IncreaseGuildExpReq : pb::IMessage<IncreaseGuildExpR
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public void MergeFrom(IncreaseGuildExpReq other) {
+  public void MergeFrom(UpdateGuildLevelReq other) {
     if (other == null) {
       return;
     }
     if (other.GuildId != 0) {
       GuildId = other.GuildId;
     }
-    if (other.IncreaseExp != 0) {
-      IncreaseExp = other.IncreaseExp;
+    if (other.Level != 0) {
+      Level = other.Level;
     }
-    expTree_.Add(other.expTree_);
+    if (other.Exp != 0) {
+      Exp = other.Exp;
+    }
+    if (other.SkillPoint != 0) {
+      SkillPoint = other.SkillPoint;
+    }
     _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
   }
 
@@ -7842,225 +7542,15 @@ public sealed partial class IncreaseGuildExpReq : pb::IMessage<IncreaseGuildExpR
           break;
         }
         case 16: {
-          IncreaseExp = input.ReadInt32();
-          break;
-        }
-        case 26:
-        case 24: {
-          expTree_.AddEntriesFrom(input, _repeated_expTree_codec);
-          break;
-        }
-      }
-    }
-  }
-
-}
-
-public sealed partial class IncreaseGuildExpResp : pb::IMessage<IncreaseGuildExpResp> {
-  private static readonly pb::MessageParser<IncreaseGuildExpResp> _parser = new pb::MessageParser<IncreaseGuildExpResp>(() => new IncreaseGuildExpResp());
-  private pb::UnknownFieldSet _unknownFields;
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public static pb::MessageParser<IncreaseGuildExpResp> Parser { get { return _parser; } }
-
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[51]; }
-  }
-
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  pbr::MessageDescriptor pb::IMessage.Descriptor {
-    get { return Descriptor; }
-  }
-
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public IncreaseGuildExpResp() {
-    OnConstruction();
-  }
-
-  partial void OnConstruction();
-
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public IncreaseGuildExpResp(IncreaseGuildExpResp other) : this() {
-    isSuccess_ = other.isSuccess_;
-    resultLevel_ = other.resultLevel_;
-    resultExp_ = other.resultExp_;
-    resultSkillPoint_ = other.resultSkillPoint_;
-    _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
-  }
-
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public IncreaseGuildExpResp Clone() {
-    return new IncreaseGuildExpResp(this);
-  }
-
-  /// <summary>Field number for the "is_success" field.</summary>
-  public const int IsSuccessFieldNumber = 1;
-  private bool isSuccess_;
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public bool IsSuccess {
-    get { return isSuccess_; }
-    set {
-      isSuccess_ = value;
-    }
-  }
-
-  /// <summary>Field number for the "result_level" field.</summary>
-  public const int ResultLevelFieldNumber = 2;
-  private int resultLevel_;
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public int ResultLevel {
-    get { return resultLevel_; }
-    set {
-      resultLevel_ = value;
-    }
-  }
-
-  /// <summary>Field number for the "result_exp" field.</summary>
-  public const int ResultExpFieldNumber = 3;
-  private int resultExp_;
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public int ResultExp {
-    get { return resultExp_; }
-    set {
-      resultExp_ = value;
-    }
-  }
-
-  /// <summary>Field number for the "result_skill_point" field.</summary>
-  public const int ResultSkillPointFieldNumber = 4;
-  private int resultSkillPoint_;
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public int ResultSkillPoint {
-    get { return resultSkillPoint_; }
-    set {
-      resultSkillPoint_ = value;
-    }
-  }
-
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public override bool Equals(object other) {
-    return Equals(other as IncreaseGuildExpResp);
-  }
-
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public bool Equals(IncreaseGuildExpResp other) {
-    if (ReferenceEquals(other, null)) {
-      return false;
-    }
-    if (ReferenceEquals(other, this)) {
-      return true;
-    }
-    if (IsSuccess != other.IsSuccess) return false;
-    if (ResultLevel != other.ResultLevel) return false;
-    if (ResultExp != other.ResultExp) return false;
-    if (ResultSkillPoint != other.ResultSkillPoint) return false;
-    return Equals(_unknownFields, other._unknownFields);
-  }
-
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public override int GetHashCode() {
-    int hash = 1;
-    if (IsSuccess != false) hash ^= IsSuccess.GetHashCode();
-    if (ResultLevel != 0) hash ^= ResultLevel.GetHashCode();
-    if (ResultExp != 0) hash ^= ResultExp.GetHashCode();
-    if (ResultSkillPoint != 0) hash ^= ResultSkillPoint.GetHashCode();
-    if (_unknownFields != null) {
-      hash ^= _unknownFields.GetHashCode();
-    }
-    return hash;
-  }
-
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public override string ToString() {
-    return pb::JsonFormatter.ToDiagnosticString(this);
-  }
-
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public void WriteTo(pb::CodedOutputStream output) {
-    if (IsSuccess != false) {
-      output.WriteRawTag(8);
-      output.WriteBool(IsSuccess);
-    }
-    if (ResultLevel != 0) {
-      output.WriteRawTag(16);
-      output.WriteInt32(ResultLevel);
-    }
-    if (ResultExp != 0) {
-      output.WriteRawTag(24);
-      output.WriteInt32(ResultExp);
-    }
-    if (ResultSkillPoint != 0) {
-      output.WriteRawTag(32);
-      output.WriteInt32(ResultSkillPoint);
-    }
-    if (_unknownFields != null) {
-      _unknownFields.WriteTo(output);
-    }
-  }
-
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public int CalculateSize() {
-    int size = 0;
-    if (IsSuccess != false) {
-      size += 1 + 1;
-    }
-    if (ResultLevel != 0) {
-      size += 1 + pb::CodedOutputStream.ComputeInt32Size(ResultLevel);
-    }
-    if (ResultExp != 0) {
-      size += 1 + pb::CodedOutputStream.ComputeInt32Size(ResultExp);
-    }
-    if (ResultSkillPoint != 0) {
-      size += 1 + pb::CodedOutputStream.ComputeInt32Size(ResultSkillPoint);
-    }
-    if (_unknownFields != null) {
-      size += _unknownFields.CalculateSize();
-    }
-    return size;
-  }
-
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public void MergeFrom(IncreaseGuildExpResp other) {
-    if (other == null) {
-      return;
-    }
-    if (other.IsSuccess != false) {
-      IsSuccess = other.IsSuccess;
-    }
-    if (other.ResultLevel != 0) {
-      ResultLevel = other.ResultLevel;
-    }
-    if (other.ResultExp != 0) {
-      ResultExp = other.ResultExp;
-    }
-    if (other.ResultSkillPoint != 0) {
-      ResultSkillPoint = other.ResultSkillPoint;
-    }
-    _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
-  }
-
-  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public void MergeFrom(pb::CodedInputStream input) {
-    uint tag;
-    while ((tag = input.ReadTag()) != 0) {
-      switch(tag) {
-        default:
-          _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
-          break;
-        case 8: {
-          IsSuccess = input.ReadBool();
-          break;
-        }
-        case 16: {
-          ResultLevel = input.ReadInt32();
+          Level = input.ReadInt32();
           break;
         }
         case 24: {
-          ResultExp = input.ReadInt32();
+          Exp = input.ReadInt32();
           break;
         }
         case 32: {
-          ResultSkillPoint = input.ReadInt32();
+          SkillPoint = input.ReadInt32();
           break;
         }
       }
@@ -8080,7 +7570,7 @@ public sealed partial class UpdateGuildLeaderReq : pb::IMessage<UpdateGuildLeade
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[52]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[49]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -8240,7 +7730,7 @@ public sealed partial class UpdateGuildMessageReq : pb::IMessage<UpdateGuildMess
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[53]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[50]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -8400,7 +7890,7 @@ public sealed partial class UpdateGuildRoleReq : pb::IMessage<UpdateGuildRoleReq
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[54]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[51]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -8672,7 +8162,7 @@ public sealed partial class UpdateGuildMemberRoleReq : pb::IMessage<UpdateGuildM
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[55]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[52]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -8832,7 +8322,7 @@ public sealed partial class UpdateGuildSkillLevelReq : pb::IMessage<UpdateGuildS
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[56]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[53]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -8851,7 +8341,7 @@ public sealed partial class UpdateGuildSkillLevelReq : pb::IMessage<UpdateGuildS
   public UpdateGuildSkillLevelReq(UpdateGuildSkillLevelReq other) : this() {
     guildId_ = other.guildId_;
     dataId_ = other.dataId_;
-    level_ = other.level_;
+    skillLevel_ = other.skillLevel_;
     skillPoint_ = other.skillPoint_;
     _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
   }
@@ -8883,14 +8373,14 @@ public sealed partial class UpdateGuildSkillLevelReq : pb::IMessage<UpdateGuildS
     }
   }
 
-  /// <summary>Field number for the "level" field.</summary>
-  public const int LevelFieldNumber = 3;
-  private int level_;
+  /// <summary>Field number for the "skill_level" field.</summary>
+  public const int SkillLevelFieldNumber = 3;
+  private int skillLevel_;
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public int Level {
-    get { return level_; }
+  public int SkillLevel {
+    get { return skillLevel_; }
     set {
-      level_ = value;
+      skillLevel_ = value;
     }
   }
 
@@ -8920,7 +8410,7 @@ public sealed partial class UpdateGuildSkillLevelReq : pb::IMessage<UpdateGuildS
     }
     if (GuildId != other.GuildId) return false;
     if (DataId != other.DataId) return false;
-    if (Level != other.Level) return false;
+    if (SkillLevel != other.SkillLevel) return false;
     if (SkillPoint != other.SkillPoint) return false;
     return Equals(_unknownFields, other._unknownFields);
   }
@@ -8930,7 +8420,7 @@ public sealed partial class UpdateGuildSkillLevelReq : pb::IMessage<UpdateGuildS
     int hash = 1;
     if (GuildId != 0) hash ^= GuildId.GetHashCode();
     if (DataId != 0) hash ^= DataId.GetHashCode();
-    if (Level != 0) hash ^= Level.GetHashCode();
+    if (SkillLevel != 0) hash ^= SkillLevel.GetHashCode();
     if (SkillPoint != 0) hash ^= SkillPoint.GetHashCode();
     if (_unknownFields != null) {
       hash ^= _unknownFields.GetHashCode();
@@ -8953,9 +8443,9 @@ public sealed partial class UpdateGuildSkillLevelReq : pb::IMessage<UpdateGuildS
       output.WriteRawTag(16);
       output.WriteInt32(DataId);
     }
-    if (Level != 0) {
+    if (SkillLevel != 0) {
       output.WriteRawTag(24);
-      output.WriteInt32(Level);
+      output.WriteInt32(SkillLevel);
     }
     if (SkillPoint != 0) {
       output.WriteRawTag(32);
@@ -8975,8 +8465,8 @@ public sealed partial class UpdateGuildSkillLevelReq : pb::IMessage<UpdateGuildS
     if (DataId != 0) {
       size += 1 + pb::CodedOutputStream.ComputeInt32Size(DataId);
     }
-    if (Level != 0) {
-      size += 1 + pb::CodedOutputStream.ComputeInt32Size(Level);
+    if (SkillLevel != 0) {
+      size += 1 + pb::CodedOutputStream.ComputeInt32Size(SkillLevel);
     }
     if (SkillPoint != 0) {
       size += 1 + pb::CodedOutputStream.ComputeInt32Size(SkillPoint);
@@ -8998,8 +8488,8 @@ public sealed partial class UpdateGuildSkillLevelReq : pb::IMessage<UpdateGuildS
     if (other.DataId != 0) {
       DataId = other.DataId;
     }
-    if (other.Level != 0) {
-      Level = other.Level;
+    if (other.SkillLevel != 0) {
+      SkillLevel = other.SkillLevel;
     }
     if (other.SkillPoint != 0) {
       SkillPoint = other.SkillPoint;
@@ -9024,7 +8514,7 @@ public sealed partial class UpdateGuildSkillLevelReq : pb::IMessage<UpdateGuildS
           break;
         }
         case 24: {
-          Level = input.ReadInt32();
+          SkillLevel = input.ReadInt32();
           break;
         }
         case 32: {
@@ -9048,7 +8538,7 @@ public sealed partial class UpdateCharacterGuildReq : pb::IMessage<UpdateCharact
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[57]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[54]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -9236,7 +8726,7 @@ public sealed partial class DeleteGuildReq : pb::IMessage<DeleteGuildReq> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[58]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[55]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -9368,7 +8858,7 @@ public sealed partial class FindGuildNameReq : pb::IMessage<FindGuildNameReq> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[59]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[56]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -9497,7 +8987,7 @@ public sealed partial class FindGuildNameResp : pb::IMessage<FindGuildNameResp> 
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[60]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[57]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -9629,7 +9119,7 @@ public sealed partial class ReadGuildReq : pb::IMessage<ReadGuildReq> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[61]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[58]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -9778,7 +9268,7 @@ public sealed partial class ReadGuildResp : pb::IMessage<ReadGuildResp> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[62]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[59]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -9910,7 +9400,7 @@ public sealed partial class GetGuildGoldReq : pb::IMessage<GetGuildGoldReq> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[63]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[60]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -10034,15 +9524,15 @@ public sealed partial class GetGuildGoldReq : pb::IMessage<GetGuildGoldReq> {
 /// <summary>
 /// Increase guild gold
 /// </summary>
-public sealed partial class IncreaseGuildGoldReq : pb::IMessage<IncreaseGuildGoldReq> {
-  private static readonly pb::MessageParser<IncreaseGuildGoldReq> _parser = new pb::MessageParser<IncreaseGuildGoldReq>(() => new IncreaseGuildGoldReq());
+public sealed partial class UpdateGuildGoldReq : pb::IMessage<UpdateGuildGoldReq> {
+  private static readonly pb::MessageParser<UpdateGuildGoldReq> _parser = new pb::MessageParser<UpdateGuildGoldReq>(() => new UpdateGuildGoldReq());
   private pb::UnknownFieldSet _unknownFields;
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public static pb::MessageParser<IncreaseGuildGoldReq> Parser { get { return _parser; } }
+  public static pb::MessageParser<UpdateGuildGoldReq> Parser { get { return _parser; } }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[64]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[61]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -10051,22 +9541,22 @@ public sealed partial class IncreaseGuildGoldReq : pb::IMessage<IncreaseGuildGol
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public IncreaseGuildGoldReq() {
+  public UpdateGuildGoldReq() {
     OnConstruction();
   }
 
   partial void OnConstruction();
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public IncreaseGuildGoldReq(IncreaseGuildGoldReq other) : this() {
+  public UpdateGuildGoldReq(UpdateGuildGoldReq other) : this() {
     guildId_ = other.guildId_;
     amount_ = other.amount_;
     _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public IncreaseGuildGoldReq Clone() {
-    return new IncreaseGuildGoldReq(this);
+  public UpdateGuildGoldReq Clone() {
+    return new UpdateGuildGoldReq(this);
   }
 
   /// <summary>Field number for the "guild_id" field.</summary>
@@ -10093,11 +9583,11 @@ public sealed partial class IncreaseGuildGoldReq : pb::IMessage<IncreaseGuildGol
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public override bool Equals(object other) {
-    return Equals(other as IncreaseGuildGoldReq);
+    return Equals(other as UpdateGuildGoldReq);
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public bool Equals(IncreaseGuildGoldReq other) {
+  public bool Equals(UpdateGuildGoldReq other) {
     if (ReferenceEquals(other, null)) {
       return false;
     }
@@ -10156,7 +9646,7 @@ public sealed partial class IncreaseGuildGoldReq : pb::IMessage<IncreaseGuildGol
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public void MergeFrom(IncreaseGuildGoldReq other) {
+  public void MergeFrom(UpdateGuildGoldReq other) {
     if (other == null) {
       return;
     }
@@ -10202,7 +9692,7 @@ public sealed partial class DecreaseGuildGoldReq : pb::IMessage<DecreaseGuildGol
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[65]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[62]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -10362,7 +9852,7 @@ public sealed partial class UpdateStorageItemsReq : pb::IMessage<UpdateStorageIt
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[66]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[63]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -10542,7 +10032,7 @@ public sealed partial class ReadStorageItemsReq : pb::IMessage<ReadStorageItemsR
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[67]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[64]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -10699,7 +10189,7 @@ public sealed partial class ReadStorageItemsResp : pb::IMessage<ReadStorageItems
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[68]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[65]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
