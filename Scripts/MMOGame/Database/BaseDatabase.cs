@@ -14,11 +14,9 @@ namespace MultiplayerARPG.MMO
         public abstract bool ValidateAccessToken(string userId, string accessToken);
         public abstract byte GetUserLevel(string userId);
         public abstract int GetGold(string userId);
-        public abstract int IncreaseGold(string userId, int amount);
-        public abstract int DecreaseGold(string userId, int amount);
+        public abstract void UpdateGold(string userId, int amount);
         public abstract int GetCash(string userId);
-        public abstract int IncreaseCash(string userId, int amount);
-        public abstract int DecreaseCash(string userId, int amount);
+        public abstract void UpdateCash(string userId, int amount);
         public abstract void UpdateAccessToken(string userId, string accessToken);
         public abstract void CreateUserLogin(string username, string password);
         public abstract long FindUsername(string username);
@@ -59,18 +57,17 @@ namespace MultiplayerARPG.MMO
 
         public abstract int CreateGuild(string guildName, string leaderId);
         public abstract GuildData ReadGuild(int id, GuildRoleData[] defaultGuildRoles);
-        public abstract bool IncreaseGuildExp(int id, int increaseExp, int[] expTree, out short resultLevel, out int resultExp, out short resultSkillPoint);
+        public abstract void UpdateGuildLevel(int id, short level, int exp, short skillPoint);
         public abstract void UpdateGuildLeader(int id, string leaderId);
         public abstract void UpdateGuildMessage(int id, string guildMessage);
         public abstract void UpdateGuildRole(int id, byte guildRole, string name, bool canInvite, bool canKick, byte shareExpPercentage);
         public abstract void UpdateGuildMemberRole(string characterId, byte guildRole);
-        public abstract void UpdateGuildSkillLevel(int id, int dataId, short level, short skillPoint);
+        public abstract void UpdateGuildSkillLevel(int id, int dataId, short skillLevel, short skillPoint);
         public abstract void DeleteGuild(int id);
         public abstract long FindGuildName(string guildName);
         public abstract void UpdateCharacterGuild(string characterId, int guildId, byte guildRole);
         public abstract int GetGuildGold(int guildId);
-        public abstract int IncreaseGuildGold(int guildId, int amount);
-        public abstract int DecreaseGuildGold(int guildId, int amount);
+        public abstract void UpdateGuildGold(int guildId, int gold);
 
         public abstract void UpdateStorageItems(StorageType storageType, string storageOwnerId, IList<CharacterItem> storageCharacterItems);
         public abstract List<CharacterItem> ReadStorageItems(StorageType storageType, string storageOwnerId);
