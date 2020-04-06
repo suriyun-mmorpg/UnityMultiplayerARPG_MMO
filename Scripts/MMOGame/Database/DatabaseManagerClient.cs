@@ -7,8 +7,8 @@ namespace MultiplayerARPG.MMO
 {
     public class DatabaseManagerClient
     {
-        private Channel channel;
-        private Client client;
+        public Channel Channel { get; private set; }
+        public Client Client { get; private set; }
 
         public DatabaseManagerClient(string serverHost, int serverPort) : this(serverHost, serverPort, ChannelCredentials.Insecure)
         {
@@ -17,13 +17,13 @@ namespace MultiplayerARPG.MMO
 
         public DatabaseManagerClient(string serverHost, int serverPort, ChannelCredentials credentials)
         {
-            channel = new Channel(serverHost, serverPort, credentials);
-            client = new Client(channel);
+            Channel = new Channel(serverHost, serverPort, credentials);
+            Client = new Client(Channel);
         }
 
         public async void ShutDown()
         {
-            await channel.ShutdownAsync();
+            await Channel.ShutdownAsync();
         }
     }
 }

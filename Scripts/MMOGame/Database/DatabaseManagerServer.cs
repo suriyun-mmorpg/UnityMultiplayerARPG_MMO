@@ -6,7 +6,7 @@ namespace MultiplayerARPG.MMO
 {
     public class DatabaseManagerServer
     {
-        private Server server;
+        public Server Server { get; private set; }
 
         public DatabaseManagerServer(int port) : this(port, ServerCredentials.Insecure)
         {
@@ -15,16 +15,21 @@ namespace MultiplayerARPG.MMO
 
         public DatabaseManagerServer(int port, ServerCredentials credentials)
         {
-            server = new Server
+            Server = new Server
             {
                 Services = { DatabaseService.BindService(new DatabaseServiceImplement()) },
                 Ports = { new ServerPort("localhost", port, credentials) }
             };
         }
 
+        public void Start()
+        {
+            Server.Start();
+        }
+
         public async void ShutDown()
         {
-            await server.ShutdownAsync();
+            await Server.ShutdownAsync();
         }
     }
 }
