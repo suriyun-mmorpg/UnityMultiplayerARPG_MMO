@@ -12,6 +12,10 @@ namespace MultiplayerARPG.MMO
         // In the future it may implements Redis
         // It's going to get some data from all tables but not every records
         // Just some records that players were requested
+        public DatabaseServiceImplement(BaseDatabase database)
+        {
+
+        }
 
         public override Task<ValidateUserLoginResp> ValidateUserLogin(ValidateUserLoginReq request, ServerCallContext context)
         {
