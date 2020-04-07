@@ -52,10 +52,10 @@ namespace MultiplayerARPG.MMO
         public const string CONFIG_CHAT_MAX_CONNECTIONS = "chatMaxConnections";
         public const string ARG_CHAT_MAX_CONNECTIONS = "-" + CONFIG_CHAT_MAX_CONNECTIONS;
         // Database manager server
-        public const string CONFIG_DATABASE_MANAGER_ADDRESS = "databaseManagerAddress";
-        public const string ARG_DATABASE_MANAGER_ADDRESS = "-" + CONFIG_DATABASE_MANAGER_ADDRESS;
-        public const string CONFIG_DATABASE_MANAGER_PORT = "databaseManagerPort";
-        public const string ARG_DATABASE_MANAGER_PORT = "-" + CONFIG_DATABASE_MANAGER_PORT;
+        public const string CONFIG_DATABASE_ADDRESS = "databaseManagerAddress";
+        public const string ARG_DATABASE_ADDRESS = "-" + CONFIG_DATABASE_ADDRESS;
+        public const string CONFIG_DATABASE_PORT = "databaseManagerPort";
+        public const string ARG_DATABASE_PORT = "-" + CONFIG_DATABASE_PORT;
         // Start servers
         public const string CONFIG_START_CENTRAL_SERVER = "startCentralServer";
         public const string ARG_START_CENTRAL_SERVER = "-" + CONFIG_START_CENTRAL_SERVER;
@@ -65,8 +65,8 @@ namespace MultiplayerARPG.MMO
         public const string ARG_START_MAP_SERVER = "-" + CONFIG_START_MAP_SERVER;
         public const string CONFIG_START_CHAT_SERVER = "startChatServer";
         public const string ARG_START_CHAT_SERVER = "-" + CONFIG_START_CHAT_SERVER;
-        public const string CONFIG_START_DATABASE_MANAGER_SERVER = "startDatabaseManagerServer";
-        public const string ARG_START_DATABASE_MANAGER_SERVER = "-" + CONFIG_START_DATABASE_MANAGER_SERVER;
+        public const string CONFIG_START_DATABASE_SERVER = "startDatabaseServer";
+        public const string ARG_START_DATABASE_SERVER = "-" + CONFIG_START_DATABASE_SERVER;
 
         [Header("Server Components")]
         [SerializeField]
@@ -302,6 +302,22 @@ namespace MultiplayerARPG.MMO
                     chatNetworkManager.maxConnections = chatMaxConnections;
                 }
 
+                // Database network address
+                string databaseNetworkAddress;
+                if (ConfigReader.ReadArgs(args, ARG_DATABASE_ADDRESS, out databaseNetworkAddress, "localhost") ||
+                    ConfigReader.ReadConfigs(jsonConfig, CONFIG_DATABASE_ADDRESS, out databaseNetworkAddress, "localhost"))
+                {
+                    databaseNetworkManager.networkAddress = databaseNetworkAddress;
+                }
+
+                // Database network port
+                int databaseNetworkPort;
+                if (ConfigReader.ReadArgs(args, ARG_DATABASE_PORT, out databaseNetworkPort, 6100) ||
+                    ConfigReader.ReadConfigs(jsonConfig, CONFIG_DATABASE_PORT, out databaseNetworkPort, 6100))
+                {
+                    databaseNetworkManager.networkPort = databaseNetworkPort;
+                }
+
                 string logFileName = "Log";
                 bool startLog = false;
                 bool tempStartServer;
@@ -348,6 +364,16 @@ namespace MultiplayerARPG.MMO
                     startLog = true;
                     gameInstance.SetOnGameDataLoadedCallback(OnGameDataLoaded);
                     startingChatServer = true;
+                }
+
+                if (ConfigReader.IsArgsProvided(args, ARG_START_DATABASE_SERVER) ||
+                    (ConfigReader.ReadConfigs(jsonConfig, CONFIG_START_DATABASE_SERVER, out tempStartServer) && tempStartServer))
+                {
+                    if (!string.IsNullOrEmpty(logFileName))
+                        logFileName += "_";
+                    logFileName += "Database";
+                    startLog = true;
+                    startingDatabaseServer = true;
                 }
 
                 if (startLog)
