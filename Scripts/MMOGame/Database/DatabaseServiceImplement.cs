@@ -8,6 +8,8 @@ namespace MultiplayerARPG.MMO
 {
     public class DatabaseServiceImplement : DatabaseService.DatabaseServiceBase
     {
+        public delegate Task<CustomResp> CustomRequestDelegate(int type, ByteString data);
+        public static CustomRequestDelegate onCustomRequest;
         public BaseDatabase Database { get; private set; }
         // TODO: I'm going to make in-memory database without Redis for now
         // In the future it may implements Redis
@@ -384,6 +386,11 @@ namespace MultiplayerARPG.MMO
             ReadStorageItemsResp resp = new ReadStorageItemsResp();
             DatabaseServiceUtils.CopyToRepeatedByteString(Database.ReadStorageItems((StorageType)request.StorageType, request.StorageOwnerId), resp.StorageCharacterItems);
             return resp;
+        }
+
+        public override async Task<CustomResp> Custom(CustomReq request, ServerCallContext context)
+        {
+            return await onCustomRequest.Invoke(request.Type, request.Data);
         }
     }
 }
