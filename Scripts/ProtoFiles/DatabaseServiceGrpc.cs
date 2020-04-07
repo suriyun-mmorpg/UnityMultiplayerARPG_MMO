@@ -76,6 +76,8 @@ public static partial class DatabaseService
   static readonly grpc::Marshaller<global::UpdateStorageItemsReq> __Marshaller_UpdateStorageItemsReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::UpdateStorageItemsReq.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::ReadStorageItemsReq> __Marshaller_ReadStorageItemsReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::ReadStorageItemsReq.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::ReadStorageItemsResp> __Marshaller_ReadStorageItemsResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::ReadStorageItemsResp.Parser.ParseFrom);
+  static readonly grpc::Marshaller<global::CustomReq> __Marshaller_CustomReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::CustomReq.Parser.ParseFrom);
+  static readonly grpc::Marshaller<global::CustomResp> __Marshaller_CustomResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::CustomResp.Parser.ParseFrom);
 
   static readonly grpc::Method<global::ValidateUserLoginReq, global::ValidateUserLoginResp> __Method_ValidateUserLogin = new grpc::Method<global::ValidateUserLoginReq, global::ValidateUserLoginResp>(
       grpc::MethodType.Unary,
@@ -392,6 +394,13 @@ public static partial class DatabaseService
       __Marshaller_ReadStorageItemsReq,
       __Marshaller_ReadStorageItemsResp);
 
+  static readonly grpc::Method<global::CustomReq, global::CustomResp> __Method_Custom = new grpc::Method<global::CustomReq, global::CustomResp>(
+      grpc::MethodType.Unary,
+      __ServiceName,
+      "Custom",
+      __Marshaller_CustomReq,
+      __Marshaller_CustomResp);
+
   /// <summary>Service descriptor</summary>
   public static global::Google.Protobuf.Reflection.ServiceDescriptor Descriptor
   {
@@ -623,6 +632,11 @@ public static partial class DatabaseService
     }
 
     public virtual global::System.Threading.Tasks.Task<global::ReadStorageItemsResp> ReadStorageItems(global::ReadStorageItemsReq request, grpc::ServerCallContext context)
+    {
+      throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+    }
+
+    public virtual global::System.Threading.Tasks.Task<global::CustomResp> Custom(global::CustomReq request, grpc::ServerCallContext context)
     {
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
@@ -1372,6 +1386,22 @@ public static partial class DatabaseService
     {
       return CallInvoker.AsyncUnaryCall(__Method_ReadStorageItems, null, options, request);
     }
+    public virtual global::CustomResp Custom(global::CustomReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    {
+      return Custom(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+    }
+    public virtual global::CustomResp Custom(global::CustomReq request, grpc::CallOptions options)
+    {
+      return CallInvoker.BlockingUnaryCall(__Method_Custom, null, options, request);
+    }
+    public virtual grpc::AsyncUnaryCall<global::CustomResp> CustomAsync(global::CustomReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    {
+      return CustomAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+    }
+    public virtual grpc::AsyncUnaryCall<global::CustomResp> CustomAsync(global::CustomReq request, grpc::CallOptions options)
+    {
+      return CallInvoker.AsyncUnaryCall(__Method_Custom, null, options, request);
+    }
     /// <summary>Creates a new instance of client from given <c>ClientBaseConfiguration</c>.</summary>
     protected override DatabaseServiceClient NewInstance(ClientBaseConfiguration configuration)
     {
@@ -1428,7 +1458,8 @@ public static partial class DatabaseService
         .AddMethod(__Method_GetGuildGold, serviceImpl.GetGuildGold)
         .AddMethod(__Method_UpdateGuildGold, serviceImpl.UpdateGuildGold)
         .AddMethod(__Method_UpdateStorageItems, serviceImpl.UpdateStorageItems)
-        .AddMethod(__Method_ReadStorageItems, serviceImpl.ReadStorageItems).Build();
+        .AddMethod(__Method_ReadStorageItems, serviceImpl.ReadStorageItems)
+        .AddMethod(__Method_Custom, serviceImpl.Custom).Build();
   }
 
   /// <summary>Register service method with a service binder with or without implementation. Useful when customizing the  service binding logic.
@@ -1482,6 +1513,7 @@ public static partial class DatabaseService
     serviceBinder.AddMethod(__Method_UpdateGuildGold, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::UpdateGuildGoldReq, global::VoidResp>(serviceImpl.UpdateGuildGold));
     serviceBinder.AddMethod(__Method_UpdateStorageItems, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::UpdateStorageItemsReq, global::VoidResp>(serviceImpl.UpdateStorageItems));
     serviceBinder.AddMethod(__Method_ReadStorageItems, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::ReadStorageItemsReq, global::ReadStorageItemsResp>(serviceImpl.ReadStorageItems));
+    serviceBinder.AddMethod(__Method_Custom, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::CustomReq, global::CustomResp>(serviceImpl.Custom));
   }
 
 }

@@ -46,6 +46,7 @@ service DatabaseService {
     rpc UpdateGuildGold (UpdateGuildGoldReq) returns (VoidResp);
     rpc UpdateStorageItems (UpdateStorageItemsReq) returns (VoidResp);
     rpc ReadStorageItems (ReadStorageItemsReq) returns (ReadStorageItemsResp);
+    rpc Custom (CustomReq) returns (CustomResp);
 }
 enum EStorageType
 {
@@ -350,4 +351,13 @@ message ReadStorageItemsReq {
 }
 message ReadStorageItemsResp {
     repeated bytes storage_character_items = 1;
+}
+// Custom
+message CustomReq {
+    int32 type = 1;
+    bytes data = 2;
+}
+message CustomResp {
+    int32 type = 1;
+    bytes data = 2;
 }
