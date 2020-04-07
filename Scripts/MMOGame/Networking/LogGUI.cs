@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using UnityEngine;
+using LiteNetLibManager;
 
 public class LogGUI : MonoBehaviour
 {
@@ -28,7 +29,7 @@ public class LogGUI : MonoBehaviour
 
     private void OnEnable()
     {
-        Application.logMessageReceived += HandleLog;
+        Logging.onLog += HandleLog;
         logSavePath = Application.persistentDataPath + "/" + logFileName + ".txt";
         if (openLogDir)
             Application.OpenURL(Application.persistentDataPath);
@@ -41,14 +42,14 @@ public class LogGUI : MonoBehaviour
 
     private void OnDisable()
     {
-        Application.logMessageReceived -= HandleLog;
+        Logging.onLog -= HandleLog;
     }
 
-    void HandleLog(string logString, string stackTrace, LogType type)
+    void HandleLog(LogType type, string tag, string logString)
     {
         using (StreamWriter writer = new StreamWriter(logSavePath, true, Encoding.UTF8))
         {
-            writer.WriteLine("(" + type + ") " + logString + "\n" + stackTrace.Replace("\n", "\n\t\t"));
+            writer.WriteLine("(" + type + ") [" + tag + "]" + logString + "\n");
         }
         Color color = Color.white;
         switch (type)
