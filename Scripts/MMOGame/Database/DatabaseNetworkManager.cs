@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using LiteNetLibManager;
 
 namespace MultiplayerARPG.MMO
 {
@@ -11,10 +12,8 @@ namespace MultiplayerARPG.MMO
         private BaseDatabase database;
         [SerializeField]
         private BaseDatabase[] databaseOptions;
-        [SerializeField]
-        private string networkAddress = "localhost";
-        [SerializeField]
-        private int networkPort = 7770;
+        public string networkAddress = "localhost";
+        public int networkPort = 7770;
         
         public DatabaseManagerClient Client { get; private set; }
         public DatabaseManagerServer Server { get; private set; }
@@ -33,6 +32,7 @@ namespace MultiplayerARPG.MMO
         {
             if (Server != null)
                 Server.ShutDown();
+            Logging.Log("DatabaseNetworkManager", "Start Server");
             Server = new DatabaseManagerServer(networkPort, Database);
             Server.Start();
         }
@@ -41,6 +41,7 @@ namespace MultiplayerARPG.MMO
         {
             if (Client != null)
                 Client.ShutDown();
+            Logging.Log("DatabaseNetworkManager", "Start Client");
             Client = new DatabaseManagerClient(networkAddress, networkPort);
         }
 
