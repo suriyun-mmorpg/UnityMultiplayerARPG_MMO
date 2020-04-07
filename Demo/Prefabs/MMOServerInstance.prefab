@@ -237,7 +237,7 @@ MonoBehaviour:
   - {fileID: 114715813743394434}
   - {fileID: 114414512406587944}
   networkAddress: localhost
-  networkPort: 7770
+  networkPort: 6100
 --- !u!114 &114227780437250376
 MonoBehaviour:
   m_ObjectHideFlags: 1
