@@ -488,7 +488,6 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: LiteNetLibManager.LiteNetLibLoadSceneEvent, LiteNetLibManager, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
-  sampleMessageToCentralServer: QWERTY
   writeAddonLog: 0
   mapInstanceId: 
   centralTransportFactory: {fileID: 0}
