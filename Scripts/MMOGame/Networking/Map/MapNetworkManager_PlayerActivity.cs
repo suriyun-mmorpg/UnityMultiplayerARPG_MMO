@@ -757,7 +757,7 @@ namespace MultiplayerARPG.MMO
                         StorageType = (EStorageType)storageId.storageType,
                         StorageOwnerId = storageId.storageOwnerId
                     };
-                    DatabaseServiceUtils.CopyToRepeatedBytes(storageItemList, req.StorageCharacterItems);
+                    DatabaseServiceUtils.CopyToRepeatedByteString(storageItemList, req.StorageCharacterItems);
                     await DbServiceClient.UpdateStorageItemsAsync(req);
                 }
                 // Update storage items to characters that open the storage
@@ -834,7 +834,7 @@ namespace MultiplayerARPG.MMO
                         StorageType = (EStorageType)storageId.storageType,
                         StorageOwnerId = storageId.storageOwnerId
                     };
-                    DatabaseServiceUtils.CopyToRepeatedBytes(storageItemList, req.StorageCharacterItems);
+                    DatabaseServiceUtils.CopyToRepeatedByteString(storageItemList, req.StorageCharacterItems);
                     await DbServiceClient.UpdateStorageItemsAsync(req);
                 }
                 // Update storage items to characters that open the storage
@@ -878,7 +878,7 @@ namespace MultiplayerARPG.MMO
                     StorageType = (EStorageType)storageId.storageType,
                     StorageOwnerId = storageId.storageOwnerId
                 };
-                DatabaseServiceUtils.CopyToRepeatedBytes(storageItemList, req.StorageCharacterItems);
+                DatabaseServiceUtils.CopyToRepeatedByteString(storageItemList, req.StorageCharacterItems);
                 await DbServiceClient.UpdateStorageItemsAsync(req);
             }
             // Update storage items to characters that open the storage
@@ -922,7 +922,7 @@ namespace MultiplayerARPG.MMO
                     StorageType = (EStorageType)storageId.storageType,
                     StorageOwnerId = storageId.storageOwnerId
                 };
-                DatabaseServiceUtils.CopyToRepeatedBytes(storageItemList, req.StorageCharacterItems);
+                DatabaseServiceUtils.CopyToRepeatedByteString(storageItemList, req.StorageCharacterItems);
                 await DbServiceClient.UpdateStorageItemsAsync(req);
             }
             // Update storage items to characters that open the storage
@@ -1001,7 +1001,7 @@ namespace MultiplayerARPG.MMO
                         StorageType = (EStorageType)storageId.storageType,
                         StorageOwnerId = storageId.storageOwnerId
                     };
-                    DatabaseServiceUtils.CopyToRepeatedBytes(storageItemList, req.StorageCharacterItems);
+                    DatabaseServiceUtils.CopyToRepeatedByteString(storageItemList, req.StorageCharacterItems);
                     await DbServiceClient.UpdateStorageItemsAsync(req);
                 }
                 // Update storage items to characters that open the storage
@@ -1180,7 +1180,7 @@ namespace MultiplayerARPG.MMO
             {
                 CharacterName = characterName
             });
-            SendUpdateFoundCharactersToClient(playerCharacterEntity.ConnectionId, resp.List.MakeArrayFromRepeatedBytes<SocialCharacterData>());
+            SendUpdateFoundCharactersToClient(playerCharacterEntity.ConnectionId, resp.List.MakeArrayFromRepeatedByteString<SocialCharacterData>());
         }
 
         public override void AddFriend(BasePlayerCharacterEntity playerCharacterEntity, string friendCharacterId)
@@ -1224,7 +1224,7 @@ namespace MultiplayerARPG.MMO
             {
                 CharacterId = playerCharacterEntity.Id
             });
-            SendUpdateFriendsToClient(playerCharacterEntity.ConnectionId, readFriendsResp.List.MakeArrayFromRepeatedBytes<SocialCharacterData>());
+            SendUpdateFriendsToClient(playerCharacterEntity.ConnectionId, readFriendsResp.List.MakeArrayFromRepeatedByteString<SocialCharacterData>());
         }
     }
 }

@@ -20,7 +20,7 @@ namespace MultiplayerARPG.MMO
                     StorageOwnerId = storageId.storageOwnerId
                 });
 
-                storageItems[storageId] = readStorageItemsResp.StorageCharacterItems.MakeListFromRepeatedBytes<CharacterItem>();
+                storageItems[storageId] = readStorageItemsResp.StorageCharacterItems.MakeListFromRepeatedByteString<CharacterItem>();
                 loadingStorageIds.Remove(storageId);
             }
         }
@@ -34,7 +34,7 @@ namespace MultiplayerARPG.MMO
                 {
                     PartyId = id
                 });
-                parties[id] = resp.PartyData.FromBytes<PartyData>();
+                parties[id] = resp.PartyData.FromByteString<PartyData>();
                 loadingPartyIds.Remove(id);
             }
         }
@@ -48,7 +48,7 @@ namespace MultiplayerARPG.MMO
                 {
                     GuildId = id
                 });
-                guilds[id] = resp.GuildData.FromBytes<GuildData>();
+                guilds[id] = resp.GuildData.FromByteString<GuildData>();
                 loadingGuildIds.Remove(id);
             }
         }
@@ -61,7 +61,7 @@ namespace MultiplayerARPG.MMO
                 // Update character
                 await DbServiceClient.UpdateCharacterAsync(new UpdateCharacterReq()
                 {
-                    CharacterData = playerCharacterData.ToBytes()
+                    CharacterData = playerCharacterData.ToByteString()
                 });
                 // Update storage items
                 StorageId storageId = new StorageId(StorageType.Player, userId);
@@ -72,7 +72,7 @@ namespace MultiplayerARPG.MMO
                         StorageType = (EStorageType)storageId.storageType,
                         StorageOwnerId = storageId.storageOwnerId
                     };
-                    DatabaseServiceUtils.CopyToRepeatedBytes(storageItems[storageId], req.StorageCharacterItems);
+                    DatabaseServiceUtils.CopyToRepeatedByteString(storageItems[storageId], req.StorageCharacterItems);
                     await DbServiceClient.UpdateStorageItemsAsync(req);
                 }
                 savingCharacters.Remove(playerCharacterData.Id);
@@ -109,7 +109,7 @@ namespace MultiplayerARPG.MMO
                 await DbServiceClient.UpdateBuildingAsync(new UpdateBuildingReq()
                 {
                     MapName = Assets.onlineScene.SceneName,
-                    BuildingData = buildingSaveData.ToBytes()
+                    BuildingData = buildingSaveData.ToByteString()
                 });
                 // Update storage items
                 StorageId storageId = new StorageId(StorageType.Building, buildingSaveData.Id);
@@ -120,7 +120,7 @@ namespace MultiplayerARPG.MMO
                         StorageType = (EStorageType)storageId.storageType,
                         StorageOwnerId = storageId.storageOwnerId
                     };
-                    DatabaseServiceUtils.CopyToRepeatedBytes(storageItems[storageId], req.StorageCharacterItems);
+                    DatabaseServiceUtils.CopyToRepeatedByteString(storageItems[storageId], req.StorageCharacterItems);
                     await DbServiceClient.UpdateStorageItemsAsync(req);
                 }
                 savingBuildings.Remove(buildingSaveData.Id);
@@ -156,7 +156,7 @@ namespace MultiplayerARPG.MMO
                 DbServiceClient.CreateBuildingAsync(new CreateBuildingReq()
                 {
                     MapName = Assets.onlineScene.SceneName,
-                    BuildingData = saveData.ToBytes()
+                    BuildingData = saveData.ToByteString()
                 });
             }
             return base.CreateBuildingEntity(saveData, initialize);

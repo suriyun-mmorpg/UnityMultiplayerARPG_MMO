@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Grpc.Core;
+using Google.Protobuf;
 
 namespace MultiplayerARPG.MMO
 {
@@ -108,7 +109,7 @@ namespace MultiplayerARPG.MMO
         public override async Task<VoidResp> CreateCharacter(CreateCharacterReq request, ServerCallContext context)
         {
             await Task.Yield();
-            Database.CreateCharacter(request.UserId, DatabaseServiceUtils.FromBytes<PlayerCharacterData>(request.CharacterData));
+            Database.CreateCharacter(request.UserId, DatabaseServiceUtils.FromByteString<PlayerCharacterData>(request.CharacterData));
             return new VoidResp();
         }
 
@@ -130,7 +131,7 @@ namespace MultiplayerARPG.MMO
                 request.WithQuests);
             return new ReadCharacterResp()
             {
-                CharacterData = DatabaseServiceUtils.ToBytes(characterData)
+                CharacterData = DatabaseServiceUtils.ToByteString(characterData)
             };
         }
 
@@ -138,14 +139,14 @@ namespace MultiplayerARPG.MMO
         {
             await Task.Yield();
             ReadCharactersResp resp = new ReadCharactersResp();
-            DatabaseServiceUtils.CopyToRepeatedBytes(Database.ReadCharacters(request.UserId), resp.List);
+            DatabaseServiceUtils.CopyToRepeatedByteString(Database.ReadCharacters(request.UserId), resp.List);
             return resp;
         }
 
         public override async Task<VoidResp> UpdateCharacter(UpdateCharacterReq request, ServerCallContext context)
         {
             await Task.Yield();
-            Database.UpdateCharacter(DatabaseServiceUtils.FromBytes<PlayerCharacterData>(request.CharacterData));
+            Database.UpdateCharacter(DatabaseServiceUtils.FromByteString<PlayerCharacterData>(request.CharacterData));
             return new VoidResp();
         }
 
@@ -170,7 +171,7 @@ namespace MultiplayerARPG.MMO
         {
             await Task.Yield();
             FindCharactersResp resp = new FindCharactersResp();
-            DatabaseServiceUtils.CopyToRepeatedBytes(Database.FindCharacters(request.CharacterName), resp.List);
+            DatabaseServiceUtils.CopyToRepeatedByteString(Database.FindCharacters(request.CharacterName), resp.List);
             return resp;
         }
 
@@ -192,21 +193,21 @@ namespace MultiplayerARPG.MMO
         {
             await Task.Yield();
             ReadFriendsResp resp = new ReadFriendsResp();
-            DatabaseServiceUtils.CopyToRepeatedBytes(Database.ReadFriends(request.CharacterId), resp.List);
+            DatabaseServiceUtils.CopyToRepeatedByteString(Database.ReadFriends(request.CharacterId), resp.List);
             return resp;
         }
 
         public override async Task<VoidResp> CreateBuilding(CreateBuildingReq request, ServerCallContext context)
         {
             await Task.Yield();
-            Database.CreateBuilding(request.MapName, DatabaseServiceUtils.FromBytes<BuildingSaveData>(request.BuildingData));
+            Database.CreateBuilding(request.MapName, DatabaseServiceUtils.FromByteString<BuildingSaveData>(request.BuildingData));
             return new VoidResp();
         }
 
         public override async Task<VoidResp> UpdateBuilding(UpdateBuildingReq request, ServerCallContext context)
         {
             await Task.Yield();
-            Database.UpdateBuilding(request.MapName, DatabaseServiceUtils.FromBytes<BuildingSaveData>(request.BuildingData));
+            Database.UpdateBuilding(request.MapName, DatabaseServiceUtils.FromByteString<BuildingSaveData>(request.BuildingData));
             return new VoidResp();
         }
 
@@ -221,7 +222,7 @@ namespace MultiplayerARPG.MMO
         {
             await Task.Yield();
             ReadBuildingsResp resp = new ReadBuildingsResp();
-            DatabaseServiceUtils.CopyToRepeatedBytes(Database.ReadBuildings(request.MapName), resp.List);
+            DatabaseServiceUtils.CopyToRepeatedByteString(Database.ReadBuildings(request.MapName), resp.List);
             return resp;
         }
 
@@ -267,7 +268,7 @@ namespace MultiplayerARPG.MMO
             await Task.Yield();
             return new ReadPartyResp()
             {
-                PartyData = DatabaseServiceUtils.ToBytes(Database.ReadParty(request.PartyId))
+                PartyData = DatabaseServiceUtils.ToByteString(Database.ReadParty(request.PartyId))
             };
         }
 
@@ -350,7 +351,7 @@ namespace MultiplayerARPG.MMO
             await Task.Yield();
             return new ReadGuildResp()
             {
-                GuildData = DatabaseServiceUtils.ToBytes(Database.ReadGuild(request.GuildId, DatabaseServiceUtils.MakeArrayFromRepeatedBytes<GuildRoleData>(request.DefaultGuildRoles)))
+                GuildData = DatabaseServiceUtils.ToByteString(Database.ReadGuild(request.GuildId, DatabaseServiceUtils.MakeArrayFromRepeatedByteString<GuildRoleData>(request.DefaultGuildRoles)))
             };
         }
 
@@ -373,7 +374,7 @@ namespace MultiplayerARPG.MMO
         public override async Task<VoidResp> UpdateStorageItems(UpdateStorageItemsReq request, ServerCallContext context)
         {
             await Task.Yield();
-            Database.UpdateStorageItems((StorageType)request.StorageType, request.StorageOwnerId, DatabaseServiceUtils.MakeListFromRepeatedBytes<CharacterItem>(request.StorageCharacterItems));
+            Database.UpdateStorageItems((StorageType)request.StorageType, request.StorageOwnerId, DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(request.StorageCharacterItems));
             return new VoidResp();
         }
 
@@ -381,7 +382,7 @@ namespace MultiplayerARPG.MMO
         {
             await Task.Yield();
             ReadStorageItemsResp resp = new ReadStorageItemsResp();
-            DatabaseServiceUtils.CopyToRepeatedBytes(Database.ReadStorageItems((StorageType)request.StorageType, request.StorageOwnerId), resp.StorageCharacterItems);
+            DatabaseServiceUtils.CopyToRepeatedByteString(Database.ReadStorageItems((StorageType)request.StorageType, request.StorageOwnerId), resp.StorageCharacterItems);
             return resp;
         }
     }

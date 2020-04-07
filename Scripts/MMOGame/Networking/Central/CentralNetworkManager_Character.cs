@@ -64,7 +64,7 @@ namespace MultiplayerARPG.MMO
                 {
                     UserId = userPeerInfo.userId
                 });
-                characters = DatabaseServiceUtils.MakeListFromRepeatedBytes<PlayerCharacterData>(readCharactersResp.List);
+                characters = DatabaseServiceUtils.MakeListFromRepeatedByteString<PlayerCharacterData>(readCharactersResp.List);
             }
             ResponseCharactersMessage responseMessage = new ResponseCharactersMessage();
             responseMessage.ackId = message.ackId;
@@ -119,7 +119,7 @@ namespace MultiplayerARPG.MMO
                 await DbServiceClient.CreateCharacterAsync(new CreateCharacterReq()
                 {
                     UserId = userPeerInfo.userId,
-                    CharacterData = characterData.ToBytes()
+                    CharacterData = characterData.ToByteString()
                 });
             }
             ResponseCreateCharacterMessage responseMessage = new ResponseCreateCharacterMessage();
@@ -193,7 +193,7 @@ namespace MultiplayerARPG.MMO
                     WithHotkeys = false,
                     WithQuests = false
                 });
-                PlayerCharacterData character = readCharacterResp.CharacterData.FromBytes<PlayerCharacterData>();
+                PlayerCharacterData character = readCharacterResp.CharacterData.FromByteString<PlayerCharacterData>();
                 if (character == null)
                     error = ResponseSelectCharacterMessage.Error.InvalidCharacterData;
                 else if (!mapServerPeersBySceneName.TryGetValue(character.CurrentMapName, out mapServerPeerInfo))

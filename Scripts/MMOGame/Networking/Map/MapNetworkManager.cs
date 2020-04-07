@@ -196,7 +196,7 @@ namespace MultiplayerARPG.MMO
                     if (playerCharacter == null) continue;
                     DbServiceClient.UpdateCharacter(new UpdateCharacterReq()
                     {
-                        CharacterData = playerCharacter.CloneTo(new PlayerCharacterData()).ToBytes()
+                        CharacterData = playerCharacter.CloneTo(new PlayerCharacterData()).ToByteString()
                     });
                 }
                 string sceneName = Assets.onlineScene.SceneName;
@@ -206,7 +206,7 @@ namespace MultiplayerARPG.MMO
                     DbServiceClient.UpdateBuilding(new UpdateBuildingReq()
                     {
                         MapName = sceneName,
-                        BuildingData = buildingEntity.CloneTo(new BuildingSaveData()).ToBytes()
+                        BuildingData = buildingEntity.CloneTo(new BuildingSaveData()).ToByteString()
                     });
                 }
             }
@@ -310,7 +310,7 @@ namespace MultiplayerARPG.MMO
                     MapName = Assets.onlineScene.SceneName
                 });
                 HashSet<StorageId> storageIds = new HashSet<StorageId>();
-                List<BuildingSaveData> buildings = resp.List.MakeListFromRepeatedBytes<BuildingSaveData>();
+                List<BuildingSaveData> buildings = resp.List.MakeListFromRepeatedByteString<BuildingSaveData>();
                 BuildingEntity buildingEntity;
                 foreach (BuildingSaveData building in buildings)
                 {
@@ -418,7 +418,7 @@ namespace MultiplayerARPG.MMO
                     WithHotkeys = true,
                     WithQuests = true
                 });
-                PlayerCharacterData playerCharacterData = readCharacterResp.CharacterData.FromBytes<PlayerCharacterData>();
+                PlayerCharacterData playerCharacterData = readCharacterResp.CharacterData.FromByteString<PlayerCharacterData>();
                 // If data is empty / cannot find character, disconnect user
                 if (playerCharacterData == null)
                 {
