@@ -66,7 +66,7 @@ public class LogGUI : MonoBehaviour
         }
         logList.Add(new LogData()
         {
-            logText = logString,
+            logText = "[" + tag + "] " + logString,
             logColor = color,
         });
         if (logList.Count > showLogSize)
