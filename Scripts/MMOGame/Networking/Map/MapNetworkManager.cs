@@ -580,6 +580,22 @@ namespace MultiplayerARPG.MMO
                 ReadChatMessage(message);
                 return;
             }
+            if (message.channel == ChatChannel.System)
+            {
+                BasePlayerCharacterEntity playerCharacter;
+                // TODO: Don't use fixed user level
+                if (!string.IsNullOrEmpty(message.sender) &&
+                    TryGetPlayerCharacterByName(message.sender, out playerCharacter) &&
+                    playerCharacter.UserLevel > 0)
+                {
+                    // Send chat message to chat server, for MMO mode chat message handling by chat server
+                    if (ChatNetworkManager.IsClientConnected)
+                    {
+                        ChatNetworkManager.SendEnterChat(null, MMOMessageTypes.Chat, message.channel, message.message, message.sender, message.receiver, message.channelId);
+                    }
+                }
+                return;
+            }
             // Send chat message to chat server, for MMO mode chat message handling by chat server
             if (ChatNetworkManager.IsClientConnected)
             {
