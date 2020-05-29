@@ -675,14 +675,14 @@ namespace MultiplayerARPG.MMO
             short slotLimit = storage.slotLimit;
             result.FillEmptySlots(isLimitSlot, slotLimit);
             // Update storage items
-            playerCharacterEntity.StorageItems = result;
+            playerCharacterEntity.StorageItems = result.ToArray();
         }
 
         public override void CloseStorage(BasePlayerCharacterEntity playerCharacterEntity)
         {
             if (usingStorageCharacters.ContainsKey(playerCharacterEntity.CurrentStorageId))
                 usingStorageCharacters[playerCharacterEntity.CurrentStorageId].Remove(playerCharacterEntity.ObjectId);
-            playerCharacterEntity.StorageItems.Clear();
+            playerCharacterEntity.StorageItems = new CharacterItem[0];
         }
 
         public override void MoveItemToStorage(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short nonEquipIndex, short amount, short storageItemIndex)
@@ -1036,7 +1036,7 @@ namespace MultiplayerARPG.MMO
                 if (Assets.TryGetSpawnedObject(objectId, out playerCharacterEntity))
                 {
                     // Update storage items
-                    playerCharacterEntity.StorageItems = storageItems;
+                    playerCharacterEntity.StorageItems = storageItems.ToArray();
                 }
             }
         }
