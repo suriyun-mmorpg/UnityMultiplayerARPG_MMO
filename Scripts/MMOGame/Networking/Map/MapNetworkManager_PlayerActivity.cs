@@ -642,6 +642,7 @@ namespace MultiplayerARPG.MMO
                     {
                         // Remove from inventory
                         playerCharacterEntity.DecreaseItemsByIndex(nonEquipIndex, amount);
+                        playerCharacterEntity.FillEmptySlots();
                     }
                 }
                 else
