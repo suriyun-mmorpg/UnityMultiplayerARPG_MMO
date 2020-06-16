@@ -17,7 +17,7 @@ namespace MultiplayerARPG.MMO
                 result = new BuildingSaveData();
                 result.Id = reader.GetString("id");
                 result.ParentId = reader.GetString("parentId");
-                result.DataId = reader.GetInt32("dataId");
+                result.EntityId = reader.GetInt32("entityId");
                 result.CurrentHp = reader.GetInt32("currentHp");
                 result.Position = new Vector3(reader.GetFloat("positionX"), reader.GetFloat("positionY"), reader.GetFloat("positionZ"));
                 result.Rotation = Quaternion.Euler(reader.GetFloat("rotationX"), reader.GetFloat("rotationY"), reader.GetFloat("rotationZ"));
@@ -33,10 +33,10 @@ namespace MultiplayerARPG.MMO
 
         public override void CreateBuilding(string mapName, IBuildingSaveData saveData)
         {
-            ExecuteNonQuery("INSERT INTO buildings (id, parentId, dataId, currentHp, mapName, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, creatorId, creatorName) VALUES (@id, @parentId, @dataId, @currentHp, @mapName, @positionX, @positionY, @positionZ, @rotationX, @rotationY, @rotationZ, @creatorId, @creatorName)",
+            ExecuteNonQuery("INSERT INTO buildings (id, parentId, entityId, currentHp, mapName, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, creatorId, creatorName) VALUES (@id, @parentId, @entityId, @currentHp, @mapName, @positionX, @positionY, @positionZ, @rotationX, @rotationY, @rotationZ, @creatorId, @creatorName)",
                 new SqliteParameter("@id", saveData.Id),
                 new SqliteParameter("@parentId", saveData.ParentId),
-                new SqliteParameter("@dataId", saveData.DataId),
+                new SqliteParameter("@entityId", saveData.EntityId),
                 new SqliteParameter("@currentHp", saveData.CurrentHp),
                 new SqliteParameter("@mapName", mapName),
                 new SqliteParameter("@positionX", saveData.Position.x),
@@ -65,7 +65,7 @@ namespace MultiplayerARPG.MMO
         {
             ExecuteNonQuery("UPDATE buildings SET " +
                 "parentId=@parentId, " +
-                "dataId=@dataId, " +
+                "entityId=@entityId, " +
                 "currentHp=@currentHp, " +
                 "positionX=@positionX, " +
                 "positionY=@positionY, " +
@@ -80,7 +80,7 @@ namespace MultiplayerARPG.MMO
                 "WHERE id=@id AND mapName=@mapName",
                 new SqliteParameter("@id", building.Id),
                 new SqliteParameter("@parentId", building.ParentId),
-                new SqliteParameter("@dataId", building.DataId),
+                new SqliteParameter("@entityId", building.EntityId),
                 new SqliteParameter("@currentHp", building.CurrentHp),
                 new SqliteParameter("@mapName", mapName),
                 new SqliteParameter("@positionX", building.Position.x),

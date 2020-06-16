@@ -17,7 +17,7 @@ namespace MultiplayerARPG.MMO
                 result = new BuildingSaveData();
                 result.Id = reader.GetString("id");
                 result.ParentId = reader.GetString("parentId");
-                result.DataId = reader.GetInt32("dataId");
+                result.EntityId = reader.GetInt32("entityId");
                 result.CurrentHp = reader.GetInt32("currentHp");
                 result.Position = new Vector3(reader.GetFloat("positionX"), reader.GetFloat("positionY"), reader.GetFloat("positionZ"));
                 result.Rotation = Quaternion.Euler(reader.GetFloat("rotationX"), reader.GetFloat("rotationY"), reader.GetFloat("rotationZ"));
@@ -35,10 +35,10 @@ namespace MultiplayerARPG.MMO
         {
             MySqlConnection connection = NewConnection();
             connection.Open();
-            ExecuteNonQuery(connection, null, "INSERT INTO buildings (id, parentId, dataId, currentHp, mapName, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, creatorId, creatorName) VALUES (@id, @parentId, @dataId, @currentHp, @mapName, @positionX, @positionY, @positionZ, @rotationX, @rotationY, @rotationZ, @creatorId, @creatorName)",
+            ExecuteNonQuery(connection, null, "INSERT INTO buildings (id, parentId, entityId, currentHp, mapName, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, creatorId, creatorName) VALUES (@id, @parentId, @entityId, @currentHp, @mapName, @positionX, @positionY, @positionZ, @rotationX, @rotationY, @rotationZ, @creatorId, @creatorName)",
                 new MySqlParameter("@id", saveData.Id),
                 new MySqlParameter("@parentId", saveData.ParentId),
-                new MySqlParameter("@dataId", saveData.DataId),
+                new MySqlParameter("@entityId", saveData.EntityId),
                 new MySqlParameter("@currentHp", saveData.CurrentHp),
                 new MySqlParameter("@mapName", mapName),
                 new MySqlParameter("@positionX", saveData.Position.x),
@@ -70,7 +70,7 @@ namespace MultiplayerARPG.MMO
             connection.Open();
             ExecuteNonQuery(connection, null, "UPDATE buildings SET " +
                 "parentId=@parentId, " +
-                "dataId=@dataId, " +
+                "entityId=@entityId, " +
                 "currentHp=@currentHp, " +
                 "positionX=@positionX, " +
                 "positionY=@positionY, " +
@@ -85,7 +85,7 @@ namespace MultiplayerARPG.MMO
                 "WHERE id=@id AND mapName=@mapName",
                 new MySqlParameter("@id", building.Id),
                 new MySqlParameter("@parentId", building.ParentId),
-                new MySqlParameter("@dataId", building.DataId),
+                new MySqlParameter("@entityId", building.EntityId),
                 new MySqlParameter("@currentHp", building.CurrentHp),
                 new MySqlParameter("@mapName", mapName),
                 new MySqlParameter("@positionX", building.Position.x),
