@@ -742,14 +742,14 @@ namespace MultiplayerARPG.MMO
             }
         }
 
-        public override void IncreaseStorageItems(StorageId storageId, CharacterItem addingItem, Action<bool> callback, int minSlotIndex = 0)
+        public override void IncreaseStorageItems(StorageId storageId, CharacterItem addingItem, Action<bool> callback)
         {
             if (!storageItems.ContainsKey(storageId))
                 storageItems[storageId] = new List<CharacterItem>();
-            StartCoroutine(IncreaseStorageItemsRoutine(storageId, addingItem, callback, minSlotIndex));
+            StartCoroutine(IncreaseStorageItemsRoutine(storageId, addingItem, callback));
         }
 
-        private IEnumerator IncreaseStorageItemsRoutine(StorageId storageId, CharacterItem addingItem, Action<bool> callback, int minSlotIndex = 0)
+        private IEnumerator IncreaseStorageItemsRoutine(StorageId storageId, CharacterItem addingItem, Action<bool> callback)
         {
             List<CharacterItem> storageItemList = new List<CharacterItem>();
             if (storageId.storageType == StorageType.Guild)
@@ -761,12 +761,17 @@ namespace MultiplayerARPG.MMO
 
             // Prepare storage data
             Storage storage = GetStorage(storageId);
+            bool isLimitWeight = storage.weightLimit > 0;
             bool isLimitSlot = storage.slotLimit > 0;
+            short weightLimit = storage.weightLimit;
             short slotLimit = storage.slotLimit;
             // Increase item to storage
-            bool increaseResult = storageItemList.IncreaseItems(addingItem, minSlotIndex);
+            bool isOverwhelming = storageItemList.IncreasingItemsWillOverwhelming(
+                addingItem.dataId, addingItem.amount, isLimitWeight, weightLimit,
+                storageItemList.GetTotalItemWeight(), isLimitSlot, slotLimit);
+            bool increaseResult = storageItemList.IncreaseItems(addingItem);
             if (callback != null)
-                callback.Invoke(increaseResult);
+                callback.Invoke(!isOverwhelming && storageItemList.IncreaseItems(addingItem));
             // Update slots
             storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
             // Update storage list immediately
