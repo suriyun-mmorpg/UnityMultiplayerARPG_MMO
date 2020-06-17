@@ -220,7 +220,7 @@ namespace MultiplayerARPG.MMO
             ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS buildings (
               id TEXT NOT NULL PRIMARY KEY,
               parentId TEXT NOT NULL,
-              dataId INTEGER NOT NULL,
+              entityId INGETER NOT NULL,
               currentHp INTEGER NOT NULL,
               mapName TEXT NOT NULL,
               positionX REAL NOT NULL,
@@ -310,6 +310,9 @@ namespace MultiplayerARPG.MMO
             if (!IsColumnExist("buildings", "lockPassword"))
                 ExecuteNonQuery("ALTER TABLE buildings ADD lockPassword TEXT NOT NULL DEFAULT '';");
 
+            if (!IsColumnExist("buildings", "entityId"))
+                ExecuteNonQuery("ALTER TABLE buildings ADD entityId INTEGER NOT NULL DEFAULT 0;");
+
             if (!IsColumnExist("characters", "partyId"))
                 ExecuteNonQuery("ALTER TABLE characters ADD partyId INTEGER NOT NULL DEFAULT 0;");
 
@@ -336,6 +339,17 @@ namespace MultiplayerARPG.MMO
 
             if (!IsColumnExist("guild", "gold"))
                 ExecuteNonQuery("ALTER TABLE guild ADD gold INTEGER NOT NULL DEFAULT 0;");
+
+            // Migrate data
+            if (IsColumnExist("buildings", "dataId"))
+            {
+                foreach (BuildingEntity prefab in GameInstance.BuildingEntities.Values)
+                {
+                    ExecuteNonQuery("UPDATE buildings SET entityId=@entityId, dataId=0 WHERE dataId=@dataId",
+                        new SqliteParameter("entityId", prefab.EntityId),
+                        new SqliteParameter("dataId", prefab.name.GenerateHashId()));
+                }
+            }
 
             this.InvokeInstanceDevExtMethods("Init");
         }

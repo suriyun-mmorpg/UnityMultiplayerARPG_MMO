@@ -384,7 +384,10 @@ namespace MultiplayerARPG.MMO
                     startingMapServer = true;
                 }
             }
+        }
 
+        private void OnGameDataLoaded()
+        {
             // Initialize database when any server starting
             if (startingCentralServer ||
                 startingMapSpawnServer ||
@@ -394,10 +397,7 @@ namespace MultiplayerARPG.MMO
                 if (database != null)
                     database.Initialize();
             }
-        }
 
-        private void OnGameDataLoaded()
-        {
             if (startingCentralServer)
                 StartCentralServer();
 
