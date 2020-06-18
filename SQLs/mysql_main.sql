@@ -25,7 +25,7 @@ SET time_zone = "+00:00";
 CREATE TABLE `buildings` (
   `id` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   `parentId` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `dataId` int(11) NOT NULL DEFAULT '0',
+  `entityId` int(11) NOT NULL DEFAULT '0',
   `currentHp` int(11) NOT NULL DEFAULT '0',
   `mapName` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   `positionX` float NOT NULL DEFAULT '0',
