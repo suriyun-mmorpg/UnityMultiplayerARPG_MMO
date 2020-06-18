@@ -843,16 +843,16 @@ namespace MultiplayerARPG.MMO
             }
         }
 
-        public override void IncreaseStorageItems(StorageId storageId, CharacterItem addingItem, Action<bool> callback, int minSlotIndex = 0)
+        public override void IncreaseStorageItems(StorageId storageId, CharacterItem addingItem, Action<bool> callback)
         {
             if (!storageItems.ContainsKey(storageId))
                 storageItems[storageId] = new List<CharacterItem>();
-            IncreaseStorageItemsRoutine(storageId, addingItem, callback, minSlotIndex);
+            IncreaseStorageItemsRoutine(storageId, addingItem, callback);
         }
 
-        private async void IncreaseStorageItemsRoutine(StorageId storageId, CharacterItem addingItem, Action<bool> callback, int minSlotIndex = 0)
+        private async void IncreaseStorageItemsRoutine(StorageId storageId, CharacterItem addingItem, Action<bool> callback)
         {
-            List<CharacterItem> storageItemList = new List<CharacterItem>();
+            List<CharacterItem> storageItemList;
             if (storageId.storageType == StorageType.Guild)
             {
                 // Have to reload guild storage because it can be changed by other players in other map-server
@@ -865,7 +865,7 @@ namespace MultiplayerARPG.MMO
             bool isLimitSlot = storage.slotLimit > 0;
             short slotLimit = storage.slotLimit;
             // Increase item to storage
-            bool increaseResult = storageItemList.IncreaseItems(addingItem, minSlotIndex);
+            bool increaseResult = storageItemList.IncreaseItems(addingItem);
             if (callback != null)
                 callback.Invoke(increaseResult);
             // Update slots
