@@ -42,6 +42,16 @@ namespace MultiplayerARPG.MMO
             }
         }
 
+        public static void CopyToRepeatedByteString<T>(this IList<T> from, RepeatedField<ByteString> to)
+            where T : INetSerializable
+        {
+            to.Clear();
+            for (int i = 0; i < from.Count; ++i)
+            {
+                to.Add(ToByteString(from[i]));
+            }
+        }
+
         public static T[] MakeArrayFromRepeatedByteString<T>(this RepeatedField<ByteString> from)
             where T : INetSerializable
         {
