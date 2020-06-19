@@ -22,6 +22,7 @@ namespace MultiplayerARPG.MMO
         private Dictionary<string, int> cachedUserCash = new Dictionary<string, int>();
         private Dictionary<string, PlayerCharacterData> cachedUserCharacter = new Dictionary<string, PlayerCharacterData>();
         private Dictionary<string, Dictionary<string, BuildingSaveData>> cachedBuilding = new Dictionary<string, Dictionary<string, BuildingSaveData>>();
+        private Dictionary<StorageId, List<CharacterItem>> cachedStorageItems = new Dictionary<StorageId, List<CharacterItem>>();
 
         public DatabaseServiceImplement(BaseDatabase database)
         {
@@ -519,9 +520,320 @@ namespace MultiplayerARPG.MMO
             return resp;
         }
 
+        public override async Task<MoveItemToStorageResp> MoveItemToStorage(MoveItemToStorageReq request, ServerCallContext context)
+        {
+            await Task.Yield();
+            MoveItemToStorageResp resp = new MoveItemToStorageResp();
+            // Prepare storage data
+            StorageId storageId = new StorageId((StorageType)request.StorageType, request.StorageOwnerId);
+            Storage storage;
+            List<CharacterItem> storageItemList;
+            if (!GetStorage(storageId, request.MapName, out storage) ||
+                !cachedStorageItems.TryGetValue(storageId, out storageItemList))
+            {
+                // Cannot find storage
+                resp.Error = EStorageError.StorageErrorInvalidStorage;
+                return resp;
+            }
+            PlayerCharacterData character;
+            if (!cachedUserCharacter.TryGetValue(request.CharacterId, out character))
+            {
+                // Cannot find character
+                resp.Error = EStorageError.StorageErrorInvalidCharacter;
+                return resp;
+            }
+            if (request.InventoryItemIndex <= 0 || 
+                request.InventoryItemIndex > character.NonEquipItems.Count)
+            {
+                // Invalid inventory index
+                resp.Error = EStorageError.StorageErrorInvalidInventoryIndex;
+                return resp;
+            }
+            bool isLimitWeight = storage.weightLimit > 0;
+            bool isLimitSlot = storage.slotLimit > 0;
+            short weightLimit = storage.weightLimit;
+            short slotLimit = storage.slotLimit;
+            // Prepare character and item data
+            CharacterItem movingItem = character.NonEquipItems[request.InventoryItemIndex].Clone();
+            movingItem.id = GenericUtils.GetUniqueId();
+            movingItem.amount = (short)request.InventoryItemAmount;
+            if (request.StorageItemIndex < 0 ||
+                request.StorageItemIndex >= storageItemList.Count ||
+                storageItemList[request.StorageItemIndex].dataId == movingItem.dataId)
+            {
+                // Add to storage or merge
+                bool isOverwhelming = storageItemList.IncreasingItemsWillOverwhelming(
+                    movingItem.dataId, movingItem.amount, isLimitWeight, weightLimit,
+                    storageItemList.GetTotalItemWeight(), isLimitSlot, slotLimit);
+                if (isOverwhelming || !storageItemList.IncreaseItems(movingItem))
+                {
+                    // Storage will overwhelming
+                    resp.Error = EStorageError.StorageErrorStorageWillOverwhelming;
+                    return resp;
+                }
+                // Remove from inventory
+                character.DecreaseItemsByIndex(request.InventoryItemIndex, (short)request.InventoryItemAmount);
+                character.FillEmptySlots();
+            }
+            else
+            {
+                // Swapping
+                CharacterItem storageItem = storageItemList[request.StorageItemIndex];
+                CharacterItem nonEquipItem = character.NonEquipItems[request.InventoryItemIndex];
+                storageItem.id = GenericUtils.GetUniqueId();
+                nonEquipItem.id = GenericUtils.GetUniqueId();
+                storageItemList[request.StorageItemIndex] = nonEquipItem;
+                character.NonEquipItems[request.InventoryItemIndex] = storageItem;
+            }
+            storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
+            // Update storage list
+            // TODO: May update later to reduce amount of processes
+            Database.UpdateStorageItems((StorageType)request.StorageType, request.StorageOwnerId, storageItemList);
+            resp.Error = EStorageError.StorageErrorNone;
+            DatabaseServiceUtils.CopyToRepeatedByteString(character.NonEquipItems, resp.InventoryItemItems);
+            DatabaseServiceUtils.CopyToRepeatedByteString(storageItemList, resp.StorageCharacterItems);
+            return resp;
+        }
+
+        public override async Task<MoveItemFromStorageResp> MoveItemFromStorage(MoveItemFromStorageReq request, ServerCallContext context)
+        {
+            await Task.Yield();
+            MoveItemFromStorageResp resp = new MoveItemFromStorageResp();
+            StorageId storageId = new StorageId((StorageType)request.StorageType, request.StorageOwnerId);
+            Storage storage;
+            List<CharacterItem> storageItemList;
+            if (!GetStorage(storageId, request.MapName, out storage) ||
+                !cachedStorageItems.TryGetValue(storageId, out storageItemList))
+            {
+                // Cannot find storage
+                resp.Error = EStorageError.StorageErrorInvalidStorage;
+                return resp;
+            }
+            PlayerCharacterData character;
+            if (!cachedUserCharacter.TryGetValue(request.CharacterId, out character))
+            {
+                // Cannot find character
+                resp.Error = EStorageError.StorageErrorInvalidCharacter;
+                return resp;
+            }
+            if (request.StorageItemIndex <= 0 ||
+                request.StorageItemIndex > storageItemList.Count)
+            {
+                // Invalid storage index
+                resp.Error = EStorageError.StorageErrorInvalidStorageIndex;
+                return resp;
+            }
+            bool isLimitSlot = storage.slotLimit > 0;
+            short slotLimit = storage.slotLimit;
+            // Prepare item data
+            CharacterItem movingItem = storageItemList[request.StorageItemIndex].Clone();
+            movingItem.id = GenericUtils.GetUniqueId();
+            movingItem.amount = (short)request.StorageItemAmount;
+            if (request.InventoryItemIndex < 0 ||
+                request.InventoryItemIndex >= character.NonEquipItems.Count ||
+                character.NonEquipItems[request.InventoryItemIndex].dataId == movingItem.dataId)
+            {
+                // Add to inventory or merge
+                bool isOverwhelming = character.IncreasingItemsWillOverwhelming(movingItem.dataId, movingItem.amount);
+                if (isOverwhelming || !character.IncreaseItems(movingItem))
+                {
+                    // inventory will overwhelming
+                    resp.Error = EStorageError.StorageErrorInventoryWillOverwhelming;
+                    return resp;
+                }
+                // Remove from storage
+                storageItemList.DecreaseItemsByIndex(request.StorageItemIndex, (short)request.StorageItemAmount, isLimitSlot);
+            }
+            else
+            {
+                // Swapping
+                CharacterItem storageItem = storageItemList[request.StorageItemIndex];
+                CharacterItem nonEquipItem = character.NonEquipItems[request.InventoryItemIndex];
+                storageItem.id = GenericUtils.GetUniqueId();
+                nonEquipItem.id = GenericUtils.GetUniqueId();
+                storageItemList[request.StorageItemIndex] = nonEquipItem;
+                character.NonEquipItems[request.InventoryItemIndex] = storageItem;
+            }
+            storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
+            character.FillEmptySlots();
+            // Update storage list
+            // TODO: May update later to reduce amount of processes
+            Database.UpdateStorageItems((StorageType)request.StorageType, request.StorageOwnerId, storageItemList);
+            resp.Error = EStorageError.StorageErrorNone;
+            DatabaseServiceUtils.CopyToRepeatedByteString(character.NonEquipItems, resp.InventoryItemItems);
+            DatabaseServiceUtils.CopyToRepeatedByteString(storageItemList, resp.StorageCharacterItems);
+            return resp;
+        }
+
+        public override async Task<SwapOrMergeStorageItemResp> SwapOrMergeStorageItem(SwapOrMergeStorageItemReq request, ServerCallContext context)
+        {
+            await Task.Yield();
+            SwapOrMergeStorageItemResp resp = new SwapOrMergeStorageItemResp();
+            // Prepare storage data
+            StorageId storageId = new StorageId((StorageType)request.StorageType, request.StorageOwnerId);
+            Storage storage;
+            List<CharacterItem> storageItemList;
+            if (!GetStorage(storageId, request.MapName, out storage) ||
+                !cachedStorageItems.TryGetValue(storageId, out storageItemList))
+            {
+                // Cannot find storage
+                resp.Error = EStorageError.StorageErrorInvalidStorage;
+                return resp;
+            }
+            bool isLimitSlot = storage.slotLimit > 0;
+            short slotLimit = storage.slotLimit;
+            // Prepare item data
+            CharacterItem fromItem = storageItemList[request.FromIndex];
+            CharacterItem toItem = storageItemList[request.ToIndex];
+            fromItem.id = GenericUtils.GetUniqueId();
+            toItem.id = GenericUtils.GetUniqueId();
+            if (fromItem.dataId.Equals(toItem.dataId) && !fromItem.IsFull() && !toItem.IsFull())
+            {
+                // Merge if same id and not full
+                short maxStack = toItem.GetMaxStack();
+                if (toItem.amount + fromItem.amount <= maxStack)
+                {
+                    toItem.amount += fromItem.amount;
+                    storageItemList[request.FromIndex] = CharacterItem.Empty;
+                    storageItemList[request.ToIndex] = toItem;
+                }
+                else
+                {
+                    short remains = (short)(toItem.amount + fromItem.amount - maxStack);
+                    toItem.amount = maxStack;
+                    fromItem.amount = remains;
+                    storageItemList[request.FromIndex] = fromItem;
+                    storageItemList[request.ToIndex] = toItem;
+                }
+            }
+            else
+            {
+                // Swap
+                storageItemList[request.FromIndex] = toItem;
+                storageItemList[request.ToIndex] = fromItem;
+            }
+            storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
+            // Update storage list
+            // TODO: May update later to reduce amount of processes
+            Database.UpdateStorageItems((StorageType)request.StorageType, request.StorageOwnerId, storageItemList);
+            resp.Error = EStorageError.StorageErrorNone;
+            DatabaseServiceUtils.CopyToRepeatedByteString(storageItemList, resp.StorageCharacterItems);
+            return resp;
+        }
+
+        public override async Task<IncreaseStorageItemsResp> IncreaseStorageItems(IncreaseStorageItemsReq request, ServerCallContext context)
+        {
+            await Task.Yield();
+            IncreaseStorageItemsResp resp = new IncreaseStorageItemsResp();
+            // Prepare storage data
+            StorageId storageId = new StorageId((StorageType)request.StorageType, request.StorageOwnerId);
+            Storage storage;
+            List<CharacterItem> storageItemList;
+            if (!GetStorage(storageId, request.MapName, out storage) ||
+                !cachedStorageItems.TryGetValue(storageId, out storageItemList))
+            {
+                // Cannot find storage
+                resp.Error = EStorageError.StorageErrorInvalidStorage;
+                return resp;
+            }
+            bool isLimitWeight = storage.weightLimit > 0;
+            bool isLimitSlot = storage.slotLimit > 0;
+            short weightLimit = storage.weightLimit;
+            short slotLimit = storage.slotLimit;
+            CharacterItem addingItem = DatabaseServiceUtils.FromByteString<CharacterItem>(request.Item);
+            // Increase item to storage
+            bool isOverwhelming = storageItemList.IncreasingItemsWillOverwhelming(
+                addingItem.dataId, addingItem.amount, isLimitWeight, weightLimit,
+                storageItemList.GetTotalItemWeight(), isLimitSlot, slotLimit);
+            if (isOverwhelming || !storageItemList.IncreaseItems(addingItem))
+            {
+                // Storage will overwhelming
+                resp.Error = EStorageError.StorageErrorStorageWillOverwhelming;
+                return resp;
+            }
+            storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
+            // Update storage list
+            // TODO: May update later to reduce amount of processes
+            Database.UpdateStorageItems((StorageType)request.StorageType, request.StorageOwnerId, storageItemList);
+            resp.Error = EStorageError.StorageErrorNone;
+            DatabaseServiceUtils.CopyToRepeatedByteString(storageItemList, resp.StorageCharacterItems);
+            return resp;
+        }
+
+        public override async Task<DecreaseStorageItemsResp> DecreaseStorageItems(DecreaseStorageItemsReq request, ServerCallContext context)
+        {
+            await Task.Yield();
+            DecreaseStorageItemsResp resp = new DecreaseStorageItemsResp();
+            // Prepare storage data
+            StorageId storageId = new StorageId((StorageType)request.StorageType, request.StorageOwnerId);
+            Storage storage;
+            List<CharacterItem> storageItemList;
+            if (!GetStorage(storageId, request.MapName, out storage) ||
+                !cachedStorageItems.TryGetValue(storageId, out storageItemList))
+            {
+                // Cannot find storage
+                resp.Error = EStorageError.StorageErrorInvalidStorage;
+                return resp;
+            }
+            bool isLimitSlot = storage.slotLimit > 0;
+            short slotLimit = storage.slotLimit;
+            // Increase item to storage
+            Dictionary<int, short> decreaseItems;
+            if (!storageItemList.DecreaseItems(request.DataId, (short)request.Amount, isLimitSlot, out decreaseItems))
+            {
+                resp.Error = EStorageError.StorageErrorDecreaseItemNotEnough;
+                return resp;
+            }
+            storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
+            // Update storage list
+            // TODO: May update later to reduce amount of processes
+            Database.UpdateStorageItems((StorageType)request.StorageType, request.StorageOwnerId, storageItemList);
+            resp.Error = EStorageError.StorageErrorNone;
+            DatabaseServiceUtils.CopyToRepeatedByteString(storageItemList, resp.StorageCharacterItems);
+            foreach (int itemIndex in decreaseItems.Keys)
+            {
+                resp.DecreasedItems.Add(new ItemIndexAmountMap()
+                {
+                    Index = itemIndex,
+                    Amount = decreaseItems[itemIndex]
+                });
+            }
+            return resp;
+        }
+
         public override async Task<CustomResp> Custom(CustomReq request, ServerCallContext context)
         {
             return await onCustomRequest.Invoke(request.Type, request.Data);
+        }
+
+        public bool GetStorage(StorageId storageId, string mapName, out Storage storage)
+        {
+            storage = default(Storage);
+            switch (storageId.storageType)
+            {
+                case StorageType.Player:
+                    // Get storage setting from game instance
+                    storage = GameInstance.Singleton.playerStorage;
+                    break;
+                case StorageType.Guild:
+                    // Get storage setting from game instance
+                    storage = GameInstance.Singleton.guildStorage;
+                    break;
+                case StorageType.Building:
+                    // Get building from cache, then get building entity from game instance
+                    // And get storage setting from building entity
+                    BuildingSaveData building;
+                    BuildingEntity buildingEntity;
+                    if (cachedBuilding.ContainsKey(mapName) &&
+                        cachedBuilding[mapName].TryGetValue(storageId.storageOwnerId, out building) &&
+                        GameInstance.BuildingEntities.TryGetValue(building.EntityId, out buildingEntity) &&
+                        buildingEntity is StorageEntity)
+                        storage = (buildingEntity as StorageEntity).storage;
+                    else
+                        return false;
+                    break;
+            }
+            return true;
         }
     }
 }

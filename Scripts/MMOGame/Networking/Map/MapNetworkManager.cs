@@ -81,7 +81,6 @@ namespace MultiplayerARPG.MMO
         private readonly Dictionary<string, HashSet<uint>> instanceMapWarpingCharactersByInstanceId = new Dictionary<string, HashSet<uint>>();
         private readonly Dictionary<string, KeyValuePair<string, Vector3>> instanceMapWarpingLocations = new Dictionary<string, KeyValuePair<string, Vector3>>();
         private readonly Dictionary<string, UserCharacterData> usersById = new Dictionary<string, UserCharacterData>();
-        private readonly Dictionary<StorageId, List<CharacterItem>> storageItems = new Dictionary<StorageId, List<CharacterItem>>();
         private readonly Dictionary<StorageId, HashSet<uint>> usingStorageCharacters = new Dictionary<StorageId, HashSet<uint>>();
         // Database operations
         private readonly HashSet<StorageId> loadingStorageIds = new HashSet<StorageId>();
@@ -157,7 +156,6 @@ namespace MultiplayerARPG.MMO
             instanceMapWarpingCharactersByInstanceId.Clear();
             instanceMapWarpingLocations.Clear();
             usersById.Clear();
-            storageItems.Clear();
             usingStorageCharacters.Clear();
             loadingStorageIds.Clear();
             loadingPartyIds.Clear();

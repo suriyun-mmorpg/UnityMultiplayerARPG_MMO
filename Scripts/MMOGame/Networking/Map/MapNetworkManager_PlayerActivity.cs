@@ -652,8 +652,6 @@ namespace MultiplayerARPG.MMO
                 SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.CannotAccessStorage);
                 return;
             }
-            if (!storageItems.ContainsKey(playerCharacterEntity.CurrentStorageId))
-                storageItems[playerCharacterEntity.CurrentStorageId] = new List<CharacterItem>();
             if (!usingStorageCharacters.ContainsKey(playerCharacterEntity.CurrentStorageId))
                 usingStorageCharacters[playerCharacterEntity.CurrentStorageId] = new HashSet<uint>();
             usingStorageCharacters[playerCharacterEntity.CurrentStorageId].Add(playerCharacterEntity.ObjectId);
@@ -662,20 +660,11 @@ namespace MultiplayerARPG.MMO
 
         private async void OpenStorageRoutine(BasePlayerCharacterEntity playerCharacterEntity)
         {
-            List<CharacterItem> result = new List<CharacterItem>();
-            if (playerCharacterEntity.CurrentStorageId.storageType == StorageType.Guild)
-            {
-                // Have to reload guild storage because it can be changed by other players in other map-server
-                await LoadStorageRoutine(playerCharacterEntity.CurrentStorageId);
-            }
-            result = storageItems[playerCharacterEntity.CurrentStorageId];
-            // Prepare storage data
-            Storage storage = GetStorage(playerCharacterEntity.CurrentStorageId);
-            bool isLimitSlot = storage.slotLimit > 0;
-            short slotLimit = storage.slotLimit;
-            result.FillEmptySlots(isLimitSlot, slotLimit);
-            // Update storage items
-            playerCharacterEntity.StorageItems = result.ToArray();
+            ReadStorageItemsReq req = new ReadStorageItemsReq();
+            req.StorageType = (EStorageType)playerCharacterEntity.CurrentStorageId.storageType;
+            req.StorageOwnerId = playerCharacterEntity.CurrentStorageId.storageOwnerId;
+            ReadStorageItemsResp resp = await DbServiceClient.ReadStorageItemsAsync(req);
+            playerCharacterEntity.StorageItems = DatabaseServiceUtils.MakeArrayFromRepeatedByteString<CharacterItem>(resp.StorageCharacterItems);
         }
 
         public override void CloseStorage(BasePlayerCharacterEntity playerCharacterEntity)
@@ -692,78 +681,27 @@ namespace MultiplayerARPG.MMO
                 SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.CannotAccessStorage);
                 return;
             }
-            if (!storageItems.ContainsKey(storageId))
-                storageItems[storageId] = new List<CharacterItem>();
             MoveItemToStorageRoutine(playerCharacterEntity, storageId, nonEquipIndex, amount, storageItemIndex);
         }
 
         private async void MoveItemToStorageRoutine(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short nonEquipIndex, short amount, short storageItemIndex)
         {
-            List<CharacterItem> storageItemList = new List<CharacterItem>();
-            if (storageId.storageType == StorageType.Guild)
+            MoveItemToStorageReq req = new MoveItemToStorageReq();
+            req.StorageType = (EStorageType)storageId.storageType;
+            req.StorageOwnerId = storageId.storageOwnerId;
+            req.CharacterId = playerCharacterEntity.Id;
+            req.MapName = CurrentMapInfo.Id;
+            req.InventoryItemIndex = nonEquipIndex;
+            req.InventoryItemAmount = amount;
+            req.StorageItemIndex = storageItemIndex;
+            MoveItemToStorageResp resp = await DbServiceClient.MoveItemToStorageAsync(req);
+            if (resp.Error != EStorageError.StorageErrorNone)
             {
-                // Have to reload guild storage because it can be changed by other players in other map-server
-                await LoadStorageRoutine(storageId);
+                // TODO: May push error message
+                return;
             }
-            storageItemList = storageItems[storageId];
-
-            if (nonEquipIndex < 0 || nonEquipIndex >= playerCharacterEntity.NonEquipItems.Count)
-            {
-                // Don't do anything, if non equip item index is invalid
-            }
-            else
-            {
-                // Prepare storage data
-                Storage storage = GetStorage(storageId);
-                bool isLimitWeight = storage.weightLimit > 0;
-                bool isLimitSlot = storage.slotLimit > 0;
-                short weightLimit = storage.weightLimit;
-                short slotLimit = storage.slotLimit;
-                // Prepare item data
-                CharacterItem movingItem = playerCharacterEntity.NonEquipItems[nonEquipIndex].Clone();
-                movingItem.id = GenericUtils.GetUniqueId();
-                movingItem.amount = amount;
-                if (storageItemIndex < 0 ||
-                    storageItemIndex >= storageItemList.Count ||
-                    storageItemList[storageItemIndex].dataId == movingItem.dataId)
-                {
-                    // Add to storage or merge
-                    bool isOverwhelming = storageItemList.IncreasingItemsWillOverwhelming(
-                        movingItem.dataId, movingItem.amount, isLimitWeight, weightLimit,
-                        storageItemList.GetTotalItemWeight(), isLimitSlot, slotLimit);
-                    if (!isOverwhelming && storageItemList.IncreaseItems(movingItem))
-                    {
-                        // Remove from inventory
-                        playerCharacterEntity.DecreaseItemsByIndex(nonEquipIndex, amount);
-                        playerCharacterEntity.FillEmptySlots();
-                    }
-                }
-                else
-                {
-                    // Swapping
-                    CharacterItem storageItem = storageItemList[storageItemIndex];
-                    CharacterItem nonEquipItem = playerCharacterEntity.NonEquipItems[nonEquipIndex];
-                    storageItem.id = GenericUtils.GetUniqueId();
-                    nonEquipItem.id = GenericUtils.GetUniqueId();
-                    storageItemList[storageItemIndex] = nonEquipItem;
-                    playerCharacterEntity.NonEquipItems[nonEquipIndex] = storageItem;
-                }
-                storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
-                // Update storage list immediately
-                if (storageId.storageType == StorageType.Guild)
-                {
-                    // TODO: Have to test about race condition while running multiple-server
-                    UpdateStorageItemsReq req = new UpdateStorageItemsReq()
-                    {
-                        StorageType = (EStorageType)storageId.storageType,
-                        StorageOwnerId = storageId.storageOwnerId
-                    };
-                    DatabaseServiceUtils.CopyToRepeatedByteString(storageItemList, req.StorageCharacterItems);
-                    await DbServiceClient.UpdateStorageItemsAsync(req);
-                }
-                // Update storage items to characters that open the storage
-                UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItemList);
-            }
+            playerCharacterEntity.NonEquipItems = DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.InventoryItemItems);
+            UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.StorageCharacterItems));
         }
 
         public override void MoveItemFromStorage(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short storageItemIndex, short amount, short nonEquipIndex)
@@ -773,161 +711,83 @@ namespace MultiplayerARPG.MMO
                 SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.CannotAccessStorage);
                 return;
             }
-            if (!storageItems.ContainsKey(storageId))
-                storageItems[storageId] = new List<CharacterItem>();
             MoveItemFromStorageRoutine(playerCharacterEntity, storageId, storageItemIndex, amount, nonEquipIndex);
         }
 
         private async void MoveItemFromStorageRoutine(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short storageItemIndex, short amount, short nonEquipIndex)
         {
-            List<CharacterItem> storageItemList = new List<CharacterItem>();
-            if (storageId.storageType == StorageType.Guild)
+            MoveItemFromStorageReq req = new MoveItemFromStorageReq();
+            req.StorageType = (EStorageType)storageId.storageType;
+            req.StorageOwnerId = storageId.storageOwnerId;
+            req.CharacterId = playerCharacterEntity.Id;
+            req.MapName = CurrentMapInfo.Id;
+            req.StorageItemIndex = storageItemIndex;
+            req.StorageItemAmount = amount;
+            req.InventoryItemIndex = nonEquipIndex;
+            MoveItemFromStorageResp resp = await DbServiceClient.MoveItemFromStorageAsync(req);
+            if (resp.Error != EStorageError.StorageErrorNone)
             {
-                // Have to reload guild storage because it can be changed by other players in other map-server
-                await LoadStorageRoutine(storageId);
+                // TODO: May push error message
+                return;
             }
-            storageItemList = storageItems[storageId];
-
-            if (storageItemIndex < 0 || storageItemIndex >= storageItemList.Count)
-            {
-                // Don't do anything, if storage item index is invalid
-            }
-            else
-            {
-                // Prepare storage data
-                Storage storage = GetStorage(storageId);
-                bool isLimitSlot = storage.slotLimit > 0;
-                short slotLimit = storage.slotLimit;
-                // Prepare item data
-                CharacterItem movingItem = storageItemList[storageItemIndex].Clone();
-                movingItem.id = GenericUtils.GetUniqueId();
-                movingItem.amount = amount;
-                if (nonEquipIndex < 0 ||
-                    nonEquipIndex >= playerCharacterEntity.NonEquipItems.Count ||
-                    playerCharacterEntity.NonEquipItems[nonEquipIndex].dataId == movingItem.dataId)
-                {
-                    // Add to inventory or merge
-                    bool isOverwhelming = playerCharacterEntity.IncreasingItemsWillOverwhelming(movingItem.dataId, movingItem.amount);
-                    if (!isOverwhelming && playerCharacterEntity.IncreaseItems(movingItem))
-                    {
-                        // Remove from storage
-                        storageItemList.DecreaseItemsByIndex(storageItemIndex, amount, isLimitSlot);
-                    }
-                }
-                else
-                {
-                    // Swapping
-                    CharacterItem storageItem = storageItemList[storageItemIndex];
-                    CharacterItem nonEquipItem = playerCharacterEntity.NonEquipItems[nonEquipIndex];
-                    storageItem.id = GenericUtils.GetUniqueId();
-                    nonEquipItem.id = GenericUtils.GetUniqueId();
-                    storageItemList[storageItemIndex] = nonEquipItem;
-                    playerCharacterEntity.NonEquipItems[nonEquipIndex] = storageItem;
-                }
-                storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
-                playerCharacterEntity.FillEmptySlots();
-                // Update storage list immediately
-                if (storageId.storageType == StorageType.Guild)
-                {
-                    // TODO: Have to test about race condition while running multiple-server
-                    UpdateStorageItemsReq req = new UpdateStorageItemsReq()
-                    {
-                        StorageType = (EStorageType)storageId.storageType,
-                        StorageOwnerId = storageId.storageOwnerId
-                    };
-                    DatabaseServiceUtils.CopyToRepeatedByteString(storageItemList, req.StorageCharacterItems);
-                    await DbServiceClient.UpdateStorageItemsAsync(req);
-                }
-                // Update storage items to characters that open the storage
-                UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItemList);
-            }
+            playerCharacterEntity.NonEquipItems = DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.InventoryItemItems);
+            UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.StorageCharacterItems));
         }
 
         public override void IncreaseStorageItems(StorageId storageId, CharacterItem addingItem, Action<bool> callback)
         {
-            if (!storageItems.ContainsKey(storageId))
-                storageItems[storageId] = new List<CharacterItem>();
             IncreaseStorageItemsRoutine(storageId, addingItem, callback);
         }
 
         private async void IncreaseStorageItemsRoutine(StorageId storageId, CharacterItem addingItem, Action<bool> callback)
         {
-            List<CharacterItem> storageItemList;
-            if (storageId.storageType == StorageType.Guild)
+            IncreaseStorageItemsReq req = new IncreaseStorageItemsReq();
+            req.StorageType = (EStorageType)storageId.storageType;
+            req.StorageOwnerId = storageId.storageOwnerId;
+            req.MapName = CurrentMapInfo.Id;
+            req.Item = DatabaseServiceUtils.ToByteString(addingItem);
+            IncreaseStorageItemsResp resp = await DbServiceClient.IncreaseStorageItemsAsync(req);
+            if (resp.Error != EStorageError.StorageErrorNone)
             {
-                // Have to reload guild storage because it can be changed by other players in other map-server
-                await LoadStorageRoutine(storageId);
+                // TODO: May push error message
+                if (resp.Error == EStorageError.StorageErrorStorageWillOverwhelming && callback != null)
+                    callback.Invoke(false);
+                return;
             }
-            storageItemList = storageItems[storageId];
-
-            // Prepare storage data
-            Storage storage = GetStorage(storageId);
-            bool isLimitSlot = storage.slotLimit > 0;
-            short slotLimit = storage.slotLimit;
-            // Increase item to storage
-            bool increaseResult = storageItemList.IncreaseItems(addingItem);
+            UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.StorageCharacterItems));
             if (callback != null)
-                callback.Invoke(increaseResult);
-            // Update slots
-            storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
-            // Update storage list immediately
-            if (storageId.storageType == StorageType.Guild)
-            {
-                // TODO: Have to test about race condition while running multiple-server
-                UpdateStorageItemsReq req = new UpdateStorageItemsReq()
-                {
-                    StorageType = (EStorageType)storageId.storageType,
-                    StorageOwnerId = storageId.storageOwnerId
-                };
-                DatabaseServiceUtils.CopyToRepeatedByteString(storageItemList, req.StorageCharacterItems);
-                await DbServiceClient.UpdateStorageItemsAsync(req);
-            }
-            // Update storage items to characters that open the storage
-            UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItemList);
+                callback.Invoke(true);
         }
 
-        public override void DecreaseStorageItems(StorageId storageId, int dataId, short amount, Action<bool, Dictionary<CharacterItem, short>> callback)
+        public override void DecreaseStorageItems(StorageId storageId, int dataId, short amount, Action<bool, Dictionary<int, short>> callback)
         {
-            if (!storageItems.ContainsKey(storageId))
-                storageItems[storageId] = new List<CharacterItem>();
             DecreaseStorageItemsRoutine(storageId, dataId, amount, callback);
         }
 
-        private async void DecreaseStorageItemsRoutine(StorageId storageId, int dataId, short amount, Action<bool, Dictionary<CharacterItem, short>> callback)
+        private async void DecreaseStorageItemsRoutine(StorageId storageId, int dataId, short amount, Action<bool, Dictionary<int, short>> callback)
         {
-            List<CharacterItem> storageItemList = new List<CharacterItem>();
-            if (storageId.storageType == StorageType.Guild)
+            DecreaseStorageItemsReq req = new DecreaseStorageItemsReq();
+            req.StorageType = (EStorageType)storageId.storageType;
+            req.StorageOwnerId = storageId.storageOwnerId;
+            req.MapName = CurrentMapInfo.Id;
+            req.DataId = dataId;
+            req.Amount = amount;
+            DecreaseStorageItemsResp resp = await DbServiceClient.DecreaseStorageItemsAsync(req);
+            if (resp.Error != EStorageError.StorageErrorNone)
             {
-                // Have to reload guild storage because it can be changed by other players in other map-server
-                await LoadStorageRoutine(storageId);
+                // TODO: May push error message
+                if (resp.Error == EStorageError.StorageErrorStorageWillOverwhelming && callback != null)
+                    callback.Invoke(false, new Dictionary<int, short>());
+                return;
             }
-            storageItemList = storageItems[storageId];
-
-            // Prepare storage data
-            Storage storage = GetStorage(storageId);
-            bool isLimitSlot = storage.slotLimit > 0;
-            short slotLimit = storage.slotLimit;
-            // Increase item to storage
-            Dictionary<CharacterItem, short> decreaseItems;
-            bool decreaseResult = storageItemList.DecreaseItems(dataId, amount, isLimitSlot, out decreaseItems);
+            UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.StorageCharacterItems));
+            Dictionary<int, short> decreasedItems = new Dictionary<int, short>();
+            foreach (ItemIndexAmountMap entry in resp.DecreasedItems)
+            {
+                decreasedItems.Add(entry.Index, (short)entry.Amount);
+            }
             if (callback != null)
-                callback.Invoke(decreaseResult, decreaseItems);
-            // Update slots
-            storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
-            // Update storage list immediately
-            if (storageId.storageType == StorageType.Guild)
-            {
-                // TODO: Have to test about race condition while running multiple-server
-                UpdateStorageItemsReq req = new UpdateStorageItemsReq()
-                {
-                    StorageType = (EStorageType)storageId.storageType,
-                    StorageOwnerId = storageId.storageOwnerId
-                };
-                DatabaseServiceUtils.CopyToRepeatedByteString(storageItemList, req.StorageCharacterItems);
-                await DbServiceClient.UpdateStorageItemsAsync(req);
-            }
-            // Update storage items to characters that open the storage
-            UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItemList);
+                callback.Invoke(true, decreasedItems);
         }
 
         public override void SwapOrMergeStorageItem(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short fromIndex, short toIndex)
@@ -937,77 +797,25 @@ namespace MultiplayerARPG.MMO
                 SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.CannotAccessStorage);
                 return;
             }
-            if (!storageItems.ContainsKey(storageId))
-                storageItems[storageId] = new List<CharacterItem>();
             SwapOrMergeStorageItemRoutine(playerCharacterEntity, storageId, fromIndex, toIndex);
         }
 
         private async void SwapOrMergeStorageItemRoutine(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short fromIndex, short toIndex)
         {
-            List<CharacterItem> storageItemList = new List<CharacterItem>();
-            if (storageId.storageType == StorageType.Guild)
+            SwapOrMergeStorageItemReq req = new SwapOrMergeStorageItemReq();
+            req.StorageType = (EStorageType)storageId.storageType;
+            req.StorageOwnerId = storageId.storageOwnerId;
+            req.CharacterId = playerCharacterEntity.Id;
+            req.MapName = CurrentMapInfo.Id;
+            req.FromIndex = fromIndex;
+            req.ToIndex = toIndex;
+            SwapOrMergeStorageItemResp resp = await DbServiceClient.SwapOrMergeStorageItemAsync(req);
+            if (resp.Error != EStorageError.StorageErrorNone)
             {
-                // Have to reload guild storage because it can be changed by other players in other map-server
-                await LoadStorageRoutine(storageId);
+                // TODO: May push error message
+                return;
             }
-            storageItemList = storageItems[storageId];
-
-            if (fromIndex >= storageItemList.Count || toIndex >= storageItemList.Count)
-            {
-                // Don't do anything, if storage item index is invalid
-            }
-            else
-            {
-                // Prepare storage data
-                Storage storage = GetStorage(storageId);
-                bool isLimitSlot = storage.slotLimit > 0;
-                short slotLimit = storage.slotLimit;
-                // Prepare item data
-                CharacterItem fromItem = storageItemList[fromIndex];
-                CharacterItem toItem = storageItemList[toIndex];
-                fromItem.id = GenericUtils.GetUniqueId();
-                toItem.id = GenericUtils.GetUniqueId();
-                if (fromItem.dataId.Equals(toItem.dataId) && !fromItem.IsFull() && !toItem.IsFull())
-                {
-                    // Merge if same id and not full
-                    short maxStack = toItem.GetMaxStack();
-                    if (toItem.amount + fromItem.amount <= maxStack)
-                    {
-                        toItem.amount += fromItem.amount;
-                        storageItemList[fromIndex] = CharacterItem.Empty;
-                        storageItemList[toIndex] = toItem;
-                    }
-                    else
-                    {
-                        short remains = (short)(toItem.amount + fromItem.amount - maxStack);
-                        toItem.amount = maxStack;
-                        fromItem.amount = remains;
-                        storageItemList[fromIndex] = fromItem;
-                        storageItemList[toIndex] = toItem;
-                    }
-                }
-                else
-                {
-                    // Swap
-                    storageItemList[fromIndex] = toItem;
-                    storageItemList[toIndex] = fromItem;
-                }
-                storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
-                // Update storage list immediately
-                if (storageId.storageType == StorageType.Guild)
-                {
-                    // TODO: Have to test about race condition while running multiple-server
-                    UpdateStorageItemsReq req = new UpdateStorageItemsReq()
-                    {
-                        StorageType = (EStorageType)storageId.storageType,
-                        StorageOwnerId = storageId.storageOwnerId
-                    };
-                    DatabaseServiceUtils.CopyToRepeatedByteString(storageItemList, req.StorageCharacterItems);
-                    await DbServiceClient.UpdateStorageItemsAsync(req);
-                }
-                // Update storage items to characters that open the storage
-                UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItemList);
-            }
+            UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.StorageCharacterItems));
         }
 
         public override bool IsStorageEntityOpen(StorageEntity storageEntity)
@@ -1017,16 +825,6 @@ namespace MultiplayerARPG.MMO
             StorageId id = new StorageId(StorageType.Building, storageEntity.Id);
             return usingStorageCharacters.ContainsKey(id) &&
                 usingStorageCharacters[id].Count > 0;
-        }
-
-        public override List<CharacterItem> GetStorageEntityItems(StorageEntity storageEntity)
-        {
-            if (storageEntity == null)
-                return new List<CharacterItem>();
-            StorageId id = new StorageId(StorageType.Building, storageEntity.Id);
-            if (!storageItems.ContainsKey(id))
-                storageItems[id] = new List<CharacterItem>();
-            return storageItems[id];
         }
 
         private void UpdateStorageItemsToCharacters(HashSet<uint> objectIds, List<CharacterItem> storageItems)
