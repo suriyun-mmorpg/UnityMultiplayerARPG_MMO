@@ -181,17 +181,7 @@ namespace MultiplayerARPG.MMO
                 ReadCharacterResp readCharacterResp = await DbServiceClient.ReadCharacterAsync(new ReadCharacterReq()
                 {
                     UserId = userPeerInfo.userId,
-                    CharacterId = message.characterId,
-                    WithEquipWeapons = false,
-                    WithAttributes = false,
-                    WithSkills = false,
-                    WithSkillUsages = false,
-                    WithBuffs = false,
-                    WithEquipItems = false,
-                    WithNonEquipItems = false,
-                    WithSummons = false,
-                    WithHotkeys = false,
-                    WithQuests = false
+                    CharacterId = message.characterId
                 });
                 PlayerCharacterData character = readCharacterResp.CharacterData.FromByteString<PlayerCharacterData>();
                 if (character == null)

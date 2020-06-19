@@ -406,17 +406,7 @@ namespace MultiplayerARPG.MMO
                 ReadCharacterResp readCharacterResp = await DbServiceClient.ReadCharacterAsync(new ReadCharacterReq()
                 {
                     UserId = userId,
-                    CharacterId = selectCharacterId,
-                    WithEquipWeapons = true,
-                    WithAttributes = true,
-                    WithSkills = true,
-                    WithSkillUsages = true,
-                    WithBuffs = true,
-                    WithEquipItems = true,
-                    WithNonEquipItems = true,
-                    WithSummons = true,
-                    WithHotkeys = true,
-                    WithQuests = true
+                    CharacterId = selectCharacterId
                 });
                 PlayerCharacterData playerCharacterData = readCharacterResp.CharacterData.FromByteString<PlayerCharacterData>();
                 // If data is empty / cannot find character, disconnect user
