@@ -33,6 +33,7 @@ namespace MultiplayerARPG.MMO
             ResponseAppServerRegisterMessage.Error error = ResponseAppServerRegisterMessage.Error.None;
             if (message.ValidateHash())
             {
+                ResponseAppServerAddressMessage appServerAddressMessage;
                 CentralServerPeerInfo peerInfo = message.peerInfo;
                 peerInfo.connectionId = connectionId;
                 switch (message.peerInfo.peerType)
@@ -85,11 +86,11 @@ namespace MultiplayerARPG.MMO
                         // Send chat peer info to map servers
                         foreach (CentralServerPeerInfo mapServerPeer in mapServerPeers.Values)
                         {
-                            ResponseAppServerAddressMessage responseChatAddressMessage = new ResponseAppServerAddressMessage();
-                            responseChatAddressMessage.responseCode = AckResponseCode.Success;
-                            responseChatAddressMessage.error = ResponseAppServerAddressMessage.Error.None;
-                            responseChatAddressMessage.peerInfo = peerInfo;
-                            ServerSendResponse(mapServerPeer.connectionId, MMOMessageTypes.ResponseAppServerAddress, responseChatAddressMessage);
+                            appServerAddressMessage = new ResponseAppServerAddressMessage();
+                            appServerAddressMessage.responseCode = AckResponseCode.Success;
+                            appServerAddressMessage.error = ResponseAppServerAddressMessage.Error.None;
+                            appServerAddressMessage.peerInfo = peerInfo;
+                            ServerSendResponse(mapServerPeer.connectionId, MMOMessageTypes.ResponseAppServerAddress, appServerAddressMessage);
                         }
                         if (LogInfo)
                             Logging.Log(LogTag, "Register Chat Server: [" + connectionId + "]");
@@ -117,31 +118,32 @@ namespace MultiplayerARPG.MMO
         /// <param name="peerInfo"></param>
         protected void BroadcastAppServers(long connectionId, CentralServerPeerInfo peerInfo)
         {
+            ResponseAppServerAddressMessage appServerAddressMessage;
             // Send map peer info to other map server
             foreach (CentralServerPeerInfo mapServerPeer in mapServerPeers.Values)
             {
                 // Send other info to current peer
-                ResponseAppServerAddressMessage responseMapAddressMessage = new ResponseAppServerAddressMessage();
-                responseMapAddressMessage.responseCode = AckResponseCode.Success;
-                responseMapAddressMessage.error = ResponseAppServerAddressMessage.Error.None;
-                responseMapAddressMessage.peerInfo = mapServerPeer;
-                ServerSendResponse(connectionId, MMOMessageTypes.ResponseAppServerAddress, responseMapAddressMessage);
+                appServerAddressMessage = new ResponseAppServerAddressMessage();
+                appServerAddressMessage.responseCode = AckResponseCode.Success;
+                appServerAddressMessage.error = ResponseAppServerAddressMessage.Error.None;
+                appServerAddressMessage.peerInfo = mapServerPeer;
+                ServerSendResponse(connectionId, MMOMessageTypes.ResponseAppServerAddress, appServerAddressMessage);
                 // Send current info to other peer
-                responseMapAddressMessage = new ResponseAppServerAddressMessage();
-                responseMapAddressMessage.responseCode = AckResponseCode.Success;
-                responseMapAddressMessage.error = ResponseAppServerAddressMessage.Error.None;
-                responseMapAddressMessage.peerInfo = peerInfo;
-                ServerSendResponse(mapServerPeer.connectionId, MMOMessageTypes.ResponseAppServerAddress, responseMapAddressMessage);
+                appServerAddressMessage = new ResponseAppServerAddressMessage();
+                appServerAddressMessage.responseCode = AckResponseCode.Success;
+                appServerAddressMessage.error = ResponseAppServerAddressMessage.Error.None;
+                appServerAddressMessage.peerInfo = peerInfo;
+                ServerSendResponse(mapServerPeer.connectionId, MMOMessageTypes.ResponseAppServerAddress, appServerAddressMessage);
             }
             // Send chat peer info to new map server
             if (chatServerPeers.Count > 0)
             {
                 CentralServerPeerInfo chatPeerInfo = chatServerPeers.Values.First();
-                ResponseAppServerAddressMessage responseChatAddressMessage = new ResponseAppServerAddressMessage();
-                responseChatAddressMessage.responseCode = AckResponseCode.Success;
-                responseChatAddressMessage.error = ResponseAppServerAddressMessage.Error.None;
-                responseChatAddressMessage.peerInfo = chatPeerInfo;
-                ServerSendResponse(connectionId, MMOMessageTypes.ResponseAppServerAddress, responseChatAddressMessage);
+                appServerAddressMessage = new ResponseAppServerAddressMessage();
+                appServerAddressMessage.responseCode = AckResponseCode.Success;
+                appServerAddressMessage.error = ResponseAppServerAddressMessage.Error.None;
+                appServerAddressMessage.peerInfo = chatPeerInfo;
+                ServerSendResponse(connectionId, MMOMessageTypes.ResponseAppServerAddress, appServerAddressMessage);
             }
         }
 

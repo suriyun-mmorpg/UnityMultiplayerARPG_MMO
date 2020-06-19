@@ -102,9 +102,9 @@ namespace MultiplayerARPG.MMO
 
         private void HandleResponseAppServerRegister(LiteNetLibMessageHandler messageHandler)
         {
-            TransportHandler peerHandler = messageHandler.transportHandler;
+            TransportHandler transportHandler = messageHandler.transportHandler;
             ResponseAppServerRegisterMessage message = messageHandler.ReadMessage<ResponseAppServerRegisterMessage>();
-            peerHandler.ReadResponse(message.ackId, message.responseCode, message);
+            transportHandler.ReadResponse(message.ackId, message.responseCode, message);
         }
 
         public void OnAppServerRegistered(AckResponseCode responseCode, BaseAckMessage message)
