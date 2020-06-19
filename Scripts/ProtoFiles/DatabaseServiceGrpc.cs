@@ -76,6 +76,16 @@ public static partial class DatabaseService
   static readonly grpc::Marshaller<global::UpdateStorageItemsReq> __Marshaller_UpdateStorageItemsReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::UpdateStorageItemsReq.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::ReadStorageItemsReq> __Marshaller_ReadStorageItemsReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::ReadStorageItemsReq.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::ReadStorageItemsResp> __Marshaller_ReadStorageItemsResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::ReadStorageItemsResp.Parser.ParseFrom);
+  static readonly grpc::Marshaller<global::MoveItemToStorageReq> __Marshaller_MoveItemToStorageReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::MoveItemToStorageReq.Parser.ParseFrom);
+  static readonly grpc::Marshaller<global::MoveItemToStorageResp> __Marshaller_MoveItemToStorageResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::MoveItemToStorageResp.Parser.ParseFrom);
+  static readonly grpc::Marshaller<global::MoveItemFromStorageReq> __Marshaller_MoveItemFromStorageReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::MoveItemFromStorageReq.Parser.ParseFrom);
+  static readonly grpc::Marshaller<global::MoveItemFromStorageResp> __Marshaller_MoveItemFromStorageResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::MoveItemFromStorageResp.Parser.ParseFrom);
+  static readonly grpc::Marshaller<global::SwapOrMergeStorageItemReq> __Marshaller_SwapOrMergeStorageItemReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::SwapOrMergeStorageItemReq.Parser.ParseFrom);
+  static readonly grpc::Marshaller<global::SwapOrMergeStorageItemResp> __Marshaller_SwapOrMergeStorageItemResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::SwapOrMergeStorageItemResp.Parser.ParseFrom);
+  static readonly grpc::Marshaller<global::IncreaseStorageItemsReq> __Marshaller_IncreaseStorageItemsReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::IncreaseStorageItemsReq.Parser.ParseFrom);
+  static readonly grpc::Marshaller<global::IncreaseStorageItemsResp> __Marshaller_IncreaseStorageItemsResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::IncreaseStorageItemsResp.Parser.ParseFrom);
+  static readonly grpc::Marshaller<global::DecreaseStorageItemsReq> __Marshaller_DecreaseStorageItemsReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::DecreaseStorageItemsReq.Parser.ParseFrom);
+  static readonly grpc::Marshaller<global::DecreaseStorageItemsResp> __Marshaller_DecreaseStorageItemsResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::DecreaseStorageItemsResp.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::CustomReq> __Marshaller_CustomReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::CustomReq.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::CustomResp> __Marshaller_CustomResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::CustomResp.Parser.ParseFrom);
 
@@ -394,6 +404,41 @@ public static partial class DatabaseService
       __Marshaller_ReadStorageItemsReq,
       __Marshaller_ReadStorageItemsResp);
 
+  static readonly grpc::Method<global::MoveItemToStorageReq, global::MoveItemToStorageResp> __Method_MoveItemToStorage = new grpc::Method<global::MoveItemToStorageReq, global::MoveItemToStorageResp>(
+      grpc::MethodType.Unary,
+      __ServiceName,
+      "MoveItemToStorage",
+      __Marshaller_MoveItemToStorageReq,
+      __Marshaller_MoveItemToStorageResp);
+
+  static readonly grpc::Method<global::MoveItemFromStorageReq, global::MoveItemFromStorageResp> __Method_MoveItemFromStorage = new grpc::Method<global::MoveItemFromStorageReq, global::MoveItemFromStorageResp>(
+      grpc::MethodType.Unary,
+      __ServiceName,
+      "MoveItemFromStorage",
+      __Marshaller_MoveItemFromStorageReq,
+      __Marshaller_MoveItemFromStorageResp);
+
+  static readonly grpc::Method<global::SwapOrMergeStorageItemReq, global::SwapOrMergeStorageItemResp> __Method_SwapOrMergeStorageItem = new grpc::Method<global::SwapOrMergeStorageItemReq, global::SwapOrMergeStorageItemResp>(
+      grpc::MethodType.Unary,
+      __ServiceName,
+      "SwapOrMergeStorageItem",
+      __Marshaller_SwapOrMergeStorageItemReq,
+      __Marshaller_SwapOrMergeStorageItemResp);
+
+  static readonly grpc::Method<global::IncreaseStorageItemsReq, global::IncreaseStorageItemsResp> __Method_IncreaseStorageItems = new grpc::Method<global::IncreaseStorageItemsReq, global::IncreaseStorageItemsResp>(
+      grpc::MethodType.Unary,
+      __ServiceName,
+      "IncreaseStorageItems",
+      __Marshaller_IncreaseStorageItemsReq,
+      __Marshaller_IncreaseStorageItemsResp);
+
+  static readonly grpc::Method<global::DecreaseStorageItemsReq, global::DecreaseStorageItemsResp> __Method_DecreaseStorageItems = new grpc::Method<global::DecreaseStorageItemsReq, global::DecreaseStorageItemsResp>(
+      grpc::MethodType.Unary,
+      __ServiceName,
+      "DecreaseStorageItems",
+      __Marshaller_DecreaseStorageItemsReq,
+      __Marshaller_DecreaseStorageItemsResp);
+
   static readonly grpc::Method<global::CustomReq, global::CustomResp> __Method_Custom = new grpc::Method<global::CustomReq, global::CustomResp>(
       grpc::MethodType.Unary,
       __ServiceName,
@@ -632,6 +677,31 @@ public static partial class DatabaseService
     }
 
     public virtual global::System.Threading.Tasks.Task<global::ReadStorageItemsResp> ReadStorageItems(global::ReadStorageItemsReq request, grpc::ServerCallContext context)
+    {
+      throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+    }
+
+    public virtual global::System.Threading.Tasks.Task<global::MoveItemToStorageResp> MoveItemToStorage(global::MoveItemToStorageReq request, grpc::ServerCallContext context)
+    {
+      throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+    }
+
+    public virtual global::System.Threading.Tasks.Task<global::MoveItemFromStorageResp> MoveItemFromStorage(global::MoveItemFromStorageReq request, grpc::ServerCallContext context)
+    {
+      throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+    }
+
+    public virtual global::System.Threading.Tasks.Task<global::SwapOrMergeStorageItemResp> SwapOrMergeStorageItem(global::SwapOrMergeStorageItemReq request, grpc::ServerCallContext context)
+    {
+      throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+    }
+
+    public virtual global::System.Threading.Tasks.Task<global::IncreaseStorageItemsResp> IncreaseStorageItems(global::IncreaseStorageItemsReq request, grpc::ServerCallContext context)
+    {
+      throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+    }
+
+    public virtual global::System.Threading.Tasks.Task<global::DecreaseStorageItemsResp> DecreaseStorageItems(global::DecreaseStorageItemsReq request, grpc::ServerCallContext context)
     {
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
@@ -1386,6 +1456,86 @@ public static partial class DatabaseService
     {
       return CallInvoker.AsyncUnaryCall(__Method_ReadStorageItems, null, options, request);
     }
+    public virtual global::MoveItemToStorageResp MoveItemToStorage(global::MoveItemToStorageReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    {
+      return MoveItemToStorage(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+    }
+    public virtual global::MoveItemToStorageResp MoveItemToStorage(global::MoveItemToStorageReq request, grpc::CallOptions options)
+    {
+      return CallInvoker.BlockingUnaryCall(__Method_MoveItemToStorage, null, options, request);
+    }
+    public virtual grpc::AsyncUnaryCall<global::MoveItemToStorageResp> MoveItemToStorageAsync(global::MoveItemToStorageReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    {
+      return MoveItemToStorageAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+    }
+    public virtual grpc::AsyncUnaryCall<global::MoveItemToStorageResp> MoveItemToStorageAsync(global::MoveItemToStorageReq request, grpc::CallOptions options)
+    {
+      return CallInvoker.AsyncUnaryCall(__Method_MoveItemToStorage, null, options, request);
+    }
+    public virtual global::MoveItemFromStorageResp MoveItemFromStorage(global::MoveItemFromStorageReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    {
+      return MoveItemFromStorage(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+    }
+    public virtual global::MoveItemFromStorageResp MoveItemFromStorage(global::MoveItemFromStorageReq request, grpc::CallOptions options)
+    {
+      return CallInvoker.BlockingUnaryCall(__Method_MoveItemFromStorage, null, options, request);
+    }
+    public virtual grpc::AsyncUnaryCall<global::MoveItemFromStorageResp> MoveItemFromStorageAsync(global::MoveItemFromStorageReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    {
+      return MoveItemFromStorageAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+    }
+    public virtual grpc::AsyncUnaryCall<global::MoveItemFromStorageResp> MoveItemFromStorageAsync(global::MoveItemFromStorageReq request, grpc::CallOptions options)
+    {
+      return CallInvoker.AsyncUnaryCall(__Method_MoveItemFromStorage, null, options, request);
+    }
+    public virtual global::SwapOrMergeStorageItemResp SwapOrMergeStorageItem(global::SwapOrMergeStorageItemReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    {
+      return SwapOrMergeStorageItem(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+    }
+    public virtual global::SwapOrMergeStorageItemResp SwapOrMergeStorageItem(global::SwapOrMergeStorageItemReq request, grpc::CallOptions options)
+    {
+      return CallInvoker.BlockingUnaryCall(__Method_SwapOrMergeStorageItem, null, options, request);
+    }
+    public virtual grpc::AsyncUnaryCall<global::SwapOrMergeStorageItemResp> SwapOrMergeStorageItemAsync(global::SwapOrMergeStorageItemReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    {
+      return SwapOrMergeStorageItemAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+    }
+    public virtual grpc::AsyncUnaryCall<global::SwapOrMergeStorageItemResp> SwapOrMergeStorageItemAsync(global::SwapOrMergeStorageItemReq request, grpc::CallOptions options)
+    {
+      return CallInvoker.AsyncUnaryCall(__Method_SwapOrMergeStorageItem, null, options, request);
+    }
+    public virtual global::IncreaseStorageItemsResp IncreaseStorageItems(global::IncreaseStorageItemsReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    {
+      return IncreaseStorageItems(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+    }
+    public virtual global::IncreaseStorageItemsResp IncreaseStorageItems(global::IncreaseStorageItemsReq request, grpc::CallOptions options)
+    {
+      return CallInvoker.BlockingUnaryCall(__Method_IncreaseStorageItems, null, options, request);
+    }
+    public virtual grpc::AsyncUnaryCall<global::IncreaseStorageItemsResp> IncreaseStorageItemsAsync(global::IncreaseStorageItemsReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    {
+      return IncreaseStorageItemsAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+    }
+    public virtual grpc::AsyncUnaryCall<global::IncreaseStorageItemsResp> IncreaseStorageItemsAsync(global::IncreaseStorageItemsReq request, grpc::CallOptions options)
+    {
+      return CallInvoker.AsyncUnaryCall(__Method_IncreaseStorageItems, null, options, request);
+    }
+    public virtual global::DecreaseStorageItemsResp DecreaseStorageItems(global::DecreaseStorageItemsReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    {
+      return DecreaseStorageItems(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+    }
+    public virtual global::DecreaseStorageItemsResp DecreaseStorageItems(global::DecreaseStorageItemsReq request, grpc::CallOptions options)
+    {
+      return CallInvoker.BlockingUnaryCall(__Method_DecreaseStorageItems, null, options, request);
+    }
+    public virtual grpc::AsyncUnaryCall<global::DecreaseStorageItemsResp> DecreaseStorageItemsAsync(global::DecreaseStorageItemsReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    {
+      return DecreaseStorageItemsAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+    }
+    public virtual grpc::AsyncUnaryCall<global::DecreaseStorageItemsResp> DecreaseStorageItemsAsync(global::DecreaseStorageItemsReq request, grpc::CallOptions options)
+    {
+      return CallInvoker.AsyncUnaryCall(__Method_DecreaseStorageItems, null, options, request);
+    }
     public virtual global::CustomResp Custom(global::CustomReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
       return Custom(request, new grpc::CallOptions(headers, deadline, cancellationToken));
@@ -1459,6 +1609,11 @@ public static partial class DatabaseService
         .AddMethod(__Method_UpdateGuildGold, serviceImpl.UpdateGuildGold)
         .AddMethod(__Method_UpdateStorageItems, serviceImpl.UpdateStorageItems)
         .AddMethod(__Method_ReadStorageItems, serviceImpl.ReadStorageItems)
+        .AddMethod(__Method_MoveItemToStorage, serviceImpl.MoveItemToStorage)
+        .AddMethod(__Method_MoveItemFromStorage, serviceImpl.MoveItemFromStorage)
+        .AddMethod(__Method_SwapOrMergeStorageItem, serviceImpl.SwapOrMergeStorageItem)
+        .AddMethod(__Method_IncreaseStorageItems, serviceImpl.IncreaseStorageItems)
+        .AddMethod(__Method_DecreaseStorageItems, serviceImpl.DecreaseStorageItems)
         .AddMethod(__Method_Custom, serviceImpl.Custom).Build();
   }
 
@@ -1513,6 +1668,11 @@ public static partial class DatabaseService
     serviceBinder.AddMethod(__Method_UpdateGuildGold, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::UpdateGuildGoldReq, global::VoidResp>(serviceImpl.UpdateGuildGold));
     serviceBinder.AddMethod(__Method_UpdateStorageItems, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::UpdateStorageItemsReq, global::VoidResp>(serviceImpl.UpdateStorageItems));
     serviceBinder.AddMethod(__Method_ReadStorageItems, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::ReadStorageItemsReq, global::ReadStorageItemsResp>(serviceImpl.ReadStorageItems));
+    serviceBinder.AddMethod(__Method_MoveItemToStorage, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::MoveItemToStorageReq, global::MoveItemToStorageResp>(serviceImpl.MoveItemToStorage));
+    serviceBinder.AddMethod(__Method_MoveItemFromStorage, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::MoveItemFromStorageReq, global::MoveItemFromStorageResp>(serviceImpl.MoveItemFromStorage));
+    serviceBinder.AddMethod(__Method_SwapOrMergeStorageItem, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::SwapOrMergeStorageItemReq, global::SwapOrMergeStorageItemResp>(serviceImpl.SwapOrMergeStorageItem));
+    serviceBinder.AddMethod(__Method_IncreaseStorageItems, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::IncreaseStorageItemsReq, global::IncreaseStorageItemsResp>(serviceImpl.IncreaseStorageItems));
+    serviceBinder.AddMethod(__Method_DecreaseStorageItems, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::DecreaseStorageItemsReq, global::DecreaseStorageItemsResp>(serviceImpl.DecreaseStorageItems));
     serviceBinder.AddMethod(__Method_Custom, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::CustomReq, global::CustomResp>(serviceImpl.Custom));
   }
 

@@ -44,16 +44,36 @@ service DatabaseService {
     rpc ReadGuild (ReadGuildReq) returns (ReadGuildResp);
     rpc GetGuildGold (GetGuildGoldReq) returns (GuildGoldResp);
     rpc UpdateGuildGold (UpdateGuildGoldReq) returns (VoidResp);
-    rpc UpdateStorageItems (UpdateStorageItemsReq) returns (VoidResp);
     rpc ReadStorageItems (ReadStorageItemsReq) returns (ReadStorageItemsResp);
+    rpc MoveItemToStorage (MoveItemToStorageReq) returns (MoveItemToStorageResp);
+    rpc MoveItemFromStorage (MoveItemFromStorageReq) returns (MoveItemFromStorageResp);
+    rpc SwapOrMergeStorageItem (SwapOrMergeStorageItemReq) returns (SwapOrMergeStorageItemResp);
+    rpc IncreaseStorageItems (IncreaseStorageItemsReq) returns (IncreaseStorageItemsResp);
+    rpc DecreaseStorageItems (DecreaseStorageItemsReq) returns (DecreaseStorageItemsResp);
     rpc Custom (CustomReq) returns (CustomResp);
 }
 enum EStorageType
 {
-    NONE = 0;
-    PLAYER = 1;
-    GUILD = 2;
-    BUILDING = 3;
+    STORAGE_TYPE_NONE = 0;
+    STORAGE_TYPE_PLAYER = 1;
+    STORAGE_TYPE_GUILD = 2;
+    STORAGE_TYPE_BUILDING = 3;
+}
+enum EStorageError
+{
+    STORAGE_ERROR_NONE = 0;
+    STORAGE_ERROR_INVALID_STORAGE = 1;
+    STORAGE_ERROR_INVALID_CHARACTER = 2;
+    STORAGE_ERROR_INVALID_STORAGE_INDEX = 3;
+    STORAGE_ERROR_INVALID_INVENTORY_INDEX = 4;
+    STORAGE_ERROR_STORAGE_WILL_OVERWHELMING = 5;
+    STORAGE_ERROR_INVENTORY_WILL_OVERWHELMING = 6;
+    STORAGE_ERROR_DECREASE_ITEM_NOT_ENOUGH = 7;
+}
+// Map
+message ItemIndexAmountMap {
+    int32 index = 1;
+    int32 amount = 2;
 }
 // Generic response
 message VoidResp {
@@ -328,12 +348,6 @@ message DecreaseGuildGoldReq {
     int32 guild_id = 1;
     int32 amount = 2;
 }
-// Update storage items
-message UpdateStorageItemsReq {
-    EStorageType storage_type = 1;
-    string storage_owner_id = 2;
-    repeated bytes storage_character_items = 3;
-}
 // Read storage items
 message ReadStorageItemsReq {
     EStorageType storage_type = 1;
@@ -341,6 +355,73 @@ message ReadStorageItemsReq {
 }
 message ReadStorageItemsResp {
     repeated bytes storage_character_items = 1;
+}
+// Move item to storage
+message MoveItemToStorageReq {
+    EStorageType storage_type = 1;
+    string storage_owner_id = 2;
+    string character_id = 3;
+    string map_name = 4;
+    int32 inventory_item_index = 5;
+    int32 inventory_item_amount = 6;
+    int32 storage_item_index = 7;
+}
+message MoveItemToStorageResp {
+    EStorageError error = 1;
+    repeated bytes inventory_item_items = 2;
+    repeated bytes storage_character_items = 3;
+}
+// Move item from storage
+message MoveItemFromStorageReq {
+    EStorageType storage_type = 1;
+    string storage_owner_id = 2;
+    string character_id = 3;
+    string map_name = 4;
+    int32 storage_item_index = 5;
+    int32 storage_item_amount = 6;
+    int32 inventory_item_index = 7;
+}
+message MoveItemFromStorageResp {
+    EStorageError error = 1;
+    repeated bytes inventory_item_items = 2;
+    repeated bytes storage_character_items = 3;
+}
+// Swap or merge storage item
+message SwapOrMergeStorageItemReq {
+    EStorageType storage_type = 1;
+    string storage_owner_id = 2;
+    string character_id = 3;
+    string map_name = 4;
+    int32 from_index = 5;
+    int32 to_index = 6;
+}
+message SwapOrMergeStorageItemResp {
+    EStorageError error = 1;
+    repeated bytes storage_character_items = 2;
+}
+// Increase storage items
+message IncreaseStorageItemsReq {
+    EStorageType storage_type = 1;
+    string storage_owner_id = 2;
+    string map_name = 3;
+    bytes item = 4;
+}
+message IncreaseStorageItemsResp {
+    EStorageError error = 1;
+    repeated bytes storage_character_items = 2;
+}
+// Decrease storage items
+message DecreaseStorageItemsReq {
+    EStorageType storage_type = 1;
+    string storage_owner_id = 2;
+    string map_name = 3;
+    int32 data_id = 4;
+    int32 amount = 5;
+}
+message DecreaseStorageItemsResp {
+    EStorageError error = 1;
+    repeated bytes storage_character_items = 2;
+    repeated ItemIndexAmountMap decreased_items = 3;
 }
 // Custom
 message CustomReq {

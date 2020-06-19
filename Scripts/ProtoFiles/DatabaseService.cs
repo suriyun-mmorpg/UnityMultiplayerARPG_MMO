@@ -22,146 +22,197 @@ public static partial class DatabaseServiceReflection {
   static DatabaseServiceReflection() {
     byte[] descriptorData = global::System.Convert.FromBase64String(
         string.Concat(
-          "ChZkYXRhYmFzZV9zZXJ2aWNlLnByb3RvIgoKCFZvaWRSZXNwIhgKCEdvbGRS",
-          "ZXNwEgwKBGdvbGQYASABKAUiGAoIQ2FzaFJlc3ASDAoEY2FzaBgBIAEoBSIj",
-          "Cg1HdWlsZEdvbGRSZXNwEhIKCmd1aWxkX2dvbGQYASABKAUiOgoUVmFsaWRh",
-          "dGVVc2VyTG9naW5SZXESEAoIdXNlcm5hbWUYASABKAkSEAoIcGFzc3dvcmQY",
-          "AiABKAkiKAoVVmFsaWRhdGVVc2VyTG9naW5SZXNwEg8KB3VzZXJfaWQYASAB",
-          "KAkiPwoWVmFsaWRhdGVBY2Nlc3NUb2tlblJlcRIPCgd1c2VyX2lkGAEgASgJ",
-          "EhQKDGFjY2Vzc190b2tlbhgCIAEoCSIqChdWYWxpZGF0ZUFjY2Vzc1Rva2Vu",
-          "UmVzcBIPCgdpc19wYXNzGAEgASgIIiIKD0dldFVzZXJMZXZlbFJlcRIPCgd1",
-          "c2VyX2lkGAEgASgJIiYKEEdldFVzZXJMZXZlbFJlc3ASEgoKdXNlcl9sZXZl",
-          "bBgBIAEoDSIdCgpHZXRHb2xkUmVxEg8KB3VzZXJfaWQYASABKAkiMAoNVXBk",
-          "YXRlR29sZFJlcRIPCgd1c2VyX2lkGAEgASgJEg4KBmFtb3VudBgCIAEoBSId",
-          "CgpHZXRDYXNoUmVxEg8KB3VzZXJfaWQYASABKAkiMAoNVXBkYXRlQ2FzaFJl",
-          "cRIPCgd1c2VyX2lkGAEgASgJEg4KBmFtb3VudBgCIAEoBSI9ChRVcGRhdGVB",
-          "Y2Nlc3NUb2tlblJlcRIPCgd1c2VyX2lkGAEgASgJEhQKDGFjY2Vzc190b2tl",
-          "bhgCIAEoCSI4ChJDcmVhdGVVc2VyTG9naW5SZXESEAoIdXNlcm5hbWUYASAB",
-          "KAkSEAoIcGFzc3dvcmQYAiABKAkiIwoPRmluZFVzZXJuYW1lUmVxEhAKCHVz",
-          "ZXJuYW1lGAEgASgJIigKEEZpbmRVc2VybmFtZVJlc3ASFAoMZm91bmRfYW1v",
-          "dW50GAEgASgDIj0KEkNyZWF0ZUNoYXJhY3RlclJlcRIPCgd1c2VyX2lkGAEg",
-          "ASgJEhYKDmNoYXJhY3Rlcl9kYXRhGAIgASgMIjkKEFJlYWRDaGFyYWN0ZXJS",
-          "ZXESDwoHdXNlcl9pZBgBIAEoCRIUCgxjaGFyYWN0ZXJfaWQYAiABKAkiKwoR",
-          "UmVhZENoYXJhY3RlclJlc3ASFgoOY2hhcmFjdGVyX2RhdGEYASABKAwiJAoR",
-          "UmVhZENoYXJhY3RlcnNSZXESDwoHdXNlcl9pZBgBIAEoCSIiChJSZWFkQ2hh",
-          "cmFjdGVyc1Jlc3ASDAoEbGlzdBgBIAMoDCIsChJVcGRhdGVDaGFyYWN0ZXJS",
-          "ZXESFgoOY2hhcmFjdGVyX2RhdGEYASABKAwiOwoSRGVsZXRlQ2hhcmFjdGVy",
-          "UmVxEg8KB3VzZXJfaWQYASABKAkSFAoMY2hhcmFjdGVyX2lkGAIgASgJIi4K",
-          "FEZpbmRDaGFyYWN0ZXJOYW1lUmVxEhYKDmNoYXJhY3Rlcl9uYW1lGAEgASgJ",
-          "Ii0KFUZpbmRDaGFyYWN0ZXJOYW1lUmVzcBIUCgxmb3VuZF9hbW91bnQYASAB",
-          "KAMiKwoRRmluZENoYXJhY3RlcnNSZXESFgoOY2hhcmFjdGVyX25hbWUYASAB",
-          "KAkiIgoSRmluZENoYXJhY3RlcnNSZXNwEgwKBGxpc3QYASADKAwiQQoPQ3Jl",
-          "YXRlRnJpZW5kUmVxEhYKDmNoYXJhY3Rlcl9pZF8xGAEgASgJEhYKDmNoYXJh",
-          "Y3Rlcl9pZF8yGAIgASgJIkEKD0RlbGV0ZUZyaWVuZFJlcRIWCg5jaGFyYWN0",
-          "ZXJfaWRfMRgBIAEoCRIWCg5jaGFyYWN0ZXJfaWRfMhgCIAEoCSImCg5SZWFk",
-          "RnJpZW5kc1JlcRIUCgxjaGFyYWN0ZXJfaWQYASABKAkiHwoPUmVhZEZyaWVu",
-          "ZHNSZXNwEgwKBGxpc3QYASADKAwiPAoRQ3JlYXRlQnVpbGRpbmdSZXESEAoI",
-          "bWFwX25hbWUYASABKAkSFQoNYnVpbGRpbmdfZGF0YRgCIAEoDCI8ChFVcGRh",
-          "dGVCdWlsZGluZ1JlcRIQCghtYXBfbmFtZRgBIAEoCRIVCg1idWlsZGluZ19k",
-          "YXRhGAIgASgMIjoKEURlbGV0ZUJ1aWxkaW5nUmVxEhAKCG1hcF9uYW1lGAEg",
-          "ASgJEhMKC2J1aWxkaW5nX2lkGAIgASgJIiQKEFJlYWRCdWlsZGluZ3NSZXES",
-          "EAoIbWFwX25hbWUYASABKAkiIQoRUmVhZEJ1aWxkaW5nc1Jlc3ASDAoEbGlz",
-          "dBgBIAMoDCJUCg5DcmVhdGVQYXJ0eVJlcRIRCglzaGFyZV9leHAYASABKAgS",
-          "EgoKc2hhcmVfaXRlbRgCIAEoCBIbChNsZWFkZXJfY2hhcmFjdGVyX2lkGAMg",
-          "ASgJIiMKD0NyZWF0ZVBhcnR5UmVzcBIQCghwYXJ0eV9pZBgBIAEoBSJJCg5V",
-          "cGRhdGVQYXJ0eVJlcRIQCghwYXJ0eV9pZBgBIAEoBRIRCglzaGFyZV9leHAY",
-          "AiABKAgSEgoKc2hhcmVfaXRlbRgDIAEoCCJFChRVcGRhdGVQYXJ0eUxlYWRl",
-          "clJlcRIQCghwYXJ0eV9pZBgBIAEoBRIbChNsZWFkZXJfY2hhcmFjdGVyX2lk",
-          "GAIgASgJIiIKDkRlbGV0ZVBhcnR5UmVxEhAKCHBhcnR5X2lkGAEgASgFIkEK",
-          "F1VwZGF0ZUNoYXJhY3RlclBhcnR5UmVxEhQKDGNoYXJhY3Rlcl9pZBgBIAEo",
-          "CRIQCghwYXJ0eV9pZBgCIAEoBSIgCgxSZWFkUGFydHlSZXESEAoIcGFydHlf",
-          "aWQYASABKAUiIwoNUmVhZFBhcnR5UmVzcBISCgpwYXJ0eV9kYXRhGAEgASgM",
-          "IkEKDkNyZWF0ZUd1aWxkUmVxEhIKCmd1aWxkX25hbWUYASABKAkSGwoTbGVh",
-          "ZGVyX2NoYXJhY3Rlcl9pZBgCIAEoCSIjCg9DcmVhdGVHdWlsZFJlc3ASEAoI",
-          "Z3VpbGRfaWQYASABKAUiWAoTVXBkYXRlR3VpbGRMZXZlbFJlcRIQCghndWls",
-          "ZF9pZBgBIAEoBRINCgVsZXZlbBgCIAEoBRILCgNleHAYAyABKAUSEwoLc2tp",
-          "bGxfcG9pbnQYBCABKAUiRQoUVXBkYXRlR3VpbGRMZWFkZXJSZXESEAoIZ3Vp",
-          "bGRfaWQYASABKAUSGwoTbGVhZGVyX2NoYXJhY3Rlcl9pZBgCIAEoCSJAChVV",
-          "cGRhdGVHdWlsZE1lc3NhZ2VSZXESEAoIZ3VpbGRfaWQYASABKAUSFQoNZ3Vp",
-          "bGRfbWVzc2FnZRgCIAEoCSKRAQoSVXBkYXRlR3VpbGRSb2xlUmVxEhAKCGd1",
-          "aWxkX2lkGAEgASgFEhIKCmd1aWxkX3JvbGUYAiABKA0SEQoJcm9sZV9uYW1l",
-          "GAMgASgJEhIKCmNhbl9pbnZpdGUYBCABKAgSEAoIY2FuX2tpY2sYBSABKAgS",
-          "HAoUc2hhcmVfZXhwX3BlcmNlbnRhZ2UYBiABKA0iSwoYVXBkYXRlR3VpbGRN",
-          "ZW1iZXJSb2xlUmVxEhsKE21lbWJlcl9jaGFyYWN0ZXJfaWQYASABKAkSEgoK",
-          "Z3VpbGRfcm9sZRgCIAEoDSJnChhVcGRhdGVHdWlsZFNraWxsTGV2ZWxSZXES",
-          "EAoIZ3VpbGRfaWQYASABKAUSDwoHZGF0YV9pZBgCIAEoBRITCgtza2lsbF9s",
-          "ZXZlbBgDIAEoBRITCgtza2lsbF9wb2ludBgEIAEoBSJVChdVcGRhdGVDaGFy",
-          "YWN0ZXJHdWlsZFJlcRIUCgxjaGFyYWN0ZXJfaWQYASABKAkSEAoIZ3VpbGRf",
-          "aWQYAiABKAUSEgoKZ3VpbGRfcm9sZRgDIAEoDSIiCg5EZWxldGVHdWlsZFJl",
-          "cRIQCghndWlsZF9pZBgBIAEoBSImChBGaW5kR3VpbGROYW1lUmVxEhIKCmd1",
-          "aWxkX25hbWUYASABKAkiKQoRRmluZEd1aWxkTmFtZVJlc3ASFAoMZm91bmRf",
-          "YW1vdW50GAEgASgDIj0KDFJlYWRHdWlsZFJlcRIQCghndWlsZF9pZBgBIAEo",
-          "BRIbChNkZWZhdWx0X2d1aWxkX3JvbGVzGAIgAygMIiMKDVJlYWRHdWlsZFJl",
-          "c3ASEgoKZ3VpbGRfZGF0YRgBIAEoDCIjCg9HZXRHdWlsZEdvbGRSZXESEAoI",
-          "Z3VpbGRfaWQYASABKAUiNgoSVXBkYXRlR3VpbGRHb2xkUmVxEhAKCGd1aWxk",
-          "X2lkGAEgASgFEg4KBmFtb3VudBgCIAEoBSI4ChREZWNyZWFzZUd1aWxkR29s",
-          "ZFJlcRIQCghndWlsZF9pZBgBIAEoBRIOCgZhbW91bnQYAiABKAUidwoVVXBk",
-          "YXRlU3RvcmFnZUl0ZW1zUmVxEiMKDHN0b3JhZ2VfdHlwZRgBIAEoDjINLkVT",
-          "dG9yYWdlVHlwZRIYChBzdG9yYWdlX293bmVyX2lkGAIgASgJEh8KF3N0b3Jh",
-          "Z2VfY2hhcmFjdGVyX2l0ZW1zGAMgAygMIlQKE1JlYWRTdG9yYWdlSXRlbXNS",
-          "ZXESIwoMc3RvcmFnZV90eXBlGAEgASgOMg0uRVN0b3JhZ2VUeXBlEhgKEHN0",
-          "b3JhZ2Vfb3duZXJfaWQYAiABKAkiNwoUUmVhZFN0b3JhZ2VJdGVtc1Jlc3AS",
-          "HwoXc3RvcmFnZV9jaGFyYWN0ZXJfaXRlbXMYASADKAwiJwoJQ3VzdG9tUmVx",
-          "EgwKBHR5cGUYASABKAUSDAoEZGF0YRgCIAEoDCIoCgpDdXN0b21SZXNwEgwK",
-          "BHR5cGUYASABKAUSDAoEZGF0YRgCIAEoDCo9CgxFU3RvcmFnZVR5cGUSCAoE",
-          "Tk9ORRAAEgoKBlBMQVlFUhABEgkKBUdVSUxEEAISDAoIQlVJTERJTkcQAzLr",
-          "EgoPRGF0YWJhc2VTZXJ2aWNlEkIKEVZhbGlkYXRlVXNlckxvZ2luEhUuVmFs",
-          "aWRhdGVVc2VyTG9naW5SZXEaFi5WYWxpZGF0ZVVzZXJMb2dpblJlc3ASSAoT",
-          "VmFsaWRhdGVBY2Nlc3NUb2tlbhIXLlZhbGlkYXRlQWNjZXNzVG9rZW5SZXEa",
-          "GC5WYWxpZGF0ZUFjY2Vzc1Rva2VuUmVzcBIzCgxHZXRVc2VyTGV2ZWwSEC5H",
-          "ZXRVc2VyTGV2ZWxSZXEaES5HZXRVc2VyTGV2ZWxSZXNwEiEKB0dldEdvbGQS",
-          "Cy5HZXRHb2xkUmVxGgkuR29sZFJlc3ASJwoKVXBkYXRlR29sZBIOLlVwZGF0",
-          "ZUdvbGRSZXEaCS5Wb2lkUmVzcBIhCgdHZXRDYXNoEgsuR2V0Q2FzaFJlcRoJ",
-          "LkNhc2hSZXNwEicKClVwZGF0ZUNhc2gSDi5VcGRhdGVDYXNoUmVxGgkuVm9p",
-          "ZFJlc3ASNQoRVXBkYXRlQWNjZXNzVG9rZW4SFS5VcGRhdGVBY2Nlc3NUb2tl",
-          "blJlcRoJLlZvaWRSZXNwEjEKD0NyZWF0ZVVzZXJMb2dpbhITLkNyZWF0ZVVz",
-          "ZXJMb2dpblJlcRoJLlZvaWRSZXNwEjMKDEZpbmRVc2VybmFtZRIQLkZpbmRV",
-          "c2VybmFtZVJlcRoRLkZpbmRVc2VybmFtZVJlc3ASMQoPQ3JlYXRlQ2hhcmFj",
-          "dGVyEhMuQ3JlYXRlQ2hhcmFjdGVyUmVxGgkuVm9pZFJlc3ASNgoNUmVhZENo",
-          "YXJhY3RlchIRLlJlYWRDaGFyYWN0ZXJSZXEaEi5SZWFkQ2hhcmFjdGVyUmVz",
-          "cBI5Cg5SZWFkQ2hhcmFjdGVycxISLlJlYWRDaGFyYWN0ZXJzUmVxGhMuUmVh",
-          "ZENoYXJhY3RlcnNSZXNwEjEKD1VwZGF0ZUNoYXJhY3RlchITLlVwZGF0ZUNo",
-          "YXJhY3RlclJlcRoJLlZvaWRSZXNwEjEKD0RlbGV0ZUNoYXJhY3RlchITLkRl",
-          "bGV0ZUNoYXJhY3RlclJlcRoJLlZvaWRSZXNwEkIKEUZpbmRDaGFyYWN0ZXJO",
-          "YW1lEhUuRmluZENoYXJhY3Rlck5hbWVSZXEaFi5GaW5kQ2hhcmFjdGVyTmFt",
-          "ZVJlc3ASOQoORmluZENoYXJhY3RlcnMSEi5GaW5kQ2hhcmFjdGVyc1JlcRoT",
-          "LkZpbmRDaGFyYWN0ZXJzUmVzcBIrCgxDcmVhdGVGcmllbmQSEC5DcmVhdGVG",
-          "cmllbmRSZXEaCS5Wb2lkUmVzcBIrCgxEZWxldGVGcmllbmQSEC5EZWxldGVG",
-          "cmllbmRSZXEaCS5Wb2lkUmVzcBIwCgtSZWFkRnJpZW5kcxIPLlJlYWRGcmll",
-          "bmRzUmVxGhAuUmVhZEZyaWVuZHNSZXNwEi8KDkNyZWF0ZUJ1aWxkaW5nEhIu",
-          "Q3JlYXRlQnVpbGRpbmdSZXEaCS5Wb2lkUmVzcBIvCg5VcGRhdGVCdWlsZGlu",
-          "ZxISLlVwZGF0ZUJ1aWxkaW5nUmVxGgkuVm9pZFJlc3ASLwoORGVsZXRlQnVp",
-          "bGRpbmcSEi5EZWxldGVCdWlsZGluZ1JlcRoJLlZvaWRSZXNwEjYKDVJlYWRC",
-          "dWlsZGluZ3MSES5SZWFkQnVpbGRpbmdzUmVxGhIuUmVhZEJ1aWxkaW5nc1Jl",
-          "c3ASMAoLQ3JlYXRlUGFydHkSDy5DcmVhdGVQYXJ0eVJlcRoQLkNyZWF0ZVBh",
-          "cnR5UmVzcBIpCgtVcGRhdGVQYXJ0eRIPLlVwZGF0ZVBhcnR5UmVxGgkuVm9p",
-          "ZFJlc3ASNQoRVXBkYXRlUGFydHlMZWFkZXISFS5VcGRhdGVQYXJ0eUxlYWRl",
-          "clJlcRoJLlZvaWRSZXNwEikKC0RlbGV0ZVBhcnR5Eg8uRGVsZXRlUGFydHlS",
-          "ZXEaCS5Wb2lkUmVzcBI7ChRVcGRhdGVDaGFyYWN0ZXJQYXJ0eRIYLlVwZGF0",
-          "ZUNoYXJhY3RlclBhcnR5UmVxGgkuVm9pZFJlc3ASKgoJUmVhZFBhcnR5Eg0u",
-          "UmVhZFBhcnR5UmVxGg4uUmVhZFBhcnR5UmVzcBIwCgtDcmVhdGVHdWlsZBIP",
-          "LkNyZWF0ZUd1aWxkUmVxGhAuQ3JlYXRlR3VpbGRSZXNwEjMKEFVwZGF0ZUd1",
-          "aWxkTGV2ZWwSFC5VcGRhdGVHdWlsZExldmVsUmVxGgkuVm9pZFJlc3ASNQoR",
-          "VXBkYXRlR3VpbGRMZWFkZXISFS5VcGRhdGVHdWlsZExlYWRlclJlcRoJLlZv",
-          "aWRSZXNwEjcKElVwZGF0ZUd1aWxkTWVzc2FnZRIWLlVwZGF0ZUd1aWxkTWVz",
-          "c2FnZVJlcRoJLlZvaWRSZXNwEjEKD1VwZGF0ZUd1aWxkUm9sZRITLlVwZGF0",
-          "ZUd1aWxkUm9sZVJlcRoJLlZvaWRSZXNwEj0KFVVwZGF0ZUd1aWxkTWVtYmVy",
-          "Um9sZRIZLlVwZGF0ZUd1aWxkTWVtYmVyUm9sZVJlcRoJLlZvaWRSZXNwEj0K",
-          "FVVwZGF0ZUd1aWxkU2tpbGxMZXZlbBIZLlVwZGF0ZUd1aWxkU2tpbGxMZXZl",
-          "bFJlcRoJLlZvaWRSZXNwEjsKFFVwZGF0ZUNoYXJhY3Rlckd1aWxkEhguVXBk",
-          "YXRlQ2hhcmFjdGVyR3VpbGRSZXEaCS5Wb2lkUmVzcBIpCgtEZWxldGVHdWls",
-          "ZBIPLkRlbGV0ZUd1aWxkUmVxGgkuVm9pZFJlc3ASNgoNRmluZEd1aWxkTmFt",
-          "ZRIRLkZpbmRHdWlsZE5hbWVSZXEaEi5GaW5kR3VpbGROYW1lUmVzcBIqCglS",
-          "ZWFkR3VpbGQSDS5SZWFkR3VpbGRSZXEaDi5SZWFkR3VpbGRSZXNwEjAKDEdl",
-          "dEd1aWxkR29sZBIQLkdldEd1aWxkR29sZFJlcRoOLkd1aWxkR29sZFJlc3AS",
-          "MQoPVXBkYXRlR3VpbGRHb2xkEhMuVXBkYXRlR3VpbGRHb2xkUmVxGgkuVm9p",
-          "ZFJlc3ASNwoSVXBkYXRlU3RvcmFnZUl0ZW1zEhYuVXBkYXRlU3RvcmFnZUl0",
-          "ZW1zUmVxGgkuVm9pZFJlc3ASPwoQUmVhZFN0b3JhZ2VJdGVtcxIULlJlYWRT",
-          "dG9yYWdlSXRlbXNSZXEaFS5SZWFkU3RvcmFnZUl0ZW1zUmVzcBIhCgZDdXN0",
-          "b20SCi5DdXN0b21SZXEaCy5DdXN0b21SZXNwYgZwcm90bzM="));
+          "ChZkYXRhYmFzZV9zZXJ2aWNlLnByb3RvIjMKEkl0ZW1JbmRleEFtb3VudE1h",
+          "cBINCgVpbmRleBgBIAEoBRIOCgZhbW91bnQYAiABKAUiCgoIVm9pZFJlc3Ai",
+          "GAoIR29sZFJlc3ASDAoEZ29sZBgBIAEoBSIYCghDYXNoUmVzcBIMCgRjYXNo",
+          "GAEgASgFIiMKDUd1aWxkR29sZFJlc3ASEgoKZ3VpbGRfZ29sZBgBIAEoBSI6",
+          "ChRWYWxpZGF0ZVVzZXJMb2dpblJlcRIQCgh1c2VybmFtZRgBIAEoCRIQCghw",
+          "YXNzd29yZBgCIAEoCSIoChVWYWxpZGF0ZVVzZXJMb2dpblJlc3ASDwoHdXNl",
+          "cl9pZBgBIAEoCSI/ChZWYWxpZGF0ZUFjY2Vzc1Rva2VuUmVxEg8KB3VzZXJf",
+          "aWQYASABKAkSFAoMYWNjZXNzX3Rva2VuGAIgASgJIioKF1ZhbGlkYXRlQWNj",
+          "ZXNzVG9rZW5SZXNwEg8KB2lzX3Bhc3MYASABKAgiIgoPR2V0VXNlckxldmVs",
+          "UmVxEg8KB3VzZXJfaWQYASABKAkiJgoQR2V0VXNlckxldmVsUmVzcBISCgp1",
+          "c2VyX2xldmVsGAEgASgNIh0KCkdldEdvbGRSZXESDwoHdXNlcl9pZBgBIAEo",
+          "CSIwCg1VcGRhdGVHb2xkUmVxEg8KB3VzZXJfaWQYASABKAkSDgoGYW1vdW50",
+          "GAIgASgFIh0KCkdldENhc2hSZXESDwoHdXNlcl9pZBgBIAEoCSIwCg1VcGRh",
+          "dGVDYXNoUmVxEg8KB3VzZXJfaWQYASABKAkSDgoGYW1vdW50GAIgASgFIj0K",
+          "FFVwZGF0ZUFjY2Vzc1Rva2VuUmVxEg8KB3VzZXJfaWQYASABKAkSFAoMYWNj",
+          "ZXNzX3Rva2VuGAIgASgJIjgKEkNyZWF0ZVVzZXJMb2dpblJlcRIQCgh1c2Vy",
+          "bmFtZRgBIAEoCRIQCghwYXNzd29yZBgCIAEoCSIjCg9GaW5kVXNlcm5hbWVS",
+          "ZXESEAoIdXNlcm5hbWUYASABKAkiKAoQRmluZFVzZXJuYW1lUmVzcBIUCgxm",
+          "b3VuZF9hbW91bnQYASABKAMiPQoSQ3JlYXRlQ2hhcmFjdGVyUmVxEg8KB3Vz",
+          "ZXJfaWQYASABKAkSFgoOY2hhcmFjdGVyX2RhdGEYAiABKAwiOQoQUmVhZENo",
+          "YXJhY3RlclJlcRIPCgd1c2VyX2lkGAEgASgJEhQKDGNoYXJhY3Rlcl9pZBgC",
+          "IAEoCSIrChFSZWFkQ2hhcmFjdGVyUmVzcBIWCg5jaGFyYWN0ZXJfZGF0YRgB",
+          "IAEoDCIkChFSZWFkQ2hhcmFjdGVyc1JlcRIPCgd1c2VyX2lkGAEgASgJIiIK",
+          "ElJlYWRDaGFyYWN0ZXJzUmVzcBIMCgRsaXN0GAEgAygMIiwKElVwZGF0ZUNo",
+          "YXJhY3RlclJlcRIWCg5jaGFyYWN0ZXJfZGF0YRgBIAEoDCI7ChJEZWxldGVD",
+          "aGFyYWN0ZXJSZXESDwoHdXNlcl9pZBgBIAEoCRIUCgxjaGFyYWN0ZXJfaWQY",
+          "AiABKAkiLgoURmluZENoYXJhY3Rlck5hbWVSZXESFgoOY2hhcmFjdGVyX25h",
+          "bWUYASABKAkiLQoVRmluZENoYXJhY3Rlck5hbWVSZXNwEhQKDGZvdW5kX2Ft",
+          "b3VudBgBIAEoAyIrChFGaW5kQ2hhcmFjdGVyc1JlcRIWCg5jaGFyYWN0ZXJf",
+          "bmFtZRgBIAEoCSIiChJGaW5kQ2hhcmFjdGVyc1Jlc3ASDAoEbGlzdBgBIAMo",
+          "DCJBCg9DcmVhdGVGcmllbmRSZXESFgoOY2hhcmFjdGVyX2lkXzEYASABKAkS",
+          "FgoOY2hhcmFjdGVyX2lkXzIYAiABKAkiQQoPRGVsZXRlRnJpZW5kUmVxEhYK",
+          "DmNoYXJhY3Rlcl9pZF8xGAEgASgJEhYKDmNoYXJhY3Rlcl9pZF8yGAIgASgJ",
+          "IiYKDlJlYWRGcmllbmRzUmVxEhQKDGNoYXJhY3Rlcl9pZBgBIAEoCSIfCg9S",
+          "ZWFkRnJpZW5kc1Jlc3ASDAoEbGlzdBgBIAMoDCI8ChFDcmVhdGVCdWlsZGlu",
+          "Z1JlcRIQCghtYXBfbmFtZRgBIAEoCRIVCg1idWlsZGluZ19kYXRhGAIgASgM",
+          "IjwKEVVwZGF0ZUJ1aWxkaW5nUmVxEhAKCG1hcF9uYW1lGAEgASgJEhUKDWJ1",
+          "aWxkaW5nX2RhdGEYAiABKAwiOgoRRGVsZXRlQnVpbGRpbmdSZXESEAoIbWFw",
+          "X25hbWUYASABKAkSEwoLYnVpbGRpbmdfaWQYAiABKAkiJAoQUmVhZEJ1aWxk",
+          "aW5nc1JlcRIQCghtYXBfbmFtZRgBIAEoCSIhChFSZWFkQnVpbGRpbmdzUmVz",
+          "cBIMCgRsaXN0GAEgAygMIlQKDkNyZWF0ZVBhcnR5UmVxEhEKCXNoYXJlX2V4",
+          "cBgBIAEoCBISCgpzaGFyZV9pdGVtGAIgASgIEhsKE2xlYWRlcl9jaGFyYWN0",
+          "ZXJfaWQYAyABKAkiIwoPQ3JlYXRlUGFydHlSZXNwEhAKCHBhcnR5X2lkGAEg",
+          "ASgFIkkKDlVwZGF0ZVBhcnR5UmVxEhAKCHBhcnR5X2lkGAEgASgFEhEKCXNo",
+          "YXJlX2V4cBgCIAEoCBISCgpzaGFyZV9pdGVtGAMgASgIIkUKFFVwZGF0ZVBh",
+          "cnR5TGVhZGVyUmVxEhAKCHBhcnR5X2lkGAEgASgFEhsKE2xlYWRlcl9jaGFy",
+          "YWN0ZXJfaWQYAiABKAkiIgoORGVsZXRlUGFydHlSZXESEAoIcGFydHlfaWQY",
+          "ASABKAUiQQoXVXBkYXRlQ2hhcmFjdGVyUGFydHlSZXESFAoMY2hhcmFjdGVy",
+          "X2lkGAEgASgJEhAKCHBhcnR5X2lkGAIgASgFIiAKDFJlYWRQYXJ0eVJlcRIQ",
+          "CghwYXJ0eV9pZBgBIAEoBSIjCg1SZWFkUGFydHlSZXNwEhIKCnBhcnR5X2Rh",
+          "dGEYASABKAwiQQoOQ3JlYXRlR3VpbGRSZXESEgoKZ3VpbGRfbmFtZRgBIAEo",
+          "CRIbChNsZWFkZXJfY2hhcmFjdGVyX2lkGAIgASgJIiMKD0NyZWF0ZUd1aWxk",
+          "UmVzcBIQCghndWlsZF9pZBgBIAEoBSJYChNVcGRhdGVHdWlsZExldmVsUmVx",
+          "EhAKCGd1aWxkX2lkGAEgASgFEg0KBWxldmVsGAIgASgFEgsKA2V4cBgDIAEo",
+          "BRITCgtza2lsbF9wb2ludBgEIAEoBSJFChRVcGRhdGVHdWlsZExlYWRlclJl",
+          "cRIQCghndWlsZF9pZBgBIAEoBRIbChNsZWFkZXJfY2hhcmFjdGVyX2lkGAIg",
+          "ASgJIkAKFVVwZGF0ZUd1aWxkTWVzc2FnZVJlcRIQCghndWlsZF9pZBgBIAEo",
+          "BRIVCg1ndWlsZF9tZXNzYWdlGAIgASgJIpEBChJVcGRhdGVHdWlsZFJvbGVS",
+          "ZXESEAoIZ3VpbGRfaWQYASABKAUSEgoKZ3VpbGRfcm9sZRgCIAEoDRIRCgly",
+          "b2xlX25hbWUYAyABKAkSEgoKY2FuX2ludml0ZRgEIAEoCBIQCghjYW5fa2lj",
+          "axgFIAEoCBIcChRzaGFyZV9leHBfcGVyY2VudGFnZRgGIAEoDSJLChhVcGRh",
+          "dGVHdWlsZE1lbWJlclJvbGVSZXESGwoTbWVtYmVyX2NoYXJhY3Rlcl9pZBgB",
+          "IAEoCRISCgpndWlsZF9yb2xlGAIgASgNImcKGFVwZGF0ZUd1aWxkU2tpbGxM",
+          "ZXZlbFJlcRIQCghndWlsZF9pZBgBIAEoBRIPCgdkYXRhX2lkGAIgASgFEhMK",
+          "C3NraWxsX2xldmVsGAMgASgFEhMKC3NraWxsX3BvaW50GAQgASgFIlUKF1Vw",
+          "ZGF0ZUNoYXJhY3Rlckd1aWxkUmVxEhQKDGNoYXJhY3Rlcl9pZBgBIAEoCRIQ",
+          "CghndWlsZF9pZBgCIAEoBRISCgpndWlsZF9yb2xlGAMgASgNIiIKDkRlbGV0",
+          "ZUd1aWxkUmVxEhAKCGd1aWxkX2lkGAEgASgFIiYKEEZpbmRHdWlsZE5hbWVS",
+          "ZXESEgoKZ3VpbGRfbmFtZRgBIAEoCSIpChFGaW5kR3VpbGROYW1lUmVzcBIU",
+          "Cgxmb3VuZF9hbW91bnQYASABKAMiPQoMUmVhZEd1aWxkUmVxEhAKCGd1aWxk",
+          "X2lkGAEgASgFEhsKE2RlZmF1bHRfZ3VpbGRfcm9sZXMYAiADKAwiIwoNUmVh",
+          "ZEd1aWxkUmVzcBISCgpndWlsZF9kYXRhGAEgASgMIiMKD0dldEd1aWxkR29s",
+          "ZFJlcRIQCghndWlsZF9pZBgBIAEoBSI2ChJVcGRhdGVHdWlsZEdvbGRSZXES",
+          "EAoIZ3VpbGRfaWQYASABKAUSDgoGYW1vdW50GAIgASgFIjgKFERlY3JlYXNl",
+          "R3VpbGRHb2xkUmVxEhAKCGd1aWxkX2lkGAEgASgFEg4KBmFtb3VudBgCIAEo",
+          "BSJ3ChVVcGRhdGVTdG9yYWdlSXRlbXNSZXESIwoMc3RvcmFnZV90eXBlGAEg",
+          "ASgOMg0uRVN0b3JhZ2VUeXBlEhgKEHN0b3JhZ2Vfb3duZXJfaWQYAiABKAkS",
+          "HwoXc3RvcmFnZV9jaGFyYWN0ZXJfaXRlbXMYAyADKAwiVAoTUmVhZFN0b3Jh",
+          "Z2VJdGVtc1JlcRIjCgxzdG9yYWdlX3R5cGUYASABKA4yDS5FU3RvcmFnZVR5",
+          "cGUSGAoQc3RvcmFnZV9vd25lcl9pZBgCIAEoCSI3ChRSZWFkU3RvcmFnZUl0",
+          "ZW1zUmVzcBIfChdzdG9yYWdlX2NoYXJhY3Rlcl9pdGVtcxgBIAMoDCLWAQoU",
+          "TW92ZUl0ZW1Ub1N0b3JhZ2VSZXESIwoMc3RvcmFnZV90eXBlGAEgASgOMg0u",
+          "RVN0b3JhZ2VUeXBlEhgKEHN0b3JhZ2Vfb3duZXJfaWQYAiABKAkSFAoMY2hh",
+          "cmFjdGVyX2lkGAMgASgJEhAKCG1hcF9uYW1lGAQgASgJEhwKFGludmVudG9y",
+          "eV9pdGVtX2luZGV4GAUgASgFEh0KFWludmVudG9yeV9pdGVtX2Ftb3VudBgG",
+          "IAEoBRIaChJzdG9yYWdlX2l0ZW1faW5kZXgYByABKAUidQoVTW92ZUl0ZW1U",
+          "b1N0b3JhZ2VSZXNwEh0KBWVycm9yGAEgASgOMg4uRVN0b3JhZ2VFcnJvchIc",
+          "ChRpbnZlbnRvcnlfaXRlbV9pdGVtcxgCIAMoDBIfChdzdG9yYWdlX2NoYXJh",
+          "Y3Rlcl9pdGVtcxgDIAMoDCLWAQoWTW92ZUl0ZW1Gcm9tU3RvcmFnZVJlcRIj",
+          "CgxzdG9yYWdlX3R5cGUYASABKA4yDS5FU3RvcmFnZVR5cGUSGAoQc3RvcmFn",
+          "ZV9vd25lcl9pZBgCIAEoCRIUCgxjaGFyYWN0ZXJfaWQYAyABKAkSEAoIbWFw",
+          "X25hbWUYBCABKAkSGgoSc3RvcmFnZV9pdGVtX2luZGV4GAUgASgFEhsKE3N0",
+          "b3JhZ2VfaXRlbV9hbW91bnQYBiABKAUSHAoUaW52ZW50b3J5X2l0ZW1faW5k",
+          "ZXgYByABKAUidwoXTW92ZUl0ZW1Gcm9tU3RvcmFnZVJlc3ASHQoFZXJyb3IY",
+          "ASABKA4yDi5FU3RvcmFnZUVycm9yEhwKFGludmVudG9yeV9pdGVtX2l0ZW1z",
+          "GAIgAygMEh8KF3N0b3JhZ2VfY2hhcmFjdGVyX2l0ZW1zGAMgAygMIqgBChlT",
+          "d2FwT3JNZXJnZVN0b3JhZ2VJdGVtUmVxEiMKDHN0b3JhZ2VfdHlwZRgBIAEo",
+          "DjINLkVTdG9yYWdlVHlwZRIYChBzdG9yYWdlX293bmVyX2lkGAIgASgJEhQK",
+          "DGNoYXJhY3Rlcl9pZBgDIAEoCRIQCghtYXBfbmFtZRgEIAEoCRISCgpmcm9t",
+          "X2luZGV4GAUgASgFEhAKCHRvX2luZGV4GAYgASgFIlwKGlN3YXBPck1lcmdl",
+          "U3RvcmFnZUl0ZW1SZXNwEh0KBWVycm9yGAEgASgOMg4uRVN0b3JhZ2VFcnJv",
+          "chIfChdzdG9yYWdlX2NoYXJhY3Rlcl9pdGVtcxgCIAMoDCJ4ChdJbmNyZWFz",
+          "ZVN0b3JhZ2VJdGVtc1JlcRIjCgxzdG9yYWdlX3R5cGUYASABKA4yDS5FU3Rv",
+          "cmFnZVR5cGUSGAoQc3RvcmFnZV9vd25lcl9pZBgCIAEoCRIQCghtYXBfbmFt",
+          "ZRgDIAEoCRIMCgRpdGVtGAQgASgMIloKGEluY3JlYXNlU3RvcmFnZUl0ZW1z",
+          "UmVzcBIdCgVlcnJvchgBIAEoDjIOLkVTdG9yYWdlRXJyb3ISHwoXc3RvcmFn",
+          "ZV9jaGFyYWN0ZXJfaXRlbXMYAiADKAwiiwEKF0RlY3JlYXNlU3RvcmFnZUl0",
+          "ZW1zUmVxEiMKDHN0b3JhZ2VfdHlwZRgBIAEoDjINLkVTdG9yYWdlVHlwZRIY",
+          "ChBzdG9yYWdlX293bmVyX2lkGAIgASgJEhAKCG1hcF9uYW1lGAMgASgJEg8K",
+          "B2RhdGFfaWQYBCABKAUSDgoGYW1vdW50GAUgASgFIogBChhEZWNyZWFzZVN0",
+          "b3JhZ2VJdGVtc1Jlc3ASHQoFZXJyb3IYASABKA4yDi5FU3RvcmFnZUVycm9y",
+          "Eh8KF3N0b3JhZ2VfY2hhcmFjdGVyX2l0ZW1zGAIgAygMEiwKD2RlY3JlYXNl",
+          "ZF9pdGVtcxgDIAMoCzITLkl0ZW1JbmRleEFtb3VudE1hcCInCglDdXN0b21S",
+          "ZXESDAoEdHlwZRgBIAEoBRIMCgRkYXRhGAIgASgMIigKCkN1c3RvbVJlc3AS",
+          "DAoEdHlwZRgBIAEoBRIMCgRkYXRhGAIgASgMKnEKDEVTdG9yYWdlVHlwZRIV",
+          "ChFTVE9SQUdFX1RZUEVfTk9ORRAAEhcKE1NUT1JBR0VfVFlQRV9QTEFZRVIQ",
+          "ARIWChJTVE9SQUdFX1RZUEVfR1VJTEQQAhIZChVTVE9SQUdFX1RZUEVfQlVJ",
+          "TERJTkcQAyrLAgoNRVN0b3JhZ2VFcnJvchIWChJTVE9SQUdFX0VSUk9SX05P",
+          "TkUQABIhCh1TVE9SQUdFX0VSUk9SX0lOVkFMSURfU1RPUkFHRRABEiMKH1NU",
+          "T1JBR0VfRVJST1JfSU5WQUxJRF9DSEFSQUNURVIQAhInCiNTVE9SQUdFX0VS",
+          "Uk9SX0lOVkFMSURfU1RPUkFHRV9JTkRFWBADEikKJVNUT1JBR0VfRVJST1Jf",
+          "SU5WQUxJRF9JTlZFTlRPUllfSU5ERVgQBBIrCidTVE9SQUdFX0VSUk9SX1NU",
+          "T1JBR0VfV0lMTF9PVkVSV0hFTE1JTkcQBRItCilTVE9SQUdFX0VSUk9SX0lO",
+          "VkVOVE9SWV9XSUxMX09WRVJXSEVMTUlORxAGEioKJlNUT1JBR0VfRVJST1Jf",
+          "REVDUkVBU0VfSVRFTV9OT1RfRU5PVUdIEAcy5hUKD0RhdGFiYXNlU2Vydmlj",
+          "ZRJCChFWYWxpZGF0ZVVzZXJMb2dpbhIVLlZhbGlkYXRlVXNlckxvZ2luUmVx",
+          "GhYuVmFsaWRhdGVVc2VyTG9naW5SZXNwEkgKE1ZhbGlkYXRlQWNjZXNzVG9r",
+          "ZW4SFy5WYWxpZGF0ZUFjY2Vzc1Rva2VuUmVxGhguVmFsaWRhdGVBY2Nlc3NU",
+          "b2tlblJlc3ASMwoMR2V0VXNlckxldmVsEhAuR2V0VXNlckxldmVsUmVxGhEu",
+          "R2V0VXNlckxldmVsUmVzcBIhCgdHZXRHb2xkEgsuR2V0R29sZFJlcRoJLkdv",
+          "bGRSZXNwEicKClVwZGF0ZUdvbGQSDi5VcGRhdGVHb2xkUmVxGgkuVm9pZFJl",
+          "c3ASIQoHR2V0Q2FzaBILLkdldENhc2hSZXEaCS5DYXNoUmVzcBInCgpVcGRh",
+          "dGVDYXNoEg4uVXBkYXRlQ2FzaFJlcRoJLlZvaWRSZXNwEjUKEVVwZGF0ZUFj",
+          "Y2Vzc1Rva2VuEhUuVXBkYXRlQWNjZXNzVG9rZW5SZXEaCS5Wb2lkUmVzcBIx",
+          "Cg9DcmVhdGVVc2VyTG9naW4SEy5DcmVhdGVVc2VyTG9naW5SZXEaCS5Wb2lk",
+          "UmVzcBIzCgxGaW5kVXNlcm5hbWUSEC5GaW5kVXNlcm5hbWVSZXEaES5GaW5k",
+          "VXNlcm5hbWVSZXNwEjEKD0NyZWF0ZUNoYXJhY3RlchITLkNyZWF0ZUNoYXJh",
+          "Y3RlclJlcRoJLlZvaWRSZXNwEjYKDVJlYWRDaGFyYWN0ZXISES5SZWFkQ2hh",
+          "cmFjdGVyUmVxGhIuUmVhZENoYXJhY3RlclJlc3ASOQoOUmVhZENoYXJhY3Rl",
+          "cnMSEi5SZWFkQ2hhcmFjdGVyc1JlcRoTLlJlYWRDaGFyYWN0ZXJzUmVzcBIx",
+          "Cg9VcGRhdGVDaGFyYWN0ZXISEy5VcGRhdGVDaGFyYWN0ZXJSZXEaCS5Wb2lk",
+          "UmVzcBIxCg9EZWxldGVDaGFyYWN0ZXISEy5EZWxldGVDaGFyYWN0ZXJSZXEa",
+          "CS5Wb2lkUmVzcBJCChFGaW5kQ2hhcmFjdGVyTmFtZRIVLkZpbmRDaGFyYWN0",
+          "ZXJOYW1lUmVxGhYuRmluZENoYXJhY3Rlck5hbWVSZXNwEjkKDkZpbmRDaGFy",
+          "YWN0ZXJzEhIuRmluZENoYXJhY3RlcnNSZXEaEy5GaW5kQ2hhcmFjdGVyc1Jl",
+          "c3ASKwoMQ3JlYXRlRnJpZW5kEhAuQ3JlYXRlRnJpZW5kUmVxGgkuVm9pZFJl",
+          "c3ASKwoMRGVsZXRlRnJpZW5kEhAuRGVsZXRlRnJpZW5kUmVxGgkuVm9pZFJl",
+          "c3ASMAoLUmVhZEZyaWVuZHMSDy5SZWFkRnJpZW5kc1JlcRoQLlJlYWRGcmll",
+          "bmRzUmVzcBIvCg5DcmVhdGVCdWlsZGluZxISLkNyZWF0ZUJ1aWxkaW5nUmVx",
+          "GgkuVm9pZFJlc3ASLwoOVXBkYXRlQnVpbGRpbmcSEi5VcGRhdGVCdWlsZGlu",
+          "Z1JlcRoJLlZvaWRSZXNwEi8KDkRlbGV0ZUJ1aWxkaW5nEhIuRGVsZXRlQnVp",
+          "bGRpbmdSZXEaCS5Wb2lkUmVzcBI2Cg1SZWFkQnVpbGRpbmdzEhEuUmVhZEJ1",
+          "aWxkaW5nc1JlcRoSLlJlYWRCdWlsZGluZ3NSZXNwEjAKC0NyZWF0ZVBhcnR5",
+          "Eg8uQ3JlYXRlUGFydHlSZXEaEC5DcmVhdGVQYXJ0eVJlc3ASKQoLVXBkYXRl",
+          "UGFydHkSDy5VcGRhdGVQYXJ0eVJlcRoJLlZvaWRSZXNwEjUKEVVwZGF0ZVBh",
+          "cnR5TGVhZGVyEhUuVXBkYXRlUGFydHlMZWFkZXJSZXEaCS5Wb2lkUmVzcBIp",
+          "CgtEZWxldGVQYXJ0eRIPLkRlbGV0ZVBhcnR5UmVxGgkuVm9pZFJlc3ASOwoU",
+          "VXBkYXRlQ2hhcmFjdGVyUGFydHkSGC5VcGRhdGVDaGFyYWN0ZXJQYXJ0eVJl",
+          "cRoJLlZvaWRSZXNwEioKCVJlYWRQYXJ0eRINLlJlYWRQYXJ0eVJlcRoOLlJl",
+          "YWRQYXJ0eVJlc3ASMAoLQ3JlYXRlR3VpbGQSDy5DcmVhdGVHdWlsZFJlcRoQ",
+          "LkNyZWF0ZUd1aWxkUmVzcBIzChBVcGRhdGVHdWlsZExldmVsEhQuVXBkYXRl",
+          "R3VpbGRMZXZlbFJlcRoJLlZvaWRSZXNwEjUKEVVwZGF0ZUd1aWxkTGVhZGVy",
+          "EhUuVXBkYXRlR3VpbGRMZWFkZXJSZXEaCS5Wb2lkUmVzcBI3ChJVcGRhdGVH",
+          "dWlsZE1lc3NhZ2USFi5VcGRhdGVHdWlsZE1lc3NhZ2VSZXEaCS5Wb2lkUmVz",
+          "cBIxCg9VcGRhdGVHdWlsZFJvbGUSEy5VcGRhdGVHdWlsZFJvbGVSZXEaCS5W",
+          "b2lkUmVzcBI9ChVVcGRhdGVHdWlsZE1lbWJlclJvbGUSGS5VcGRhdGVHdWls",
+          "ZE1lbWJlclJvbGVSZXEaCS5Wb2lkUmVzcBI9ChVVcGRhdGVHdWlsZFNraWxs",
+          "TGV2ZWwSGS5VcGRhdGVHdWlsZFNraWxsTGV2ZWxSZXEaCS5Wb2lkUmVzcBI7",
+          "ChRVcGRhdGVDaGFyYWN0ZXJHdWlsZBIYLlVwZGF0ZUNoYXJhY3Rlckd1aWxk",
+          "UmVxGgkuVm9pZFJlc3ASKQoLRGVsZXRlR3VpbGQSDy5EZWxldGVHdWlsZFJl",
+          "cRoJLlZvaWRSZXNwEjYKDUZpbmRHdWlsZE5hbWUSES5GaW5kR3VpbGROYW1l",
+          "UmVxGhIuRmluZEd1aWxkTmFtZVJlc3ASKgoJUmVhZEd1aWxkEg0uUmVhZEd1",
+          "aWxkUmVxGg4uUmVhZEd1aWxkUmVzcBIwCgxHZXRHdWlsZEdvbGQSEC5HZXRH",
+          "dWlsZEdvbGRSZXEaDi5HdWlsZEdvbGRSZXNwEjEKD1VwZGF0ZUd1aWxkR29s",
+          "ZBITLlVwZGF0ZUd1aWxkR29sZFJlcRoJLlZvaWRSZXNwEjcKElVwZGF0ZVN0",
+          "b3JhZ2VJdGVtcxIWLlVwZGF0ZVN0b3JhZ2VJdGVtc1JlcRoJLlZvaWRSZXNw",
+          "Ej8KEFJlYWRTdG9yYWdlSXRlbXMSFC5SZWFkU3RvcmFnZUl0ZW1zUmVxGhUu",
+          "UmVhZFN0b3JhZ2VJdGVtc1Jlc3ASQgoRTW92ZUl0ZW1Ub1N0b3JhZ2USFS5N",
+          "b3ZlSXRlbVRvU3RvcmFnZVJlcRoWLk1vdmVJdGVtVG9TdG9yYWdlUmVzcBJI",
+          "ChNNb3ZlSXRlbUZyb21TdG9yYWdlEhcuTW92ZUl0ZW1Gcm9tU3RvcmFnZVJl",
+          "cRoYLk1vdmVJdGVtRnJvbVN0b3JhZ2VSZXNwElEKFlN3YXBPck1lcmdlU3Rv",
+          "cmFnZUl0ZW0SGi5Td2FwT3JNZXJnZVN0b3JhZ2VJdGVtUmVxGhsuU3dhcE9y",
+          "TWVyZ2VTdG9yYWdlSXRlbVJlc3ASSwoUSW5jcmVhc2VTdG9yYWdlSXRlbXMS",
+          "GC5JbmNyZWFzZVN0b3JhZ2VJdGVtc1JlcRoZLkluY3JlYXNlU3RvcmFnZUl0",
+          "ZW1zUmVzcBJLChREZWNyZWFzZVN0b3JhZ2VJdGVtcxIYLkRlY3JlYXNlU3Rv",
+          "cmFnZUl0ZW1zUmVxGhkuRGVjcmVhc2VTdG9yYWdlSXRlbXNSZXNwEiEKBkN1",
+          "c3RvbRIKLkN1c3RvbVJlcRoLLkN1c3RvbVJlc3BiBnByb3RvMw=="));
     descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
         new pbr::FileDescriptor[] { },
-        new pbr::GeneratedClrTypeInfo(new[] {typeof(global::EStorageType), }, null, new pbr::GeneratedClrTypeInfo[] {
+        new pbr::GeneratedClrTypeInfo(new[] {typeof(global::EStorageType), typeof(global::EStorageError), }, null, new pbr::GeneratedClrTypeInfo[] {
+          new pbr::GeneratedClrTypeInfo(typeof(global::ItemIndexAmountMap), global::ItemIndexAmountMap.Parser, new[]{ "Index", "Amount" }, null, null, null, null),
           new pbr::GeneratedClrTypeInfo(typeof(global::VoidResp), global::VoidResp.Parser, null, null, null, null, null),
           new pbr::GeneratedClrTypeInfo(typeof(global::GoldResp), global::GoldResp.Parser, new[]{ "Gold" }, null, null, null, null),
           new pbr::GeneratedClrTypeInfo(typeof(global::CashResp), global::CashResp.Parser, new[]{ "Cash" }, null, null, null, null),
@@ -228,6 +279,16 @@ public static partial class DatabaseServiceReflection {
           new pbr::GeneratedClrTypeInfo(typeof(global::UpdateStorageItemsReq), global::UpdateStorageItemsReq.Parser, new[]{ "StorageType", "StorageOwnerId", "StorageCharacterItems" }, null, null, null, null),
           new pbr::GeneratedClrTypeInfo(typeof(global::ReadStorageItemsReq), global::ReadStorageItemsReq.Parser, new[]{ "StorageType", "StorageOwnerId" }, null, null, null, null),
           new pbr::GeneratedClrTypeInfo(typeof(global::ReadStorageItemsResp), global::ReadStorageItemsResp.Parser, new[]{ "StorageCharacterItems" }, null, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::MoveItemToStorageReq), global::MoveItemToStorageReq.Parser, new[]{ "StorageType", "StorageOwnerId", "CharacterId", "MapName", "InventoryItemIndex", "InventoryItemAmount", "StorageItemIndex" }, null, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::MoveItemToStorageResp), global::MoveItemToStorageResp.Parser, new[]{ "Error", "InventoryItemItems", "StorageCharacterItems" }, null, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::MoveItemFromStorageReq), global::MoveItemFromStorageReq.Parser, new[]{ "StorageType", "StorageOwnerId", "CharacterId", "MapName", "StorageItemIndex", "StorageItemAmount", "InventoryItemIndex" }, null, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::MoveItemFromStorageResp), global::MoveItemFromStorageResp.Parser, new[]{ "Error", "InventoryItemItems", "StorageCharacterItems" }, null, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::SwapOrMergeStorageItemReq), global::SwapOrMergeStorageItemReq.Parser, new[]{ "StorageType", "StorageOwnerId", "CharacterId", "MapName", "FromIndex", "ToIndex" }, null, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::SwapOrMergeStorageItemResp), global::SwapOrMergeStorageItemResp.Parser, new[]{ "Error", "StorageCharacterItems" }, null, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::IncreaseStorageItemsReq), global::IncreaseStorageItemsReq.Parser, new[]{ "StorageType", "StorageOwnerId", "MapName", "Item" }, null, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::IncreaseStorageItemsResp), global::IncreaseStorageItemsResp.Parser, new[]{ "Error", "StorageCharacterItems" }, null, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::DecreaseStorageItemsReq), global::DecreaseStorageItemsReq.Parser, new[]{ "StorageType", "StorageOwnerId", "MapName", "DataId", "Amount" }, null, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::DecreaseStorageItemsResp), global::DecreaseStorageItemsResp.Parser, new[]{ "Error", "StorageCharacterItems", "DecreasedItems" }, null, null, null, null),
           new pbr::GeneratedClrTypeInfo(typeof(global::CustomReq), global::CustomReq.Parser, new[]{ "Type", "Data" }, null, null, null, null),
           new pbr::GeneratedClrTypeInfo(typeof(global::CustomResp), global::CustomResp.Parser, new[]{ "Type", "Data" }, null, null, null, null)
         }));
@@ -237,15 +298,186 @@ public static partial class DatabaseServiceReflection {
 }
 #region Enums
 public enum EStorageType {
-  [pbr::OriginalName("NONE")] None = 0,
-  [pbr::OriginalName("PLAYER")] Player = 1,
-  [pbr::OriginalName("GUILD")] Guild = 2,
-  [pbr::OriginalName("BUILDING")] Building = 3,
+  [pbr::OriginalName("STORAGE_TYPE_NONE")] StorageTypeNone = 0,
+  [pbr::OriginalName("STORAGE_TYPE_PLAYER")] StorageTypePlayer = 1,
+  [pbr::OriginalName("STORAGE_TYPE_GUILD")] StorageTypeGuild = 2,
+  [pbr::OriginalName("STORAGE_TYPE_BUILDING")] StorageTypeBuilding = 3,
+}
+
+public enum EStorageError {
+  [pbr::OriginalName("STORAGE_ERROR_NONE")] StorageErrorNone = 0,
+  [pbr::OriginalName("STORAGE_ERROR_INVALID_STORAGE")] StorageErrorInvalidStorage = 1,
+  [pbr::OriginalName("STORAGE_ERROR_INVALID_CHARACTER")] StorageErrorInvalidCharacter = 2,
+  [pbr::OriginalName("STORAGE_ERROR_INVALID_STORAGE_INDEX")] StorageErrorInvalidStorageIndex = 3,
+  [pbr::OriginalName("STORAGE_ERROR_INVALID_INVENTORY_INDEX")] StorageErrorInvalidInventoryIndex = 4,
+  [pbr::OriginalName("STORAGE_ERROR_STORAGE_WILL_OVERWHELMING")] StorageErrorStorageWillOverwhelming = 5,
+  [pbr::OriginalName("STORAGE_ERROR_INVENTORY_WILL_OVERWHELMING")] StorageErrorInventoryWillOverwhelming = 6,
+  [pbr::OriginalName("STORAGE_ERROR_DECREASE_ITEM_NOT_ENOUGH")] StorageErrorDecreaseItemNotEnough = 7,
 }
 
 #endregion
 
 #region Messages
+/// <summary>
+/// Map
+/// </summary>
+public sealed partial class ItemIndexAmountMap : pb::IMessage<ItemIndexAmountMap> {
+  private static readonly pb::MessageParser<ItemIndexAmountMap> _parser = new pb::MessageParser<ItemIndexAmountMap>(() => new ItemIndexAmountMap());
+  private pb::UnknownFieldSet _unknownFields;
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public static pb::MessageParser<ItemIndexAmountMap> Parser { get { return _parser; } }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public static pbr::MessageDescriptor Descriptor {
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[0]; }
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  pbr::MessageDescriptor pb::IMessage.Descriptor {
+    get { return Descriptor; }
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public ItemIndexAmountMap() {
+    OnConstruction();
+  }
+
+  partial void OnConstruction();
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public ItemIndexAmountMap(ItemIndexAmountMap other) : this() {
+    index_ = other.index_;
+    amount_ = other.amount_;
+    _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public ItemIndexAmountMap Clone() {
+    return new ItemIndexAmountMap(this);
+  }
+
+  /// <summary>Field number for the "index" field.</summary>
+  public const int IndexFieldNumber = 1;
+  private int index_;
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public int Index {
+    get { return index_; }
+    set {
+      index_ = value;
+    }
+  }
+
+  /// <summary>Field number for the "amount" field.</summary>
+  public const int AmountFieldNumber = 2;
+  private int amount_;
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public int Amount {
+    get { return amount_; }
+    set {
+      amount_ = value;
+    }
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public override bool Equals(object other) {
+    return Equals(other as ItemIndexAmountMap);
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public bool Equals(ItemIndexAmountMap other) {
+    if (ReferenceEquals(other, null)) {
+      return false;
+    }
+    if (ReferenceEquals(other, this)) {
+      return true;
+    }
+    if (Index != other.Index) return false;
+    if (Amount != other.Amount) return false;
+    return Equals(_unknownFields, other._unknownFields);
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public override int GetHashCode() {
+    int hash = 1;
+    if (Index != 0) hash ^= Index.GetHashCode();
+    if (Amount != 0) hash ^= Amount.GetHashCode();
+    if (_unknownFields != null) {
+      hash ^= _unknownFields.GetHashCode();
+    }
+    return hash;
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public override string ToString() {
+    return pb::JsonFormatter.ToDiagnosticString(this);
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public void WriteTo(pb::CodedOutputStream output) {
+    if (Index != 0) {
+      output.WriteRawTag(8);
+      output.WriteInt32(Index);
+    }
+    if (Amount != 0) {
+      output.WriteRawTag(16);
+      output.WriteInt32(Amount);
+    }
+    if (_unknownFields != null) {
+      _unknownFields.WriteTo(output);
+    }
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public int CalculateSize() {
+    int size = 0;
+    if (Index != 0) {
+      size += 1 + pb::CodedOutputStream.ComputeInt32Size(Index);
+    }
+    if (Amount != 0) {
+      size += 1 + pb::CodedOutputStream.ComputeInt32Size(Amount);
+    }
+    if (_unknownFields != null) {
+      size += _unknownFields.CalculateSize();
+    }
+    return size;
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public void MergeFrom(ItemIndexAmountMap other) {
+    if (other == null) {
+      return;
+    }
+    if (other.Index != 0) {
+      Index = other.Index;
+    }
+    if (other.Amount != 0) {
+      Amount = other.Amount;
+    }
+    _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public void MergeFrom(pb::CodedInputStream input) {
+    uint tag;
+    while ((tag = input.ReadTag()) != 0) {
+      switch(tag) {
+        default:
+          _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+          break;
+        case 8: {
+          Index = input.ReadInt32();
+          break;
+        }
+        case 16: {
+          Amount = input.ReadInt32();
+          break;
+        }
+      }
+    }
+  }
+
+}
+
 /// <summary>
 /// Generic response
 /// </summary>
@@ -257,7 +489,7 @@ public sealed partial class VoidResp : pb::IMessage<VoidResp> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[0]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[1]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -358,7 +590,7 @@ public sealed partial class GoldResp : pb::IMessage<GoldResp> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[1]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[2]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -487,7 +719,7 @@ public sealed partial class CashResp : pb::IMessage<CashResp> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[2]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[3]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -616,7 +848,7 @@ public sealed partial class GuildGoldResp : pb::IMessage<GuildGoldResp> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[3]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[4]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -748,7 +980,7 @@ public sealed partial class ValidateUserLoginReq : pb::IMessage<ValidateUserLogi
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[4]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[5]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -905,7 +1137,7 @@ public sealed partial class ValidateUserLoginResp : pb::IMessage<ValidateUserLog
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[5]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[6]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1037,7 +1269,7 @@ public sealed partial class ValidateAccessTokenReq : pb::IMessage<ValidateAccess
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[6]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[7]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1194,7 +1426,7 @@ public sealed partial class ValidateAccessTokenResp : pb::IMessage<ValidateAcces
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[7]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[8]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1326,7 +1558,7 @@ public sealed partial class GetUserLevelReq : pb::IMessage<GetUserLevelReq> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[8]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[9]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1455,7 +1687,7 @@ public sealed partial class GetUserLevelResp : pb::IMessage<GetUserLevelResp> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[9]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[10]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1587,7 +1819,7 @@ public sealed partial class GetGoldReq : pb::IMessage<GetGoldReq> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[10]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[11]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1719,7 +1951,7 @@ public sealed partial class UpdateGoldReq : pb::IMessage<UpdateGoldReq> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[11]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[12]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1879,7 +2111,7 @@ public sealed partial class GetCashReq : pb::IMessage<GetCashReq> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[12]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[13]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -2011,7 +2243,7 @@ public sealed partial class UpdateCashReq : pb::IMessage<UpdateCashReq> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[13]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[14]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -2171,7 +2403,7 @@ public sealed partial class UpdateAccessTokenReq : pb::IMessage<UpdateAccessToke
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[14]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[15]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -2331,7 +2563,7 @@ public sealed partial class CreateUserLoginReq : pb::IMessage<CreateUserLoginReq
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[15]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[16]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -2491,7 +2723,7 @@ public sealed partial class FindUsernameReq : pb::IMessage<FindUsernameReq> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[16]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[17]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -2620,7 +2852,7 @@ public sealed partial class FindUsernameResp : pb::IMessage<FindUsernameResp> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[17]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[18]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -2752,7 +2984,7 @@ public sealed partial class CreateCharacterReq : pb::IMessage<CreateCharacterReq
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[18]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[19]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -2912,7 +3144,7 @@ public sealed partial class ReadCharacterReq : pb::IMessage<ReadCharacterReq> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[19]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[20]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -3069,7 +3301,7 @@ public sealed partial class ReadCharacterResp : pb::IMessage<ReadCharacterResp> 
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[20]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[21]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -3201,7 +3433,7 @@ public sealed partial class ReadCharactersReq : pb::IMessage<ReadCharactersReq> 
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[21]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[22]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -3330,7 +3562,7 @@ public sealed partial class ReadCharactersResp : pb::IMessage<ReadCharactersResp
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[22]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[23]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -3454,7 +3686,7 @@ public sealed partial class UpdateCharacterReq : pb::IMessage<UpdateCharacterReq
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[23]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[24]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -3586,7 +3818,7 @@ public sealed partial class DeleteCharacterReq : pb::IMessage<DeleteCharacterReq
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[24]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[25]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -3746,7 +3978,7 @@ public sealed partial class FindCharacterNameReq : pb::IMessage<FindCharacterNam
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[25]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[26]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -3875,7 +4107,7 @@ public sealed partial class FindCharacterNameResp : pb::IMessage<FindCharacterNa
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[26]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[27]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -4007,7 +4239,7 @@ public sealed partial class FindCharactersReq : pb::IMessage<FindCharactersReq> 
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[27]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[28]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -4136,7 +4368,7 @@ public sealed partial class FindCharactersResp : pb::IMessage<FindCharactersResp
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[28]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[29]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -4260,7 +4492,7 @@ public sealed partial class CreateFriendReq : pb::IMessage<CreateFriendReq> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[29]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[30]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -4420,7 +4652,7 @@ public sealed partial class DeleteFriendReq : pb::IMessage<DeleteFriendReq> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[30]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[31]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -4580,7 +4812,7 @@ public sealed partial class ReadFriendsReq : pb::IMessage<ReadFriendsReq> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[31]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[32]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -4709,7 +4941,7 @@ public sealed partial class ReadFriendsResp : pb::IMessage<ReadFriendsResp> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[32]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[33]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -4833,7 +5065,7 @@ public sealed partial class CreateBuildingReq : pb::IMessage<CreateBuildingReq> 
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[33]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[34]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -4993,7 +5225,7 @@ public sealed partial class UpdateBuildingReq : pb::IMessage<UpdateBuildingReq> 
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[34]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[35]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -5153,7 +5385,7 @@ public sealed partial class DeleteBuildingReq : pb::IMessage<DeleteBuildingReq> 
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[35]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[36]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -5313,7 +5545,7 @@ public sealed partial class ReadBuildingsReq : pb::IMessage<ReadBuildingsReq> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[36]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[37]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -5442,7 +5674,7 @@ public sealed partial class ReadBuildingsResp : pb::IMessage<ReadBuildingsResp> 
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[37]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[38]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -5566,7 +5798,7 @@ public sealed partial class CreatePartyReq : pb::IMessage<CreatePartyReq> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[38]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[39]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -5751,7 +5983,7 @@ public sealed partial class CreatePartyResp : pb::IMessage<CreatePartyResp> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[39]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[40]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -5883,7 +6115,7 @@ public sealed partial class UpdatePartyReq : pb::IMessage<UpdatePartyReq> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[40]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[41]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -6071,7 +6303,7 @@ public sealed partial class UpdatePartyLeaderReq : pb::IMessage<UpdatePartyLeade
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[41]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[42]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -6231,7 +6463,7 @@ public sealed partial class DeletePartyReq : pb::IMessage<DeletePartyReq> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[42]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[43]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -6363,7 +6595,7 @@ public sealed partial class UpdateCharacterPartyReq : pb::IMessage<UpdateCharact
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[43]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[44]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -6523,7 +6755,7 @@ public sealed partial class ReadPartyReq : pb::IMessage<ReadPartyReq> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[44]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[45]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -6652,7 +6884,7 @@ public sealed partial class ReadPartyResp : pb::IMessage<ReadPartyResp> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[45]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[46]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -6784,7 +7016,7 @@ public sealed partial class CreateGuildReq : pb::IMessage<CreateGuildReq> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[46]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[47]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -6941,7 +7173,7 @@ public sealed partial class CreateGuildResp : pb::IMessage<CreateGuildResp> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[47]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[48]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -7073,7 +7305,7 @@ public sealed partial class UpdateGuildLevelReq : pb::IMessage<UpdateGuildLevelR
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[48]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[49]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -7289,7 +7521,7 @@ public sealed partial class UpdateGuildLeaderReq : pb::IMessage<UpdateGuildLeade
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[49]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[50]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -7449,7 +7681,7 @@ public sealed partial class UpdateGuildMessageReq : pb::IMessage<UpdateGuildMess
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[50]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[51]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -7609,7 +7841,7 @@ public sealed partial class UpdateGuildRoleReq : pb::IMessage<UpdateGuildRoleReq
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[51]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[52]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -7881,7 +8113,7 @@ public sealed partial class UpdateGuildMemberRoleReq : pb::IMessage<UpdateGuildM
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[52]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[53]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -8041,7 +8273,7 @@ public sealed partial class UpdateGuildSkillLevelReq : pb::IMessage<UpdateGuildS
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[53]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[54]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -8257,7 +8489,7 @@ public sealed partial class UpdateCharacterGuildReq : pb::IMessage<UpdateCharact
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[54]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[55]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -8445,7 +8677,7 @@ public sealed partial class DeleteGuildReq : pb::IMessage<DeleteGuildReq> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[55]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[56]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -8577,7 +8809,7 @@ public sealed partial class FindGuildNameReq : pb::IMessage<FindGuildNameReq> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[56]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[57]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -8706,7 +8938,7 @@ public sealed partial class FindGuildNameResp : pb::IMessage<FindGuildNameResp> 
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[57]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[58]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -8838,7 +9070,7 @@ public sealed partial class ReadGuildReq : pb::IMessage<ReadGuildReq> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[58]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[59]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -8987,7 +9219,7 @@ public sealed partial class ReadGuildResp : pb::IMessage<ReadGuildResp> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[59]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[60]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -9119,7 +9351,7 @@ public sealed partial class GetGuildGoldReq : pb::IMessage<GetGuildGoldReq> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[60]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[61]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -9251,7 +9483,7 @@ public sealed partial class UpdateGuildGoldReq : pb::IMessage<UpdateGuildGoldReq
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[61]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[62]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -9411,7 +9643,7 @@ public sealed partial class DecreaseGuildGoldReq : pb::IMessage<DecreaseGuildGol
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[62]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[63]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -9571,7 +9803,7 @@ public sealed partial class UpdateStorageItemsReq : pb::IMessage<UpdateStorageIt
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[63]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[64]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -9601,7 +9833,7 @@ public sealed partial class UpdateStorageItemsReq : pb::IMessage<UpdateStorageIt
 
   /// <summary>Field number for the "storage_type" field.</summary>
   public const int StorageTypeFieldNumber = 1;
-  private global::EStorageType storageType_ = global::EStorageType.None;
+  private global::EStorageType storageType_ = global::EStorageType.StorageTypeNone;
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public global::EStorageType StorageType {
     get { return storageType_; }
@@ -9653,7 +9885,7 @@ public sealed partial class UpdateStorageItemsReq : pb::IMessage<UpdateStorageIt
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public override int GetHashCode() {
     int hash = 1;
-    if (StorageType != global::EStorageType.None) hash ^= StorageType.GetHashCode();
+    if (StorageType != global::EStorageType.StorageTypeNone) hash ^= StorageType.GetHashCode();
     if (StorageOwnerId.Length != 0) hash ^= StorageOwnerId.GetHashCode();
     hash ^= storageCharacterItems_.GetHashCode();
     if (_unknownFields != null) {
@@ -9669,7 +9901,7 @@ public sealed partial class UpdateStorageItemsReq : pb::IMessage<UpdateStorageIt
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public void WriteTo(pb::CodedOutputStream output) {
-    if (StorageType != global::EStorageType.None) {
+    if (StorageType != global::EStorageType.StorageTypeNone) {
       output.WriteRawTag(8);
       output.WriteEnum((int) StorageType);
     }
@@ -9686,7 +9918,7 @@ public sealed partial class UpdateStorageItemsReq : pb::IMessage<UpdateStorageIt
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public int CalculateSize() {
     int size = 0;
-    if (StorageType != global::EStorageType.None) {
+    if (StorageType != global::EStorageType.StorageTypeNone) {
       size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) StorageType);
     }
     if (StorageOwnerId.Length != 0) {
@@ -9704,7 +9936,7 @@ public sealed partial class UpdateStorageItemsReq : pb::IMessage<UpdateStorageIt
     if (other == null) {
       return;
     }
-    if (other.StorageType != global::EStorageType.None) {
+    if (other.StorageType != global::EStorageType.StorageTypeNone) {
       StorageType = other.StorageType;
     }
     if (other.StorageOwnerId.Length != 0) {
@@ -9751,7 +9983,7 @@ public sealed partial class ReadStorageItemsReq : pb::IMessage<ReadStorageItemsR
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[64]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[65]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -9780,7 +10012,7 @@ public sealed partial class ReadStorageItemsReq : pb::IMessage<ReadStorageItemsR
 
   /// <summary>Field number for the "storage_type" field.</summary>
   public const int StorageTypeFieldNumber = 1;
-  private global::EStorageType storageType_ = global::EStorageType.None;
+  private global::EStorageType storageType_ = global::EStorageType.StorageTypeNone;
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public global::EStorageType StorageType {
     get { return storageType_; }
@@ -9821,7 +10053,7 @@ public sealed partial class ReadStorageItemsReq : pb::IMessage<ReadStorageItemsR
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public override int GetHashCode() {
     int hash = 1;
-    if (StorageType != global::EStorageType.None) hash ^= StorageType.GetHashCode();
+    if (StorageType != global::EStorageType.StorageTypeNone) hash ^= StorageType.GetHashCode();
     if (StorageOwnerId.Length != 0) hash ^= StorageOwnerId.GetHashCode();
     if (_unknownFields != null) {
       hash ^= _unknownFields.GetHashCode();
@@ -9836,7 +10068,7 @@ public sealed partial class ReadStorageItemsReq : pb::IMessage<ReadStorageItemsR
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public void WriteTo(pb::CodedOutputStream output) {
-    if (StorageType != global::EStorageType.None) {
+    if (StorageType != global::EStorageType.StorageTypeNone) {
       output.WriteRawTag(8);
       output.WriteEnum((int) StorageType);
     }
@@ -9852,7 +10084,7 @@ public sealed partial class ReadStorageItemsReq : pb::IMessage<ReadStorageItemsR
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public int CalculateSize() {
     int size = 0;
-    if (StorageType != global::EStorageType.None) {
+    if (StorageType != global::EStorageType.StorageTypeNone) {
       size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) StorageType);
     }
     if (StorageOwnerId.Length != 0) {
@@ -9869,7 +10101,7 @@ public sealed partial class ReadStorageItemsReq : pb::IMessage<ReadStorageItemsR
     if (other == null) {
       return;
     }
-    if (other.StorageType != global::EStorageType.None) {
+    if (other.StorageType != global::EStorageType.StorageTypeNone) {
       StorageType = other.StorageType;
     }
     if (other.StorageOwnerId.Length != 0) {
@@ -9908,7 +10140,7 @@ public sealed partial class ReadStorageItemsResp : pb::IMessage<ReadStorageItems
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[65]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[66]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -10022,6 +10254,2143 @@ public sealed partial class ReadStorageItemsResp : pb::IMessage<ReadStorageItems
 }
 
 /// <summary>
+/// Move item to storage
+/// </summary>
+public sealed partial class MoveItemToStorageReq : pb::IMessage<MoveItemToStorageReq> {
+  private static readonly pb::MessageParser<MoveItemToStorageReq> _parser = new pb::MessageParser<MoveItemToStorageReq>(() => new MoveItemToStorageReq());
+  private pb::UnknownFieldSet _unknownFields;
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public static pb::MessageParser<MoveItemToStorageReq> Parser { get { return _parser; } }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public static pbr::MessageDescriptor Descriptor {
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[67]; }
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  pbr::MessageDescriptor pb::IMessage.Descriptor {
+    get { return Descriptor; }
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public MoveItemToStorageReq() {
+    OnConstruction();
+  }
+
+  partial void OnConstruction();
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public MoveItemToStorageReq(MoveItemToStorageReq other) : this() {
+    storageType_ = other.storageType_;
+    storageOwnerId_ = other.storageOwnerId_;
+    characterId_ = other.characterId_;
+    mapName_ = other.mapName_;
+    inventoryItemIndex_ = other.inventoryItemIndex_;
+    inventoryItemAmount_ = other.inventoryItemAmount_;
+    storageItemIndex_ = other.storageItemIndex_;
+    _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public MoveItemToStorageReq Clone() {
+    return new MoveItemToStorageReq(this);
+  }
+
+  /// <summary>Field number for the "storage_type" field.</summary>
+  public const int StorageTypeFieldNumber = 1;
+  private global::EStorageType storageType_ = global::EStorageType.StorageTypeNone;
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public global::EStorageType StorageType {
+    get { return storageType_; }
+    set {
+      storageType_ = value;
+    }
+  }
+
+  /// <summary>Field number for the "storage_owner_id" field.</summary>
+  public const int StorageOwnerIdFieldNumber = 2;
+  private string storageOwnerId_ = "";
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public string StorageOwnerId {
+    get { return storageOwnerId_; }
+    set {
+      storageOwnerId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+    }
+  }
+
+  /// <summary>Field number for the "character_id" field.</summary>
+  public const int CharacterIdFieldNumber = 3;
+  private string characterId_ = "";
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public string CharacterId {
+    get { return characterId_; }
+    set {
+      characterId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+    }
+  }
+
+  /// <summary>Field number for the "map_name" field.</summary>
+  public const int MapNameFieldNumber = 4;
+  private string mapName_ = "";
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public string MapName {
+    get { return mapName_; }
+    set {
+      mapName_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+    }
+  }
+
+  /// <summary>Field number for the "inventory_item_index" field.</summary>
+  public const int InventoryItemIndexFieldNumber = 5;
+  private int inventoryItemIndex_;
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public int InventoryItemIndex {
+    get { return inventoryItemIndex_; }
+    set {
+      inventoryItemIndex_ = value;
+    }
+  }
+
+  /// <summary>Field number for the "inventory_item_amount" field.</summary>
+  public const int InventoryItemAmountFieldNumber = 6;
+  private int inventoryItemAmount_;
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public int InventoryItemAmount {
+    get { return inventoryItemAmount_; }
+    set {
+      inventoryItemAmount_ = value;
+    }
+  }
+
+  /// <summary>Field number for the "storage_item_index" field.</summary>
+  public const int StorageItemIndexFieldNumber = 7;
+  private int storageItemIndex_;
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public int StorageItemIndex {
+    get { return storageItemIndex_; }
+    set {
+      storageItemIndex_ = value;
+    }
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public override bool Equals(object other) {
+    return Equals(other as MoveItemToStorageReq);
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public bool Equals(MoveItemToStorageReq other) {
+    if (ReferenceEquals(other, null)) {
+      return false;
+    }
+    if (ReferenceEquals(other, this)) {
+      return true;
+    }
+    if (StorageType != other.StorageType) return false;
+    if (StorageOwnerId != other.StorageOwnerId) return false;
+    if (CharacterId != other.CharacterId) return false;
+    if (MapName != other.MapName) return false;
+    if (InventoryItemIndex != other.InventoryItemIndex) return false;
+    if (InventoryItemAmount != other.InventoryItemAmount) return false;
+    if (StorageItemIndex != other.StorageItemIndex) return false;
+    return Equals(_unknownFields, other._unknownFields);
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public override int GetHashCode() {
+    int hash = 1;
+    if (StorageType != global::EStorageType.StorageTypeNone) hash ^= StorageType.GetHashCode();
+    if (StorageOwnerId.Length != 0) hash ^= StorageOwnerId.GetHashCode();
+    if (CharacterId.Length != 0) hash ^= CharacterId.GetHashCode();
+    if (MapName.Length != 0) hash ^= MapName.GetHashCode();
+    if (InventoryItemIndex != 0) hash ^= InventoryItemIndex.GetHashCode();
+    if (InventoryItemAmount != 0) hash ^= InventoryItemAmount.GetHashCode();
+    if (StorageItemIndex != 0) hash ^= StorageItemIndex.GetHashCode();
+    if (_unknownFields != null) {
+      hash ^= _unknownFields.GetHashCode();
+    }
+    return hash;
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public override string ToString() {
+    return pb::JsonFormatter.ToDiagnosticString(this);
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public void WriteTo(pb::CodedOutputStream output) {
+    if (StorageType != global::EStorageType.StorageTypeNone) {
+      output.WriteRawTag(8);
+      output.WriteEnum((int) StorageType);
+    }
+    if (StorageOwnerId.Length != 0) {
+      output.WriteRawTag(18);
+      output.WriteString(StorageOwnerId);
+    }
+    if (CharacterId.Length != 0) {
+      output.WriteRawTag(26);
+      output.WriteString(CharacterId);
+    }
+    if (MapName.Length != 0) {
+      output.WriteRawTag(34);
+      output.WriteString(MapName);
+    }
+    if (InventoryItemIndex != 0) {
+      output.WriteRawTag(40);
+      output.WriteInt32(InventoryItemIndex);
+    }
+    if (InventoryItemAmount != 0) {
+      output.WriteRawTag(48);
+      output.WriteInt32(InventoryItemAmount);
+    }
+    if (StorageItemIndex != 0) {
+      output.WriteRawTag(56);
+      output.WriteInt32(StorageItemIndex);
+    }
+    if (_unknownFields != null) {
+      _unknownFields.WriteTo(output);
+    }
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public int CalculateSize() {
+    int size = 0;
+    if (StorageType != global::EStorageType.StorageTypeNone) {
+      size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) StorageType);
+    }
+    if (StorageOwnerId.Length != 0) {
+      size += 1 + pb::CodedOutputStream.ComputeStringSize(StorageOwnerId);
+    }
+    if (CharacterId.Length != 0) {
+      size += 1 + pb::CodedOutputStream.ComputeStringSize(CharacterId);
+    }
+    if (MapName.Length != 0) {
+      size += 1 + pb::CodedOutputStream.ComputeStringSize(MapName);
+    }
+    if (InventoryItemIndex != 0) {
+      size += 1 + pb::CodedOutputStream.ComputeInt32Size(InventoryItemIndex);
+    }
+    if (InventoryItemAmount != 0) {
+      size += 1 + pb::CodedOutputStream.ComputeInt32Size(InventoryItemAmount);
+    }
+    if (StorageItemIndex != 0) {
+      size += 1 + pb::CodedOutputStream.ComputeInt32Size(StorageItemIndex);
+    }
+    if (_unknownFields != null) {
+      size += _unknownFields.CalculateSize();
+    }
+    return size;
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public void MergeFrom(MoveItemToStorageReq other) {
+    if (other == null) {
+      return;
+    }
+    if (other.StorageType != global::EStorageType.StorageTypeNone) {
+      StorageType = other.StorageType;
+    }
+    if (other.StorageOwnerId.Length != 0) {
+      StorageOwnerId = other.StorageOwnerId;
+    }
+    if (other.CharacterId.Length != 0) {
+      CharacterId = other.CharacterId;
+    }
+    if (other.MapName.Length != 0) {
+      MapName = other.MapName;
+    }
+    if (other.InventoryItemIndex != 0) {
+      InventoryItemIndex = other.InventoryItemIndex;
+    }
+    if (other.InventoryItemAmount != 0) {
+      InventoryItemAmount = other.InventoryItemAmount;
+    }
+    if (other.StorageItemIndex != 0) {
+      StorageItemIndex = other.StorageItemIndex;
+    }
+    _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public void MergeFrom(pb::CodedInputStream input) {
+    uint tag;
+    while ((tag = input.ReadTag()) != 0) {
+      switch(tag) {
+        default:
+          _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+          break;
+        case 8: {
+          StorageType = (global::EStorageType) input.ReadEnum();
+          break;
+        }
+        case 18: {
+          StorageOwnerId = input.ReadString();
+          break;
+        }
+        case 26: {
+          CharacterId = input.ReadString();
+          break;
+        }
+        case 34: {
+          MapName = input.ReadString();
+          break;
+        }
+        case 40: {
+          InventoryItemIndex = input.ReadInt32();
+          break;
+        }
+        case 48: {
+          InventoryItemAmount = input.ReadInt32();
+          break;
+        }
+        case 56: {
+          StorageItemIndex = input.ReadInt32();
+          break;
+        }
+      }
+    }
+  }
+
+}
+
+public sealed partial class MoveItemToStorageResp : pb::IMessage<MoveItemToStorageResp> {
+  private static readonly pb::MessageParser<MoveItemToStorageResp> _parser = new pb::MessageParser<MoveItemToStorageResp>(() => new MoveItemToStorageResp());
+  private pb::UnknownFieldSet _unknownFields;
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public static pb::MessageParser<MoveItemToStorageResp> Parser { get { return _parser; } }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public static pbr::MessageDescriptor Descriptor {
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[68]; }
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  pbr::MessageDescriptor pb::IMessage.Descriptor {
+    get { return Descriptor; }
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public MoveItemToStorageResp() {
+    OnConstruction();
+  }
+
+  partial void OnConstruction();
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public MoveItemToStorageResp(MoveItemToStorageResp other) : this() {
+    error_ = other.error_;
+    inventoryItemItems_ = other.inventoryItemItems_.Clone();
+    storageCharacterItems_ = other.storageCharacterItems_.Clone();
+    _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public MoveItemToStorageResp Clone() {
+    return new MoveItemToStorageResp(this);
+  }
+
+  /// <summary>Field number for the "error" field.</summary>
+  public const int ErrorFieldNumber = 1;
+  private global::EStorageError error_ = global::EStorageError.StorageErrorNone;
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public global::EStorageError Error {
+    get { return error_; }
+    set {
+      error_ = value;
+    }
+  }
+
+  /// <summary>Field number for the "inventory_item_items" field.</summary>
+  public const int InventoryItemItemsFieldNumber = 2;
+  private static readonly pb::FieldCodec<pb::ByteString> _repeated_inventoryItemItems_codec
+      = pb::FieldCodec.ForBytes(18);
+  private readonly pbc::RepeatedField<pb::ByteString> inventoryItemItems_ = new pbc::RepeatedField<pb::ByteString>();
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public pbc::RepeatedField<pb::ByteString> InventoryItemItems {
+    get { return inventoryItemItems_; }
+  }
+
+  /// <summary>Field number for the "storage_character_items" field.</summary>
+  public const int StorageCharacterItemsFieldNumber = 3;
+  private static readonly pb::FieldCodec<pb::ByteString> _repeated_storageCharacterItems_codec
+      = pb::FieldCodec.ForBytes(26);
+  private readonly pbc::RepeatedField<pb::ByteString> storageCharacterItems_ = new pbc::RepeatedField<pb::ByteString>();
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public pbc::RepeatedField<pb::ByteString> StorageCharacterItems {
+    get { return storageCharacterItems_; }
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public override bool Equals(object other) {
+    return Equals(other as MoveItemToStorageResp);
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public bool Equals(MoveItemToStorageResp other) {
+    if (ReferenceEquals(other, null)) {
+      return false;
+    }
+    if (ReferenceEquals(other, this)) {
+      return true;
+    }
+    if (Error != other.Error) return false;
+    if(!inventoryItemItems_.Equals(other.inventoryItemItems_)) return false;
+    if(!storageCharacterItems_.Equals(other.storageCharacterItems_)) return false;
+    return Equals(_unknownFields, other._unknownFields);
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public override int GetHashCode() {
+    int hash = 1;
+    if (Error != global::EStorageError.StorageErrorNone) hash ^= Error.GetHashCode();
+    hash ^= inventoryItemItems_.GetHashCode();
+    hash ^= storageCharacterItems_.GetHashCode();
+    if (_unknownFields != null) {
+      hash ^= _unknownFields.GetHashCode();
+    }
+    return hash;
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public override string ToString() {
+    return pb::JsonFormatter.ToDiagnosticString(this);
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public void WriteTo(pb::CodedOutputStream output) {
+    if (Error != global::EStorageError.StorageErrorNone) {
+      output.WriteRawTag(8);
+      output.WriteEnum((int) Error);
+    }
+    inventoryItemItems_.WriteTo(output, _repeated_inventoryItemItems_codec);
+    storageCharacterItems_.WriteTo(output, _repeated_storageCharacterItems_codec);
+    if (_unknownFields != null) {
+      _unknownFields.WriteTo(output);
+    }
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public int CalculateSize() {
+    int size = 0;
+    if (Error != global::EStorageError.StorageErrorNone) {
+      size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) Error);
+    }
+    size += inventoryItemItems_.CalculateSize(_repeated_inventoryItemItems_codec);
+    size += storageCharacterItems_.CalculateSize(_repeated_storageCharacterItems_codec);
+    if (_unknownFields != null) {
+      size += _unknownFields.CalculateSize();
+    }
+    return size;
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public void MergeFrom(MoveItemToStorageResp other) {
+    if (other == null) {
+      return;
+    }
+    if (other.Error != global::EStorageError.StorageErrorNone) {
+      Error = other.Error;
+    }
+    inventoryItemItems_.Add(other.inventoryItemItems_);
+    storageCharacterItems_.Add(other.storageCharacterItems_);
+    _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public void MergeFrom(pb::CodedInputStream input) {
+    uint tag;
+    while ((tag = input.ReadTag()) != 0) {
+      switch(tag) {
+        default:
+          _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+          break;
+        case 8: {
+          Error = (global::EStorageError) input.ReadEnum();
+          break;
+        }
+        case 18: {
+          inventoryItemItems_.AddEntriesFrom(input, _repeated_inventoryItemItems_codec);
+          break;
+        }
+        case 26: {
+          storageCharacterItems_.AddEntriesFrom(input, _repeated_storageCharacterItems_codec);
+          break;
+        }
+      }
+    }
+  }
+
+}
+
+/// <summary>
+/// Move item from storage
+/// </summary>
+public sealed partial class MoveItemFromStorageReq : pb::IMessage<MoveItemFromStorageReq> {
+  private static readonly pb::MessageParser<MoveItemFromStorageReq> _parser = new pb::MessageParser<MoveItemFromStorageReq>(() => new MoveItemFromStorageReq());
+  private pb::UnknownFieldSet _unknownFields;
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public static pb::MessageParser<MoveItemFromStorageReq> Parser { get { return _parser; } }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public static pbr::MessageDescriptor Descriptor {
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[69]; }
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  pbr::MessageDescriptor pb::IMessage.Descriptor {
+    get { return Descriptor; }
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public MoveItemFromStorageReq() {
+    OnConstruction();
+  }
+
+  partial void OnConstruction();
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public MoveItemFromStorageReq(MoveItemFromStorageReq other) : this() {
+    storageType_ = other.storageType_;
+    storageOwnerId_ = other.storageOwnerId_;
+    characterId_ = other.characterId_;
+    mapName_ = other.mapName_;
+    storageItemIndex_ = other.storageItemIndex_;
+    storageItemAmount_ = other.storageItemAmount_;
+    inventoryItemIndex_ = other.inventoryItemIndex_;
+    _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public MoveItemFromStorageReq Clone() {
+    return new MoveItemFromStorageReq(this);
+  }
+
+  /// <summary>Field number for the "storage_type" field.</summary>
+  public const int StorageTypeFieldNumber = 1;
+  private global::EStorageType storageType_ = global::EStorageType.StorageTypeNone;
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public global::EStorageType StorageType {
+    get { return storageType_; }
+    set {
+      storageType_ = value;
+    }
+  }
+
+  /// <summary>Field number for the "storage_owner_id" field.</summary>
+  public const int StorageOwnerIdFieldNumber = 2;
+  private string storageOwnerId_ = "";
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public string StorageOwnerId {
+    get { return storageOwnerId_; }
+    set {
+      storageOwnerId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+    }
+  }
+
+  /// <summary>Field number for the "character_id" field.</summary>
+  public const int CharacterIdFieldNumber = 3;
+  private string characterId_ = "";
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public string CharacterId {
+    get { return characterId_; }
+    set {
+      characterId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+    }
+  }
+
+  /// <summary>Field number for the "map_name" field.</summary>
+  public const int MapNameFieldNumber = 4;
+  private string mapName_ = "";
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public string MapName {
+    get { return mapName_; }
+    set {
+      mapName_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+    }
+  }
+
+  /// <summary>Field number for the "storage_item_index" field.</summary>
+  public const int StorageItemIndexFieldNumber = 5;
+  private int storageItemIndex_;
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public int StorageItemIndex {
+    get { return storageItemIndex_; }
+    set {
+      storageItemIndex_ = value;
+    }
+  }
+
+  /// <summary>Field number for the "storage_item_amount" field.</summary>
+  public const int StorageItemAmountFieldNumber = 6;
+  private int storageItemAmount_;
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public int StorageItemAmount {
+    get { return storageItemAmount_; }
+    set {
+      storageItemAmount_ = value;
+    }
+  }
+
+  /// <summary>Field number for the "inventory_item_index" field.</summary>
+  public const int InventoryItemIndexFieldNumber = 7;
+  private int inventoryItemIndex_;
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public int InventoryItemIndex {
+    get { return inventoryItemIndex_; }
+    set {
+      inventoryItemIndex_ = value;
+    }
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public override bool Equals(object other) {
+    return Equals(other as MoveItemFromStorageReq);
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public bool Equals(MoveItemFromStorageReq other) {
+    if (ReferenceEquals(other, null)) {
+      return false;
+    }
+    if (ReferenceEquals(other, this)) {
+      return true;
+    }
+    if (StorageType != other.StorageType) return false;
+    if (StorageOwnerId != other.StorageOwnerId) return false;
+    if (CharacterId != other.CharacterId) return false;
+    if (MapName != other.MapName) return false;
+    if (StorageItemIndex != other.StorageItemIndex) return false;
+    if (StorageItemAmount != other.StorageItemAmount) return false;
+    if (InventoryItemIndex != other.InventoryItemIndex) return false;
+    return Equals(_unknownFields, other._unknownFields);
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public override int GetHashCode() {
+    int hash = 1;
+    if (StorageType != global::EStorageType.StorageTypeNone) hash ^= StorageType.GetHashCode();
+    if (StorageOwnerId.Length != 0) hash ^= StorageOwnerId.GetHashCode();
+    if (CharacterId.Length != 0) hash ^= CharacterId.GetHashCode();
+    if (MapName.Length != 0) hash ^= MapName.GetHashCode();
+    if (StorageItemIndex != 0) hash ^= StorageItemIndex.GetHashCode();
+    if (StorageItemAmount != 0) hash ^= StorageItemAmount.GetHashCode();
+    if (InventoryItemIndex != 0) hash ^= InventoryItemIndex.GetHashCode();
+    if (_unknownFields != null) {
+      hash ^= _unknownFields.GetHashCode();
+    }
+    return hash;
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public override string ToString() {
+    return pb::JsonFormatter.ToDiagnosticString(this);
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public void WriteTo(pb::CodedOutputStream output) {
+    if (StorageType != global::EStorageType.StorageTypeNone) {
+      output.WriteRawTag(8);
+      output.WriteEnum((int) StorageType);
+    }
+    if (StorageOwnerId.Length != 0) {
+      output.WriteRawTag(18);
+      output.WriteString(StorageOwnerId);
+    }
+    if (CharacterId.Length != 0) {
+      output.WriteRawTag(26);
+      output.WriteString(CharacterId);
+    }
+    if (MapName.Length != 0) {
+      output.WriteRawTag(34);
+      output.WriteString(MapName);
+    }
+    if (StorageItemIndex != 0) {
+      output.WriteRawTag(40);
+      output.WriteInt32(StorageItemIndex);
+    }
+    if (StorageItemAmount != 0) {
+      output.WriteRawTag(48);
+      output.WriteInt32(StorageItemAmount);
+    }
+    if (InventoryItemIndex != 0) {
+      output.WriteRawTag(56);
+      output.WriteInt32(InventoryItemIndex);
+    }
+    if (_unknownFields != null) {
+      _unknownFields.WriteTo(output);
+    }
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public int CalculateSize() {
+    int size = 0;
+    if (StorageType != global::EStorageType.StorageTypeNone) {
+      size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) StorageType);
+    }
+    if (StorageOwnerId.Length != 0) {
+      size += 1 + pb::CodedOutputStream.ComputeStringSize(StorageOwnerId);
+    }
+    if (CharacterId.Length != 0) {
+      size += 1 + pb::CodedOutputStream.ComputeStringSize(CharacterId);
+    }
+    if (MapName.Length != 0) {
+      size += 1 + pb::CodedOutputStream.ComputeStringSize(MapName);
+    }
+    if (StorageItemIndex != 0) {
+      size += 1 + pb::CodedOutputStream.ComputeInt32Size(StorageItemIndex);
+    }
+    if (StorageItemAmount != 0) {
+      size += 1 + pb::CodedOutputStream.ComputeInt32Size(StorageItemAmount);
+    }
+    if (InventoryItemIndex != 0) {
+      size += 1 + pb::CodedOutputStream.ComputeInt32Size(InventoryItemIndex);
+    }
+    if (_unknownFields != null) {
+      size += _unknownFields.CalculateSize();
+    }
+    return size;
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public void MergeFrom(MoveItemFromStorageReq other) {
+    if (other == null) {
+      return;
+    }
+    if (other.StorageType != global::EStorageType.StorageTypeNone) {
+      StorageType = other.StorageType;
+    }
+    if (other.StorageOwnerId.Length != 0) {
+      StorageOwnerId = other.StorageOwnerId;
+    }
+    if (other.CharacterId.Length != 0) {
+      CharacterId = other.CharacterId;
+    }
+    if (other.MapName.Length != 0) {
+      MapName = other.MapName;
+    }
+    if (other.StorageItemIndex != 0) {
+      StorageItemIndex = other.StorageItemIndex;
+    }
+    if (other.StorageItemAmount != 0) {
+      StorageItemAmount = other.StorageItemAmount;
+    }
+    if (other.InventoryItemIndex != 0) {
+      InventoryItemIndex = other.InventoryItemIndex;
+    }
+    _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public void MergeFrom(pb::CodedInputStream input) {
+    uint tag;
+    while ((tag = input.ReadTag()) != 0) {
+      switch(tag) {
+        default:
+          _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+          break;
+        case 8: {
+          StorageType = (global::EStorageType) input.ReadEnum();
+          break;
+        }
+        case 18: {
+          StorageOwnerId = input.ReadString();
+          break;
+        }
+        case 26: {
+          CharacterId = input.ReadString();
+          break;
+        }
+        case 34: {
+          MapName = input.ReadString();
+          break;
+        }
+        case 40: {
+          StorageItemIndex = input.ReadInt32();
+          break;
+        }
+        case 48: {
+          StorageItemAmount = input.ReadInt32();
+          break;
+        }
+        case 56: {
+          InventoryItemIndex = input.ReadInt32();
+          break;
+        }
+      }
+    }
+  }
+
+}
+
+public sealed partial class MoveItemFromStorageResp : pb::IMessage<MoveItemFromStorageResp> {
+  private static readonly pb::MessageParser<MoveItemFromStorageResp> _parser = new pb::MessageParser<MoveItemFromStorageResp>(() => new MoveItemFromStorageResp());
+  private pb::UnknownFieldSet _unknownFields;
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public static pb::MessageParser<MoveItemFromStorageResp> Parser { get { return _parser; } }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public static pbr::MessageDescriptor Descriptor {
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[70]; }
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  pbr::MessageDescriptor pb::IMessage.Descriptor {
+    get { return Descriptor; }
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public MoveItemFromStorageResp() {
+    OnConstruction();
+  }
+
+  partial void OnConstruction();
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public MoveItemFromStorageResp(MoveItemFromStorageResp other) : this() {
+    error_ = other.error_;
+    inventoryItemItems_ = other.inventoryItemItems_.Clone();
+    storageCharacterItems_ = other.storageCharacterItems_.Clone();
+    _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public MoveItemFromStorageResp Clone() {
+    return new MoveItemFromStorageResp(this);
+  }
+
+  /// <summary>Field number for the "error" field.</summary>
+  public const int ErrorFieldNumber = 1;
+  private global::EStorageError error_ = global::EStorageError.StorageErrorNone;
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public global::EStorageError Error {
+    get { return error_; }
+    set {
+      error_ = value;
+    }
+  }
+
+  /// <summary>Field number for the "inventory_item_items" field.</summary>
+  public const int InventoryItemItemsFieldNumber = 2;
+  private static readonly pb::FieldCodec<pb::ByteString> _repeated_inventoryItemItems_codec
+      = pb::FieldCodec.ForBytes(18);
+  private readonly pbc::RepeatedField<pb::ByteString> inventoryItemItems_ = new pbc::RepeatedField<pb::ByteString>();
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public pbc::RepeatedField<pb::ByteString> InventoryItemItems {
+    get { return inventoryItemItems_; }
+  }
+
+  /// <summary>Field number for the "storage_character_items" field.</summary>
+  public const int StorageCharacterItemsFieldNumber = 3;
+  private static readonly pb::FieldCodec<pb::ByteString> _repeated_storageCharacterItems_codec
+      = pb::FieldCodec.ForBytes(26);
+  private readonly pbc::RepeatedField<pb::ByteString> storageCharacterItems_ = new pbc::RepeatedField<pb::ByteString>();
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public pbc::RepeatedField<pb::ByteString> StorageCharacterItems {
+    get { return storageCharacterItems_; }
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public override bool Equals(object other) {
+    return Equals(other as MoveItemFromStorageResp);
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public bool Equals(MoveItemFromStorageResp other) {
+    if (ReferenceEquals(other, null)) {
+      return false;
+    }
+    if (ReferenceEquals(other, this)) {
+      return true;
+    }
+    if (Error != other.Error) return false;
+    if(!inventoryItemItems_.Equals(other.inventoryItemItems_)) return false;
+    if(!storageCharacterItems_.Equals(other.storageCharacterItems_)) return false;
+    return Equals(_unknownFields, other._unknownFields);
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public override int GetHashCode() {
+    int hash = 1;
+    if (Error != global::EStorageError.StorageErrorNone) hash ^= Error.GetHashCode();
+    hash ^= inventoryItemItems_.GetHashCode();
+    hash ^= storageCharacterItems_.GetHashCode();
+    if (_unknownFields != null) {
+      hash ^= _unknownFields.GetHashCode();
+    }
+    return hash;
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public override string ToString() {
+    return pb::JsonFormatter.ToDiagnosticString(this);
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public void WriteTo(pb::CodedOutputStream output) {
+    if (Error != global::EStorageError.StorageErrorNone) {
+      output.WriteRawTag(8);
+      output.WriteEnum((int) Error);
+    }
+    inventoryItemItems_.WriteTo(output, _repeated_inventoryItemItems_codec);
+    storageCharacterItems_.WriteTo(output, _repeated_storageCharacterItems_codec);
+    if (_unknownFields != null) {
+      _unknownFields.WriteTo(output);
+    }
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public int CalculateSize() {
+    int size = 0;
+    if (Error != global::EStorageError.StorageErrorNone) {
+      size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) Error);
+    }
+    size += inventoryItemItems_.CalculateSize(_repeated_inventoryItemItems_codec);
+    size += storageCharacterItems_.CalculateSize(_repeated_storageCharacterItems_codec);
+    if (_unknownFields != null) {
+      size += _unknownFields.CalculateSize();
+    }
+    return size;
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public void MergeFrom(MoveItemFromStorageResp other) {
+    if (other == null) {
+      return;
+    }
+    if (other.Error != global::EStorageError.StorageErrorNone) {
+      Error = other.Error;
+    }
+    inventoryItemItems_.Add(other.inventoryItemItems_);
+    storageCharacterItems_.Add(other.storageCharacterItems_);
+    _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public void MergeFrom(pb::CodedInputStream input) {
+    uint tag;
+    while ((tag = input.ReadTag()) != 0) {
+      switch(tag) {
+        default:
+          _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+          break;
+        case 8: {
+          Error = (global::EStorageError) input.ReadEnum();
+          break;
+        }
+        case 18: {
+          inventoryItemItems_.AddEntriesFrom(input, _repeated_inventoryItemItems_codec);
+          break;
+        }
+        case 26: {
+          storageCharacterItems_.AddEntriesFrom(input, _repeated_storageCharacterItems_codec);
+          break;
+        }
+      }
+    }
+  }
+
+}
+
+/// <summary>
+/// Swap or merge storage item
+/// </summary>
+public sealed partial class SwapOrMergeStorageItemReq : pb::IMessage<SwapOrMergeStorageItemReq> {
+  private static readonly pb::MessageParser<SwapOrMergeStorageItemReq> _parser = new pb::MessageParser<SwapOrMergeStorageItemReq>(() => new SwapOrMergeStorageItemReq());
+  private pb::UnknownFieldSet _unknownFields;
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public static pb::MessageParser<SwapOrMergeStorageItemReq> Parser { get { return _parser; } }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public static pbr::MessageDescriptor Descriptor {
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[71]; }
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  pbr::MessageDescriptor pb::IMessage.Descriptor {
+    get { return Descriptor; }
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public SwapOrMergeStorageItemReq() {
+    OnConstruction();
+  }
+
+  partial void OnConstruction();
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public SwapOrMergeStorageItemReq(SwapOrMergeStorageItemReq other) : this() {
+    storageType_ = other.storageType_;
+    storageOwnerId_ = other.storageOwnerId_;
+    characterId_ = other.characterId_;
+    mapName_ = other.mapName_;
+    fromIndex_ = other.fromIndex_;
+    toIndex_ = other.toIndex_;
+    _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public SwapOrMergeStorageItemReq Clone() {
+    return new SwapOrMergeStorageItemReq(this);
+  }
+
+  /// <summary>Field number for the "storage_type" field.</summary>
+  public const int StorageTypeFieldNumber = 1;
+  private global::EStorageType storageType_ = global::EStorageType.StorageTypeNone;
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public global::EStorageType StorageType {
+    get { return storageType_; }
+    set {
+      storageType_ = value;
+    }
+  }
+
+  /// <summary>Field number for the "storage_owner_id" field.</summary>
+  public const int StorageOwnerIdFieldNumber = 2;
+  private string storageOwnerId_ = "";
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public string StorageOwnerId {
+    get { return storageOwnerId_; }
+    set {
+      storageOwnerId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+    }
+  }
+
+  /// <summary>Field number for the "character_id" field.</summary>
+  public const int CharacterIdFieldNumber = 3;
+  private string characterId_ = "";
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public string CharacterId {
+    get { return characterId_; }
+    set {
+      characterId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+    }
+  }
+
+  /// <summary>Field number for the "map_name" field.</summary>
+  public const int MapNameFieldNumber = 4;
+  private string mapName_ = "";
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public string MapName {
+    get { return mapName_; }
+    set {
+      mapName_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+    }
+  }
+
+  /// <summary>Field number for the "from_index" field.</summary>
+  public const int FromIndexFieldNumber = 5;
+  private int fromIndex_;
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public int FromIndex {
+    get { return fromIndex_; }
+    set {
+      fromIndex_ = value;
+    }
+  }
+
+  /// <summary>Field number for the "to_index" field.</summary>
+  public const int ToIndexFieldNumber = 6;
+  private int toIndex_;
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public int ToIndex {
+    get { return toIndex_; }
+    set {
+      toIndex_ = value;
+    }
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public override bool Equals(object other) {
+    return Equals(other as SwapOrMergeStorageItemReq);
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public bool Equals(SwapOrMergeStorageItemReq other) {
+    if (ReferenceEquals(other, null)) {
+      return false;
+    }
+    if (ReferenceEquals(other, this)) {
+      return true;
+    }
+    if (StorageType != other.StorageType) return false;
+    if (StorageOwnerId != other.StorageOwnerId) return false;
+    if (CharacterId != other.CharacterId) return false;
+    if (MapName != other.MapName) return false;
+    if (FromIndex != other.FromIndex) return false;
+    if (ToIndex != other.ToIndex) return false;
+    return Equals(_unknownFields, other._unknownFields);
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public override int GetHashCode() {
+    int hash = 1;
+    if (StorageType != global::EStorageType.StorageTypeNone) hash ^= StorageType.GetHashCode();
+    if (StorageOwnerId.Length != 0) hash ^= StorageOwnerId.GetHashCode();
+    if (CharacterId.Length != 0) hash ^= CharacterId.GetHashCode();
+    if (MapName.Length != 0) hash ^= MapName.GetHashCode();
+    if (FromIndex != 0) hash ^= FromIndex.GetHashCode();
+    if (ToIndex != 0) hash ^= ToIndex.GetHashCode();
+    if (_unknownFields != null) {
+      hash ^= _unknownFields.GetHashCode();
+    }
+    return hash;
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public override string ToString() {
+    return pb::JsonFormatter.ToDiagnosticString(this);
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public void WriteTo(pb::CodedOutputStream output) {
+    if (StorageType != global::EStorageType.StorageTypeNone) {
+      output.WriteRawTag(8);
+      output.WriteEnum((int) StorageType);
+    }
+    if (StorageOwnerId.Length != 0) {
+      output.WriteRawTag(18);
+      output.WriteString(StorageOwnerId);
+    }
+    if (CharacterId.Length != 0) {
+      output.WriteRawTag(26);
+      output.WriteString(CharacterId);
+    }
+    if (MapName.Length != 0) {
+      output.WriteRawTag(34);
+      output.WriteString(MapName);
+    }
+    if (FromIndex != 0) {
+      output.WriteRawTag(40);
+      output.WriteInt32(FromIndex);
+    }
+    if (ToIndex != 0) {
+      output.WriteRawTag(48);
+      output.WriteInt32(ToIndex);
+    }
+    if (_unknownFields != null) {
+      _unknownFields.WriteTo(output);
+    }
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public int CalculateSize() {
+    int size = 0;
+    if (StorageType != global::EStorageType.StorageTypeNone) {
+      size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) StorageType);
+    }
+    if (StorageOwnerId.Length != 0) {
+      size += 1 + pb::CodedOutputStream.ComputeStringSize(StorageOwnerId);
+    }
+    if (CharacterId.Length != 0) {
+      size += 1 + pb::CodedOutputStream.ComputeStringSize(CharacterId);
+    }
+    if (MapName.Length != 0) {
+      size += 1 + pb::CodedOutputStream.ComputeStringSize(MapName);
+    }
+    if (FromIndex != 0) {
+      size += 1 + pb::CodedOutputStream.ComputeInt32Size(FromIndex);
+    }
+    if (ToIndex != 0) {
+      size += 1 + pb::CodedOutputStream.ComputeInt32Size(ToIndex);
+    }
+    if (_unknownFields != null) {
+      size += _unknownFields.CalculateSize();
+    }
+    return size;
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public void MergeFrom(SwapOrMergeStorageItemReq other) {
+    if (other == null) {
+      return;
+    }
+    if (other.StorageType != global::EStorageType.StorageTypeNone) {
+      StorageType = other.StorageType;
+    }
+    if (other.StorageOwnerId.Length != 0) {
+      StorageOwnerId = other.StorageOwnerId;
+    }
+    if (other.CharacterId.Length != 0) {
+      CharacterId = other.CharacterId;
+    }
+    if (other.MapName.Length != 0) {
+      MapName = other.MapName;
+    }
+    if (other.FromIndex != 0) {
+      FromIndex = other.FromIndex;
+    }
+    if (other.ToIndex != 0) {
+      ToIndex = other.ToIndex;
+    }
+    _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public void MergeFrom(pb::CodedInputStream input) {
+    uint tag;
+    while ((tag = input.ReadTag()) != 0) {
+      switch(tag) {
+        default:
+          _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+          break;
+        case 8: {
+          StorageType = (global::EStorageType) input.ReadEnum();
+          break;
+        }
+        case 18: {
+          StorageOwnerId = input.ReadString();
+          break;
+        }
+        case 26: {
+          CharacterId = input.ReadString();
+          break;
+        }
+        case 34: {
+          MapName = input.ReadString();
+          break;
+        }
+        case 40: {
+          FromIndex = input.ReadInt32();
+          break;
+        }
+        case 48: {
+          ToIndex = input.ReadInt32();
+          break;
+        }
+      }
+    }
+  }
+
+}
+
+public sealed partial class SwapOrMergeStorageItemResp : pb::IMessage<SwapOrMergeStorageItemResp> {
+  private static readonly pb::MessageParser<SwapOrMergeStorageItemResp> _parser = new pb::MessageParser<SwapOrMergeStorageItemResp>(() => new SwapOrMergeStorageItemResp());
+  private pb::UnknownFieldSet _unknownFields;
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public static pb::MessageParser<SwapOrMergeStorageItemResp> Parser { get { return _parser; } }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public static pbr::MessageDescriptor Descriptor {
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[72]; }
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  pbr::MessageDescriptor pb::IMessage.Descriptor {
+    get { return Descriptor; }
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public SwapOrMergeStorageItemResp() {
+    OnConstruction();
+  }
+
+  partial void OnConstruction();
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public SwapOrMergeStorageItemResp(SwapOrMergeStorageItemResp other) : this() {
+    error_ = other.error_;
+    storageCharacterItems_ = other.storageCharacterItems_.Clone();
+    _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public SwapOrMergeStorageItemResp Clone() {
+    return new SwapOrMergeStorageItemResp(this);
+  }
+
+  /// <summary>Field number for the "error" field.</summary>
+  public const int ErrorFieldNumber = 1;
+  private global::EStorageError error_ = global::EStorageError.StorageErrorNone;
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public global::EStorageError Error {
+    get { return error_; }
+    set {
+      error_ = value;
+    }
+  }
+
+  /// <summary>Field number for the "storage_character_items" field.</summary>
+  public const int StorageCharacterItemsFieldNumber = 2;
+  private static readonly pb::FieldCodec<pb::ByteString> _repeated_storageCharacterItems_codec
+      = pb::FieldCodec.ForBytes(18);
+  private readonly pbc::RepeatedField<pb::ByteString> storageCharacterItems_ = new pbc::RepeatedField<pb::ByteString>();
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public pbc::RepeatedField<pb::ByteString> StorageCharacterItems {
+    get { return storageCharacterItems_; }
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public override bool Equals(object other) {
+    return Equals(other as SwapOrMergeStorageItemResp);
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public bool Equals(SwapOrMergeStorageItemResp other) {
+    if (ReferenceEquals(other, null)) {
+      return false;
+    }
+    if (ReferenceEquals(other, this)) {
+      return true;
+    }
+    if (Error != other.Error) return false;
+    if(!storageCharacterItems_.Equals(other.storageCharacterItems_)) return false;
+    return Equals(_unknownFields, other._unknownFields);
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public override int GetHashCode() {
+    int hash = 1;
+    if (Error != global::EStorageError.StorageErrorNone) hash ^= Error.GetHashCode();
+    hash ^= storageCharacterItems_.GetHashCode();
+    if (_unknownFields != null) {
+      hash ^= _unknownFields.GetHashCode();
+    }
+    return hash;
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public override string ToString() {
+    return pb::JsonFormatter.ToDiagnosticString(this);
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public void WriteTo(pb::CodedOutputStream output) {
+    if (Error != global::EStorageError.StorageErrorNone) {
+      output.WriteRawTag(8);
+      output.WriteEnum((int) Error);
+    }
+    storageCharacterItems_.WriteTo(output, _repeated_storageCharacterItems_codec);
+    if (_unknownFields != null) {
+      _unknownFields.WriteTo(output);
+    }
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public int CalculateSize() {
+    int size = 0;
+    if (Error != global::EStorageError.StorageErrorNone) {
+      size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) Error);
+    }
+    size += storageCharacterItems_.CalculateSize(_repeated_storageCharacterItems_codec);
+    if (_unknownFields != null) {
+      size += _unknownFields.CalculateSize();
+    }
+    return size;
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public void MergeFrom(SwapOrMergeStorageItemResp other) {
+    if (other == null) {
+      return;
+    }
+    if (other.Error != global::EStorageError.StorageErrorNone) {
+      Error = other.Error;
+    }
+    storageCharacterItems_.Add(other.storageCharacterItems_);
+    _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public void MergeFrom(pb::CodedInputStream input) {
+    uint tag;
+    while ((tag = input.ReadTag()) != 0) {
+      switch(tag) {
+        default:
+          _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+          break;
+        case 8: {
+          Error = (global::EStorageError) input.ReadEnum();
+          break;
+        }
+        case 18: {
+          storageCharacterItems_.AddEntriesFrom(input, _repeated_storageCharacterItems_codec);
+          break;
+        }
+      }
+    }
+  }
+
+}
+
+/// <summary>
+/// Increase storage items
+/// </summary>
+public sealed partial class IncreaseStorageItemsReq : pb::IMessage<IncreaseStorageItemsReq> {
+  private static readonly pb::MessageParser<IncreaseStorageItemsReq> _parser = new pb::MessageParser<IncreaseStorageItemsReq>(() => new IncreaseStorageItemsReq());
+  private pb::UnknownFieldSet _unknownFields;
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public static pb::MessageParser<IncreaseStorageItemsReq> Parser { get { return _parser; } }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public static pbr::MessageDescriptor Descriptor {
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[73]; }
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  pbr::MessageDescriptor pb::IMessage.Descriptor {
+    get { return Descriptor; }
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public IncreaseStorageItemsReq() {
+    OnConstruction();
+  }
+
+  partial void OnConstruction();
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public IncreaseStorageItemsReq(IncreaseStorageItemsReq other) : this() {
+    storageType_ = other.storageType_;
+    storageOwnerId_ = other.storageOwnerId_;
+    mapName_ = other.mapName_;
+    item_ = other.item_;
+    _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public IncreaseStorageItemsReq Clone() {
+    return new IncreaseStorageItemsReq(this);
+  }
+
+  /// <summary>Field number for the "storage_type" field.</summary>
+  public const int StorageTypeFieldNumber = 1;
+  private global::EStorageType storageType_ = global::EStorageType.StorageTypeNone;
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public global::EStorageType StorageType {
+    get { return storageType_; }
+    set {
+      storageType_ = value;
+    }
+  }
+
+  /// <summary>Field number for the "storage_owner_id" field.</summary>
+  public const int StorageOwnerIdFieldNumber = 2;
+  private string storageOwnerId_ = "";
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public string StorageOwnerId {
+    get { return storageOwnerId_; }
+    set {
+      storageOwnerId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+    }
+  }
+
+  /// <summary>Field number for the "map_name" field.</summary>
+  public const int MapNameFieldNumber = 3;
+  private string mapName_ = "";
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public string MapName {
+    get { return mapName_; }
+    set {
+      mapName_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+    }
+  }
+
+  /// <summary>Field number for the "item" field.</summary>
+  public const int ItemFieldNumber = 4;
+  private pb::ByteString item_ = pb::ByteString.Empty;
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public pb::ByteString Item {
+    get { return item_; }
+    set {
+      item_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+    }
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public override bool Equals(object other) {
+    return Equals(other as IncreaseStorageItemsReq);
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public bool Equals(IncreaseStorageItemsReq other) {
+    if (ReferenceEquals(other, null)) {
+      return false;
+    }
+    if (ReferenceEquals(other, this)) {
+      return true;
+    }
+    if (StorageType != other.StorageType) return false;
+    if (StorageOwnerId != other.StorageOwnerId) return false;
+    if (MapName != other.MapName) return false;
+    if (Item != other.Item) return false;
+    return Equals(_unknownFields, other._unknownFields);
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public override int GetHashCode() {
+    int hash = 1;
+    if (StorageType != global::EStorageType.StorageTypeNone) hash ^= StorageType.GetHashCode();
+    if (StorageOwnerId.Length != 0) hash ^= StorageOwnerId.GetHashCode();
+    if (MapName.Length != 0) hash ^= MapName.GetHashCode();
+    if (Item.Length != 0) hash ^= Item.GetHashCode();
+    if (_unknownFields != null) {
+      hash ^= _unknownFields.GetHashCode();
+    }
+    return hash;
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public override string ToString() {
+    return pb::JsonFormatter.ToDiagnosticString(this);
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public void WriteTo(pb::CodedOutputStream output) {
+    if (StorageType != global::EStorageType.StorageTypeNone) {
+      output.WriteRawTag(8);
+      output.WriteEnum((int) StorageType);
+    }
+    if (StorageOwnerId.Length != 0) {
+      output.WriteRawTag(18);
+      output.WriteString(StorageOwnerId);
+    }
+    if (MapName.Length != 0) {
+      output.WriteRawTag(26);
+      output.WriteString(MapName);
+    }
+    if (Item.Length != 0) {
+      output.WriteRawTag(34);
+      output.WriteBytes(Item);
+    }
+    if (_unknownFields != null) {
+      _unknownFields.WriteTo(output);
+    }
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public int CalculateSize() {
+    int size = 0;
+    if (StorageType != global::EStorageType.StorageTypeNone) {
+      size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) StorageType);
+    }
+    if (StorageOwnerId.Length != 0) {
+      size += 1 + pb::CodedOutputStream.ComputeStringSize(StorageOwnerId);
+    }
+    if (MapName.Length != 0) {
+      size += 1 + pb::CodedOutputStream.ComputeStringSize(MapName);
+    }
+    if (Item.Length != 0) {
+      size += 1 + pb::CodedOutputStream.ComputeBytesSize(Item);
+    }
+    if (_unknownFields != null) {
+      size += _unknownFields.CalculateSize();
+    }
+    return size;
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public void MergeFrom(IncreaseStorageItemsReq other) {
+    if (other == null) {
+      return;
+    }
+    if (other.StorageType != global::EStorageType.StorageTypeNone) {
+      StorageType = other.StorageType;
+    }
+    if (other.StorageOwnerId.Length != 0) {
+      StorageOwnerId = other.StorageOwnerId;
+    }
+    if (other.MapName.Length != 0) {
+      MapName = other.MapName;
+    }
+    if (other.Item.Length != 0) {
+      Item = other.Item;
+    }
+    _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public void MergeFrom(pb::CodedInputStream input) {
+    uint tag;
+    while ((tag = input.ReadTag()) != 0) {
+      switch(tag) {
+        default:
+          _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+          break;
+        case 8: {
+          StorageType = (global::EStorageType) input.ReadEnum();
+          break;
+        }
+        case 18: {
+          StorageOwnerId = input.ReadString();
+          break;
+        }
+        case 26: {
+          MapName = input.ReadString();
+          break;
+        }
+        case 34: {
+          Item = input.ReadBytes();
+          break;
+        }
+      }
+    }
+  }
+
+}
+
+public sealed partial class IncreaseStorageItemsResp : pb::IMessage<IncreaseStorageItemsResp> {
+  private static readonly pb::MessageParser<IncreaseStorageItemsResp> _parser = new pb::MessageParser<IncreaseStorageItemsResp>(() => new IncreaseStorageItemsResp());
+  private pb::UnknownFieldSet _unknownFields;
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public static pb::MessageParser<IncreaseStorageItemsResp> Parser { get { return _parser; } }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public static pbr::MessageDescriptor Descriptor {
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[74]; }
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  pbr::MessageDescriptor pb::IMessage.Descriptor {
+    get { return Descriptor; }
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public IncreaseStorageItemsResp() {
+    OnConstruction();
+  }
+
+  partial void OnConstruction();
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public IncreaseStorageItemsResp(IncreaseStorageItemsResp other) : this() {
+    error_ = other.error_;
+    storageCharacterItems_ = other.storageCharacterItems_.Clone();
+    _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public IncreaseStorageItemsResp Clone() {
+    return new IncreaseStorageItemsResp(this);
+  }
+
+  /// <summary>Field number for the "error" field.</summary>
+  public const int ErrorFieldNumber = 1;
+  private global::EStorageError error_ = global::EStorageError.StorageErrorNone;
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public global::EStorageError Error {
+    get { return error_; }
+    set {
+      error_ = value;
+    }
+  }
+
+  /// <summary>Field number for the "storage_character_items" field.</summary>
+  public const int StorageCharacterItemsFieldNumber = 2;
+  private static readonly pb::FieldCodec<pb::ByteString> _repeated_storageCharacterItems_codec
+      = pb::FieldCodec.ForBytes(18);
+  private readonly pbc::RepeatedField<pb::ByteString> storageCharacterItems_ = new pbc::RepeatedField<pb::ByteString>();
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public pbc::RepeatedField<pb::ByteString> StorageCharacterItems {
+    get { return storageCharacterItems_; }
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public override bool Equals(object other) {
+    return Equals(other as IncreaseStorageItemsResp);
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public bool Equals(IncreaseStorageItemsResp other) {
+    if (ReferenceEquals(other, null)) {
+      return false;
+    }
+    if (ReferenceEquals(other, this)) {
+      return true;
+    }
+    if (Error != other.Error) return false;
+    if(!storageCharacterItems_.Equals(other.storageCharacterItems_)) return false;
+    return Equals(_unknownFields, other._unknownFields);
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public override int GetHashCode() {
+    int hash = 1;
+    if (Error != global::EStorageError.StorageErrorNone) hash ^= Error.GetHashCode();
+    hash ^= storageCharacterItems_.GetHashCode();
+    if (_unknownFields != null) {
+      hash ^= _unknownFields.GetHashCode();
+    }
+    return hash;
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public override string ToString() {
+    return pb::JsonFormatter.ToDiagnosticString(this);
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public void WriteTo(pb::CodedOutputStream output) {
+    if (Error != global::EStorageError.StorageErrorNone) {
+      output.WriteRawTag(8);
+      output.WriteEnum((int) Error);
+    }
+    storageCharacterItems_.WriteTo(output, _repeated_storageCharacterItems_codec);
+    if (_unknownFields != null) {
+      _unknownFields.WriteTo(output);
+    }
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public int CalculateSize() {
+    int size = 0;
+    if (Error != global::EStorageError.StorageErrorNone) {
+      size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) Error);
+    }
+    size += storageCharacterItems_.CalculateSize(_repeated_storageCharacterItems_codec);
+    if (_unknownFields != null) {
+      size += _unknownFields.CalculateSize();
+    }
+    return size;
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public void MergeFrom(IncreaseStorageItemsResp other) {
+    if (other == null) {
+      return;
+    }
+    if (other.Error != global::EStorageError.StorageErrorNone) {
+      Error = other.Error;
+    }
+    storageCharacterItems_.Add(other.storageCharacterItems_);
+    _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public void MergeFrom(pb::CodedInputStream input) {
+    uint tag;
+    while ((tag = input.ReadTag()) != 0) {
+      switch(tag) {
+        default:
+          _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+          break;
+        case 8: {
+          Error = (global::EStorageError) input.ReadEnum();
+          break;
+        }
+        case 18: {
+          storageCharacterItems_.AddEntriesFrom(input, _repeated_storageCharacterItems_codec);
+          break;
+        }
+      }
+    }
+  }
+
+}
+
+/// <summary>
+/// Decrease storage items
+/// </summary>
+public sealed partial class DecreaseStorageItemsReq : pb::IMessage<DecreaseStorageItemsReq> {
+  private static readonly pb::MessageParser<DecreaseStorageItemsReq> _parser = new pb::MessageParser<DecreaseStorageItemsReq>(() => new DecreaseStorageItemsReq());
+  private pb::UnknownFieldSet _unknownFields;
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public static pb::MessageParser<DecreaseStorageItemsReq> Parser { get { return _parser; } }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public static pbr::MessageDescriptor Descriptor {
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[75]; }
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  pbr::MessageDescriptor pb::IMessage.Descriptor {
+    get { return Descriptor; }
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public DecreaseStorageItemsReq() {
+    OnConstruction();
+  }
+
+  partial void OnConstruction();
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public DecreaseStorageItemsReq(DecreaseStorageItemsReq other) : this() {
+    storageType_ = other.storageType_;
+    storageOwnerId_ = other.storageOwnerId_;
+    mapName_ = other.mapName_;
+    dataId_ = other.dataId_;
+    amount_ = other.amount_;
+    _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public DecreaseStorageItemsReq Clone() {
+    return new DecreaseStorageItemsReq(this);
+  }
+
+  /// <summary>Field number for the "storage_type" field.</summary>
+  public const int StorageTypeFieldNumber = 1;
+  private global::EStorageType storageType_ = global::EStorageType.StorageTypeNone;
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public global::EStorageType StorageType {
+    get { return storageType_; }
+    set {
+      storageType_ = value;
+    }
+  }
+
+  /// <summary>Field number for the "storage_owner_id" field.</summary>
+  public const int StorageOwnerIdFieldNumber = 2;
+  private string storageOwnerId_ = "";
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public string StorageOwnerId {
+    get { return storageOwnerId_; }
+    set {
+      storageOwnerId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+    }
+  }
+
+  /// <summary>Field number for the "map_name" field.</summary>
+  public const int MapNameFieldNumber = 3;
+  private string mapName_ = "";
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public string MapName {
+    get { return mapName_; }
+    set {
+      mapName_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+    }
+  }
+
+  /// <summary>Field number for the "data_id" field.</summary>
+  public const int DataIdFieldNumber = 4;
+  private int dataId_;
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public int DataId {
+    get { return dataId_; }
+    set {
+      dataId_ = value;
+    }
+  }
+
+  /// <summary>Field number for the "amount" field.</summary>
+  public const int AmountFieldNumber = 5;
+  private int amount_;
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public int Amount {
+    get { return amount_; }
+    set {
+      amount_ = value;
+    }
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public override bool Equals(object other) {
+    return Equals(other as DecreaseStorageItemsReq);
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public bool Equals(DecreaseStorageItemsReq other) {
+    if (ReferenceEquals(other, null)) {
+      return false;
+    }
+    if (ReferenceEquals(other, this)) {
+      return true;
+    }
+    if (StorageType != other.StorageType) return false;
+    if (StorageOwnerId != other.StorageOwnerId) return false;
+    if (MapName != other.MapName) return false;
+    if (DataId != other.DataId) return false;
+    if (Amount != other.Amount) return false;
+    return Equals(_unknownFields, other._unknownFields);
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public override int GetHashCode() {
+    int hash = 1;
+    if (StorageType != global::EStorageType.StorageTypeNone) hash ^= StorageType.GetHashCode();
+    if (StorageOwnerId.Length != 0) hash ^= StorageOwnerId.GetHashCode();
+    if (MapName.Length != 0) hash ^= MapName.GetHashCode();
+    if (DataId != 0) hash ^= DataId.GetHashCode();
+    if (Amount != 0) hash ^= Amount.GetHashCode();
+    if (_unknownFields != null) {
+      hash ^= _unknownFields.GetHashCode();
+    }
+    return hash;
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public override string ToString() {
+    return pb::JsonFormatter.ToDiagnosticString(this);
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public void WriteTo(pb::CodedOutputStream output) {
+    if (StorageType != global::EStorageType.StorageTypeNone) {
+      output.WriteRawTag(8);
+      output.WriteEnum((int) StorageType);
+    }
+    if (StorageOwnerId.Length != 0) {
+      output.WriteRawTag(18);
+      output.WriteString(StorageOwnerId);
+    }
+    if (MapName.Length != 0) {
+      output.WriteRawTag(26);
+      output.WriteString(MapName);
+    }
+    if (DataId != 0) {
+      output.WriteRawTag(32);
+      output.WriteInt32(DataId);
+    }
+    if (Amount != 0) {
+      output.WriteRawTag(40);
+      output.WriteInt32(Amount);
+    }
+    if (_unknownFields != null) {
+      _unknownFields.WriteTo(output);
+    }
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public int CalculateSize() {
+    int size = 0;
+    if (StorageType != global::EStorageType.StorageTypeNone) {
+      size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) StorageType);
+    }
+    if (StorageOwnerId.Length != 0) {
+      size += 1 + pb::CodedOutputStream.ComputeStringSize(StorageOwnerId);
+    }
+    if (MapName.Length != 0) {
+      size += 1 + pb::CodedOutputStream.ComputeStringSize(MapName);
+    }
+    if (DataId != 0) {
+      size += 1 + pb::CodedOutputStream.ComputeInt32Size(DataId);
+    }
+    if (Amount != 0) {
+      size += 1 + pb::CodedOutputStream.ComputeInt32Size(Amount);
+    }
+    if (_unknownFields != null) {
+      size += _unknownFields.CalculateSize();
+    }
+    return size;
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public void MergeFrom(DecreaseStorageItemsReq other) {
+    if (other == null) {
+      return;
+    }
+    if (other.StorageType != global::EStorageType.StorageTypeNone) {
+      StorageType = other.StorageType;
+    }
+    if (other.StorageOwnerId.Length != 0) {
+      StorageOwnerId = other.StorageOwnerId;
+    }
+    if (other.MapName.Length != 0) {
+      MapName = other.MapName;
+    }
+    if (other.DataId != 0) {
+      DataId = other.DataId;
+    }
+    if (other.Amount != 0) {
+      Amount = other.Amount;
+    }
+    _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public void MergeFrom(pb::CodedInputStream input) {
+    uint tag;
+    while ((tag = input.ReadTag()) != 0) {
+      switch(tag) {
+        default:
+          _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+          break;
+        case 8: {
+          StorageType = (global::EStorageType) input.ReadEnum();
+          break;
+        }
+        case 18: {
+          StorageOwnerId = input.ReadString();
+          break;
+        }
+        case 26: {
+          MapName = input.ReadString();
+          break;
+        }
+        case 32: {
+          DataId = input.ReadInt32();
+          break;
+        }
+        case 40: {
+          Amount = input.ReadInt32();
+          break;
+        }
+      }
+    }
+  }
+
+}
+
+public sealed partial class DecreaseStorageItemsResp : pb::IMessage<DecreaseStorageItemsResp> {
+  private static readonly pb::MessageParser<DecreaseStorageItemsResp> _parser = new pb::MessageParser<DecreaseStorageItemsResp>(() => new DecreaseStorageItemsResp());
+  private pb::UnknownFieldSet _unknownFields;
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public static pb::MessageParser<DecreaseStorageItemsResp> Parser { get { return _parser; } }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public static pbr::MessageDescriptor Descriptor {
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[76]; }
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  pbr::MessageDescriptor pb::IMessage.Descriptor {
+    get { return Descriptor; }
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public DecreaseStorageItemsResp() {
+    OnConstruction();
+  }
+
+  partial void OnConstruction();
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public DecreaseStorageItemsResp(DecreaseStorageItemsResp other) : this() {
+    error_ = other.error_;
+    storageCharacterItems_ = other.storageCharacterItems_.Clone();
+    decreasedItems_ = other.decreasedItems_.Clone();
+    _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public DecreaseStorageItemsResp Clone() {
+    return new DecreaseStorageItemsResp(this);
+  }
+
+  /// <summary>Field number for the "error" field.</summary>
+  public const int ErrorFieldNumber = 1;
+  private global::EStorageError error_ = global::EStorageError.StorageErrorNone;
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public global::EStorageError Error {
+    get { return error_; }
+    set {
+      error_ = value;
+    }
+  }
+
+  /// <summary>Field number for the "storage_character_items" field.</summary>
+  public const int StorageCharacterItemsFieldNumber = 2;
+  private static readonly pb::FieldCodec<pb::ByteString> _repeated_storageCharacterItems_codec
+      = pb::FieldCodec.ForBytes(18);
+  private readonly pbc::RepeatedField<pb::ByteString> storageCharacterItems_ = new pbc::RepeatedField<pb::ByteString>();
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public pbc::RepeatedField<pb::ByteString> StorageCharacterItems {
+    get { return storageCharacterItems_; }
+  }
+
+  /// <summary>Field number for the "decreased_items" field.</summary>
+  public const int DecreasedItemsFieldNumber = 3;
+  private static readonly pb::FieldCodec<global::ItemIndexAmountMap> _repeated_decreasedItems_codec
+      = pb::FieldCodec.ForMessage(26, global::ItemIndexAmountMap.Parser);
+  private readonly pbc::RepeatedField<global::ItemIndexAmountMap> decreasedItems_ = new pbc::RepeatedField<global::ItemIndexAmountMap>();
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public pbc::RepeatedField<global::ItemIndexAmountMap> DecreasedItems {
+    get { return decreasedItems_; }
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public override bool Equals(object other) {
+    return Equals(other as DecreaseStorageItemsResp);
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public bool Equals(DecreaseStorageItemsResp other) {
+    if (ReferenceEquals(other, null)) {
+      return false;
+    }
+    if (ReferenceEquals(other, this)) {
+      return true;
+    }
+    if (Error != other.Error) return false;
+    if(!storageCharacterItems_.Equals(other.storageCharacterItems_)) return false;
+    if(!decreasedItems_.Equals(other.decreasedItems_)) return false;
+    return Equals(_unknownFields, other._unknownFields);
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public override int GetHashCode() {
+    int hash = 1;
+    if (Error != global::EStorageError.StorageErrorNone) hash ^= Error.GetHashCode();
+    hash ^= storageCharacterItems_.GetHashCode();
+    hash ^= decreasedItems_.GetHashCode();
+    if (_unknownFields != null) {
+      hash ^= _unknownFields.GetHashCode();
+    }
+    return hash;
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public override string ToString() {
+    return pb::JsonFormatter.ToDiagnosticString(this);
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public void WriteTo(pb::CodedOutputStream output) {
+    if (Error != global::EStorageError.StorageErrorNone) {
+      output.WriteRawTag(8);
+      output.WriteEnum((int) Error);
+    }
+    storageCharacterItems_.WriteTo(output, _repeated_storageCharacterItems_codec);
+    decreasedItems_.WriteTo(output, _repeated_decreasedItems_codec);
+    if (_unknownFields != null) {
+      _unknownFields.WriteTo(output);
+    }
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public int CalculateSize() {
+    int size = 0;
+    if (Error != global::EStorageError.StorageErrorNone) {
+      size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) Error);
+    }
+    size += storageCharacterItems_.CalculateSize(_repeated_storageCharacterItems_codec);
+    size += decreasedItems_.CalculateSize(_repeated_decreasedItems_codec);
+    if (_unknownFields != null) {
+      size += _unknownFields.CalculateSize();
+    }
+    return size;
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public void MergeFrom(DecreaseStorageItemsResp other) {
+    if (other == null) {
+      return;
+    }
+    if (other.Error != global::EStorageError.StorageErrorNone) {
+      Error = other.Error;
+    }
+    storageCharacterItems_.Add(other.storageCharacterItems_);
+    decreasedItems_.Add(other.decreasedItems_);
+    _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public void MergeFrom(pb::CodedInputStream input) {
+    uint tag;
+    while ((tag = input.ReadTag()) != 0) {
+      switch(tag) {
+        default:
+          _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+          break;
+        case 8: {
+          Error = (global::EStorageError) input.ReadEnum();
+          break;
+        }
+        case 18: {
+          storageCharacterItems_.AddEntriesFrom(input, _repeated_storageCharacterItems_codec);
+          break;
+        }
+        case 26: {
+          decreasedItems_.AddEntriesFrom(input, _repeated_decreasedItems_codec);
+          break;
+        }
+      }
+    }
+  }
+
+}
+
+/// <summary>
 /// Custom
 /// </summary>
 public sealed partial class CustomReq : pb::IMessage<CustomReq> {
@@ -10032,7 +12401,7 @@ public sealed partial class CustomReq : pb::IMessage<CustomReq> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[66]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[77]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -10189,7 +12558,7 @@ public sealed partial class CustomResp : pb::IMessage<CustomResp> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
-    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[67]; }
+    get { return global::DatabaseServiceReflection.Descriptor.MessageTypes[78]; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
