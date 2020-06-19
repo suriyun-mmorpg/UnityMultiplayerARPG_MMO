@@ -134,16 +134,6 @@ message CreateCharacterReq {
 message ReadCharacterReq {
     string user_id = 1;
     string character_id = 2;
-    bool with_equip_weapons = 3;
-    bool with_attributes = 4;
-    bool with_skills = 5;
-    bool with_skill_usages = 6;
-    bool with_buffs = 7;
-    bool with_equip_items = 8;
-    bool with_non_equip_items = 9;
-    bool with_summons = 10;
-    bool with_hotkeys = 11;
-    bool with_quests = 12;
 }
 message ReadCharacterResp {
     bytes character_data = 1;
