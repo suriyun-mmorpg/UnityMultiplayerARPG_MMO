@@ -569,7 +569,7 @@ namespace MultiplayerARPG.MMO
 
         private IEnumerator OpenStorageRoutine(BasePlayerCharacterEntity playerCharacterEntity)
         {
-            List<CharacterItem> result = new List<CharacterItem>();
+            List<CharacterItem> result;
             if (playerCharacterEntity.CurrentStorageId.storageType == StorageType.Guild)
             {
                 // Have to reload guild storage because it can be changed by other players in other map-server
@@ -606,7 +606,7 @@ namespace MultiplayerARPG.MMO
 
         private IEnumerator MoveItemToStorageRoutine(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short nonEquipIndex, short amount, short storageItemIndex)
         {
-            List<CharacterItem> storageItemList = new List<CharacterItem>();
+            List<CharacterItem> storageItemList;
             if (storageId.storageType == StorageType.Guild)
             {
                 // Have to reload guild storage because it can be changed by other players in other map-server
@@ -683,7 +683,7 @@ namespace MultiplayerARPG.MMO
 
         private IEnumerator MoveItemFromStorageRoutine(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short storageItemIndex, short amount, short nonEquipIndex)
         {
-            List<CharacterItem> storageItemList = new List<CharacterItem>();
+            List<CharacterItem> storageItemList;
             if (storageId.storageType == StorageType.Guild)
             {
                 // Have to reload guild storage because it can be changed by other players in other map-server
@@ -751,7 +751,7 @@ namespace MultiplayerARPG.MMO
 
         private IEnumerator IncreaseStorageItemsRoutine(StorageId storageId, CharacterItem addingItem, Action<bool> callback)
         {
-            List<CharacterItem> storageItemList = new List<CharacterItem>();
+            List<CharacterItem> storageItemList;
             if (storageId.storageType == StorageType.Guild)
             {
                 // Have to reload guild storage because it can be changed by other players in other map-server
@@ -786,16 +786,16 @@ namespace MultiplayerARPG.MMO
             UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItemList);
         }
 
-        public override void DecreaseStorageItems(StorageId storageId, int dataId, short amount, Action<bool, Dictionary<CharacterItem, short>> callback)
+        public override void DecreaseStorageItems(StorageId storageId, int dataId, short amount, Action<bool, Dictionary<int, short>> callback)
         {
             if (!storageItems.ContainsKey(storageId))
                 storageItems[storageId] = new List<CharacterItem>();
             StartCoroutine(DecreaseStorageItemsRoutine(storageId, dataId, amount, callback));
         }
 
-        private IEnumerator DecreaseStorageItemsRoutine(StorageId storageId, int dataId, short amount, Action<bool, Dictionary<CharacterItem, short>> callback)
+        private IEnumerator DecreaseStorageItemsRoutine(StorageId storageId, int dataId, short amount, Action<bool, Dictionary<int, short>> callback)
         {
-            List<CharacterItem> storageItemList = new List<CharacterItem>();
+            List<CharacterItem> storageItemList;
             if (storageId.storageType == StorageType.Guild)
             {
                 // Have to reload guild storage because it can be changed by other players in other map-server
@@ -808,7 +808,7 @@ namespace MultiplayerARPG.MMO
             bool isLimitSlot = storage.slotLimit > 0;
             short slotLimit = storage.slotLimit;
             // Increase item to storage
-            Dictionary<CharacterItem, short> decreaseItems;
+            Dictionary<int, short> decreaseItems;
             bool decreaseResult = storageItemList.DecreaseItems(dataId, amount, isLimitSlot, out decreaseItems);
             if (callback != null)
                 callback.Invoke(decreaseResult, decreaseItems);
@@ -840,7 +840,7 @@ namespace MultiplayerARPG.MMO
 
         private IEnumerator SwapOrMergeStorageItemRoutine(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short fromIndex, short toIndex)
         {
-            List<CharacterItem> storageItemList = new List<CharacterItem>();
+            List<CharacterItem> storageItemList;
             if (storageId.storageType == StorageType.Guild)
             {
                 // Have to reload guild storage because it can be changed by other players in other map-server
