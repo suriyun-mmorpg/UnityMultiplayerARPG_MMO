@@ -73,7 +73,6 @@ public static partial class DatabaseService
   static readonly grpc::Marshaller<global::GetGuildGoldReq> __Marshaller_GetGuildGoldReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::GetGuildGoldReq.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::GuildGoldResp> __Marshaller_GuildGoldResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::GuildGoldResp.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::UpdateGuildGoldReq> __Marshaller_UpdateGuildGoldReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::UpdateGuildGoldReq.Parser.ParseFrom);
-  static readonly grpc::Marshaller<global::UpdateStorageItemsReq> __Marshaller_UpdateStorageItemsReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::UpdateStorageItemsReq.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::ReadStorageItemsReq> __Marshaller_ReadStorageItemsReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::ReadStorageItemsReq.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::ReadStorageItemsResp> __Marshaller_ReadStorageItemsResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::ReadStorageItemsResp.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::MoveItemToStorageReq> __Marshaller_MoveItemToStorageReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::MoveItemToStorageReq.Parser.ParseFrom);
@@ -390,13 +389,6 @@ public static partial class DatabaseService
       __Marshaller_UpdateGuildGoldReq,
       __Marshaller_VoidResp);
 
-  static readonly grpc::Method<global::UpdateStorageItemsReq, global::VoidResp> __Method_UpdateStorageItems = new grpc::Method<global::UpdateStorageItemsReq, global::VoidResp>(
-      grpc::MethodType.Unary,
-      __ServiceName,
-      "UpdateStorageItems",
-      __Marshaller_UpdateStorageItemsReq,
-      __Marshaller_VoidResp);
-
   static readonly grpc::Method<global::ReadStorageItemsReq, global::ReadStorageItemsResp> __Method_ReadStorageItems = new grpc::Method<global::ReadStorageItemsReq, global::ReadStorageItemsResp>(
       grpc::MethodType.Unary,
       __ServiceName,
@@ -667,11 +659,6 @@ public static partial class DatabaseService
     }
 
     public virtual global::System.Threading.Tasks.Task<global::VoidResp> UpdateGuildGold(global::UpdateGuildGoldReq request, grpc::ServerCallContext context)
-    {
-      throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
-    }
-
-    public virtual global::System.Threading.Tasks.Task<global::VoidResp> UpdateStorageItems(global::UpdateStorageItemsReq request, grpc::ServerCallContext context)
     {
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
@@ -1424,22 +1411,6 @@ public static partial class DatabaseService
     {
       return CallInvoker.AsyncUnaryCall(__Method_UpdateGuildGold, null, options, request);
     }
-    public virtual global::VoidResp UpdateStorageItems(global::UpdateStorageItemsReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
-    {
-      return UpdateStorageItems(request, new grpc::CallOptions(headers, deadline, cancellationToken));
-    }
-    public virtual global::VoidResp UpdateStorageItems(global::UpdateStorageItemsReq request, grpc::CallOptions options)
-    {
-      return CallInvoker.BlockingUnaryCall(__Method_UpdateStorageItems, null, options, request);
-    }
-    public virtual grpc::AsyncUnaryCall<global::VoidResp> UpdateStorageItemsAsync(global::UpdateStorageItemsReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
-    {
-      return UpdateStorageItemsAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
-    }
-    public virtual grpc::AsyncUnaryCall<global::VoidResp> UpdateStorageItemsAsync(global::UpdateStorageItemsReq request, grpc::CallOptions options)
-    {
-      return CallInvoker.AsyncUnaryCall(__Method_UpdateStorageItems, null, options, request);
-    }
     public virtual global::ReadStorageItemsResp ReadStorageItems(global::ReadStorageItemsReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
       return ReadStorageItems(request, new grpc::CallOptions(headers, deadline, cancellationToken));
@@ -1607,7 +1578,6 @@ public static partial class DatabaseService
         .AddMethod(__Method_ReadGuild, serviceImpl.ReadGuild)
         .AddMethod(__Method_GetGuildGold, serviceImpl.GetGuildGold)
         .AddMethod(__Method_UpdateGuildGold, serviceImpl.UpdateGuildGold)
-        .AddMethod(__Method_UpdateStorageItems, serviceImpl.UpdateStorageItems)
         .AddMethod(__Method_ReadStorageItems, serviceImpl.ReadStorageItems)
         .AddMethod(__Method_MoveItemToStorage, serviceImpl.MoveItemToStorage)
         .AddMethod(__Method_MoveItemFromStorage, serviceImpl.MoveItemFromStorage)
@@ -1666,7 +1636,6 @@ public static partial class DatabaseService
     serviceBinder.AddMethod(__Method_ReadGuild, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::ReadGuildReq, global::ReadGuildResp>(serviceImpl.ReadGuild));
     serviceBinder.AddMethod(__Method_GetGuildGold, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::GetGuildGoldReq, global::GuildGoldResp>(serviceImpl.GetGuildGold));
     serviceBinder.AddMethod(__Method_UpdateGuildGold, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::UpdateGuildGoldReq, global::VoidResp>(serviceImpl.UpdateGuildGold));
-    serviceBinder.AddMethod(__Method_UpdateStorageItems, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::UpdateStorageItemsReq, global::VoidResp>(serviceImpl.UpdateStorageItems));
     serviceBinder.AddMethod(__Method_ReadStorageItems, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::ReadStorageItemsReq, global::ReadStorageItemsResp>(serviceImpl.ReadStorageItems));
     serviceBinder.AddMethod(__Method_MoveItemToStorage, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::MoveItemToStorageReq, global::MoveItemToStorageResp>(serviceImpl.MoveItemToStorage));
     serviceBinder.AddMethod(__Method_MoveItemFromStorage, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::MoveItemFromStorageReq, global::MoveItemFromStorageResp>(serviceImpl.MoveItemFromStorage));
