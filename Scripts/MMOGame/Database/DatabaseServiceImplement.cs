@@ -505,18 +505,27 @@ namespace MultiplayerARPG.MMO
             return new VoidResp();
         }
 
-        public override async Task<VoidResp> UpdateStorageItems(UpdateStorageItemsReq request, ServerCallContext context)
-        {
-            await Task.Yield();
-            Database.UpdateStorageItems((StorageType)request.StorageType, request.StorageOwnerId, DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(request.StorageCharacterItems));
-            return new VoidResp();
-        }
-
         public override async Task<ReadStorageItemsResp> ReadStorageItems(ReadStorageItemsReq request, ServerCallContext context)
         {
             await Task.Yield();
             ReadStorageItemsResp resp = new ReadStorageItemsResp();
-            DatabaseServiceUtils.CopyToRepeatedByteString(Database.ReadStorageItems((StorageType)request.StorageType, request.StorageOwnerId), resp.StorageCharacterItems);
+            // Prepare storage data
+            StorageId storageId = new StorageId((StorageType)request.StorageType, request.StorageOwnerId);
+            List<CharacterItem> storageItems;
+            if (cachedStorageItems.ContainsKey(storageId))
+            {
+                // Already cached data, so get data from cache
+                storageItems = cachedStorageItems[storageId];
+            }
+            else
+            {
+                // Doesn't cached yet, so get data from database
+                storageItems = Database.ReadStorageItems(storageId.storageType, storageId.storageOwnerId);
+                // Cache data, it will be used to validate later
+                if (storageItems != null)
+                    cachedStorageItems[storageId] = storageItems;
+            }
+            DatabaseServiceUtils.CopyToRepeatedByteString(storageItems, resp.StorageCharacterItems);
             return resp;
         }
 
