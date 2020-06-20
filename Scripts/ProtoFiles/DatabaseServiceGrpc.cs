@@ -20,19 +20,19 @@ public static partial class DatabaseService
   static readonly grpc::Marshaller<global::GetGoldReq> __Marshaller_GetGoldReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::GetGoldReq.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::GoldResp> __Marshaller_GoldResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::GoldResp.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::UpdateGoldReq> __Marshaller_UpdateGoldReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::UpdateGoldReq.Parser.ParseFrom);
-  static readonly grpc::Marshaller<global::VoidResp> __Marshaller_VoidResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::VoidResp.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::GetCashReq> __Marshaller_GetCashReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::GetCashReq.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::CashResp> __Marshaller_CashResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::CashResp.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::UpdateCashReq> __Marshaller_UpdateCashReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::UpdateCashReq.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::UpdateAccessTokenReq> __Marshaller_UpdateAccessTokenReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::UpdateAccessTokenReq.Parser.ParseFrom);
+  static readonly grpc::Marshaller<global::VoidResp> __Marshaller_VoidResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::VoidResp.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::CreateUserLoginReq> __Marshaller_CreateUserLoginReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::CreateUserLoginReq.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::FindUsernameReq> __Marshaller_FindUsernameReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::FindUsernameReq.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::FindUsernameResp> __Marshaller_FindUsernameResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::FindUsernameResp.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::CreateCharacterReq> __Marshaller_CreateCharacterReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::CreateCharacterReq.Parser.ParseFrom);
+  static readonly grpc::Marshaller<global::CharacterResp> __Marshaller_CharacterResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::CharacterResp.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::ReadCharacterReq> __Marshaller_ReadCharacterReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::ReadCharacterReq.Parser.ParseFrom);
-  static readonly grpc::Marshaller<global::ReadCharacterResp> __Marshaller_ReadCharacterResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::ReadCharacterResp.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::ReadCharactersReq> __Marshaller_ReadCharactersReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::ReadCharactersReq.Parser.ParseFrom);
-  static readonly grpc::Marshaller<global::ReadCharactersResp> __Marshaller_ReadCharactersResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::ReadCharactersResp.Parser.ParseFrom);
+  static readonly grpc::Marshaller<global::CharactersResp> __Marshaller_CharactersResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::CharactersResp.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::UpdateCharacterReq> __Marshaller_UpdateCharacterReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::UpdateCharacterReq.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::DeleteCharacterReq> __Marshaller_DeleteCharacterReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::DeleteCharacterReq.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::FindCharacterNameReq> __Marshaller_FindCharacterNameReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::FindCharacterNameReq.Parser.ParseFrom);
@@ -40,36 +40,35 @@ public static partial class DatabaseService
   static readonly grpc::Marshaller<global::FindCharactersReq> __Marshaller_FindCharactersReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::FindCharactersReq.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::FindCharactersResp> __Marshaller_FindCharactersResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::FindCharactersResp.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::CreateFriendReq> __Marshaller_CreateFriendReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::CreateFriendReq.Parser.ParseFrom);
+  static readonly grpc::Marshaller<global::ReadFriendsResp> __Marshaller_ReadFriendsResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::ReadFriendsResp.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::DeleteFriendReq> __Marshaller_DeleteFriendReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::DeleteFriendReq.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::ReadFriendsReq> __Marshaller_ReadFriendsReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::ReadFriendsReq.Parser.ParseFrom);
-  static readonly grpc::Marshaller<global::ReadFriendsResp> __Marshaller_ReadFriendsResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::ReadFriendsResp.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::CreateBuildingReq> __Marshaller_CreateBuildingReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::CreateBuildingReq.Parser.ParseFrom);
+  static readonly grpc::Marshaller<global::BuildingResp> __Marshaller_BuildingResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::BuildingResp.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::UpdateBuildingReq> __Marshaller_UpdateBuildingReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::UpdateBuildingReq.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::DeleteBuildingReq> __Marshaller_DeleteBuildingReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::DeleteBuildingReq.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::ReadBuildingsReq> __Marshaller_ReadBuildingsReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::ReadBuildingsReq.Parser.ParseFrom);
-  static readonly grpc::Marshaller<global::ReadBuildingsResp> __Marshaller_ReadBuildingsResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::ReadBuildingsResp.Parser.ParseFrom);
+  static readonly grpc::Marshaller<global::BuildingsResp> __Marshaller_BuildingsResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::BuildingsResp.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::CreatePartyReq> __Marshaller_CreatePartyReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::CreatePartyReq.Parser.ParseFrom);
-  static readonly grpc::Marshaller<global::CreatePartyResp> __Marshaller_CreatePartyResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::CreatePartyResp.Parser.ParseFrom);
+  static readonly grpc::Marshaller<global::PartyResp> __Marshaller_PartyResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::PartyResp.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::UpdatePartyReq> __Marshaller_UpdatePartyReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::UpdatePartyReq.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::UpdatePartyLeaderReq> __Marshaller_UpdatePartyLeaderReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::UpdatePartyLeaderReq.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::DeletePartyReq> __Marshaller_DeletePartyReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::DeletePartyReq.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::UpdateCharacterPartyReq> __Marshaller_UpdateCharacterPartyReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::UpdateCharacterPartyReq.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::ReadPartyReq> __Marshaller_ReadPartyReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::ReadPartyReq.Parser.ParseFrom);
-  static readonly grpc::Marshaller<global::ReadPartyResp> __Marshaller_ReadPartyResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::ReadPartyResp.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::CreateGuildReq> __Marshaller_CreateGuildReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::CreateGuildReq.Parser.ParseFrom);
-  static readonly grpc::Marshaller<global::CreateGuildResp> __Marshaller_CreateGuildResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::CreateGuildResp.Parser.ParseFrom);
-  static readonly grpc::Marshaller<global::UpdateGuildLevelReq> __Marshaller_UpdateGuildLevelReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::UpdateGuildLevelReq.Parser.ParseFrom);
+  static readonly grpc::Marshaller<global::GuildResp> __Marshaller_GuildResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::GuildResp.Parser.ParseFrom);
+  static readonly grpc::Marshaller<global::GuildLevelUpReq> __Marshaller_GuildLevelUpReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::GuildLevelUpReq.Parser.ParseFrom);
+  static readonly grpc::Marshaller<global::GuildSkillLevelUpReq> __Marshaller_GuildSkillLevelUpReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::GuildSkillLevelUpReq.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::UpdateGuildLeaderReq> __Marshaller_UpdateGuildLeaderReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::UpdateGuildLeaderReq.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::UpdateGuildMessageReq> __Marshaller_UpdateGuildMessageReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::UpdateGuildMessageReq.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::UpdateGuildRoleReq> __Marshaller_UpdateGuildRoleReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::UpdateGuildRoleReq.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::UpdateGuildMemberRoleReq> __Marshaller_UpdateGuildMemberRoleReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::UpdateGuildMemberRoleReq.Parser.ParseFrom);
-  static readonly grpc::Marshaller<global::UpdateGuildSkillLevelReq> __Marshaller_UpdateGuildSkillLevelReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::UpdateGuildSkillLevelReq.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::UpdateCharacterGuildReq> __Marshaller_UpdateCharacterGuildReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::UpdateCharacterGuildReq.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::DeleteGuildReq> __Marshaller_DeleteGuildReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::DeleteGuildReq.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::FindGuildNameReq> __Marshaller_FindGuildNameReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::FindGuildNameReq.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::FindGuildNameResp> __Marshaller_FindGuildNameResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::FindGuildNameResp.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::ReadGuildReq> __Marshaller_ReadGuildReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::ReadGuildReq.Parser.ParseFrom);
-  static readonly grpc::Marshaller<global::ReadGuildResp> __Marshaller_ReadGuildResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::ReadGuildResp.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::GetGuildGoldReq> __Marshaller_GetGuildGoldReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::GetGuildGoldReq.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::GuildGoldResp> __Marshaller_GuildGoldResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::GuildGoldResp.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::UpdateGuildGoldReq> __Marshaller_UpdateGuildGoldReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::UpdateGuildGoldReq.Parser.ParseFrom);
@@ -116,12 +115,12 @@ public static partial class DatabaseService
       __Marshaller_GetGoldReq,
       __Marshaller_GoldResp);
 
-  static readonly grpc::Method<global::UpdateGoldReq, global::VoidResp> __Method_UpdateGold = new grpc::Method<global::UpdateGoldReq, global::VoidResp>(
+  static readonly grpc::Method<global::UpdateGoldReq, global::GoldResp> __Method_UpdateGold = new grpc::Method<global::UpdateGoldReq, global::GoldResp>(
       grpc::MethodType.Unary,
       __ServiceName,
       "UpdateGold",
       __Marshaller_UpdateGoldReq,
-      __Marshaller_VoidResp);
+      __Marshaller_GoldResp);
 
   static readonly grpc::Method<global::GetCashReq, global::CashResp> __Method_GetCash = new grpc::Method<global::GetCashReq, global::CashResp>(
       grpc::MethodType.Unary,
@@ -130,12 +129,12 @@ public static partial class DatabaseService
       __Marshaller_GetCashReq,
       __Marshaller_CashResp);
 
-  static readonly grpc::Method<global::UpdateCashReq, global::VoidResp> __Method_UpdateCash = new grpc::Method<global::UpdateCashReq, global::VoidResp>(
+  static readonly grpc::Method<global::UpdateCashReq, global::CashResp> __Method_UpdateCash = new grpc::Method<global::UpdateCashReq, global::CashResp>(
       grpc::MethodType.Unary,
       __ServiceName,
       "UpdateCash",
       __Marshaller_UpdateCashReq,
-      __Marshaller_VoidResp);
+      __Marshaller_CashResp);
 
   static readonly grpc::Method<global::UpdateAccessTokenReq, global::VoidResp> __Method_UpdateAccessToken = new grpc::Method<global::UpdateAccessTokenReq, global::VoidResp>(
       grpc::MethodType.Unary,
@@ -158,33 +157,33 @@ public static partial class DatabaseService
       __Marshaller_FindUsernameReq,
       __Marshaller_FindUsernameResp);
 
-  static readonly grpc::Method<global::CreateCharacterReq, global::VoidResp> __Method_CreateCharacter = new grpc::Method<global::CreateCharacterReq, global::VoidResp>(
+  static readonly grpc::Method<global::CreateCharacterReq, global::CharacterResp> __Method_CreateCharacter = new grpc::Method<global::CreateCharacterReq, global::CharacterResp>(
       grpc::MethodType.Unary,
       __ServiceName,
       "CreateCharacter",
       __Marshaller_CreateCharacterReq,
-      __Marshaller_VoidResp);
+      __Marshaller_CharacterResp);
 
-  static readonly grpc::Method<global::ReadCharacterReq, global::ReadCharacterResp> __Method_ReadCharacter = new grpc::Method<global::ReadCharacterReq, global::ReadCharacterResp>(
+  static readonly grpc::Method<global::ReadCharacterReq, global::CharacterResp> __Method_ReadCharacter = new grpc::Method<global::ReadCharacterReq, global::CharacterResp>(
       grpc::MethodType.Unary,
       __ServiceName,
       "ReadCharacter",
       __Marshaller_ReadCharacterReq,
-      __Marshaller_ReadCharacterResp);
+      __Marshaller_CharacterResp);
 
-  static readonly grpc::Method<global::ReadCharactersReq, global::ReadCharactersResp> __Method_ReadCharacters = new grpc::Method<global::ReadCharactersReq, global::ReadCharactersResp>(
+  static readonly grpc::Method<global::ReadCharactersReq, global::CharactersResp> __Method_ReadCharacters = new grpc::Method<global::ReadCharactersReq, global::CharactersResp>(
       grpc::MethodType.Unary,
       __ServiceName,
       "ReadCharacters",
       __Marshaller_ReadCharactersReq,
-      __Marshaller_ReadCharactersResp);
+      __Marshaller_CharactersResp);
 
-  static readonly grpc::Method<global::UpdateCharacterReq, global::VoidResp> __Method_UpdateCharacter = new grpc::Method<global::UpdateCharacterReq, global::VoidResp>(
+  static readonly grpc::Method<global::UpdateCharacterReq, global::CharacterResp> __Method_UpdateCharacter = new grpc::Method<global::UpdateCharacterReq, global::CharacterResp>(
       grpc::MethodType.Unary,
       __ServiceName,
       "UpdateCharacter",
       __Marshaller_UpdateCharacterReq,
-      __Marshaller_VoidResp);
+      __Marshaller_CharacterResp);
 
   static readonly grpc::Method<global::DeleteCharacterReq, global::VoidResp> __Method_DeleteCharacter = new grpc::Method<global::DeleteCharacterReq, global::VoidResp>(
       grpc::MethodType.Unary,
@@ -207,12 +206,12 @@ public static partial class DatabaseService
       __Marshaller_FindCharactersReq,
       __Marshaller_FindCharactersResp);
 
-  static readonly grpc::Method<global::CreateFriendReq, global::VoidResp> __Method_CreateFriend = new grpc::Method<global::CreateFriendReq, global::VoidResp>(
+  static readonly grpc::Method<global::CreateFriendReq, global::ReadFriendsResp> __Method_CreateFriend = new grpc::Method<global::CreateFriendReq, global::ReadFriendsResp>(
       grpc::MethodType.Unary,
       __ServiceName,
       "CreateFriend",
       __Marshaller_CreateFriendReq,
-      __Marshaller_VoidResp);
+      __Marshaller_ReadFriendsResp);
 
   static readonly grpc::Method<global::DeleteFriendReq, global::VoidResp> __Method_DeleteFriend = new grpc::Method<global::DeleteFriendReq, global::VoidResp>(
       grpc::MethodType.Unary,
@@ -228,19 +227,19 @@ public static partial class DatabaseService
       __Marshaller_ReadFriendsReq,
       __Marshaller_ReadFriendsResp);
 
-  static readonly grpc::Method<global::CreateBuildingReq, global::VoidResp> __Method_CreateBuilding = new grpc::Method<global::CreateBuildingReq, global::VoidResp>(
+  static readonly grpc::Method<global::CreateBuildingReq, global::BuildingResp> __Method_CreateBuilding = new grpc::Method<global::CreateBuildingReq, global::BuildingResp>(
       grpc::MethodType.Unary,
       __ServiceName,
       "CreateBuilding",
       __Marshaller_CreateBuildingReq,
-      __Marshaller_VoidResp);
+      __Marshaller_BuildingResp);
 
-  static readonly grpc::Method<global::UpdateBuildingReq, global::VoidResp> __Method_UpdateBuilding = new grpc::Method<global::UpdateBuildingReq, global::VoidResp>(
+  static readonly grpc::Method<global::UpdateBuildingReq, global::BuildingResp> __Method_UpdateBuilding = new grpc::Method<global::UpdateBuildingReq, global::BuildingResp>(
       grpc::MethodType.Unary,
       __ServiceName,
       "UpdateBuilding",
       __Marshaller_UpdateBuildingReq,
-      __Marshaller_VoidResp);
+      __Marshaller_BuildingResp);
 
   static readonly grpc::Method<global::DeleteBuildingReq, global::VoidResp> __Method_DeleteBuilding = new grpc::Method<global::DeleteBuildingReq, global::VoidResp>(
       grpc::MethodType.Unary,
@@ -249,33 +248,33 @@ public static partial class DatabaseService
       __Marshaller_DeleteBuildingReq,
       __Marshaller_VoidResp);
 
-  static readonly grpc::Method<global::ReadBuildingsReq, global::ReadBuildingsResp> __Method_ReadBuildings = new grpc::Method<global::ReadBuildingsReq, global::ReadBuildingsResp>(
+  static readonly grpc::Method<global::ReadBuildingsReq, global::BuildingsResp> __Method_ReadBuildings = new grpc::Method<global::ReadBuildingsReq, global::BuildingsResp>(
       grpc::MethodType.Unary,
       __ServiceName,
       "ReadBuildings",
       __Marshaller_ReadBuildingsReq,
-      __Marshaller_ReadBuildingsResp);
+      __Marshaller_BuildingsResp);
 
-  static readonly grpc::Method<global::CreatePartyReq, global::CreatePartyResp> __Method_CreateParty = new grpc::Method<global::CreatePartyReq, global::CreatePartyResp>(
+  static readonly grpc::Method<global::CreatePartyReq, global::PartyResp> __Method_CreateParty = new grpc::Method<global::CreatePartyReq, global::PartyResp>(
       grpc::MethodType.Unary,
       __ServiceName,
       "CreateParty",
       __Marshaller_CreatePartyReq,
-      __Marshaller_CreatePartyResp);
+      __Marshaller_PartyResp);
 
-  static readonly grpc::Method<global::UpdatePartyReq, global::VoidResp> __Method_UpdateParty = new grpc::Method<global::UpdatePartyReq, global::VoidResp>(
+  static readonly grpc::Method<global::UpdatePartyReq, global::PartyResp> __Method_UpdateParty = new grpc::Method<global::UpdatePartyReq, global::PartyResp>(
       grpc::MethodType.Unary,
       __ServiceName,
       "UpdateParty",
       __Marshaller_UpdatePartyReq,
-      __Marshaller_VoidResp);
+      __Marshaller_PartyResp);
 
-  static readonly grpc::Method<global::UpdatePartyLeaderReq, global::VoidResp> __Method_UpdatePartyLeader = new grpc::Method<global::UpdatePartyLeaderReq, global::VoidResp>(
+  static readonly grpc::Method<global::UpdatePartyLeaderReq, global::PartyResp> __Method_UpdatePartyLeader = new grpc::Method<global::UpdatePartyLeaderReq, global::PartyResp>(
       grpc::MethodType.Unary,
       __ServiceName,
       "UpdatePartyLeader",
       __Marshaller_UpdatePartyLeaderReq,
-      __Marshaller_VoidResp);
+      __Marshaller_PartyResp);
 
   static readonly grpc::Method<global::DeletePartyReq, global::VoidResp> __Method_DeleteParty = new grpc::Method<global::DeletePartyReq, global::VoidResp>(
       grpc::MethodType.Unary,
@@ -284,75 +283,75 @@ public static partial class DatabaseService
       __Marshaller_DeletePartyReq,
       __Marshaller_VoidResp);
 
-  static readonly grpc::Method<global::UpdateCharacterPartyReq, global::VoidResp> __Method_UpdateCharacterParty = new grpc::Method<global::UpdateCharacterPartyReq, global::VoidResp>(
+  static readonly grpc::Method<global::UpdateCharacterPartyReq, global::PartyResp> __Method_UpdateCharacterParty = new grpc::Method<global::UpdateCharacterPartyReq, global::PartyResp>(
       grpc::MethodType.Unary,
       __ServiceName,
       "UpdateCharacterParty",
       __Marshaller_UpdateCharacterPartyReq,
-      __Marshaller_VoidResp);
+      __Marshaller_PartyResp);
 
-  static readonly grpc::Method<global::ReadPartyReq, global::ReadPartyResp> __Method_ReadParty = new grpc::Method<global::ReadPartyReq, global::ReadPartyResp>(
+  static readonly grpc::Method<global::ReadPartyReq, global::PartyResp> __Method_ReadParty = new grpc::Method<global::ReadPartyReq, global::PartyResp>(
       grpc::MethodType.Unary,
       __ServiceName,
       "ReadParty",
       __Marshaller_ReadPartyReq,
-      __Marshaller_ReadPartyResp);
+      __Marshaller_PartyResp);
 
-  static readonly grpc::Method<global::CreateGuildReq, global::CreateGuildResp> __Method_CreateGuild = new grpc::Method<global::CreateGuildReq, global::CreateGuildResp>(
+  static readonly grpc::Method<global::CreateGuildReq, global::GuildResp> __Method_CreateGuild = new grpc::Method<global::CreateGuildReq, global::GuildResp>(
       grpc::MethodType.Unary,
       __ServiceName,
       "CreateGuild",
       __Marshaller_CreateGuildReq,
-      __Marshaller_CreateGuildResp);
+      __Marshaller_GuildResp);
 
-  static readonly grpc::Method<global::UpdateGuildLevelReq, global::VoidResp> __Method_UpdateGuildLevel = new grpc::Method<global::UpdateGuildLevelReq, global::VoidResp>(
+  static readonly grpc::Method<global::GuildLevelUpReq, global::GuildResp> __Method_GuildLevelUp = new grpc::Method<global::GuildLevelUpReq, global::GuildResp>(
       grpc::MethodType.Unary,
       __ServiceName,
-      "UpdateGuildLevel",
-      __Marshaller_UpdateGuildLevelReq,
-      __Marshaller_VoidResp);
+      "GuildLevelUp",
+      __Marshaller_GuildLevelUpReq,
+      __Marshaller_GuildResp);
 
-  static readonly grpc::Method<global::UpdateGuildLeaderReq, global::VoidResp> __Method_UpdateGuildLeader = new grpc::Method<global::UpdateGuildLeaderReq, global::VoidResp>(
+  static readonly grpc::Method<global::GuildSkillLevelUpReq, global::GuildResp> __Method_GuildSkillLevelUp = new grpc::Method<global::GuildSkillLevelUpReq, global::GuildResp>(
+      grpc::MethodType.Unary,
+      __ServiceName,
+      "GuildSkillLevelUp",
+      __Marshaller_GuildSkillLevelUpReq,
+      __Marshaller_GuildResp);
+
+  static readonly grpc::Method<global::UpdateGuildLeaderReq, global::GuildResp> __Method_UpdateGuildLeader = new grpc::Method<global::UpdateGuildLeaderReq, global::GuildResp>(
       grpc::MethodType.Unary,
       __ServiceName,
       "UpdateGuildLeader",
       __Marshaller_UpdateGuildLeaderReq,
-      __Marshaller_VoidResp);
+      __Marshaller_GuildResp);
 
-  static readonly grpc::Method<global::UpdateGuildMessageReq, global::VoidResp> __Method_UpdateGuildMessage = new grpc::Method<global::UpdateGuildMessageReq, global::VoidResp>(
+  static readonly grpc::Method<global::UpdateGuildMessageReq, global::GuildResp> __Method_UpdateGuildMessage = new grpc::Method<global::UpdateGuildMessageReq, global::GuildResp>(
       grpc::MethodType.Unary,
       __ServiceName,
       "UpdateGuildMessage",
       __Marshaller_UpdateGuildMessageReq,
-      __Marshaller_VoidResp);
+      __Marshaller_GuildResp);
 
-  static readonly grpc::Method<global::UpdateGuildRoleReq, global::VoidResp> __Method_UpdateGuildRole = new grpc::Method<global::UpdateGuildRoleReq, global::VoidResp>(
+  static readonly grpc::Method<global::UpdateGuildRoleReq, global::GuildResp> __Method_UpdateGuildRole = new grpc::Method<global::UpdateGuildRoleReq, global::GuildResp>(
       grpc::MethodType.Unary,
       __ServiceName,
       "UpdateGuildRole",
       __Marshaller_UpdateGuildRoleReq,
-      __Marshaller_VoidResp);
+      __Marshaller_GuildResp);
 
-  static readonly grpc::Method<global::UpdateGuildMemberRoleReq, global::VoidResp> __Method_UpdateGuildMemberRole = new grpc::Method<global::UpdateGuildMemberRoleReq, global::VoidResp>(
+  static readonly grpc::Method<global::UpdateGuildMemberRoleReq, global::GuildResp> __Method_UpdateGuildMemberRole = new grpc::Method<global::UpdateGuildMemberRoleReq, global::GuildResp>(
       grpc::MethodType.Unary,
       __ServiceName,
       "UpdateGuildMemberRole",
       __Marshaller_UpdateGuildMemberRoleReq,
-      __Marshaller_VoidResp);
+      __Marshaller_GuildResp);
 
-  static readonly grpc::Method<global::UpdateGuildSkillLevelReq, global::VoidResp> __Method_UpdateGuildSkillLevel = new grpc::Method<global::UpdateGuildSkillLevelReq, global::VoidResp>(
-      grpc::MethodType.Unary,
-      __ServiceName,
-      "UpdateGuildSkillLevel",
-      __Marshaller_UpdateGuildSkillLevelReq,
-      __Marshaller_VoidResp);
-
-  static readonly grpc::Method<global::UpdateCharacterGuildReq, global::VoidResp> __Method_UpdateCharacterGuild = new grpc::Method<global::UpdateCharacterGuildReq, global::VoidResp>(
+  static readonly grpc::Method<global::UpdateCharacterGuildReq, global::GuildResp> __Method_UpdateCharacterGuild = new grpc::Method<global::UpdateCharacterGuildReq, global::GuildResp>(
       grpc::MethodType.Unary,
       __ServiceName,
       "UpdateCharacterGuild",
       __Marshaller_UpdateCharacterGuildReq,
-      __Marshaller_VoidResp);
+      __Marshaller_GuildResp);
 
   static readonly grpc::Method<global::DeleteGuildReq, global::VoidResp> __Method_DeleteGuild = new grpc::Method<global::DeleteGuildReq, global::VoidResp>(
       grpc::MethodType.Unary,
@@ -368,12 +367,12 @@ public static partial class DatabaseService
       __Marshaller_FindGuildNameReq,
       __Marshaller_FindGuildNameResp);
 
-  static readonly grpc::Method<global::ReadGuildReq, global::ReadGuildResp> __Method_ReadGuild = new grpc::Method<global::ReadGuildReq, global::ReadGuildResp>(
+  static readonly grpc::Method<global::ReadGuildReq, global::GuildResp> __Method_ReadGuild = new grpc::Method<global::ReadGuildReq, global::GuildResp>(
       grpc::MethodType.Unary,
       __ServiceName,
       "ReadGuild",
       __Marshaller_ReadGuildReq,
-      __Marshaller_ReadGuildResp);
+      __Marshaller_GuildResp);
 
   static readonly grpc::Method<global::GetGuildGoldReq, global::GuildGoldResp> __Method_GetGuildGold = new grpc::Method<global::GetGuildGoldReq, global::GuildGoldResp>(
       grpc::MethodType.Unary,
@@ -382,12 +381,12 @@ public static partial class DatabaseService
       __Marshaller_GetGuildGoldReq,
       __Marshaller_GuildGoldResp);
 
-  static readonly grpc::Method<global::UpdateGuildGoldReq, global::VoidResp> __Method_UpdateGuildGold = new grpc::Method<global::UpdateGuildGoldReq, global::VoidResp>(
+  static readonly grpc::Method<global::UpdateGuildGoldReq, global::GuildGoldResp> __Method_UpdateGuildGold = new grpc::Method<global::UpdateGuildGoldReq, global::GuildGoldResp>(
       grpc::MethodType.Unary,
       __ServiceName,
       "UpdateGuildGold",
       __Marshaller_UpdateGuildGoldReq,
-      __Marshaller_VoidResp);
+      __Marshaller_GuildGoldResp);
 
   static readonly grpc::Method<global::ReadStorageItemsReq, global::ReadStorageItemsResp> __Method_ReadStorageItems = new grpc::Method<global::ReadStorageItemsReq, global::ReadStorageItemsResp>(
       grpc::MethodType.Unary,
@@ -468,7 +467,7 @@ public static partial class DatabaseService
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
 
-    public virtual global::System.Threading.Tasks.Task<global::VoidResp> UpdateGold(global::UpdateGoldReq request, grpc::ServerCallContext context)
+    public virtual global::System.Threading.Tasks.Task<global::GoldResp> UpdateGold(global::UpdateGoldReq request, grpc::ServerCallContext context)
     {
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
@@ -478,7 +477,7 @@ public static partial class DatabaseService
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
 
-    public virtual global::System.Threading.Tasks.Task<global::VoidResp> UpdateCash(global::UpdateCashReq request, grpc::ServerCallContext context)
+    public virtual global::System.Threading.Tasks.Task<global::CashResp> UpdateCash(global::UpdateCashReq request, grpc::ServerCallContext context)
     {
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
@@ -498,22 +497,28 @@ public static partial class DatabaseService
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
 
-    public virtual global::System.Threading.Tasks.Task<global::VoidResp> CreateCharacter(global::CreateCharacterReq request, grpc::ServerCallContext context)
+    /// <summary>
+    /// Character
+    /// </summary>
+    /// <param name="request">The request received from the client.</param>
+    /// <param name="context">The context of the server-side call handler being invoked.</param>
+    /// <returns>The response to send back to the client (wrapped by a task).</returns>
+    public virtual global::System.Threading.Tasks.Task<global::CharacterResp> CreateCharacter(global::CreateCharacterReq request, grpc::ServerCallContext context)
     {
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
 
-    public virtual global::System.Threading.Tasks.Task<global::ReadCharacterResp> ReadCharacter(global::ReadCharacterReq request, grpc::ServerCallContext context)
+    public virtual global::System.Threading.Tasks.Task<global::CharacterResp> ReadCharacter(global::ReadCharacterReq request, grpc::ServerCallContext context)
     {
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
 
-    public virtual global::System.Threading.Tasks.Task<global::ReadCharactersResp> ReadCharacters(global::ReadCharactersReq request, grpc::ServerCallContext context)
+    public virtual global::System.Threading.Tasks.Task<global::CharactersResp> ReadCharacters(global::ReadCharactersReq request, grpc::ServerCallContext context)
     {
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
 
-    public virtual global::System.Threading.Tasks.Task<global::VoidResp> UpdateCharacter(global::UpdateCharacterReq request, grpc::ServerCallContext context)
+    public virtual global::System.Threading.Tasks.Task<global::CharacterResp> UpdateCharacter(global::UpdateCharacterReq request, grpc::ServerCallContext context)
     {
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
@@ -533,7 +538,13 @@ public static partial class DatabaseService
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
 
-    public virtual global::System.Threading.Tasks.Task<global::VoidResp> CreateFriend(global::CreateFriendReq request, grpc::ServerCallContext context)
+    /// <summary>
+    /// Friend
+    /// </summary>
+    /// <param name="request">The request received from the client.</param>
+    /// <param name="context">The context of the server-side call handler being invoked.</param>
+    /// <returns>The response to send back to the client (wrapped by a task).</returns>
+    public virtual global::System.Threading.Tasks.Task<global::ReadFriendsResp> CreateFriend(global::CreateFriendReq request, grpc::ServerCallContext context)
     {
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
@@ -548,12 +559,18 @@ public static partial class DatabaseService
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
 
-    public virtual global::System.Threading.Tasks.Task<global::VoidResp> CreateBuilding(global::CreateBuildingReq request, grpc::ServerCallContext context)
+    /// <summary>
+    /// Building
+    /// </summary>
+    /// <param name="request">The request received from the client.</param>
+    /// <param name="context">The context of the server-side call handler being invoked.</param>
+    /// <returns>The response to send back to the client (wrapped by a task).</returns>
+    public virtual global::System.Threading.Tasks.Task<global::BuildingResp> CreateBuilding(global::CreateBuildingReq request, grpc::ServerCallContext context)
     {
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
 
-    public virtual global::System.Threading.Tasks.Task<global::VoidResp> UpdateBuilding(global::UpdateBuildingReq request, grpc::ServerCallContext context)
+    public virtual global::System.Threading.Tasks.Task<global::BuildingResp> UpdateBuilding(global::UpdateBuildingReq request, grpc::ServerCallContext context)
     {
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
@@ -563,22 +580,28 @@ public static partial class DatabaseService
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
 
-    public virtual global::System.Threading.Tasks.Task<global::ReadBuildingsResp> ReadBuildings(global::ReadBuildingsReq request, grpc::ServerCallContext context)
+    public virtual global::System.Threading.Tasks.Task<global::BuildingsResp> ReadBuildings(global::ReadBuildingsReq request, grpc::ServerCallContext context)
     {
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
 
-    public virtual global::System.Threading.Tasks.Task<global::CreatePartyResp> CreateParty(global::CreatePartyReq request, grpc::ServerCallContext context)
+    /// <summary>
+    /// Party
+    /// </summary>
+    /// <param name="request">The request received from the client.</param>
+    /// <param name="context">The context of the server-side call handler being invoked.</param>
+    /// <returns>The response to send back to the client (wrapped by a task).</returns>
+    public virtual global::System.Threading.Tasks.Task<global::PartyResp> CreateParty(global::CreatePartyReq request, grpc::ServerCallContext context)
     {
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
 
-    public virtual global::System.Threading.Tasks.Task<global::VoidResp> UpdateParty(global::UpdatePartyReq request, grpc::ServerCallContext context)
+    public virtual global::System.Threading.Tasks.Task<global::PartyResp> UpdateParty(global::UpdatePartyReq request, grpc::ServerCallContext context)
     {
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
 
-    public virtual global::System.Threading.Tasks.Task<global::VoidResp> UpdatePartyLeader(global::UpdatePartyLeaderReq request, grpc::ServerCallContext context)
+    public virtual global::System.Threading.Tasks.Task<global::PartyResp> UpdatePartyLeader(global::UpdatePartyLeaderReq request, grpc::ServerCallContext context)
     {
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
@@ -588,52 +611,58 @@ public static partial class DatabaseService
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
 
-    public virtual global::System.Threading.Tasks.Task<global::VoidResp> UpdateCharacterParty(global::UpdateCharacterPartyReq request, grpc::ServerCallContext context)
+    public virtual global::System.Threading.Tasks.Task<global::PartyResp> UpdateCharacterParty(global::UpdateCharacterPartyReq request, grpc::ServerCallContext context)
     {
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
 
-    public virtual global::System.Threading.Tasks.Task<global::ReadPartyResp> ReadParty(global::ReadPartyReq request, grpc::ServerCallContext context)
+    public virtual global::System.Threading.Tasks.Task<global::PartyResp> ReadParty(global::ReadPartyReq request, grpc::ServerCallContext context)
     {
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
 
-    public virtual global::System.Threading.Tasks.Task<global::CreateGuildResp> CreateGuild(global::CreateGuildReq request, grpc::ServerCallContext context)
+    /// <summary>
+    /// Guild
+    /// </summary>
+    /// <param name="request">The request received from the client.</param>
+    /// <param name="context">The context of the server-side call handler being invoked.</param>
+    /// <returns>The response to send back to the client (wrapped by a task).</returns>
+    public virtual global::System.Threading.Tasks.Task<global::GuildResp> CreateGuild(global::CreateGuildReq request, grpc::ServerCallContext context)
     {
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
 
-    public virtual global::System.Threading.Tasks.Task<global::VoidResp> UpdateGuildLevel(global::UpdateGuildLevelReq request, grpc::ServerCallContext context)
+    public virtual global::System.Threading.Tasks.Task<global::GuildResp> GuildLevelUp(global::GuildLevelUpReq request, grpc::ServerCallContext context)
     {
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
 
-    public virtual global::System.Threading.Tasks.Task<global::VoidResp> UpdateGuildLeader(global::UpdateGuildLeaderReq request, grpc::ServerCallContext context)
+    public virtual global::System.Threading.Tasks.Task<global::GuildResp> GuildSkillLevelUp(global::GuildSkillLevelUpReq request, grpc::ServerCallContext context)
     {
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
 
-    public virtual global::System.Threading.Tasks.Task<global::VoidResp> UpdateGuildMessage(global::UpdateGuildMessageReq request, grpc::ServerCallContext context)
+    public virtual global::System.Threading.Tasks.Task<global::GuildResp> UpdateGuildLeader(global::UpdateGuildLeaderReq request, grpc::ServerCallContext context)
     {
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
 
-    public virtual global::System.Threading.Tasks.Task<global::VoidResp> UpdateGuildRole(global::UpdateGuildRoleReq request, grpc::ServerCallContext context)
+    public virtual global::System.Threading.Tasks.Task<global::GuildResp> UpdateGuildMessage(global::UpdateGuildMessageReq request, grpc::ServerCallContext context)
     {
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
 
-    public virtual global::System.Threading.Tasks.Task<global::VoidResp> UpdateGuildMemberRole(global::UpdateGuildMemberRoleReq request, grpc::ServerCallContext context)
+    public virtual global::System.Threading.Tasks.Task<global::GuildResp> UpdateGuildRole(global::UpdateGuildRoleReq request, grpc::ServerCallContext context)
     {
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
 
-    public virtual global::System.Threading.Tasks.Task<global::VoidResp> UpdateGuildSkillLevel(global::UpdateGuildSkillLevelReq request, grpc::ServerCallContext context)
+    public virtual global::System.Threading.Tasks.Task<global::GuildResp> UpdateGuildMemberRole(global::UpdateGuildMemberRoleReq request, grpc::ServerCallContext context)
     {
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
 
-    public virtual global::System.Threading.Tasks.Task<global::VoidResp> UpdateCharacterGuild(global::UpdateCharacterGuildReq request, grpc::ServerCallContext context)
+    public virtual global::System.Threading.Tasks.Task<global::GuildResp> UpdateCharacterGuild(global::UpdateCharacterGuildReq request, grpc::ServerCallContext context)
     {
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
@@ -648,7 +677,7 @@ public static partial class DatabaseService
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
 
-    public virtual global::System.Threading.Tasks.Task<global::ReadGuildResp> ReadGuild(global::ReadGuildReq request, grpc::ServerCallContext context)
+    public virtual global::System.Threading.Tasks.Task<global::GuildResp> ReadGuild(global::ReadGuildReq request, grpc::ServerCallContext context)
     {
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
@@ -658,11 +687,17 @@ public static partial class DatabaseService
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
 
-    public virtual global::System.Threading.Tasks.Task<global::VoidResp> UpdateGuildGold(global::UpdateGuildGoldReq request, grpc::ServerCallContext context)
+    public virtual global::System.Threading.Tasks.Task<global::GuildGoldResp> UpdateGuildGold(global::UpdateGuildGoldReq request, grpc::ServerCallContext context)
     {
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
 
+    /// <summary>
+    /// Storage
+    /// </summary>
+    /// <param name="request">The request received from the client.</param>
+    /// <param name="context">The context of the server-side call handler being invoked.</param>
+    /// <returns>The response to send back to the client (wrapped by a task).</returns>
     public virtual global::System.Threading.Tasks.Task<global::ReadStorageItemsResp> ReadStorageItems(global::ReadStorageItemsReq request, grpc::ServerCallContext context)
     {
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
@@ -693,6 +728,12 @@ public static partial class DatabaseService
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
 
+    /// <summary>
+    /// Other
+    /// </summary>
+    /// <param name="request">The request received from the client.</param>
+    /// <param name="context">The context of the server-side call handler being invoked.</param>
+    /// <returns>The response to send back to the client (wrapped by a task).</returns>
     public virtual global::System.Threading.Tasks.Task<global::CustomResp> Custom(global::CustomReq request, grpc::ServerCallContext context)
     {
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
@@ -787,19 +828,19 @@ public static partial class DatabaseService
     {
       return CallInvoker.AsyncUnaryCall(__Method_GetGold, null, options, request);
     }
-    public virtual global::VoidResp UpdateGold(global::UpdateGoldReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    public virtual global::GoldResp UpdateGold(global::UpdateGoldReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
       return UpdateGold(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual global::VoidResp UpdateGold(global::UpdateGoldReq request, grpc::CallOptions options)
+    public virtual global::GoldResp UpdateGold(global::UpdateGoldReq request, grpc::CallOptions options)
     {
       return CallInvoker.BlockingUnaryCall(__Method_UpdateGold, null, options, request);
     }
-    public virtual grpc::AsyncUnaryCall<global::VoidResp> UpdateGoldAsync(global::UpdateGoldReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    public virtual grpc::AsyncUnaryCall<global::GoldResp> UpdateGoldAsync(global::UpdateGoldReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
       return UpdateGoldAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual grpc::AsyncUnaryCall<global::VoidResp> UpdateGoldAsync(global::UpdateGoldReq request, grpc::CallOptions options)
+    public virtual grpc::AsyncUnaryCall<global::GoldResp> UpdateGoldAsync(global::UpdateGoldReq request, grpc::CallOptions options)
     {
       return CallInvoker.AsyncUnaryCall(__Method_UpdateGold, null, options, request);
     }
@@ -819,19 +860,19 @@ public static partial class DatabaseService
     {
       return CallInvoker.AsyncUnaryCall(__Method_GetCash, null, options, request);
     }
-    public virtual global::VoidResp UpdateCash(global::UpdateCashReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    public virtual global::CashResp UpdateCash(global::UpdateCashReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
       return UpdateCash(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual global::VoidResp UpdateCash(global::UpdateCashReq request, grpc::CallOptions options)
+    public virtual global::CashResp UpdateCash(global::UpdateCashReq request, grpc::CallOptions options)
     {
       return CallInvoker.BlockingUnaryCall(__Method_UpdateCash, null, options, request);
     }
-    public virtual grpc::AsyncUnaryCall<global::VoidResp> UpdateCashAsync(global::UpdateCashReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    public virtual grpc::AsyncUnaryCall<global::CashResp> UpdateCashAsync(global::UpdateCashReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
       return UpdateCashAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual grpc::AsyncUnaryCall<global::VoidResp> UpdateCashAsync(global::UpdateCashReq request, grpc::CallOptions options)
+    public virtual grpc::AsyncUnaryCall<global::CashResp> UpdateCashAsync(global::UpdateCashReq request, grpc::CallOptions options)
     {
       return CallInvoker.AsyncUnaryCall(__Method_UpdateCash, null, options, request);
     }
@@ -883,67 +924,95 @@ public static partial class DatabaseService
     {
       return CallInvoker.AsyncUnaryCall(__Method_FindUsername, null, options, request);
     }
-    public virtual global::VoidResp CreateCharacter(global::CreateCharacterReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    /// <summary>
+    /// Character
+    /// </summary>
+    /// <param name="request">The request to send to the server.</param>
+    /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+    /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+    /// <param name="cancellationToken">An optional token for canceling the call.</param>
+    /// <returns>The response received from the server.</returns>
+    public virtual global::CharacterResp CreateCharacter(global::CreateCharacterReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
       return CreateCharacter(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual global::VoidResp CreateCharacter(global::CreateCharacterReq request, grpc::CallOptions options)
+    /// <summary>
+    /// Character
+    /// </summary>
+    /// <param name="request">The request to send to the server.</param>
+    /// <param name="options">The options for the call.</param>
+    /// <returns>The response received from the server.</returns>
+    public virtual global::CharacterResp CreateCharacter(global::CreateCharacterReq request, grpc::CallOptions options)
     {
       return CallInvoker.BlockingUnaryCall(__Method_CreateCharacter, null, options, request);
     }
-    public virtual grpc::AsyncUnaryCall<global::VoidResp> CreateCharacterAsync(global::CreateCharacterReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    /// <summary>
+    /// Character
+    /// </summary>
+    /// <param name="request">The request to send to the server.</param>
+    /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+    /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+    /// <param name="cancellationToken">An optional token for canceling the call.</param>
+    /// <returns>The call object.</returns>
+    public virtual grpc::AsyncUnaryCall<global::CharacterResp> CreateCharacterAsync(global::CreateCharacterReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
       return CreateCharacterAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual grpc::AsyncUnaryCall<global::VoidResp> CreateCharacterAsync(global::CreateCharacterReq request, grpc::CallOptions options)
+    /// <summary>
+    /// Character
+    /// </summary>
+    /// <param name="request">The request to send to the server.</param>
+    /// <param name="options">The options for the call.</param>
+    /// <returns>The call object.</returns>
+    public virtual grpc::AsyncUnaryCall<global::CharacterResp> CreateCharacterAsync(global::CreateCharacterReq request, grpc::CallOptions options)
     {
       return CallInvoker.AsyncUnaryCall(__Method_CreateCharacter, null, options, request);
     }
-    public virtual global::ReadCharacterResp ReadCharacter(global::ReadCharacterReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    public virtual global::CharacterResp ReadCharacter(global::ReadCharacterReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
       return ReadCharacter(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual global::ReadCharacterResp ReadCharacter(global::ReadCharacterReq request, grpc::CallOptions options)
+    public virtual global::CharacterResp ReadCharacter(global::ReadCharacterReq request, grpc::CallOptions options)
     {
       return CallInvoker.BlockingUnaryCall(__Method_ReadCharacter, null, options, request);
     }
-    public virtual grpc::AsyncUnaryCall<global::ReadCharacterResp> ReadCharacterAsync(global::ReadCharacterReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    public virtual grpc::AsyncUnaryCall<global::CharacterResp> ReadCharacterAsync(global::ReadCharacterReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
       return ReadCharacterAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual grpc::AsyncUnaryCall<global::ReadCharacterResp> ReadCharacterAsync(global::ReadCharacterReq request, grpc::CallOptions options)
+    public virtual grpc::AsyncUnaryCall<global::CharacterResp> ReadCharacterAsync(global::ReadCharacterReq request, grpc::CallOptions options)
     {
       return CallInvoker.AsyncUnaryCall(__Method_ReadCharacter, null, options, request);
     }
-    public virtual global::ReadCharactersResp ReadCharacters(global::ReadCharactersReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    public virtual global::CharactersResp ReadCharacters(global::ReadCharactersReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
       return ReadCharacters(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual global::ReadCharactersResp ReadCharacters(global::ReadCharactersReq request, grpc::CallOptions options)
+    public virtual global::CharactersResp ReadCharacters(global::ReadCharactersReq request, grpc::CallOptions options)
     {
       return CallInvoker.BlockingUnaryCall(__Method_ReadCharacters, null, options, request);
     }
-    public virtual grpc::AsyncUnaryCall<global::ReadCharactersResp> ReadCharactersAsync(global::ReadCharactersReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    public virtual grpc::AsyncUnaryCall<global::CharactersResp> ReadCharactersAsync(global::ReadCharactersReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
       return ReadCharactersAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual grpc::AsyncUnaryCall<global::ReadCharactersResp> ReadCharactersAsync(global::ReadCharactersReq request, grpc::CallOptions options)
+    public virtual grpc::AsyncUnaryCall<global::CharactersResp> ReadCharactersAsync(global::ReadCharactersReq request, grpc::CallOptions options)
     {
       return CallInvoker.AsyncUnaryCall(__Method_ReadCharacters, null, options, request);
     }
-    public virtual global::VoidResp UpdateCharacter(global::UpdateCharacterReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    public virtual global::CharacterResp UpdateCharacter(global::UpdateCharacterReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
       return UpdateCharacter(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual global::VoidResp UpdateCharacter(global::UpdateCharacterReq request, grpc::CallOptions options)
+    public virtual global::CharacterResp UpdateCharacter(global::UpdateCharacterReq request, grpc::CallOptions options)
     {
       return CallInvoker.BlockingUnaryCall(__Method_UpdateCharacter, null, options, request);
     }
-    public virtual grpc::AsyncUnaryCall<global::VoidResp> UpdateCharacterAsync(global::UpdateCharacterReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    public virtual grpc::AsyncUnaryCall<global::CharacterResp> UpdateCharacterAsync(global::UpdateCharacterReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
       return UpdateCharacterAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual grpc::AsyncUnaryCall<global::VoidResp> UpdateCharacterAsync(global::UpdateCharacterReq request, grpc::CallOptions options)
+    public virtual grpc::AsyncUnaryCall<global::CharacterResp> UpdateCharacterAsync(global::UpdateCharacterReq request, grpc::CallOptions options)
     {
       return CallInvoker.AsyncUnaryCall(__Method_UpdateCharacter, null, options, request);
     }
@@ -995,19 +1064,47 @@ public static partial class DatabaseService
     {
       return CallInvoker.AsyncUnaryCall(__Method_FindCharacters, null, options, request);
     }
-    public virtual global::VoidResp CreateFriend(global::CreateFriendReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    /// <summary>
+    /// Friend
+    /// </summary>
+    /// <param name="request">The request to send to the server.</param>
+    /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+    /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+    /// <param name="cancellationToken">An optional token for canceling the call.</param>
+    /// <returns>The response received from the server.</returns>
+    public virtual global::ReadFriendsResp CreateFriend(global::CreateFriendReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
       return CreateFriend(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual global::VoidResp CreateFriend(global::CreateFriendReq request, grpc::CallOptions options)
+    /// <summary>
+    /// Friend
+    /// </summary>
+    /// <param name="request">The request to send to the server.</param>
+    /// <param name="options">The options for the call.</param>
+    /// <returns>The response received from the server.</returns>
+    public virtual global::ReadFriendsResp CreateFriend(global::CreateFriendReq request, grpc::CallOptions options)
     {
       return CallInvoker.BlockingUnaryCall(__Method_CreateFriend, null, options, request);
     }
-    public virtual grpc::AsyncUnaryCall<global::VoidResp> CreateFriendAsync(global::CreateFriendReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    /// <summary>
+    /// Friend
+    /// </summary>
+    /// <param name="request">The request to send to the server.</param>
+    /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+    /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+    /// <param name="cancellationToken">An optional token for canceling the call.</param>
+    /// <returns>The call object.</returns>
+    public virtual grpc::AsyncUnaryCall<global::ReadFriendsResp> CreateFriendAsync(global::CreateFriendReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
       return CreateFriendAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual grpc::AsyncUnaryCall<global::VoidResp> CreateFriendAsync(global::CreateFriendReq request, grpc::CallOptions options)
+    /// <summary>
+    /// Friend
+    /// </summary>
+    /// <param name="request">The request to send to the server.</param>
+    /// <param name="options">The options for the call.</param>
+    /// <returns>The call object.</returns>
+    public virtual grpc::AsyncUnaryCall<global::ReadFriendsResp> CreateFriendAsync(global::CreateFriendReq request, grpc::CallOptions options)
     {
       return CallInvoker.AsyncUnaryCall(__Method_CreateFriend, null, options, request);
     }
@@ -1043,35 +1140,63 @@ public static partial class DatabaseService
     {
       return CallInvoker.AsyncUnaryCall(__Method_ReadFriends, null, options, request);
     }
-    public virtual global::VoidResp CreateBuilding(global::CreateBuildingReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    /// <summary>
+    /// Building
+    /// </summary>
+    /// <param name="request">The request to send to the server.</param>
+    /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+    /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+    /// <param name="cancellationToken">An optional token for canceling the call.</param>
+    /// <returns>The response received from the server.</returns>
+    public virtual global::BuildingResp CreateBuilding(global::CreateBuildingReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
       return CreateBuilding(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual global::VoidResp CreateBuilding(global::CreateBuildingReq request, grpc::CallOptions options)
+    /// <summary>
+    /// Building
+    /// </summary>
+    /// <param name="request">The request to send to the server.</param>
+    /// <param name="options">The options for the call.</param>
+    /// <returns>The response received from the server.</returns>
+    public virtual global::BuildingResp CreateBuilding(global::CreateBuildingReq request, grpc::CallOptions options)
     {
       return CallInvoker.BlockingUnaryCall(__Method_CreateBuilding, null, options, request);
     }
-    public virtual grpc::AsyncUnaryCall<global::VoidResp> CreateBuildingAsync(global::CreateBuildingReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    /// <summary>
+    /// Building
+    /// </summary>
+    /// <param name="request">The request to send to the server.</param>
+    /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+    /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+    /// <param name="cancellationToken">An optional token for canceling the call.</param>
+    /// <returns>The call object.</returns>
+    public virtual grpc::AsyncUnaryCall<global::BuildingResp> CreateBuildingAsync(global::CreateBuildingReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
       return CreateBuildingAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual grpc::AsyncUnaryCall<global::VoidResp> CreateBuildingAsync(global::CreateBuildingReq request, grpc::CallOptions options)
+    /// <summary>
+    /// Building
+    /// </summary>
+    /// <param name="request">The request to send to the server.</param>
+    /// <param name="options">The options for the call.</param>
+    /// <returns>The call object.</returns>
+    public virtual grpc::AsyncUnaryCall<global::BuildingResp> CreateBuildingAsync(global::CreateBuildingReq request, grpc::CallOptions options)
     {
       return CallInvoker.AsyncUnaryCall(__Method_CreateBuilding, null, options, request);
     }
-    public virtual global::VoidResp UpdateBuilding(global::UpdateBuildingReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    public virtual global::BuildingResp UpdateBuilding(global::UpdateBuildingReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
       return UpdateBuilding(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual global::VoidResp UpdateBuilding(global::UpdateBuildingReq request, grpc::CallOptions options)
+    public virtual global::BuildingResp UpdateBuilding(global::UpdateBuildingReq request, grpc::CallOptions options)
     {
       return CallInvoker.BlockingUnaryCall(__Method_UpdateBuilding, null, options, request);
     }
-    public virtual grpc::AsyncUnaryCall<global::VoidResp> UpdateBuildingAsync(global::UpdateBuildingReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    public virtual grpc::AsyncUnaryCall<global::BuildingResp> UpdateBuildingAsync(global::UpdateBuildingReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
       return UpdateBuildingAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual grpc::AsyncUnaryCall<global::VoidResp> UpdateBuildingAsync(global::UpdateBuildingReq request, grpc::CallOptions options)
+    public virtual grpc::AsyncUnaryCall<global::BuildingResp> UpdateBuildingAsync(global::UpdateBuildingReq request, grpc::CallOptions options)
     {
       return CallInvoker.AsyncUnaryCall(__Method_UpdateBuilding, null, options, request);
     }
@@ -1091,67 +1216,95 @@ public static partial class DatabaseService
     {
       return CallInvoker.AsyncUnaryCall(__Method_DeleteBuilding, null, options, request);
     }
-    public virtual global::ReadBuildingsResp ReadBuildings(global::ReadBuildingsReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    public virtual global::BuildingsResp ReadBuildings(global::ReadBuildingsReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
       return ReadBuildings(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual global::ReadBuildingsResp ReadBuildings(global::ReadBuildingsReq request, grpc::CallOptions options)
+    public virtual global::BuildingsResp ReadBuildings(global::ReadBuildingsReq request, grpc::CallOptions options)
     {
       return CallInvoker.BlockingUnaryCall(__Method_ReadBuildings, null, options, request);
     }
-    public virtual grpc::AsyncUnaryCall<global::ReadBuildingsResp> ReadBuildingsAsync(global::ReadBuildingsReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    public virtual grpc::AsyncUnaryCall<global::BuildingsResp> ReadBuildingsAsync(global::ReadBuildingsReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
       return ReadBuildingsAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual grpc::AsyncUnaryCall<global::ReadBuildingsResp> ReadBuildingsAsync(global::ReadBuildingsReq request, grpc::CallOptions options)
+    public virtual grpc::AsyncUnaryCall<global::BuildingsResp> ReadBuildingsAsync(global::ReadBuildingsReq request, grpc::CallOptions options)
     {
       return CallInvoker.AsyncUnaryCall(__Method_ReadBuildings, null, options, request);
     }
-    public virtual global::CreatePartyResp CreateParty(global::CreatePartyReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    /// <summary>
+    /// Party
+    /// </summary>
+    /// <param name="request">The request to send to the server.</param>
+    /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+    /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+    /// <param name="cancellationToken">An optional token for canceling the call.</param>
+    /// <returns>The response received from the server.</returns>
+    public virtual global::PartyResp CreateParty(global::CreatePartyReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
       return CreateParty(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual global::CreatePartyResp CreateParty(global::CreatePartyReq request, grpc::CallOptions options)
+    /// <summary>
+    /// Party
+    /// </summary>
+    /// <param name="request">The request to send to the server.</param>
+    /// <param name="options">The options for the call.</param>
+    /// <returns>The response received from the server.</returns>
+    public virtual global::PartyResp CreateParty(global::CreatePartyReq request, grpc::CallOptions options)
     {
       return CallInvoker.BlockingUnaryCall(__Method_CreateParty, null, options, request);
     }
-    public virtual grpc::AsyncUnaryCall<global::CreatePartyResp> CreatePartyAsync(global::CreatePartyReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    /// <summary>
+    /// Party
+    /// </summary>
+    /// <param name="request">The request to send to the server.</param>
+    /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+    /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+    /// <param name="cancellationToken">An optional token for canceling the call.</param>
+    /// <returns>The call object.</returns>
+    public virtual grpc::AsyncUnaryCall<global::PartyResp> CreatePartyAsync(global::CreatePartyReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
       return CreatePartyAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual grpc::AsyncUnaryCall<global::CreatePartyResp> CreatePartyAsync(global::CreatePartyReq request, grpc::CallOptions options)
+    /// <summary>
+    /// Party
+    /// </summary>
+    /// <param name="request">The request to send to the server.</param>
+    /// <param name="options">The options for the call.</param>
+    /// <returns>The call object.</returns>
+    public virtual grpc::AsyncUnaryCall<global::PartyResp> CreatePartyAsync(global::CreatePartyReq request, grpc::CallOptions options)
     {
       return CallInvoker.AsyncUnaryCall(__Method_CreateParty, null, options, request);
     }
-    public virtual global::VoidResp UpdateParty(global::UpdatePartyReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    public virtual global::PartyResp UpdateParty(global::UpdatePartyReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
       return UpdateParty(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual global::VoidResp UpdateParty(global::UpdatePartyReq request, grpc::CallOptions options)
+    public virtual global::PartyResp UpdateParty(global::UpdatePartyReq request, grpc::CallOptions options)
     {
       return CallInvoker.BlockingUnaryCall(__Method_UpdateParty, null, options, request);
     }
-    public virtual grpc::AsyncUnaryCall<global::VoidResp> UpdatePartyAsync(global::UpdatePartyReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    public virtual grpc::AsyncUnaryCall<global::PartyResp> UpdatePartyAsync(global::UpdatePartyReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
       return UpdatePartyAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual grpc::AsyncUnaryCall<global::VoidResp> UpdatePartyAsync(global::UpdatePartyReq request, grpc::CallOptions options)
+    public virtual grpc::AsyncUnaryCall<global::PartyResp> UpdatePartyAsync(global::UpdatePartyReq request, grpc::CallOptions options)
     {
       return CallInvoker.AsyncUnaryCall(__Method_UpdateParty, null, options, request);
     }
-    public virtual global::VoidResp UpdatePartyLeader(global::UpdatePartyLeaderReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    public virtual global::PartyResp UpdatePartyLeader(global::UpdatePartyLeaderReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
       return UpdatePartyLeader(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual global::VoidResp UpdatePartyLeader(global::UpdatePartyLeaderReq request, grpc::CallOptions options)
+    public virtual global::PartyResp UpdatePartyLeader(global::UpdatePartyLeaderReq request, grpc::CallOptions options)
     {
       return CallInvoker.BlockingUnaryCall(__Method_UpdatePartyLeader, null, options, request);
     }
-    public virtual grpc::AsyncUnaryCall<global::VoidResp> UpdatePartyLeaderAsync(global::UpdatePartyLeaderReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    public virtual grpc::AsyncUnaryCall<global::PartyResp> UpdatePartyLeaderAsync(global::UpdatePartyLeaderReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
       return UpdatePartyLeaderAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual grpc::AsyncUnaryCall<global::VoidResp> UpdatePartyLeaderAsync(global::UpdatePartyLeaderReq request, grpc::CallOptions options)
+    public virtual grpc::AsyncUnaryCall<global::PartyResp> UpdatePartyLeaderAsync(global::UpdatePartyLeaderReq request, grpc::CallOptions options)
     {
       return CallInvoker.AsyncUnaryCall(__Method_UpdatePartyLeader, null, options, request);
     }
@@ -1171,163 +1324,191 @@ public static partial class DatabaseService
     {
       return CallInvoker.AsyncUnaryCall(__Method_DeleteParty, null, options, request);
     }
-    public virtual global::VoidResp UpdateCharacterParty(global::UpdateCharacterPartyReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    public virtual global::PartyResp UpdateCharacterParty(global::UpdateCharacterPartyReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
       return UpdateCharacterParty(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual global::VoidResp UpdateCharacterParty(global::UpdateCharacterPartyReq request, grpc::CallOptions options)
+    public virtual global::PartyResp UpdateCharacterParty(global::UpdateCharacterPartyReq request, grpc::CallOptions options)
     {
       return CallInvoker.BlockingUnaryCall(__Method_UpdateCharacterParty, null, options, request);
     }
-    public virtual grpc::AsyncUnaryCall<global::VoidResp> UpdateCharacterPartyAsync(global::UpdateCharacterPartyReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    public virtual grpc::AsyncUnaryCall<global::PartyResp> UpdateCharacterPartyAsync(global::UpdateCharacterPartyReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
       return UpdateCharacterPartyAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual grpc::AsyncUnaryCall<global::VoidResp> UpdateCharacterPartyAsync(global::UpdateCharacterPartyReq request, grpc::CallOptions options)
+    public virtual grpc::AsyncUnaryCall<global::PartyResp> UpdateCharacterPartyAsync(global::UpdateCharacterPartyReq request, grpc::CallOptions options)
     {
       return CallInvoker.AsyncUnaryCall(__Method_UpdateCharacterParty, null, options, request);
     }
-    public virtual global::ReadPartyResp ReadParty(global::ReadPartyReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    public virtual global::PartyResp ReadParty(global::ReadPartyReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
       return ReadParty(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual global::ReadPartyResp ReadParty(global::ReadPartyReq request, grpc::CallOptions options)
+    public virtual global::PartyResp ReadParty(global::ReadPartyReq request, grpc::CallOptions options)
     {
       return CallInvoker.BlockingUnaryCall(__Method_ReadParty, null, options, request);
     }
-    public virtual grpc::AsyncUnaryCall<global::ReadPartyResp> ReadPartyAsync(global::ReadPartyReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    public virtual grpc::AsyncUnaryCall<global::PartyResp> ReadPartyAsync(global::ReadPartyReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
       return ReadPartyAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual grpc::AsyncUnaryCall<global::ReadPartyResp> ReadPartyAsync(global::ReadPartyReq request, grpc::CallOptions options)
+    public virtual grpc::AsyncUnaryCall<global::PartyResp> ReadPartyAsync(global::ReadPartyReq request, grpc::CallOptions options)
     {
       return CallInvoker.AsyncUnaryCall(__Method_ReadParty, null, options, request);
     }
-    public virtual global::CreateGuildResp CreateGuild(global::CreateGuildReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    /// <summary>
+    /// Guild
+    /// </summary>
+    /// <param name="request">The request to send to the server.</param>
+    /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+    /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+    /// <param name="cancellationToken">An optional token for canceling the call.</param>
+    /// <returns>The response received from the server.</returns>
+    public virtual global::GuildResp CreateGuild(global::CreateGuildReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
       return CreateGuild(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual global::CreateGuildResp CreateGuild(global::CreateGuildReq request, grpc::CallOptions options)
+    /// <summary>
+    /// Guild
+    /// </summary>
+    /// <param name="request">The request to send to the server.</param>
+    /// <param name="options">The options for the call.</param>
+    /// <returns>The response received from the server.</returns>
+    public virtual global::GuildResp CreateGuild(global::CreateGuildReq request, grpc::CallOptions options)
     {
       return CallInvoker.BlockingUnaryCall(__Method_CreateGuild, null, options, request);
     }
-    public virtual grpc::AsyncUnaryCall<global::CreateGuildResp> CreateGuildAsync(global::CreateGuildReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    /// <summary>
+    /// Guild
+    /// </summary>
+    /// <param name="request">The request to send to the server.</param>
+    /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+    /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+    /// <param name="cancellationToken">An optional token for canceling the call.</param>
+    /// <returns>The call object.</returns>
+    public virtual grpc::AsyncUnaryCall<global::GuildResp> CreateGuildAsync(global::CreateGuildReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
       return CreateGuildAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual grpc::AsyncUnaryCall<global::CreateGuildResp> CreateGuildAsync(global::CreateGuildReq request, grpc::CallOptions options)
+    /// <summary>
+    /// Guild
+    /// </summary>
+    /// <param name="request">The request to send to the server.</param>
+    /// <param name="options">The options for the call.</param>
+    /// <returns>The call object.</returns>
+    public virtual grpc::AsyncUnaryCall<global::GuildResp> CreateGuildAsync(global::CreateGuildReq request, grpc::CallOptions options)
     {
       return CallInvoker.AsyncUnaryCall(__Method_CreateGuild, null, options, request);
     }
-    public virtual global::VoidResp UpdateGuildLevel(global::UpdateGuildLevelReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    public virtual global::GuildResp GuildLevelUp(global::GuildLevelUpReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
-      return UpdateGuildLevel(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      return GuildLevelUp(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual global::VoidResp UpdateGuildLevel(global::UpdateGuildLevelReq request, grpc::CallOptions options)
+    public virtual global::GuildResp GuildLevelUp(global::GuildLevelUpReq request, grpc::CallOptions options)
     {
-      return CallInvoker.BlockingUnaryCall(__Method_UpdateGuildLevel, null, options, request);
+      return CallInvoker.BlockingUnaryCall(__Method_GuildLevelUp, null, options, request);
     }
-    public virtual grpc::AsyncUnaryCall<global::VoidResp> UpdateGuildLevelAsync(global::UpdateGuildLevelReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    public virtual grpc::AsyncUnaryCall<global::GuildResp> GuildLevelUpAsync(global::GuildLevelUpReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
-      return UpdateGuildLevelAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      return GuildLevelUpAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual grpc::AsyncUnaryCall<global::VoidResp> UpdateGuildLevelAsync(global::UpdateGuildLevelReq request, grpc::CallOptions options)
+    public virtual grpc::AsyncUnaryCall<global::GuildResp> GuildLevelUpAsync(global::GuildLevelUpReq request, grpc::CallOptions options)
     {
-      return CallInvoker.AsyncUnaryCall(__Method_UpdateGuildLevel, null, options, request);
+      return CallInvoker.AsyncUnaryCall(__Method_GuildLevelUp, null, options, request);
     }
-    public virtual global::VoidResp UpdateGuildLeader(global::UpdateGuildLeaderReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    public virtual global::GuildResp GuildSkillLevelUp(global::GuildSkillLevelUpReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    {
+      return GuildSkillLevelUp(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+    }
+    public virtual global::GuildResp GuildSkillLevelUp(global::GuildSkillLevelUpReq request, grpc::CallOptions options)
+    {
+      return CallInvoker.BlockingUnaryCall(__Method_GuildSkillLevelUp, null, options, request);
+    }
+    public virtual grpc::AsyncUnaryCall<global::GuildResp> GuildSkillLevelUpAsync(global::GuildSkillLevelUpReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    {
+      return GuildSkillLevelUpAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+    }
+    public virtual grpc::AsyncUnaryCall<global::GuildResp> GuildSkillLevelUpAsync(global::GuildSkillLevelUpReq request, grpc::CallOptions options)
+    {
+      return CallInvoker.AsyncUnaryCall(__Method_GuildSkillLevelUp, null, options, request);
+    }
+    public virtual global::GuildResp UpdateGuildLeader(global::UpdateGuildLeaderReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
       return UpdateGuildLeader(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual global::VoidResp UpdateGuildLeader(global::UpdateGuildLeaderReq request, grpc::CallOptions options)
+    public virtual global::GuildResp UpdateGuildLeader(global::UpdateGuildLeaderReq request, grpc::CallOptions options)
     {
       return CallInvoker.BlockingUnaryCall(__Method_UpdateGuildLeader, null, options, request);
     }
-    public virtual grpc::AsyncUnaryCall<global::VoidResp> UpdateGuildLeaderAsync(global::UpdateGuildLeaderReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    public virtual grpc::AsyncUnaryCall<global::GuildResp> UpdateGuildLeaderAsync(global::UpdateGuildLeaderReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
       return UpdateGuildLeaderAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual grpc::AsyncUnaryCall<global::VoidResp> UpdateGuildLeaderAsync(global::UpdateGuildLeaderReq request, grpc::CallOptions options)
+    public virtual grpc::AsyncUnaryCall<global::GuildResp> UpdateGuildLeaderAsync(global::UpdateGuildLeaderReq request, grpc::CallOptions options)
     {
       return CallInvoker.AsyncUnaryCall(__Method_UpdateGuildLeader, null, options, request);
     }
-    public virtual global::VoidResp UpdateGuildMessage(global::UpdateGuildMessageReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    public virtual global::GuildResp UpdateGuildMessage(global::UpdateGuildMessageReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
       return UpdateGuildMessage(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual global::VoidResp UpdateGuildMessage(global::UpdateGuildMessageReq request, grpc::CallOptions options)
+    public virtual global::GuildResp UpdateGuildMessage(global::UpdateGuildMessageReq request, grpc::CallOptions options)
     {
       return CallInvoker.BlockingUnaryCall(__Method_UpdateGuildMessage, null, options, request);
     }
-    public virtual grpc::AsyncUnaryCall<global::VoidResp> UpdateGuildMessageAsync(global::UpdateGuildMessageReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    public virtual grpc::AsyncUnaryCall<global::GuildResp> UpdateGuildMessageAsync(global::UpdateGuildMessageReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
       return UpdateGuildMessageAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual grpc::AsyncUnaryCall<global::VoidResp> UpdateGuildMessageAsync(global::UpdateGuildMessageReq request, grpc::CallOptions options)
+    public virtual grpc::AsyncUnaryCall<global::GuildResp> UpdateGuildMessageAsync(global::UpdateGuildMessageReq request, grpc::CallOptions options)
     {
       return CallInvoker.AsyncUnaryCall(__Method_UpdateGuildMessage, null, options, request);
     }
-    public virtual global::VoidResp UpdateGuildRole(global::UpdateGuildRoleReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    public virtual global::GuildResp UpdateGuildRole(global::UpdateGuildRoleReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
       return UpdateGuildRole(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual global::VoidResp UpdateGuildRole(global::UpdateGuildRoleReq request, grpc::CallOptions options)
+    public virtual global::GuildResp UpdateGuildRole(global::UpdateGuildRoleReq request, grpc::CallOptions options)
     {
       return CallInvoker.BlockingUnaryCall(__Method_UpdateGuildRole, null, options, request);
     }
-    public virtual grpc::AsyncUnaryCall<global::VoidResp> UpdateGuildRoleAsync(global::UpdateGuildRoleReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    public virtual grpc::AsyncUnaryCall<global::GuildResp> UpdateGuildRoleAsync(global::UpdateGuildRoleReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
       return UpdateGuildRoleAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual grpc::AsyncUnaryCall<global::VoidResp> UpdateGuildRoleAsync(global::UpdateGuildRoleReq request, grpc::CallOptions options)
+    public virtual grpc::AsyncUnaryCall<global::GuildResp> UpdateGuildRoleAsync(global::UpdateGuildRoleReq request, grpc::CallOptions options)
     {
       return CallInvoker.AsyncUnaryCall(__Method_UpdateGuildRole, null, options, request);
     }
-    public virtual global::VoidResp UpdateGuildMemberRole(global::UpdateGuildMemberRoleReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    public virtual global::GuildResp UpdateGuildMemberRole(global::UpdateGuildMemberRoleReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
       return UpdateGuildMemberRole(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual global::VoidResp UpdateGuildMemberRole(global::UpdateGuildMemberRoleReq request, grpc::CallOptions options)
+    public virtual global::GuildResp UpdateGuildMemberRole(global::UpdateGuildMemberRoleReq request, grpc::CallOptions options)
     {
       return CallInvoker.BlockingUnaryCall(__Method_UpdateGuildMemberRole, null, options, request);
     }
-    public virtual grpc::AsyncUnaryCall<global::VoidResp> UpdateGuildMemberRoleAsync(global::UpdateGuildMemberRoleReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    public virtual grpc::AsyncUnaryCall<global::GuildResp> UpdateGuildMemberRoleAsync(global::UpdateGuildMemberRoleReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
       return UpdateGuildMemberRoleAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual grpc::AsyncUnaryCall<global::VoidResp> UpdateGuildMemberRoleAsync(global::UpdateGuildMemberRoleReq request, grpc::CallOptions options)
+    public virtual grpc::AsyncUnaryCall<global::GuildResp> UpdateGuildMemberRoleAsync(global::UpdateGuildMemberRoleReq request, grpc::CallOptions options)
     {
       return CallInvoker.AsyncUnaryCall(__Method_UpdateGuildMemberRole, null, options, request);
     }
-    public virtual global::VoidResp UpdateGuildSkillLevel(global::UpdateGuildSkillLevelReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
-    {
-      return UpdateGuildSkillLevel(request, new grpc::CallOptions(headers, deadline, cancellationToken));
-    }
-    public virtual global::VoidResp UpdateGuildSkillLevel(global::UpdateGuildSkillLevelReq request, grpc::CallOptions options)
-    {
-      return CallInvoker.BlockingUnaryCall(__Method_UpdateGuildSkillLevel, null, options, request);
-    }
-    public virtual grpc::AsyncUnaryCall<global::VoidResp> UpdateGuildSkillLevelAsync(global::UpdateGuildSkillLevelReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
-    {
-      return UpdateGuildSkillLevelAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
-    }
-    public virtual grpc::AsyncUnaryCall<global::VoidResp> UpdateGuildSkillLevelAsync(global::UpdateGuildSkillLevelReq request, grpc::CallOptions options)
-    {
-      return CallInvoker.AsyncUnaryCall(__Method_UpdateGuildSkillLevel, null, options, request);
-    }
-    public virtual global::VoidResp UpdateCharacterGuild(global::UpdateCharacterGuildReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    public virtual global::GuildResp UpdateCharacterGuild(global::UpdateCharacterGuildReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
       return UpdateCharacterGuild(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual global::VoidResp UpdateCharacterGuild(global::UpdateCharacterGuildReq request, grpc::CallOptions options)
+    public virtual global::GuildResp UpdateCharacterGuild(global::UpdateCharacterGuildReq request, grpc::CallOptions options)
     {
       return CallInvoker.BlockingUnaryCall(__Method_UpdateCharacterGuild, null, options, request);
     }
-    public virtual grpc::AsyncUnaryCall<global::VoidResp> UpdateCharacterGuildAsync(global::UpdateCharacterGuildReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    public virtual grpc::AsyncUnaryCall<global::GuildResp> UpdateCharacterGuildAsync(global::UpdateCharacterGuildReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
       return UpdateCharacterGuildAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual grpc::AsyncUnaryCall<global::VoidResp> UpdateCharacterGuildAsync(global::UpdateCharacterGuildReq request, grpc::CallOptions options)
+    public virtual grpc::AsyncUnaryCall<global::GuildResp> UpdateCharacterGuildAsync(global::UpdateCharacterGuildReq request, grpc::CallOptions options)
     {
       return CallInvoker.AsyncUnaryCall(__Method_UpdateCharacterGuild, null, options, request);
     }
@@ -1363,19 +1544,19 @@ public static partial class DatabaseService
     {
       return CallInvoker.AsyncUnaryCall(__Method_FindGuildName, null, options, request);
     }
-    public virtual global::ReadGuildResp ReadGuild(global::ReadGuildReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    public virtual global::GuildResp ReadGuild(global::ReadGuildReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
       return ReadGuild(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual global::ReadGuildResp ReadGuild(global::ReadGuildReq request, grpc::CallOptions options)
+    public virtual global::GuildResp ReadGuild(global::ReadGuildReq request, grpc::CallOptions options)
     {
       return CallInvoker.BlockingUnaryCall(__Method_ReadGuild, null, options, request);
     }
-    public virtual grpc::AsyncUnaryCall<global::ReadGuildResp> ReadGuildAsync(global::ReadGuildReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    public virtual grpc::AsyncUnaryCall<global::GuildResp> ReadGuildAsync(global::ReadGuildReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
       return ReadGuildAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual grpc::AsyncUnaryCall<global::ReadGuildResp> ReadGuildAsync(global::ReadGuildReq request, grpc::CallOptions options)
+    public virtual grpc::AsyncUnaryCall<global::GuildResp> ReadGuildAsync(global::ReadGuildReq request, grpc::CallOptions options)
     {
       return CallInvoker.AsyncUnaryCall(__Method_ReadGuild, null, options, request);
     }
@@ -1395,34 +1576,62 @@ public static partial class DatabaseService
     {
       return CallInvoker.AsyncUnaryCall(__Method_GetGuildGold, null, options, request);
     }
-    public virtual global::VoidResp UpdateGuildGold(global::UpdateGuildGoldReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    public virtual global::GuildGoldResp UpdateGuildGold(global::UpdateGuildGoldReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
       return UpdateGuildGold(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual global::VoidResp UpdateGuildGold(global::UpdateGuildGoldReq request, grpc::CallOptions options)
+    public virtual global::GuildGoldResp UpdateGuildGold(global::UpdateGuildGoldReq request, grpc::CallOptions options)
     {
       return CallInvoker.BlockingUnaryCall(__Method_UpdateGuildGold, null, options, request);
     }
-    public virtual grpc::AsyncUnaryCall<global::VoidResp> UpdateGuildGoldAsync(global::UpdateGuildGoldReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    public virtual grpc::AsyncUnaryCall<global::GuildGoldResp> UpdateGuildGoldAsync(global::UpdateGuildGoldReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
       return UpdateGuildGoldAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual grpc::AsyncUnaryCall<global::VoidResp> UpdateGuildGoldAsync(global::UpdateGuildGoldReq request, grpc::CallOptions options)
+    public virtual grpc::AsyncUnaryCall<global::GuildGoldResp> UpdateGuildGoldAsync(global::UpdateGuildGoldReq request, grpc::CallOptions options)
     {
       return CallInvoker.AsyncUnaryCall(__Method_UpdateGuildGold, null, options, request);
     }
+    /// <summary>
+    /// Storage
+    /// </summary>
+    /// <param name="request">The request to send to the server.</param>
+    /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+    /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+    /// <param name="cancellationToken">An optional token for canceling the call.</param>
+    /// <returns>The response received from the server.</returns>
     public virtual global::ReadStorageItemsResp ReadStorageItems(global::ReadStorageItemsReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
       return ReadStorageItems(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
+    /// <summary>
+    /// Storage
+    /// </summary>
+    /// <param name="request">The request to send to the server.</param>
+    /// <param name="options">The options for the call.</param>
+    /// <returns>The response received from the server.</returns>
     public virtual global::ReadStorageItemsResp ReadStorageItems(global::ReadStorageItemsReq request, grpc::CallOptions options)
     {
       return CallInvoker.BlockingUnaryCall(__Method_ReadStorageItems, null, options, request);
     }
+    /// <summary>
+    /// Storage
+    /// </summary>
+    /// <param name="request">The request to send to the server.</param>
+    /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+    /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+    /// <param name="cancellationToken">An optional token for canceling the call.</param>
+    /// <returns>The call object.</returns>
     public virtual grpc::AsyncUnaryCall<global::ReadStorageItemsResp> ReadStorageItemsAsync(global::ReadStorageItemsReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
       return ReadStorageItemsAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
+    /// <summary>
+    /// Storage
+    /// </summary>
+    /// <param name="request">The request to send to the server.</param>
+    /// <param name="options">The options for the call.</param>
+    /// <returns>The call object.</returns>
     public virtual grpc::AsyncUnaryCall<global::ReadStorageItemsResp> ReadStorageItemsAsync(global::ReadStorageItemsReq request, grpc::CallOptions options)
     {
       return CallInvoker.AsyncUnaryCall(__Method_ReadStorageItems, null, options, request);
@@ -1507,18 +1716,46 @@ public static partial class DatabaseService
     {
       return CallInvoker.AsyncUnaryCall(__Method_DecreaseStorageItems, null, options, request);
     }
+    /// <summary>
+    /// Other
+    /// </summary>
+    /// <param name="request">The request to send to the server.</param>
+    /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+    /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+    /// <param name="cancellationToken">An optional token for canceling the call.</param>
+    /// <returns>The response received from the server.</returns>
     public virtual global::CustomResp Custom(global::CustomReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
       return Custom(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
+    /// <summary>
+    /// Other
+    /// </summary>
+    /// <param name="request">The request to send to the server.</param>
+    /// <param name="options">The options for the call.</param>
+    /// <returns>The response received from the server.</returns>
     public virtual global::CustomResp Custom(global::CustomReq request, grpc::CallOptions options)
     {
       return CallInvoker.BlockingUnaryCall(__Method_Custom, null, options, request);
     }
+    /// <summary>
+    /// Other
+    /// </summary>
+    /// <param name="request">The request to send to the server.</param>
+    /// <param name="headers">The initial metadata to send with the call. This parameter is optional.</param>
+    /// <param name="deadline">An optional deadline for the call. The call will be cancelled if deadline is hit.</param>
+    /// <param name="cancellationToken">An optional token for canceling the call.</param>
+    /// <returns>The call object.</returns>
     public virtual grpc::AsyncUnaryCall<global::CustomResp> CustomAsync(global::CustomReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
       return CustomAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
+    /// <summary>
+    /// Other
+    /// </summary>
+    /// <param name="request">The request to send to the server.</param>
+    /// <param name="options">The options for the call.</param>
+    /// <returns>The call object.</returns>
     public virtual grpc::AsyncUnaryCall<global::CustomResp> CustomAsync(global::CustomReq request, grpc::CallOptions options)
     {
       return CallInvoker.AsyncUnaryCall(__Method_Custom, null, options, request);
@@ -1566,12 +1803,12 @@ public static partial class DatabaseService
         .AddMethod(__Method_UpdateCharacterParty, serviceImpl.UpdateCharacterParty)
         .AddMethod(__Method_ReadParty, serviceImpl.ReadParty)
         .AddMethod(__Method_CreateGuild, serviceImpl.CreateGuild)
-        .AddMethod(__Method_UpdateGuildLevel, serviceImpl.UpdateGuildLevel)
+        .AddMethod(__Method_GuildLevelUp, serviceImpl.GuildLevelUp)
+        .AddMethod(__Method_GuildSkillLevelUp, serviceImpl.GuildSkillLevelUp)
         .AddMethod(__Method_UpdateGuildLeader, serviceImpl.UpdateGuildLeader)
         .AddMethod(__Method_UpdateGuildMessage, serviceImpl.UpdateGuildMessage)
         .AddMethod(__Method_UpdateGuildRole, serviceImpl.UpdateGuildRole)
         .AddMethod(__Method_UpdateGuildMemberRole, serviceImpl.UpdateGuildMemberRole)
-        .AddMethod(__Method_UpdateGuildSkillLevel, serviceImpl.UpdateGuildSkillLevel)
         .AddMethod(__Method_UpdateCharacterGuild, serviceImpl.UpdateCharacterGuild)
         .AddMethod(__Method_DeleteGuild, serviceImpl.DeleteGuild)
         .AddMethod(__Method_FindGuildName, serviceImpl.FindGuildName)
@@ -1597,45 +1834,45 @@ public static partial class DatabaseService
     serviceBinder.AddMethod(__Method_ValidateAccessToken, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::ValidateAccessTokenReq, global::ValidateAccessTokenResp>(serviceImpl.ValidateAccessToken));
     serviceBinder.AddMethod(__Method_GetUserLevel, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::GetUserLevelReq, global::GetUserLevelResp>(serviceImpl.GetUserLevel));
     serviceBinder.AddMethod(__Method_GetGold, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::GetGoldReq, global::GoldResp>(serviceImpl.GetGold));
-    serviceBinder.AddMethod(__Method_UpdateGold, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::UpdateGoldReq, global::VoidResp>(serviceImpl.UpdateGold));
+    serviceBinder.AddMethod(__Method_UpdateGold, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::UpdateGoldReq, global::GoldResp>(serviceImpl.UpdateGold));
     serviceBinder.AddMethod(__Method_GetCash, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::GetCashReq, global::CashResp>(serviceImpl.GetCash));
-    serviceBinder.AddMethod(__Method_UpdateCash, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::UpdateCashReq, global::VoidResp>(serviceImpl.UpdateCash));
+    serviceBinder.AddMethod(__Method_UpdateCash, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::UpdateCashReq, global::CashResp>(serviceImpl.UpdateCash));
     serviceBinder.AddMethod(__Method_UpdateAccessToken, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::UpdateAccessTokenReq, global::VoidResp>(serviceImpl.UpdateAccessToken));
     serviceBinder.AddMethod(__Method_CreateUserLogin, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::CreateUserLoginReq, global::VoidResp>(serviceImpl.CreateUserLogin));
     serviceBinder.AddMethod(__Method_FindUsername, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::FindUsernameReq, global::FindUsernameResp>(serviceImpl.FindUsername));
-    serviceBinder.AddMethod(__Method_CreateCharacter, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::CreateCharacterReq, global::VoidResp>(serviceImpl.CreateCharacter));
-    serviceBinder.AddMethod(__Method_ReadCharacter, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::ReadCharacterReq, global::ReadCharacterResp>(serviceImpl.ReadCharacter));
-    serviceBinder.AddMethod(__Method_ReadCharacters, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::ReadCharactersReq, global::ReadCharactersResp>(serviceImpl.ReadCharacters));
-    serviceBinder.AddMethod(__Method_UpdateCharacter, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::UpdateCharacterReq, global::VoidResp>(serviceImpl.UpdateCharacter));
+    serviceBinder.AddMethod(__Method_CreateCharacter, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::CreateCharacterReq, global::CharacterResp>(serviceImpl.CreateCharacter));
+    serviceBinder.AddMethod(__Method_ReadCharacter, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::ReadCharacterReq, global::CharacterResp>(serviceImpl.ReadCharacter));
+    serviceBinder.AddMethod(__Method_ReadCharacters, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::ReadCharactersReq, global::CharactersResp>(serviceImpl.ReadCharacters));
+    serviceBinder.AddMethod(__Method_UpdateCharacter, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::UpdateCharacterReq, global::CharacterResp>(serviceImpl.UpdateCharacter));
     serviceBinder.AddMethod(__Method_DeleteCharacter, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::DeleteCharacterReq, global::VoidResp>(serviceImpl.DeleteCharacter));
     serviceBinder.AddMethod(__Method_FindCharacterName, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::FindCharacterNameReq, global::FindCharacterNameResp>(serviceImpl.FindCharacterName));
     serviceBinder.AddMethod(__Method_FindCharacters, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::FindCharactersReq, global::FindCharactersResp>(serviceImpl.FindCharacters));
-    serviceBinder.AddMethod(__Method_CreateFriend, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::CreateFriendReq, global::VoidResp>(serviceImpl.CreateFriend));
+    serviceBinder.AddMethod(__Method_CreateFriend, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::CreateFriendReq, global::ReadFriendsResp>(serviceImpl.CreateFriend));
     serviceBinder.AddMethod(__Method_DeleteFriend, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::DeleteFriendReq, global::VoidResp>(serviceImpl.DeleteFriend));
     serviceBinder.AddMethod(__Method_ReadFriends, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::ReadFriendsReq, global::ReadFriendsResp>(serviceImpl.ReadFriends));
-    serviceBinder.AddMethod(__Method_CreateBuilding, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::CreateBuildingReq, global::VoidResp>(serviceImpl.CreateBuilding));
-    serviceBinder.AddMethod(__Method_UpdateBuilding, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::UpdateBuildingReq, global::VoidResp>(serviceImpl.UpdateBuilding));
+    serviceBinder.AddMethod(__Method_CreateBuilding, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::CreateBuildingReq, global::BuildingResp>(serviceImpl.CreateBuilding));
+    serviceBinder.AddMethod(__Method_UpdateBuilding, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::UpdateBuildingReq, global::BuildingResp>(serviceImpl.UpdateBuilding));
     serviceBinder.AddMethod(__Method_DeleteBuilding, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::DeleteBuildingReq, global::VoidResp>(serviceImpl.DeleteBuilding));
-    serviceBinder.AddMethod(__Method_ReadBuildings, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::ReadBuildingsReq, global::ReadBuildingsResp>(serviceImpl.ReadBuildings));
-    serviceBinder.AddMethod(__Method_CreateParty, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::CreatePartyReq, global::CreatePartyResp>(serviceImpl.CreateParty));
-    serviceBinder.AddMethod(__Method_UpdateParty, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::UpdatePartyReq, global::VoidResp>(serviceImpl.UpdateParty));
-    serviceBinder.AddMethod(__Method_UpdatePartyLeader, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::UpdatePartyLeaderReq, global::VoidResp>(serviceImpl.UpdatePartyLeader));
+    serviceBinder.AddMethod(__Method_ReadBuildings, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::ReadBuildingsReq, global::BuildingsResp>(serviceImpl.ReadBuildings));
+    serviceBinder.AddMethod(__Method_CreateParty, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::CreatePartyReq, global::PartyResp>(serviceImpl.CreateParty));
+    serviceBinder.AddMethod(__Method_UpdateParty, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::UpdatePartyReq, global::PartyResp>(serviceImpl.UpdateParty));
+    serviceBinder.AddMethod(__Method_UpdatePartyLeader, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::UpdatePartyLeaderReq, global::PartyResp>(serviceImpl.UpdatePartyLeader));
     serviceBinder.AddMethod(__Method_DeleteParty, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::DeletePartyReq, global::VoidResp>(serviceImpl.DeleteParty));
-    serviceBinder.AddMethod(__Method_UpdateCharacterParty, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::UpdateCharacterPartyReq, global::VoidResp>(serviceImpl.UpdateCharacterParty));
-    serviceBinder.AddMethod(__Method_ReadParty, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::ReadPartyReq, global::ReadPartyResp>(serviceImpl.ReadParty));
-    serviceBinder.AddMethod(__Method_CreateGuild, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::CreateGuildReq, global::CreateGuildResp>(serviceImpl.CreateGuild));
-    serviceBinder.AddMethod(__Method_UpdateGuildLevel, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::UpdateGuildLevelReq, global::VoidResp>(serviceImpl.UpdateGuildLevel));
-    serviceBinder.AddMethod(__Method_UpdateGuildLeader, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::UpdateGuildLeaderReq, global::VoidResp>(serviceImpl.UpdateGuildLeader));
-    serviceBinder.AddMethod(__Method_UpdateGuildMessage, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::UpdateGuildMessageReq, global::VoidResp>(serviceImpl.UpdateGuildMessage));
-    serviceBinder.AddMethod(__Method_UpdateGuildRole, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::UpdateGuildRoleReq, global::VoidResp>(serviceImpl.UpdateGuildRole));
-    serviceBinder.AddMethod(__Method_UpdateGuildMemberRole, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::UpdateGuildMemberRoleReq, global::VoidResp>(serviceImpl.UpdateGuildMemberRole));
-    serviceBinder.AddMethod(__Method_UpdateGuildSkillLevel, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::UpdateGuildSkillLevelReq, global::VoidResp>(serviceImpl.UpdateGuildSkillLevel));
-    serviceBinder.AddMethod(__Method_UpdateCharacterGuild, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::UpdateCharacterGuildReq, global::VoidResp>(serviceImpl.UpdateCharacterGuild));
+    serviceBinder.AddMethod(__Method_UpdateCharacterParty, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::UpdateCharacterPartyReq, global::PartyResp>(serviceImpl.UpdateCharacterParty));
+    serviceBinder.AddMethod(__Method_ReadParty, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::ReadPartyReq, global::PartyResp>(serviceImpl.ReadParty));
+    serviceBinder.AddMethod(__Method_CreateGuild, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::CreateGuildReq, global::GuildResp>(serviceImpl.CreateGuild));
+    serviceBinder.AddMethod(__Method_GuildLevelUp, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::GuildLevelUpReq, global::GuildResp>(serviceImpl.GuildLevelUp));
+    serviceBinder.AddMethod(__Method_GuildSkillLevelUp, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::GuildSkillLevelUpReq, global::GuildResp>(serviceImpl.GuildSkillLevelUp));
+    serviceBinder.AddMethod(__Method_UpdateGuildLeader, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::UpdateGuildLeaderReq, global::GuildResp>(serviceImpl.UpdateGuildLeader));
+    serviceBinder.AddMethod(__Method_UpdateGuildMessage, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::UpdateGuildMessageReq, global::GuildResp>(serviceImpl.UpdateGuildMessage));
+    serviceBinder.AddMethod(__Method_UpdateGuildRole, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::UpdateGuildRoleReq, global::GuildResp>(serviceImpl.UpdateGuildRole));
+    serviceBinder.AddMethod(__Method_UpdateGuildMemberRole, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::UpdateGuildMemberRoleReq, global::GuildResp>(serviceImpl.UpdateGuildMemberRole));
+    serviceBinder.AddMethod(__Method_UpdateCharacterGuild, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::UpdateCharacterGuildReq, global::GuildResp>(serviceImpl.UpdateCharacterGuild));
     serviceBinder.AddMethod(__Method_DeleteGuild, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::DeleteGuildReq, global::VoidResp>(serviceImpl.DeleteGuild));
     serviceBinder.AddMethod(__Method_FindGuildName, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::FindGuildNameReq, global::FindGuildNameResp>(serviceImpl.FindGuildName));
-    serviceBinder.AddMethod(__Method_ReadGuild, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::ReadGuildReq, global::ReadGuildResp>(serviceImpl.ReadGuild));
+    serviceBinder.AddMethod(__Method_ReadGuild, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::ReadGuildReq, global::GuildResp>(serviceImpl.ReadGuild));
     serviceBinder.AddMethod(__Method_GetGuildGold, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::GetGuildGoldReq, global::GuildGoldResp>(serviceImpl.GetGuildGold));
-    serviceBinder.AddMethod(__Method_UpdateGuildGold, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::UpdateGuildGoldReq, global::VoidResp>(serviceImpl.UpdateGuildGold));
+    serviceBinder.AddMethod(__Method_UpdateGuildGold, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::UpdateGuildGoldReq, global::GuildGoldResp>(serviceImpl.UpdateGuildGold));
     serviceBinder.AddMethod(__Method_ReadStorageItems, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::ReadStorageItemsReq, global::ReadStorageItemsResp>(serviceImpl.ReadStorageItems));
     serviceBinder.AddMethod(__Method_MoveItemToStorage, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::MoveItemToStorageReq, global::MoveItemToStorageResp>(serviceImpl.MoveItemToStorage));
     serviceBinder.AddMethod(__Method_MoveItemFromStorage, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::MoveItemFromStorageReq, global::MoveItemFromStorageResp>(serviceImpl.MoveItemFromStorage));

@@ -5,51 +5,58 @@ service DatabaseService {
     rpc ValidateAccessToken (ValidateAccessTokenReq) returns (ValidateAccessTokenResp);
     rpc GetUserLevel (GetUserLevelReq) returns (GetUserLevelResp);
     rpc GetGold (GetGoldReq) returns (GoldResp);
-    rpc UpdateGold (UpdateGoldReq) returns (VoidResp);
+    rpc UpdateGold (UpdateGoldReq) returns (GoldResp);
     rpc GetCash (GetCashReq) returns (CashResp);
-    rpc UpdateCash (UpdateCashReq) returns (VoidResp);
+    rpc UpdateCash (UpdateCashReq) returns (CashResp);
     rpc UpdateAccessToken (UpdateAccessTokenReq) returns (VoidResp);
     rpc CreateUserLogin (CreateUserLoginReq) returns (VoidResp);
     rpc FindUsername (FindUsernameReq) returns (FindUsernameResp);
-    rpc CreateCharacter (CreateCharacterReq) returns (VoidResp);
-    rpc ReadCharacter (ReadCharacterReq) returns (ReadCharacterResp);
-    rpc ReadCharacters (ReadCharactersReq) returns (ReadCharactersResp);
-    rpc UpdateCharacter (UpdateCharacterReq) returns (VoidResp);
+    // Character
+    rpc CreateCharacter (CreateCharacterReq) returns (CharacterResp);
+    rpc ReadCharacter (ReadCharacterReq) returns (CharacterResp);
+    rpc ReadCharacters (ReadCharactersReq) returns (CharactersResp);
+    rpc UpdateCharacter (UpdateCharacterReq) returns (CharacterResp);
     rpc DeleteCharacter (DeleteCharacterReq) returns (VoidResp);
     rpc FindCharacterName (FindCharacterNameReq) returns (FindCharacterNameResp);
     rpc FindCharacters (FindCharactersReq) returns (FindCharactersResp);
-    rpc CreateFriend (CreateFriendReq) returns (VoidResp);
+    // Friend
+    rpc CreateFriend (CreateFriendReq) returns (ReadFriendsResp);
     rpc DeleteFriend (DeleteFriendReq) returns (VoidResp);
     rpc ReadFriends (ReadFriendsReq) returns (ReadFriendsResp);
-    rpc CreateBuilding (CreateBuildingReq) returns (VoidResp);
-    rpc UpdateBuilding (UpdateBuildingReq) returns (VoidResp);
+    // Building
+    rpc CreateBuilding (CreateBuildingReq) returns (BuildingResp);
+    rpc UpdateBuilding (UpdateBuildingReq) returns (BuildingResp);
     rpc DeleteBuilding (DeleteBuildingReq) returns (VoidResp);
-    rpc ReadBuildings (ReadBuildingsReq) returns (ReadBuildingsResp);
-    rpc CreateParty (CreatePartyReq) returns (CreatePartyResp);
-    rpc UpdateParty (UpdatePartyReq) returns (VoidResp);
-    rpc UpdatePartyLeader (UpdatePartyLeaderReq) returns (VoidResp);
+    rpc ReadBuildings (ReadBuildingsReq) returns (BuildingsResp);
+    // Party
+    rpc CreateParty (CreatePartyReq) returns (PartyResp);
+    rpc UpdateParty (UpdatePartyReq) returns (PartyResp);
+    rpc UpdatePartyLeader (UpdatePartyLeaderReq) returns (PartyResp);
     rpc DeleteParty (DeletePartyReq) returns (VoidResp);
-    rpc UpdateCharacterParty (UpdateCharacterPartyReq) returns (VoidResp);
-    rpc ReadParty (ReadPartyReq) returns (ReadPartyResp);
-    rpc CreateGuild (CreateGuildReq) returns (CreateGuildResp);
-    rpc UpdateGuildLevel (UpdateGuildLevelReq) returns (VoidResp);
-    rpc UpdateGuildLeader (UpdateGuildLeaderReq) returns (VoidResp);
-    rpc UpdateGuildMessage (UpdateGuildMessageReq) returns (VoidResp);
-    rpc UpdateGuildRole (UpdateGuildRoleReq) returns (VoidResp);
-    rpc UpdateGuildMemberRole (UpdateGuildMemberRoleReq) returns (VoidResp);
-    rpc UpdateGuildSkillLevel (UpdateGuildSkillLevelReq) returns (VoidResp);
-    rpc UpdateCharacterGuild (UpdateCharacterGuildReq) returns (VoidResp);
+    rpc UpdateCharacterParty (UpdateCharacterPartyReq) returns (PartyResp);
+    rpc ReadParty (ReadPartyReq) returns (PartyResp);
+    // Guild
+    rpc CreateGuild (CreateGuildReq) returns (GuildResp);
+    rpc GuildLevelUp (GuildLevelUpReq) returns (GuildResp);
+    rpc GuildSkillLevelUp (GuildSkillLevelUpReq) returns (GuildResp);
+    rpc UpdateGuildLeader (UpdateGuildLeaderReq) returns (GuildResp);
+    rpc UpdateGuildMessage (UpdateGuildMessageReq) returns (GuildResp);
+    rpc UpdateGuildRole (UpdateGuildRoleReq) returns (GuildResp);
+    rpc UpdateGuildMemberRole (UpdateGuildMemberRoleReq) returns (GuildResp);
+    rpc UpdateCharacterGuild (UpdateCharacterGuildReq) returns (GuildResp);
     rpc DeleteGuild (DeleteGuildReq) returns (VoidResp);
     rpc FindGuildName (FindGuildNameReq) returns (FindGuildNameResp);
-    rpc ReadGuild (ReadGuildReq) returns (ReadGuildResp);
+    rpc ReadGuild (ReadGuildReq) returns (GuildResp);
     rpc GetGuildGold (GetGuildGoldReq) returns (GuildGoldResp);
-    rpc UpdateGuildGold (UpdateGuildGoldReq) returns (VoidResp);
+    rpc UpdateGuildGold (UpdateGuildGoldReq) returns (GuildGoldResp);
+    // Storage
     rpc ReadStorageItems (ReadStorageItemsReq) returns (ReadStorageItemsResp);
     rpc MoveItemToStorage (MoveItemToStorageReq) returns (MoveItemToStorageResp);
     rpc MoveItemFromStorage (MoveItemFromStorageReq) returns (MoveItemFromStorageResp);
     rpc SwapOrMergeStorageItem (SwapOrMergeStorageItemReq) returns (SwapOrMergeStorageItemResp);
     rpc IncreaseStorageItems (IncreaseStorageItemsReq) returns (IncreaseStorageItemsResp);
     rpc DecreaseStorageItems (DecreaseStorageItemsReq) returns (DecreaseStorageItemsResp);
+    // Other
     rpc Custom (CustomReq) returns (CustomResp);
 }
 enum EStorageType
@@ -155,14 +162,14 @@ message ReadCharacterReq {
     string user_id = 1;
     string character_id = 2;
 }
-message ReadCharacterResp {
+message CharacterResp {
     bytes character_data = 1;
 }
 // Read characters
 message ReadCharactersReq {
     string user_id = 1;
 }
-message ReadCharactersResp {
+message CharactersResp {
     repeated bytes list = 1;
 }
 // Update character
@@ -190,13 +197,13 @@ message FindCharactersResp {
 }
 // Create friend
 message CreateFriendReq {
-    string character_id_1 = 1;
-    string character_id_2 = 2;
+    string character_1_id = 1;
+    bytes character_2_data = 2;
 }
 // Delete friend
 message DeleteFriendReq {
-    string character_id_1 = 1;
-    string character_id_2 = 2;
+    string character_1_id = 1;
+    string character_2_id = 2;
 }
 // Read friends
 message ReadFriendsReq {
@@ -220,11 +227,15 @@ message DeleteBuildingReq {
     string map_name = 1;
     string building_id = 2;
 }
+// Read building
+message BuildingResp {
+    bytes building_data = 1;
+}
 // Read buildings
 message ReadBuildingsReq {
     string map_name = 1;
 }
-message ReadBuildingsResp {
+message BuildingsResp {
     repeated bytes list = 1;
 }
 // Create party
@@ -232,9 +243,6 @@ message CreatePartyReq {
     bool share_exp = 1;
     bool share_item = 2;
     string leader_character_id = 3;
-}
-message CreatePartyResp {
-    int32 party_id = 1;
 }
 // Update party
 message UpdatePartyReq {
@@ -253,14 +261,14 @@ message DeletePartyReq {
 }
 // Update character party
 message UpdateCharacterPartyReq {
-    string character_id = 1;
+    bytes social_character_data = 1;
     int32 party_id = 2;
 }
 // Read party
 message ReadPartyReq {
     int32 party_id = 1;
 }
-message ReadPartyResp {
+message PartyResp {
     bytes party_data = 1;
 }
 // Create guild
@@ -268,15 +276,15 @@ message CreateGuildReq {
     string guild_name = 1;
     string leader_character_id = 2;
 }
-message CreateGuildResp {
+// Guild Level Up
+message GuildLevelUpReq {
     int32 guild_id = 1;
+    int32 exp = 2;
 }
-// Increase guild exp
-message UpdateGuildLevelReq {
+// Guild Skill Level Up
+message GuildSkillLevelUpReq {
     int32 guild_id = 1;
-    int32 level = 2;
-    int32 exp = 3;
-    int32 skill_point = 4;
+    int32 skill_id = 2;
 }
 // Update guild leader
 message UpdateGuildLeaderReq {
@@ -299,19 +307,13 @@ message UpdateGuildRoleReq {
 }
 // Update guild member role
 message UpdateGuildMemberRoleReq {
-    string member_character_id = 1;
-    uint32 guild_role = 2;
-}
-// Update guild skill level
-message UpdateGuildSkillLevelReq {
     int32 guild_id = 1;
-    int32 data_id = 2;
-    int32 skill_level = 3;
-    int32 skill_point = 4;
+    string member_character_id = 2;
+    uint32 guild_role = 3;
 }
 // Update character guild
 message UpdateCharacterGuildReq {
-    string character_id = 1;
+    bytes social_character_data = 1;
     int32 guild_id = 2;
     uint32 guild_role = 3;
 }
@@ -329,9 +331,8 @@ message FindGuildNameResp {
 // Read guild
 message ReadGuildReq {
     int32 guild_id = 1;
-    repeated bytes default_guild_roles = 2;
 }
-message ReadGuildResp {
+message GuildResp {
     bytes guild_data = 1;
 }
 // Get guild gold

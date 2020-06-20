@@ -141,7 +141,6 @@ namespace MultiplayerARPG.MMO
         }
 
         public override PlayerCharacterData ReadCharacter(
-            string userId,
             string id,
             bool withEquipWeapons = true,
             bool withAttributes = true,
@@ -154,9 +153,8 @@ namespace MultiplayerARPG.MMO
             bool withHotkeys = true,
             bool withQuests = true)
         {
-            SQLiteRowsReader reader = ExecuteReader("SELECT * FROM characters WHERE id=@id AND userId=@userId LIMIT 1",
-                new SqliteParameter("@id", id),
-                new SqliteParameter("@userId", userId));
+            SQLiteRowsReader reader = ExecuteReader("SELECT * FROM characters WHERE id=@id LIMIT 1",
+                new SqliteParameter("@id", id));
             PlayerCharacterData result = new PlayerCharacterData();
             if (ReadCharacter(reader, out result))
             {
@@ -206,7 +204,7 @@ namespace MultiplayerARPG.MMO
             while (reader.Read())
             {
                 string characterId = reader.GetString("id");
-                result.Add(ReadCharacter(userId, characterId, true, true, true, false, false, true, false, false, false, false));
+                result.Add(ReadCharacter(characterId, true, true, true, false, false, true, false, false, false, false));
             }
             return result;
         }

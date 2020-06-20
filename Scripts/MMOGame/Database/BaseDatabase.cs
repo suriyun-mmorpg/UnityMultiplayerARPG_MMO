@@ -22,7 +22,7 @@ namespace MultiplayerARPG.MMO
         public abstract long FindUsername(string username);
 
         public abstract void CreateCharacter(string userId, IPlayerCharacterData characterData);
-        public abstract PlayerCharacterData ReadCharacter(string userId, 
+        public abstract PlayerCharacterData ReadCharacter(
             string id,
             bool withEquipWeapons = true,
             bool withAttributes = true,
