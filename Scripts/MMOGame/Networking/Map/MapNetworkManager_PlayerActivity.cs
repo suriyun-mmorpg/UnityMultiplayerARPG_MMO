@@ -848,19 +848,13 @@ namespace MultiplayerARPG.MMO
         {
             if (playerCharacterEntity.Gold - amount >= 0)
             {
-                // Get gold amount
-                GoldResp goldResp = await DbServiceClient.GetGoldAsync(new GetGoldReq()
-                {
-                    UserId = playerCharacterEntity.UserId
-                });
-                int gold = goldResp.Gold + amount;
                 // Update gold amount
-                await DbServiceClient.UpdateGoldAsync(new UpdateGoldReq()
+                GoldResp changeGoldResp = await DbServiceClient.ChangeGoldAsync(new ChangeGoldReq()
                 {
                     UserId = playerCharacterEntity.UserId,
-                    Amount = gold
+                    ChangeAmount = amount
                 });
-                playerCharacterEntity.UserGold = gold;
+                playerCharacterEntity.UserGold = changeGoldResp.Gold;
                 playerCharacterEntity.Gold -= amount;
             }
             else
@@ -883,12 +877,12 @@ namespace MultiplayerARPG.MMO
             if (gold >= 0)
             {
                 // Update gold amount
-                await DbServiceClient.UpdateGoldAsync(new UpdateGoldReq()
+                GoldResp changeGoldResp = await DbServiceClient.ChangeGoldAsync(new ChangeGoldReq()
                 {
                     UserId = playerCharacterEntity.UserId,
-                    Amount = gold
+                    ChangeAmount = -amount
                 });
-                playerCharacterEntity.UserGold = gold;
+                playerCharacterEntity.UserGold = changeGoldResp.Gold;
                 playerCharacterEntity.Gold += amount;
             }
             else
@@ -907,19 +901,13 @@ namespace MultiplayerARPG.MMO
             {
                 if (playerCharacterEntity.Gold - amount >= 0)
                 {
-                    // Get gold amount
-                    GuildGoldResp goldResp = await DbServiceClient.GetGuildGoldAsync(new GetGuildGoldReq()
-                    {
-                        GuildId = playerCharacterEntity.GuildId
-                    });
-                    int gold = goldResp.GuildGold + amount;
                     // Update gold amount
-                    await DbServiceClient.UpdateGuildGoldAsync(new UpdateGuildGoldReq()
+                    GuildGoldResp changeGoldResp = await DbServiceClient.ChangeGuildGoldAsync(new ChangeGuildGoldReq()
                     {
                         GuildId = playerCharacterEntity.GuildId,
-                        Amount = gold
+                        ChangeAmount = amount
                     });
-                    guild.gold = gold;
+                    guild.gold = changeGoldResp.GuildGold;
                     playerCharacterEntity.Gold -= amount;
                     guilds[playerCharacterEntity.GuildId] = guild;
                     SendSetGuildGoldToClients(guild);
@@ -950,12 +938,12 @@ namespace MultiplayerARPG.MMO
                 if (gold >= 0)
                 {
                     // Update gold amount
-                    await DbServiceClient.UpdateGoldAsync(new UpdateGoldReq()
+                    GuildGoldResp changeGoldResp = await DbServiceClient.ChangeGuildGoldAsync(new ChangeGuildGoldReq()
                     {
-                        UserId = playerCharacterEntity.UserId,
-                        Amount = gold
+                        GuildId = playerCharacterEntity.GuildId,
+                        ChangeAmount = -amount
                     });
-                    guild.gold = gold;
+                    guild.gold = changeGoldResp.GuildGold;
                     playerCharacterEntity.Gold += amount;
                     guilds[playerCharacterEntity.GuildId] = guild;
                     SendSetGuildGoldToClients(guild);

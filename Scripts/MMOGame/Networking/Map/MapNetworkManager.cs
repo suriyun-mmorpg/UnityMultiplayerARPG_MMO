@@ -681,12 +681,12 @@ namespace MultiplayerARPG.MMO
                 else
                 {
                     // Decrease cash amount
-                    cash -= cashShopItem.sellPrice;
-                    await DbServiceClient.UpdateCashAsync(new UpdateCashReq()
+                    CashResp changeCashResp = await DbServiceClient.ChangeCashAsync(new ChangeCashReq()
                     {
                         UserId = userData.userId,
-                        Amount = cash
+                        ChangeAmount = -cashShopItem.sellPrice
                     });
+                    cash = changeCashResp.Cash;
                     playerCharacter.UserCash = cash;
                     // Increase character gold
                     playerCharacter.Gold += cashShopItem.receiveGold;
@@ -790,12 +790,12 @@ namespace MultiplayerARPG.MMO
                 else
                 {
                     // Increase cash amount
-                    cash += cashPackage.cashAmount;
-                    await DbServiceClient.UpdateCashAsync(new UpdateCashReq()
+                    CashResp changeCashResp = await DbServiceClient.ChangeCashAsync(new ChangeCashReq()
                     {
                         UserId = userData.userId,
-                        Amount = cash
+                        ChangeAmount = cashPackage.cashAmount
                     });
+                    cash = changeCashResp.Cash;
                     playerCharacter.UserCash = cash;
                 }
             }
