@@ -644,6 +644,16 @@ namespace MultiplayerARPG.MMO
             }
         }
 
+        public override List<CharacterItem> GetStorageEntityItems(StorageEntity storageEntity)
+        {
+            if (storageEntity == null)
+                return new List<CharacterItem>();
+            StorageId id = new StorageId(StorageType.Building, storageEntity.Id);
+            if (!allStorageItems.ContainsKey(id))
+                allStorageItems[id] = new List<CharacterItem>();
+            return allStorageItems[id];
+        }
+
         public override void OpenStorage(BasePlayerCharacterEntity playerCharacterEntity)
         {
             if (!CanAccessStorage(playerCharacterEntity, playerCharacterEntity.CurrentStorageId))
@@ -663,7 +673,9 @@ namespace MultiplayerARPG.MMO
             req.StorageType = (EStorageType)playerCharacterEntity.CurrentStorageId.storageType;
             req.StorageOwnerId = playerCharacterEntity.CurrentStorageId.storageOwnerId;
             ReadStorageItemsResp resp = await DbServiceClient.ReadStorageItemsAsync(req);
-            playerCharacterEntity.StorageItems = DatabaseServiceUtils.MakeArrayFromRepeatedByteString<CharacterItem>(resp.StorageCharacterItems);
+            List<CharacterItem> storageItems = DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.StorageCharacterItems);
+            playerCharacterEntity.StorageItems = storageItems.ToArray();
+            allStorageItems[playerCharacterEntity.CurrentStorageId] = storageItems;
         }
 
         public override void CloseStorage(BasePlayerCharacterEntity playerCharacterEntity)
@@ -700,7 +712,9 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             playerCharacterEntity.NonEquipItems = DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.InventoryItemItems);
-            UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.StorageCharacterItems));
+            List<CharacterItem> storageItems = DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.StorageCharacterItems);
+            UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItems);
+            allStorageItems[storageId] = storageItems;
         }
 
         public override void MoveItemFromStorage(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short storageItemIndex, short amount, short nonEquipIndex)
@@ -730,7 +744,9 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             playerCharacterEntity.NonEquipItems = DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.InventoryItemItems);
-            UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.StorageCharacterItems));
+            List<CharacterItem> storageItems = DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.StorageCharacterItems);
+            UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItems);
+            allStorageItems[storageId] = storageItems;
         }
 
         public override void IncreaseStorageItems(StorageId storageId, CharacterItem addingItem, Action<bool> callback)
@@ -753,7 +769,9 @@ namespace MultiplayerARPG.MMO
                     callback.Invoke(false);
                 return;
             }
-            UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.StorageCharacterItems));
+            List<CharacterItem> storageItems = DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.StorageCharacterItems);
+            UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItems);
+            allStorageItems[storageId] = storageItems;
             if (callback != null)
                 callback.Invoke(true);
         }
@@ -779,7 +797,9 @@ namespace MultiplayerARPG.MMO
                     callback.Invoke(false, new Dictionary<int, short>());
                 return;
             }
-            UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.StorageCharacterItems));
+            List<CharacterItem> storageItems = DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.StorageCharacterItems);
+            UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItems);
+            allStorageItems[storageId] = storageItems;
             Dictionary<int, short> decreasedItems = new Dictionary<int, short>();
             foreach (ItemIndexAmountMap entry in resp.DecreasedItems)
             {
@@ -814,7 +834,9 @@ namespace MultiplayerARPG.MMO
                 // TODO: May push error message
                 return;
             }
-            UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.StorageCharacterItems));
+            List<CharacterItem> storageItems = DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.StorageCharacterItems);
+            UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItems);
+            allStorageItems[storageId] = storageItems;
         }
 
         public override bool IsStorageEntityOpen(StorageEntity storageEntity)
@@ -826,15 +848,16 @@ namespace MultiplayerARPG.MMO
                 usingStorageCharacters[id].Count > 0;
         }
 
-        private void UpdateStorageItemsToCharacters(HashSet<uint> objectIds, List<CharacterItem> storageItems)
+        private void UpdateStorageItemsToCharacters(HashSet<uint> objectIds, List<CharacterItem> items)
         {
             BasePlayerCharacterEntity playerCharacterEntity;
+            CharacterItem[] storageItems = items.ToArray();
             foreach (uint objectId in objectIds)
             {
                 if (Assets.TryGetSpawnedObject(objectId, out playerCharacterEntity))
                 {
                     // Update storage items
-                    playerCharacterEntity.StorageItems = storageItems.ToArray();
+                    playerCharacterEntity.StorageItems = storageItems;
                 }
             }
         }

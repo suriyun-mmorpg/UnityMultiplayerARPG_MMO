@@ -9,6 +9,22 @@ namespace MultiplayerARPG.MMO
 {
     public partial class MapNetworkManager
     {
+        private async Task LoadStorageRoutine(StorageId storageId)
+        {
+            if (!loadingStorageIds.Contains(storageId))
+            {
+                loadingStorageIds.Add(storageId);
+                ReadStorageItemsResp readStorageItemsResp = await DbServiceClient.ReadStorageItemsAsync(new ReadStorageItemsReq()
+                {
+                    StorageType = (EStorageType)storageId.storageType,
+                    StorageOwnerId = storageId.storageOwnerId
+                });
+
+                allStorageItems[storageId] = readStorageItemsResp.StorageCharacterItems.MakeListFromRepeatedByteString<CharacterItem>();
+                loadingStorageIds.Remove(storageId);
+            }
+        }
+
         private async Task LoadPartyRoutine(int id)
         {
             if (id > 0 && !loadingPartyIds.Contains(id))
