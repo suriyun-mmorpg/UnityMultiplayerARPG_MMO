@@ -23,6 +23,7 @@ namespace MultiplayerARPG.MMO
         private Dictionary<string, int> cachedUserGold = new Dictionary<string, int>();
         private Dictionary<string, int> cachedUserCash = new Dictionary<string, int>();
         private Dictionary<string, PlayerCharacterData> cachedUserCharacter = new Dictionary<string, PlayerCharacterData>();
+        private Dictionary<string, SocialCharacterData> cachedSocialCharacter = new Dictionary<string, SocialCharacterData>();
         private Dictionary<string, Dictionary<string, BuildingSaveData>> cachedBuilding = new Dictionary<string, Dictionary<string, BuildingSaveData>>();
         private Dictionary<string, List<SocialCharacterData>> cachedFriend = new Dictionary<string, List<SocialCharacterData>>();
         private Dictionary<int, PartyData> cachedParty = new Dictionary<int, PartyData>();
@@ -79,69 +80,45 @@ namespace MultiplayerARPG.MMO
 
         public override async Task<GoldResp> GetGold(GetGoldReq request, ServerCallContext context)
         {
-            await Task.Yield();
-            int gold;
-            if (cachedUserGold.ContainsKey(request.UserId))
+            return new GoldResp()
             {
-                // Already cached data, so get data from cache
-                gold = cachedUserGold[request.UserId];
-            }
-            else
-            {
-                // Doesn't cached yet, so get data from database and cache it
-                gold = Database.GetGold(request.UserId);
-                cachedUserGold[request.UserId] = gold;
-            }
+                Gold = await ReadGold(request.UserId)
+            };
+        }
+
+        public override async Task<GoldResp> ChangeGold(ChangeGoldReq request, ServerCallContext context)
+        {
+            int gold = await ReadGold(request.UserId);
+            gold += request.ChangeAmount;
+            // Cache the data, it will be used later
+            cachedUserGold[request.UserId] = gold;
+            // Update data to database
+            Database.UpdateGold(request.UserId, gold);
             return new GoldResp()
             {
                 Gold = gold
             };
         }
 
-        public override async Task<GoldResp> UpdateGold(UpdateGoldReq request, ServerCallContext context)
+        public override async Task<CashResp> GetCash(GetCashReq request, ServerCallContext context)
         {
-            await Task.Yield();
-            // Cache the data, it will be used later
-            cachedUserGold[request.UserId] = request.Amount;
-            // Update data to database
-            Database.UpdateGold(request.UserId, request.Amount);
-            return new GoldResp()
+            return new CashResp()
             {
-                Gold = request.Amount
+                Cash = await ReadCash(request.UserId)
             };
         }
 
-        public override async Task<CashResp> GetCash(GetCashReq request, ServerCallContext context)
+        public override async Task<CashResp> ChangeCash(ChangeCashReq request, ServerCallContext context)
         {
-            await Task.Yield();
-            int cash;
-            if (cachedUserCash.ContainsKey(request.UserId))
-            {
-                // Already cached data, so get data from cache
-                cash = cachedUserCash[request.UserId];
-            }
-            else
-            {
-                // Doesn't cached yet, so get data from database and cache it
-                cash = Database.GetCash(request.UserId);
-                cachedUserCash[request.UserId] = cash;
-            }
+            int cash = await ReadCash(request.UserId);
+            cash += request.ChangeAmount;
+            // Cache the data, it will be used later
+            cachedUserCash[request.UserId] = cash;
+            // Update data to database
+            Database.UpdateCash(request.UserId, cash);
             return new CashResp()
             {
                 Cash = cash
-            };
-        }
-
-        public override async Task<CashResp> UpdateCash(UpdateCashReq request, ServerCallContext context)
-        {
-            await Task.Yield();
-            // Cache the data, it will be used later
-            cachedUserCash[request.UserId] = request.Amount;
-            // Update data to database
-            Database.UpdateCash(request.UserId, request.Amount);
-            return new CashResp()
-            {
-                Cash = request.Amount
             };
         }
 
@@ -282,7 +259,7 @@ namespace MultiplayerARPG.MMO
         {
             List<SocialCharacterData> friends = await ReadFriends(request.Character1Id);
             // Update to cache
-            SocialCharacterData character = DatabaseServiceUtils.FromByteString<SocialCharacterData>(request.Character2Data);
+            SocialCharacterData character = await ReadSocialCharacter(request.Character2Id);
             friends.Add(character);
             cachedFriend[request.Character1Id] = friends;
             // Update to database
@@ -292,23 +269,24 @@ namespace MultiplayerARPG.MMO
             return resp;
         }
 
-        public override async Task<VoidResp> DeleteFriend(DeleteFriendReq request, ServerCallContext context)
+        public override async Task<ReadFriendsResp> DeleteFriend(DeleteFriendReq request, ServerCallContext context)
         {
             await Task.Yield();
-            if (cachedFriend.ContainsKey(request.Character1Id))
+            List<SocialCharacterData> friends = await ReadFriends(request.Character1Id);
+            // Update to cache
+            for (int i = 0; i < friends.Count; ++i)
             {
-                List<SocialCharacterData> friends = cachedFriend[request.Character1Id];
-                for (int i = 0; i < friends.Count; ++i)
+                if (friends[i].id.Equals(request.Character2Id))
                 {
-                    if (friends[i].id.Equals(request.Character2Id))
-                    {
-                        friends.RemoveAt(i);
-                        break;
-                    }
+                    friends.RemoveAt(i);
+                    break;
                 }
             }
+            // Update to database
             Database.DeleteFriend(request.Character1Id, request.Character2Id);
-            return new VoidResp();
+            ReadFriendsResp resp = new ReadFriendsResp();
+            DatabaseServiceUtils.CopyToRepeatedByteString(friends, resp.List);
+            return resp;
         }
 
         public override async Task<ReadFriendsResp> ReadFriends(ReadFriendsReq request, ServerCallContext context)
@@ -450,6 +428,21 @@ namespace MultiplayerARPG.MMO
             };
         }
 
+        public override async Task<VoidResp> ClearCharacterParty(ClearCharacterPartyReq request, ServerCallContext context)
+        {
+            PlayerCharacterData character = await ReadCharacter(request.CharacterId);
+            PartyData party = await ReadParty(character.PartyId);
+            // Update to cache
+            party.RemoveMember(request.CharacterId);
+            cachedParty[character.PartyId] = party;
+            // Update to cached character
+            if (cachedUserCharacter.ContainsKey(request.CharacterId))
+                cachedUserCharacter[request.CharacterId].PartyId = 0;
+            // Update to database
+            Database.UpdateCharacterParty(request.CharacterId, 0);
+            return new VoidResp();
+        }
+
         public override async Task<PartyResp> ReadParty(ReadPartyReq request, ServerCallContext context)
         {
             return new PartyResp()
@@ -528,6 +521,21 @@ namespace MultiplayerARPG.MMO
             };
         }
 
+        public override async Task<VoidResp> DeleteGuild(DeleteGuildReq request, ServerCallContext context)
+        {
+            await Task.Yield();
+            // Remove data from cache
+            if (cachedGuild.ContainsKey(request.GuildId))
+            {
+                string characterName = cachedGuild[request.GuildId].guildName;
+                cachedGuildNames.Remove(characterName);
+                cachedGuild.Remove(request.GuildId);
+            }
+            // Remove data from database
+            Database.DeleteGuild(request.GuildId);
+            return new VoidResp();
+        }
+
         public override async Task<GuildResp> UpdateCharacterGuild(UpdateCharacterGuildReq request, ServerCallContext context)
         {
             GuildData guild = await ReadGuild(request.GuildId);
@@ -546,18 +554,21 @@ namespace MultiplayerARPG.MMO
             };
         }
 
-        public override async Task<VoidResp> DeleteGuild(DeleteGuildReq request, ServerCallContext context)
+        public override async Task<VoidResp> ClearCharacterGuild(ClearCharacterGuildReq request, ServerCallContext context)
         {
-            await Task.Yield();
-            // Remove data from cache
-            if (cachedGuild.ContainsKey(request.GuildId))
+            PlayerCharacterData character = await ReadCharacter(request.CharacterId);
+            GuildData guild = await ReadGuild(character.GuildId);
+            // Update to cache
+            guild.RemoveMember(request.CharacterId);
+            cachedGuild[character.GuildId] = guild;
+            // Update to cached character
+            if (cachedUserCharacter.ContainsKey(request.CharacterId))
             {
-                string characterName = cachedGuild[request.GuildId].guildName;
-                cachedGuildNames.Remove(characterName);
-                cachedGuild.Remove(request.GuildId);
+                cachedUserCharacter[request.CharacterId].GuildId = 0;
+                cachedUserCharacter[request.CharacterId].GuildRole = 0;
             }
-            // Remove data from database
-            Database.DeleteGuild(request.GuildId);
+            // Update to database
+            Database.UpdateCharacterGuild(request.CharacterId, 0, 0);
             return new VoidResp();
         }
 
@@ -591,6 +602,36 @@ namespace MultiplayerARPG.MMO
             };
         }
 
+        public override async Task<GuildResp> IncreaseGuildExp(IncreaseGuildExpReq request, ServerCallContext context)
+        {
+            // TODO: May validate guild by character
+            GuildData guild = await ReadGuild(request.GuildId);
+            // Update to cache
+            guild = GameInstance.Singleton.SocialSystemSetting.IncreaseGuildExp(guild, request.Exp);
+            cachedGuild[guild.id] = guild;
+            // Update to database
+            Database.UpdateGuildLevel(request.GuildId, guild.level, guild.exp, guild.skillPoint);
+            return new GuildResp()
+            {
+                GuildData = DatabaseServiceUtils.ToByteString(guild)
+            };
+        }
+
+        public override async Task<GuildResp> AddGuildSkill(AddGuildSkillReq request, ServerCallContext context)
+        {
+            // TODO: May validate guild by character
+            GuildData guild = await ReadGuild(request.GuildId);
+            // Update to cache
+            guild.AddSkillLevel(request.SkillId);
+            cachedGuild[guild.id] = guild;
+            // Update to database
+            Database.UpdateGuildSkillLevel(request.GuildId, request.SkillId, guild.GetSkillLevel(request.SkillId), guild.skillPoint);
+            return new GuildResp()
+            {
+                GuildData = DatabaseServiceUtils.ToByteString(guild)
+            };
+        }
+
         public override async Task<GuildGoldResp> GetGuildGold(GetGuildGoldReq request, ServerCallContext context)
         {
             GuildData guild = await ReadGuild(request.GuildId);
@@ -600,14 +641,14 @@ namespace MultiplayerARPG.MMO
             };
         }
 
-        public override async Task<GuildGoldResp> UpdateGuildGold(UpdateGuildGoldReq request, ServerCallContext context)
+        public override async Task<GuildGoldResp> ChangeGuildGold(ChangeGuildGoldReq request, ServerCallContext context)
         {
             GuildData guild = await ReadGuild(request.GuildId);
             // Update to cache
-            guild.gold = request.Amount;
+            guild.gold += request.ChangeAmount;
             cachedGuild[request.GuildId] = guild;
             // Update to database
-            Database.UpdateGuildGold(request.GuildId, request.Amount);
+            Database.UpdateGuildGold(request.GuildId, guild.gold);
             return new GuildGoldResp()
             {
                 GuildGold = guild.gold
@@ -924,6 +965,42 @@ namespace MultiplayerARPG.MMO
             return await onCustomRequest.Invoke(request.Type, request.Data);
         }
 
+        public async Task<int> ReadGold(string userId)
+        {
+            await Task.Yield();
+            int gold;
+            if (cachedUserGold.ContainsKey(userId))
+            {
+                // Already cached data, so get data from cache
+                gold = cachedUserGold[userId];
+            }
+            else
+            {
+                // Doesn't cached yet, so get data from database and cache it
+                gold = Database.GetGold(userId);
+                cachedUserGold[userId] = gold;
+            }
+            return gold;
+        }
+
+        public async Task<int> ReadCash(string userId)
+        {
+            await Task.Yield();
+            int cash;
+            if (cachedUserCash.ContainsKey(userId))
+            {
+                // Already cached data, so get data from cache
+                cash = cachedUserCash[userId];
+            }
+            else
+            {
+                // Doesn't cached yet, so get data from database and cache it
+                cash = Database.GetCash(userId);
+                cachedUserCash[userId] = cash;
+            }
+            return cash;
+        }
+
         public async Task<PlayerCharacterData> ReadCharacter(string id)
         {
             await Task.Yield();
@@ -947,24 +1024,47 @@ namespace MultiplayerARPG.MMO
             return character;
         }
 
-        public async Task<List<SocialCharacterData>> ReadFriends(string id)
+        public async Task<SocialCharacterData> ReadSocialCharacter(string id)
         {
             await Task.Yield();
-            List<SocialCharacterData> friend;
-            if (cachedFriend.ContainsKey(id))
+            //cachedSocialCharacter
+            SocialCharacterData character;
+            if (cachedSocialCharacter.ContainsKey(id))
             {
                 // Already cached data, so get data from cache
-                friend = cachedFriend[id];
+                character = cachedSocialCharacter[id];
             }
             else
             {
                 // Doesn't cached yet, so get data from database
-                friend = Database.ReadFriends(id);
+                character = SocialCharacterData.Create(Database.ReadCharacter(id, false, false, false, false, false, false, false, false, false, false));
                 // Cache the data
-                if (friend != null)
-                    cachedFriend[id] = friend;
+                cachedSocialCharacter[id] = character;
             }
-            return friend;
+            return character;
+        }
+
+        public async Task<List<SocialCharacterData>> ReadFriends(string id)
+        {
+            await Task.Yield();
+            List<SocialCharacterData> friends;
+            if (cachedFriend.ContainsKey(id))
+            {
+                // Already cached data, so get data from cache
+                friends = cachedFriend[id];
+            }
+            else
+            {
+                // Doesn't cached yet, so get data from database
+                friends = Database.ReadFriends(id);
+                // Cache the data
+                if (friends != null)
+                {
+                    cachedFriend[id] = friends;
+                    CacheSocialCharacters(friends);
+                }
+            }
+            return friends;
         }
 
         public async Task<PartyData> ReadParty(int id)
@@ -982,7 +1082,10 @@ namespace MultiplayerARPG.MMO
                 party = Database.ReadParty(id);
                 // Cache the data
                 if (party != null)
+                {
                     cachedParty[id] = party;
+                    CacheSocialCharacters(party.GetMembers());
+                }
             }
             return party;
         }
@@ -1005,9 +1108,18 @@ namespace MultiplayerARPG.MMO
                 {
                     cachedGuild[id] = guild;
                     cachedGuildNames.Add(guild.guildName);
+                    CacheSocialCharacters(guild.GetMembers());
                 }
             }
             return guild;
+        }
+
+        public void CacheSocialCharacters(IEnumerable<SocialCharacterData> socialCharacters)
+        {
+            foreach (SocialCharacterData socialCharacter in socialCharacters)
+            {
+                cachedSocialCharacter[socialCharacter.id] = socialCharacter;
+            }
         }
 
         public bool GetStorage(StorageId storageId, string mapName, out Storage storage)
