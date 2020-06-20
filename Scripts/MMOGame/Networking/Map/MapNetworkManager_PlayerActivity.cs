@@ -199,26 +199,23 @@ namespace MultiplayerARPG.MMO
 
         private async void CreatePartyRoutine(BasePlayerCharacterEntity playerCharacterEntity, bool shareExp, bool shareItem)
         {
-            CreatePartyResp createPartyResp = await DbServiceClient.CreatePartyAsync(new CreatePartyReq()
+            PartyResp createPartyResp = await DbServiceClient.CreatePartyAsync(new CreatePartyReq()
             {
                 LeaderCharacterId = playerCharacterEntity.Id,
                 ShareExp = shareExp,
                 ShareItem = shareItem
             });
-            int partyId = createPartyResp.PartyId;
-            // Create party
-            base.CreateParty(playerCharacterEntity, shareExp, shareItem, partyId);
-            // Save to database
-            await DbServiceClient.UpdateCharacterPartyAsync(new UpdateCharacterPartyReq()
-            {
-                CharacterId = playerCharacterEntity.Id,
-                PartyId = partyId
-            });
+            PartyData party = DatabaseServiceUtils.FromByteString<PartyData>(createPartyResp.PartyData);
+            // Created party, notify to players
+            parties[party.id] = party;
+            playerCharacterEntity.PartyId = party.id;
+            SendCreatePartyToClient(playerCharacterEntity.ConnectionId, party);
+            SendAddPartyMembersToClient(playerCharacterEntity.ConnectionId, party);
             // Broadcast via chat server
             if (ChatNetworkManager.IsClientConnected)
             {
-                ChatNetworkManager.SendCreateParty(null, MMOMessageTypes.UpdateParty, partyId, shareExp, shareItem, playerCharacterEntity.Id);
-                ChatNetworkManager.SendAddSocialMember(null, MMOMessageTypes.UpdatePartyMember, partyId, playerCharacterEntity.Id, playerCharacterEntity.CharacterName, playerCharacterEntity.DataId, playerCharacterEntity.Level);
+                ChatNetworkManager.SendCreateParty(null, MMOMessageTypes.UpdateParty, party.id, shareExp, shareItem, playerCharacterEntity.Id);
+                ChatNetworkManager.SendAddSocialMember(null, MMOMessageTypes.UpdatePartyMember, party.id, playerCharacterEntity.Id, playerCharacterEntity.CharacterName, playerCharacterEntity.DataId, playerCharacterEntity.Level);
             }
         }
 
@@ -272,7 +269,7 @@ namespace MultiplayerARPG.MMO
             // Save to database
             DbServiceClient.UpdateCharacterPartyAsync(new UpdateCharacterPartyReq()
             {
-                CharacterId = acceptCharacterEntity.Id,
+                SocialCharacterData = DatabaseServiceUtils.ToByteString(SocialCharacterData.Create(acceptCharacterEntity)),
                 PartyId = partyId
             });
             // Broadcast via chat server
@@ -289,10 +286,9 @@ namespace MultiplayerARPG.MMO
 
             base.KickFromParty(playerCharacterEntity, characterId);
             // Save to database
-            DbServiceClient.UpdateCharacterPartyAsync(new UpdateCharacterPartyReq()
+            DbServiceClient.ClearCharacterPartyAsync(new ClearCharacterPartyReq()
             {
-                CharacterId = characterId,
-                PartyId = 0
+                CharacterId = characterId
             });
             // Broadcast via chat server
             if (ChatNetworkManager.IsClientConnected)
@@ -318,10 +314,9 @@ namespace MultiplayerARPG.MMO
                         SendPartyTerminateToClient(memberCharacterEntity.ConnectionId, partyId);
                     }
                     // Save to database
-                    DbServiceClient.UpdateCharacterPartyAsync(new UpdateCharacterPartyReq()
+                    DbServiceClient.ClearCharacterPartyAsync(new ClearCharacterPartyReq()
                     {
-                        CharacterId = memberId,
-                        PartyId = 0
+                        CharacterId = memberId
                     });
                     // Broadcast via chat server
                     if (ChatNetworkManager.IsClientConnected)
@@ -345,10 +340,9 @@ namespace MultiplayerARPG.MMO
                 parties[partyId] = party;
                 SendRemovePartyMemberToClients(party, playerCharacterEntity.Id);
                 // Save to database
-                DbServiceClient.UpdateCharacterPartyAsync(new UpdateCharacterPartyReq()
+                DbServiceClient.ClearCharacterPartyAsync(new ClearCharacterPartyReq()
                 {
-                    CharacterId = playerCharacterEntity.Id,
-                    PartyId = 0
+                    CharacterId = playerCharacterEntity.Id
                 });
                 // Broadcast via chat server
                 if (ChatNetworkManager.IsClientConnected)
@@ -376,26 +370,26 @@ namespace MultiplayerARPG.MMO
             }
             else
             {
-                CreateGuildResp createGuildResp = await DbServiceClient.CreateGuildAsync(new CreateGuildReq()
+                GuildResp createGuildResp = await DbServiceClient.CreateGuildAsync(new CreateGuildReq()
                 {
                     LeaderCharacterId = playerCharacterEntity.Id,
                     GuildName = guildName
                 });
-                int guildId = createGuildResp.GuildId;
-                // Create guild
-                base.CreateGuild(playerCharacterEntity, guildName, guildId);
-                // Save to database
-                await DbServiceClient.UpdateCharacterGuildAsync(new UpdateCharacterGuildReq()
-                {
-                    CharacterId = playerCharacterEntity.Id,
-                    GuildId = guildId,
-                    GuildRole = guilds[guildId].GetMemberRole(playerCharacterEntity.Id)
-                });
+                GuildData guild = DatabaseServiceUtils.FromByteString<GuildData>(createGuildResp.GuildData);
+                // Created party, notify to players
+                CurrentGameInstance.SocialSystemSetting.DecreaseCreateGuildResource(playerCharacterEntity);
+                guilds[guild.id] = guild;
+                playerCharacterEntity.GuildId = guild.id;
+                playerCharacterEntity.GuildName = guildName;
+                playerCharacterEntity.GuildRole = guild.GetMemberRole(playerCharacterEntity.Id);
+                playerCharacterEntity.SharedGuildExp = 0;
+                SendCreateGuildToClient(playerCharacterEntity.ConnectionId, guild);
+                SendAddGuildMembersToClient(playerCharacterEntity.ConnectionId, guild);
                 // Broadcast via chat server
                 if (ChatNetworkManager.IsClientConnected)
                 {
-                    ChatNetworkManager.SendCreateGuild(null, MMOMessageTypes.UpdateGuild, guildId, guildName, playerCharacterEntity.Id);
-                    ChatNetworkManager.SendAddSocialMember(null, MMOMessageTypes.UpdateGuildMember, guildId, playerCharacterEntity.Id, playerCharacterEntity.CharacterName, playerCharacterEntity.DataId, playerCharacterEntity.Level);
+                    ChatNetworkManager.SendCreateGuild(null, MMOMessageTypes.UpdateGuild, guild.id, guildName, playerCharacterEntity.Id);
+                    ChatNetworkManager.SendAddSocialMember(null, MMOMessageTypes.UpdateGuildMember, guild.id, playerCharacterEntity.Id, playerCharacterEntity.CharacterName, playerCharacterEntity.DataId, playerCharacterEntity.Level);
                 }
             }
         }
@@ -513,7 +507,7 @@ namespace MultiplayerARPG.MMO
             // Save to database
             DbServiceClient.UpdateCharacterGuildAsync(new UpdateCharacterGuildReq()
             {
-                CharacterId = acceptCharacterEntity.Id,
+                SocialCharacterData = DatabaseServiceUtils.ToByteString(SocialCharacterData.Create(acceptCharacterEntity)),
                 GuildId = guildId,
                 GuildRole = guild.GetMemberRole(acceptCharacterEntity.Id)
             });
@@ -531,11 +525,9 @@ namespace MultiplayerARPG.MMO
 
             base.KickFromGuild(playerCharacterEntity, characterId);
             // Save to database
-            DbServiceClient.UpdateCharacterGuildAsync(new UpdateCharacterGuildReq()
+            DbServiceClient.ClearCharacterGuildAsync(new ClearCharacterGuildReq()
             {
-                CharacterId = characterId,
-                GuildId = 0,
-                GuildRole = 0
+                CharacterId = characterId
             });
             // Broadcast via chat server
             if (ChatNetworkManager.IsClientConnected)
@@ -561,11 +553,9 @@ namespace MultiplayerARPG.MMO
                         SendGuildTerminateToClient(memberCharacterEntity.ConnectionId, guildId);
                     }
                     // Save to database
-                    DbServiceClient.UpdateCharacterGuildAsync(new UpdateCharacterGuildReq()
+                    DbServiceClient.ClearCharacterGuildAsync(new ClearCharacterGuildReq()
                     {
-                        CharacterId = memberId,
-                        GuildId = 0,
-                        GuildRole = 0
+                        CharacterId = memberId
                     });
                     // Broadcast via chat server
                     if (ChatNetworkManager.IsClientConnected)
@@ -589,11 +579,9 @@ namespace MultiplayerARPG.MMO
                 guilds[guildId] = guild;
                 SendRemoveGuildMemberToClients(guild, playerCharacterEntity.Id);
                 // Save to database
-                DbServiceClient.UpdateCharacterGuildAsync(new UpdateCharacterGuildReq()
+                DbServiceClient.ClearCharacterGuildAsync(new ClearCharacterGuildReq()
                 {
-                    CharacterId = playerCharacterEntity.Id,
-                    GuildId = 0,
-                    GuildRole = 0
+                    CharacterId = playerCharacterEntity.Id
                 });
                 // Broadcast via chat server
                 if (ChatNetworkManager.IsClientConnected)
@@ -603,19 +591,25 @@ namespace MultiplayerARPG.MMO
 
         public override void IncreaseGuildExp(BasePlayerCharacterEntity playerCharacterEntity, int exp)
         {
+            IncreaseGuildExpRoutine(playerCharacterEntity, exp);
+        }
+
+
+        private async void IncreaseGuildExpRoutine(BasePlayerCharacterEntity playerCharacterEntity, int exp)
+        {
             int guildId;
             GuildData guild;
             if (!CanIncreaseGuildExp(playerCharacterEntity, exp, out guildId, out guild))
                 return;
-            base.IncreaseGuildExp(playerCharacterEntity, exp);
             // Save to database
-            DbServiceClient.UpdateGuildLevelAsync(new UpdateGuildLevelReq()
+            GuildResp resp = await DbServiceClient.IncreaseGuildExpAsync(new IncreaseGuildExpReq()
             {
                 GuildId = guildId,
-                Level = guild.level,
-                Exp = guild.exp,
-                SkillPoint = guild.skillPoint
+                Exp = exp
             });
+            guild = DatabaseServiceUtils.FromByteString<GuildData>(resp.GuildData);
+            guilds[guildId] = guild;
+            SendGuildLevelExpSkillPointToClients(guild);
             // Broadcast via chat server
             if (ChatNetworkManager.IsClientConnected)
                 ChatNetworkManager.SendGuildLevelExpSkillPoint(null, MMOMessageTypes.UpdateGuild, guildId, guild.level, guild.exp, guild.skillPoint);
@@ -623,19 +617,24 @@ namespace MultiplayerARPG.MMO
 
         public override void AddGuildSkill(BasePlayerCharacterEntity playerCharacterEntity, int dataId)
         {
+            AddGuildSkillRoutine(playerCharacterEntity, dataId);
+        }
+
+        private async void AddGuildSkillRoutine(BasePlayerCharacterEntity playerCharacterEntity, int dataId)
+        {
             int guildId;
             GuildData guild;
             if (!CanAddGuildSkill(playerCharacterEntity, dataId, out guildId, out guild))
                 return;
-            base.AddGuildSkill(playerCharacterEntity, dataId);
             // Save to database
-            DbServiceClient.UpdateGuildSkillLevelAsync(new UpdateGuildSkillLevelReq()
+            GuildResp resp = await DbServiceClient.AddGuildSkillAsync(new AddGuildSkillReq()
             {
                 GuildId = guildId,
-                DataId = dataId,
-                SkillLevel = guild.GetSkillLevel(dataId),
-                SkillPoint = guild.skillPoint
+                SkillId = dataId
             });
+            guilds[guildId] = guild;
+            SendSetGuildSkillLevelToClients(guild, dataId);
+            SendGuildLevelExpSkillPointToClients(guild);
             // Broadcast via chat server
             if (ChatNetworkManager.IsClientConnected)
             {
@@ -989,12 +988,12 @@ namespace MultiplayerARPG.MMO
 
         private async void AddFriendRoutine(BasePlayerCharacterEntity playerCharacterEntity, string friendCharacterId)
         {
-            await DbServiceClient.CreateFriendAsync(new CreateFriendReq()
+            ReadFriendsResp resp = await DbServiceClient.CreateFriendAsync(new CreateFriendReq()
             {
-                CharacterId1 = playerCharacterEntity.Id,
-                CharacterId2 = friendCharacterId
+                Character1Id = playerCharacterEntity.Id,
+                Character2Id = friendCharacterId
             });
-            GetFriends(playerCharacterEntity);
+            SendUpdateFriendsToClient(playerCharacterEntity.ConnectionId, resp.List.MakeArrayFromRepeatedByteString<SocialCharacterData>());
         }
 
         public override void RemoveFriend(BasePlayerCharacterEntity playerCharacterEntity, string friendCharacterId)
@@ -1004,12 +1003,12 @@ namespace MultiplayerARPG.MMO
 
         private async void RemoveFriendRoutine(BasePlayerCharacterEntity playerCharacterEntity, string friendCharacterId)
         {
-            await DbServiceClient.DeleteFriendAsync(new DeleteFriendReq()
+            ReadFriendsResp resp = await DbServiceClient.DeleteFriendAsync(new DeleteFriendReq()
             {
-                CharacterId1 = playerCharacterEntity.Id,
-                CharacterId2 = friendCharacterId
+                Character1Id = playerCharacterEntity.Id,
+                Character2Id = friendCharacterId
             });
-            GetFriends(playerCharacterEntity);
+            SendUpdateFriendsToClient(playerCharacterEntity.ConnectionId, resp.List.MakeArrayFromRepeatedByteString<SocialCharacterData>());
         }
 
         public override void GetFriends(BasePlayerCharacterEntity playerCharacterEntity)

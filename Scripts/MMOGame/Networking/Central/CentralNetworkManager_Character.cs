@@ -60,11 +60,11 @@ namespace MultiplayerARPG.MMO
                 error = ResponseCharactersMessage.Error.NotLoggedin;
             else
             {
-                ReadCharactersResp readCharactersResp = await DbServiceClient.ReadCharactersAsync(new ReadCharactersReq()
+                CharactersResp charactersResp = await DbServiceClient.ReadCharactersAsync(new ReadCharactersReq()
                 {
                     UserId = userPeerInfo.userId
                 });
-                characters = DatabaseServiceUtils.MakeListFromRepeatedByteString<PlayerCharacterData>(readCharactersResp.List);
+                characters = DatabaseServiceUtils.MakeListFromRepeatedByteString<PlayerCharacterData>(charactersResp.List);
             }
             ResponseCharactersMessage responseMessage = new ResponseCharactersMessage();
             responseMessage.ackId = message.ackId;
@@ -178,12 +178,12 @@ namespace MultiplayerARPG.MMO
                 error = ResponseSelectCharacterMessage.Error.NotLoggedin;
             else
             {
-                ReadCharacterResp readCharacterResp = await DbServiceClient.ReadCharacterAsync(new ReadCharacterReq()
+                CharacterResp characterResp = await DbServiceClient.ReadCharacterAsync(new ReadCharacterReq()
                 {
                     UserId = userPeerInfo.userId,
                     CharacterId = message.characterId
                 });
-                PlayerCharacterData character = readCharacterResp.CharacterData.FromByteString<PlayerCharacterData>();
+                PlayerCharacterData character = characterResp.CharacterData.FromByteString<PlayerCharacterData>();
                 if (character == null)
                     error = ResponseSelectCharacterMessage.Error.InvalidCharacterData;
                 else if (!mapServerPeersBySceneName.TryGetValue(character.CurrentMapName, out mapServerPeerInfo))

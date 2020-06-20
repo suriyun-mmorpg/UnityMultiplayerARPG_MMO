@@ -303,7 +303,7 @@ namespace MultiplayerARPG.MMO
             {
                 // Load buildings
                 // Don't load buildings if it's instance map
-                ReadBuildingsResp resp = await DbServiceClient.ReadBuildingsAsync(new ReadBuildingsReq()
+                BuildingsResp resp = await DbServiceClient.ReadBuildingsAsync(new ReadBuildingsReq()
                 {
                     MapName = Assets.onlineScene.SceneName
                 });
@@ -401,12 +401,12 @@ namespace MultiplayerARPG.MMO
             }
             else
             {
-                ReadCharacterResp readCharacterResp = await DbServiceClient.ReadCharacterAsync(new ReadCharacterReq()
+                CharacterResp characterResp = await DbServiceClient.ReadCharacterAsync(new ReadCharacterReq()
                 {
                     UserId = userId,
                     CharacterId = selectCharacterId
                 });
-                PlayerCharacterData playerCharacterData = readCharacterResp.CharacterData.FromByteString<PlayerCharacterData>();
+                PlayerCharacterData playerCharacterData = characterResp.CharacterData.FromByteString<PlayerCharacterData>();
                 // If data is empty / cannot find character, disconnect user
                 if (playerCharacterData == null)
                 {

@@ -14,7 +14,7 @@ namespace MultiplayerARPG.MMO
             if (id > 0 && !loadingPartyIds.Contains(id))
             {
                 loadingPartyIds.Add(id);
-                ReadPartyResp resp = await DbServiceClient.ReadPartyAsync(new ReadPartyReq()
+                PartyResp resp = await DbServiceClient.ReadPartyAsync(new ReadPartyReq()
                 {
                     PartyId = id
                 });
@@ -28,7 +28,7 @@ namespace MultiplayerARPG.MMO
             if (id > 0 && !loadingGuildIds.Contains(id))
             {
                 loadingGuildIds.Add(id);
-                ReadGuildResp resp = await DbServiceClient.ReadGuildAsync(new ReadGuildReq()
+                GuildResp resp = await DbServiceClient.ReadGuildAsync(new ReadGuildReq()
                 {
                     GuildId = id
                 });
@@ -47,18 +47,6 @@ namespace MultiplayerARPG.MMO
                 {
                     CharacterData = playerCharacterData.ToByteString()
                 });
-                // Update storage items
-                StorageId storageId = new StorageId(StorageType.Player, userId);
-                if (storageItems.ContainsKey(storageId))
-                {
-                    UpdateStorageItemsReq req = new UpdateStorageItemsReq()
-                    {
-                        StorageType = (EStorageType)storageId.storageType,
-                        StorageOwnerId = storageId.storageOwnerId
-                    };
-                    DatabaseServiceUtils.CopyToRepeatedByteString(storageItems[storageId], req.StorageCharacterItems);
-                    await DbServiceClient.UpdateStorageItemsAsync(req);
-                }
                 savingCharacters.Remove(playerCharacterData.Id);
                 if (LogInfo)
                     Logging.Log(LogTag, "Character [" + playerCharacterData.Id + "] Saved");
@@ -95,18 +83,6 @@ namespace MultiplayerARPG.MMO
                     MapName = Assets.onlineScene.SceneName,
                     BuildingData = buildingSaveData.ToByteString()
                 });
-                // Update storage items
-                StorageId storageId = new StorageId(StorageType.Building, buildingSaveData.Id);
-                if (storageItems.ContainsKey(storageId))
-                {
-                    UpdateStorageItemsReq req = new UpdateStorageItemsReq()
-                    {
-                        StorageType = (EStorageType)storageId.storageType,
-                        StorageOwnerId = storageId.storageOwnerId
-                    };
-                    DatabaseServiceUtils.CopyToRepeatedByteString(storageItems[storageId], req.StorageCharacterItems);
-                    await DbServiceClient.UpdateStorageItemsAsync(req);
-                }
                 savingBuildings.Remove(buildingSaveData.Id);
                 if (LogInfo)
                     Logging.Log(LogTag, "Building [" + buildingSaveData.Id + "] Saved");
