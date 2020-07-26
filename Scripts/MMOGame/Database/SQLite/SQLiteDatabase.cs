@@ -221,7 +221,8 @@ namespace MultiplayerARPG.MMO
               id TEXT NOT NULL PRIMARY KEY,
               parentId TEXT NOT NULL,
               entityId INGETER NOT NULL,
-              currentHp INTEGER NOT NULL,
+              currentHp INTEGER NOT NULL DEFAULT 0,
+              remainsLifeTime REAL NOT NULL DEFAULT 0,
               mapName TEXT NOT NULL,
               positionX REAL NOT NULL,
               positionY REAL NOT NULL,
@@ -303,6 +304,9 @@ namespace MultiplayerARPG.MMO
 
             if (!IsColumnExist("userlogin", "userLevel"))
                 ExecuteNonQuery("ALTER TABLE userlogin ADD userLevel INTEGER NOT NULL DEFAULT 0;");
+
+            if (!IsColumnExist("buildings", "remainsLifeTime"))
+                ExecuteNonQuery("ALTER TABLE buildings ADD remainsLifeTime REAL NOT NULL DEFAULT 0;");
 
             if (!IsColumnExist("buildings", "isLocked"))
                 ExecuteNonQuery("ALTER TABLE buildings ADD isLocked INTEGER NOT NULL DEFAULT 0;");

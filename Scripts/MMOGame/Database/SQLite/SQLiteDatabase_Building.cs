@@ -19,12 +19,13 @@ namespace MultiplayerARPG.MMO
                 result.ParentId = reader.GetString("parentId");
                 result.EntityId = reader.GetInt32("entityId");
                 result.CurrentHp = reader.GetInt32("currentHp");
-                result.Position = new Vector3(reader.GetFloat("positionX"), reader.GetFloat("positionY"), reader.GetFloat("positionZ"));
-                result.Rotation = Quaternion.Euler(reader.GetFloat("rotationX"), reader.GetFloat("rotationY"), reader.GetFloat("rotationZ"));
+                result.RemainsLifeTime = reader.GetFloat("remainsLifeTime");
                 result.IsLocked = reader.GetBoolean("isLocked");
                 result.LockPassword = reader.GetString("lockPassword");
                 result.CreatorId = reader.GetString("creatorId");
                 result.CreatorName = reader.GetString("creatorName");
+                result.Position = new Vector3(reader.GetFloat("positionX"), reader.GetFloat("positionY"), reader.GetFloat("positionZ"));
+                result.Rotation = Quaternion.Euler(reader.GetFloat("rotationX"), reader.GetFloat("rotationY"), reader.GetFloat("rotationZ"));
                 return true;
             }
             result = new BuildingSaveData();
@@ -33,11 +34,12 @@ namespace MultiplayerARPG.MMO
 
         public override void CreateBuilding(string mapName, IBuildingSaveData saveData)
         {
-            ExecuteNonQuery("INSERT INTO buildings (id, parentId, entityId, currentHp, mapName, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, creatorId, creatorName) VALUES (@id, @parentId, @entityId, @currentHp, @mapName, @positionX, @positionY, @positionZ, @rotationX, @rotationY, @rotationZ, @creatorId, @creatorName)",
+            ExecuteNonQuery("INSERT INTO buildings (id, parentId, entityId, currentHp, remainsLifeTime, mapName, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, creatorId, creatorName) VALUES (@id, @parentId, @entityId, @currentHp, @remainsLifeTime, @mapName, @positionX, @positionY, @positionZ, @rotationX, @rotationY, @rotationZ, @creatorId, @creatorName)",
                 new SqliteParameter("@id", saveData.Id),
                 new SqliteParameter("@parentId", saveData.ParentId),
                 new SqliteParameter("@entityId", saveData.EntityId),
                 new SqliteParameter("@currentHp", saveData.CurrentHp),
+                new SqliteParameter("@remainsLifeTime", saveData.RemainsLifeTime),
                 new SqliteParameter("@mapName", mapName),
                 new SqliteParameter("@positionX", saveData.Position.x),
                 new SqliteParameter("@positionY", saveData.Position.y),
@@ -67,32 +69,34 @@ namespace MultiplayerARPG.MMO
                 "parentId=@parentId, " +
                 "entityId=@entityId, " +
                 "currentHp=@currentHp, " +
+                "remainsLifeTime=@remainsLifeTime, " +
+                "isLocked=@isLocked, " +
+                "lockPassword=@lockPassword, " +
+                "creatorId=@creatorId, " +
+                "creatorName=@creatorName " +
                 "positionX=@positionX, " +
                 "positionY=@positionY, " +
                 "positionZ=@positionZ, " +
                 "rotationX=@rotationX, " +
                 "rotationY=@rotationY, " +
                 "rotationZ=@rotationZ, " +
-                "isLocked=@isLocked, " +
-                "lockPassword=@lockPassword, " +
-                "creatorId=@creatorId, " +
-                "creatorName=@creatorName " +
                 "WHERE id=@id AND mapName=@mapName",
                 new SqliteParameter("@id", building.Id),
                 new SqliteParameter("@parentId", building.ParentId),
                 new SqliteParameter("@entityId", building.EntityId),
                 new SqliteParameter("@currentHp", building.CurrentHp),
-                new SqliteParameter("@mapName", mapName),
+                new SqliteParameter("@remainsLifeTime", building.RemainsLifeTime),
+                new SqliteParameter("@isLocked", building.IsLocked),
+                new SqliteParameter("@lockPassword", building.LockPassword),
+                new SqliteParameter("@creatorId", building.CreatorId),
+                new SqliteParameter("@creatorName", building.CreatorName),
                 new SqliteParameter("@positionX", building.Position.x),
                 new SqliteParameter("@positionY", building.Position.y),
                 new SqliteParameter("@positionZ", building.Position.z),
                 new SqliteParameter("@rotationX", building.Rotation.eulerAngles.x),
                 new SqliteParameter("@rotationY", building.Rotation.eulerAngles.y),
                 new SqliteParameter("@rotationZ", building.Rotation.eulerAngles.z),
-                new SqliteParameter("@isLocked", building.IsLocked),
-                new SqliteParameter("@lockPassword", building.LockPassword),
-                new SqliteParameter("@creatorId", building.CreatorId),
-                new SqliteParameter("@creatorName", building.CreatorName));
+                new SqliteParameter("@mapName", mapName));
         }
 
         public override void DeleteBuilding(string mapName, string id)
