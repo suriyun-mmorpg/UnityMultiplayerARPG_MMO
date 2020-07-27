@@ -40,12 +40,16 @@ namespace MultiplayerARPG.MMO
             ConfigReader.ReadConfigs(jsonConfig, "mySqlDbName", out dbName, dbName);
 
             // Migrate data
-            foreach (BuildingEntity prefab in GameInstance.BuildingEntities.Values)
+            try
             {
-                ExecuteNonQuery("UPDATE buildings SET entityId=@entityId, dataId=0 WHERE dataId=@dataId",
-                    new MySqlParameter("entityId", prefab.EntityId),
-                    new MySqlParameter("dataId", prefab.name.GenerateHashId()));
+                foreach (BuildingEntity prefab in GameInstance.BuildingEntities.Values)
+                {
+                    ExecuteNonQuery("UPDATE buildings SET entityId=@entityId, dataId=0 WHERE dataId=@dataId",
+                        new MySqlParameter("entityId", prefab.EntityId),
+                        new MySqlParameter("dataId", prefab.name.GenerateHashId()));
+                }
             }
+            catch { }
         }
 
         public string GetConnectionString()
