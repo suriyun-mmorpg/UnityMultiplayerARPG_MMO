@@ -769,7 +769,6 @@ namespace MultiplayerARPG.MMO
             bool isOverwhelming = storageItemList.IncreasingItemsWillOverwhelming(
                 addingItem.dataId, addingItem.amount, isLimitWeight, weightLimit,
                 storageItemList.GetTotalItemWeight(), isLimitSlot, slotLimit);
-            bool increaseResult = storageItemList.IncreaseItems(addingItem);
             if (callback != null)
                 callback.Invoke(!isOverwhelming && storageItemList.IncreaseItems(addingItem));
             // Update slots
