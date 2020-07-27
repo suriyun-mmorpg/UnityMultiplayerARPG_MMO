@@ -271,7 +271,20 @@ namespace MultiplayerARPG.MMO
               leaderId TEXT NOT NULL
             )");
 
-            // Update data
+            // Migrate data
+            try
+            {
+                // Avoid exception which occuring when `dataId` field not found
+                foreach (BuildingEntity prefab in GameInstance.BuildingEntities.Values)
+                {
+                    ExecuteNonQuery("UPDATE buildings SET entityId=@entityId, dataId=0 WHERE dataId=@dataId",
+                        new SqliteParameter("entityId", prefab.EntityId),
+                        new SqliteParameter("dataId", prefab.name.GenerateHashId()));
+                }
+            }
+            catch { }
+
+            // Migrate fields
             if (!IsColumnExist("characterhotkey", "relateId"))
                 ExecuteNonQuery("ALTER TABLE characterhotkey ADD relateId TEXT NOT NULL DEFAULT '';");
 
@@ -317,6 +330,9 @@ namespace MultiplayerARPG.MMO
             if (!IsColumnExist("buildings", "entityId"))
                 ExecuteNonQuery("ALTER TABLE buildings ADD entityId INTEGER NOT NULL DEFAULT 0;");
 
+            if (IsColumnExist("buildings", "dataId"))
+                ExecuteNonQuery("ALTER TABLE buildings DROP dataId;");
+
             if (!IsColumnExist("characters", "partyId"))
                 ExecuteNonQuery("ALTER TABLE characters ADD partyId INTEGER NOT NULL DEFAULT 0;");
 
@@ -343,19 +359,6 @@ namespace MultiplayerARPG.MMO
 
             if (!IsColumnExist("guild", "gold"))
                 ExecuteNonQuery("ALTER TABLE guild ADD gold INTEGER NOT NULL DEFAULT 0;");
-
-            // Migrate data
-            try
-            {
-                // Avoid exception which occuring when `dataId` field not found
-                foreach (BuildingEntity prefab in GameInstance.BuildingEntities.Values)
-                {
-                    ExecuteNonQuery("UPDATE buildings SET entityId=@entityId, dataId=0 WHERE dataId=@dataId",
-                        new SqliteParameter("entityId", prefab.EntityId),
-                        new SqliteParameter("dataId", prefab.name.GenerateHashId()));
-                }
-            }
-            catch { }
 
             this.InvokeInstanceDevExtMethods("Init");
         }
