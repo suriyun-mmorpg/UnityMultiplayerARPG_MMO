@@ -61,7 +61,12 @@ namespace MultiplayerARPG.MMO
                 }
                 catch { }
                 // Migrate fields
-                ExecuteNonQuery("ALTER TABLE buildings DROP dataId;");
+                try
+                {
+                    // Avoid exception which occuring when `dataId` field not found
+                    ExecuteNonQuery("ALTER TABLE buildings DROP dataId;");
+                }
+                catch { }
                 // Insert migrate history
                 InsertMigrationId(migrationId);
             }
