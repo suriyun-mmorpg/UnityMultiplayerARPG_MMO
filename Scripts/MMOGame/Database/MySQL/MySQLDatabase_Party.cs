@@ -1,6 +1,4 @@
-﻿using MySql.Data.MySqlClient;
-using System.Collections;
-using System.Collections.Generic;
+﻿using MySqlConnector;
 
 namespace MultiplayerARPG.MMO
 {
