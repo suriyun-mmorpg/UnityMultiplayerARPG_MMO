@@ -345,7 +345,7 @@ namespace MultiplayerARPG.MMO
                 ExecuteNonQuery("ALTER TABLE guild ADD gold INTEGER NOT NULL DEFAULT 0;");
 
             // Migrate data
-            if (IsColumnExist("buildings", "dataId"))
+            try
             {
                 foreach (BuildingEntity prefab in GameInstance.BuildingEntities.Values)
                 {
@@ -354,6 +354,7 @@ namespace MultiplayerARPG.MMO
                         new SqliteParameter("dataId", prefab.name.GenerateHashId()));
                 }
             }
+            catch { }
 
             this.InvokeInstanceDevExtMethods("Init");
         }
