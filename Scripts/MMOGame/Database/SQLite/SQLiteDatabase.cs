@@ -347,6 +347,7 @@ namespace MultiplayerARPG.MMO
             // Migrate data
             try
             {
+                // Avoid exception which occuring when `dataId` field not found
                 foreach (BuildingEntity prefab in GameInstance.BuildingEntities.Values)
                 {
                     ExecuteNonQuery("UPDATE buildings SET entityId=@entityId, dataId=0 WHERE dataId=@dataId",
