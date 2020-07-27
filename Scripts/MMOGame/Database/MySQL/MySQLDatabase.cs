@@ -58,7 +58,8 @@ namespace MultiplayerARPG.MMO
                 "Port=" + port + ";" +
                 "Uid=" + username + ";" +
                 (string.IsNullOrEmpty(password) ? "" : "Pwd=\"" + password + "\";") +
-                "Database=" + dbName + ";";
+                "Database=" + dbName + ";" +
+                "SSL Mode=None;";
             return connectionString;
         }
 
