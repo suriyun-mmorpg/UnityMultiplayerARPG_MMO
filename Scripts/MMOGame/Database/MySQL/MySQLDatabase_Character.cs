@@ -1,8 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using LiteNetLibManager;
 using UnityEngine;
-using MySql.Data.MySqlClient;
+using MySqlConnector;
 
 namespace MultiplayerARPG.MMO
 {

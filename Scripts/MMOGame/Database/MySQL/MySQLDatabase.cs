@@ -1,4 +1,4 @@
-﻿using MySql.Data.MySqlClient;
+﻿using MySqlConnector;
 using System.Collections.Generic;
 using LiteNetLibManager;
 using UnityEngine;
