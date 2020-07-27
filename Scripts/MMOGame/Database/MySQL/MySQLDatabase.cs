@@ -39,17 +39,44 @@ namespace MultiplayerARPG.MMO
             ConfigReader.ReadConfigs(jsonConfig, "mySqlPassword", out password, password);
             ConfigReader.ReadConfigs(jsonConfig, "mySqlDbName", out dbName, dbName);
 
-            // Migrate data
-            try
+            Migration();
+        }
+
+        private void Migration()
+        {
+            // 1.57b
+            string migrationId = "1.57b";
+            if (!HasMigrationId(migrationId))
             {
-                // Avoid exception which occuring when `dataId` field not found
-                foreach (BuildingEntity prefab in GameInstance.BuildingEntities.Values)
+                // Migrate data
+                try
                 {
-                    ExecuteNonQuery("UPDATE buildings SET entityId=@entityId, dataId=0 WHERE dataId=@dataId",
-                        new MySqlParameter("entityId", prefab.EntityId),
-                        new MySqlParameter("dataId", prefab.name.GenerateHashId()));
+                    // Avoid exception which occuring when `dataId` field not found
+                    foreach (BuildingEntity prefab in GameInstance.BuildingEntities.Values)
+                    {
+                        ExecuteNonQuery("UPDATE buildings SET entityId=@entityId, dataId=0 WHERE dataId=@dataId",
+                            new MySqlParameter("entityId", prefab.EntityId),
+                            new MySqlParameter("dataId", prefab.name.GenerateHashId()));
+                    }
                 }
-            } catch { }
+                catch { }
+                // Migrate fields
+                ExecuteNonQuery("ALTER TABLE buildings DROP dataId;");
+                // Insert migrate history
+                InsertMigrationId(migrationId);
+            }
+        }
+
+        private bool HasMigrationId(string migrationId)
+        {
+            object result = ExecuteScalar("SELECT COUNT(*) FROM __migrations WHERE migrationId=@migrationId", new MySqlParameter("@migrationId", migrationId));
+            long count = result != null ? (long)result : 0;
+            return count > 0;
+        }
+
+        public void InsertMigrationId(string migrationId)
+        {
+            ExecuteNonQuery("INSERT INTO __migrations (migrationId) VALUES (@migrationId)", new MySqlParameter("@migrationId", migrationId));
         }
 
         public string GetConnectionString()
