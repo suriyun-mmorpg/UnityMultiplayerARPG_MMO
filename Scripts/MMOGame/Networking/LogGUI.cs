@@ -30,7 +30,7 @@ public class LogGUI : MonoBehaviour
     private void OnEnable()
     {
         Logging.onLog += HandleLog;
-        logSavePath = Application.persistentDataPath + "/" + logFileName + ".txt";
+        logSavePath = @"./" + logFileName + ".txt";
         if (openLogDir)
             Application.OpenURL(Application.persistentDataPath);
         // Write log file header
