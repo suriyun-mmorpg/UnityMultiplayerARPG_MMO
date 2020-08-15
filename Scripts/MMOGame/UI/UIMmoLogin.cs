@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using LiteNetLibManager;
+using UnityEngine;
 
 namespace MultiplayerARPG.MMO
 {
@@ -10,14 +11,61 @@ namespace MultiplayerARPG.MMO
     {
         public InputField textUsername;
         public InputField textPassword;
+        [Tooltip("If this is turned on, it will store both username to player prefs")]
+        public Toggle toggleRememberUsername;
+        [Tooltip("If this is turned on, it will store both username and password to player prefs. And login automatically when start game")]
+        public Toggle toggleAutoLogin;
+        public string keyUsername = "_USERNAME_";
+        public string keyPassword = "_PASSWORD_";
         public UnityEvent onLoginSuccess;
         public UnityEvent onLoginFail;
 
-        public string Username { get { return textUsername == null ? string.Empty : textUsername.text; } }
-        public string Password { get { return textPassword == null ? string.Empty : textPassword.text; } }
+        private bool logginIn;
+        public bool LoggingIn
+        {
+            get { return logginIn; }
+            set
+            {
+                logginIn = value;
+                if (textUsername != null)
+                    textUsername.interactable = !logginIn;
+                if (textPassword != null)
+                    textPassword.interactable = !logginIn;
+            }
+        }
+
+        public string Username { 
+            get { return textUsername == null ? string.Empty : textUsername.text; } 
+            set { if (textUsername != null) textUsername.text = value; }
+        }
+        public string Password { 
+            get { return textPassword == null ? string.Empty : textPassword.text; }
+            set { if (textPassword != null) textPassword.text = value; }
+        }
+
+        private void Start()
+        {
+            string username = PlayerPrefs.GetString(keyUsername, string.Empty);
+            string password = PlayerPrefs.GetString(keyPassword, string.Empty);
+            if (!string.IsNullOrEmpty(username))
+                Username = username;
+            if (!string.IsNullOrEmpty(password))
+                Password = password;
+            if (!string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password))
+                OnClickLogin();
+        }
 
         public void OnClickLogin()
         {
+            // Don't allow to spam login button
+            if (LoggingIn)
+                return;
+
+            // Clear stored username and password
+            PlayerPrefs.SetString(keyUsername, Username);
+            PlayerPrefs.SetString(keyPassword, Password);
+            PlayerPrefs.Save();
+
             UISceneGlobal uiSceneGlobal = UISceneGlobal.Singleton;
             if (string.IsNullOrEmpty(Username))
             {
@@ -31,11 +79,23 @@ namespace MultiplayerARPG.MMO
                 return;
             }
 
+            if ((toggleRememberUsername != null && toggleRememberUsername.isOn) ||
+                (toggleAutoLogin != null && toggleAutoLogin.isOn))
+            {
+                // Remember username
+                PlayerPrefs.SetString(keyUsername, Username);
+                PlayerPrefs.Save();
+            }
+
+            LoggingIn = true;
             MMOClientInstance.Singleton.RequestUserLogin(Username, Password, OnLogin);
         }
 
         public void OnLogin(AckResponseCode responseCode, BaseAckMessage message)
         {
+            LoggingIn = false;
+            string storingUsername = string.Empty;
+            string storingPassword = string.Empty;
             ResponseUserLoginMessage castedMessage = (ResponseUserLoginMessage)message;
             switch (responseCode)
             {
@@ -62,6 +122,13 @@ namespace MultiplayerARPG.MMO
                 default:
                     if (onLoginSuccess != null)
                         onLoginSuccess.Invoke();
+
+                    if (toggleAutoLogin != null && toggleAutoLogin.isOn)
+                    {
+                        // Store password
+                        PlayerPrefs.SetString(keyPassword, storingPassword);
+                        PlayerPrefs.Save();
+                    }
                     break;
             }
         }
