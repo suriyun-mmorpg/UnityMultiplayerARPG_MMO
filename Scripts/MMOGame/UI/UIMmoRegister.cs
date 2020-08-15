@@ -14,6 +14,22 @@ namespace MultiplayerARPG.MMO
         public UnityEvent onRegisterSuccess;
         public UnityEvent onRegisterFail;
 
+        private bool registering;
+        public bool Registering
+        {
+            get { return registering; }
+            set
+            {
+                registering = value;
+                if (textUsername != null)
+                    textUsername.interactable = !registering;
+                if (textPassword != null)
+                    textPassword.interactable = !registering;
+                if (textConfirmPassword != null)
+                    textConfirmPassword.interactable = !registering;
+            }
+        }
+
         public string Username { get { return textUsername == null ? string.Empty : textUsername.text; } }
         public string Password { get { return textPassword == null ? string.Empty : textPassword.text; } }
         public string ConfirmPassword { get { return textConfirmPassword == null ? string.Empty : textConfirmPassword.text; } }
@@ -29,6 +45,10 @@ namespace MultiplayerARPG.MMO
 
         public void OnClickRegister()
         {
+            // Don't allow to spam register button
+            if (Registering)
+                return;
+
             UISceneGlobal uiSceneGlobal = UISceneGlobal.Singleton;
             if (string.IsNullOrEmpty(Username))
             {
@@ -48,11 +68,13 @@ namespace MultiplayerARPG.MMO
                 return;
             }
 
+            Registering = true;
             MMOClientInstance.Singleton.RequestUserRegister(Username, Password, OnRegister);
         }
 
         public void OnRegister(AckResponseCode responseCode, BaseAckMessage message)
         {
+            Registering = false;
             ResponseUserRegisterMessage castedMessage = (ResponseUserRegisterMessage)message;
             switch (responseCode)
             {
