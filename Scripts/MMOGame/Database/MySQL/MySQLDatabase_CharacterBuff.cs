@@ -1,15 +1,13 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using MySqlConnector;
 
 namespace MultiplayerARPG.MMO
 {
     public partial class MySQLDatabase
     {
-        private bool ReadCharacterBuff(MySQLRowsReader reader, out CharacterBuff result, bool resetReader = true)
+        private bool ReadCharacterBuff(MySqlDataReader reader, out CharacterBuff result)
         {
-            if (resetReader)
-                reader.ResetReader();
-
             if (reader.Read())
             {
                 result = new CharacterBuff();
@@ -23,9 +21,9 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public void CreateCharacterBuff(MySqlConnection connection, MySqlTransaction transaction, string characterId, CharacterBuff characterBuff)
+        public async Task CreateCharacterBuff(MySqlConnection connection, MySqlTransaction transaction, string characterId, CharacterBuff characterBuff)
         {
-            ExecuteNonQuery(connection, transaction, "INSERT INTO characterbuff (id, characterId, type, dataId, level, buffRemainsDuration) VALUES (@id, @characterId, @type, @dataId, @level, @buffRemainsDuration)",
+            await ExecuteNonQuery(connection, transaction, "INSERT INTO characterbuff (id, characterId, type, dataId, level, buffRemainsDuration) VALUES (@id, @characterId, @type, @dataId, @level, @buffRemainsDuration)",
                 new MySqlParameter("@id", characterId + "_" + characterBuff.type + "_" + characterBuff.dataId),
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@type", (byte)characterBuff.type),
@@ -34,22 +32,25 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@buffRemainsDuration", characterBuff.buffRemainsDuration));
         }
 
-        public List<CharacterBuff> ReadCharacterBuffs(string characterId)
+        public async Task<List<CharacterBuff>> ReadCharacterBuffs(string characterId, List<CharacterBuff> result = null)
         {
-            List<CharacterBuff> result = new List<CharacterBuff>();
-            MySQLRowsReader reader = ExecuteReader("SELECT * FROM characterbuff WHERE characterId=@characterId ORDER BY buffRemainsDuration ASC",
-                new MySqlParameter("@characterId", characterId));
-            CharacterBuff tempBuff;
-            while (ReadCharacterBuff(reader, out tempBuff, false))
+            if (result == null)
+                result = new List<CharacterBuff>();
+            await ExecuteReader((reader) =>
             {
-                result.Add(tempBuff);
-            }
+                CharacterBuff tempBuff;
+                while (ReadCharacterBuff(reader, out tempBuff))
+                {
+                    result.Add(tempBuff);
+                }
+            }, "SELECT * FROM characterbuff WHERE characterId=@characterId ORDER BY buffRemainsDuration ASC",
+                new MySqlParameter("@characterId", characterId));
             return result;
         }
 
-        public void DeleteCharacterBuffs(MySqlConnection connection, MySqlTransaction transaction, string characterId)
+        public async Task DeleteCharacterBuffs(MySqlConnection connection, MySqlTransaction transaction, string characterId)
         {
-            ExecuteNonQuery(connection, transaction, "DELETE FROM characterbuff WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
+            await ExecuteNonQuery(connection, transaction, "DELETE FROM characterbuff WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
         }
     }
 }

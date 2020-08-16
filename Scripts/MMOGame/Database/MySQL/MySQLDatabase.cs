@@ -4,6 +4,8 @@ using LiteNetLibManager;
 using UnityEngine;
 using MiniJSON;
 using System.IO;
+using System.Threading.Tasks;
+using System;
 
 namespace MultiplayerARPG.MMO
 {
@@ -42,11 +44,11 @@ namespace MultiplayerARPG.MMO
             Migration();
         }
 
-        private void Migration()
+        private async void Migration()
         {
             // 1.57b
             string migrationId = "1.57b";
-            if (!HasMigrationId(migrationId))
+            if (!await HasMigrationId(migrationId))
             {
                 // Migrate data
                 try
@@ -54,7 +56,7 @@ namespace MultiplayerARPG.MMO
                     // Avoid exception which occuring when `dataId` field not found
                     foreach (BuildingEntity prefab in GameInstance.BuildingEntities.Values)
                     {
-                        ExecuteNonQuery("UPDATE buildings SET entityId=@entityId, dataId=0 WHERE dataId=@dataId",
+                        await ExecuteNonQuery("UPDATE buildings SET entityId=@entityId, dataId=0 WHERE dataId=@dataId",
                             new MySqlParameter("entityId", prefab.EntityId),
                             new MySqlParameter("dataId", prefab.name.GenerateHashId()));
                     }
@@ -64,7 +66,7 @@ namespace MultiplayerARPG.MMO
                 try
                 {
                     // Avoid exception which occuring when `dataId` field not found
-                    ExecuteNonQuery("ALTER TABLE buildings DROP dataId;");
+                    await ExecuteNonQuery("ALTER TABLE buildings DROP dataId;");
                 }
                 catch { }
                 // Insert migrate history
@@ -72,16 +74,16 @@ namespace MultiplayerARPG.MMO
             }
         }
 
-        private bool HasMigrationId(string migrationId)
+        private async Task<bool> HasMigrationId(string migrationId)
         {
-            object result = ExecuteScalar("SELECT COUNT(*) FROM __migrations WHERE migrationId=@migrationId", new MySqlParameter("@migrationId", migrationId));
+            object result = await ExecuteScalar("SELECT COUNT(*) FROM __migrations WHERE migrationId=@migrationId", new MySqlParameter("@migrationId", migrationId));
             long count = result != null ? (long)result : 0;
             return count > 0;
         }
 
-        public void InsertMigrationId(string migrationId)
+        public async void InsertMigrationId(string migrationId)
         {
-            ExecuteNonQuery("INSERT INTO __migrations (migrationId) VALUES (@migrationId)", new MySqlParameter("@migrationId", migrationId));
+            await ExecuteNonQuery("INSERT INTO __migrations (migrationId) VALUES (@migrationId)", new MySqlParameter("@migrationId", migrationId));
         }
 
         public string GetConnectionString()
@@ -100,23 +102,23 @@ namespace MultiplayerARPG.MMO
             return new MySqlConnection(GetConnectionString());
         }
 
-        public long ExecuteInsertData(string sql, params MySqlParameter[] args)
+        public async Task<long> ExecuteInsertData(string sql, params MySqlParameter[] args)
         {
             MySqlConnection connection = NewConnection();
-            connection.Open();
-            long result = ExecuteInsertData(connection, null, sql, args);
-            connection.Close();
+            await connection.OpenAsync();
+            long result = await ExecuteInsertData(connection, null, sql, args);
+            await connection.CloseAsync();
             return result;
         }
 
-        public long ExecuteInsertData(MySqlConnection connection, MySqlTransaction transaction, string sql, params MySqlParameter[] args)
+        public async Task<long> ExecuteInsertData(MySqlConnection connection, MySqlTransaction transaction, string sql, params MySqlParameter[] args)
         {
             bool createLocalConnection = false;
             if (connection == null)
             {
                 connection = NewConnection();
                 transaction = null;
-                connection.Open();
+                await connection.OpenAsync();
                 createLocalConnection = true;
             }
             long result = 0;
@@ -128,31 +130,31 @@ namespace MultiplayerARPG.MMO
                 {
                     cmd.Parameters.Add(arg);
                 }
-                cmd.ExecuteNonQuery();
+                await cmd.ExecuteNonQueryAsync();
                 result = cmd.LastInsertedId;
             }
             if (createLocalConnection)
-                connection.Close();
+                await connection.CloseAsync();
             return result;
         }
 
-        public int ExecuteNonQuery(string sql, params MySqlParameter[] args)
+        public async Task<int> ExecuteNonQuery(string sql, params MySqlParameter[] args)
         {
             MySqlConnection connection = NewConnection();
-            connection.Open();
-            int result = ExecuteNonQuery(connection, null, sql, args);
-            connection.Close();
+            await connection.OpenAsync();
+            int result = await ExecuteNonQuery(connection, null, sql, args);
+            await connection.CloseAsync();
             return result;
         }
 
-        public int ExecuteNonQuery(MySqlConnection connection, MySqlTransaction transaction, string sql, params MySqlParameter[] args)
+        public async Task<int> ExecuteNonQuery(MySqlConnection connection, MySqlTransaction transaction, string sql, params MySqlParameter[] args)
         {
             bool createLocalConnection = false;
             if (connection == null)
             {
                 connection = NewConnection();
                 transaction = null;
-                connection.Open();
+                await connection.OpenAsync();
                 createLocalConnection = true;
             }
             int numRows = 0;
@@ -164,30 +166,30 @@ namespace MultiplayerARPG.MMO
                 {
                     cmd.Parameters.Add(arg);
                 }
-                numRows = cmd.ExecuteNonQuery();
+                numRows = await cmd.ExecuteNonQueryAsync();
             }
             if (createLocalConnection)
-                connection.Close();
+                await connection.CloseAsync();
             return numRows;
         }
 
-        public object ExecuteScalar(string sql, params MySqlParameter[] args)
+        public async Task<object> ExecuteScalar(string sql, params MySqlParameter[] args)
         {
             MySqlConnection connection = NewConnection();
-            connection.Open();
-            object result = ExecuteScalar(connection, null, sql, args);
-            connection.Close();
+            await connection.OpenAsync();
+            object result = await ExecuteScalar(connection, null, sql, args);
+            await connection.CloseAsync();
             return result;
         }
 
-        public object ExecuteScalar(MySqlConnection connection, MySqlTransaction transaction, string sql, params MySqlParameter[] args)
+        public async Task<object> ExecuteScalar(MySqlConnection connection, MySqlTransaction transaction, string sql, params MySqlParameter[] args)
         {
             bool createLocalConnection = false;
             if (connection == null)
             {
                 connection = NewConnection();
                 transaction = null;
-                connection.Open();
+                await connection.OpenAsync();
                 createLocalConnection = true;
             }
             object result;
@@ -199,33 +201,31 @@ namespace MultiplayerARPG.MMO
                 {
                     cmd.Parameters.Add(arg);
                 }
-                result = cmd.ExecuteScalar();
+                result = await cmd.ExecuteScalarAsync();
             }
             if (createLocalConnection)
-                connection.Close();
+                await connection.CloseAsync();
             return result;
         }
 
-        public MySQLRowsReader ExecuteReader(string sql, params MySqlParameter[] args)
+        public async Task ExecuteReader(Action<MySqlDataReader> onRead, string sql, params MySqlParameter[] args)
         {
             MySqlConnection connection = NewConnection();
-            connection.Open();
-            MySQLRowsReader result = ExecuteReader(connection, null, sql, args);
-            connection.Close();
-            return result;
+            await connection.OpenAsync();
+            await ExecuteReader(connection, null, onRead, sql, args);
+            await connection.CloseAsync();
         }
 
-        public MySQLRowsReader ExecuteReader(MySqlConnection connection, MySqlTransaction transaction, string sql, params MySqlParameter[] args)
+        public async Task ExecuteReader(MySqlConnection connection, MySqlTransaction transaction, Action<MySqlDataReader> onRead, string sql, params MySqlParameter[] args)
         {
             bool createLocalConnection = false;
             if (connection == null)
             {
                 connection = NewConnection();
                 transaction = null;
-                connection.Open();
+                await connection.OpenAsync();
                 createLocalConnection = true;
             }
-            MySQLRowsReader result = new MySQLRowsReader();
             using (MySqlCommand cmd = new MySqlCommand(sql, connection))
             {
                 if (transaction != null)
@@ -234,101 +234,109 @@ namespace MultiplayerARPG.MMO
                 {
                     cmd.Parameters.Add(arg);
                 }
-                MySqlDataReader dataReader = cmd.ExecuteReader();
-                result.Init(dataReader);
+                MySqlDataReader dataReader = await cmd.ExecuteReaderAsync();
+                if (onRead != null) onRead.Invoke(dataReader);
                 dataReader.Close();
             }
             if (createLocalConnection)
-                connection.Close();
-            return result;
+                await connection.CloseAsync();
         }
 
-        public override string ValidateUserLogin(string username, string password)
+        public override async Task<string> ValidateUserLogin(string username, string password)
         {
             string id = string.Empty;
-            MySQLRowsReader reader = ExecuteReader("SELECT id FROM userlogin WHERE username=@username AND password=@password AND authType=@authType LIMIT 1",
+            await ExecuteReader((reader) =>
+            {
+                if (reader.Read())
+                {
+                    id = reader.GetString("Id");
+                }
+            }, "SELECT id FROM userlogin WHERE username=@username AND password=@password AND authType=@authType LIMIT 1",
                 new MySqlParameter("@username", username),
-                new MySqlParameter("@password", GenericUtils.GetMD5(password)),
+                new MySqlParameter("@password", password.GetMD5()),
                 new MySqlParameter("@authType", AUTH_TYPE_NORMAL));
-
-            if (reader.Read())
-                id = reader.GetString("id");
 
             return id;
         }
 
-        public override bool ValidateAccessToken(string userId, string accessToken)
+        public override async Task<bool> ValidateAccessToken(string userId, string accessToken)
         {
-            object result = ExecuteScalar("SELECT COUNT(*) FROM userlogin WHERE id=@id AND accessToken=@accessToken",
+            object result = await ExecuteScalar("SELECT COUNT(*) FROM userlogin WHERE id=@id AND accessToken=@accessToken",
                 new MySqlParameter("@id", userId),
                 new MySqlParameter("@accessToken", accessToken));
             return (result != null ? (long)result : 0) > 0;
         }
 
-        public override byte GetUserLevel(string userId)
+        public override async Task<byte> GetUserLevel(string userId)
         {
             byte userLevel = 0;
-            MySQLRowsReader reader = ExecuteReader("SELECT userLevel FROM userlogin WHERE id=@id LIMIT 1",
+            await ExecuteReader((reader) =>
+            {
+                if (reader.Read())
+                    userLevel = reader.GetByte("userLevel");
+            }, "SELECT userLevel FROM userlogin WHERE id=@id LIMIT 1",
                 new MySqlParameter("@id", userId));
-            if (reader.Read())
-                userLevel = (byte)reader.GetSByte("userLevel");
             return userLevel;
         }
 
-        public override int GetGold(string userId)
+        public override async Task<int> GetGold(string userId)
         {
             int gold = 0;
-            MySQLRowsReader reader = ExecuteReader("SELECT gold FROM userlogin WHERE id=@id LIMIT 1",
+            await ExecuteReader((reader) =>
+            {
+                if (reader.Read())
+                    gold = reader.GetInt32("gold");
+            }, "SELECT gold FROM userlogin WHERE id=@id LIMIT 1",
                 new MySqlParameter("@id", userId));
-            if (reader.Read())
-                gold = reader.GetInt32("gold");
             return gold;
         }
 
-        public override void UpdateGold(string userId, int gold)
+        public override async Task UpdateGold(string userId, int gold)
         {
-            ExecuteNonQuery("UPDATE userlogin SET gold=@gold WHERE id=@id",
+            await ExecuteNonQuery("UPDATE userlogin SET gold=@gold WHERE id=@id",
                 new MySqlParameter("@id", userId),
                 new MySqlParameter("@gold", gold));
         }
 
-        public override int GetCash(string userId)
+        public override async Task<int> GetCash(string userId)
         {
             int cash = 0;
-            MySQLRowsReader reader = ExecuteReader("SELECT cash FROM userlogin WHERE id=@id LIMIT 1",
+            await ExecuteReader((reader) =>
+            {
+                if (reader.Read())
+                    cash = reader.GetInt32("cash");
+            }, "SELECT cash FROM userlogin WHERE id=@id LIMIT 1",
                 new MySqlParameter("@id", userId));
-            if (reader.Read())
-                cash = reader.GetInt32("cash");
             return cash;
         }
 
-        public override void UpdateCash(string userId, int cash)
+        public override async Task UpdateCash(string userId, int cash)
         {
-            ExecuteNonQuery("UPDATE userlogin SET cash=@cash WHERE id=@id",
+            await ExecuteNonQuery("UPDATE userlogin SET cash=@cash WHERE id=@id",
                 new MySqlParameter("@id", userId),
                 new MySqlParameter("@cash", cash));
         }
 
-        public override void UpdateAccessToken(string userId, string accessToken)
+        public override async Task UpdateAccessToken(string userId, string accessToken)
         {
-            ExecuteNonQuery("UPDATE userlogin SET accessToken=@accessToken WHERE id=@id",
+            await ExecuteNonQuery("UPDATE userlogin SET accessToken=@accessToken WHERE id=@id",
                 new MySqlParameter("@id", userId),
                 new MySqlParameter("@accessToken", accessToken));
         }
 
-        public override void CreateUserLogin(string username, string password)
+        public override async Task CreateUserLogin(string username, string password)
         {
-            ExecuteNonQuery("INSERT INTO userlogin (id, username, password, email, authType) VALUES (@id, @username, @password, @email, @authType)",
+            await ExecuteNonQuery("INSERT INTO userlogin (id, username, password, email, authType) VALUES (@id, @username, @password, @email, @authType)",
                 new MySqlParameter("@id", GenericUtils.GetUniqueId()),
                 new MySqlParameter("@username", username),
-                new MySqlParameter("@password", GenericUtils.GetMD5(password)),
+                new MySqlParameter("@password", password.GetMD5()),
                 new MySqlParameter("@email", ""),
                 new MySqlParameter("@authType", AUTH_TYPE_NORMAL));
         }
 
-        public override long FindUsername(string username)
+        public override async Task<long> FindUsername(string username)
         {
-            object result = ExecuteScalar("SELECT COUNT(*) FROM userlogin WHERE username LIKE @username",
+            object result = await ExecuteScalar("SELECT COUNT(*) FROM userlogin WHERE username LIKE @username",
                 new MySqlParameter("@username", username));
             return result != null ? (long)result : 0;
         }

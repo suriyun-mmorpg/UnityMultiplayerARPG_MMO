@@ -1,15 +1,13 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using MySqlConnector;
 
 namespace MultiplayerARPG.MMO
 {
     public partial class MySQLDatabase
     {
-        private bool ReadCharacterSkill(MySQLRowsReader reader, out CharacterSkill result, bool resetReader = true)
+        private bool ReadCharacterSkill(MySqlDataReader reader, out CharacterSkill result)
         {
-            if (resetReader)
-                reader.ResetReader();
-
             if (reader.Read())
             {
                 result = new CharacterSkill();
@@ -21,9 +19,9 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public void CreateCharacterSkill(MySqlConnection connection, MySqlTransaction transaction, int idx, string characterId, CharacterSkill characterSkill)
+        public async Task CreateCharacterSkill(MySqlConnection connection, MySqlTransaction transaction, int idx, string characterId, CharacterSkill characterSkill)
         {
-            ExecuteNonQuery(connection, transaction, "INSERT INTO characterskill (id, idx, characterId, dataId, level) VALUES (@id, @idx, @characterId, @dataId, @level)",
+            await ExecuteNonQuery(connection, transaction, "INSERT INTO characterskill (id, idx, characterId, dataId, level) VALUES (@id, @idx, @characterId, @dataId, @level)",
                 new MySqlParameter("@id", characterId + "_" + idx),
                 new MySqlParameter("@idx", idx),
                 new MySqlParameter("@characterId", characterId),
@@ -31,22 +29,25 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@level", characterSkill.level));
         }
 
-        public List<CharacterSkill> ReadCharacterSkills(string characterId)
+        public async Task<List<CharacterSkill>> ReadCharacterSkills(string characterId, List<CharacterSkill> result = null)
         {
-            List<CharacterSkill> result = new List<CharacterSkill>();
-            MySQLRowsReader reader = ExecuteReader("SELECT * FROM characterskill WHERE characterId=@characterId ORDER BY idx ASC",
-                new MySqlParameter("@characterId", characterId));
-            CharacterSkill tempSkill;
-            while (ReadCharacterSkill(reader, out tempSkill, false))
+            if (result == null)
+                result = new List<CharacterSkill>();
+            await ExecuteReader((reader) =>
             {
-                result.Add(tempSkill);
-            }
+                CharacterSkill tempSkill;
+                while (ReadCharacterSkill(reader, out tempSkill))
+                {
+                    result.Add(tempSkill);
+                }
+            }, "SELECT * FROM characterskill WHERE characterId=@characterId ORDER BY idx ASC",
+                new MySqlParameter("@characterId", characterId));
             return result;
         }
 
-        public void DeleteCharacterSkills(MySqlConnection connection, MySqlTransaction transaction, string characterId)
+        public async Task DeleteCharacterSkills(MySqlConnection connection, MySqlTransaction transaction, string characterId)
         {
-            ExecuteNonQuery(connection, transaction, "DELETE FROM characterskill WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
+            await ExecuteNonQuery(connection, transaction, "DELETE FROM characterskill WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
         }
     }
 }

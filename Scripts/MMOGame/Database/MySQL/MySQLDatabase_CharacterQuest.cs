@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using MySqlConnector;
 
 namespace MultiplayerARPG.MMO
@@ -31,11 +32,8 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        private bool ReadCharacterQuest(MySQLRowsReader reader, out CharacterQuest result, bool resetReader = true)
+        private bool ReadCharacterQuest(MySqlDataReader reader, out CharacterQuest result)
         {
-            if (resetReader)
-                reader.ResetReader();
-
             if (reader.Read())
             {
                 result = new CharacterQuest();
@@ -48,9 +46,9 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public void CreateCharacterQuest(MySqlConnection connection, MySqlTransaction transaction, int idx, string characterId, CharacterQuest characterQuest)
+        public async Task CreateCharacterQuest(MySqlConnection connection, MySqlTransaction transaction, int idx, string characterId, CharacterQuest characterQuest)
         {
-            ExecuteNonQuery(connection, transaction, "INSERT INTO characterquest (id, idx, characterId, dataId, isComplete, killedMonsters) VALUES (@id, @idx, @characterId, @dataId, @isComplete, @killedMonsters)",
+            await ExecuteNonQuery(connection, transaction, "INSERT INTO characterquest (id, idx, characterId, dataId, isComplete, killedMonsters) VALUES (@id, @idx, @characterId, @dataId, @isComplete, @killedMonsters)",
                 new MySqlParameter("@id", characterId + "_" + idx),
                 new MySqlParameter("@idx", idx),
                 new MySqlParameter("@characterId", characterId),
@@ -59,22 +57,25 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@killedMonsters", WriteKillMonsters(characterQuest.killedMonsters)));
         }
 
-        public List<CharacterQuest> ReadCharacterQuests(string characterId)
+        public async Task<List<CharacterQuest>> ReadCharacterQuests(string characterId, List<CharacterQuest> result = null)
         {
-            List<CharacterQuest> result = new List<CharacterQuest>();
-            MySQLRowsReader reader = ExecuteReader("SELECT * FROM characterquest WHERE characterId=@characterId ORDER BY idx ASC",
-                new MySqlParameter("@characterId", characterId));
-            CharacterQuest tempQuest;
-            while (ReadCharacterQuest(reader, out tempQuest, false))
+            if (result == null)
+                result = new List<CharacterQuest>();
+            await ExecuteReader((reader) =>
             {
-                result.Add(tempQuest);
-            }
+                CharacterQuest tempQuest;
+                while (ReadCharacterQuest(reader, out tempQuest))
+                {
+                    result.Add(tempQuest);
+                }
+            }, "SELECT * FROM characterquest WHERE characterId=@characterId ORDER BY idx ASC",
+                new MySqlParameter("@characterId", characterId));
             return result;
         }
 
-        public void DeleteCharacterQuests(MySqlConnection connection, MySqlTransaction transaction, string characterId)
+        public async Task DeleteCharacterQuests(MySqlConnection connection, MySqlTransaction transaction, string characterId)
         {
-            ExecuteNonQuery(connection, transaction, "DELETE FROM characterquest WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
+            await ExecuteNonQuery(connection, transaction, "DELETE FROM characterquest WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
         }
     }
 }

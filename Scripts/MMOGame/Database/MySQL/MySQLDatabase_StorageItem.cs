@@ -1,14 +1,15 @@
 ﻿using System.Collections.Generic;
 using MySqlConnector;
 using LiteNetLibManager;
+using System.Threading.Tasks;
 
 namespace MultiplayerARPG.MMO
 {
     public partial class MySQLDatabase
     {
-        private void CreateStorageItem(MySqlConnection connection, MySqlTransaction transaction, int idx, StorageType storageType, string storageOwnerId, CharacterItem characterItem)
+        private async Task CreateStorageItem(MySqlConnection connection, MySqlTransaction transaction, int idx, StorageType storageType, string storageOwnerId, CharacterItem characterItem)
         {
-            ExecuteNonQuery(connection, transaction, "INSERT INTO storageitem (id, idx, storageType, storageOwnerId, dataId, level, amount, durability, exp, lockRemainsDuration, ammo, sockets) VALUES (@id, @idx, @storageType, @storageOwnerId, @dataId, @level, @amount, @durability, @exp, @lockRemainsDuration, @ammo, @sockets)",
+            await ExecuteNonQuery(connection, transaction, "INSERT INTO storageitem (id, idx, storageType, storageOwnerId, dataId, level, amount, durability, exp, lockRemainsDuration, ammo, sockets) VALUES (@id, @idx, @storageType, @storageOwnerId, @dataId, @level, @amount, @durability, @exp, @lockRemainsDuration, @ammo, @sockets)",
                 new MySqlParameter("@id", new StorageItemId(storageType, storageOwnerId, idx).GetId()),
                 new MySqlParameter("@idx", idx),
                 new MySqlParameter("@storageType", (byte)storageType),
@@ -23,11 +24,8 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@sockets", WriteSockets(characterItem.sockets)));
         }
 
-        private bool ReadStorageItem(MySQLRowsReader reader, out CharacterItem result, bool resetReader = true)
+        private bool ReadStorageItem(MySqlDataReader reader, out CharacterItem result)
         {
-            if (resetReader)
-                reader.ResetReader();
-
             if (reader.Read())
             {
                 result = new CharacterItem();
@@ -45,47 +43,52 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public override List<CharacterItem> ReadStorageItems(StorageType storageType, string storageOwnerId)
+        public override async Task<List<CharacterItem>> ReadStorageItems(StorageType storageType, string storageOwnerId)
         {
             List<CharacterItem> result = new List<CharacterItem>();
-            MySQLRowsReader reader = ExecuteReader("SELECT * FROM storageitem WHERE storageType=@storageType AND storageOwnerId=@storageOwnerId ORDER BY idx ASC",
+            await ExecuteReader((reader) =>
+            {
+                CharacterItem tempInventory;
+                while (ReadStorageItem(reader, out tempInventory))
+                {
+                    result.Add(tempInventory);
+                }
+            }, "SELECT * FROM storageitem WHERE storageType=@storageType AND storageOwnerId=@storageOwnerId ORDER BY idx ASC",
                 new MySqlParameter("@storageType", (byte)storageType),
                 new MySqlParameter("@storageOwnerId", storageOwnerId));
-            CharacterItem tempInventory;
-            while (ReadStorageItem(reader, out tempInventory, false))
-            {
-                result.Add(tempInventory);
-            }
             return result;
         }
 
-        public override void UpdateStorageItems(StorageType storageType, string storageOwnerId, IList<CharacterItem> characterItems)
+        public override async Task UpdateStorageItems(StorageType storageType, string storageOwnerId, IList<CharacterItem> characterItems)
         {
             MySqlConnection connection = NewConnection();
-            connection.Open();
+            await connection.OpenAsync();
             MySqlTransaction transaction = connection.BeginTransaction();
             try
             {
-                DeleteStorageItems(connection, transaction, storageType, storageOwnerId);
-                for (int i = 0; i < characterItems.Count; ++i)
+                await DeleteStorageItems(connection, transaction, storageType, storageOwnerId);
+                Task[] tasks = new Task[characterItems.Count];
+                int i;
+                for (i = 0; i < characterItems.Count; ++i)
                 {
-                    CreateStorageItem(connection, transaction, i, storageType, storageOwnerId, characterItems[i]);
+                    tasks[i] = CreateStorageItem(connection, transaction, i, storageType, storageOwnerId, characterItems[i]);
                 }
-                transaction.Commit();
+                await Task.WhenAll(tasks);
+                await transaction.CommitAsync();
             }
             catch (System.Exception ex)
             {
                 Logging.LogError(ToString(), "Transaction, Error occurs while replacing storage items");
                 Logging.LogException(ToString(), ex);
-                transaction.Rollback();
+                await transaction.RollbackAsync();
             }
-            transaction.Dispose();
-            connection.Close();
+            await transaction.DisposeAsync();
+            await connection.CloseAsync();
         }
 
-        public void DeleteStorageItems(MySqlConnection connection, MySqlTransaction transaction, StorageType storageType, string storageOwnerId)
+        public async Task DeleteStorageItems(MySqlConnection connection, MySqlTransaction transaction, StorageType storageType, string storageOwnerId)
         {
-            ExecuteNonQuery(connection, transaction, "DELETE FROM storageitem WHERE storageType=@storageType AND storageOwnerId=@storageOwnerId",
+            await ExecuteNonQuery(connection, transaction, "DELETE FROM storageitem WHERE storageType=@storageType AND storageOwnerId=@storageOwnerId",
                 new MySqlParameter("@storageType", (byte)storageType),
                 new MySqlParameter("@storageOwnerId", storageOwnerId));
         }

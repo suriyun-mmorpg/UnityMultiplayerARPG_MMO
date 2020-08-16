@@ -2,234 +2,251 @@
 using LiteNetLibManager;
 using UnityEngine;
 using MySqlConnector;
+using System.Threading.Tasks;
 
 namespace MultiplayerARPG.MMO
 {
     public partial class MySQLDatabase
     {
-        private void FillCharacterAttributes(IPlayerCharacterData characterData)
+        private async Task FillCharacterAttributes(IPlayerCharacterData characterData)
         {
             MySqlConnection connection = NewConnection();
-            connection.Open();
+            await connection.OpenAsync();
             MySqlTransaction transaction = connection.BeginTransaction();
             try
             {
-                DeleteCharacterAttributes(connection, transaction, characterData.Id);
+                await DeleteCharacterAttributes(connection, transaction, characterData.Id);
+                Task[] tasks = new Task[characterData.Attributes.Count];
                 int i;
                 for (i = 0; i < characterData.Attributes.Count; ++i)
                 {
-                    CreateCharacterAttribute(connection, transaction, i, characterData.Id, characterData.Attributes[i]);
+                    tasks[i] = CreateCharacterAttribute(connection, transaction, i, characterData.Id, characterData.Attributes[i]);
                 }
-                transaction.Commit();
+                await Task.WhenAll(tasks);
+                await transaction.CommitAsync();
             }
             catch (System.Exception ex)
             {
                 Logging.LogError(ToString(), "Transaction, Error occurs while replacing attributes of character: " + characterData.Id);
                 Logging.LogException(ToString(), ex);
-                transaction.Rollback();
+                await transaction.RollbackAsync();
             }
-            transaction.Dispose();
-            connection.Close();
+            await transaction.DisposeAsync();
+            await connection.CloseAsync();
         }
 
-        private void FillCharacterBuffs(IPlayerCharacterData characterData)
+        private async Task FillCharacterBuffs(IPlayerCharacterData characterData)
         {
             MySqlConnection connection = NewConnection();
-            connection.Open();
-            MySqlTransaction transaction = connection.BeginTransaction();
+            await connection.OpenAsync();
+            MySqlTransaction transaction = await connection.BeginTransactionAsync();
             try
             {
-                DeleteCharacterBuffs(connection, transaction, characterData.Id);
+                await DeleteCharacterBuffs(connection, transaction, characterData.Id);
+                Task[] tasks = new Task[characterData.Buffs.Count];
                 int i;
                 for (i = 0; i < characterData.Buffs.Count; ++i)
                 {
-                    CreateCharacterBuff(connection, transaction, characterData.Id, characterData.Buffs[i]);
+                    tasks[i] = CreateCharacterBuff(connection, transaction, characterData.Id, characterData.Buffs[i]);
                 }
-                transaction.Commit();
+                await Task.WhenAll(tasks);
+                await transaction.CommitAsync();
             }
             catch (System.Exception ex)
             {
                 Logging.LogError(ToString(), "Transaction, Error occurs while replacing buffs of character: " + characterData.Id);
                 Logging.LogException(ToString(), ex);
-                transaction.Rollback();
+                await transaction.RollbackAsync();
             }
-            transaction.Dispose();
-            connection.Close();
+            await transaction.DisposeAsync();
+            await connection.CloseAsync();
         }
 
-        private void FillCharacterHotkeys(IPlayerCharacterData characterData)
+        private async Task FillCharacterHotkeys(IPlayerCharacterData characterData)
         {
             MySqlConnection connection = NewConnection();
-            connection.Open();
+            await connection.OpenAsync();
             MySqlTransaction transaction = connection.BeginTransaction();
             try
             {
-                DeleteCharacterHotkeys(connection, transaction, characterData.Id);
+                await DeleteCharacterHotkeys(connection, transaction, characterData.Id);
+                Task[] tasks = new Task[characterData.Hotkeys.Count];
                 int i;
                 for (i = 0; i < characterData.Hotkeys.Count; ++i)
                 {
-                    CreateCharacterHotkey(connection, transaction, characterData.Id, characterData.Hotkeys[i]);
+                    tasks[i] = CreateCharacterHotkey(connection, transaction, characterData.Id, characterData.Hotkeys[i]);
                 }
-                transaction.Commit();
+                await Task.WhenAll(tasks);
+                await transaction.CommitAsync();
             }
             catch (System.Exception ex)
             {
                 Logging.LogError(ToString(), "Transaction, Error occurs while replacing hotkeys of character: " + characterData.Id);
                 Logging.LogException(ToString(), ex);
-                transaction.Rollback();
+                await transaction.RollbackAsync();
             }
-            transaction.Dispose();
-            connection.Close();
+            await transaction.DisposeAsync();
+            await connection.CloseAsync();
         }
 
-        private void FillCharacterItems(IPlayerCharacterData characterData)
+        private async Task FillCharacterItems(IPlayerCharacterData characterData)
         {
             MySqlConnection connection = NewConnection();
-            connection.Open();
+            await connection.OpenAsync();
             MySqlTransaction transaction = connection.BeginTransaction();
             try
             {
-                DeleteCharacterItems(connection, transaction, characterData.Id);
+                await DeleteCharacterItems(connection, transaction, characterData.Id);
+                List<Task> tasks = new List<Task>();
                 int i;
                 for (i = 0; i < characterData.SelectableWeaponSets.Count; ++i)
                 {
-                    CreateCharacterEquipWeapons(connection, transaction, (byte)i, characterData.Id, characterData.SelectableWeaponSets[i]);
+                    tasks.Add(CreateCharacterEquipWeapons(connection, transaction, (byte)i, characterData.Id, characterData.SelectableWeaponSets[i]));
                 }
                 for (i = 0; i < characterData.EquipItems.Count; ++i)
                 {
-                    CreateCharacterEquipItem(connection, transaction, i, characterData.Id, characterData.EquipItems[i]);
+                    tasks.Add(CreateCharacterEquipItem(connection, transaction, i, characterData.Id, characterData.EquipItems[i]));
                 }
                 for (i = 0; i < characterData.NonEquipItems.Count; ++i)
                 {
-                    CreateCharacterNonEquipItem(connection, transaction, i, characterData.Id, characterData.NonEquipItems[i]);
+                    tasks.Add(CreateCharacterNonEquipItem(connection, transaction, i, characterData.Id, characterData.NonEquipItems[i]));
                 }
-                transaction.Commit();
+                await Task.WhenAll(tasks);
+                await transaction.CommitAsync();
             }
             catch (System.Exception ex)
             {
                 Logging.LogError(ToString(), "Transaction, Error occurs while replacing items of character: " + characterData.Id);
                 Logging.LogException(ToString(), ex);
-                transaction.Rollback();
+                await transaction.RollbackAsync();
             }
-            transaction.Dispose();
-            connection.Close();
+            await transaction.DisposeAsync();
+            await connection.CloseAsync();
         }
 
-        private void FillCharacterQuests(IPlayerCharacterData characterData)
+        private async Task FillCharacterQuests(IPlayerCharacterData characterData)
         {
             MySqlConnection connection = NewConnection();
-            connection.Open();
+            await connection.OpenAsync();
             MySqlTransaction transaction = connection.BeginTransaction();
             try
             {
-                DeleteCharacterQuests(connection, transaction, characterData.Id);
+                await DeleteCharacterQuests(connection, transaction, characterData.Id);
+                Task[] tasks = new Task[characterData.Quests.Count];
                 int i;
                 for (i = 0; i < characterData.Quests.Count; ++i)
                 {
-                    CreateCharacterQuest(connection, transaction, i, characterData.Id, characterData.Quests[i]);
+                    tasks[i] = CreateCharacterQuest(connection, transaction, i, characterData.Id, characterData.Quests[i]);
                 }
-                transaction.Commit();
+                await Task.WhenAll(tasks);
+                await transaction.CommitAsync();
             }
             catch (System.Exception ex)
             {
                 Logging.LogError(ToString(), "Transaction, Error occurs while replacing quests of character: " + characterData.Id);
                 Logging.LogException(ToString(), ex);
-                transaction.Rollback();
+                await transaction.RollbackAsync();
             }
-            transaction.Dispose();
-            connection.Close();
+            await transaction.DisposeAsync();
+            await connection.CloseAsync();
         }
 
-        private void FillCharacterSkills(IPlayerCharacterData characterData)
+        private async Task FillCharacterSkills(IPlayerCharacterData characterData)
         {
             MySqlConnection connection = NewConnection();
-            connection.Open();
+            await connection.OpenAsync();
             MySqlTransaction transaction = connection.BeginTransaction();
             try
             {
-                DeleteCharacterSkills(connection, transaction, characterData.Id);
+                await DeleteCharacterSkills(connection, transaction, characterData.Id);
+                Task[] tasks = new Task[characterData.Skills.Count];
                 int i;
                 for (i = 0; i < characterData.Skills.Count; ++i)
                 {
-                    CreateCharacterSkill(connection, transaction, i, characterData.Id, characterData.Skills[i]);
+                    tasks[i] = CreateCharacterSkill(connection, transaction, i, characterData.Id, characterData.Skills[i]);
                 }
-                transaction.Commit();
+                await Task.WhenAll(tasks);
+                await transaction.CommitAsync();
             }
             catch (System.Exception ex)
             {
                 Logging.LogError(ToString(), "Transaction, Error occurs while replacing skills of character: " + characterData.Id);
                 Logging.LogException(ToString(), ex);
-                transaction.Rollback();
+                await transaction.RollbackAsync();
             }
-            transaction.Dispose();
-            connection.Close();
+            await transaction.DisposeAsync();
+            await connection.CloseAsync();
         }
 
-        private void FillCharacterSkillUsages(IPlayerCharacterData characterData)
+        private async Task FillCharacterSkillUsages(IPlayerCharacterData characterData)
         {
             MySqlConnection connection = NewConnection();
-            connection.Open();
+            await connection.OpenAsync();
             MySqlTransaction transaction = connection.BeginTransaction();
             try
             {
-                DeleteCharacterSkillUsages(connection, transaction, characterData.Id);
+                await DeleteCharacterSkillUsages(connection, transaction, characterData.Id);
+                Task[] tasks = new Task[characterData.SkillUsages.Count];
                 int i;
                 for (i = 0; i < characterData.SkillUsages.Count; ++i)
                 {
-                    CreateCharacterSkillUsage(connection, transaction, characterData.Id, characterData.SkillUsages[i]);
+                    tasks[i] = CreateCharacterSkillUsage(connection, transaction, characterData.Id, characterData.SkillUsages[i]);
                 }
-                transaction.Commit();
+                await Task.WhenAll(tasks);
+                await transaction.CommitAsync();
             }
             catch (System.Exception ex)
             {
                 Logging.LogError(ToString(), "Transaction, Error occurs while replacing skill usages of character: " + characterData.Id);
                 Logging.LogException(ToString(), ex);
-                transaction.Rollback();
+                await transaction.RollbackAsync();
             }
-            transaction.Dispose();
-            connection.Close();
+            await transaction.DisposeAsync();
+            await connection.CloseAsync();
         }
 
-        private void FillCharacterSummons(IPlayerCharacterData characterData)
+        private async Task FillCharacterSummons(IPlayerCharacterData characterData)
         {
             MySqlConnection connection = NewConnection();
-            connection.Open();
+            await connection.OpenAsync();
             MySqlTransaction transaction = connection.BeginTransaction();
             try
             {
-                DeleteCharacterSummons(connection, transaction, characterData.Id);
+                await DeleteCharacterSummons(connection, transaction, characterData.Id);
+                Task[] tasks = new Task[characterData.Summons.Count];
                 int i;
                 for (i = 0; i < characterData.Summons.Count; ++i)
                 {
-                    CreateCharacterSummon(connection, transaction, i, characterData.Id, characterData.Summons[i]);
+                    tasks[i] = CreateCharacterSummon(connection, transaction, i, characterData.Id, characterData.Summons[i]);
                 }
-                transaction.Commit();
+                await Task.WhenAll(tasks);
+                await transaction.CommitAsync();
             }
             catch (System.Exception ex)
             {
                 Logging.LogError(ToString(), "Transaction, Error occurs while replacing skill usages of character: " + characterData.Id);
                 Logging.LogException(ToString(), ex);
-                transaction.Rollback();
+                await transaction.RollbackAsync();
             }
-            transaction.Dispose();
-            connection.Close();
+            await transaction.DisposeAsync();
+            await connection.CloseAsync();
         }
 
-        private void FillCharacterRelatesData(IPlayerCharacterData characterData)
+        private async Task FillCharacterRelatesData(IPlayerCharacterData characterData)
         {
-            FillCharacterAttributes(characterData);
-            FillCharacterBuffs(characterData);
-            FillCharacterHotkeys(characterData);
-            FillCharacterItems(characterData);
-            FillCharacterQuests(characterData);
-            FillCharacterSkills(characterData);
-            FillCharacterSkillUsages(characterData);
-            FillCharacterSummons(characterData);
+            await Task.WhenAll(FillCharacterAttributes(characterData),
+                FillCharacterBuffs(characterData),
+                FillCharacterHotkeys(characterData),
+                FillCharacterItems(characterData),
+                FillCharacterQuests(characterData),
+                FillCharacterSkills(characterData),
+                FillCharacterSkillUsages(characterData),
+                FillCharacterSummons(characterData));
         }
 
-        public override void CreateCharacter(string userId, IPlayerCharacterData characterData)
+        public override async Task CreateCharacter(string userId, IPlayerCharacterData characterData)
         {
-            ExecuteNonQuery("INSERT INTO characters " +
+            await ExecuteNonQuery("INSERT INTO characters " +
                 "(id, userId, dataId, entityId, factionId, characterName, level, exp, currentHp, currentMp, currentStamina, currentFood, currentWater, equipWeaponSet, statPoint, skillPoint, gold, currentMapName, currentPositionX, currentPositionY, currentPositionZ, respawnMapName, respawnPositionX, respawnPositionY, respawnPositionZ, mountDataId) VALUES " +
                 "(@id, @userId, @dataId, @entityId, @factionId, @characterName, @level, @exp, @currentHp, @currentMp, @currentStamina, @currentFood, @currentWater, @equipWeaponSet, @statPoint, @skillPoint, @gold, @currentMapName, @currentPositionX, @currentPositionY, @currentPositionZ, @respawnMapName, @respawnPositionX, @respawnPositionY, @respawnPositionZ, @mountDataId)",
                 new MySqlParameter("@id", characterData.Id),
@@ -258,15 +275,12 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@respawnPositionY", characterData.RespawnPosition.y),
                 new MySqlParameter("@respawnPositionZ", characterData.RespawnPosition.z),
                 new MySqlParameter("@mountDataId", characterData.MountDataId));
-            FillCharacterRelatesData(characterData);
+            await FillCharacterRelatesData(characterData);
             this.InvokeInstanceDevExtMethods("CreateCharacter", userId, characterData);
         }
 
-        private bool ReadCharacter(MySQLRowsReader reader, out PlayerCharacterData result, bool resetReader = true)
+        private bool ReadCharacter(MySqlDataReader reader, out PlayerCharacterData result)
         {
-            if (resetReader)
-                reader.ResetReader();
-
             if (reader.Read())
             {
                 result = new PlayerCharacterData();
@@ -302,7 +316,7 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public override PlayerCharacterData ReadCharacter(
+        public override async Task<PlayerCharacterData> ReadCharacter(
             string id,
             bool withEquipWeapons = true,
             bool withAttributes = true,
@@ -315,65 +329,109 @@ namespace MultiplayerARPG.MMO
             bool withHotkeys = true,
             bool withQuests = true)
         {
-            MySQLRowsReader reader = ExecuteReader("SELECT * FROM characters WHERE id=@id LIMIT 1",
+            PlayerCharacterData result = null;
+            await ExecuteReader((reader) =>
+            {
+                if (ReadCharacter(reader, out result))
+                {
+                    // Invoke dev extension methods
+                    this.InvokeInstanceDevExtMethods("ReadCharacter",
+                        result,
+                        withEquipWeapons,
+                        withAttributes,
+                        withSkills,
+                        withSkillUsages,
+                        withBuffs,
+                        withEquipItems,
+                        withNonEquipItems,
+                        withSummons,
+                        withHotkeys,
+                        withQuests);
+                }
+            }, "SELECT * FROM characters WHERE id=@id LIMIT 1",
                 new MySqlParameter("@id", id));
-            PlayerCharacterData result = new PlayerCharacterData();
-            if (ReadCharacter(reader, out result))
+            // Found character, then read its relates data
+            if (result != null)
             {
+                List<EquipWeapons> selectableWeaponSets = new List<EquipWeapons>();
+                List<CharacterAttribute> attributes = new List<CharacterAttribute>();
+                List<CharacterSkill> skills = new List<CharacterSkill>();
+                List<CharacterSkillUsage> skillUsages = new List<CharacterSkillUsage>();
+                List<CharacterBuff> buffs = new List<CharacterBuff>();
+                List<CharacterItem> equipItems = new List<CharacterItem>();
+                List<CharacterItem> nonEquipItems = new List<CharacterItem>();
+                List<CharacterSummon> summons = new List<CharacterSummon>();
+                List<CharacterHotkey> hotkeys = new List<CharacterHotkey>();
+                List<CharacterQuest> quests = new List<CharacterQuest>();
+                // Read data
+                List<Task> tasks = new List<Task>();
                 if (withEquipWeapons)
-                    result.SelectableWeaponSets = ReadCharacterEquipWeapons(id);
+                    tasks.Add(ReadCharacterEquipWeapons(id, selectableWeaponSets));
                 if (withAttributes)
-                    result.Attributes = ReadCharacterAttributes(id);
+                    tasks.Add(ReadCharacterAttributes(id, attributes));
                 if (withSkills)
-                    result.Skills = ReadCharacterSkills(id);
+                    tasks.Add(ReadCharacterSkills(id, skills));
                 if (withSkillUsages)
-                    result.SkillUsages = ReadCharacterSkillUsages(id);
+                    tasks.Add(ReadCharacterSkillUsages(id, skillUsages));
                 if (withBuffs)
-                    result.Buffs = ReadCharacterBuffs(id);
+                    tasks.Add(ReadCharacterBuffs(id, buffs));
                 if (withEquipItems)
-                    result.EquipItems = ReadCharacterEquipItems(id);
+                    tasks.Add(ReadCharacterEquipItems(id, equipItems));
                 if (withNonEquipItems)
-                    result.NonEquipItems = ReadCharacterNonEquipItems(id);
+                    tasks.Add(ReadCharacterNonEquipItems(id, nonEquipItems));
                 if (withSummons)
-                    result.Summons = ReadCharacterSummons(id);
+                    tasks.Add(ReadCharacterSummons(id, summons));
                 if (withHotkeys)
-                    result.Hotkeys = ReadCharacterHotkeys(id);
+                    tasks.Add(ReadCharacterHotkeys(id, hotkeys));
                 if (withQuests)
-                    result.Quests = ReadCharacterQuests(id);
-                // Invoke dev extension methods
-                this.InvokeInstanceDevExtMethods("ReadCharacter",
-                    result,
-                    withEquipWeapons,
-                    withAttributes,
-                    withSkills,
-                    withSkillUsages,
-                    withBuffs,
-                    withEquipItems,
-                    withNonEquipItems,
-                    withSummons,
-                    withHotkeys,
-                    withQuests);
-                // Return result
-                return result;
-            }
-            return null;
-        }
-
-        public override List<PlayerCharacterData> ReadCharacters(string userId)
-        {
-            List<PlayerCharacterData> result = new List<PlayerCharacterData>();
-            MySQLRowsReader reader = ExecuteReader("SELECT id FROM characters WHERE userId=@userId ORDER BY updateAt DESC", new MySqlParameter("@userId", userId));
-            while (reader.Read())
-            {
-                string characterId = reader.GetString("id");
-                result.Add(ReadCharacter(characterId, true, true, true, false, false, true, false, false, false, false));
+                    tasks.Add(ReadCharacterQuests(id, quests));
+                await Task.WhenAll(tasks);
+                // Assign read data
+                if (withEquipWeapons)
+                    result.SelectableWeaponSets = selectableWeaponSets;
+                if (withAttributes)
+                    result.Attributes = attributes;
+                if (withSkills)
+                    result.Skills = skills;
+                if (withSkillUsages)
+                    result.SkillUsages = skillUsages;
+                if (withBuffs)
+                    result.Buffs = buffs;
+                if (withEquipItems)
+                    result.EquipItems = equipItems;
+                if (withNonEquipItems)
+                    result.NonEquipItems = nonEquipItems;
+                if (withSummons)
+                    result.Summons = summons;
+                if (withHotkeys)
+                    result.Hotkeys = hotkeys;
+                if (withQuests)
+                    result.Quests = quests;
             }
             return result;
         }
 
-        public override void UpdateCharacter(IPlayerCharacterData character)
+        public override async Task<List<PlayerCharacterData>> ReadCharacters(string userId)
         {
-            ExecuteNonQuery("UPDATE characters SET " +
+            List<PlayerCharacterData> result = new List<PlayerCharacterData>();
+            List<string> characterIds = new List<string>();
+            await ExecuteReader((reader) =>
+            {
+                while (reader.Read())
+                {
+                    characterIds.Add(reader.GetString("id"));
+                }
+            }, "SELECT id FROM characters WHERE userId=@userId ORDER BY updateAt DESC", new MySqlParameter("@userId", userId));
+            foreach (string characterId in characterIds)
+            {
+                result.Add(await ReadCharacter(characterId, true, true, true, false, false, true, false, false, false, false));
+            }
+            return result;
+        }
+
+        public override async Task UpdateCharacter(IPlayerCharacterData character)
+        {
+            await ExecuteNonQuery("UPDATE characters SET " +
                 "dataId=@dataId, " +
                 "entityId=@entityId, " +
                 "factionId=@factionId, " +
@@ -424,11 +482,11 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@respawnPositionZ", character.RespawnPosition.z),
                 new MySqlParameter("@mountDataId", character.MountDataId),
                 new MySqlParameter("@id", character.Id));
-            FillCharacterRelatesData(character);
+            await FillCharacterRelatesData(character);
             this.InvokeInstanceDevExtMethods("UpdateCharacter", character);
         }
 
-        public override void DeleteCharacter(string userId, string id)
+        public override async Task DeleteCharacter(string userId, string id)
         {
             object result = ExecuteScalar("SELECT COUNT(*) FROM characters WHERE id=@id AND userId=@userId",
                 new MySqlParameter("@id", id),
@@ -437,102 +495,109 @@ namespace MultiplayerARPG.MMO
             if (count > 0)
             {
                 MySqlConnection connection = NewConnection();
-                connection.Open();
+                await connection.OpenAsync();
                 MySqlTransaction transaction = connection.BeginTransaction();
                 try
                 {
-                    ExecuteNonQuery(connection, transaction, "DELETE FROM characters WHERE id=@characterId", new MySqlParameter("@characterId", id));
-                    DeleteCharacterAttributes(connection, transaction, id);
-                    DeleteCharacterBuffs(connection, transaction, id);
-                    DeleteCharacterHotkeys(connection, transaction, id);
-                    DeleteCharacterItems(connection, transaction, id);
-                    DeleteCharacterQuests(connection, transaction, id);
-                    DeleteCharacterSkills(connection, transaction, id);
-                    DeleteCharacterSkillUsages(connection, transaction, id);
-                    DeleteCharacterSummons(connection, transaction, id);
-                    transaction.Commit();
+                    await Task.WhenAll(ExecuteNonQuery(connection, transaction, "DELETE FROM characters WHERE id=@characterId", new MySqlParameter("@characterId", id)),
+                        DeleteCharacterAttributes(connection, transaction, id),
+                        DeleteCharacterBuffs(connection, transaction, id),
+                        DeleteCharacterHotkeys(connection, transaction, id),
+                        DeleteCharacterItems(connection, transaction, id),
+                        DeleteCharacterQuests(connection, transaction, id),
+                        DeleteCharacterSkills(connection, transaction, id),
+                        DeleteCharacterSkillUsages(connection, transaction, id),
+                        DeleteCharacterSummons(connection, transaction, id));
+                    await transaction.CommitAsync();
                 }
                 catch (System.Exception ex)
                 {
                     Logging.LogError(ToString(), "Transaction, Error occurs while deleting character: " + id);
                     Logging.LogException(ToString(), ex);
-                    transaction.Rollback();
+                    await transaction.RollbackAsync();
                 }
-                transaction.Dispose();
-                connection.Close();
+                await transaction.DisposeAsync();
+                await connection.CloseAsync();
                 this.InvokeInstanceDevExtMethods("DeleteCharacter", userId, id);
             }
         }
 
-        public override long FindCharacterName(string characterName)
+        public override async Task<long> FindCharacterName(string characterName)
         {
-            object result = ExecuteScalar("SELECT COUNT(*) FROM characters WHERE characterName LIKE @characterName",
+            object result = await ExecuteScalar("SELECT COUNT(*) FROM characters WHERE characterName LIKE @characterName",
                 new MySqlParameter("@characterName", characterName));
             return result != null ? (long)result : 0;
         }
 
-        public override List<SocialCharacterData> FindCharacters(string characterName)
+        public override async Task<List<SocialCharacterData>> FindCharacters(string characterName)
         {
             List<SocialCharacterData> result = new List<SocialCharacterData>();
-            MySQLRowsReader reader = ExecuteReader("SELECT id, dataId, characterName, level FROM characters WHERE characterName LIKE @characterName LIMIT 0, 20",
-                new MySqlParameter("@characterName", "%" + characterName + "%"));
-            SocialCharacterData socialCharacterData;
-            while (reader.Read())
+            await ExecuteReader((reader) =>
             {
-                // Get some required data, other data will be set at server side
-                socialCharacterData = new SocialCharacterData();
-                socialCharacterData.id = reader.GetString("id");
-                socialCharacterData.characterName = reader.GetString("characterName");
-                socialCharacterData.dataId = reader.GetInt32("dataId");
-                socialCharacterData.level = reader.GetInt16("level");
-                result.Add(socialCharacterData);
-            }
+                SocialCharacterData socialCharacterData;
+                while (reader.Read())
+                {
+                    // Get some required data, other data will be set at server side
+                    socialCharacterData = new SocialCharacterData();
+                    socialCharacterData.id = reader.GetString("id");
+                    socialCharacterData.characterName = reader.GetString("characterName");
+                    socialCharacterData.dataId = reader.GetInt32("dataId");
+                    socialCharacterData.level = reader.GetInt16("level");
+                    result.Add(socialCharacterData);
+                }
+            }, "SELECT id, dataId, characterName, level FROM characters WHERE characterName LIKE @characterName LIMIT 0, 20",
+                new MySqlParameter("@characterName", "%" + characterName + "%"));
             return result;
         }
 
-        public override void CreateFriend(string id1, string id2)
+        public override async Task CreateFriend(string id1, string id2)
         {
-            DeleteFriend(id1, id2);
-            ExecuteNonQuery("INSERT INTO friend " +
+            await DeleteFriend(id1, id2);
+            await ExecuteNonQuery("INSERT INTO friend " +
                 "(characterId1, characterId2) VALUES " +
                 "(@characterId1, @characterId2)",
                 new MySqlParameter("@characterId1", id1),
                 new MySqlParameter("@characterId2", id2));
         }
 
-        public override void DeleteFriend(string id1, string id2)
+        public override async Task DeleteFriend(string id1, string id2)
         {
-            ExecuteNonQuery("DELETE FROM friend WHERE " +
+            await ExecuteNonQuery("DELETE FROM friend WHERE " +
                 "characterId1 LIKE @characterId1 AND " +
                 "characterId2 LIKE @characterId2",
                 new MySqlParameter("@characterId1", id1),
                 new MySqlParameter("@characterId2", id2));
         }
 
-        public override List<SocialCharacterData> ReadFriends(string id1)
+        public override async Task<List<SocialCharacterData>> ReadFriends(string id1)
         {
             List<SocialCharacterData> result = new List<SocialCharacterData>();
-
-            MySQLRowsReader reader = ExecuteReader("SELECT characterId2 FROM friend WHERE characterId1=@id1",
-                new MySqlParameter("@id1", id1));
-            string characterId;
-            SocialCharacterData socialCharacterData;
-            MySQLRowsReader reader2;
-            while (reader.Read())
+            List<string> characterIds = new List<string>();
+            await ExecuteReader((reader) =>
             {
-                characterId = reader.GetString("characterId2");
-                reader2 = ExecuteReader("SELECT id, dataId, characterName, level FROM characters WHERE BINARY id = @id",
-                    new MySqlParameter("@id", characterId));
-                while (reader2.Read())
+                while (reader.Read())
                 {
-                    // Get some required data, other data will be set at server side
-                    socialCharacterData = new SocialCharacterData();
-                    socialCharacterData.id = reader2.GetString("id");
-                    socialCharacterData.characterName = reader2.GetString("characterName");
-                    socialCharacterData.dataId = reader2.GetInt32("dataId");
-                    socialCharacterData.level = reader2.GetInt16("level");
-                    result.Add(socialCharacterData);
+                    characterIds.Add(reader.GetString("characterId2"));
                 }
+            }, "SELECT characterId2 FROM friend WHERE characterId1=@id1",
+                new MySqlParameter("@id1", id1));
+            SocialCharacterData socialCharacterData;
+            foreach (string characterId in characterIds)
+            {
+                await ExecuteReader((reader) =>
+                {
+                    while (reader.Read())
+                    {
+                        // Get some required data, other data will be set at server side
+                        socialCharacterData = new SocialCharacterData();
+                        socialCharacterData.id = reader.GetString("id");
+                        socialCharacterData.characterName = reader.GetString("characterName");
+                        socialCharacterData.dataId = reader.GetInt32("dataId");
+                        socialCharacterData.level = reader.GetInt16("level");
+                        result.Add(socialCharacterData);
+                    }
+                }, "SELECT id, dataId, characterName, level FROM characters WHERE BINARY id = @id",
+                    new MySqlParameter("@id", characterId));
             }
             return result;
         }

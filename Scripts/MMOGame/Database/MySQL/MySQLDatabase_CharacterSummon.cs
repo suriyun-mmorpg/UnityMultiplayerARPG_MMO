@@ -1,15 +1,13 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using MySqlConnector;
 
 namespace MultiplayerARPG.MMO
 {
     public partial class MySQLDatabase
     {
-        private bool ReadCharacterSummon(MySQLRowsReader reader, out CharacterSummon result, bool resetReader = true)
+        private bool ReadCharacterSummon(MySqlDataReader reader, out CharacterSummon result)
         {
-            if (resetReader)
-                reader.ResetReader();
-
             if (reader.Read())
             {
                 result = new CharacterSummon();
@@ -26,9 +24,9 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public void CreateCharacterSummon(MySqlConnection connection, MySqlTransaction transaction, int idx, string characterId, CharacterSummon characterSummon)
+        public async Task CreateCharacterSummon(MySqlConnection connection, MySqlTransaction transaction, int idx, string characterId, CharacterSummon characterSummon)
         {
-            ExecuteNonQuery(connection, transaction, "INSERT INTO charactersummon (id, characterId, type, dataId, summonRemainsDuration, level, exp, currentHp, currentMp) VALUES (@id, @characterId, @type, @dataId, @summonRemainsDuration, @level, @exp, @currentHp, @currentMp)",
+            await ExecuteNonQuery(connection, transaction, "INSERT INTO charactersummon (id, characterId, type, dataId, summonRemainsDuration, level, exp, currentHp, currentMp) VALUES (@id, @characterId, @type, @dataId, @summonRemainsDuration, @level, @exp, @currentHp, @currentMp)",
                 new MySqlParameter("@id", characterId + "_" + characterSummon.type + "_" + idx),
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@type", (byte)characterSummon.type),
@@ -40,22 +38,25 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@currentMp", characterSummon.currentMp));
         }
 
-        public List<CharacterSummon> ReadCharacterSummons(string characterId)
+        public async Task<List<CharacterSummon>> ReadCharacterSummons(string characterId, List<CharacterSummon> result = null)
         {
-            List<CharacterSummon> result = new List<CharacterSummon>();
-            MySQLRowsReader reader = ExecuteReader("SELECT * FROM charactersummon WHERE characterId=@characterId ORDER BY type DESC",
-                new MySqlParameter("@characterId", characterId));
-            CharacterSummon tempSummon;
-            while (ReadCharacterSummon(reader, out tempSummon, false))
+            if (result == null)
+                result = new List<CharacterSummon>();
+            await ExecuteReader((reader) =>
             {
-                result.Add(tempSummon);
-            }
+                CharacterSummon tempSummon;
+                while (ReadCharacterSummon(reader, out tempSummon))
+                {
+                    result.Add(tempSummon);
+                }
+            }, "SELECT * FROM charactersummon WHERE characterId=@characterId ORDER BY type DESC",
+                new MySqlParameter("@characterId", characterId));
             return result;
         }
 
-        public void DeleteCharacterSummons(MySqlConnection connection, MySqlTransaction transaction, string characterId)
+        public async Task DeleteCharacterSummons(MySqlConnection connection, MySqlTransaction transaction, string characterId)
         {
-            ExecuteNonQuery(connection, transaction, "DELETE FROM charactersummon WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
+            await ExecuteNonQuery(connection, transaction, "DELETE FROM charactersummon WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
         }
     }
 }

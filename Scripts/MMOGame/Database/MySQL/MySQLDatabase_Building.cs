@@ -1,16 +1,14 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using MySqlConnector;
+using System.Threading.Tasks;
 
 namespace MultiplayerARPG.MMO
 {
     public partial class MySQLDatabase
     {
-        private bool ReadBuilding(MySQLRowsReader reader, out BuildingSaveData result, bool resetReader = true)
+        private bool ReadBuilding(MySqlDataReader reader, out BuildingSaveData result)
         {
-            if (resetReader)
-                reader.ResetReader();
-
             if (reader.Read())
             {
                 result = new BuildingSaveData();
@@ -31,11 +29,11 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public override void CreateBuilding(string mapName, IBuildingSaveData saveData)
+        public override async Task CreateBuilding(string mapName, IBuildingSaveData saveData)
         {
             MySqlConnection connection = NewConnection();
-            connection.Open();
-            ExecuteNonQuery(connection, null, "INSERT INTO buildings (id, parentId, entityId, currentHp, remainsLifeTime, mapName, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, creatorId, creatorName) VALUES (@id, @parentId, @entityId, @currentHp, @remainsLifeTime, @mapName, @positionX, @positionY, @positionZ, @rotationX, @rotationY, @rotationZ, @creatorId, @creatorName)",
+            await connection.OpenAsync();
+            await ExecuteNonQuery(connection, null, "INSERT INTO buildings (id, parentId, entityId, currentHp, remainsLifeTime, mapName, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, creatorId, creatorName) VALUES (@id, @parentId, @entityId, @currentHp, @remainsLifeTime, @mapName, @positionX, @positionY, @positionZ, @rotationX, @rotationY, @rotationZ, @creatorId, @creatorName)",
                 new MySqlParameter("@id", saveData.Id),
                 new MySqlParameter("@parentId", saveData.ParentId),
                 new MySqlParameter("@entityId", saveData.EntityId),
@@ -50,26 +48,28 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@rotationZ", saveData.Rotation.eulerAngles.z),
                 new MySqlParameter("@creatorId", saveData.CreatorId),
                 new MySqlParameter("@creatorName", saveData.CreatorName));
-            connection.Close();
+            await connection.CloseAsync();
         }
 
-        public override List<BuildingSaveData> ReadBuildings(string mapName)
+        public override async Task<List<BuildingSaveData>> ReadBuildings(string mapName)
         {
             List<BuildingSaveData> result = new List<BuildingSaveData>();
-            MySQLRowsReader reader = ExecuteReader("SELECT * FROM buildings WHERE mapName=@mapName", new MySqlParameter("@mapName", mapName));
-            BuildingSaveData tempBuilding;
-            while (ReadBuilding(reader, out tempBuilding, false))
+            await ExecuteReader((reader) =>
             {
-                result.Add(tempBuilding);
-            }
+                BuildingSaveData tempBuilding;
+                while (ReadBuilding(reader, out tempBuilding))
+                {
+                    result.Add(tempBuilding);
+                }
+            }, "SELECT * FROM buildings WHERE mapName=@mapName", new MySqlParameter("@mapName", mapName));
             return result;
         }
 
-        public override void UpdateBuilding(string mapName, IBuildingSaveData building)
+        public override async Task UpdateBuilding(string mapName, IBuildingSaveData building)
         {
             MySqlConnection connection = NewConnection();
-            connection.Open();
-            ExecuteNonQuery(connection, null, "UPDATE buildings SET " +
+            await connection.OpenAsync();
+            await ExecuteNonQuery(connection, null, "UPDATE buildings SET " +
                 "parentId=@parentId, " +
                 "entityId=@entityId, " +
                 "currentHp=@currentHp, " +
@@ -101,15 +101,15 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@rotationX", building.Rotation.eulerAngles.x),
                 new MySqlParameter("@rotationY", building.Rotation.eulerAngles.y),
                 new MySqlParameter("@rotationZ", building.Rotation.eulerAngles.z));
-            connection.Close();
+            await connection.CloseAsync();
         }
 
-        public override void DeleteBuilding(string mapName, string id)
+        public override async Task DeleteBuilding(string mapName, string id)
         {
             MySqlConnection connection = NewConnection();
-            connection.Open();
-            ExecuteNonQuery(connection, null, "DELETE FROM buildings WHERE id=@id AND mapName=@mapName", new MySqlParameter("@id", id), new MySqlParameter("@mapName", mapName));
-            connection.Close();
+            await connection.OpenAsync();
+            await ExecuteNonQuery(connection, null, "DELETE FROM buildings WHERE id=@id AND mapName=@mapName", new MySqlParameter("@id", id), new MySqlParameter("@mapName", mapName));
+            await connection.CloseAsync();
         }
     }
 }
