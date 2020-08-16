@@ -33,6 +33,7 @@ namespace MultiplayerARPG.MMO
         public DatabaseServiceImplement(BaseDatabase database)
         {
             Database = database;
+            database.Initialize();
         }
 
         public override async Task<ValidateUserLoginResp> ValidateUserLogin(ValidateUserLoginReq request, ServerCallContext context)
