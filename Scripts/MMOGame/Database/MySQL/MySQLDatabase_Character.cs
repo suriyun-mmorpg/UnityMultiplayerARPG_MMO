@@ -11,18 +11,16 @@ namespace MultiplayerARPG.MMO
         private async Task FillCharacterAttributes(IPlayerCharacterData characterData)
         {
             MySqlConnection connection = NewConnection();
-            await connection.OpenAsync();
-            MySqlTransaction transaction = connection.BeginTransaction();
+            await OpenConnection(connection);
+            MySqlTransaction transaction = await connection.BeginTransactionAsync();
             try
             {
                 await DeleteCharacterAttributes(connection, transaction, characterData.Id);
-                Task[] tasks = new Task[characterData.Attributes.Count];
                 int i;
                 for (i = 0; i < characterData.Attributes.Count; ++i)
                 {
-                    tasks[i] = CreateCharacterAttribute(connection, transaction, i, characterData.Id, characterData.Attributes[i]);
+                    await CreateCharacterAttribute(connection, transaction, i, characterData.Id, characterData.Attributes[i]);
                 }
-                await Task.WhenAll(tasks);
                 await transaction.CommitAsync();
             }
             catch (System.Exception ex)
@@ -38,18 +36,16 @@ namespace MultiplayerARPG.MMO
         private async Task FillCharacterBuffs(IPlayerCharacterData characterData)
         {
             MySqlConnection connection = NewConnection();
-            await connection.OpenAsync();
+            await OpenConnection(connection);
             MySqlTransaction transaction = await connection.BeginTransactionAsync();
             try
             {
                 await DeleteCharacterBuffs(connection, transaction, characterData.Id);
-                Task[] tasks = new Task[characterData.Buffs.Count];
                 int i;
                 for (i = 0; i < characterData.Buffs.Count; ++i)
                 {
-                    tasks[i] = CreateCharacterBuff(connection, transaction, characterData.Id, characterData.Buffs[i]);
+                    await CreateCharacterBuff(connection, transaction, characterData.Id, characterData.Buffs[i]);
                 }
-                await Task.WhenAll(tasks);
                 await transaction.CommitAsync();
             }
             catch (System.Exception ex)
@@ -65,18 +61,16 @@ namespace MultiplayerARPG.MMO
         private async Task FillCharacterHotkeys(IPlayerCharacterData characterData)
         {
             MySqlConnection connection = NewConnection();
-            await connection.OpenAsync();
-            MySqlTransaction transaction = connection.BeginTransaction();
+            await OpenConnection(connection);
+            MySqlTransaction transaction = await connection.BeginTransactionAsync();
             try
             {
                 await DeleteCharacterHotkeys(connection, transaction, characterData.Id);
-                Task[] tasks = new Task[characterData.Hotkeys.Count];
                 int i;
                 for (i = 0; i < characterData.Hotkeys.Count; ++i)
                 {
-                    tasks[i] = CreateCharacterHotkey(connection, transaction, characterData.Id, characterData.Hotkeys[i]);
+                    await CreateCharacterHotkey(connection, transaction, characterData.Id, characterData.Hotkeys[i]);
                 }
-                await Task.WhenAll(tasks);
                 await transaction.CommitAsync();
             }
             catch (System.Exception ex)
@@ -92,26 +86,24 @@ namespace MultiplayerARPG.MMO
         private async Task FillCharacterItems(IPlayerCharacterData characterData)
         {
             MySqlConnection connection = NewConnection();
-            await connection.OpenAsync();
-            MySqlTransaction transaction = connection.BeginTransaction();
+            await OpenConnection(connection);
+            MySqlTransaction transaction = await connection.BeginTransactionAsync();
             try
             {
                 await DeleteCharacterItems(connection, transaction, characterData.Id);
-                List<Task> tasks = new List<Task>();
                 int i;
                 for (i = 0; i < characterData.SelectableWeaponSets.Count; ++i)
                 {
-                    tasks.Add(CreateCharacterEquipWeapons(connection, transaction, (byte)i, characterData.Id, characterData.SelectableWeaponSets[i]));
+                    await CreateCharacterEquipWeapons(connection, transaction, (byte)i, characterData.Id, characterData.SelectableWeaponSets[i]);
                 }
                 for (i = 0; i < characterData.EquipItems.Count; ++i)
                 {
-                    tasks.Add(CreateCharacterEquipItem(connection, transaction, i, characterData.Id, characterData.EquipItems[i]));
+                    await CreateCharacterEquipItem(connection, transaction, i, characterData.Id, characterData.EquipItems[i]);
                 }
                 for (i = 0; i < characterData.NonEquipItems.Count; ++i)
                 {
-                    tasks.Add(CreateCharacterNonEquipItem(connection, transaction, i, characterData.Id, characterData.NonEquipItems[i]));
+                    await CreateCharacterNonEquipItem(connection, transaction, i, characterData.Id, characterData.NonEquipItems[i]);
                 }
-                await Task.WhenAll(tasks);
                 await transaction.CommitAsync();
             }
             catch (System.Exception ex)
@@ -127,18 +119,16 @@ namespace MultiplayerARPG.MMO
         private async Task FillCharacterQuests(IPlayerCharacterData characterData)
         {
             MySqlConnection connection = NewConnection();
-            await connection.OpenAsync();
-            MySqlTransaction transaction = connection.BeginTransaction();
+            await OpenConnection(connection);
+            MySqlTransaction transaction = await connection.BeginTransactionAsync();
             try
             {
                 await DeleteCharacterQuests(connection, transaction, characterData.Id);
-                Task[] tasks = new Task[characterData.Quests.Count];
                 int i;
                 for (i = 0; i < characterData.Quests.Count; ++i)
                 {
-                    tasks[i] = CreateCharacterQuest(connection, transaction, i, characterData.Id, characterData.Quests[i]);
+                    await CreateCharacterQuest(connection, transaction, i, characterData.Id, characterData.Quests[i]);
                 }
-                await Task.WhenAll(tasks);
                 await transaction.CommitAsync();
             }
             catch (System.Exception ex)
@@ -154,18 +144,16 @@ namespace MultiplayerARPG.MMO
         private async Task FillCharacterSkills(IPlayerCharacterData characterData)
         {
             MySqlConnection connection = NewConnection();
-            await connection.OpenAsync();
-            MySqlTransaction transaction = connection.BeginTransaction();
+            await OpenConnection(connection);
+            MySqlTransaction transaction = await connection.BeginTransactionAsync();
             try
             {
                 await DeleteCharacterSkills(connection, transaction, characterData.Id);
-                Task[] tasks = new Task[characterData.Skills.Count];
                 int i;
                 for (i = 0; i < characterData.Skills.Count; ++i)
                 {
-                    tasks[i] = CreateCharacterSkill(connection, transaction, i, characterData.Id, characterData.Skills[i]);
+                    await CreateCharacterSkill(connection, transaction, i, characterData.Id, characterData.Skills[i]);
                 }
-                await Task.WhenAll(tasks);
                 await transaction.CommitAsync();
             }
             catch (System.Exception ex)
@@ -181,18 +169,16 @@ namespace MultiplayerARPG.MMO
         private async Task FillCharacterSkillUsages(IPlayerCharacterData characterData)
         {
             MySqlConnection connection = NewConnection();
-            await connection.OpenAsync();
-            MySqlTransaction transaction = connection.BeginTransaction();
+            await OpenConnection(connection);
+            MySqlTransaction transaction = await connection.BeginTransactionAsync();
             try
             {
                 await DeleteCharacterSkillUsages(connection, transaction, characterData.Id);
-                Task[] tasks = new Task[characterData.SkillUsages.Count];
                 int i;
                 for (i = 0; i < characterData.SkillUsages.Count; ++i)
                 {
-                    tasks[i] = CreateCharacterSkillUsage(connection, transaction, characterData.Id, characterData.SkillUsages[i]);
+                    await CreateCharacterSkillUsage(connection, transaction, characterData.Id, characterData.SkillUsages[i]);
                 }
-                await Task.WhenAll(tasks);
                 await transaction.CommitAsync();
             }
             catch (System.Exception ex)
@@ -208,18 +194,16 @@ namespace MultiplayerARPG.MMO
         private async Task FillCharacterSummons(IPlayerCharacterData characterData)
         {
             MySqlConnection connection = NewConnection();
-            await connection.OpenAsync();
-            MySqlTransaction transaction = connection.BeginTransaction();
+            await OpenConnection(connection);
+            MySqlTransaction transaction = await connection.BeginTransactionAsync();
             try
             {
                 await DeleteCharacterSummons(connection, transaction, characterData.Id);
-                Task[] tasks = new Task[characterData.Summons.Count];
                 int i;
                 for (i = 0; i < characterData.Summons.Count; ++i)
                 {
-                    tasks[i] = CreateCharacterSummon(connection, transaction, i, characterData.Id, characterData.Summons[i]);
+                    await CreateCharacterSummon(connection, transaction, i, characterData.Id, characterData.Summons[i]);
                 }
-                await Task.WhenAll(tasks);
                 await transaction.CommitAsync();
             }
             catch (System.Exception ex)
@@ -507,19 +491,19 @@ namespace MultiplayerARPG.MMO
             if (count > 0)
             {
                 MySqlConnection connection = NewConnection();
-                await connection.OpenAsync();
-                MySqlTransaction transaction = connection.BeginTransaction();
+                await OpenConnection(connection);
+                MySqlTransaction transaction = await connection.BeginTransactionAsync();
                 try
                 {
-                    await Task.WhenAll(ExecuteNonQuery(connection, transaction, "DELETE FROM characters WHERE id=@characterId", new MySqlParameter("@characterId", id)),
-                        DeleteCharacterAttributes(connection, transaction, id),
-                        DeleteCharacterBuffs(connection, transaction, id),
-                        DeleteCharacterHotkeys(connection, transaction, id),
-                        DeleteCharacterItems(connection, transaction, id),
-                        DeleteCharacterQuests(connection, transaction, id),
-                        DeleteCharacterSkills(connection, transaction, id),
-                        DeleteCharacterSkillUsages(connection, transaction, id),
-                        DeleteCharacterSummons(connection, transaction, id));
+                    await ExecuteNonQuery(connection, transaction, "DELETE FROM characters WHERE id=@characterId", new MySqlParameter("@characterId", id));
+                    await DeleteCharacterAttributes(connection, transaction, id);
+                    await DeleteCharacterBuffs(connection, transaction, id);
+                    await DeleteCharacterHotkeys(connection, transaction, id);
+                    await DeleteCharacterItems(connection, transaction, id);
+                    await DeleteCharacterQuests(connection, transaction, id);
+                    await DeleteCharacterSkills(connection, transaction, id);
+                    await DeleteCharacterSkillUsages(connection, transaction, id);
+                    await DeleteCharacterSummons(connection, transaction, id);
                     await transaction.CommitAsync();
                 }
                 catch (System.Exception ex)

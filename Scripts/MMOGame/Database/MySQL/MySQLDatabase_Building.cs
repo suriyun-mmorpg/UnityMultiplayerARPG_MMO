@@ -32,7 +32,7 @@ namespace MultiplayerARPG.MMO
         public override async Task CreateBuilding(string mapName, IBuildingSaveData saveData)
         {
             MySqlConnection connection = NewConnection();
-            await connection.OpenAsync();
+            await OpenConnection(connection);
             await ExecuteNonQuery(connection, null, "INSERT INTO buildings (id, parentId, entityId, currentHp, remainsLifeTime, mapName, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, creatorId, creatorName) VALUES (@id, @parentId, @entityId, @currentHp, @remainsLifeTime, @mapName, @positionX, @positionY, @positionZ, @rotationX, @rotationY, @rotationZ, @creatorId, @creatorName)",
                 new MySqlParameter("@id", saveData.Id),
                 new MySqlParameter("@parentId", saveData.ParentId),
@@ -68,7 +68,7 @@ namespace MultiplayerARPG.MMO
         public override async Task UpdateBuilding(string mapName, IBuildingSaveData building)
         {
             MySqlConnection connection = NewConnection();
-            await connection.OpenAsync();
+            await OpenConnection(connection);
             await ExecuteNonQuery(connection, null, "UPDATE buildings SET " +
                 "parentId=@parentId, " +
                 "entityId=@entityId, " +
@@ -107,7 +107,7 @@ namespace MultiplayerARPG.MMO
         public override async Task DeleteBuilding(string mapName, string id)
         {
             MySqlConnection connection = NewConnection();
-            await connection.OpenAsync();
+            await OpenConnection(connection);
             await ExecuteNonQuery(connection, null, "DELETE FROM buildings WHERE id=@id AND mapName=@mapName", new MySqlParameter("@id", id), new MySqlParameter("@mapName", mapName));
             await connection.CloseAsync();
         }

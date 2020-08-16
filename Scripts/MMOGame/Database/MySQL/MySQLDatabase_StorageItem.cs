@@ -62,18 +62,16 @@ namespace MultiplayerARPG.MMO
         public override async Task UpdateStorageItems(StorageType storageType, string storageOwnerId, IList<CharacterItem> characterItems)
         {
             MySqlConnection connection = NewConnection();
-            await connection.OpenAsync();
-            MySqlTransaction transaction = connection.BeginTransaction();
+            await OpenConnection(connection);
+            MySqlTransaction transaction = await connection.BeginTransactionAsync();
             try
             {
                 await DeleteStorageItems(connection, transaction, storageType, storageOwnerId);
-                Task[] tasks = new Task[characterItems.Count];
                 int i;
                 for (i = 0; i < characterItems.Count; ++i)
                 {
-                    tasks[i] = CreateStorageItem(connection, transaction, i, storageType, storageOwnerId, characterItems[i]);
+                    await CreateStorageItem(connection, transaction, i, storageType, storageOwnerId, characterItems[i]);
                 }
-                await Task.WhenAll(tasks);
                 await transaction.CommitAsync();
             }
             catch (System.Exception ex)
