@@ -373,6 +373,7 @@ namespace MultiplayerARPG.MMO
                         logFileName += "_";
                     logFileName += "Database";
                     startLog = true;
+                    gameInstance.SetOnGameDataLoadedCallback(OnGameDataLoaded);
                     startingDatabaseServer = true;
                 }
 
@@ -401,6 +402,9 @@ namespace MultiplayerARPG.MMO
                 if (startChatOnAwake)
                     startingChatServer = true;
 
+                if (startDatabaseManagerOnAwake)
+                    startingDatabaseServer = true;
+
                 if (startMapOnAwake)
                 {
                     // If run map-server, don't load home scene (home scene load in `Game Instance`)
@@ -414,10 +418,14 @@ namespace MultiplayerARPG.MMO
         private void OnGameDataLoaded()
         {
             if (startingCentralServer)
+            {
+                // Start central server
                 StartCentralServer();
+            }
 
             if (startingMapSpawnServer)
             {
+                // Start map spawn server
                 if (spawningMapIds != null && spawningMapIds.Count > 0)
                 {
                     mapSpawnNetworkManager.spawningMaps = new List<BaseMapInfo>();
@@ -433,6 +441,7 @@ namespace MultiplayerARPG.MMO
 
             if (startingMapServer)
             {
+                // Start map server
                 BaseMapInfo tempMapInfo;
                 if (!string.IsNullOrEmpty(startingMapId) && GameInstance.MapInfos.TryGetValue(startingMapId, out tempMapInfo))
                 {
@@ -443,10 +452,16 @@ namespace MultiplayerARPG.MMO
             }
 
             if (startingChatServer)
+            {
+                // Start chat manager server
                 StartChatServer();
+            }
 
             if (startingDatabaseServer)
+            {
+                // Start database manager server
                 StartDatabaseManagerServer();
+            }
 
             if (startingCentralServer ||
                 startingMapSpawnServer ||
