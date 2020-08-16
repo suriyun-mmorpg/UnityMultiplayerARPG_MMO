@@ -14,7 +14,7 @@ namespace MultiplayerARPG.MMO
 
         private void OnRequestedCharacters(AckResponseCode responseCode, BaseAckMessage message)
         {
-            ResponseCharactersMessage castedMessage = (ResponseCharactersMessage)message;
+            ResponseCharactersMessage castedMessage = message as ResponseCharactersMessage;
             CacheCharacterSelectionManager.Clear();
             CacheCharacterList.HideAll();
             // Unenabled buttons
@@ -112,7 +112,7 @@ namespace MultiplayerARPG.MMO
 
         private void OnRequestedSelectCharacter(AckResponseCode responseCode, BaseAckMessage message)
         {
-            ResponseSelectCharacterMessage castedMessage = (ResponseSelectCharacterMessage)message;
+            ResponseSelectCharacterMessage castedMessage = message as ResponseSelectCharacterMessage;
             
             switch (responseCode)
             {
@@ -160,7 +160,7 @@ namespace MultiplayerARPG.MMO
 
         private void OnRequestedDeleteCharacter(AckResponseCode responseCode, BaseAckMessage message)
         {
-            ResponseDeleteCharacterMessage castedMessage = (ResponseDeleteCharacterMessage)message;
+            ResponseDeleteCharacterMessage castedMessage = message as ResponseDeleteCharacterMessage;
             
             switch (responseCode)
             {

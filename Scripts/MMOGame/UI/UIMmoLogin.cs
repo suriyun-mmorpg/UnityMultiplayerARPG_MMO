@@ -96,7 +96,7 @@ namespace MultiplayerARPG.MMO
             LoggingIn = false;
             string storingUsername = string.Empty;
             string storingPassword = string.Empty;
-            ResponseUserLoginMessage castedMessage = (ResponseUserLoginMessage)message;
+            ResponseUserLoginMessage castedMessage = message as ResponseUserLoginMessage;
             switch (responseCode)
             {
                 case AckResponseCode.Error:

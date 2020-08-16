@@ -16,7 +16,7 @@ namespace MultiplayerARPG.MMO
 
         private void OnRequestedCreateCharacter(AckResponseCode responseCode, BaseAckMessage message)
         {
-            ResponseCreateCharacterMessage castedMessage = (ResponseCreateCharacterMessage)message;
+            ResponseCreateCharacterMessage castedMessage = message as ResponseCreateCharacterMessage;
 
             switch (responseCode)
             {

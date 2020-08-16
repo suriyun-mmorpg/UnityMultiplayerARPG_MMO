@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using LiteNetLibManager;
@@ -75,7 +76,7 @@ namespace MultiplayerARPG.MMO
         public void OnRegister(AckResponseCode responseCode, BaseAckMessage message)
         {
             Registering = false;
-            ResponseUserRegisterMessage castedMessage = (ResponseUserRegisterMessage)message;
+            ResponseUserRegisterMessage castedMessage = message as ResponseUserRegisterMessage;
             switch (responseCode)
             {
                 case AckResponseCode.Error:
