@@ -62,8 +62,8 @@ namespace MultiplayerARPG.MMO
                 return;
 
             // Clear stored username and password
-            PlayerPrefs.SetString(keyUsername, Username);
-            PlayerPrefs.SetString(keyPassword, Password);
+            PlayerPrefs.SetString(keyUsername, string.Empty);
+            PlayerPrefs.SetString(keyPassword, string.Empty);
             PlayerPrefs.Save();
 
             UISceneGlobal uiSceneGlobal = UISceneGlobal.Singleton;
