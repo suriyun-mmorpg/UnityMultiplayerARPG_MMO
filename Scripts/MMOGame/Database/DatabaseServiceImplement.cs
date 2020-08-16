@@ -37,8 +37,7 @@ namespace MultiplayerARPG.MMO
 
         public override async Task<ValidateUserLoginResp> ValidateUserLogin(ValidateUserLoginReq request, ServerCallContext context)
         {
-            await Task.Yield();
-            string userId = Database.ValidateUserLogin(request.Username, request.Password);
+            string userId = await Database.ValidateUserLogin(request.Username, request.Password);
             return new ValidateUserLoginResp()
             {
                 UserId = userId
@@ -47,7 +46,6 @@ namespace MultiplayerARPG.MMO
 
         public override async Task<ValidateAccessTokenResp> ValidateAccessToken(ValidateAccessTokenReq request, ServerCallContext context)
         {
-            await Task.Yield();
             bool isPass;
             if (cachedUserAccessToken.ContainsKey(request.UserId))
             {
@@ -57,7 +55,7 @@ namespace MultiplayerARPG.MMO
             else
             {
                 // Doesn't cached yet, so try validate from database
-                isPass = Database.ValidateAccessToken(request.UserId, request.AccessToken);
+                isPass = await Database.ValidateAccessToken(request.UserId, request.AccessToken);
                 // Pass, store access token to the dictionary
                 if (isPass)
                     cachedUserAccessToken[request.UserId] = request.AccessToken;
@@ -70,8 +68,7 @@ namespace MultiplayerARPG.MMO
 
         public override async Task<GetUserLevelResp> GetUserLevel(GetUserLevelReq request, ServerCallContext context)
         {
-            await Task.Yield();
-            byte userLevel = Database.GetUserLevel(request.UserId);
+            byte userLevel = await Database.GetUserLevel(request.UserId);
             return new GetUserLevelResp()
             {
                 UserLevel = userLevel
@@ -93,7 +90,7 @@ namespace MultiplayerARPG.MMO
             // Cache the data, it will be used later
             cachedUserGold[request.UserId] = gold;
             // Update data to database
-            Database.UpdateGold(request.UserId, gold);
+            await Database.UpdateGold(request.UserId, gold);
             return new GoldResp()
             {
                 Gold = gold
@@ -115,7 +112,7 @@ namespace MultiplayerARPG.MMO
             // Cache the data, it will be used later
             cachedUserCash[request.UserId] = cash;
             // Update data to database
-            Database.UpdateCash(request.UserId, cash);
+            await Database.UpdateCash(request.UserId, cash);
             return new CashResp()
             {
                 Cash = cash
@@ -124,27 +121,24 @@ namespace MultiplayerARPG.MMO
 
         public override async Task<VoidResp> UpdateAccessToken(UpdateAccessTokenReq request, ServerCallContext context)
         {
-            await Task.Yield();
             // Store access token to the dictionary, it will be used to validate later
             cachedUserAccessToken[request.UserId] = request.AccessToken;
             // Update data to database
-            Database.UpdateAccessToken(request.UserId, request.AccessToken);
+            await Database.UpdateAccessToken(request.UserId, request.AccessToken);
             return new VoidResp();
         }
 
         public override async Task<VoidResp> CreateUserLogin(CreateUserLoginReq request, ServerCallContext context)
         {
-            await Task.Yield();
             // Cache username, it will be used to validate later
             cachedUsernames.Add(request.Username);
             // Insert new user login to database
-            Database.CreateUserLogin(request.Username, request.Password);
+            await Database.CreateUserLogin(request.Username, request.Password);
             return new VoidResp();
         }
 
         public override async Task<FindUsernameResp> FindUsername(FindUsernameReq request, ServerCallContext context)
         {
-            await Task.Yield();
             long foundAmount;
             if (cachedUsernames.Contains(request.Username))
             {
@@ -154,7 +148,7 @@ namespace MultiplayerARPG.MMO
             else
             {
                 // Doesn't cached yet, so try validate from database
-                foundAmount = Database.FindUsername(request.Username);
+                foundAmount = await Database.FindUsername(request.Username);
                 // Cache username, it will be used to validate later
                 cachedUsernames.Add(request.Username);
             }
@@ -166,13 +160,12 @@ namespace MultiplayerARPG.MMO
 
         public override async Task<CharacterResp> CreateCharacter(CreateCharacterReq request, ServerCallContext context)
         {
-            await Task.Yield();
             PlayerCharacterData character = DatabaseServiceUtils.FromByteString<PlayerCharacterData>(request.CharacterData);
             // Store character to the dictionary, it will be used later
             cachedUserCharacter[request.UserId] = character;
             cachedCharacterNames.Add(character.CharacterName);
             // Insert new character to database
-            Database.CreateCharacter(request.UserId, character);
+            await Database.CreateCharacter(request.UserId, character);
             return new CharacterResp()
             {
                 CharacterData = DatabaseServiceUtils.ToByteString(character)
@@ -189,21 +182,19 @@ namespace MultiplayerARPG.MMO
 
         public override async Task<CharactersResp> ReadCharacters(ReadCharactersReq request, ServerCallContext context)
         {
-            await Task.Yield();
             CharactersResp resp = new CharactersResp();
-            DatabaseServiceUtils.CopyToRepeatedByteString(Database.ReadCharacters(request.UserId), resp.List);
+            DatabaseServiceUtils.CopyToRepeatedByteString(await Database.ReadCharacters(request.UserId), resp.List);
             return resp;
         }
 
         public override async Task<CharacterResp> UpdateCharacter(UpdateCharacterReq request, ServerCallContext context)
         {
-            await Task.Yield();
             PlayerCharacterData character = DatabaseServiceUtils.FromByteString<PlayerCharacterData>(request.CharacterData);
             // Cache the data, it will be used later
             cachedUserCharacter[character.Id] = character;
             // Update data to database
             // TODO: May update later to reduce amount of processes
-            Database.UpdateCharacter(character);
+            await Database.UpdateCharacter(character);
             return new CharacterResp()
             {
                 CharacterData = DatabaseServiceUtils.ToByteString(character)
@@ -212,7 +203,6 @@ namespace MultiplayerARPG.MMO
 
         public override async Task<VoidResp> DeleteCharacter(DeleteCharacterReq request, ServerCallContext context)
         {
-            await Task.Yield();
             // Remove data from cache
             if (cachedUserCharacter.ContainsKey(request.CharacterId))
             {
@@ -221,13 +211,12 @@ namespace MultiplayerARPG.MMO
                 cachedUserCharacter.Remove(request.CharacterId);
             }
             // Delete data from database
-            Database.DeleteCharacter(request.UserId, request.CharacterId);
+            await Database.DeleteCharacter(request.UserId, request.CharacterId);
             return new VoidResp();
         }
 
         public override async Task<FindCharacterNameResp> FindCharacterName(FindCharacterNameReq request, ServerCallContext context)
         {
-            await Task.Yield();
             long foundAmount;
             if (cachedCharacterNames.Contains(request.CharacterName))
             {
@@ -237,7 +226,7 @@ namespace MultiplayerARPG.MMO
             else
             {
                 // Doesn't cached yet, so try validate from database
-                foundAmount = Database.FindCharacterName(request.CharacterName);
+                foundAmount = await Database.FindCharacterName(request.CharacterName);
                 // Cache character name, it will be used to validate later
                 cachedCharacterNames.Add(request.CharacterName);
             }
@@ -249,9 +238,8 @@ namespace MultiplayerARPG.MMO
 
         public override async Task<FindCharactersResp> FindCharacters(FindCharactersReq request, ServerCallContext context)
         {
-            await Task.Yield();
             FindCharactersResp resp = new FindCharactersResp();
-            DatabaseServiceUtils.CopyToRepeatedByteString(Database.FindCharacters(request.CharacterName), resp.List);
+            DatabaseServiceUtils.CopyToRepeatedByteString(await Database.FindCharacters(request.CharacterName), resp.List);
             return resp;
         }
 
@@ -263,7 +251,7 @@ namespace MultiplayerARPG.MMO
             friends.Add(character);
             cachedFriend[request.Character1Id] = friends;
             // Update to database
-            Database.CreateFriend(request.Character1Id, character.id);
+            await Database.CreateFriend(request.Character1Id, character.id);
             ReadFriendsResp resp = new ReadFriendsResp();
             DatabaseServiceUtils.CopyToRepeatedByteString(friends, resp.List);
             return resp;
@@ -271,7 +259,6 @@ namespace MultiplayerARPG.MMO
 
         public override async Task<ReadFriendsResp> DeleteFriend(DeleteFriendReq request, ServerCallContext context)
         {
-            await Task.Yield();
             List<SocialCharacterData> friends = await ReadFriends(request.Character1Id);
             // Update to cache
             for (int i = 0; i < friends.Count; ++i)
@@ -283,7 +270,7 @@ namespace MultiplayerARPG.MMO
                 }
             }
             // Update to database
-            Database.DeleteFriend(request.Character1Id, request.Character2Id);
+            await Database.DeleteFriend(request.Character1Id, request.Character2Id);
             ReadFriendsResp resp = new ReadFriendsResp();
             DatabaseServiceUtils.CopyToRepeatedByteString(friends, resp.List);
             return resp;
@@ -298,13 +285,12 @@ namespace MultiplayerARPG.MMO
 
         public override async Task<BuildingResp> CreateBuilding(CreateBuildingReq request, ServerCallContext context)
         {
-            await Task.Yield();
             BuildingSaveData building = DatabaseServiceUtils.FromByteString<BuildingSaveData>(request.BuildingData);
             // Cache building data
             if (cachedBuilding.ContainsKey(request.MapName))
                 cachedBuilding[request.MapName][building.Id] = building;
             // Insert data to database
-            Database.CreateBuilding(request.MapName, building);
+            await Database.CreateBuilding(request.MapName, building);
             return new BuildingResp()
             {
                 BuildingData = DatabaseServiceUtils.ToByteString(building)
@@ -313,13 +299,12 @@ namespace MultiplayerARPG.MMO
 
         public override async Task<BuildingResp> UpdateBuilding(UpdateBuildingReq request, ServerCallContext context)
         {
-            await Task.Yield();
             BuildingSaveData building = DatabaseServiceUtils.FromByteString<BuildingSaveData>(request.BuildingData);
             // Cache building data
             if (cachedBuilding.ContainsKey(request.MapName))
                 cachedBuilding[request.MapName][building.Id] = building;
             // Update data to database
-            Database.UpdateBuilding(request.MapName, building);
+            await Database.UpdateBuilding(request.MapName, building);
             return new BuildingResp()
             {
                 BuildingData = DatabaseServiceUtils.ToByteString(building)
@@ -328,18 +313,16 @@ namespace MultiplayerARPG.MMO
 
         public override async Task<VoidResp> DeleteBuilding(DeleteBuildingReq request, ServerCallContext context)
         {
-            await Task.Yield();
             // Remove from cache
             if (cachedBuilding.ContainsKey(request.MapName))
                 cachedBuilding[request.MapName].Remove(request.BuildingId);
             // Remove from database
-            Database.DeleteBuilding(request.MapName, request.BuildingId);
+            await Database.DeleteBuilding(request.MapName, request.BuildingId);
             return new VoidResp();
         }
 
         public override async Task<BuildingsResp> ReadBuildings(ReadBuildingsReq request, ServerCallContext context)
         {
-            await Task.Yield();
             BuildingsResp resp = new BuildingsResp();
             List<BuildingSaveData> buildings;
             if (cachedBuilding.ContainsKey(request.MapName))
@@ -351,7 +334,7 @@ namespace MultiplayerARPG.MMO
             {
                 // Store buildings to cache
                 cachedBuilding[request.MapName] = new Dictionary<string, BuildingSaveData>();
-                buildings = Database.ReadBuildings(request.MapName);
+                buildings = await Database.ReadBuildings(request.MapName);
                 foreach (BuildingSaveData building in buildings)
                 {
                     cachedBuilding[request.MapName][building.Id] = building;
@@ -363,9 +346,8 @@ namespace MultiplayerARPG.MMO
 
         public override async Task<PartyResp> CreateParty(CreatePartyReq request, ServerCallContext context)
         {
-            await Task.Yield();
             // Insert to database
-            int partyId = Database.CreateParty(request.ShareExp, request.ShareItem, request.LeaderCharacterId);
+            int partyId = await Database.CreateParty(request.ShareExp, request.ShareItem, request.LeaderCharacterId);
             // Cached the data
             PartyData party = new PartyData(partyId, request.ShareExp, request.ShareItem, request.LeaderCharacterId);
             cachedParty[partyId] = party;
@@ -382,7 +364,7 @@ namespace MultiplayerARPG.MMO
             party.Setting(request.ShareExp, request.ShareItem);
             cachedParty[request.PartyId] = party;
             // Update to database
-            Database.UpdateParty(request.PartyId, request.ShareExp, request.ShareItem);
+            await Database.UpdateParty(request.PartyId, request.ShareExp, request.ShareItem);
             return new PartyResp()
             {
                 PartyData = DatabaseServiceUtils.ToByteString(party)
@@ -396,7 +378,7 @@ namespace MultiplayerARPG.MMO
             party.SetLeader(request.LeaderCharacterId);
             cachedParty[request.PartyId] = party;
             // Update to database
-            Database.UpdatePartyLeader(request.PartyId, request.LeaderCharacterId);
+            await Database.UpdatePartyLeader(request.PartyId, request.LeaderCharacterId);
             return new PartyResp()
             {
                 PartyData = DatabaseServiceUtils.ToByteString(party)
@@ -405,8 +387,7 @@ namespace MultiplayerARPG.MMO
 
         public override async Task<VoidResp> DeleteParty(DeletePartyReq request, ServerCallContext context)
         {
-            await Task.Yield();
-            Database.DeleteParty(request.PartyId);
+            await Database.DeleteParty(request.PartyId);
             return new VoidResp();
         }
 
@@ -421,7 +402,7 @@ namespace MultiplayerARPG.MMO
             if (cachedUserCharacter.ContainsKey(character.id))
                 cachedUserCharacter[character.id].PartyId = request.PartyId;
             // Update to database
-            Database.UpdateCharacterParty(character.id, request.PartyId);
+            await Database.UpdateCharacterParty(character.id, request.PartyId);
             return new PartyResp()
             {
                 PartyData = DatabaseServiceUtils.ToByteString(party)
@@ -439,7 +420,7 @@ namespace MultiplayerARPG.MMO
             if (cachedUserCharacter.ContainsKey(request.CharacterId))
                 cachedUserCharacter[request.CharacterId].PartyId = 0;
             // Update to database
-            Database.UpdateCharacterParty(request.CharacterId, 0);
+            await Database.UpdateCharacterParty(request.CharacterId, 0);
             return new VoidResp();
         }
 
@@ -453,9 +434,8 @@ namespace MultiplayerARPG.MMO
 
         public override async Task<GuildResp> CreateGuild(CreateGuildReq request, ServerCallContext context)
         {
-            await Task.Yield();
             // Insert to database
-            int guildId = Database.CreateGuild(request.GuildName, request.LeaderCharacterId);
+            int guildId = await Database.CreateGuild(request.GuildName, request.LeaderCharacterId);
             // Cached the data
             GuildData guild = new GuildData(guildId, request.GuildName, request.LeaderCharacterId);
             cachedGuild[guildId] = guild;
@@ -472,7 +452,7 @@ namespace MultiplayerARPG.MMO
             guild.SetLeader(request.LeaderCharacterId);
             cachedGuild[request.GuildId] = guild;
             // Update to database
-            Database.UpdateGuildLeader(request.GuildId, request.LeaderCharacterId);
+            await Database.UpdateGuildLeader(request.GuildId, request.LeaderCharacterId);
             return new GuildResp()
             {
                 GuildData = DatabaseServiceUtils.ToByteString(guild)
@@ -486,7 +466,7 @@ namespace MultiplayerARPG.MMO
             guild.guildMessage = request.GuildMessage;
             cachedGuild[request.GuildId] = guild;
             // Update to database
-            Database.UpdateGuildMessage(request.GuildId, request.GuildMessage);
+            await Database.UpdateGuildMessage(request.GuildId, request.GuildMessage);
             return new GuildResp()
             {
                 GuildData = DatabaseServiceUtils.ToByteString(guild)
@@ -500,7 +480,7 @@ namespace MultiplayerARPG.MMO
             guild.SetRole((byte)request.GuildRole, request.RoleName, request.CanInvite, request.CanKick, (byte)request.ShareExpPercentage);
             cachedGuild[request.GuildId] = guild;
             // Update to database
-            Database.UpdateGuildRole(request.GuildId, (byte)request.GuildRole, request.RoleName, request.CanInvite, request.CanKick, (byte)request.ShareExpPercentage);
+            await Database.UpdateGuildRole(request.GuildId, (byte)request.GuildRole, request.RoleName, request.CanInvite, request.CanKick, (byte)request.ShareExpPercentage);
             return new GuildResp()
             {
                 GuildData = DatabaseServiceUtils.ToByteString(guild)
@@ -514,7 +494,7 @@ namespace MultiplayerARPG.MMO
             guild.SetMemberRole(request.MemberCharacterId, (byte)request.GuildRole);
             cachedGuild[request.GuildId] = guild;
             // Update to database
-            Database.UpdateGuildMemberRole(request.MemberCharacterId, (byte)request.GuildRole);
+            await Database.UpdateGuildMemberRole(request.MemberCharacterId, (byte)request.GuildRole);
             return new GuildResp()
             {
                 GuildData = DatabaseServiceUtils.ToByteString(guild)
@@ -523,7 +503,6 @@ namespace MultiplayerARPG.MMO
 
         public override async Task<VoidResp> DeleteGuild(DeleteGuildReq request, ServerCallContext context)
         {
-            await Task.Yield();
             // Remove data from cache
             if (cachedGuild.ContainsKey(request.GuildId))
             {
@@ -532,7 +511,7 @@ namespace MultiplayerARPG.MMO
                 cachedGuild.Remove(request.GuildId);
             }
             // Remove data from database
-            Database.DeleteGuild(request.GuildId);
+            await Database.DeleteGuild(request.GuildId);
             return new VoidResp();
         }
 
@@ -547,7 +526,7 @@ namespace MultiplayerARPG.MMO
             if (cachedUserCharacter.ContainsKey(character.id))
                 cachedUserCharacter[character.id].GuildId = request.GuildId;
             // Update to database
-            Database.UpdateCharacterGuild(character.id, request.GuildId, (byte)request.GuildRole);
+            await Database.UpdateCharacterGuild(character.id, request.GuildId, (byte)request.GuildRole);
             return new GuildResp()
             {
                 GuildData = DatabaseServiceUtils.ToByteString(guild)
@@ -568,13 +547,12 @@ namespace MultiplayerARPG.MMO
                 cachedUserCharacter[request.CharacterId].GuildRole = 0;
             }
             // Update to database
-            Database.UpdateCharacterGuild(request.CharacterId, 0, 0);
+            await Database.UpdateCharacterGuild(request.CharacterId, 0, 0);
             return new VoidResp();
         }
 
         public override async Task<FindGuildNameResp> FindGuildName(FindGuildNameReq request, ServerCallContext context)
         {
-            await Task.Yield();
             long foundAmount;
             if (cachedGuildNames.Contains(request.GuildName))
             {
@@ -584,7 +562,7 @@ namespace MultiplayerARPG.MMO
             else
             {
                 // Doesn't cached yet, so try validate from database
-                foundAmount = Database.FindGuildName(request.GuildName);
+                foundAmount = await Database.FindGuildName(request.GuildName);
                 // Cache username, it will be used to validate later
                 cachedGuildNames.Add(request.GuildName);
             }
@@ -610,7 +588,7 @@ namespace MultiplayerARPG.MMO
             guild = GameInstance.Singleton.SocialSystemSetting.IncreaseGuildExp(guild, request.Exp);
             cachedGuild[guild.id] = guild;
             // Update to database
-            Database.UpdateGuildLevel(request.GuildId, guild.level, guild.exp, guild.skillPoint);
+            await Database.UpdateGuildLevel(request.GuildId, guild.level, guild.exp, guild.skillPoint);
             return new GuildResp()
             {
                 GuildData = DatabaseServiceUtils.ToByteString(guild)
@@ -625,7 +603,7 @@ namespace MultiplayerARPG.MMO
             guild.AddSkillLevel(request.SkillId);
             cachedGuild[guild.id] = guild;
             // Update to database
-            Database.UpdateGuildSkillLevel(request.GuildId, request.SkillId, guild.GetSkillLevel(request.SkillId), guild.skillPoint);
+            await Database.UpdateGuildSkillLevel(request.GuildId, request.SkillId, guild.GetSkillLevel(request.SkillId), guild.skillPoint);
             return new GuildResp()
             {
                 GuildData = DatabaseServiceUtils.ToByteString(guild)
@@ -648,7 +626,7 @@ namespace MultiplayerARPG.MMO
             guild.gold += request.ChangeAmount;
             cachedGuild[request.GuildId] = guild;
             // Update to database
-            Database.UpdateGuildGold(request.GuildId, guild.gold);
+            await Database.UpdateGuildGold(request.GuildId, guild.gold);
             return new GuildGoldResp()
             {
                 GuildGold = guild.gold
@@ -657,7 +635,6 @@ namespace MultiplayerARPG.MMO
 
         public override async Task<ReadStorageItemsResp> ReadStorageItems(ReadStorageItemsReq request, ServerCallContext context)
         {
-            await Task.Yield();
             ReadStorageItemsResp resp = new ReadStorageItemsResp();
             // Prepare storage data
             StorageId storageId = new StorageId((StorageType)request.StorageType, request.StorageOwnerId);
@@ -670,7 +647,7 @@ namespace MultiplayerARPG.MMO
             else
             {
                 // Doesn't cached yet, so get data from database
-                storageItems = Database.ReadStorageItems(storageId.storageType, storageId.storageOwnerId);
+                storageItems = await Database.ReadStorageItems(storageId.storageType, storageId.storageOwnerId);
                 // Cache data, it will be used to validate later
                 if (storageItems != null)
                     cachedStorageItems[storageId] = storageItems;
@@ -681,7 +658,6 @@ namespace MultiplayerARPG.MMO
 
         public override async Task<MoveItemToStorageResp> MoveItemToStorage(MoveItemToStorageReq request, ServerCallContext context)
         {
-            await Task.Yield();
             MoveItemToStorageResp resp = new MoveItemToStorageResp();
             // Prepare storage data
             StorageId storageId = new StorageId((StorageType)request.StorageType, request.StorageOwnerId);
@@ -747,7 +723,7 @@ namespace MultiplayerARPG.MMO
             storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
             // Update storage list
             // TODO: May update later to reduce amount of processes
-            Database.UpdateStorageItems((StorageType)request.StorageType, request.StorageOwnerId, storageItemList);
+            await Database.UpdateStorageItems((StorageType)request.StorageType, request.StorageOwnerId, storageItemList);
             resp.Error = EStorageError.StorageErrorNone;
             DatabaseServiceUtils.CopyToRepeatedByteString(character.NonEquipItems, resp.InventoryItemItems);
             DatabaseServiceUtils.CopyToRepeatedByteString(storageItemList, resp.StorageCharacterItems);
@@ -756,7 +732,6 @@ namespace MultiplayerARPG.MMO
 
         public override async Task<MoveItemFromStorageResp> MoveItemFromStorage(MoveItemFromStorageReq request, ServerCallContext context)
         {
-            await Task.Yield();
             MoveItemFromStorageResp resp = new MoveItemFromStorageResp();
             StorageId storageId = new StorageId((StorageType)request.StorageType, request.StorageOwnerId);
             Storage storage;
@@ -817,7 +792,7 @@ namespace MultiplayerARPG.MMO
             character.FillEmptySlots();
             // Update storage list
             // TODO: May update later to reduce amount of processes
-            Database.UpdateStorageItems((StorageType)request.StorageType, request.StorageOwnerId, storageItemList);
+            await Database.UpdateStorageItems((StorageType)request.StorageType, request.StorageOwnerId, storageItemList);
             resp.Error = EStorageError.StorageErrorNone;
             DatabaseServiceUtils.CopyToRepeatedByteString(character.NonEquipItems, resp.InventoryItemItems);
             DatabaseServiceUtils.CopyToRepeatedByteString(storageItemList, resp.StorageCharacterItems);
@@ -826,7 +801,6 @@ namespace MultiplayerARPG.MMO
 
         public override async Task<SwapOrMergeStorageItemResp> SwapOrMergeStorageItem(SwapOrMergeStorageItemReq request, ServerCallContext context)
         {
-            await Task.Yield();
             SwapOrMergeStorageItemResp resp = new SwapOrMergeStorageItemResp();
             // Prepare storage data
             StorageId storageId = new StorageId((StorageType)request.StorageType, request.StorageOwnerId);
@@ -874,7 +848,7 @@ namespace MultiplayerARPG.MMO
             storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
             // Update storage list
             // TODO: May update later to reduce amount of processes
-            Database.UpdateStorageItems((StorageType)request.StorageType, request.StorageOwnerId, storageItemList);
+            await Database.UpdateStorageItems((StorageType)request.StorageType, request.StorageOwnerId, storageItemList);
             resp.Error = EStorageError.StorageErrorNone;
             DatabaseServiceUtils.CopyToRepeatedByteString(storageItemList, resp.StorageCharacterItems);
             return resp;
@@ -882,7 +856,6 @@ namespace MultiplayerARPG.MMO
 
         public override async Task<IncreaseStorageItemsResp> IncreaseStorageItems(IncreaseStorageItemsReq request, ServerCallContext context)
         {
-            await Task.Yield();
             IncreaseStorageItemsResp resp = new IncreaseStorageItemsResp();
             // Prepare storage data
             StorageId storageId = new StorageId((StorageType)request.StorageType, request.StorageOwnerId);
@@ -913,7 +886,7 @@ namespace MultiplayerARPG.MMO
             storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
             // Update storage list
             // TODO: May update later to reduce amount of processes
-            Database.UpdateStorageItems((StorageType)request.StorageType, request.StorageOwnerId, storageItemList);
+            await Database.UpdateStorageItems((StorageType)request.StorageType, request.StorageOwnerId, storageItemList);
             resp.Error = EStorageError.StorageErrorNone;
             DatabaseServiceUtils.CopyToRepeatedByteString(storageItemList, resp.StorageCharacterItems);
             return resp;
@@ -921,7 +894,6 @@ namespace MultiplayerARPG.MMO
 
         public override async Task<DecreaseStorageItemsResp> DecreaseStorageItems(DecreaseStorageItemsReq request, ServerCallContext context)
         {
-            await Task.Yield();
             DecreaseStorageItemsResp resp = new DecreaseStorageItemsResp();
             // Prepare storage data
             StorageId storageId = new StorageId((StorageType)request.StorageType, request.StorageOwnerId);
@@ -946,7 +918,7 @@ namespace MultiplayerARPG.MMO
             storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
             // Update storage list
             // TODO: May update later to reduce amount of processes
-            Database.UpdateStorageItems((StorageType)request.StorageType, request.StorageOwnerId, storageItemList);
+            await Database.UpdateStorageItems((StorageType)request.StorageType, request.StorageOwnerId, storageItemList);
             resp.Error = EStorageError.StorageErrorNone;
             DatabaseServiceUtils.CopyToRepeatedByteString(storageItemList, resp.StorageCharacterItems);
             foreach (int itemIndex in decreaseItems.Keys)
@@ -967,7 +939,6 @@ namespace MultiplayerARPG.MMO
 
         public async Task<int> ReadGold(string userId)
         {
-            await Task.Yield();
             int gold;
             if (cachedUserGold.ContainsKey(userId))
             {
@@ -977,7 +948,7 @@ namespace MultiplayerARPG.MMO
             else
             {
                 // Doesn't cached yet, so get data from database and cache it
-                gold = Database.GetGold(userId);
+                gold = await Database.GetGold(userId);
                 cachedUserGold[userId] = gold;
             }
             return gold;
@@ -985,7 +956,6 @@ namespace MultiplayerARPG.MMO
 
         public async Task<int> ReadCash(string userId)
         {
-            await Task.Yield();
             int cash;
             if (cachedUserCash.ContainsKey(userId))
             {
@@ -995,7 +965,7 @@ namespace MultiplayerARPG.MMO
             else
             {
                 // Doesn't cached yet, so get data from database and cache it
-                cash = Database.GetCash(userId);
+                cash = await Database.GetCash(userId);
                 cachedUserCash[userId] = cash;
             }
             return cash;
@@ -1003,7 +973,6 @@ namespace MultiplayerARPG.MMO
 
         public async Task<PlayerCharacterData> ReadCharacter(string id)
         {
-            await Task.Yield();
             PlayerCharacterData character;
             if (cachedUserCharacter.ContainsKey(id))
             {
@@ -1013,7 +982,7 @@ namespace MultiplayerARPG.MMO
             else
             {
                 // Doesn't cached yet, so get data from database
-                character = Database.ReadCharacter(id);
+                character = await Database.ReadCharacter(id);
                 // Cache character, it will be used to validate later
                 if (character != null)
                 {
@@ -1026,7 +995,6 @@ namespace MultiplayerARPG.MMO
 
         public async Task<SocialCharacterData> ReadSocialCharacter(string id)
         {
-            await Task.Yield();
             //cachedSocialCharacter
             SocialCharacterData character;
             if (cachedSocialCharacter.ContainsKey(id))
@@ -1037,7 +1005,7 @@ namespace MultiplayerARPG.MMO
             else
             {
                 // Doesn't cached yet, so get data from database
-                character = SocialCharacterData.Create(Database.ReadCharacter(id, false, false, false, false, false, false, false, false, false, false));
+                character = SocialCharacterData.Create(await Database.ReadCharacter(id, false, false, false, false, false, false, false, false, false, false));
                 // Cache the data
                 cachedSocialCharacter[id] = character;
             }
@@ -1046,7 +1014,6 @@ namespace MultiplayerARPG.MMO
 
         public async Task<List<SocialCharacterData>> ReadFriends(string id)
         {
-            await Task.Yield();
             List<SocialCharacterData> friends;
             if (cachedFriend.ContainsKey(id))
             {
@@ -1056,7 +1023,7 @@ namespace MultiplayerARPG.MMO
             else
             {
                 // Doesn't cached yet, so get data from database
-                friends = Database.ReadFriends(id);
+                friends = await Database.ReadFriends(id);
                 // Cache the data
                 if (friends != null)
                 {
@@ -1069,7 +1036,6 @@ namespace MultiplayerARPG.MMO
 
         public async Task<PartyData> ReadParty(int id)
         {
-            await Task.Yield();
             PartyData party;
             if (cachedParty.ContainsKey(id))
             {
@@ -1079,7 +1045,7 @@ namespace MultiplayerARPG.MMO
             else
             {
                 // Doesn't cached yet, so get data from database
-                party = Database.ReadParty(id);
+                party = await Database.ReadParty(id);
                 // Cache the data
                 if (party != null)
                 {
@@ -1092,7 +1058,6 @@ namespace MultiplayerARPG.MMO
 
         public async Task<GuildData> ReadGuild(int id)
         {
-            await Task.Yield();
             GuildData guild;
             if (cachedGuild.ContainsKey(id))
             {
@@ -1102,7 +1067,7 @@ namespace MultiplayerARPG.MMO
             else
             {
                 // Doesn't cached yet, so get data from database
-                guild = Database.ReadGuild(id, GameInstance.Singleton.SocialSystemSetting.GuildMemberRoles);
+                guild = await Database.ReadGuild(id, GameInstance.Singleton.SocialSystemSetting.GuildMemberRoles);
                 // Cache the data
                 if (guild != null)
                 {
