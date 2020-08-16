@@ -981,9 +981,9 @@
         </member>
         <member name="M:Grpc.Core.IAsyncStreamWriter`1.WriteAsync(`0)">
             <summary>
-            Writes a single asynchronously. Only one write can be pending at a time.
+            Writes a message asynchronously. Only one write can be pending at a time.
             </summary>
-            <param name="message">the message to be written. Cannot be null.</param>
+            <param name="message">The message to be written. Cannot be null.</param>
         </member>
         <member name="P:Grpc.Core.IAsyncStreamWriter`1.WriteOptions">
             <summary>
@@ -1642,6 +1642,41 @@
             </summary>
             <returns>this object</returns>
         </member>
+        <member name="M:Grpc.Core.Metadata.Get(System.String)">
+            <summary>
+            Gets the last metadata entry with the specified key.
+            If there are no matching entries then <c>null</c> is returned.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.Metadata.GetValue(System.String)">
+            <summary>
+            Gets the string value of the last metadata entry with the specified key.
+            If the metadata entry is binary then an exception is thrown.
+            If there are no matching entries then <c>null</c> is returned.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.Metadata.GetValueBytes(System.String)">
+            <summary>
+            Gets the bytes value of the last metadata entry with the specified key.
+            If the metadata entry is not binary the string value will be returned as ASCII encoded bytes.
+            If there are no matching entries then <c>null</c> is returned.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.Metadata.GetAll(System.String)">
+            <summary>
+            Gets all metadata entries with the specified key.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.Metadata.Add(System.String,System.String)">
+            <summary>
+            Adds a new ASCII-valued metadata entry. See <c>Metadata.Entry</c> constructor for params.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.Metadata.Add(System.String,System.Byte[])">
+            <summary>
+            Adds a new binary-valued metadata entry. See <c>Metadata.Entry</c> constructor for params.
+            </summary>
+        </member>
         <member name="M:Grpc.Core.Metadata.IndexOf(Grpc.Core.Metadata.Entry)">
             <summary>
             <see cref="T:IList`1"/>
@@ -1665,16 +1700,6 @@
         <member name="M:Grpc.Core.Metadata.Add(Grpc.Core.Metadata.Entry)">
             <summary>
             <see cref="T:IList`1"/>
-            </summary>
-        </member>
-        <member name="M:Grpc.Core.Metadata.Add(System.String,System.String)">
-            <summary>
-            Adds a new ASCII-valued metadata entry. See <c>Metadata.Entry</c> constructor for params.
-            </summary>
-        </member>
-        <member name="M:Grpc.Core.Metadata.Add(System.String,System.Byte[])">
-            <summary>
-            Adds a new binary-valued metadata entry. See <c>Metadata.Entry</c> constructor for params.
             </summary>
         </member>
         <member name="M:Grpc.Core.Metadata.Clear">
@@ -1739,11 +1764,13 @@
         <member name="P:Grpc.Core.Metadata.Entry.ValueBytes">
             <summary>
             Gets the binary value of this metadata entry.
+            If the metadata entry is not binary the string value will be returned as ASCII encoded bytes.
             </summary>
         </member>
         <member name="P:Grpc.Core.Metadata.Entry.Value">
             <summary>
             Gets the string value of this metadata entry.
+            If the metadata entry is binary then an exception is thrown.
             </summary>
         </member>
         <member name="P:Grpc.Core.Metadata.Entry.IsBinary">
@@ -2296,6 +2323,17 @@
             <param name="statusCode">Status code.</param>
             <param name="detail">Detail.</param>
         </member>
+        <member name="M:Grpc.Core.Status.#ctor(Grpc.Core.StatusCode,System.String,System.Exception)">
+            <summary>
+            Creates a new instance of <c>Status</c>.
+            Users should not use this constructor, except for creating instances for testing.
+            The debug error string should only be populated by gRPC internals.
+            Note: experimental API that can change or be removed without any prior notice.
+            </summary>
+            <param name="statusCode">Status code.</param>
+            <param name="detail">Detail.</param>
+            <param name="debugException">Optional internal error details.</param>
+        </member>
         <member name="P:Grpc.Core.Status.StatusCode">
             <summary>
             Gets the gRPC status code. OK indicates success, all other values indicate an error.
@@ -2304,6 +2342,18 @@
         <member name="P:Grpc.Core.Status.Detail">
             <summary>
             Gets the detail.
+            </summary>
+        </member>
+        <member name="P:Grpc.Core.Status.DebugException">
+            <summary>
+            In case of an error, this field may contain additional error details to help with debugging.
+            This field will be only populated on a client and its value is generated locally,
+            based on the internal state of the gRPC client stack (i.e. the value is never sent over the wire).
+            Note that this field is available only for debugging purposes, the application logic should
+            never rely on values of this field (it should use <c>StatusCode</c> and <c>Detail</c> instead).
+            Example: when a client fails to connect to a server, this field may provide additional details
+            why the connection to the server has failed.
+            Note: experimental API that can change or be removed without any prior notice.
             </summary>
         </member>
         <member name="M:Grpc.Core.Status.ToString">

@@ -1012,6 +1012,11 @@
             "ours" (was created by this implementation).
             </summary>
         </member>
+        <member name="T:Grpc.Core.Internal.CoreErrorDetailException">
+            <summary>
+            Represents error details provides by C-core's debug_error_string
+            </summary>
+        </member>
         <member name="T:Grpc.Core.Internal.CStringSafeHandle">
             <summary>
             Owned char* object.
