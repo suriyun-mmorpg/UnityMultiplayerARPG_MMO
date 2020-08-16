@@ -2465,6 +2465,11 @@
         <member name="F:Grpc.Core.StatusCode.DataLoss">
             <summary>Unrecoverable data loss or corruption.</summary>
         </member>
+        <member name="M:Grpc.Core.Api.Utils.EncodingExtensions.GetString(System.Text.Encoding,System.Byte*,System.Int32)">
+            <summary>
+            Converts <c>byte*</c> pointing to an encoded byte array to a <c>string</c> using the provided <c>Encoding</c>.
+            </summary>
+        </member>
         <member name="M:Grpc.Core.Api.Utils.EncodingExtensions.GetString(System.Text.Encoding,System.IntPtr,System.Int32)">
             <summary>
             Converts <c>IntPtr</c> pointing to a encoded byte array to a <c>string</c> using the provided <c>Encoding</c>.
