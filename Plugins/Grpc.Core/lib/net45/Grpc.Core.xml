@@ -213,8 +213,18 @@
             </summary>
             <param name="deadline">The deadline. <c>null</c> indicates no deadline.</param>
         </member>
-        <member name="M:Grpc.Core.Channel.ShutdownAsyncCore">
-            <summary>Provides implementation of a non-virtual public member.</summary>
+        <member name="M:Grpc.Core.Channel.ShutdownAsync">
+            <summary>
+            Shuts down the channel cleanly. It is strongly recommended to shutdown
+            all previously created channels before exiting from the process.
+            </summary>
+            <remarks>
+            This method doesn't wait for all calls on this channel to finish (nor does
+            it explicitly cancel all outstanding calls). It is user's responsibility to make sure
+            all the calls on this channel have finished (successfully or with an error)
+            before shutting down the channel to ensure channel shutdown won't impact
+            the outcome of those remote calls.
+            </remarks>
         </member>
         <member name="M:Grpc.Core.Channel.CreateCallInvoker">
             <summary>
@@ -1012,11 +1022,6 @@
             "ours" (was created by this implementation).
             </summary>
         </member>
-        <member name="T:Grpc.Core.Internal.CoreErrorDetailException">
-            <summary>
-            Represents error details provides by C-core's debug_error_string
-            </summary>
-        </member>
         <member name="T:Grpc.Core.Internal.CStringSafeHandle">
             <summary>
             Owned char* object.
@@ -1515,7 +1520,7 @@
         </member>
         <member name="T:Grpc.Core.Internal.UnmanagedLibrary.Mono">
             <summary>
-            On Linux systems, using dlopen and dlsym results in
+            On Linux systems, using using dlopen and dlsym results in
             DllNotFoundException("libdl.so not found") if libc6-dev
             is not installed. As a workaround, we load symbols for
             dlopen and dlsym from the current process as on Linux
