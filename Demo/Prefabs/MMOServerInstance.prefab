@@ -46,7 +46,7 @@ MonoBehaviour:
   address: 127.0.0.1
   port: 3306
   username: root
-  password: 
+  password: password
   dbName: mmorpg_kit
 --- !u!1 &1250662783992638
 GameObject:
