@@ -284,32 +284,38 @@ namespace MultiplayerARPG.MMO
             if (reader.Read())
             {
                 result = new PlayerCharacterData();
-                result.Id = reader.GetString("id");
-                result.DataId = reader.GetInt32("dataId");
-                result.EntityId = reader.GetInt32("entityId");
-                result.FactionId = reader.GetInt32("factionId");
-                result.CharacterName = reader.GetString("characterName");
-                result.Level = reader.GetInt16("level");
-                result.Exp = reader.GetInt32("exp");
-                result.CurrentHp = reader.GetInt32("currentHp");
-                result.CurrentMp = reader.GetInt32("currentMp");
-                result.CurrentStamina = reader.GetInt32("currentStamina");
-                result.CurrentFood = reader.GetInt32("currentFood");
-                result.CurrentWater = reader.GetInt32("currentWater");
-                result.EquipWeaponSet = reader.GetByte("equipWeaponSet");
-                result.StatPoint = reader.GetInt16("statPoint");
-                result.SkillPoint = reader.GetInt16("skillPoint");
-                result.Gold = reader.GetInt32("gold");
-                result.PartyId = reader.GetInt32("partyId");
-                result.GuildId = reader.GetInt32("guildId");
-                result.GuildRole = reader.GetByte("guildRole");
-                result.SharedGuildExp = reader.GetInt32("sharedGuildExp");
-                result.CurrentMapName = reader.GetString("currentMapName");
-                result.CurrentPosition = new Vector3(reader.GetFloat("currentPositionX"), reader.GetFloat("currentPositionY"), reader.GetFloat("currentPositionZ"));
-                result.RespawnMapName = reader.GetString("respawnMapName");
-                result.RespawnPosition = new Vector3(reader.GetFloat("respawnPositionX"), reader.GetFloat("respawnPositionY"), reader.GetFloat("respawnPositionZ"));
-                result.MountDataId = reader.GetInt32("mountDataId");
-                result.LastUpdate = (int)(reader.GetDateTime("updateAt").Ticks / System.TimeSpan.TicksPerMillisecond);
+                result.Id = reader.GetString(0);
+                result.DataId = reader.GetInt32(1);
+                result.EntityId = reader.GetInt32(2);
+                result.FactionId = reader.GetInt32(3);
+                result.CharacterName = reader.GetString(4);
+                result.Level = reader.GetInt16(5);
+                result.Exp = reader.GetInt32(6);
+                result.CurrentHp = reader.GetInt32(7);
+                result.CurrentMp = reader.GetInt32(8);
+                result.CurrentStamina = reader.GetInt32(9);
+                result.CurrentFood = reader.GetInt32(10);
+                result.CurrentWater = reader.GetInt32(11);
+                result.EquipWeaponSet = reader.GetByte(12);
+                result.StatPoint = reader.GetInt16(13);
+                result.SkillPoint = reader.GetInt16(14);
+                result.Gold = reader.GetInt32(15);
+                result.PartyId = reader.GetInt32(16);
+                result.GuildId = reader.GetInt32(17);
+                result.GuildRole = reader.GetByte(18);
+                result.SharedGuildExp = reader.GetInt32(19);
+                result.CurrentMapName = reader.GetString(20);
+                result.CurrentPosition = new Vector3(
+                    reader.GetFloat(21),
+                    reader.GetFloat(22),
+                    reader.GetFloat(23));
+                result.RespawnMapName = reader.GetString(24);
+                result.RespawnPosition = new Vector3(
+                    reader.GetFloat(25),
+                    reader.GetFloat(26),
+                    reader.GetFloat(27));
+                result.MountDataId = reader.GetInt32(28);
+                result.LastUpdate = (int)(reader.GetDateTime(29).Ticks / System.TimeSpan.TicksPerMillisecond);
                 return true;
             }
             result = null;
@@ -348,7 +354,13 @@ namespace MultiplayerARPG.MMO
                         withHotkeys,
                         withQuests);
                 }
-            }, "SELECT * FROM characters WHERE id=@id LIMIT 1",
+            }, "SELECT " +
+                "id, dataId, entityId, factionId, characterName, level, exp, " +
+                "currentHp, currentMp, currentStamina, currentFood, currentWater, " +
+                "equipWeaponSet, statPoint, skillPoint, gold, partyId, guildId, guildRole, sharedGuildExp, " +
+                "currentMapName, currentPositionX, currentPositionY, currentPositionZ," +
+                "respawnMapName, respawnPositionX, respawnPositionY, respawnPositionZ," +
+                "mountDataId, updateAt FROM characters WHERE id=@id LIMIT 1",
                 new MySqlParameter("@id", id));
             // Found character, then read its relates data
             if (result != null)
@@ -419,7 +431,7 @@ namespace MultiplayerARPG.MMO
             {
                 while (reader.Read())
                 {
-                    characterIds.Add(reader.GetString("id"));
+                    characterIds.Add(reader.GetString(0));
                 }
             }, "SELECT id FROM characters WHERE userId=@userId ORDER BY updateAt DESC", new MySqlParameter("@userId", userId));
             foreach (string characterId in characterIds)
@@ -539,10 +551,10 @@ namespace MultiplayerARPG.MMO
                 {
                     // Get some required data, other data will be set at server side
                     socialCharacterData = new SocialCharacterData();
-                    socialCharacterData.id = reader.GetString("id");
-                    socialCharacterData.characterName = reader.GetString("characterName");
-                    socialCharacterData.dataId = reader.GetInt32("dataId");
-                    socialCharacterData.level = reader.GetInt16("level");
+                    socialCharacterData.id = reader.GetString(0);
+                    socialCharacterData.dataId = reader.GetInt32(1);
+                    socialCharacterData.characterName = reader.GetString(2);
+                    socialCharacterData.level = reader.GetInt16(3);
                     result.Add(socialCharacterData);
                 }
             }, "SELECT id, dataId, characterName, level FROM characters WHERE characterName LIKE @characterName LIMIT 0, 20",
@@ -577,7 +589,7 @@ namespace MultiplayerARPG.MMO
             {
                 while (reader.Read())
                 {
-                    characterIds.Add(reader.GetString("characterId2"));
+                    characterIds.Add(reader.GetString(0));
                 }
             }, "SELECT characterId2 FROM friend WHERE characterId1=@id1",
                 new MySqlParameter("@id1", id1));
@@ -590,10 +602,10 @@ namespace MultiplayerARPG.MMO
                     {
                         // Get some required data, other data will be set at server side
                         socialCharacterData = new SocialCharacterData();
-                        socialCharacterData.id = reader.GetString("id");
-                        socialCharacterData.characterName = reader.GetString("characterName");
-                        socialCharacterData.dataId = reader.GetInt32("dataId");
-                        socialCharacterData.level = reader.GetInt16("level");
+                        socialCharacterData.id = reader.GetString(0);
+                        socialCharacterData.dataId = reader.GetInt32(1);
+                        socialCharacterData.characterName = reader.GetString(2);
+                        socialCharacterData.level = reader.GetInt16(3);
                         result.Add(socialCharacterData);
                     }
                 }, "SELECT id, dataId, characterName, level FROM characters WHERE BINARY id = @id",

@@ -11,9 +11,9 @@ namespace MultiplayerARPG.MMO
             if (reader.Read())
             {
                 result = new CharacterSkillUsage();
-                result.type = (SkillUsageType)reader.GetSByte("type");
-                result.dataId = reader.GetInt32("dataId");
-                result.coolDownRemainsDuration = reader.GetFloat("coolDownRemainsDuration");
+                result.type = (SkillUsageType)reader.GetByte(0);
+                result.dataId = reader.GetInt32(1);
+                result.coolDownRemainsDuration = reader.GetFloat(2);
                 return true;
             }
             result = CharacterSkillUsage.Empty;
@@ -41,7 +41,7 @@ namespace MultiplayerARPG.MMO
                 {
                     result.Add(tempSkillUsage);
                 }
-            }, "SELECT * FROM characterskillusage WHERE characterId=@characterId ORDER BY coolDownRemainsDuration ASC",
+            }, "SELECT type, dataId, coolDownRemainsDuration FROM characterskillusage WHERE characterId=@characterId ORDER BY coolDownRemainsDuration ASC",
                 new MySqlParameter("@characterId", characterId));
             return result;
         }

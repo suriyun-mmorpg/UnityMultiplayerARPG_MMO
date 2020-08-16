@@ -11,9 +11,9 @@ namespace MultiplayerARPG.MMO
             if (reader.Read())
             {
                 result = new CharacterHotkey();
-                result.hotkeyId = reader.GetString("hotkeyId");
-                result.type = (HotkeyType)reader.GetSByte("type");
-                result.relateId = reader.GetString("relateId");
+                result.hotkeyId = reader.GetString(0);
+                result.type = (HotkeyType)reader.GetByte(1);
+                result.relateId = reader.GetString(2);
                 return true;
             }
             result = CharacterHotkey.Empty;

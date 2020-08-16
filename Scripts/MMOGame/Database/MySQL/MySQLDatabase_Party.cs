@@ -32,28 +32,32 @@ namespace MultiplayerARPG.MMO
                 if (reader.Read())
                 {
                     result = new PartyData(id,
-                        reader.GetBoolean("shareExp"),
-                        reader.GetBoolean("shareItem"),
-                        reader.GetString("leaderId"));
+                        reader.GetBoolean(0),
+                        reader.GetBoolean(1),
+                        reader.GetString(2));
                 }
-            }, "SELECT * FROM party WHERE id=@id LIMIT 1",
+            }, "SELECT shareExp, shareItem, leaderId FROM party WHERE id=@id LIMIT 1",
                 new MySqlParameter("@id", id));
-
-            await ExecuteReader((reader) =>
+            // Read relates data if party exists
+            if (result != null)
             {
-                SocialCharacterData partyMemberData;
-                while (reader.Read())
+                // Party members
+                await ExecuteReader((reader) =>
                 {
-                    // Get some required data, other data will be set at server side
-                    partyMemberData = new SocialCharacterData();
-                    partyMemberData.id = reader.GetString("id");
-                    partyMemberData.characterName = reader.GetString("characterName");
-                    partyMemberData.dataId = reader.GetInt32("dataId");
-                    partyMemberData.level = reader.GetInt16("level");
-                    result.AddMember(partyMemberData);
-                }
-            }, "SELECT id, dataId, characterName, level FROM characters WHERE partyId=@id",
-                new MySqlParameter("@id", id));
+                    SocialCharacterData partyMemberData;
+                    while (reader.Read())
+                    {
+                        // Get some required data, other data will be set at server side
+                        partyMemberData = new SocialCharacterData();
+                        partyMemberData.id = reader.GetString(0);
+                        partyMemberData.dataId = reader.GetInt32(1);
+                        partyMemberData.characterName = reader.GetString(2);
+                        partyMemberData.level = reader.GetInt16(3);
+                        result.AddMember(partyMemberData);
+                    }
+                }, "SELECT id, dataId, characterName, level FROM characters WHERE partyId=@id",
+                    new MySqlParameter("@id", id));
+            }
             return result;
         }
 

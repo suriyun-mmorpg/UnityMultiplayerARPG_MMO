@@ -249,7 +249,7 @@ namespace MultiplayerARPG.MMO
             {
                 if (reader.Read())
                 {
-                    id = reader.GetString("Id");
+                    id = reader.GetString(0);
                 }
             }, "SELECT id FROM userlogin WHERE username=@username AND password=@password AND authType=@authType LIMIT 1",
                 new MySqlParameter("@username", username),
@@ -273,7 +273,7 @@ namespace MultiplayerARPG.MMO
             await ExecuteReader((reader) =>
             {
                 if (reader.Read())
-                    userLevel = reader.GetByte("userLevel");
+                    userLevel = reader.GetByte(0);
             }, "SELECT userLevel FROM userlogin WHERE id=@id LIMIT 1",
                 new MySqlParameter("@id", userId));
             return userLevel;
@@ -285,7 +285,7 @@ namespace MultiplayerARPG.MMO
             await ExecuteReader((reader) =>
             {
                 if (reader.Read())
-                    gold = reader.GetInt32("gold");
+                    gold = reader.GetInt32(0);
             }, "SELECT gold FROM userlogin WHERE id=@id LIMIT 1",
                 new MySqlParameter("@id", userId));
             return gold;
@@ -304,7 +304,7 @@ namespace MultiplayerARPG.MMO
             await ExecuteReader((reader) =>
             {
                 if (reader.Read())
-                    cash = reader.GetInt32("cash");
+                    cash = reader.GetInt32(0);
             }, "SELECT cash FROM userlogin WHERE id=@id LIMIT 1",
                 new MySqlParameter("@id", userId));
             return cash;

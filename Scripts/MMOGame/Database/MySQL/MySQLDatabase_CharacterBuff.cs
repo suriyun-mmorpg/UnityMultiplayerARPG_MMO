@@ -11,10 +11,10 @@ namespace MultiplayerARPG.MMO
             if (reader.Read())
             {
                 result = new CharacterBuff();
-                result.type = (BuffType)reader.GetSByte("type");
-                result.dataId = reader.GetInt32("dataId");
-                result.level = reader.GetInt16("level");
-                result.buffRemainsDuration = reader.GetFloat("buffRemainsDuration");
+                result.type = (BuffType)reader.GetByte(0);
+                result.dataId = reader.GetInt32(1);
+                result.level = reader.GetInt16(2);
+                result.buffRemainsDuration = reader.GetFloat(3);
                 return true;
             }
             result = CharacterBuff.Empty;
@@ -43,7 +43,7 @@ namespace MultiplayerARPG.MMO
                 {
                     result.Add(tempBuff);
                 }
-            }, "SELECT * FROM characterbuff WHERE characterId=@characterId ORDER BY buffRemainsDuration ASC",
+            }, "SELECT type, dataId, level, buffRemainsDuration FROM characterbuff WHERE characterId=@characterId ORDER BY buffRemainsDuration ASC",
                 new MySqlParameter("@characterId", characterId));
             return result;
         }

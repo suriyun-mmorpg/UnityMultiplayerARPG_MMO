@@ -11,8 +11,8 @@ namespace MultiplayerARPG.MMO
             if (reader.Read())
             {
                 result = new CharacterSkill();
-                result.dataId = reader.GetInt32("dataId");
-                result.level = reader.GetInt16("level");
+                result.dataId = reader.GetInt32(0);
+                result.level = reader.GetInt16(1);
                 return true;
             }
             result = CharacterSkill.Empty;
@@ -40,7 +40,7 @@ namespace MultiplayerARPG.MMO
                 {
                     result.Add(tempSkill);
                 }
-            }, "SELECT * FROM characterskill WHERE characterId=@characterId ORDER BY idx ASC",
+            }, "SELECT dataId, level FROM characterskill WHERE characterId=@characterId ORDER BY idx ASC",
                 new MySqlParameter("@characterId", characterId));
             return result;
         }

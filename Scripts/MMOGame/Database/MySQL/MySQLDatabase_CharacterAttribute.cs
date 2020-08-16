@@ -11,8 +11,8 @@ namespace MultiplayerARPG.MMO
             if (reader.Read())
             {
                 result = new CharacterAttribute();
-                result.dataId = reader.GetInt32("dataId");
-                result.amount = reader.GetInt16("amount");
+                result.dataId = reader.GetInt32(0);
+                result.amount = reader.GetInt16(1);
                 return true;
             }
             result = CharacterAttribute.Empty;
@@ -40,7 +40,7 @@ namespace MultiplayerARPG.MMO
                 {
                     result.Add(tempAttribute);
                 }
-            }, "SELECT * FROM characterattribute WHERE characterId=@characterId ORDER BY idx ASC",
+            }, "SELECT dataId, amount FROM characterattribute WHERE characterId=@characterId ORDER BY idx ASC",
                 new MySqlParameter("@characterId", characterId));
             return result;
         }

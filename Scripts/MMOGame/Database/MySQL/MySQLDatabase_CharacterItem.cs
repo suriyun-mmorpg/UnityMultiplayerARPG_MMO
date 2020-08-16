@@ -55,16 +55,16 @@ namespace MultiplayerARPG.MMO
             if (reader.Read())
             {
                 result = new CharacterItem();
-                result.id = reader.GetString("id");
-                result.dataId = reader.GetInt32("dataId");
-                result.level = reader.GetInt16("level");
-                result.amount = reader.GetInt16("amount");
-                result.equipSlotIndex = reader.GetByte("equipSlotIndex");
-                result.durability = reader.GetFloat("durability");
-                result.exp = reader.GetInt32("exp");
-                result.lockRemainsDuration = reader.GetFloat("lockRemainsDuration");
-                result.ammo = reader.GetInt16("ammo");
-                result.sockets = ReadSockets(reader.GetString("sockets"));
+                result.id = reader.GetString(0);
+                result.dataId = reader.GetInt32(1);
+                result.level = reader.GetInt16(2);
+                result.amount = reader.GetInt16(3);
+                result.equipSlotIndex = reader.GetByte(4);
+                result.durability = reader.GetFloat(5);
+                result.exp = reader.GetInt32(6);
+                result.lockRemainsDuration = reader.GetFloat(7);
+                result.ammo = reader.GetInt16(8);
+                result.sockets = ReadSockets(reader.GetString(9));
                 return true;
             }
             result = CharacterItem.Empty;
@@ -82,7 +82,7 @@ namespace MultiplayerARPG.MMO
                 {
                     result.Add(tempInventory);
                 }
-            }, "SELECT * FROM characteritem WHERE characterId=@characterId AND inventoryType=@inventoryType ORDER BY idx ASC",
+            }, "SELECT id, dataId, level, amount, equipSlotIndex, durability, exp, lockRemainsDuration, ammo, sockets FROM characteritem WHERE characterId=@characterId AND inventoryType=@inventoryType ORDER BY idx ASC",
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@inventoryType", (byte)inventoryType));
             return result;
@@ -99,8 +99,8 @@ namespace MultiplayerARPG.MMO
                 InventoryType inventoryType;
                 while (ReadCharacterItem(reader, out tempInventory))
                 {
-                    equipWeaponSet = reader.GetByte("idx");
-                    inventoryType = (InventoryType)reader.GetSByte("inventoryType");
+                    equipWeaponSet = reader.GetByte(10);
+                    inventoryType = (InventoryType)reader.GetByte(11);
                     // Fill weapon sets if needed
                     while (result.Count <= equipWeaponSet)
                         result.Add(new EquipWeapons());
@@ -110,7 +110,7 @@ namespace MultiplayerARPG.MMO
                     if (inventoryType == InventoryType.EquipWeaponLeft)
                         result[equipWeaponSet].leftHand = tempInventory;
                 }
-            }, "SELECT * FROM characteritem WHERE characterId=@characterId AND (inventoryType=@inventoryType1 OR inventoryType=@inventoryType2) ORDER BY idx ASC",
+            }, "SELECT id, dataId, level, amount, equipSlotIndex, durability, exp, lockRemainsDuration, ammo, sockets, idx, inventoryType FROM characteritem WHERE characterId=@characterId AND (inventoryType=@inventoryType1 OR inventoryType=@inventoryType2) ORDER BY idx ASC",
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@inventoryType1", (byte)InventoryType.EquipWeaponRight),
                 new MySqlParameter("@inventoryType2", (byte)InventoryType.EquipWeaponLeft));

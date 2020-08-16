@@ -31,60 +31,63 @@ namespace MultiplayerARPG.MMO
                 if (reader.Read())
                 {
                     result = new GuildData(id,
-                        reader.GetString("guildName"),
-                        reader.GetString("leaderId"),
+                        reader.GetString(0),
+                        reader.GetString(1),
                         defaultGuildRoles);
-                    result.level = reader.GetInt16("level");
-                    result.exp = reader.GetInt32("exp");
-                    result.skillPoint = reader.GetInt16("skillPoint");
-                    result.guildMessage = reader.GetString("guildMessage");
-                    result.gold = reader.GetInt32("gold");
+                    result.level = reader.GetInt16(2);
+                    result.exp = reader.GetInt32(3);
+                    result.skillPoint = reader.GetInt16(4);
+                    result.guildMessage = reader.GetString(5);
+                    result.gold = reader.GetInt32(6);
                 }
-            }, "SELECT * FROM guild WHERE id=@id LIMIT 1",
+            }, "SELECT guildName, leaderId, level, exp, skillPoint, guildMessage, gold FROM guild WHERE id=@id LIMIT 1",
                 new MySqlParameter("@id", id));
-
-
-            await ExecuteReader((reader) =>
+            // Read relates data if guild exists
+            if (result != null)
             {
-                byte guildRole;
-                GuildRoleData guildRoleData;
-                while (reader.Read())
+                // Guild roles
+                await ExecuteReader((reader) =>
                 {
-                    guildRole = reader.GetByte("guildRole");
-                    guildRoleData = new GuildRoleData();
-                    guildRoleData.roleName = reader.GetString("name");
-                    guildRoleData.canInvite = reader.GetBoolean("canInvite");
-                    guildRoleData.canKick = reader.GetBoolean("canKick");
-                    guildRoleData.shareExpPercentage = reader.GetByte("shareExpPercentage");
-                    result.SetRole(guildRole, guildRoleData);
-                }
-            }, "SELECT * FROM guildrole WHERE guildId=@id",
-                new MySqlParameter("@id", id));
-
-            await ExecuteReader((reader) =>
-            {
-                SocialCharacterData guildMemberData;
-                while (reader.Read())
+                    byte guildRole;
+                    GuildRoleData guildRoleData;
+                    while (reader.Read())
+                    {
+                        guildRole = reader.GetByte(0);
+                        guildRoleData = new GuildRoleData();
+                        guildRoleData.roleName = reader.GetString(1);
+                        guildRoleData.canInvite = reader.GetBoolean(2);
+                        guildRoleData.canKick = reader.GetBoolean(3);
+                        guildRoleData.shareExpPercentage = reader.GetByte(4);
+                        result.SetRole(guildRole, guildRoleData);
+                    }
+                }, "SELECT guildRole, name, canInvite, canKick, shareExpPercentage FROM guildrole WHERE guildId=@id",
+                    new MySqlParameter("@id", id));
+                // Guild members
+                await ExecuteReader((reader) =>
                 {
-                    // Get some required data, other data will be set at server side
-                    guildMemberData = new SocialCharacterData();
-                    guildMemberData.id = reader.GetString("id");
-                    guildMemberData.characterName = reader.GetString("characterName");
-                    guildMemberData.dataId = reader.GetInt32("dataId");
-                    guildMemberData.level = reader.GetInt16("level");
-                    result.AddMember(guildMemberData, reader.GetByte("guildRole"));
-                }
-            }, "SELECT id, dataId, characterName, level, guildRole FROM characters WHERE guildId=@id",
-                new MySqlParameter("@id", id));
-
-            await ExecuteReader((reader) =>
-            {
-                while (reader.Read())
+                    SocialCharacterData guildMemberData;
+                    while (reader.Read())
+                    {
+                        // Get some required data, other data will be set at server side
+                        guildMemberData = new SocialCharacterData();
+                        guildMemberData.id = reader.GetString(0);
+                        guildMemberData.dataId = reader.GetInt32(1);
+                        guildMemberData.characterName = reader.GetString(2);
+                        guildMemberData.level = reader.GetInt16(3);
+                        result.AddMember(guildMemberData, reader.GetByte(4));
+                    }
+                }, "SELECT id, dataId, characterName, level, guildRole FROM characters WHERE guildId=@id",
+                    new MySqlParameter("@id", id));
+                // Guild skills
+                await ExecuteReader((reader) =>
                 {
-                    result.SetSkillLevel(reader.GetInt32("dataId"), reader.GetInt16("level"));
-                }
-            }, "SELECT dataId, level FROM guildskill WHERE guildId=@id",
-                new MySqlParameter("@id", id));
+                    while (reader.Read())
+                    {
+                        result.SetSkillLevel(reader.GetInt32(0), reader.GetInt16(1));
+                    }
+                }, "SELECT dataId, level FROM guildskill WHERE guildId=@id",
+                    new MySqlParameter("@id", id));
+            }
             return result;
         }
 
@@ -176,7 +179,7 @@ namespace MultiplayerARPG.MMO
             await ExecuteReader((reader) =>
             {
                 if (reader.Read())
-                    gold = reader.GetInt32("gold");
+                    gold = reader.GetInt32(0);
             }, "SELECT gold FROM guild WHERE id=@id LIMIT 1",
                 new MySqlParameter("@id", guildId));
             return gold;

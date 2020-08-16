@@ -29,14 +29,14 @@ namespace MultiplayerARPG.MMO
             if (reader.Read())
             {
                 result = new CharacterItem();
-                result.dataId = reader.GetInt32("dataId");
-                result.level = reader.GetInt16("level");
-                result.amount = reader.GetInt16("amount");
-                result.durability = reader.GetFloat("durability");
-                result.exp = reader.GetInt32("exp");
-                result.lockRemainsDuration = reader.GetFloat("lockRemainsDuration");
-                result.ammo = reader.GetInt16("ammo");
-                result.sockets = ReadSockets(reader.GetString("sockets"));
+                result.dataId = reader.GetInt32(0);
+                result.level = reader.GetInt16(1);
+                result.amount = reader.GetInt16(2);
+                result.durability = reader.GetFloat(3);
+                result.exp = reader.GetInt32(4);
+                result.lockRemainsDuration = reader.GetFloat(5);
+                result.ammo = reader.GetInt16(6);
+                result.sockets = ReadSockets(reader.GetString(7));
                 return true;
             }
             result = CharacterItem.Empty;
@@ -53,7 +53,7 @@ namespace MultiplayerARPG.MMO
                 {
                     result.Add(tempInventory);
                 }
-            }, "SELECT * FROM storageitem WHERE storageType=@storageType AND storageOwnerId=@storageOwnerId ORDER BY idx ASC",
+            }, "SELECT dataId, level, amount, durability, exp, lockRemainsDuration, ammo, sockets FROM storageitem WHERE storageType=@storageType AND storageOwnerId=@storageOwnerId ORDER BY idx ASC",
                 new MySqlParameter("@storageType", (byte)storageType),
                 new MySqlParameter("@storageOwnerId", storageOwnerId));
             return result;

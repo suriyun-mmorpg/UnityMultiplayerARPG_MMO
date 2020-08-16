@@ -12,17 +12,17 @@ namespace MultiplayerARPG.MMO
             if (reader.Read())
             {
                 result = new BuildingSaveData();
-                result.Id = reader.GetString("id");
-                result.ParentId = reader.GetString("parentId");
-                result.EntityId = reader.GetInt32("entityId");
-                result.CurrentHp = reader.GetInt32("currentHp");
-                result.RemainsLifeTime = reader.GetFloat("remainsLifeTime");
-                result.IsLocked = reader.GetBoolean("isLocked");
-                result.LockPassword = reader.GetString("lockPassword");
-                result.CreatorId = reader.GetString("creatorId");
-                result.CreatorName = reader.GetString("creatorName");
-                result.Position = new Vector3(reader.GetFloat("positionX"), reader.GetFloat("positionY"), reader.GetFloat("positionZ"));
-                result.Rotation = Quaternion.Euler(reader.GetFloat("rotationX"), reader.GetFloat("rotationY"), reader.GetFloat("rotationZ"));
+                result.Id = reader.GetString(0);
+                result.ParentId = reader.GetString(1);
+                result.EntityId = reader.GetInt32(2);
+                result.CurrentHp = reader.GetInt32(3);
+                result.RemainsLifeTime = reader.GetFloat(4);
+                result.IsLocked = reader.GetBoolean(5);
+                result.LockPassword = reader.GetString(6);
+                result.CreatorId = reader.GetString(7);
+                result.CreatorName = reader.GetString(8);
+                result.Position = new Vector3(reader.GetFloat(9), reader.GetFloat(10), reader.GetFloat(11));
+                result.Rotation = Quaternion.Euler(reader.GetFloat(12), reader.GetFloat(13), reader.GetFloat(14));
                 return true;
             }
             result = new BuildingSaveData();
@@ -61,7 +61,7 @@ namespace MultiplayerARPG.MMO
                 {
                     result.Add(tempBuilding);
                 }
-            }, "SELECT * FROM buildings WHERE mapName=@mapName", new MySqlParameter("@mapName", mapName));
+            }, "SELECT id, parentId, entityId, currentHp, remainsLifeTime, isLocked, lockPassword, creatorId, creatorName, positionX, positionY, positionZ, rotationX, rotationY, rotationZ FROM buildings WHERE mapName=@mapName", new MySqlParameter("@mapName", mapName));
             return result;
         }
 

@@ -37,9 +37,9 @@ namespace MultiplayerARPG.MMO
             if (reader.Read())
             {
                 result = new CharacterQuest();
-                result.dataId = reader.GetInt32("dataId");
-                result.isComplete = reader.GetBoolean("isComplete");
-                result.killedMonsters = ReadKillMonsters(reader.GetString("killedMonsters"));
+                result.dataId = reader.GetInt32(0);
+                result.isComplete = reader.GetBoolean(1);
+                result.killedMonsters = ReadKillMonsters(reader.GetString(2));
                 return true;
             }
             result = CharacterQuest.Empty;
@@ -68,7 +68,7 @@ namespace MultiplayerARPG.MMO
                 {
                     result.Add(tempQuest);
                 }
-            }, "SELECT * FROM characterquest WHERE characterId=@characterId ORDER BY idx ASC",
+            }, "SELECT dataId, isComplete, killedMonsters FROM characterquest WHERE characterId=@characterId ORDER BY idx ASC",
                 new MySqlParameter("@characterId", characterId));
             return result;
         }

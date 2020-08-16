@@ -11,13 +11,13 @@ namespace MultiplayerARPG.MMO
             if (reader.Read())
             {
                 result = new CharacterSummon();
-                result.type = (SummonType)reader.GetSByte("type");
-                result.dataId = reader.GetInt32("dataId");
-                result.summonRemainsDuration = reader.GetFloat("summonRemainsDuration");
-                result.level = reader.GetInt16("level");
-                result.exp = reader.GetInt32("exp");
-                result.currentHp = reader.GetInt32("currentHp");
-                result.currentMp = reader.GetInt32("currentMp");
+                result.type = (SummonType)reader.GetByte(0);
+                result.dataId = reader.GetInt32(1);
+                result.summonRemainsDuration = reader.GetFloat(2);
+                result.level = reader.GetInt16(3);
+                result.exp = reader.GetInt32(4);
+                result.currentHp = reader.GetInt32(5);
+                result.currentMp = reader.GetInt32(6);
                 return true;
             }
             result = CharacterSummon.Empty;
@@ -49,7 +49,7 @@ namespace MultiplayerARPG.MMO
                 {
                     result.Add(tempSummon);
                 }
-            }, "SELECT * FROM charactersummon WHERE characterId=@characterId ORDER BY type DESC",
+            }, "SELECT type, dataId, summonRemainsDuration, level, exp, currentHp, currentMp FROM charactersummon WHERE characterId=@characterId ORDER BY type DESC",
                 new MySqlParameter("@characterId", characterId));
             return result;
         }
