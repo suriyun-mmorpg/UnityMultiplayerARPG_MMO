@@ -32,6 +32,12 @@
             The method name of the RPC being called.
             </summary>
         </member>
+        <member name="T:Grpc.Core.AsyncCallState">
+            <summary>
+            Provides an abstraction over the callback providers
+            used by AsyncUnaryCall, AsyncDuplexStreamingCall, etc
+            </summary>
+        </member>
         <member name="T:Grpc.Core.AsyncClientStreamingCall`2">
             <summary>
             Return type for client streaming calls.
@@ -49,6 +55,18 @@
             <param name="getStatusFunc">Delegate returning the status of the call.</param>
             <param name="getTrailersFunc">Delegate returning the trailing metadata of the call.</param>
             <param name="disposeAction">Delegate to invoke when Dispose is called on the call object.</param>
+        </member>
+        <member name="M:Grpc.Core.AsyncClientStreamingCall`2.#ctor(Grpc.Core.IClientStreamWriter{`0},System.Threading.Tasks.Task{`1},System.Func{System.Object,System.Threading.Tasks.Task{Grpc.Core.Metadata}},System.Func{System.Object,Grpc.Core.Status},System.Func{System.Object,Grpc.Core.Metadata},System.Action{System.Object},System.Object)">
+            <summary>
+            Creates a new AsyncClientStreamingCall object with the specified properties.
+            </summary>
+            <param name="requestStream">Stream of request values.</param>
+            <param name="responseAsync">The response of the asynchronous call.</param>
+            <param name="responseHeadersAsync">Response headers of the asynchronous call.</param>
+            <param name="getStatusFunc">Delegate returning the status of the call.</param>
+            <param name="getTrailersFunc">Delegate returning the trailing metadata of the call.</param>
+            <param name="disposeAction">Delegate to invoke when Dispose is called on the call object.</param>
+            <param name="state">State object for use with the callback parameters.</param>
         </member>
         <member name="P:Grpc.Core.AsyncClientStreamingCall`2.ResponseAsync">
             <summary>
@@ -113,6 +131,18 @@
             <param name="getTrailersFunc">Delegate returning the trailing metadata of the call.</param>
             <param name="disposeAction">Delegate to invoke when Dispose is called on the call object.</param>
         </member>
+        <member name="M:Grpc.Core.AsyncDuplexStreamingCall`2.#ctor(Grpc.Core.IClientStreamWriter{`0},Grpc.Core.IAsyncStreamReader{`1},System.Func{System.Object,System.Threading.Tasks.Task{Grpc.Core.Metadata}},System.Func{System.Object,Grpc.Core.Status},System.Func{System.Object,Grpc.Core.Metadata},System.Action{System.Object},System.Object)">
+            <summary>
+            Creates a new AsyncDuplexStreamingCall object with the specified properties.
+            </summary>
+            <param name="requestStream">Stream of request values.</param>
+            <param name="responseStream">Stream of response values.</param>
+            <param name="responseHeadersAsync">Response headers of the asynchronous call.</param>
+            <param name="getStatusFunc">Delegate returning the status of the call.</param>
+            <param name="getTrailersFunc">Delegate returning the trailing metadata of the call.</param>
+            <param name="disposeAction">Delegate to invoke when Dispose is called on the call object.</param>
+            <param name="state">State object for use with the callback parameters.</param>
+        </member>
         <member name="P:Grpc.Core.AsyncDuplexStreamingCall`2.ResponseStream">
             <summary>
             Async stream to read streaming responses.
@@ -167,6 +197,17 @@
             <param name="getStatusFunc">Delegate returning the status of the call.</param>
             <param name="getTrailersFunc">Delegate returning the trailing metadata of the call.</param>
             <param name="disposeAction">Delegate to invoke when Dispose is called on the call object.</param>
+        </member>
+        <member name="M:Grpc.Core.AsyncServerStreamingCall`1.#ctor(Grpc.Core.IAsyncStreamReader{`0},System.Func{System.Object,System.Threading.Tasks.Task{Grpc.Core.Metadata}},System.Func{System.Object,Grpc.Core.Status},System.Func{System.Object,Grpc.Core.Metadata},System.Action{System.Object},System.Object)">
+            <summary>
+            Creates a new AsyncDuplexStreamingCall object with the specified properties.
+            </summary>
+            <param name="responseStream">Stream of response values.</param>
+            <param name="responseHeadersAsync">Response headers of the asynchronous call.</param>
+            <param name="getStatusFunc">Delegate returning the status of the call.</param>
+            <param name="getTrailersFunc">Delegate returning the trailing metadata of the call.</param>
+            <param name="disposeAction">Delegate to invoke when Dispose is called on the call object.</param>
+            <param name="state">State object for use with the callback parameters.</param>
         </member>
         <member name="P:Grpc.Core.AsyncServerStreamingCall`1.ResponseStream">
             <summary>
@@ -233,6 +274,17 @@
             <param name="getStatusFunc">Delegate returning the status of the call.</param>
             <param name="getTrailersFunc">Delegate returning the trailing metadata of the call.</param>
             <param name="disposeAction">Delegate to invoke when Dispose is called on the call object.</param>
+        </member>
+        <member name="M:Grpc.Core.AsyncUnaryCall`1.#ctor(System.Threading.Tasks.Task{`0},System.Func{System.Object,System.Threading.Tasks.Task{Grpc.Core.Metadata}},System.Func{System.Object,Grpc.Core.Status},System.Func{System.Object,Grpc.Core.Metadata},System.Action{System.Object},System.Object)">
+            <summary>
+            Creates a new AsyncUnaryCall object with the specified properties.
+            </summary>
+            <param name="responseAsync">The response of the asynchronous call.</param>
+            <param name="responseHeadersAsync">Response headers of the asynchronous call.</param>
+            <param name="getStatusFunc">Delegate returning the status of the call.</param>
+            <param name="getTrailersFunc">Delegate returning the trailing metadata of the call.</param>
+            <param name="disposeAction">Delegate to invoke when Dispose is called on the call object.</param>
+            <param name="state">State object for use with the callback parameters.</param>
         </member>
         <member name="P:Grpc.Core.AsyncUnaryCall`1.ResponseAsync">
             <summary>
@@ -388,7 +440,7 @@
         </member>
         <member name="M:Grpc.Core.CallCredentials.Compose(Grpc.Core.CallCredentials[])">
             <summary>
-            Composes multiple multiple <c>CallCredentials</c> objects into
+            Composes multiple <c>CallCredentials</c> objects into
             a single <c>CallCredentials</c> object.
             </summary>
             <param name="credentials">credentials to compose</param>
@@ -537,7 +589,7 @@
         </member>
         <member name="P:Grpc.Core.CallOptions.IsWaitForReady">
             <summary>
-            If <c>true</c> and and channel is in <c>ChannelState.TransientFailure</c>, the call will attempt waiting for the channel to recover
+            If <c>true</c> and channel is in <c>ChannelState.TransientFailure</c>, the call will attempt waiting for the channel to recover
             instead of failing immediately (which is the default "FailFast" semantics).
             Note: experimental API that can change or be removed without any prior notice.
             </summary>
@@ -622,6 +674,23 @@
             Create a new <see cref="T:Grpc.Core.CallInvoker"/> for the channel.
             </summary>
             <returns>A new <see cref="T:Grpc.Core.CallInvoker"/>.</returns>
+        </member>
+        <member name="M:Grpc.Core.ChannelBase.ShutdownAsync">
+            <summary>
+            Shuts down the channel cleanly. It is strongly recommended to shutdown
+            the channel once you stopped using it.
+            </summary>
+            <remarks>
+            Guidance for implementors:
+            This method doesn't wait for all calls on this channel to finish (nor does
+            it have to explicitly cancel all outstanding calls). It is user's responsibility to make sure
+            all the calls on this channel have finished (successfully or with an error)
+            before shutting down the channel to ensure channel shutdown won't impact
+            the outcome of those remote calls.
+            </remarks>
+        </member>
+        <member name="M:Grpc.Core.ChannelBase.ShutdownAsyncCore">
+            <summary>Provides implementation of a non-virtual public member.</summary>
         </member>
         <member name="T:Grpc.Core.ChannelCredentials">
             <summary>
@@ -912,9 +981,9 @@
         </member>
         <member name="M:Grpc.Core.IAsyncStreamWriter`1.WriteAsync(`0)">
             <summary>
-            Writes a single asynchronously. Only one write can be pending at a time.
+            Writes a message asynchronously. Only one write can be pending at a time.
             </summary>
-            <param name="message">the message to be written. Cannot be null.</param>
+            <param name="message">The message to be written. Cannot be null.</param>
         </member>
         <member name="P:Grpc.Core.IAsyncStreamWriter`1.WriteOptions">
             <summary>
@@ -1573,6 +1642,41 @@
             </summary>
             <returns>this object</returns>
         </member>
+        <member name="M:Grpc.Core.Metadata.Get(System.String)">
+            <summary>
+            Gets the last metadata entry with the specified key.
+            If there are no matching entries then <c>null</c> is returned.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.Metadata.GetValue(System.String)">
+            <summary>
+            Gets the string value of the last metadata entry with the specified key.
+            If the metadata entry is binary then an exception is thrown.
+            If there are no matching entries then <c>null</c> is returned.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.Metadata.GetValueBytes(System.String)">
+            <summary>
+            Gets the bytes value of the last metadata entry with the specified key.
+            If the metadata entry is not binary the string value will be returned as ASCII encoded bytes.
+            If there are no matching entries then <c>null</c> is returned.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.Metadata.GetAll(System.String)">
+            <summary>
+            Gets all metadata entries with the specified key.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.Metadata.Add(System.String,System.String)">
+            <summary>
+            Adds a new ASCII-valued metadata entry. See <c>Metadata.Entry</c> constructor for params.
+            </summary>
+        </member>
+        <member name="M:Grpc.Core.Metadata.Add(System.String,System.Byte[])">
+            <summary>
+            Adds a new binary-valued metadata entry. See <c>Metadata.Entry</c> constructor for params.
+            </summary>
+        </member>
         <member name="M:Grpc.Core.Metadata.IndexOf(Grpc.Core.Metadata.Entry)">
             <summary>
             <see cref="T:IList`1"/>
@@ -1596,16 +1700,6 @@
         <member name="M:Grpc.Core.Metadata.Add(Grpc.Core.Metadata.Entry)">
             <summary>
             <see cref="T:IList`1"/>
-            </summary>
-        </member>
-        <member name="M:Grpc.Core.Metadata.Add(System.String,System.String)">
-            <summary>
-            Adds a new ASCII-valued metadata entry. See <c>Metadata.Entry</c> constructor for params.
-            </summary>
-        </member>
-        <member name="M:Grpc.Core.Metadata.Add(System.String,System.Byte[])">
-            <summary>
-            Adds a new binary-valued metadata entry. See <c>Metadata.Entry</c> constructor for params.
             </summary>
         </member>
         <member name="M:Grpc.Core.Metadata.Clear">
@@ -1670,11 +1764,13 @@
         <member name="P:Grpc.Core.Metadata.Entry.ValueBytes">
             <summary>
             Gets the binary value of this metadata entry.
+            If the metadata entry is not binary the string value will be returned as ASCII encoded bytes.
             </summary>
         </member>
         <member name="P:Grpc.Core.Metadata.Entry.Value">
             <summary>
             Gets the string value of this metadata entry.
+            If the metadata entry is binary then an exception is thrown.
             </summary>
         </member>
         <member name="P:Grpc.Core.Metadata.Entry.IsBinary">
@@ -2227,6 +2323,17 @@
             <param name="statusCode">Status code.</param>
             <param name="detail">Detail.</param>
         </member>
+        <member name="M:Grpc.Core.Status.#ctor(Grpc.Core.StatusCode,System.String,System.Exception)">
+            <summary>
+            Creates a new instance of <c>Status</c>.
+            Users should not use this constructor, except for creating instances for testing.
+            The debug error string should only be populated by gRPC internals.
+            Note: experimental API that can change or be removed without any prior notice.
+            </summary>
+            <param name="statusCode">Status code.</param>
+            <param name="detail">Detail.</param>
+            <param name="debugException">Optional internal error details.</param>
+        </member>
         <member name="P:Grpc.Core.Status.StatusCode">
             <summary>
             Gets the gRPC status code. OK indicates success, all other values indicate an error.
@@ -2235,6 +2342,18 @@
         <member name="P:Grpc.Core.Status.Detail">
             <summary>
             Gets the detail.
+            </summary>
+        </member>
+        <member name="P:Grpc.Core.Status.DebugException">
+            <summary>
+            In case of an error, this field may contain additional error details to help with debugging.
+            This field will be only populated on a client and its value is generated locally,
+            based on the internal state of the gRPC client stack (i.e. the value is never sent over the wire).
+            Note that this field is available only for debugging purposes, the application logic should
+            never rely on values of this field (it should use <c>StatusCode</c> and <c>Detail</c> instead).
+            Example: when a client fails to connect to a server, this field may provide additional details
+            why the connection to the server has failed.
+            Note: experimental API that can change or be removed without any prior notice.
             </summary>
         </member>
         <member name="M:Grpc.Core.Status.ToString">
@@ -2345,11 +2464,6 @@
         </member>
         <member name="F:Grpc.Core.StatusCode.DataLoss">
             <summary>Unrecoverable data loss or corruption.</summary>
-        </member>
-        <member name="M:Grpc.Core.Api.Utils.EncodingExtensions.GetString(System.Text.Encoding,System.Byte*,System.Int32)">
-            <summary>
-            Converts <c>byte*</c> pointing to an encoded byte array to a <c>string</c> using the provided <c>Encoding</c>.
-            </summary>
         </member>
         <member name="M:Grpc.Core.Api.Utils.EncodingExtensions.GetString(System.Text.Encoding,System.IntPtr,System.Int32)">
             <summary>
