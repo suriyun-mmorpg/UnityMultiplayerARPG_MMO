@@ -484,7 +484,7 @@ namespace MultiplayerARPG.MMO
 
         public override async Task DeleteCharacter(string userId, string id)
         {
-            object result = ExecuteScalar("SELECT COUNT(*) FROM characters WHERE id=@id AND userId=@userId",
+            object result = await ExecuteScalar("SELECT COUNT(*) FROM characters WHERE id=@id AND userId=@userId",
                 new MySqlParameter("@id", id),
                 new MySqlParameter("@userId", userId));
             long count = result != null ? (long)result : 0;
