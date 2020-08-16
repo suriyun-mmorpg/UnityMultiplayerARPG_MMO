@@ -7,17 +7,14 @@ namespace MultiplayerARPG.MMO
 {
     public partial class SQLiteDatabase
     {
-        private bool ReadCharacterHotkey(SQLiteRowsReader reader, out CharacterHotkey result, bool resetReader = true)
+        private bool ReadCharacterHotkey(SqliteDataReader reader, out CharacterHotkey result)
         {
-            if (resetReader)
-                reader.ResetReader();
-
             if (reader.Read())
             {
                 result = new CharacterHotkey();
-                result.hotkeyId = reader.GetString("hotkeyId");
-                result.type = (HotkeyType)reader.GetSByte("type");
-                result.relateId = reader.GetString("relateId");
+                result.hotkeyId = reader.GetString(0);
+                result.type = (HotkeyType)reader.GetByte(1);
+                result.relateId = reader.GetString(2);
                 return true;
             }
             result = CharacterHotkey.Empty;
@@ -37,13 +34,15 @@ namespace MultiplayerARPG.MMO
         public List<CharacterHotkey> ReadCharacterHotkeys(string characterId)
         {
             List<CharacterHotkey> result = new List<CharacterHotkey>();
-            SQLiteRowsReader reader = ExecuteReader("SELECT * FROM characterhotkey WHERE characterId=@characterId",
-                new SqliteParameter("@characterId", characterId));
-            CharacterHotkey tempHotkey;
-            while (ReadCharacterHotkey(reader, out tempHotkey, false))
+            ExecuteReader((reader) =>
             {
-                result.Add(tempHotkey);
-            }
+                CharacterHotkey tempHotkey;
+                while (ReadCharacterHotkey(reader, out tempHotkey))
+                {
+                    result.Add(tempHotkey);
+                }
+            }, "SELECT hotkeyId, type, relateId FROM characterhotkey WHERE characterId=@characterId",
+                new SqliteParameter("@characterId", characterId));
             return result;
         }
 

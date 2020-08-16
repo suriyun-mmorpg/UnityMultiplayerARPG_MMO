@@ -7,18 +7,15 @@ namespace MultiplayerARPG.MMO
 {
     public partial class SQLiteDatabase
     {
-        private bool ReadCharacterBuff(SQLiteRowsReader reader, out CharacterBuff result, bool resetReader = true)
+        private bool ReadCharacterBuff(SqliteDataReader reader, out CharacterBuff result)
         {
-            if (resetReader)
-                reader.ResetReader();
-
             if (reader.Read())
             {
                 result = new CharacterBuff();
-                result.type = (BuffType)reader.GetSByte("type");
-                result.dataId = reader.GetInt32("dataId");
-                result.level = reader.GetInt16("level");
-                result.buffRemainsDuration = reader.GetFloat("buffRemainsDuration");
+                result.type = (BuffType)reader.GetByte(0);
+                result.dataId = reader.GetInt32(1);
+                result.level = reader.GetInt16(2);
+                result.buffRemainsDuration = reader.GetFloat(3);
                 return true;
             }
             result = CharacterBuff.Empty;
@@ -39,13 +36,15 @@ namespace MultiplayerARPG.MMO
         public List<CharacterBuff> ReadCharacterBuffs(string characterId)
         {
             List<CharacterBuff> result = new List<CharacterBuff>();
-            SQLiteRowsReader reader = ExecuteReader("SELECT * FROM characterbuff WHERE characterId=@characterId ORDER BY buffRemainsDuration ASC",
-                new SqliteParameter("@characterId", characterId));
-            CharacterBuff tempBuff;
-            while (ReadCharacterBuff(reader, out tempBuff, false))
+            ExecuteReader((reader) =>
             {
-                result.Add(tempBuff);
-            }
+                CharacterBuff tempBuff;
+                while (ReadCharacterBuff(reader, out tempBuff))
+                {
+                    result.Add(tempBuff);
+                }
+            }, "SELECT type, dataId, level, buffRemainsDuration FROM characterbuff WHERE characterId=@characterId ORDER BY buffRemainsDuration ASC",
+                new SqliteParameter("@characterId", characterId));
             return result;
         }
 

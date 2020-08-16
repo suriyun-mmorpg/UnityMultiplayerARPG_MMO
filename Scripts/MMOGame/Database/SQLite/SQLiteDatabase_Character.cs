@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Mono.Data.Sqlite;
+using System.Threading.Tasks;
 
 namespace MultiplayerARPG.MMO
 {
@@ -63,8 +64,9 @@ namespace MultiplayerARPG.MMO
             }
         }
 
-        public override void CreateCharacter(string userId, IPlayerCharacterData characterData)
+        public override async Task CreateCharacter(string userId, IPlayerCharacterData characterData)
         {
+            await Task.Yield();
             BeginTransaction();
             ExecuteNonQuery("INSERT INTO characters " +
                 "(id, userId, dataId, entityId, factionId, characterName, level, exp, currentHp, currentMp, currentStamina, currentFood, currentWater, equipWeaponSet, statPoint, skillPoint, gold, currentMapName, currentPositionX, currentPositionY, currentPositionZ, respawnMapName, respawnPositionX, respawnPositionY, respawnPositionZ, mountDataId) VALUES " +
@@ -100,47 +102,50 @@ namespace MultiplayerARPG.MMO
             EndTransaction();
         }
 
-        private bool ReadCharacter(SQLiteRowsReader reader, out PlayerCharacterData result, bool resetReader = true)
+        private bool ReadCharacter(SqliteDataReader reader, out PlayerCharacterData result)
         {
-            if (resetReader)
-                reader.ResetReader();
-
             if (reader.Read())
             {
                 result = new PlayerCharacterData();
-                result.Id = reader.GetString("id");
-                result.DataId = reader.GetInt32("dataId");
-                result.EntityId = reader.GetInt32("entityId");
-                result.FactionId = reader.GetInt32("factionId");
-                result.CharacterName = reader.GetString("characterName");
-                result.Level = reader.GetInt16("level");
-                result.Exp = reader.GetInt32("exp");
-                result.CurrentHp = reader.GetInt32("currentHp");
-                result.CurrentMp = reader.GetInt32("currentMp");
-                result.CurrentStamina = reader.GetInt32("currentStamina");
-                result.CurrentFood = reader.GetInt32("currentFood");
-                result.CurrentWater = reader.GetInt32("currentWater");
-                result.EquipWeaponSet = reader.GetByte("equipWeaponSet");
-                result.StatPoint = reader.GetInt16("statPoint");
-                result.SkillPoint = reader.GetInt16("skillPoint");
-                result.Gold = reader.GetInt32("gold");
-                result.PartyId = reader.GetInt32("partyId");
-                result.GuildId = reader.GetInt32("guildId");
-                result.GuildRole = reader.GetByte("guildRole");
-                result.SharedGuildExp = reader.GetInt32("sharedGuildExp");
-                result.CurrentMapName = reader.GetString("currentMapName");
-                result.CurrentPosition = new Vector3(reader.GetFloat("currentPositionX"), reader.GetFloat("currentPositionY"), reader.GetFloat("currentPositionZ"));
-                result.RespawnMapName = reader.GetString("respawnMapName");
-                result.RespawnPosition = new Vector3(reader.GetFloat("respawnPositionX"), reader.GetFloat("respawnPositionY"), reader.GetFloat("respawnPositionZ"));
-                result.MountDataId = reader.GetInt32("mountDataId");
-                result.LastUpdate = (int)(reader.GetDateTime("updateAt").Ticks / System.TimeSpan.TicksPerMillisecond);
+                result.Id = reader.GetString(0);
+                result.DataId = reader.GetInt32(1);
+                result.EntityId = reader.GetInt32(2);
+                result.FactionId = reader.GetInt32(3);
+                result.CharacterName = reader.GetString(4);
+                result.Level = reader.GetInt16(5);
+                result.Exp = reader.GetInt32(6);
+                result.CurrentHp = reader.GetInt32(7);
+                result.CurrentMp = reader.GetInt32(8);
+                result.CurrentStamina = reader.GetInt32(9);
+                result.CurrentFood = reader.GetInt32(10);
+                result.CurrentWater = reader.GetInt32(11);
+                result.EquipWeaponSet = reader.GetByte(12);
+                result.StatPoint = reader.GetInt16(13);
+                result.SkillPoint = reader.GetInt16(14);
+                result.Gold = reader.GetInt32(15);
+                result.PartyId = reader.GetInt32(16);
+                result.GuildId = reader.GetInt32(17);
+                result.GuildRole = reader.GetByte(18);
+                result.SharedGuildExp = reader.GetInt32(19);
+                result.CurrentMapName = reader.GetString(20);
+                result.CurrentPosition = new Vector3(
+                    reader.GetFloat(21),
+                    reader.GetFloat(22),
+                    reader.GetFloat(23));
+                result.RespawnMapName = reader.GetString(24);
+                result.RespawnPosition = new Vector3(
+                    reader.GetFloat(25),
+                    reader.GetFloat(26),
+                    reader.GetFloat(27));
+                result.MountDataId = reader.GetInt32(28);
+                result.LastUpdate = (int)(reader.GetDateTime(29).Ticks / System.TimeSpan.TicksPerMillisecond);
                 return true;
             }
             result = null;
             return false;
         }
 
-        public override PlayerCharacterData ReadCharacter(
+        public override async Task<PlayerCharacterData> ReadCharacter(
             string id,
             bool withEquipWeapons = true,
             bool withAttributes = true,
@@ -153,10 +158,36 @@ namespace MultiplayerARPG.MMO
             bool withHotkeys = true,
             bool withQuests = true)
         {
-            SQLiteRowsReader reader = ExecuteReader("SELECT * FROM characters WHERE id=@id LIMIT 1",
+            await Task.Yield();
+            PlayerCharacterData result = null;
+            ExecuteReader((reader) =>
+            {
+                if (ReadCharacter(reader, out result))
+                {
+                    // Invoke dev extension methods
+                    this.InvokeInstanceDevExtMethods("ReadCharacter",
+                        result,
+                        withEquipWeapons,
+                        withAttributes,
+                        withSkills,
+                        withSkillUsages,
+                        withBuffs,
+                        withEquipItems,
+                        withNonEquipItems,
+                        withSummons,
+                        withHotkeys,
+                        withQuests);
+                }
+            }, "SELECT " +
+                "id, dataId, entityId, factionId, characterName, level, exp, " +
+                "currentHp, currentMp, currentStamina, currentFood, currentWater, " +
+                "equipWeaponSet, statPoint, skillPoint, gold, partyId, guildId, guildRole, sharedGuildExp, " +
+                "currentMapName, currentPositionX, currentPositionY, currentPositionZ," +
+                "respawnMapName, respawnPositionX, respawnPositionY, respawnPositionZ," +
+                "mountDataId, updateAt FROM characters WHERE id=@id LIMIT 1",
                 new SqliteParameter("@id", id));
-            PlayerCharacterData result = new PlayerCharacterData();
-            if (ReadCharacter(reader, out result))
+            // Found character, then read its relates data
+            if (result != null)
             {
                 if (withEquipWeapons)
                     result.SelectableWeaponSets = ReadCharacterEquipWeapons(id);
@@ -178,39 +209,31 @@ namespace MultiplayerARPG.MMO
                     result.Hotkeys = ReadCharacterHotkeys(id);
                 if (withQuests)
                     result.Quests = ReadCharacterQuests(id);
-                // Invoke dev extension methods
-                this.InvokeInstanceDevExtMethods("ReadCharacter",
-                    result,
-                    withEquipWeapons,
-                    withAttributes,
-                    withSkills,
-                    withSkillUsages,
-                    withBuffs,
-                    withEquipItems,
-                    withNonEquipItems,
-                    withSummons,
-                    withHotkeys,
-                    withQuests);
-                // Return result
-                return result;
-            }
-            return null;
-        }
-
-        public override List<PlayerCharacterData> ReadCharacters(string userId)
-        {
-            List<PlayerCharacterData> result = new List<PlayerCharacterData>();
-            SQLiteRowsReader reader = ExecuteReader("SELECT id FROM characters WHERE userId=@userId ORDER BY updateAt DESC", new SqliteParameter("@userId", userId));
-            while (reader.Read())
-            {
-                string characterId = reader.GetString("id");
-                result.Add(ReadCharacter(characterId, true, true, true, false, false, true, false, false, false, false));
             }
             return result;
         }
 
-        public override void UpdateCharacter(IPlayerCharacterData character)
+        public override async Task<List<PlayerCharacterData>> ReadCharacters(string userId)
         {
+            List<PlayerCharacterData> result = new List<PlayerCharacterData>();
+            List<string> characterIds = new List<string>();
+            ExecuteReader((reader) =>
+            {
+                while (reader.Read())
+                {
+                    characterIds.Add(reader.GetString(0));
+                }
+            }, "SELECT id FROM characters WHERE userId=@userId ORDER BY updateAt DESC", new SqliteParameter("@userId", userId));
+            foreach (string characterId in characterIds)
+            {
+                result.Add(await ReadCharacter(characterId, true, true, true, false, false, true, false, false, false, false));
+            }
+            return result;
+        }
+
+        public override async Task UpdateCharacter(IPlayerCharacterData character)
+        {
+            await Task.Yield();
             BeginTransaction();
             ExecuteNonQuery("UPDATE characters SET " +
                 "dataId=@dataId, " +
@@ -268,8 +291,9 @@ namespace MultiplayerARPG.MMO
             EndTransaction();
         }
 
-        public override void DeleteCharacter(string userId, string id)
+        public override async Task DeleteCharacter(string userId, string id)
         {
+            await Task.Yield();
             object result = ExecuteScalar("SELECT COUNT(*) FROM characters WHERE id=@id AND userId=@userId",
                 new SqliteParameter("@id", id),
                 new SqliteParameter("@userId", userId));
@@ -291,35 +315,39 @@ namespace MultiplayerARPG.MMO
             }
         }
 
-        public override long FindCharacterName(string characterName)
+        public override async Task<long> FindCharacterName(string characterName)
         {
+            await Task.Yield();
             object result = ExecuteScalar("SELECT COUNT(*) FROM characters WHERE characterName LIKE @characterName",
                 new SqliteParameter("@characterName", characterName));
             return result != null ? (long)result : 0;
         }
 
-        public override List<SocialCharacterData> FindCharacters(string characterName)
+        public override async Task<List<SocialCharacterData>> FindCharacters(string characterName)
         {
+            await Task.Yield();
             List<SocialCharacterData> result = new List<SocialCharacterData>();
-            SQLiteRowsReader reader = ExecuteReader("SELECT id, dataId, characterName, level FROM characters WHERE characterName LIKE @characterName LIMIT 0, 20",
-                new SqliteParameter("@characterName", "%" + characterName + "%"));
-            SocialCharacterData socialCharacterData;
-            while (reader.Read())
+            ExecuteReader((reader) =>
             {
-                // Get some required data, other data will be set at server side
-                socialCharacterData = new SocialCharacterData();
-                socialCharacterData.id = reader.GetString("id");
-                socialCharacterData.characterName = reader.GetString("characterName");
-                socialCharacterData.dataId = reader.GetInt32("dataId");
-                socialCharacterData.level = reader.GetInt16("level");
-                result.Add(socialCharacterData);
-            }
+                SocialCharacterData socialCharacterData;
+                while (reader.Read())
+                {
+                    // Get some required data, other data will be set at server side
+                    socialCharacterData = new SocialCharacterData();
+                    socialCharacterData.id = reader.GetString(0);
+                    socialCharacterData.dataId = reader.GetInt32(1);
+                    socialCharacterData.characterName = reader.GetString(2);
+                    socialCharacterData.level = reader.GetInt16(3);
+                    result.Add(socialCharacterData);
+                }
+            }, "SELECT id, dataId, characterName, level FROM characters WHERE characterName LIKE @characterName LIMIT 0, 20",
+                new SqliteParameter("@characterName", "%" + characterName + "%"));
             return result;
         }
 
-        public override void CreateFriend(string id1, string id2)
+        public override async Task CreateFriend(string id1, string id2)
         {
-            DeleteFriend(id1, id2);
+            await DeleteFriend(id1, id2);
             ExecuteNonQuery("INSERT INTO friend " +
                 "(characterId1, characterId2) VALUES " +
                 "(@characterId1, @characterId2)",
@@ -327,8 +355,9 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@characterId2", id2));
         }
 
-        public override void DeleteFriend(string id1, string id2)
+        public override async Task DeleteFriend(string id1, string id2)
         {
+            await Task.Yield();
             ExecuteNonQuery("DELETE FROM friend WHERE " +
                 "characterId1 LIKE @characterId1 AND " +
                 "characterId2 LIKE @characterId2",
@@ -336,30 +365,36 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@characterId2", id2));
         }
 
-        public override List<SocialCharacterData> ReadFriends(string id1)
+        public override async Task<List<SocialCharacterData>> ReadFriends(string id1)
         {
+            await Task.Yield();
             List<SocialCharacterData> result = new List<SocialCharacterData>();
-
-            SQLiteRowsReader reader = ExecuteReader("SELECT characterId2 FROM friend WHERE characterId1=@id1",
-                new SqliteParameter("@id1", id1));
-            string characterId;
-            SocialCharacterData socialCharacterData;
-            SQLiteRowsReader reader2;
-            while (reader.Read())
+            List<string> characterIds = new List<string>();
+            ExecuteReader((reader) =>
             {
-                characterId = reader.GetString("characterId2");
-                reader2 = ExecuteReader("SELECT id, dataId, characterName, level FROM characters WHERE id LIKE @id",
-                    new SqliteParameter("@id", characterId));
-                while (reader2.Read())
+                while (reader.Read())
                 {
-                    // Get some required data, other data will be set at server side
-                    socialCharacterData = new SocialCharacterData();
-                    socialCharacterData.id = reader2.GetString("id");
-                    socialCharacterData.characterName = reader2.GetString("characterName");
-                    socialCharacterData.dataId = reader2.GetInt32("dataId");
-                    socialCharacterData.level = reader2.GetInt16("level");
-                    result.Add(socialCharacterData);
+                    characterIds.Add(reader.GetString(0));
                 }
+            }, "SELECT characterId2 FROM friend WHERE characterId1=@id1",
+                new SqliteParameter("@id1", id1));
+            SocialCharacterData socialCharacterData;
+            foreach (string characterId in characterIds)
+            {
+                ExecuteReader((reader) =>
+                {
+                    while (reader.Read())
+                    {
+                        // Get some required data, other data will be set at server side
+                        socialCharacterData = new SocialCharacterData();
+                        socialCharacterData.id = reader.GetString(0);
+                        socialCharacterData.dataId = reader.GetInt32(1);
+                        socialCharacterData.characterName = reader.GetString(2);
+                        socialCharacterData.level = reader.GetInt16(3);
+                        result.Add(socialCharacterData);
+                    }
+                }, "SELECT id, dataId, characterName, level FROM characters WHERE id LIKE @id",
+                    new SqliteParameter("@id", characterId));
             }
             return result;
         }

@@ -33,17 +33,14 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        private bool ReadCharacterQuest(SQLiteRowsReader reader, out CharacterQuest result, bool resetReader = true)
+        private bool ReadCharacterQuest(SqliteDataReader reader, out CharacterQuest result)
         {
-            if (resetReader)
-                reader.ResetReader();
-
             if (reader.Read())
             {
                 result = new CharacterQuest();
-                result.dataId = reader.GetInt32("dataId");
-                result.isComplete = reader.GetBoolean("isComplete");
-                result.killedMonsters = ReadKillMonsters(reader.GetString("killedMonsters"));
+                result.dataId = reader.GetInt32(0);
+                result.isComplete = reader.GetBoolean(1);
+                result.killedMonsters = ReadKillMonsters(reader.GetString(2));
                 return true;
             }
             result = CharacterQuest.Empty;
@@ -64,13 +61,15 @@ namespace MultiplayerARPG.MMO
         public List<CharacterQuest> ReadCharacterQuests(string characterId)
         {
             List<CharacterQuest> result = new List<CharacterQuest>();
-            SQLiteRowsReader reader = ExecuteReader("SELECT * FROM characterquest WHERE characterId=@characterId ORDER BY idx ASC",
-                new SqliteParameter("@characterId", characterId));
-            CharacterQuest tempQuest;
-            while (ReadCharacterQuest(reader, out tempQuest, false))
+            ExecuteReader((reader) =>
             {
-                result.Add(tempQuest);
-            }
+                CharacterQuest tempQuest;
+                while (ReadCharacterQuest(reader, out tempQuest))
+                {
+                    result.Add(tempQuest);
+                }
+            }, "SELECT dataId, isComplete, killedMonsters FROM characterquest WHERE characterId=@characterId ORDER BY idx ASC",
+                new SqliteParameter("@characterId", characterId));
             return result;
         }
 

@@ -1,6 +1,7 @@
 ﻿using Mono.Data.Sqlite;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace MultiplayerARPG.MMO
@@ -24,44 +25,45 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@sockets", WriteSockets(characterItem.sockets)));
         }
 
-        private bool ReadStorageItem(SQLiteRowsReader reader, out CharacterItem result, bool resetReader = true)
+        private bool ReadStorageItem(SqliteDataReader reader, out CharacterItem result)
         {
-            if (resetReader)
-                reader.ResetReader();
-
             if (reader.Read())
             {
                 result = new CharacterItem();
-                result.dataId = reader.GetInt32("dataId");
-                result.level = reader.GetInt16("level");
-                result.amount = reader.GetInt16("amount");
-                result.durability = reader.GetFloat("durability");
-                result.exp = reader.GetInt32("exp");
-                result.lockRemainsDuration = reader.GetFloat("lockRemainsDuration");
-                result.ammo = reader.GetInt16("ammo");
-                result.sockets = ReadSockets(reader.GetString("sockets"));
+                result.dataId = reader.GetInt32(0);
+                result.level = reader.GetInt16(1);
+                result.amount = reader.GetInt16(2);
+                result.durability = reader.GetFloat(3);
+                result.exp = reader.GetInt32(4);
+                result.lockRemainsDuration = reader.GetFloat(5);
+                result.ammo = reader.GetInt16(6);
+                result.sockets = ReadSockets(reader.GetString(7));
                 return true;
             }
             result = CharacterItem.Empty;
             return false;
         }
 
-        public override List<CharacterItem> ReadStorageItems(StorageType storageType, string storageOwnerId)
+        public override async Task<List<CharacterItem>> ReadStorageItems(StorageType storageType, string storageOwnerId)
         {
+            await Task.Yield();
             List<CharacterItem> result = new List<CharacterItem>();
-            SQLiteRowsReader reader = ExecuteReader("SELECT * FROM storageitem WHERE storageType=@storageType AND storageOwnerId=@storageOwnerId ORDER BY idx ASC",
+            ExecuteReader((reader) =>
+            {
+                CharacterItem tempInventory;
+                while (ReadStorageItem(reader, out tempInventory))
+                {
+                    result.Add(tempInventory);
+                }
+            }, "SELECT dataId, level, amount, durability, exp, lockRemainsDuration, ammo, sockets FROM storageitem WHERE storageType=@storageType AND storageOwnerId=@storageOwnerId ORDER BY idx ASC",
                 new SqliteParameter("@storageType", (byte)storageType),
                 new SqliteParameter("@storageOwnerId", storageOwnerId));
-            CharacterItem tempInventory;
-            while (ReadStorageItem(reader, out tempInventory, false))
-            {
-                result.Add(tempInventory);
-            }
             return result;
         }
 
-        public override void UpdateStorageItems(StorageType storageType, string storageOwnerId, IList<CharacterItem> characterItems)
+        public override async Task UpdateStorageItems(StorageType storageType, string storageOwnerId, IList<CharacterItem> characterItems)
         {
+            await Task.Yield();
             BeginTransaction();
             DeleteStorageItems(storageType, storageOwnerId);
             for (int i = 0; i < characterItems.Count; ++i)

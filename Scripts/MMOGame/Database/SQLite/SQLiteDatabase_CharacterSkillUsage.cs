@@ -6,17 +6,14 @@ namespace MultiplayerARPG.MMO
 {
     public partial class SQLiteDatabase
     {
-        private bool ReadCharacterSkillUsage(SQLiteRowsReader reader, out CharacterSkillUsage result, bool resetReader = true)
+        private bool ReadCharacterSkillUsage(SqliteDataReader reader, out CharacterSkillUsage result)
         {
-            if (resetReader)
-                reader.ResetReader();
-
             if (reader.Read())
             {
                 result = new CharacterSkillUsage();
-                result.type = (SkillUsageType)reader.GetSByte("type");
-                result.dataId = reader.GetInt32("dataId");
-                result.coolDownRemainsDuration = reader.GetFloat("coolDownRemainsDuration");
+                result.type = (SkillUsageType)reader.GetByte(0);
+                result.dataId = reader.GetInt32(1);
+                result.coolDownRemainsDuration = reader.GetFloat(2);
                 return true;
             }
             result = CharacterSkillUsage.Empty;
@@ -36,13 +33,15 @@ namespace MultiplayerARPG.MMO
         public List<CharacterSkillUsage> ReadCharacterSkillUsages(string characterId)
         {
             List<CharacterSkillUsage> result = new List<CharacterSkillUsage>();
-            SQLiteRowsReader reader = ExecuteReader("SELECT * FROM characterskillusage WHERE characterId=@characterId ORDER BY coolDownRemainsDuration ASC",
-                new SqliteParameter("@characterId", characterId));
-            CharacterSkillUsage tempSkillUsage;
-            while (ReadCharacterSkillUsage(reader, out tempSkillUsage, false))
+            ExecuteReader((reader) =>
             {
-                result.Add(tempSkillUsage);
-            }
+                CharacterSkillUsage tempSkillUsage;
+                while (ReadCharacterSkillUsage(reader, out tempSkillUsage))
+                {
+                    result.Add(tempSkillUsage);
+                }
+            }, "SELECT type, dataId, coolDownRemainsDuration FROM characterskillusage WHERE characterId=@characterId ORDER BY coolDownRemainsDuration ASC",
+                new SqliteParameter("@characterId", characterId));
             return result;
         }
 

@@ -1,20 +1,24 @@
 ﻿using Mono.Data.Sqlite;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace MultiplayerARPG.MMO
 {
     public partial class SQLiteDatabase
     {
-        public override int CreateGuild(string guildName, string leaderId)
+        public override async Task<int> CreateGuild(string guildName, string leaderId)
         {
+            await Task.Yield();
             int id = 0;
-            SQLiteRowsReader reader = ExecuteReader("INSERT INTO guild (guildName, leaderId) VALUES (@guildName, @leaderId);" +
+            ExecuteReader((reader) =>
+            {
+                if (reader.Read())
+                    id = (int)reader.GetInt64(0);
+            }, "INSERT INTO guild (guildName, leaderId) VALUES (@guildName, @leaderId);" +
                 "SELECT LAST_INSERT_ROWID();",
                 new SqliteParameter("@guildName", guildName),
                 new SqliteParameter("@leaderId", leaderId));
-            if (reader.Read())
-                id = (int)reader.GetInt64(0);
             if (id > 0)
                 ExecuteNonQuery("UPDATE characters SET guildId=@id WHERE id=@leaderId",
                     new SqliteParameter("@id", id),
@@ -22,61 +26,77 @@ namespace MultiplayerARPG.MMO
             return id;
         }
 
-        public override GuildData ReadGuild(int id, GuildRoleData[] defaultGuildRoles)
+        public override async Task<GuildData> ReadGuild(int id, GuildRoleData[] defaultGuildRoles)
         {
+            await Task.Yield();
             GuildData result = null;
-            SQLiteRowsReader reader = ExecuteReader("SELECT * FROM guild WHERE id=@id LIMIT 1",
-                new SqliteParameter("@id", id));
-            if (reader.Read())
+            ExecuteReader((reader) =>
             {
-                result = new GuildData(id, reader.GetString("guildName"), reader.GetString("leaderId"), defaultGuildRoles);
-                result.level = reader.GetInt16("level");
-                result.exp = reader.GetInt32("exp");
-                result.skillPoint = reader.GetInt16("skillPoint");
-                result.guildMessage = reader.GetString("guildMessage");
-                result.gold = reader.GetInt32("gold");
-
-                reader = ExecuteReader("SELECT * FROM guildrole WHERE guildId=@id",
-                    new SqliteParameter("@id", id));
-                byte guildRole;
-                GuildRoleData guildRoleData;
-                while (reader.Read())
+                if (reader.Read())
                 {
-                    guildRole = reader.GetByte("guildRole");
-                    guildRoleData = new GuildRoleData();
-                    guildRoleData.roleName = reader.GetString("name");
-                    guildRoleData.canInvite = reader.GetBoolean("canInvite");
-                    guildRoleData.canKick = reader.GetBoolean("canKick");
-                    guildRoleData.shareExpPercentage = reader.GetByte("shareExpPercentage");
-                    result.SetRole(guildRole, guildRoleData);
+                    result = new GuildData(id,
+                        reader.GetString(0),
+                        reader.GetString(1),
+                        defaultGuildRoles);
+                    result.level = reader.GetInt16(2);
+                    result.exp = reader.GetInt32(3);
+                    result.skillPoint = reader.GetInt16(4);
+                    result.guildMessage = reader.GetString(5);
+                    result.gold = reader.GetInt32(6);
                 }
-
-                reader = ExecuteReader("SELECT id, dataId, characterName, level, guildRole FROM characters WHERE guildId=@id",
-                    new SqliteParameter("@id", id));
-                SocialCharacterData guildMemberData;
-                while (reader.Read())
+            }, "SELECT guildName, leaderId, level, exp, skillPoint, guildMessage, gold FROM guild WHERE id=@id LIMIT 1",
+                new SqliteParameter("@id", id));
+            if (result != null)
+            {
+                // Guild roles
+                ExecuteReader((reader) =>
                 {
-                    // Get some required data, other data will be set at server side
-                    guildMemberData = new SocialCharacterData();
-                    guildMemberData.id = reader.GetString("id");
-                    guildMemberData.characterName = reader.GetString("characterName");
-                    guildMemberData.dataId = reader.GetInt32("dataId");
-                    guildMemberData.level = reader.GetInt16("level");
-                    result.AddMember(guildMemberData, reader.GetByte("guildRole"));
-                }
-
-                reader = ExecuteReader("SELECT dataId, level FROM guildskill WHERE guildId=@id",
+                    byte guildRole;
+                    GuildRoleData guildRoleData;
+                    while (reader.Read())
+                    {
+                        guildRole = reader.GetByte(0);
+                        guildRoleData = new GuildRoleData();
+                        guildRoleData.roleName = reader.GetString(1);
+                        guildRoleData.canInvite = reader.GetBoolean(2);
+                        guildRoleData.canKick = reader.GetBoolean(3);
+                        guildRoleData.shareExpPercentage = reader.GetByte(4);
+                        result.SetRole(guildRole, guildRoleData);
+                    }
+                }, "SELECT guildRole, name, canInvite, canKick, shareExpPercentage FROM guildrole WHERE guildId=@id",
                     new SqliteParameter("@id", id));
-                while (reader.Read())
+                // Guild members
+                ExecuteReader((reader) =>
                 {
-                    result.SetSkillLevel(reader.GetInt32("dataId"), reader.GetInt16("level"));
-                }
+                    SocialCharacterData guildMemberData;
+                    while (reader.Read())
+                    {
+                        // Get some required data, other data will be set at server side
+                        guildMemberData = new SocialCharacterData();
+                        guildMemberData.id = reader.GetString(0);
+                        guildMemberData.dataId = reader.GetInt32(1);
+                        guildMemberData.characterName = reader.GetString(2);
+                        guildMemberData.level = reader.GetInt16(3);
+                        result.AddMember(guildMemberData, reader.GetByte(4));
+                    }
+                }, "SELECT id, dataId, characterName, level, guildRole FROM characters WHERE guildId=@id",
+                    new SqliteParameter("@id", id));
+                // Guild skills
+                ExecuteReader((reader) =>
+                {
+                    while (reader.Read())
+                    {
+                        result.SetSkillLevel(reader.GetInt32(0), reader.GetInt16(1));
+                    }
+                }, "SELECT dataId, level FROM guildskill WHERE guildId=@id",
+                    new SqliteParameter("@id", id));
             }
             return result;
         }
 
-        public override void UpdateGuildLevel(int id, short level, int exp, short skillPoint)
+        public override async Task UpdateGuildLevel(int id, short level, int exp, short skillPoint)
         {
+            await Task.Yield();
             ExecuteNonQuery("UPDATE guild SET level=@level, exp=@exp, skillPoint=@skillPoint WHERE id=@id",
                 new SqliteParameter("@level", level),
                 new SqliteParameter("@exp", exp),
@@ -84,22 +104,25 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@id", id));
         }
 
-        public override void UpdateGuildLeader(int id, string leaderId)
+        public override async Task UpdateGuildLeader(int id, string leaderId)
         {
+            await Task.Yield();
             ExecuteNonQuery("UPDATE guild SET leaderId=@leaderId WHERE id=@id",
                 new SqliteParameter("@leaderId", leaderId),
                 new SqliteParameter("@id", id));
         }
 
-        public override void UpdateGuildMessage(int id, string guildMessage)
+        public override async Task UpdateGuildMessage(int id, string guildMessage)
         {
+            await Task.Yield();
             ExecuteNonQuery("UPDATE guild SET guildMessage=@guildMessage WHERE id=@id",
                 new SqliteParameter("@guildMessage", guildMessage),
                 new SqliteParameter("@id", id));
         }
 
-        public override void UpdateGuildRole(int id, byte guildRole, string name, bool canInvite, bool canKick, byte shareExpPercentage)
+        public override async Task UpdateGuildRole(int id, byte guildRole, string name, bool canInvite, bool canKick, byte shareExpPercentage)
         {
+            await Task.Yield();
             ExecuteNonQuery("DELETE FROM guildrole WHERE guildId=@guildId AND guildRole=@guildRole",
                 new SqliteParameter("@guildId", id),
                 new SqliteParameter("@guildRole", guildRole));
@@ -113,15 +136,17 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@shareExpPercentage", shareExpPercentage));
         }
 
-        public override void UpdateGuildMemberRole(string characterId, byte guildRole)
+        public override async Task UpdateGuildMemberRole(string characterId, byte guildRole)
         {
+            await Task.Yield();
             ExecuteNonQuery("UPDATE characters SET guildRole=@guildRole WHERE id=@characterId",
                 new SqliteParameter("@characterId", characterId),
                 new SqliteParameter("@guildRole", guildRole));
         }
 
-        public override void UpdateGuildSkillLevel(int id, int dataId, short level, short skillPoint)
+        public override async Task UpdateGuildSkillLevel(int id, int dataId, short level, short skillPoint)
         {
+            await Task.Yield();
             ExecuteNonQuery("DELETE FROM guildskill WHERE guildId=@guildId AND dataId=@dataId",
                 new SqliteParameter("@guildId", id),
                 new SqliteParameter("@dataId", dataId));
@@ -135,40 +160,47 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@id", id));
         }
 
-        public override void DeleteGuild(int id)
+        public override async Task DeleteGuild(int id)
         {
+            await Task.Yield();
             ExecuteNonQuery("DELETE FROM guild WHERE id=@id;" +
                 "UPDATE characters SET guildId=0 WHERE guildId=@id;",
                 new SqliteParameter("@id", id));
         }
 
-        public override long FindGuildName(string guildName)
+        public override async Task<long> FindGuildName(string guildName)
         {
+            await Task.Yield();
             object result = ExecuteScalar("SELECT COUNT(*) FROM guild WHERE guildName LIKE @guildName",
                 new SqliteParameter("@guildName", guildName));
             return result != null ? (long)result : 0;
         }
 
-        public override void UpdateCharacterGuild(string characterId, int guildId, byte guildRole)
+        public override async Task UpdateCharacterGuild(string characterId, int guildId, byte guildRole)
         {
+            await Task.Yield();
             ExecuteNonQuery("UPDATE characters SET guildId=@guildId, guildRole=@guildRole WHERE id=@characterId",
                 new SqliteParameter("@characterId", characterId),
                 new SqliteParameter("@guildId", guildId),
                 new SqliteParameter("@guildRole", guildRole));
         }
 
-        public override int GetGuildGold(int guildId)
+        public override async Task<int> GetGuildGold(int guildId)
         {
+            await Task.Yield();
             int gold = 0;
-            SQLiteRowsReader reader = ExecuteReader("SELECT gold FROM guild WHERE id=@id LIMIT 1",
+            ExecuteReader((reader) =>
+            {
+                if (reader.Read())
+                    gold = reader.GetInt32(0);
+            }, "SELECT gold FROM guild WHERE id=@id LIMIT 1",
                 new SqliteParameter("@id", guildId));
-            if (reader.Read())
-                gold = reader.GetInt32("gold");
             return gold;
         }
 
-        public override void UpdateGuildGold(int guildId, int gold)
+        public override async Task UpdateGuildGold(int guildId, int gold)
         {
+            await Task.Yield();
             ExecuteNonQuery("UPDATE guild SET gold=@gold WHERE id=@id",
                 new SqliteParameter("@id", guildId),
                 new SqliteParameter("@gold", gold));

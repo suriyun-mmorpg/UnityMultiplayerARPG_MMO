@@ -7,16 +7,13 @@ namespace MultiplayerARPG.MMO
 {
     public partial class SQLiteDatabase
     {
-        private bool ReadCharacterAttribute(SQLiteRowsReader reader, out CharacterAttribute result, bool resetReader = true)
+        private bool ReadCharacterAttribute(SqliteDataReader reader, out CharacterAttribute result)
         {
-            if (resetReader)
-                reader.ResetReader();
-
             if (reader.Read())
             {
                 result = new CharacterAttribute();
-                result.dataId = reader.GetInt32("dataId");
-                result.amount = reader.GetInt16("amount");
+                result.dataId = reader.GetInt32(0);
+                result.amount = reader.GetInt16(1);
                 return true;
             }
             result = CharacterAttribute.Empty;
@@ -36,13 +33,15 @@ namespace MultiplayerARPG.MMO
         public List<CharacterAttribute> ReadCharacterAttributes(string characterId)
         {
             List<CharacterAttribute> result = new List<CharacterAttribute>();
-            SQLiteRowsReader reader = ExecuteReader("SELECT * FROM characterattribute WHERE characterId=@characterId ORDER BY idx ASC",
-                new SqliteParameter("@characterId", characterId));
-            CharacterAttribute tempAttribute;
-            while (ReadCharacterAttribute(reader, out tempAttribute, false))
+            ExecuteReader((reader) =>
             {
-                result.Add(tempAttribute);
-            }
+                CharacterAttribute tempAttribute;
+                while (ReadCharacterAttribute(reader, out tempAttribute))
+                {
+                    result.Add(tempAttribute);
+                }
+            }, "SELECT dataId, amount FROM characterattribute WHERE characterId=@characterId ORDER BY idx ASC",
+                new SqliteParameter("@characterId", characterId));
             return result;
         }
 

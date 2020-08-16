@@ -2,38 +2,37 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Mono.Data.Sqlite;
+using System.Threading.Tasks;
 
 namespace MultiplayerARPG.MMO
 {
     public partial class SQLiteDatabase
     {
-        private bool ReadBuilding(SQLiteRowsReader reader, out BuildingSaveData result, bool resetReader = true)
+        private bool ReadBuilding(SqliteDataReader reader, out BuildingSaveData result)
         {
-            if (resetReader)
-                reader.ResetReader();
-
             if (reader.Read())
             {
                 result = new BuildingSaveData();
-                result.Id = reader.GetString("id");
-                result.ParentId = reader.GetString("parentId");
-                result.EntityId = reader.GetInt32("entityId");
-                result.CurrentHp = reader.GetInt32("currentHp");
-                result.RemainsLifeTime = reader.GetFloat("remainsLifeTime");
-                result.IsLocked = reader.GetBoolean("isLocked");
-                result.LockPassword = reader.GetString("lockPassword");
-                result.CreatorId = reader.GetString("creatorId");
-                result.CreatorName = reader.GetString("creatorName");
-                result.Position = new Vector3(reader.GetFloat("positionX"), reader.GetFloat("positionY"), reader.GetFloat("positionZ"));
-                result.Rotation = Quaternion.Euler(reader.GetFloat("rotationX"), reader.GetFloat("rotationY"), reader.GetFloat("rotationZ"));
+                result.Id = reader.GetString(0);
+                result.ParentId = reader.GetString(1);
+                result.EntityId = reader.GetInt32(2);
+                result.CurrentHp = reader.GetInt32(3);
+                result.RemainsLifeTime = reader.GetFloat(4);
+                result.IsLocked = reader.GetBoolean(5);
+                result.LockPassword = reader.GetString(6);
+                result.CreatorId = reader.GetString(7);
+                result.CreatorName = reader.GetString(8);
+                result.Position = new Vector3(reader.GetFloat(9), reader.GetFloat(10), reader.GetFloat(11));
+                result.Rotation = Quaternion.Euler(reader.GetFloat(12), reader.GetFloat(13), reader.GetFloat(14));
                 return true;
             }
             result = new BuildingSaveData();
             return false;
         }
 
-        public override void CreateBuilding(string mapName, IBuildingSaveData saveData)
+        public override async Task CreateBuilding(string mapName, IBuildingSaveData saveData)
         {
+            await Task.Yield();
             ExecuteNonQuery("INSERT INTO buildings (id, parentId, entityId, currentHp, remainsLifeTime, mapName, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, creatorId, creatorName) VALUES (@id, @parentId, @entityId, @currentHp, @remainsLifeTime, @mapName, @positionX, @positionY, @positionZ, @rotationX, @rotationY, @rotationZ, @creatorId, @creatorName)",
                 new SqliteParameter("@id", saveData.Id),
                 new SqliteParameter("@parentId", saveData.ParentId),
@@ -51,20 +50,24 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@creatorName", saveData.CreatorName));
         }
 
-        public override List<BuildingSaveData> ReadBuildings(string mapName)
+        public override async Task<List<BuildingSaveData>> ReadBuildings(string mapName)
         {
+            await Task.Yield();
             List<BuildingSaveData> result = new List<BuildingSaveData>();
-            SQLiteRowsReader reader = ExecuteReader("SELECT * FROM buildings WHERE mapName=@mapName", new SqliteParameter("@mapName", mapName));
-            BuildingSaveData tempBuilding;
-            while (ReadBuilding(reader, out tempBuilding, false))
+            ExecuteReader((reader) =>
             {
-                result.Add(tempBuilding);
-            }
+                BuildingSaveData tempBuilding;
+                while (ReadBuilding(reader, out tempBuilding))
+                {
+                    result.Add(tempBuilding);
+                }
+            }, "SELECT id, parentId, entityId, currentHp, remainsLifeTime, isLocked, lockPassword, creatorId, creatorName, positionX, positionY, positionZ, rotationX, rotationY, rotationZ FROM buildings WHERE mapName=@mapName", new SqliteParameter("@mapName", mapName));
             return result;
         }
 
-        public override void UpdateBuilding(string mapName, IBuildingSaveData building)
+        public override async Task UpdateBuilding(string mapName, IBuildingSaveData building)
         {
+            await Task.Yield();
             ExecuteNonQuery("UPDATE buildings SET " +
                 "parentId=@parentId, " +
                 "entityId=@entityId, " +
@@ -99,8 +102,9 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@mapName", mapName));
         }
 
-        public override void DeleteBuilding(string mapName, string id)
+        public override async Task DeleteBuilding(string mapName, string id)
         {
+            await Task.Yield();
             ExecuteNonQuery("DELETE FROM buildings WHERE id=@id AND mapName=@mapName", new SqliteParameter("@id", id), new SqliteParameter("@mapName", mapName));
         }
     }

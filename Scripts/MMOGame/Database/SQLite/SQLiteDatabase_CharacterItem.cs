@@ -49,24 +49,21 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@sockets", WriteSockets(characterItem.sockets)));
         }
 
-        private bool ReadCharacterItem(SQLiteRowsReader reader, out CharacterItem result, bool resetReader = true)
+        private bool ReadCharacterItem(SqliteDataReader reader, out CharacterItem result)
         {
-            if (resetReader)
-                reader.ResetReader();
-
             if (reader.Read())
             {
                 result = new CharacterItem();
-                result.id = reader.GetString("id");
-                result.dataId = reader.GetInt32("dataId");
-                result.level = reader.GetInt16("level");
-                result.amount = reader.GetInt16("amount");
-                result.equipSlotIndex = reader.GetByte("equipSlotIndex");
-                result.durability = reader.GetFloat("durability");
-                result.exp = reader.GetInt32("exp");
-                result.lockRemainsDuration = reader.GetFloat("lockRemainsDuration");
-                result.ammo = reader.GetInt16("ammo");
-                result.sockets = ReadSockets(reader.GetString("sockets"));
+                result.id = reader.GetString(0);
+                result.dataId = reader.GetInt32(1);
+                result.level = reader.GetInt16(2);
+                result.amount = reader.GetInt16(3);
+                result.equipSlotIndex = reader.GetByte(4);
+                result.durability = reader.GetFloat(5);
+                result.exp = reader.GetInt32(6);
+                result.lockRemainsDuration = reader.GetFloat(7);
+                result.ammo = reader.GetInt16(8);
+                result.sockets = ReadSockets(reader.GetString(9));
                 return true;
             }
             result = CharacterItem.Empty;
@@ -76,42 +73,44 @@ namespace MultiplayerARPG.MMO
         private List<CharacterItem> ReadCharacterItems(string characterId, InventoryType inventoryType)
         {
             List<CharacterItem> result = new List<CharacterItem>();
-            SQLiteRowsReader reader = ExecuteReader("SELECT * FROM characteritem WHERE characterId=@characterId AND inventoryType=@inventoryType ORDER BY idx ASC",
+            ExecuteReader((reader) =>
+            {
+                CharacterItem tempInventory;
+                while (ReadCharacterItem(reader, out tempInventory))
+                {
+                    result.Add(tempInventory);
+                }
+            }, "SELECT id, dataId, level, amount, equipSlotIndex, durability, exp, lockRemainsDuration, ammo, sockets FROM characteritem WHERE characterId=@characterId AND inventoryType=@inventoryType ORDER BY idx ASC",
                 new SqliteParameter("@characterId", characterId),
                 new SqliteParameter("@inventoryType", (byte)inventoryType));
-            CharacterItem tempInventory;
-            while (ReadCharacterItem(reader, out tempInventory, false))
-            {
-                result.Add(tempInventory);
-            }
             return result;
         }
         
         public List<EquipWeapons> ReadCharacterEquipWeapons(string characterId)
         {
             List<EquipWeapons> result = new List<EquipWeapons>();
-
-            SQLiteRowsReader reader = ExecuteReader("SELECT * FROM characteritem WHERE characterId=@characterId AND (inventoryType=@inventoryType1 OR inventoryType=@inventoryType2) ORDER BY idx ASC",
+            ExecuteReader((reader) =>
+            {
+                CharacterItem tempInventory;
+                byte equipWeaponSet;
+                InventoryType inventoryType;
+                while (ReadCharacterItem(reader, out tempInventory))
+                {
+                    equipWeaponSet = reader.GetByte(10);
+                    inventoryType = (InventoryType)reader.GetByte(11);
+                    // Fill weapon sets if needed
+                    while (result.Count <= equipWeaponSet)
+                        result.Add(new EquipWeapons());
+                    // Get equip weapon set
+                    if (inventoryType == InventoryType.EquipWeaponRight)
+                        result[equipWeaponSet].rightHand = tempInventory;
+                    if (inventoryType == InventoryType.EquipWeaponLeft)
+                        result[equipWeaponSet].leftHand = tempInventory;
+                }
+            }, "SELECT id, dataId, level, amount, equipSlotIndex, durability, exp, lockRemainsDuration, ammo, sockets, idx, inventoryType FROM characteritem WHERE characterId=@characterId AND (inventoryType=@inventoryType1 OR inventoryType=@inventoryType2) ORDER BY idx ASC",
                 new SqliteParameter("@characterId", characterId),
                 new SqliteParameter("@inventoryType1", (byte)InventoryType.EquipWeaponRight),
                 new SqliteParameter("@inventoryType2", (byte)InventoryType.EquipWeaponLeft));
-
-            CharacterItem tempInventory;
-            byte equipWeaponSet;
-            InventoryType inventoryType;
-            while (ReadCharacterItem(reader, out tempInventory, false))
-            {
-                equipWeaponSet = reader.GetByte("idx");
-                inventoryType = (InventoryType)reader.GetSByte("inventoryType");
-                // Fill weapon sets if needed
-                while (result.Count <= equipWeaponSet)
-                    result.Add(new EquipWeapons());
-                // Get equip weapon set
-                if (inventoryType == InventoryType.EquipWeaponRight)
-                    result[equipWeaponSet].rightHand = tempInventory;
-                if (inventoryType == InventoryType.EquipWeaponLeft)
-                    result[equipWeaponSet].leftHand = tempInventory;
-            }
             return result;
         }
 

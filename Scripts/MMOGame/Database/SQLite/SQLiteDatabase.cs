@@ -5,6 +5,8 @@ using System.IO;
 using LiteNetLibManager;
 using UnityEngine;
 using MiniJSON;
+using System.Threading.Tasks;
+using System;
 
 namespace MultiplayerARPG.MMO
 {
@@ -439,9 +441,8 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public SQLiteRowsReader ExecuteReader(string sql, params SqliteParameter[] args)
+        public void ExecuteReader(Action<SqliteDataReader> onRead, string sql, params SqliteParameter[] args)
         {
-            SQLiteRowsReader result = new SQLiteRowsReader();
             using (SqliteCommand cmd = new SqliteCommand(sql, connection))
             {
                 foreach (SqliteParameter arg in args)
@@ -449,87 +450,102 @@ namespace MultiplayerARPG.MMO
                     cmd.Parameters.Add(arg);
                 }
                 SqliteDataReader dataReader = cmd.ExecuteReader();
-                result.Init(dataReader);
+                if (onRead != null) onRead.Invoke(dataReader);
                 dataReader.Close();
             }
-            return result;
         }
 
-        public override string ValidateUserLogin(string username, string password)
+        public override async Task<string> ValidateUserLogin(string username, string password)
         {
+            await Task.Yield();
             string id = string.Empty;
-            SQLiteRowsReader reader = ExecuteReader("SELECT id FROM userlogin WHERE username=@username AND password=@password AND authType=@authType LIMIT 1",
+            ExecuteReader((reader) =>
+            {
+                if (reader.Read())
+                    id = reader.GetString(0);
+            }, "SELECT id FROM userlogin WHERE username=@username AND password=@password AND authType=@authType LIMIT 1",
                 new SqliteParameter("@username", username),
                 new SqliteParameter("@password", GenericUtils.GetMD5(password)),
                 new SqliteParameter("@authType", AUTH_TYPE_NORMAL));
 
-            if (reader.Read())
-                id = reader.GetString("id");
-
             return id;
         }
 
-        public override bool ValidateAccessToken(string userId, string accessToken)
+        public override async Task<bool> ValidateAccessToken(string userId, string accessToken)
         {
+            await Task.Yield();
             object result = ExecuteScalar("SELECT COUNT(*) FROM userlogin WHERE id=@id AND accessToken=@accessToken",
                 new SqliteParameter("@id", userId),
                 new SqliteParameter("@accessToken", accessToken));
             return (result != null ? (long)result : 0) > 0;
         }
 
-        public override byte GetUserLevel(string userId)
+        public override async Task<byte> GetUserLevel(string userId)
         {
+            await Task.Yield();
             byte userLevel = 0;
-            SQLiteRowsReader reader = ExecuteReader("SELECT userLevel FROM userlogin WHERE id=@id LIMIT 1",
+            ExecuteReader((reader) =>
+            {
+                if (reader.Read())
+                    userLevel = (byte)reader.GetInt32(0);
+            }, "SELECT userLevel FROM userlogin WHERE id=@id LIMIT 1",
                 new SqliteParameter("@id", userId));
-            if (reader.Read())
-                userLevel = (byte)reader.GetSByte("userLevel");
             return userLevel;
         }
 
-        public override int GetGold(string userId)
+        public override async Task<int> GetGold(string userId)
         {
+            await Task.Yield();
             int gold = 0;
-            SQLiteRowsReader reader = ExecuteReader("SELECT gold FROM userlogin WHERE id=@id LIMIT 1",
+            ExecuteReader((reader) =>
+            {
+                if (reader.Read())
+                    gold = reader.GetInt32(0);
+            }, "SELECT gold FROM userlogin WHERE id=@id LIMIT 1",
                 new SqliteParameter("@id", userId));
-            if (reader.Read())
-                gold = reader.GetInt32("gold");
             return gold;
         }
 
-        public override void UpdateGold(string userId, int gold)
+        public override async Task UpdateGold(string userId, int gold)
         {
+            await Task.Yield();
             ExecuteNonQuery("UPDATE userlogin SET gold=@gold WHERE id=@id",
                 new SqliteParameter("@id", userId),
                 new SqliteParameter("@gold", gold));
         }
 
-        public override int GetCash(string userId)
+        public override async Task<int> GetCash(string userId)
         {
+            await Task.Yield();
             int cash = 0;
-            SQLiteRowsReader reader = ExecuteReader("SELECT cash FROM userlogin WHERE id=@id LIMIT 1",
+            ExecuteReader((reader) =>
+            {
+                if (reader.Read())
+                    cash = reader.GetInt32(0);
+            }, "SELECT cash FROM userlogin WHERE id=@id LIMIT 1",
                 new SqliteParameter("@id", userId));
-            if (reader.Read())
-                cash = reader.GetInt32("cash");
             return cash;
         }
 
-        public override void UpdateCash(string userId, int cash)
+        public override async Task UpdateCash(string userId, int cash)
         {
+            await Task.Yield();
             ExecuteNonQuery("UPDATE userlogin SET cash=@cash WHERE id=@id",
                 new SqliteParameter("@id", userId),
                 new SqliteParameter("@cash", cash));
         }
 
-        public override void UpdateAccessToken(string userId, string accessToken)
+        public override async Task UpdateAccessToken(string userId, string accessToken)
         {
+            await Task.Yield();
             ExecuteNonQuery("UPDATE userlogin SET accessToken=@accessToken WHERE id=@id",
                 new SqliteParameter("@id", userId),
                 new SqliteParameter("@accessToken", accessToken));
         }
 
-        public override void CreateUserLogin(string username, string password)
+        public override async Task CreateUserLogin(string username, string password)
         {
+            await Task.Yield();
             ExecuteNonQuery("INSERT INTO userlogin (id, username, password, email, authType) VALUES (@id, @username, @password, @email, @authType)",
                 new SqliteParameter("@id", GenericUtils.GetUniqueId()),
                 new SqliteParameter("@username", username),
@@ -538,8 +554,9 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@authType", AUTH_TYPE_NORMAL));
         }
 
-        public override long FindUsername(string username)
+        public override async Task<long> FindUsername(string username)
         {
+            await Task.Yield();
             object result = ExecuteScalar("SELECT COUNT(*) FROM userlogin WHERE username LIKE @username",
                 new SqliteParameter("@username", username));
             return result != null ? (long)result : 0;
