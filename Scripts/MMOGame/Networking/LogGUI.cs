@@ -27,12 +27,13 @@ public class LogGUI : MonoBehaviour
     private List<LogData> logList = new List<LogData>();
     private bool shouldScrollToBottom;
 
-    private void OnEnable()
+    private void Start()
     {
-        Logging.onLog += HandleLog;
-        logSavePath = @"./" + logFileName + ".txt";
+        if (!Directory.Exists(@"./log"))
+            Directory.CreateDirectory(@"./log");
+        logSavePath = @"./log/" + logFileName + ".txt";
         if (openLogDir)
-            Application.OpenURL(Application.persistentDataPath);
+            Application.OpenURL(@"./log/");
         // Write log file header
         using (StreamWriter writer = new StreamWriter(logSavePath, true, Encoding.UTF8))
         {
@@ -40,13 +41,20 @@ public class LogGUI : MonoBehaviour
         }
     }
 
+    private void OnEnable()
+    {
+        Logging.onLog += HandleLog;
+    }
+
     private void OnDisable()
     {
         Logging.onLog -= HandleLog;
     }
 
-    void HandleLog(LogType type, string tag, string logString)
+    private void HandleLog(LogType type, string tag, string logString)
     {
+        if (string.IsNullOrEmpty(logSavePath))
+            return;
         using (StreamWriter writer = new StreamWriter(logSavePath, true, Encoding.UTF8))
         {
             writer.WriteLine("(" + type + ") [" + tag + "]" + logString + "\n");
