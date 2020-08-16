@@ -210,86 +210,86 @@ public static partial class DatabaseServiceReflection {
           "cm90bzM="));
     descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
         new pbr::FileDescriptor[] { },
-        new pbr::GeneratedClrTypeInfo(new[] {typeof(global::EStorageType), typeof(global::EStorageError), }, null, new pbr::GeneratedClrTypeInfo[] {
-          new pbr::GeneratedClrTypeInfo(typeof(global::ItemIndexAmountMap), global::ItemIndexAmountMap.Parser, new[]{ "Index", "Amount" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::VoidResp), global::VoidResp.Parser, null, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::GoldResp), global::GoldResp.Parser, new[]{ "Gold" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::CashResp), global::CashResp.Parser, new[]{ "Cash" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::GuildGoldResp), global::GuildGoldResp.Parser, new[]{ "GuildGold" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::ValidateUserLoginReq), global::ValidateUserLoginReq.Parser, new[]{ "Username", "Password" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::ValidateUserLoginResp), global::ValidateUserLoginResp.Parser, new[]{ "UserId" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::ValidateAccessTokenReq), global::ValidateAccessTokenReq.Parser, new[]{ "UserId", "AccessToken" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::ValidateAccessTokenResp), global::ValidateAccessTokenResp.Parser, new[]{ "IsPass" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::GetUserLevelReq), global::GetUserLevelReq.Parser, new[]{ "UserId" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::GetUserLevelResp), global::GetUserLevelResp.Parser, new[]{ "UserLevel" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::GetGoldReq), global::GetGoldReq.Parser, new[]{ "UserId" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::ChangeGoldReq), global::ChangeGoldReq.Parser, new[]{ "UserId", "ChangeAmount" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::GetCashReq), global::GetCashReq.Parser, new[]{ "UserId" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::ChangeCashReq), global::ChangeCashReq.Parser, new[]{ "UserId", "ChangeAmount" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::UpdateAccessTokenReq), global::UpdateAccessTokenReq.Parser, new[]{ "UserId", "AccessToken" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::CreateUserLoginReq), global::CreateUserLoginReq.Parser, new[]{ "Username", "Password" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::FindUsernameReq), global::FindUsernameReq.Parser, new[]{ "Username" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::FindUsernameResp), global::FindUsernameResp.Parser, new[]{ "FoundAmount" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::CreateCharacterReq), global::CreateCharacterReq.Parser, new[]{ "UserId", "CharacterData" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::ReadCharacterReq), global::ReadCharacterReq.Parser, new[]{ "UserId", "CharacterId" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::CharacterResp), global::CharacterResp.Parser, new[]{ "CharacterData" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::ReadCharactersReq), global::ReadCharactersReq.Parser, new[]{ "UserId" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::CharactersResp), global::CharactersResp.Parser, new[]{ "List" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::UpdateCharacterReq), global::UpdateCharacterReq.Parser, new[]{ "CharacterData" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::DeleteCharacterReq), global::DeleteCharacterReq.Parser, new[]{ "UserId", "CharacterId" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::FindCharacterNameReq), global::FindCharacterNameReq.Parser, new[]{ "CharacterName" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::FindCharacterNameResp), global::FindCharacterNameResp.Parser, new[]{ "FoundAmount" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::FindCharactersReq), global::FindCharactersReq.Parser, new[]{ "CharacterName" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::FindCharactersResp), global::FindCharactersResp.Parser, new[]{ "List" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::CreateFriendReq), global::CreateFriendReq.Parser, new[]{ "Character1Id", "Character2Id" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::DeleteFriendReq), global::DeleteFriendReq.Parser, new[]{ "Character1Id", "Character2Id" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::ReadFriendsReq), global::ReadFriendsReq.Parser, new[]{ "CharacterId" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::ReadFriendsResp), global::ReadFriendsResp.Parser, new[]{ "List" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::CreateBuildingReq), global::CreateBuildingReq.Parser, new[]{ "MapName", "BuildingData" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::UpdateBuildingReq), global::UpdateBuildingReq.Parser, new[]{ "MapName", "BuildingData" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::DeleteBuildingReq), global::DeleteBuildingReq.Parser, new[]{ "MapName", "BuildingId" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::BuildingResp), global::BuildingResp.Parser, new[]{ "BuildingData" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::ReadBuildingsReq), global::ReadBuildingsReq.Parser, new[]{ "MapName" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::BuildingsResp), global::BuildingsResp.Parser, new[]{ "List" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::CreatePartyReq), global::CreatePartyReq.Parser, new[]{ "ShareExp", "ShareItem", "LeaderCharacterId" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::UpdatePartyReq), global::UpdatePartyReq.Parser, new[]{ "PartyId", "ShareExp", "ShareItem" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::UpdatePartyLeaderReq), global::UpdatePartyLeaderReq.Parser, new[]{ "PartyId", "LeaderCharacterId" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::UpdateCharacterPartyReq), global::UpdateCharacterPartyReq.Parser, new[]{ "SocialCharacterData", "PartyId" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::ClearCharacterPartyReq), global::ClearCharacterPartyReq.Parser, new[]{ "CharacterId" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::DeletePartyReq), global::DeletePartyReq.Parser, new[]{ "PartyId" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::ReadPartyReq), global::ReadPartyReq.Parser, new[]{ "PartyId" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::PartyResp), global::PartyResp.Parser, new[]{ "PartyData" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::CreateGuildReq), global::CreateGuildReq.Parser, new[]{ "GuildName", "LeaderCharacterId" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::IncreaseGuildExpReq), global::IncreaseGuildExpReq.Parser, new[]{ "GuildId", "Exp" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::AddGuildSkillReq), global::AddGuildSkillReq.Parser, new[]{ "GuildId", "SkillId" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::UpdateGuildLeaderReq), global::UpdateGuildLeaderReq.Parser, new[]{ "GuildId", "LeaderCharacterId" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::UpdateGuildMessageReq), global::UpdateGuildMessageReq.Parser, new[]{ "GuildId", "GuildMessage" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::UpdateGuildRoleReq), global::UpdateGuildRoleReq.Parser, new[]{ "GuildId", "GuildRole", "RoleName", "CanInvite", "CanKick", "ShareExpPercentage" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::UpdateGuildMemberRoleReq), global::UpdateGuildMemberRoleReq.Parser, new[]{ "GuildId", "MemberCharacterId", "GuildRole" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::UpdateCharacterGuildReq), global::UpdateCharacterGuildReq.Parser, new[]{ "SocialCharacterData", "GuildId", "GuildRole" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::ClearCharacterGuildReq), global::ClearCharacterGuildReq.Parser, new[]{ "CharacterId" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::DeleteGuildReq), global::DeleteGuildReq.Parser, new[]{ "GuildId" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::FindGuildNameReq), global::FindGuildNameReq.Parser, new[]{ "GuildName" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::FindGuildNameResp), global::FindGuildNameResp.Parser, new[]{ "FoundAmount" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::ReadGuildReq), global::ReadGuildReq.Parser, new[]{ "GuildId" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::GuildResp), global::GuildResp.Parser, new[]{ "GuildData" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::GetGuildGoldReq), global::GetGuildGoldReq.Parser, new[]{ "GuildId" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::ChangeGuildGoldReq), global::ChangeGuildGoldReq.Parser, new[]{ "GuildId", "ChangeAmount" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::DecreaseGuildGoldReq), global::DecreaseGuildGoldReq.Parser, new[]{ "GuildId", "Amount" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::ReadStorageItemsReq), global::ReadStorageItemsReq.Parser, new[]{ "StorageType", "StorageOwnerId" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::ReadStorageItemsResp), global::ReadStorageItemsResp.Parser, new[]{ "StorageCharacterItems" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::MoveItemToStorageReq), global::MoveItemToStorageReq.Parser, new[]{ "StorageType", "StorageOwnerId", "CharacterId", "MapName", "InventoryItemIndex", "InventoryItemAmount", "StorageItemIndex" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::MoveItemToStorageResp), global::MoveItemToStorageResp.Parser, new[]{ "Error", "InventoryItemItems", "StorageCharacterItems" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::MoveItemFromStorageReq), global::MoveItemFromStorageReq.Parser, new[]{ "StorageType", "StorageOwnerId", "CharacterId", "MapName", "StorageItemIndex", "StorageItemAmount", "InventoryItemIndex" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::MoveItemFromStorageResp), global::MoveItemFromStorageResp.Parser, new[]{ "Error", "InventoryItemItems", "StorageCharacterItems" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::SwapOrMergeStorageItemReq), global::SwapOrMergeStorageItemReq.Parser, new[]{ "StorageType", "StorageOwnerId", "CharacterId", "MapName", "FromIndex", "ToIndex" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::SwapOrMergeStorageItemResp), global::SwapOrMergeStorageItemResp.Parser, new[]{ "Error", "StorageCharacterItems" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::IncreaseStorageItemsReq), global::IncreaseStorageItemsReq.Parser, new[]{ "StorageType", "StorageOwnerId", "MapName", "Item" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::IncreaseStorageItemsResp), global::IncreaseStorageItemsResp.Parser, new[]{ "Error", "StorageCharacterItems" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::DecreaseStorageItemsReq), global::DecreaseStorageItemsReq.Parser, new[]{ "StorageType", "StorageOwnerId", "MapName", "DataId", "Amount" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::DecreaseStorageItemsResp), global::DecreaseStorageItemsResp.Parser, new[]{ "Error", "StorageCharacterItems", "DecreasedItems" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::CustomReq), global::CustomReq.Parser, new[]{ "Type", "Data" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::CustomResp), global::CustomResp.Parser, new[]{ "Type", "Data" }, null, null, null, null)
+        new pbr::GeneratedClrTypeInfo(new[] {typeof(global::EStorageType), typeof(global::EStorageError), }, new pbr::GeneratedClrTypeInfo[] {
+          new pbr::GeneratedClrTypeInfo(typeof(global::ItemIndexAmountMap), global::ItemIndexAmountMap.Parser, new[]{ "Index", "Amount" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::VoidResp), global::VoidResp.Parser, null, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::GoldResp), global::GoldResp.Parser, new[]{ "Gold" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::CashResp), global::CashResp.Parser, new[]{ "Cash" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::GuildGoldResp), global::GuildGoldResp.Parser, new[]{ "GuildGold" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::ValidateUserLoginReq), global::ValidateUserLoginReq.Parser, new[]{ "Username", "Password" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::ValidateUserLoginResp), global::ValidateUserLoginResp.Parser, new[]{ "UserId" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::ValidateAccessTokenReq), global::ValidateAccessTokenReq.Parser, new[]{ "UserId", "AccessToken" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::ValidateAccessTokenResp), global::ValidateAccessTokenResp.Parser, new[]{ "IsPass" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::GetUserLevelReq), global::GetUserLevelReq.Parser, new[]{ "UserId" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::GetUserLevelResp), global::GetUserLevelResp.Parser, new[]{ "UserLevel" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::GetGoldReq), global::GetGoldReq.Parser, new[]{ "UserId" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::ChangeGoldReq), global::ChangeGoldReq.Parser, new[]{ "UserId", "ChangeAmount" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::GetCashReq), global::GetCashReq.Parser, new[]{ "UserId" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::ChangeCashReq), global::ChangeCashReq.Parser, new[]{ "UserId", "ChangeAmount" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::UpdateAccessTokenReq), global::UpdateAccessTokenReq.Parser, new[]{ "UserId", "AccessToken" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::CreateUserLoginReq), global::CreateUserLoginReq.Parser, new[]{ "Username", "Password" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::FindUsernameReq), global::FindUsernameReq.Parser, new[]{ "Username" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::FindUsernameResp), global::FindUsernameResp.Parser, new[]{ "FoundAmount" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::CreateCharacterReq), global::CreateCharacterReq.Parser, new[]{ "UserId", "CharacterData" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::ReadCharacterReq), global::ReadCharacterReq.Parser, new[]{ "UserId", "CharacterId" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::CharacterResp), global::CharacterResp.Parser, new[]{ "CharacterData" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::ReadCharactersReq), global::ReadCharactersReq.Parser, new[]{ "UserId" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::CharactersResp), global::CharactersResp.Parser, new[]{ "List" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::UpdateCharacterReq), global::UpdateCharacterReq.Parser, new[]{ "CharacterData" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::DeleteCharacterReq), global::DeleteCharacterReq.Parser, new[]{ "UserId", "CharacterId" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::FindCharacterNameReq), global::FindCharacterNameReq.Parser, new[]{ "CharacterName" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::FindCharacterNameResp), global::FindCharacterNameResp.Parser, new[]{ "FoundAmount" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::FindCharactersReq), global::FindCharactersReq.Parser, new[]{ "CharacterName" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::FindCharactersResp), global::FindCharactersResp.Parser, new[]{ "List" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::CreateFriendReq), global::CreateFriendReq.Parser, new[]{ "Character1Id", "Character2Id" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::DeleteFriendReq), global::DeleteFriendReq.Parser, new[]{ "Character1Id", "Character2Id" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::ReadFriendsReq), global::ReadFriendsReq.Parser, new[]{ "CharacterId" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::ReadFriendsResp), global::ReadFriendsResp.Parser, new[]{ "List" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::CreateBuildingReq), global::CreateBuildingReq.Parser, new[]{ "MapName", "BuildingData" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::UpdateBuildingReq), global::UpdateBuildingReq.Parser, new[]{ "MapName", "BuildingData" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::DeleteBuildingReq), global::DeleteBuildingReq.Parser, new[]{ "MapName", "BuildingId" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::BuildingResp), global::BuildingResp.Parser, new[]{ "BuildingData" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::ReadBuildingsReq), global::ReadBuildingsReq.Parser, new[]{ "MapName" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::BuildingsResp), global::BuildingsResp.Parser, new[]{ "List" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::CreatePartyReq), global::CreatePartyReq.Parser, new[]{ "ShareExp", "ShareItem", "LeaderCharacterId" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::UpdatePartyReq), global::UpdatePartyReq.Parser, new[]{ "PartyId", "ShareExp", "ShareItem" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::UpdatePartyLeaderReq), global::UpdatePartyLeaderReq.Parser, new[]{ "PartyId", "LeaderCharacterId" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::UpdateCharacterPartyReq), global::UpdateCharacterPartyReq.Parser, new[]{ "SocialCharacterData", "PartyId" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::ClearCharacterPartyReq), global::ClearCharacterPartyReq.Parser, new[]{ "CharacterId" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::DeletePartyReq), global::DeletePartyReq.Parser, new[]{ "PartyId" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::ReadPartyReq), global::ReadPartyReq.Parser, new[]{ "PartyId" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::PartyResp), global::PartyResp.Parser, new[]{ "PartyData" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::CreateGuildReq), global::CreateGuildReq.Parser, new[]{ "GuildName", "LeaderCharacterId" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::IncreaseGuildExpReq), global::IncreaseGuildExpReq.Parser, new[]{ "GuildId", "Exp" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::AddGuildSkillReq), global::AddGuildSkillReq.Parser, new[]{ "GuildId", "SkillId" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::UpdateGuildLeaderReq), global::UpdateGuildLeaderReq.Parser, new[]{ "GuildId", "LeaderCharacterId" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::UpdateGuildMessageReq), global::UpdateGuildMessageReq.Parser, new[]{ "GuildId", "GuildMessage" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::UpdateGuildRoleReq), global::UpdateGuildRoleReq.Parser, new[]{ "GuildId", "GuildRole", "RoleName", "CanInvite", "CanKick", "ShareExpPercentage" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::UpdateGuildMemberRoleReq), global::UpdateGuildMemberRoleReq.Parser, new[]{ "GuildId", "MemberCharacterId", "GuildRole" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::UpdateCharacterGuildReq), global::UpdateCharacterGuildReq.Parser, new[]{ "SocialCharacterData", "GuildId", "GuildRole" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::ClearCharacterGuildReq), global::ClearCharacterGuildReq.Parser, new[]{ "CharacterId" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::DeleteGuildReq), global::DeleteGuildReq.Parser, new[]{ "GuildId" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::FindGuildNameReq), global::FindGuildNameReq.Parser, new[]{ "GuildName" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::FindGuildNameResp), global::FindGuildNameResp.Parser, new[]{ "FoundAmount" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::ReadGuildReq), global::ReadGuildReq.Parser, new[]{ "GuildId" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::GuildResp), global::GuildResp.Parser, new[]{ "GuildData" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::GetGuildGoldReq), global::GetGuildGoldReq.Parser, new[]{ "GuildId" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::ChangeGuildGoldReq), global::ChangeGuildGoldReq.Parser, new[]{ "GuildId", "ChangeAmount" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::DecreaseGuildGoldReq), global::DecreaseGuildGoldReq.Parser, new[]{ "GuildId", "Amount" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::ReadStorageItemsReq), global::ReadStorageItemsReq.Parser, new[]{ "StorageType", "StorageOwnerId" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::ReadStorageItemsResp), global::ReadStorageItemsResp.Parser, new[]{ "StorageCharacterItems" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::MoveItemToStorageReq), global::MoveItemToStorageReq.Parser, new[]{ "StorageType", "StorageOwnerId", "CharacterId", "MapName", "InventoryItemIndex", "InventoryItemAmount", "StorageItemIndex" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::MoveItemToStorageResp), global::MoveItemToStorageResp.Parser, new[]{ "Error", "InventoryItemItems", "StorageCharacterItems" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::MoveItemFromStorageReq), global::MoveItemFromStorageReq.Parser, new[]{ "StorageType", "StorageOwnerId", "CharacterId", "MapName", "StorageItemIndex", "StorageItemAmount", "InventoryItemIndex" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::MoveItemFromStorageResp), global::MoveItemFromStorageResp.Parser, new[]{ "Error", "InventoryItemItems", "StorageCharacterItems" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::SwapOrMergeStorageItemReq), global::SwapOrMergeStorageItemReq.Parser, new[]{ "StorageType", "StorageOwnerId", "CharacterId", "MapName", "FromIndex", "ToIndex" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::SwapOrMergeStorageItemResp), global::SwapOrMergeStorageItemResp.Parser, new[]{ "Error", "StorageCharacterItems" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::IncreaseStorageItemsReq), global::IncreaseStorageItemsReq.Parser, new[]{ "StorageType", "StorageOwnerId", "MapName", "Item" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::IncreaseStorageItemsResp), global::IncreaseStorageItemsResp.Parser, new[]{ "Error", "StorageCharacterItems" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::DecreaseStorageItemsReq), global::DecreaseStorageItemsReq.Parser, new[]{ "StorageType", "StorageOwnerId", "MapName", "DataId", "Amount" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::DecreaseStorageItemsResp), global::DecreaseStorageItemsResp.Parser, new[]{ "Error", "StorageCharacterItems", "DecreasedItems" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::CustomReq), global::CustomReq.Parser, new[]{ "Type", "Data" }, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::CustomResp), global::CustomResp.Parser, new[]{ "Type", "Data" }, null, null, null)
         }));
   }
   #endregion
@@ -9865,7 +9865,7 @@ public sealed partial class ReadStorageItemsReq : pb::IMessage<ReadStorageItemsR
 
   /// <summary>Field number for the "storage_type" field.</summary>
   public const int StorageTypeFieldNumber = 1;
-  private global::EStorageType storageType_ = global::EStorageType.StorageTypeNone;
+  private global::EStorageType storageType_ = 0;
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public global::EStorageType StorageType {
     get { return storageType_; }
@@ -9906,7 +9906,7 @@ public sealed partial class ReadStorageItemsReq : pb::IMessage<ReadStorageItemsR
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public override int GetHashCode() {
     int hash = 1;
-    if (StorageType != global::EStorageType.StorageTypeNone) hash ^= StorageType.GetHashCode();
+    if (StorageType != 0) hash ^= StorageType.GetHashCode();
     if (StorageOwnerId.Length != 0) hash ^= StorageOwnerId.GetHashCode();
     if (_unknownFields != null) {
       hash ^= _unknownFields.GetHashCode();
@@ -9921,7 +9921,7 @@ public sealed partial class ReadStorageItemsReq : pb::IMessage<ReadStorageItemsR
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public void WriteTo(pb::CodedOutputStream output) {
-    if (StorageType != global::EStorageType.StorageTypeNone) {
+    if (StorageType != 0) {
       output.WriteRawTag(8);
       output.WriteEnum((int) StorageType);
     }
@@ -9937,7 +9937,7 @@ public sealed partial class ReadStorageItemsReq : pb::IMessage<ReadStorageItemsR
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public int CalculateSize() {
     int size = 0;
-    if (StorageType != global::EStorageType.StorageTypeNone) {
+    if (StorageType != 0) {
       size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) StorageType);
     }
     if (StorageOwnerId.Length != 0) {
@@ -9954,7 +9954,7 @@ public sealed partial class ReadStorageItemsReq : pb::IMessage<ReadStorageItemsR
     if (other == null) {
       return;
     }
-    if (other.StorageType != global::EStorageType.StorageTypeNone) {
+    if (other.StorageType != 0) {
       StorageType = other.StorageType;
     }
     if (other.StorageOwnerId.Length != 0) {
@@ -10151,7 +10151,7 @@ public sealed partial class MoveItemToStorageReq : pb::IMessage<MoveItemToStorag
 
   /// <summary>Field number for the "storage_type" field.</summary>
   public const int StorageTypeFieldNumber = 1;
-  private global::EStorageType storageType_ = global::EStorageType.StorageTypeNone;
+  private global::EStorageType storageType_ = 0;
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public global::EStorageType StorageType {
     get { return storageType_; }
@@ -10252,7 +10252,7 @@ public sealed partial class MoveItemToStorageReq : pb::IMessage<MoveItemToStorag
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public override int GetHashCode() {
     int hash = 1;
-    if (StorageType != global::EStorageType.StorageTypeNone) hash ^= StorageType.GetHashCode();
+    if (StorageType != 0) hash ^= StorageType.GetHashCode();
     if (StorageOwnerId.Length != 0) hash ^= StorageOwnerId.GetHashCode();
     if (CharacterId.Length != 0) hash ^= CharacterId.GetHashCode();
     if (MapName.Length != 0) hash ^= MapName.GetHashCode();
@@ -10272,7 +10272,7 @@ public sealed partial class MoveItemToStorageReq : pb::IMessage<MoveItemToStorag
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public void WriteTo(pb::CodedOutputStream output) {
-    if (StorageType != global::EStorageType.StorageTypeNone) {
+    if (StorageType != 0) {
       output.WriteRawTag(8);
       output.WriteEnum((int) StorageType);
     }
@@ -10308,7 +10308,7 @@ public sealed partial class MoveItemToStorageReq : pb::IMessage<MoveItemToStorag
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public int CalculateSize() {
     int size = 0;
-    if (StorageType != global::EStorageType.StorageTypeNone) {
+    if (StorageType != 0) {
       size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) StorageType);
     }
     if (StorageOwnerId.Length != 0) {
@@ -10340,7 +10340,7 @@ public sealed partial class MoveItemToStorageReq : pb::IMessage<MoveItemToStorag
     if (other == null) {
       return;
     }
-    if (other.StorageType != global::EStorageType.StorageTypeNone) {
+    if (other.StorageType != 0) {
       StorageType = other.StorageType;
     }
     if (other.StorageOwnerId.Length != 0) {
@@ -10444,7 +10444,7 @@ public sealed partial class MoveItemToStorageResp : pb::IMessage<MoveItemToStora
 
   /// <summary>Field number for the "error" field.</summary>
   public const int ErrorFieldNumber = 1;
-  private global::EStorageError error_ = global::EStorageError.StorageErrorNone;
+  private global::EStorageError error_ = 0;
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public global::EStorageError Error {
     get { return error_; }
@@ -10495,7 +10495,7 @@ public sealed partial class MoveItemToStorageResp : pb::IMessage<MoveItemToStora
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public override int GetHashCode() {
     int hash = 1;
-    if (Error != global::EStorageError.StorageErrorNone) hash ^= Error.GetHashCode();
+    if (Error != 0) hash ^= Error.GetHashCode();
     hash ^= inventoryItemItems_.GetHashCode();
     hash ^= storageCharacterItems_.GetHashCode();
     if (_unknownFields != null) {
@@ -10511,7 +10511,7 @@ public sealed partial class MoveItemToStorageResp : pb::IMessage<MoveItemToStora
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public void WriteTo(pb::CodedOutputStream output) {
-    if (Error != global::EStorageError.StorageErrorNone) {
+    if (Error != 0) {
       output.WriteRawTag(8);
       output.WriteEnum((int) Error);
     }
@@ -10525,7 +10525,7 @@ public sealed partial class MoveItemToStorageResp : pb::IMessage<MoveItemToStora
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public int CalculateSize() {
     int size = 0;
-    if (Error != global::EStorageError.StorageErrorNone) {
+    if (Error != 0) {
       size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) Error);
     }
     size += inventoryItemItems_.CalculateSize(_repeated_inventoryItemItems_codec);
@@ -10541,7 +10541,7 @@ public sealed partial class MoveItemToStorageResp : pb::IMessage<MoveItemToStora
     if (other == null) {
       return;
     }
-    if (other.Error != global::EStorageError.StorageErrorNone) {
+    if (other.Error != 0) {
       Error = other.Error;
     }
     inventoryItemItems_.Add(other.inventoryItemItems_);
@@ -10620,7 +10620,7 @@ public sealed partial class MoveItemFromStorageReq : pb::IMessage<MoveItemFromSt
 
   /// <summary>Field number for the "storage_type" field.</summary>
   public const int StorageTypeFieldNumber = 1;
-  private global::EStorageType storageType_ = global::EStorageType.StorageTypeNone;
+  private global::EStorageType storageType_ = 0;
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public global::EStorageType StorageType {
     get { return storageType_; }
@@ -10721,7 +10721,7 @@ public sealed partial class MoveItemFromStorageReq : pb::IMessage<MoveItemFromSt
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public override int GetHashCode() {
     int hash = 1;
-    if (StorageType != global::EStorageType.StorageTypeNone) hash ^= StorageType.GetHashCode();
+    if (StorageType != 0) hash ^= StorageType.GetHashCode();
     if (StorageOwnerId.Length != 0) hash ^= StorageOwnerId.GetHashCode();
     if (CharacterId.Length != 0) hash ^= CharacterId.GetHashCode();
     if (MapName.Length != 0) hash ^= MapName.GetHashCode();
@@ -10741,7 +10741,7 @@ public sealed partial class MoveItemFromStorageReq : pb::IMessage<MoveItemFromSt
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public void WriteTo(pb::CodedOutputStream output) {
-    if (StorageType != global::EStorageType.StorageTypeNone) {
+    if (StorageType != 0) {
       output.WriteRawTag(8);
       output.WriteEnum((int) StorageType);
     }
@@ -10777,7 +10777,7 @@ public sealed partial class MoveItemFromStorageReq : pb::IMessage<MoveItemFromSt
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public int CalculateSize() {
     int size = 0;
-    if (StorageType != global::EStorageType.StorageTypeNone) {
+    if (StorageType != 0) {
       size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) StorageType);
     }
     if (StorageOwnerId.Length != 0) {
@@ -10809,7 +10809,7 @@ public sealed partial class MoveItemFromStorageReq : pb::IMessage<MoveItemFromSt
     if (other == null) {
       return;
     }
-    if (other.StorageType != global::EStorageType.StorageTypeNone) {
+    if (other.StorageType != 0) {
       StorageType = other.StorageType;
     }
     if (other.StorageOwnerId.Length != 0) {
@@ -10913,7 +10913,7 @@ public sealed partial class MoveItemFromStorageResp : pb::IMessage<MoveItemFromS
 
   /// <summary>Field number for the "error" field.</summary>
   public const int ErrorFieldNumber = 1;
-  private global::EStorageError error_ = global::EStorageError.StorageErrorNone;
+  private global::EStorageError error_ = 0;
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public global::EStorageError Error {
     get { return error_; }
@@ -10964,7 +10964,7 @@ public sealed partial class MoveItemFromStorageResp : pb::IMessage<MoveItemFromS
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public override int GetHashCode() {
     int hash = 1;
-    if (Error != global::EStorageError.StorageErrorNone) hash ^= Error.GetHashCode();
+    if (Error != 0) hash ^= Error.GetHashCode();
     hash ^= inventoryItemItems_.GetHashCode();
     hash ^= storageCharacterItems_.GetHashCode();
     if (_unknownFields != null) {
@@ -10980,7 +10980,7 @@ public sealed partial class MoveItemFromStorageResp : pb::IMessage<MoveItemFromS
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public void WriteTo(pb::CodedOutputStream output) {
-    if (Error != global::EStorageError.StorageErrorNone) {
+    if (Error != 0) {
       output.WriteRawTag(8);
       output.WriteEnum((int) Error);
     }
@@ -10994,7 +10994,7 @@ public sealed partial class MoveItemFromStorageResp : pb::IMessage<MoveItemFromS
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public int CalculateSize() {
     int size = 0;
-    if (Error != global::EStorageError.StorageErrorNone) {
+    if (Error != 0) {
       size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) Error);
     }
     size += inventoryItemItems_.CalculateSize(_repeated_inventoryItemItems_codec);
@@ -11010,7 +11010,7 @@ public sealed partial class MoveItemFromStorageResp : pb::IMessage<MoveItemFromS
     if (other == null) {
       return;
     }
-    if (other.Error != global::EStorageError.StorageErrorNone) {
+    if (other.Error != 0) {
       Error = other.Error;
     }
     inventoryItemItems_.Add(other.inventoryItemItems_);
@@ -11088,7 +11088,7 @@ public sealed partial class SwapOrMergeStorageItemReq : pb::IMessage<SwapOrMerge
 
   /// <summary>Field number for the "storage_type" field.</summary>
   public const int StorageTypeFieldNumber = 1;
-  private global::EStorageType storageType_ = global::EStorageType.StorageTypeNone;
+  private global::EStorageType storageType_ = 0;
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public global::EStorageType StorageType {
     get { return storageType_; }
@@ -11177,7 +11177,7 @@ public sealed partial class SwapOrMergeStorageItemReq : pb::IMessage<SwapOrMerge
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public override int GetHashCode() {
     int hash = 1;
-    if (StorageType != global::EStorageType.StorageTypeNone) hash ^= StorageType.GetHashCode();
+    if (StorageType != 0) hash ^= StorageType.GetHashCode();
     if (StorageOwnerId.Length != 0) hash ^= StorageOwnerId.GetHashCode();
     if (CharacterId.Length != 0) hash ^= CharacterId.GetHashCode();
     if (MapName.Length != 0) hash ^= MapName.GetHashCode();
@@ -11196,7 +11196,7 @@ public sealed partial class SwapOrMergeStorageItemReq : pb::IMessage<SwapOrMerge
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public void WriteTo(pb::CodedOutputStream output) {
-    if (StorageType != global::EStorageType.StorageTypeNone) {
+    if (StorageType != 0) {
       output.WriteRawTag(8);
       output.WriteEnum((int) StorageType);
     }
@@ -11228,7 +11228,7 @@ public sealed partial class SwapOrMergeStorageItemReq : pb::IMessage<SwapOrMerge
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public int CalculateSize() {
     int size = 0;
-    if (StorageType != global::EStorageType.StorageTypeNone) {
+    if (StorageType != 0) {
       size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) StorageType);
     }
     if (StorageOwnerId.Length != 0) {
@@ -11257,7 +11257,7 @@ public sealed partial class SwapOrMergeStorageItemReq : pb::IMessage<SwapOrMerge
     if (other == null) {
       return;
     }
-    if (other.StorageType != global::EStorageType.StorageTypeNone) {
+    if (other.StorageType != 0) {
       StorageType = other.StorageType;
     }
     if (other.StorageOwnerId.Length != 0) {
@@ -11353,7 +11353,7 @@ public sealed partial class SwapOrMergeStorageItemResp : pb::IMessage<SwapOrMerg
 
   /// <summary>Field number for the "error" field.</summary>
   public const int ErrorFieldNumber = 1;
-  private global::EStorageError error_ = global::EStorageError.StorageErrorNone;
+  private global::EStorageError error_ = 0;
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public global::EStorageError Error {
     get { return error_; }
@@ -11393,7 +11393,7 @@ public sealed partial class SwapOrMergeStorageItemResp : pb::IMessage<SwapOrMerg
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public override int GetHashCode() {
     int hash = 1;
-    if (Error != global::EStorageError.StorageErrorNone) hash ^= Error.GetHashCode();
+    if (Error != 0) hash ^= Error.GetHashCode();
     hash ^= storageCharacterItems_.GetHashCode();
     if (_unknownFields != null) {
       hash ^= _unknownFields.GetHashCode();
@@ -11408,7 +11408,7 @@ public sealed partial class SwapOrMergeStorageItemResp : pb::IMessage<SwapOrMerg
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public void WriteTo(pb::CodedOutputStream output) {
-    if (Error != global::EStorageError.StorageErrorNone) {
+    if (Error != 0) {
       output.WriteRawTag(8);
       output.WriteEnum((int) Error);
     }
@@ -11421,7 +11421,7 @@ public sealed partial class SwapOrMergeStorageItemResp : pb::IMessage<SwapOrMerg
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public int CalculateSize() {
     int size = 0;
-    if (Error != global::EStorageError.StorageErrorNone) {
+    if (Error != 0) {
       size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) Error);
     }
     size += storageCharacterItems_.CalculateSize(_repeated_storageCharacterItems_codec);
@@ -11436,7 +11436,7 @@ public sealed partial class SwapOrMergeStorageItemResp : pb::IMessage<SwapOrMerg
     if (other == null) {
       return;
     }
-    if (other.Error != global::EStorageError.StorageErrorNone) {
+    if (other.Error != 0) {
       Error = other.Error;
     }
     storageCharacterItems_.Add(other.storageCharacterItems_);
@@ -11507,7 +11507,7 @@ public sealed partial class IncreaseStorageItemsReq : pb::IMessage<IncreaseStora
 
   /// <summary>Field number for the "storage_type" field.</summary>
   public const int StorageTypeFieldNumber = 1;
-  private global::EStorageType storageType_ = global::EStorageType.StorageTypeNone;
+  private global::EStorageType storageType_ = 0;
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public global::EStorageType StorageType {
     get { return storageType_; }
@@ -11572,7 +11572,7 @@ public sealed partial class IncreaseStorageItemsReq : pb::IMessage<IncreaseStora
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public override int GetHashCode() {
     int hash = 1;
-    if (StorageType != global::EStorageType.StorageTypeNone) hash ^= StorageType.GetHashCode();
+    if (StorageType != 0) hash ^= StorageType.GetHashCode();
     if (StorageOwnerId.Length != 0) hash ^= StorageOwnerId.GetHashCode();
     if (MapName.Length != 0) hash ^= MapName.GetHashCode();
     if (Item.Length != 0) hash ^= Item.GetHashCode();
@@ -11589,7 +11589,7 @@ public sealed partial class IncreaseStorageItemsReq : pb::IMessage<IncreaseStora
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public void WriteTo(pb::CodedOutputStream output) {
-    if (StorageType != global::EStorageType.StorageTypeNone) {
+    if (StorageType != 0) {
       output.WriteRawTag(8);
       output.WriteEnum((int) StorageType);
     }
@@ -11613,7 +11613,7 @@ public sealed partial class IncreaseStorageItemsReq : pb::IMessage<IncreaseStora
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public int CalculateSize() {
     int size = 0;
-    if (StorageType != global::EStorageType.StorageTypeNone) {
+    if (StorageType != 0) {
       size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) StorageType);
     }
     if (StorageOwnerId.Length != 0) {
@@ -11636,7 +11636,7 @@ public sealed partial class IncreaseStorageItemsReq : pb::IMessage<IncreaseStora
     if (other == null) {
       return;
     }
-    if (other.StorageType != global::EStorageType.StorageTypeNone) {
+    if (other.StorageType != 0) {
       StorageType = other.StorageType;
     }
     if (other.StorageOwnerId.Length != 0) {
@@ -11718,7 +11718,7 @@ public sealed partial class IncreaseStorageItemsResp : pb::IMessage<IncreaseStor
 
   /// <summary>Field number for the "error" field.</summary>
   public const int ErrorFieldNumber = 1;
-  private global::EStorageError error_ = global::EStorageError.StorageErrorNone;
+  private global::EStorageError error_ = 0;
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public global::EStorageError Error {
     get { return error_; }
@@ -11758,7 +11758,7 @@ public sealed partial class IncreaseStorageItemsResp : pb::IMessage<IncreaseStor
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public override int GetHashCode() {
     int hash = 1;
-    if (Error != global::EStorageError.StorageErrorNone) hash ^= Error.GetHashCode();
+    if (Error != 0) hash ^= Error.GetHashCode();
     hash ^= storageCharacterItems_.GetHashCode();
     if (_unknownFields != null) {
       hash ^= _unknownFields.GetHashCode();
@@ -11773,7 +11773,7 @@ public sealed partial class IncreaseStorageItemsResp : pb::IMessage<IncreaseStor
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public void WriteTo(pb::CodedOutputStream output) {
-    if (Error != global::EStorageError.StorageErrorNone) {
+    if (Error != 0) {
       output.WriteRawTag(8);
       output.WriteEnum((int) Error);
     }
@@ -11786,7 +11786,7 @@ public sealed partial class IncreaseStorageItemsResp : pb::IMessage<IncreaseStor
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public int CalculateSize() {
     int size = 0;
-    if (Error != global::EStorageError.StorageErrorNone) {
+    if (Error != 0) {
       size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) Error);
     }
     size += storageCharacterItems_.CalculateSize(_repeated_storageCharacterItems_codec);
@@ -11801,7 +11801,7 @@ public sealed partial class IncreaseStorageItemsResp : pb::IMessage<IncreaseStor
     if (other == null) {
       return;
     }
-    if (other.Error != global::EStorageError.StorageErrorNone) {
+    if (other.Error != 0) {
       Error = other.Error;
     }
     storageCharacterItems_.Add(other.storageCharacterItems_);
@@ -11873,7 +11873,7 @@ public sealed partial class DecreaseStorageItemsReq : pb::IMessage<DecreaseStora
 
   /// <summary>Field number for the "storage_type" field.</summary>
   public const int StorageTypeFieldNumber = 1;
-  private global::EStorageType storageType_ = global::EStorageType.StorageTypeNone;
+  private global::EStorageType storageType_ = 0;
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public global::EStorageType StorageType {
     get { return storageType_; }
@@ -11950,7 +11950,7 @@ public sealed partial class DecreaseStorageItemsReq : pb::IMessage<DecreaseStora
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public override int GetHashCode() {
     int hash = 1;
-    if (StorageType != global::EStorageType.StorageTypeNone) hash ^= StorageType.GetHashCode();
+    if (StorageType != 0) hash ^= StorageType.GetHashCode();
     if (StorageOwnerId.Length != 0) hash ^= StorageOwnerId.GetHashCode();
     if (MapName.Length != 0) hash ^= MapName.GetHashCode();
     if (DataId != 0) hash ^= DataId.GetHashCode();
@@ -11968,7 +11968,7 @@ public sealed partial class DecreaseStorageItemsReq : pb::IMessage<DecreaseStora
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public void WriteTo(pb::CodedOutputStream output) {
-    if (StorageType != global::EStorageType.StorageTypeNone) {
+    if (StorageType != 0) {
       output.WriteRawTag(8);
       output.WriteEnum((int) StorageType);
     }
@@ -11996,7 +11996,7 @@ public sealed partial class DecreaseStorageItemsReq : pb::IMessage<DecreaseStora
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public int CalculateSize() {
     int size = 0;
-    if (StorageType != global::EStorageType.StorageTypeNone) {
+    if (StorageType != 0) {
       size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) StorageType);
     }
     if (StorageOwnerId.Length != 0) {
@@ -12022,7 +12022,7 @@ public sealed partial class DecreaseStorageItemsReq : pb::IMessage<DecreaseStora
     if (other == null) {
       return;
     }
-    if (other.StorageType != global::EStorageType.StorageTypeNone) {
+    if (other.StorageType != 0) {
       StorageType = other.StorageType;
     }
     if (other.StorageOwnerId.Length != 0) {
@@ -12112,7 +12112,7 @@ public sealed partial class DecreaseStorageItemsResp : pb::IMessage<DecreaseStor
 
   /// <summary>Field number for the "error" field.</summary>
   public const int ErrorFieldNumber = 1;
-  private global::EStorageError error_ = global::EStorageError.StorageErrorNone;
+  private global::EStorageError error_ = 0;
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public global::EStorageError Error {
     get { return error_; }
@@ -12163,7 +12163,7 @@ public sealed partial class DecreaseStorageItemsResp : pb::IMessage<DecreaseStor
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public override int GetHashCode() {
     int hash = 1;
-    if (Error != global::EStorageError.StorageErrorNone) hash ^= Error.GetHashCode();
+    if (Error != 0) hash ^= Error.GetHashCode();
     hash ^= storageCharacterItems_.GetHashCode();
     hash ^= decreasedItems_.GetHashCode();
     if (_unknownFields != null) {
@@ -12179,7 +12179,7 @@ public sealed partial class DecreaseStorageItemsResp : pb::IMessage<DecreaseStor
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public void WriteTo(pb::CodedOutputStream output) {
-    if (Error != global::EStorageError.StorageErrorNone) {
+    if (Error != 0) {
       output.WriteRawTag(8);
       output.WriteEnum((int) Error);
     }
@@ -12193,7 +12193,7 @@ public sealed partial class DecreaseStorageItemsResp : pb::IMessage<DecreaseStor
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public int CalculateSize() {
     int size = 0;
-    if (Error != global::EStorageError.StorageErrorNone) {
+    if (Error != 0) {
       size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) Error);
     }
     size += storageCharacterItems_.CalculateSize(_repeated_storageCharacterItems_codec);
@@ -12209,7 +12209,7 @@ public sealed partial class DecreaseStorageItemsResp : pb::IMessage<DecreaseStor
     if (other == null) {
       return;
     }
-    if (other.Error != global::EStorageError.StorageErrorNone) {
+    if (other.Error != 0) {
       Error = other.Error;
     }
     storageCharacterItems_.Add(other.storageCharacterItems_);
