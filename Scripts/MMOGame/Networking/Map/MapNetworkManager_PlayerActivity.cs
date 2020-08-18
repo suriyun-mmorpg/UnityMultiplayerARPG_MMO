@@ -1,9 +1,9 @@
-﻿using LiteNetLib;
+﻿using Cysharp.Threading.Tasks;
+using LiteNetLib;
 using LiteNetLibManager;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace MultiplayerARPG.MMO
@@ -36,7 +36,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
 
-            WarpCharacterRoutine(playerCharacterEntity, mapName, position);
+            WarpCharacterRoutine(playerCharacterEntity, mapName, position).Forget();
         }
 
         /// <summary>
@@ -46,7 +46,7 @@ namespace MultiplayerARPG.MMO
         /// <param name="mapName"></param>
         /// <param name="position"></param>
         /// <returns></returns>
-        private async void WarpCharacterRoutine(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position)
+        private async UniTaskVoid WarpCharacterRoutine(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position)
         {
             // If warping to different map
             long connectionId = playerCharacterEntity.ConnectionId;
@@ -69,7 +69,7 @@ namespace MultiplayerARPG.MMO
                 savingCharacterData.CurrentPosition = position;
                 while (savingCharacters.Contains(savingCharacterData.Id))
                 {
-                    await Task.Yield();
+                    await UniTask.Yield();
                 }
                 await SaveCharacterRoutine(savingCharacterData, playerCharacterEntity.UserId);
                 // Remove this character from warping list
@@ -124,7 +124,7 @@ namespace MultiplayerARPG.MMO
             CentralAppServerRegister.SendRequest(MMOMessageTypes.RequestSpawnMap, requestSpawnMapMessage, OnRequestSpawnMap);
         }
 
-        private async void WarpCharacterToInstanceRoutine(BasePlayerCharacterEntity playerCharacterEntity, string instanceId)
+        private async UniTaskVoid WarpCharacterToInstanceRoutine(BasePlayerCharacterEntity playerCharacterEntity, string instanceId)
         {
             // If warping to different map
             long connectionId = playerCharacterEntity.ConnectionId;
@@ -146,7 +146,7 @@ namespace MultiplayerARPG.MMO
                 playerCharacterEntity.CloneTo(savingCharacterData);
                 while (savingCharacters.Contains(savingCharacterData.Id))
                 {
-                    await Task.Yield();
+                    await UniTask.Yield();
                 }
                 await SaveCharacterRoutine(savingCharacterData, playerCharacterEntity.UserId);
                 // Remove this character from warping list
@@ -194,10 +194,10 @@ namespace MultiplayerARPG.MMO
         {
             if (!CanCreateParty(playerCharacterEntity))
                 return;
-            CreatePartyRoutine(playerCharacterEntity, shareExp, shareItem);
+            CreatePartyRoutine(playerCharacterEntity, shareExp, shareItem).Forget();
         }
 
-        private async void CreatePartyRoutine(BasePlayerCharacterEntity playerCharacterEntity, bool shareExp, bool shareItem)
+        private async UniTaskVoid CreatePartyRoutine(BasePlayerCharacterEntity playerCharacterEntity, bool shareExp, bool shareItem)
         {
             PartyResp createPartyResp = await DbServiceClient.CreatePartyAsync(new CreatePartyReq()
             {
@@ -354,10 +354,10 @@ namespace MultiplayerARPG.MMO
         {
             if (!CanCreateGuild(playerCharacterEntity, guildName))
                 return;
-            CreateGuildRoutine(playerCharacterEntity, guildName);
+            CreateGuildRoutine(playerCharacterEntity, guildName).Forget();
         }
 
-        private async void CreateGuildRoutine(BasePlayerCharacterEntity playerCharacterEntity, string guildName)
+        private async UniTaskVoid CreateGuildRoutine(BasePlayerCharacterEntity playerCharacterEntity, string guildName)
         {
             FindGuildNameResp findGuildNameResp = await DbServiceClient.FindGuildNameAsync(new FindGuildNameReq()
             {
@@ -591,11 +591,11 @@ namespace MultiplayerARPG.MMO
 
         public override void IncreaseGuildExp(BasePlayerCharacterEntity playerCharacterEntity, int exp)
         {
-            IncreaseGuildExpRoutine(playerCharacterEntity, exp);
+            IncreaseGuildExpRoutine(playerCharacterEntity, exp).Forget();
         }
 
 
-        private async void IncreaseGuildExpRoutine(BasePlayerCharacterEntity playerCharacterEntity, int exp)
+        private async UniTaskVoid IncreaseGuildExpRoutine(BasePlayerCharacterEntity playerCharacterEntity, int exp)
         {
             int guildId;
             GuildData guild;
@@ -617,10 +617,10 @@ namespace MultiplayerARPG.MMO
 
         public override void AddGuildSkill(BasePlayerCharacterEntity playerCharacterEntity, int dataId)
         {
-            AddGuildSkillRoutine(playerCharacterEntity, dataId);
+            AddGuildSkillRoutine(playerCharacterEntity, dataId).Forget();
         }
 
-        private async void AddGuildSkillRoutine(BasePlayerCharacterEntity playerCharacterEntity, int dataId)
+        private async UniTaskVoid AddGuildSkillRoutine(BasePlayerCharacterEntity playerCharacterEntity, int dataId)
         {
             int guildId;
             GuildData guild;
@@ -664,10 +664,10 @@ namespace MultiplayerARPG.MMO
             if (!usingStorageCharacters.ContainsKey(playerCharacterEntity.CurrentStorageId))
                 usingStorageCharacters[playerCharacterEntity.CurrentStorageId] = new HashSet<uint>();
             usingStorageCharacters[playerCharacterEntity.CurrentStorageId].Add(playerCharacterEntity.ObjectId);
-            OpenStorageRoutine(playerCharacterEntity);
+            OpenStorageRoutine(playerCharacterEntity).Forget();
         }
 
-        private async void OpenStorageRoutine(BasePlayerCharacterEntity playerCharacterEntity)
+        private async UniTaskVoid OpenStorageRoutine(BasePlayerCharacterEntity playerCharacterEntity)
         {
             ReadStorageItemsReq req = new ReadStorageItemsReq();
             req.StorageType = (EStorageType)playerCharacterEntity.CurrentStorageId.storageType;
@@ -692,10 +692,10 @@ namespace MultiplayerARPG.MMO
                 SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.CannotAccessStorage);
                 return;
             }
-            MoveItemToStorageRoutine(playerCharacterEntity, storageId, nonEquipIndex, amount, storageItemIndex);
+            MoveItemToStorageRoutine(playerCharacterEntity, storageId, nonEquipIndex, amount, storageItemIndex).Forget();
         }
 
-        private async void MoveItemToStorageRoutine(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short nonEquipIndex, short amount, short storageItemIndex)
+        private async UniTaskVoid MoveItemToStorageRoutine(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short nonEquipIndex, short amount, short storageItemIndex)
         {
             MoveItemToStorageReq req = new MoveItemToStorageReq();
             req.StorageType = (EStorageType)storageId.storageType;
@@ -724,10 +724,10 @@ namespace MultiplayerARPG.MMO
                 SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.CannotAccessStorage);
                 return;
             }
-            MoveItemFromStorageRoutine(playerCharacterEntity, storageId, storageItemIndex, amount, nonEquipIndex);
+            MoveItemFromStorageRoutine(playerCharacterEntity, storageId, storageItemIndex, amount, nonEquipIndex).Forget();
         }
 
-        private async void MoveItemFromStorageRoutine(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short storageItemIndex, short amount, short nonEquipIndex)
+        private async UniTaskVoid MoveItemFromStorageRoutine(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short storageItemIndex, short amount, short nonEquipIndex)
         {
             MoveItemFromStorageReq req = new MoveItemFromStorageReq();
             req.StorageType = (EStorageType)storageId.storageType;
@@ -751,10 +751,10 @@ namespace MultiplayerARPG.MMO
 
         public override void IncreaseStorageItems(StorageId storageId, CharacterItem addingItem, Action<bool> callback)
         {
-            IncreaseStorageItemsRoutine(storageId, addingItem, callback);
+            IncreaseStorageItemsRoutine(storageId, addingItem, callback).Forget();
         }
 
-        private async void IncreaseStorageItemsRoutine(StorageId storageId, CharacterItem addingItem, Action<bool> callback)
+        private async UniTaskVoid IncreaseStorageItemsRoutine(StorageId storageId, CharacterItem addingItem, Action<bool> callback)
         {
             IncreaseStorageItemsReq req = new IncreaseStorageItemsReq();
             req.StorageType = (EStorageType)storageId.storageType;
@@ -778,10 +778,10 @@ namespace MultiplayerARPG.MMO
 
         public override void DecreaseStorageItems(StorageId storageId, int dataId, short amount, Action<bool, Dictionary<int, short>> callback)
         {
-            DecreaseStorageItemsRoutine(storageId, dataId, amount, callback);
+            DecreaseStorageItemsRoutine(storageId, dataId, amount, callback).Forget();
         }
 
-        private async void DecreaseStorageItemsRoutine(StorageId storageId, int dataId, short amount, Action<bool, Dictionary<int, short>> callback)
+        private async UniTaskVoid DecreaseStorageItemsRoutine(StorageId storageId, int dataId, short amount, Action<bool, Dictionary<int, short>> callback)
         {
             DecreaseStorageItemsReq req = new DecreaseStorageItemsReq();
             req.StorageType = (EStorageType)storageId.storageType;
@@ -816,10 +816,10 @@ namespace MultiplayerARPG.MMO
                 SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.CannotAccessStorage);
                 return;
             }
-            SwapOrMergeStorageItemRoutine(playerCharacterEntity, storageId, fromIndex, toIndex);
+            SwapOrMergeStorageItemRoutine(playerCharacterEntity, storageId, fromIndex, toIndex).Forget();
         }
 
-        private async void SwapOrMergeStorageItemRoutine(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short fromIndex, short toIndex)
+        private async UniTaskVoid SwapOrMergeStorageItemRoutine(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short fromIndex, short toIndex)
         {
             SwapOrMergeStorageItemReq req = new SwapOrMergeStorageItemReq();
             req.StorageType = (EStorageType)storageId.storageType;
@@ -864,10 +864,10 @@ namespace MultiplayerARPG.MMO
 
         public override void DepositGold(BasePlayerCharacterEntity playerCharacterEntity, int amount)
         {
-            DepositGoldRoutine(playerCharacterEntity, amount);
+            DepositGoldRoutine(playerCharacterEntity, amount).Forget();
         }
 
-        private async void DepositGoldRoutine(BasePlayerCharacterEntity playerCharacterEntity, int amount)
+        private async UniTaskVoid DepositGoldRoutine(BasePlayerCharacterEntity playerCharacterEntity, int amount)
         {
             if (playerCharacterEntity.Gold - amount >= 0)
             {
@@ -886,10 +886,10 @@ namespace MultiplayerARPG.MMO
 
         public override void WithdrawGold(BasePlayerCharacterEntity playerCharacterEntity, int amount)
         {
-            WithdrawGoldRoutine(playerCharacterEntity, amount);
+            WithdrawGoldRoutine(playerCharacterEntity, amount).Forget();
         }
 
-        private async void WithdrawGoldRoutine(BasePlayerCharacterEntity playerCharacterEntity, int amount)
+        private async UniTaskVoid WithdrawGoldRoutine(BasePlayerCharacterEntity playerCharacterEntity, int amount)
         {
             // Get gold amount
             GoldResp goldResp = await DbServiceClient.GetGoldAsync(new GetGoldReq()
@@ -914,10 +914,10 @@ namespace MultiplayerARPG.MMO
 
         public override void DepositGuildGold(BasePlayerCharacterEntity playerCharacterEntity, int amount)
         {
-            DepositGuildGoldRoutine(playerCharacterEntity, amount);
+            DepositGuildGoldRoutine(playerCharacterEntity, amount).Forget();
         }
 
-        private async void DepositGuildGoldRoutine(BasePlayerCharacterEntity playerCharacterEntity, int amount)
+        private async UniTaskVoid DepositGuildGoldRoutine(BasePlayerCharacterEntity playerCharacterEntity, int amount)
         {
             GuildData guild;
             if (guilds.TryGetValue(playerCharacterEntity.GuildId, out guild))
@@ -944,10 +944,10 @@ namespace MultiplayerARPG.MMO
 
         public override void WithdrawGuildGold(BasePlayerCharacterEntity playerCharacterEntity, int amount)
         {
-            WithdrawGuildGoldRoutine(playerCharacterEntity, amount);
+            WithdrawGuildGoldRoutine(playerCharacterEntity, amount).Forget();
         }
 
-        private async void WithdrawGuildGoldRoutine(BasePlayerCharacterEntity playerCharacterEntity, int amount)
+        private async UniTaskVoid WithdrawGuildGoldRoutine(BasePlayerCharacterEntity playerCharacterEntity, int amount)
         {
             GuildData guild;
             if (guilds.TryGetValue(playerCharacterEntity.GuildId, out guild))
@@ -980,10 +980,10 @@ namespace MultiplayerARPG.MMO
 
         public override void FindCharacters(BasePlayerCharacterEntity playerCharacterEntity, string characterName)
         {
-            FindCharactersRoutine(playerCharacterEntity, characterName);
+            FindCharactersRoutine(playerCharacterEntity, characterName).Forget();
         }
 
-        private async void FindCharactersRoutine(BasePlayerCharacterEntity playerCharacterEntity, string characterName)
+        private async UniTaskVoid FindCharactersRoutine(BasePlayerCharacterEntity playerCharacterEntity, string characterName)
         {
             FindCharactersResp resp = await DbServiceClient.FindCharactersAsync(new FindCharactersReq()
             {
@@ -994,10 +994,10 @@ namespace MultiplayerARPG.MMO
 
         public override void AddFriend(BasePlayerCharacterEntity playerCharacterEntity, string friendCharacterId)
         {
-            AddFriendRoutine(playerCharacterEntity, friendCharacterId);
+            AddFriendRoutine(playerCharacterEntity, friendCharacterId).Forget();
         }
 
-        private async void AddFriendRoutine(BasePlayerCharacterEntity playerCharacterEntity, string friendCharacterId)
+        private async UniTaskVoid AddFriendRoutine(BasePlayerCharacterEntity playerCharacterEntity, string friendCharacterId)
         {
             ReadFriendsResp resp = await DbServiceClient.CreateFriendAsync(new CreateFriendReq()
             {
@@ -1009,10 +1009,10 @@ namespace MultiplayerARPG.MMO
 
         public override void RemoveFriend(BasePlayerCharacterEntity playerCharacterEntity, string friendCharacterId)
         {
-            RemoveFriendRoutine(playerCharacterEntity, friendCharacterId);
+            RemoveFriendRoutine(playerCharacterEntity, friendCharacterId).Forget();
         }
 
-        private async void RemoveFriendRoutine(BasePlayerCharacterEntity playerCharacterEntity, string friendCharacterId)
+        private async UniTaskVoid RemoveFriendRoutine(BasePlayerCharacterEntity playerCharacterEntity, string friendCharacterId)
         {
             ReadFriendsResp resp = await DbServiceClient.DeleteFriendAsync(new DeleteFriendReq()
             {
@@ -1024,10 +1024,10 @@ namespace MultiplayerARPG.MMO
 
         public override void GetFriends(BasePlayerCharacterEntity playerCharacterEntity)
         {
-            GetFriendsRoutine(playerCharacterEntity);
+            GetFriendsRoutine(playerCharacterEntity).Forget();
         }
 
-        private async void GetFriendsRoutine(BasePlayerCharacterEntity playerCharacterEntity)
+        private async UniTaskVoid GetFriendsRoutine(BasePlayerCharacterEntity playerCharacterEntity)
         {
             ReadFriendsResp readFriendsResp = await DbServiceClient.ReadFriendsAsync(new ReadFriendsReq()
             {

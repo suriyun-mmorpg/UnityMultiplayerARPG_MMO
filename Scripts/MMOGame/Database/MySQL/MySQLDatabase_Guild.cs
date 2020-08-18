@@ -1,11 +1,11 @@
-﻿using MySqlConnector;
-using System.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
+using MySqlConnector;
 
 namespace MultiplayerARPG.MMO
 {
     public partial class MySQLDatabase
     {
-        public override async Task<int> CreateGuild(string guildName, string leaderId)
+        public override async UniTask<int> CreateGuild(string guildName, string leaderId)
         {
             int id = 0;
             await ExecuteReader((reader) =>
@@ -23,7 +23,7 @@ namespace MultiplayerARPG.MMO
             return id;
         }
 
-        public override async Task<GuildData> ReadGuild(int id, GuildRoleData[] defaultGuildRoles)
+        public override async UniTask<GuildData> ReadGuild(int id, GuildRoleData[] defaultGuildRoles)
         {
             GuildData result = null;
             await ExecuteReader((reader) =>
@@ -91,7 +91,7 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public override async Task UpdateGuildLevel(int id, short level, int exp, short skillPoint)
+        public override async UniTask UpdateGuildLevel(int id, short level, int exp, short skillPoint)
         {
             await ExecuteNonQuery("UPDATE guild SET level=@level, exp=@exp, skillPoint=@skillPoint WHERE id=@id",
                 new MySqlParameter("@level", level),
@@ -100,21 +100,21 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@id", id));
         }
 
-        public override async Task UpdateGuildLeader(int id, string leaderId)
+        public override async UniTask UpdateGuildLeader(int id, string leaderId)
         {
             await ExecuteNonQuery("UPDATE guild SET leaderId=@leaderId WHERE id=@id",
                 new MySqlParameter("@leaderId", leaderId),
                 new MySqlParameter("@id", id));
         }
 
-        public override async Task UpdateGuildMessage(int id, string guildMessage)
+        public override async UniTask UpdateGuildMessage(int id, string guildMessage)
         {
             await ExecuteNonQuery("UPDATE guild SET guildMessage=@guildMessage WHERE id=@id",
                 new MySqlParameter("@guildMessage", guildMessage),
                 new MySqlParameter("@id", id));
         }
 
-        public override async Task UpdateGuildRole(int id, byte guildRole, string name, bool canInvite, bool canKick, byte shareExpPercentage)
+        public override async UniTask UpdateGuildRole(int id, byte guildRole, string name, bool canInvite, bool canKick, byte shareExpPercentage)
         {
             await ExecuteNonQuery("DELETE FROM guildrole WHERE guildId=@guildId AND guildRole=@guildRole",
                 new MySqlParameter("@guildId", id),
@@ -129,14 +129,14 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@shareExpPercentage", shareExpPercentage));
         }
 
-        public override async Task UpdateGuildMemberRole(string characterId, byte guildRole)
+        public override async UniTask UpdateGuildMemberRole(string characterId, byte guildRole)
         {
             await ExecuteNonQuery("UPDATE characters SET guildRole=@guildRole WHERE id=@characterId",
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@guildRole", guildRole));
         }
 
-        public override async Task UpdateGuildSkillLevel(int id, int dataId, short level, short skillPoint)
+        public override async UniTask UpdateGuildSkillLevel(int id, int dataId, short level, short skillPoint)
         {
             await ExecuteNonQuery("DELETE FROM guildskill WHERE guildId=@guildId AND dataId=@dataId",
                 new MySqlParameter("@guildId", id),
@@ -151,21 +151,21 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@id", id));
         }
 
-        public override async Task DeleteGuild(int id)
+        public override async UniTask DeleteGuild(int id)
         {
             await ExecuteNonQuery("DELETE FROM guild WHERE id=@id;" +
                 "UPDATE characters SET guildId=0 WHERE guildId=@id;",
                 new MySqlParameter("@id", id));
         }
 
-        public override async Task<long> FindGuildName(string guildName)
+        public override async UniTask<long> FindGuildName(string guildName)
         {
             object result = await ExecuteScalar("SELECT COUNT(*) FROM guild WHERE guildName LIKE @guildName",
                 new MySqlParameter("@guildName", guildName));
             return result != null ? (long)result : 0;
         }
 
-        public override async Task UpdateCharacterGuild(string characterId, int guildId, byte guildRole)
+        public override async UniTask UpdateCharacterGuild(string characterId, int guildId, byte guildRole)
         {
             await ExecuteNonQuery("UPDATE characters SET guildId=@guildId, guildRole=@guildRole WHERE id=@characterId",
                 new MySqlParameter("@characterId", characterId),
@@ -173,7 +173,7 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@guildRole", guildRole));
         }
 
-        public override async Task<int> GetGuildGold(int guildId)
+        public override async UniTask<int> GetGuildGold(int guildId)
         {
             int gold = 0;
             await ExecuteReader((reader) =>
@@ -185,7 +185,7 @@ namespace MultiplayerARPG.MMO
             return gold;
         }
 
-        public override async Task UpdateGuildGold(int guildId, int gold)
+        public override async UniTask UpdateGuildGold(int guildId, int gold)
         {
             await ExecuteNonQuery("UPDATE guild SET gold=@gold WHERE id=@id",
                 new MySqlParameter("@id", guildId),

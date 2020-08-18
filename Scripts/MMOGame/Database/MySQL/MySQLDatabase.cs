@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using LiteNetLibManager;
 using UnityEngine;
 using MiniJSON;
-using System.IO;
-using System.Threading.Tasks;
 using System;
+using System.IO;
+using Cysharp.Threading.Tasks;
 
 namespace MultiplayerARPG.MMO
 {
@@ -41,10 +41,10 @@ namespace MultiplayerARPG.MMO
             ConfigReader.ReadConfigs(jsonConfig, "mySqlPassword", out password, password);
             ConfigReader.ReadConfigs(jsonConfig, "mySqlDbName", out dbName, dbName);
 
-            Migration();
+            Migration().Forget();
         }
 
-        private async void Migration()
+        private async UniTaskVoid Migration()
         {
             // 1.57b
             string migrationId = "1.57b";
@@ -70,18 +70,18 @@ namespace MultiplayerARPG.MMO
                 }
                 catch { }
                 // Insert migrate history
-                InsertMigrationId(migrationId);
+                InsertMigrationId(migrationId).Forget();
             }
         }
 
-        private async Task<bool> HasMigrationId(string migrationId)
+        private async UniTask<bool> HasMigrationId(string migrationId)
         {
             object result = await ExecuteScalar("SELECT COUNT(*) FROM __migrations WHERE migrationId=@migrationId", new MySqlParameter("@migrationId", migrationId));
             long count = result != null ? (long)result : 0;
             return count > 0;
         }
 
-        public async void InsertMigrationId(string migrationId)
+        public async UniTaskVoid InsertMigrationId(string migrationId)
         {
             await ExecuteNonQuery("INSERT INTO __migrations (migrationId) VALUES (@migrationId)", new MySqlParameter("@migrationId", migrationId));
         }
@@ -102,7 +102,7 @@ namespace MultiplayerARPG.MMO
             return new MySqlConnection(GetConnectionString());
         }
 
-        private async Task OpenConnection(MySqlConnection connection)
+        private async UniTask OpenConnection(MySqlConnection connection)
         {
             try
             {
@@ -114,7 +114,7 @@ namespace MultiplayerARPG.MMO
             }
         }
 
-        public async Task<long> ExecuteInsertData(string sql, params MySqlParameter[] args)
+        public async UniTask<long> ExecuteInsertData(string sql, params MySqlParameter[] args)
         {
             MySqlConnection connection = NewConnection();
             await OpenConnection(connection);
@@ -123,7 +123,7 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public async Task<long> ExecuteInsertData(MySqlConnection connection, MySqlTransaction transaction, string sql, params MySqlParameter[] args)
+        public async UniTask<long> ExecuteInsertData(MySqlConnection connection, MySqlTransaction transaction, string sql, params MySqlParameter[] args)
         {
             bool createLocalConnection = false;
             if (connection == null)
@@ -150,7 +150,7 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public async Task<int> ExecuteNonQuery(string sql, params MySqlParameter[] args)
+        public async UniTask<int> ExecuteNonQuery(string sql, params MySqlParameter[] args)
         {
             MySqlConnection connection = NewConnection();
             await OpenConnection(connection);
@@ -159,7 +159,7 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public async Task<int> ExecuteNonQuery(MySqlConnection connection, MySqlTransaction transaction, string sql, params MySqlParameter[] args)
+        public async UniTask<int> ExecuteNonQuery(MySqlConnection connection, MySqlTransaction transaction, string sql, params MySqlParameter[] args)
         {
             bool createLocalConnection = false;
             if (connection == null)
@@ -185,7 +185,7 @@ namespace MultiplayerARPG.MMO
             return numRows;
         }
 
-        public async Task<object> ExecuteScalar(string sql, params MySqlParameter[] args)
+        public async UniTask<object> ExecuteScalar(string sql, params MySqlParameter[] args)
         {
             MySqlConnection connection = NewConnection();
             await OpenConnection(connection);
@@ -194,7 +194,7 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public async Task<object> ExecuteScalar(MySqlConnection connection, MySqlTransaction transaction, string sql, params MySqlParameter[] args)
+        public async UniTask<object> ExecuteScalar(MySqlConnection connection, MySqlTransaction transaction, string sql, params MySqlParameter[] args)
         {
             bool createLocalConnection = false;
             if (connection == null)
@@ -220,7 +220,7 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public async Task ExecuteReader(Action<MySqlDataReader> onRead, string sql, params MySqlParameter[] args)
+        public async UniTask ExecuteReader(Action<MySqlDataReader> onRead, string sql, params MySqlParameter[] args)
         {
             MySqlConnection connection = NewConnection();
             await OpenConnection(connection);
@@ -228,7 +228,7 @@ namespace MultiplayerARPG.MMO
             await connection.CloseAsync();
         }
 
-        public async Task ExecuteReader(MySqlConnection connection, MySqlTransaction transaction, Action<MySqlDataReader> onRead, string sql, params MySqlParameter[] args)
+        public async UniTask ExecuteReader(MySqlConnection connection, MySqlTransaction transaction, Action<MySqlDataReader> onRead, string sql, params MySqlParameter[] args)
         {
             bool createLocalConnection = false;
             if (connection == null)
@@ -254,7 +254,7 @@ namespace MultiplayerARPG.MMO
                 await connection.CloseAsync();
         }
 
-        public override async Task<string> ValidateUserLogin(string username, string password)
+        public override async UniTask<string> ValidateUserLogin(string username, string password)
         {
             string id = string.Empty;
             await ExecuteReader((reader) =>
@@ -271,7 +271,7 @@ namespace MultiplayerARPG.MMO
             return id;
         }
 
-        public override async Task<bool> ValidateAccessToken(string userId, string accessToken)
+        public override async UniTask<bool> ValidateAccessToken(string userId, string accessToken)
         {
             object result = await ExecuteScalar("SELECT COUNT(*) FROM userlogin WHERE id=@id AND accessToken=@accessToken",
                 new MySqlParameter("@id", userId),
@@ -279,7 +279,7 @@ namespace MultiplayerARPG.MMO
             return (result != null ? (long)result : 0) > 0;
         }
 
-        public override async Task<byte> GetUserLevel(string userId)
+        public override async UniTask<byte> GetUserLevel(string userId)
         {
             byte userLevel = 0;
             await ExecuteReader((reader) =>
@@ -291,7 +291,7 @@ namespace MultiplayerARPG.MMO
             return userLevel;
         }
 
-        public override async Task<int> GetGold(string userId)
+        public override async UniTask<int> GetGold(string userId)
         {
             int gold = 0;
             await ExecuteReader((reader) =>
@@ -303,14 +303,14 @@ namespace MultiplayerARPG.MMO
             return gold;
         }
 
-        public override async Task UpdateGold(string userId, int gold)
+        public override async UniTask UpdateGold(string userId, int gold)
         {
             await ExecuteNonQuery("UPDATE userlogin SET gold=@gold WHERE id=@id",
                 new MySqlParameter("@id", userId),
                 new MySqlParameter("@gold", gold));
         }
 
-        public override async Task<int> GetCash(string userId)
+        public override async UniTask<int> GetCash(string userId)
         {
             int cash = 0;
             await ExecuteReader((reader) =>
@@ -322,21 +322,21 @@ namespace MultiplayerARPG.MMO
             return cash;
         }
 
-        public override async Task UpdateCash(string userId, int cash)
+        public override async UniTask UpdateCash(string userId, int cash)
         {
             await ExecuteNonQuery("UPDATE userlogin SET cash=@cash WHERE id=@id",
                 new MySqlParameter("@id", userId),
                 new MySqlParameter("@cash", cash));
         }
 
-        public override async Task UpdateAccessToken(string userId, string accessToken)
+        public override async UniTask UpdateAccessToken(string userId, string accessToken)
         {
             await ExecuteNonQuery("UPDATE userlogin SET accessToken=@accessToken WHERE id=@id",
                 new MySqlParameter("@id", userId),
                 new MySqlParameter("@accessToken", accessToken));
         }
 
-        public override async Task CreateUserLogin(string username, string password)
+        public override async UniTask CreateUserLogin(string username, string password)
         {
             await ExecuteNonQuery("INSERT INTO userlogin (id, username, password, email, authType) VALUES (@id, @username, @password, @email, @authType)",
                 new MySqlParameter("@id", GenericUtils.GetUniqueId()),
@@ -346,7 +346,7 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@authType", AUTH_TYPE_NORMAL));
         }
 
-        public override async Task<long> FindUsername(string username)
+        public override async UniTask<long> FindUsername(string username)
         {
             object result = await ExecuteScalar("SELECT COUNT(*) FROM userlogin WHERE username LIKE @username",
                 new MySqlParameter("@username", username));

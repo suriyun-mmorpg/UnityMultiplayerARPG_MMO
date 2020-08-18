@@ -1,7 +1,7 @@
-﻿using Mono.Data.Sqlite;
+﻿using Cysharp.Threading.Tasks;
+using Mono.Data.Sqlite;
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace MultiplayerARPG.MMO
@@ -44,9 +44,9 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public override async Task<List<CharacterItem>> ReadStorageItems(StorageType storageType, string storageOwnerId)
+        public override async UniTask<List<CharacterItem>> ReadStorageItems(StorageType storageType, string storageOwnerId)
         {
-            await Task.Yield();
+            await UniTask.Yield();
             List<CharacterItem> result = new List<CharacterItem>();
             ExecuteReader((reader) =>
             {
@@ -61,9 +61,9 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public override async Task UpdateStorageItems(StorageType storageType, string storageOwnerId, IList<CharacterItem> characterItems)
+        public override async UniTask UpdateStorageItems(StorageType storageType, string storageOwnerId, IList<CharacterItem> characterItems)
         {
-            await Task.Yield();
+            await UniTask.Yield();
             BeginTransaction();
             DeleteStorageItems(storageType, storageOwnerId);
             for (int i = 0; i < characterItems.Count; ++i)

@@ -2,13 +2,13 @@
 using LiteNetLibManager;
 using UnityEngine;
 using MySqlConnector;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 
 namespace MultiplayerARPG.MMO
 {
     public partial class MySQLDatabase
     {
-        private async Task FillCharacterAttributes(IPlayerCharacterData characterData)
+        private async UniTask FillCharacterAttributes(IPlayerCharacterData characterData)
         {
             MySqlConnection connection = NewConnection();
             await OpenConnection(connection);
@@ -33,7 +33,7 @@ namespace MultiplayerARPG.MMO
             await connection.CloseAsync();
         }
 
-        private async Task FillCharacterBuffs(IPlayerCharacterData characterData)
+        private async UniTask FillCharacterBuffs(IPlayerCharacterData characterData)
         {
             MySqlConnection connection = NewConnection();
             await OpenConnection(connection);
@@ -58,7 +58,7 @@ namespace MultiplayerARPG.MMO
             await connection.CloseAsync();
         }
 
-        private async Task FillCharacterHotkeys(IPlayerCharacterData characterData)
+        private async UniTask FillCharacterHotkeys(IPlayerCharacterData characterData)
         {
             MySqlConnection connection = NewConnection();
             await OpenConnection(connection);
@@ -83,7 +83,7 @@ namespace MultiplayerARPG.MMO
             await connection.CloseAsync();
         }
 
-        private async Task FillCharacterItems(IPlayerCharacterData characterData)
+        private async UniTask FillCharacterItems(IPlayerCharacterData characterData)
         {
             MySqlConnection connection = NewConnection();
             await OpenConnection(connection);
@@ -116,7 +116,7 @@ namespace MultiplayerARPG.MMO
             await connection.CloseAsync();
         }
 
-        private async Task FillCharacterQuests(IPlayerCharacterData characterData)
+        private async UniTask FillCharacterQuests(IPlayerCharacterData characterData)
         {
             MySqlConnection connection = NewConnection();
             await OpenConnection(connection);
@@ -141,7 +141,7 @@ namespace MultiplayerARPG.MMO
             await connection.CloseAsync();
         }
 
-        private async Task FillCharacterSkills(IPlayerCharacterData characterData)
+        private async UniTask FillCharacterSkills(IPlayerCharacterData characterData)
         {
             MySqlConnection connection = NewConnection();
             await OpenConnection(connection);
@@ -166,7 +166,7 @@ namespace MultiplayerARPG.MMO
             await connection.CloseAsync();
         }
 
-        private async Task FillCharacterSkillUsages(IPlayerCharacterData characterData)
+        private async UniTask FillCharacterSkillUsages(IPlayerCharacterData characterData)
         {
             MySqlConnection connection = NewConnection();
             await OpenConnection(connection);
@@ -191,7 +191,7 @@ namespace MultiplayerARPG.MMO
             await connection.CloseAsync();
         }
 
-        private async Task FillCharacterSummons(IPlayerCharacterData characterData)
+        private async UniTask FillCharacterSummons(IPlayerCharacterData characterData)
         {
             MySqlConnection connection = NewConnection();
             await OpenConnection(connection);
@@ -216,9 +216,9 @@ namespace MultiplayerARPG.MMO
             await connection.CloseAsync();
         }
 
-        private async Task FillCharacterRelatesData(IPlayerCharacterData characterData)
+        private async UniTask FillCharacterRelatesData(IPlayerCharacterData characterData)
         {
-            await Task.WhenAll(FillCharacterAttributes(characterData),
+            await UniTask.WhenAll(FillCharacterAttributes(characterData),
                 FillCharacterBuffs(characterData),
                 FillCharacterHotkeys(characterData),
                 FillCharacterItems(characterData),
@@ -228,7 +228,7 @@ namespace MultiplayerARPG.MMO
                 FillCharacterSummons(characterData));
         }
 
-        public override async Task CreateCharacter(string userId, IPlayerCharacterData characterData)
+        public override async UniTask CreateCharacter(string userId, IPlayerCharacterData characterData)
         {
             await ExecuteNonQuery("INSERT INTO characters " +
                 "(id, userId, dataId, entityId, factionId, characterName, level, exp, currentHp, currentMp, currentStamina, currentFood, currentWater, equipWeaponSet, statPoint, skillPoint, gold, currentMapName, currentPositionX, currentPositionY, currentPositionZ, respawnMapName, respawnPositionX, respawnPositionY, respawnPositionZ, mountDataId) VALUES " +
@@ -306,7 +306,7 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public override async Task<PlayerCharacterData> ReadCharacter(
+        public override async UniTask<PlayerCharacterData> ReadCharacter(
             string id,
             bool withEquipWeapons = true,
             bool withAttributes = true,
@@ -360,7 +360,7 @@ namespace MultiplayerARPG.MMO
                 List<CharacterHotkey> hotkeys = new List<CharacterHotkey>();
                 List<CharacterQuest> quests = new List<CharacterQuest>();
                 // Read data
-                List<Task> tasks = new List<Task>();
+                List<UniTask> tasks = new List<UniTask>();
                 if (withEquipWeapons)
                     tasks.Add(ReadCharacterEquipWeapons(id, selectableWeaponSets));
                 if (withAttributes)
@@ -381,7 +381,7 @@ namespace MultiplayerARPG.MMO
                     tasks.Add(ReadCharacterHotkeys(id, hotkeys));
                 if (withQuests)
                     tasks.Add(ReadCharacterQuests(id, quests));
-                await Task.WhenAll(tasks);
+                await UniTask.WhenAll(tasks);
                 // Assign read data
                 if (withEquipWeapons)
                     result.SelectableWeaponSets = selectableWeaponSets;
@@ -407,7 +407,7 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public override async Task<List<PlayerCharacterData>> ReadCharacters(string userId)
+        public override async UniTask<List<PlayerCharacterData>> ReadCharacters(string userId)
         {
             List<PlayerCharacterData> result = new List<PlayerCharacterData>();
             List<string> characterIds = new List<string>();
@@ -425,7 +425,7 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public override async Task UpdateCharacter(IPlayerCharacterData character)
+        public override async UniTask UpdateCharacter(IPlayerCharacterData character)
         {
             await ExecuteNonQuery("UPDATE characters SET " +
                 "dataId=@dataId, " +
@@ -482,7 +482,7 @@ namespace MultiplayerARPG.MMO
             this.InvokeInstanceDevExtMethods("UpdateCharacter", character);
         }
 
-        public override async Task DeleteCharacter(string userId, string id)
+        public override async UniTask DeleteCharacter(string userId, string id)
         {
             object result = await ExecuteScalar("SELECT COUNT(*) FROM characters WHERE id=@id AND userId=@userId",
                 new MySqlParameter("@id", id),
@@ -518,14 +518,14 @@ namespace MultiplayerARPG.MMO
             }
         }
 
-        public override async Task<long> FindCharacterName(string characterName)
+        public override async UniTask<long> FindCharacterName(string characterName)
         {
             object result = await ExecuteScalar("SELECT COUNT(*) FROM characters WHERE characterName LIKE @characterName",
                 new MySqlParameter("@characterName", characterName));
             return result != null ? (long)result : 0;
         }
 
-        public override async Task<List<SocialCharacterData>> FindCharacters(string characterName)
+        public override async UniTask<List<SocialCharacterData>> FindCharacters(string characterName)
         {
             List<SocialCharacterData> result = new List<SocialCharacterData>();
             await ExecuteReader((reader) =>
@@ -546,7 +546,7 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public override async Task CreateFriend(string id1, string id2)
+        public override async UniTask CreateFriend(string id1, string id2)
         {
             await DeleteFriend(id1, id2);
             await ExecuteNonQuery("INSERT INTO friend " +
@@ -556,7 +556,7 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@characterId2", id2));
         }
 
-        public override async Task DeleteFriend(string id1, string id2)
+        public override async UniTask DeleteFriend(string id1, string id2)
         {
             await ExecuteNonQuery("DELETE FROM friend WHERE " +
                 "characterId1 LIKE @characterId1 AND " +
@@ -565,7 +565,7 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@characterId2", id2));
         }
 
-        public override async Task<List<SocialCharacterData>> ReadFriends(string id1)
+        public override async UniTask<List<SocialCharacterData>> ReadFriends(string id1)
         {
             List<SocialCharacterData> result = new List<SocialCharacterData>();
             List<string> characterIds = new List<string>();

@@ -1,15 +1,15 @@
-﻿using Mono.Data.Sqlite;
+﻿using Cysharp.Threading.Tasks;
+using Mono.Data.Sqlite;
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace MultiplayerARPG.MMO
 {
     public partial class SQLiteDatabase
     {
-        public override async Task<int> CreateParty(bool shareExp, bool shareItem, string leaderId)
+        public override async UniTask<int> CreateParty(bool shareExp, bool shareItem, string leaderId)
         {
-            await Task.Yield();
+            await UniTask.Yield();
             int id = 0;
             ExecuteReader((reader) =>
             {
@@ -27,9 +27,9 @@ namespace MultiplayerARPG.MMO
             return id;
         }
 
-        public override async Task<PartyData> ReadParty(int id)
+        public override async UniTask<PartyData> ReadParty(int id)
         {
-            await Task.Yield();
+            await UniTask.Yield();
             PartyData result = null;
             ExecuteReader((reader) =>
             {
@@ -63,34 +63,34 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public override async Task UpdatePartyLeader(int id, string leaderId)
+        public override async UniTask UpdatePartyLeader(int id, string leaderId)
         {
-            await Task.Yield();
+            await UniTask.Yield();
             ExecuteNonQuery("UPDATE party SET leaderId=@leaderId WHERE id=@id",
                 new SqliteParameter("@leaderId", leaderId),
                 new SqliteParameter("@id", id));
         }
 
-        public override async Task UpdateParty(int id, bool shareExp, bool shareItem)
+        public override async UniTask UpdateParty(int id, bool shareExp, bool shareItem)
         {
-            await Task.Yield();
+            await UniTask.Yield();
             ExecuteNonQuery("UPDATE party SET shareExp=@shareExp, shareItem=@shareItem WHERE id=@id",
                 new SqliteParameter("@shareExp", shareExp),
                 new SqliteParameter("@shareItem", shareItem),
                 new SqliteParameter("@id", id));
         }
 
-        public override async Task DeleteParty(int id)
+        public override async UniTask DeleteParty(int id)
         {
-            await Task.Yield();
+            await UniTask.Yield();
             ExecuteNonQuery("DELETE FROM party WHERE id=@id;" +
                 "UPDATE characters SET partyId=0 WHERE partyId=@id;",
                 new SqliteParameter("@id", id));
         }
 
-        public override async Task UpdateCharacterParty(string characterId, int partyId)
+        public override async UniTask UpdateCharacterParty(string characterId, int partyId)
         {
-            await Task.Yield();
+            await UniTask.Yield();
             ExecuteNonQuery("UPDATE characters SET partyId=@partyId WHERE id=@characterId",
                 new SqliteParameter("@characterId", characterId),
                 new SqliteParameter("@partyId", partyId));

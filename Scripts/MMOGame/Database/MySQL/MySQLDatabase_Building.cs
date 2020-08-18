@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using MySqlConnector;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 
 namespace MultiplayerARPG.MMO
 {
@@ -29,7 +29,7 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public override async Task CreateBuilding(string mapName, IBuildingSaveData saveData)
+        public override async UniTask CreateBuilding(string mapName, IBuildingSaveData saveData)
         {
             MySqlConnection connection = NewConnection();
             await OpenConnection(connection);
@@ -51,7 +51,7 @@ namespace MultiplayerARPG.MMO
             await connection.CloseAsync();
         }
 
-        public override async Task<List<BuildingSaveData>> ReadBuildings(string mapName)
+        public override async UniTask<List<BuildingSaveData>> ReadBuildings(string mapName)
         {
             List<BuildingSaveData> result = new List<BuildingSaveData>();
             await ExecuteReader((reader) =>
@@ -65,7 +65,7 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public override async Task UpdateBuilding(string mapName, IBuildingSaveData building)
+        public override async UniTask UpdateBuilding(string mapName, IBuildingSaveData building)
         {
             MySqlConnection connection = NewConnection();
             await OpenConnection(connection);
@@ -104,7 +104,7 @@ namespace MultiplayerARPG.MMO
             await connection.CloseAsync();
         }
 
-        public override async Task DeleteBuilding(string mapName, string id)
+        public override async UniTask DeleteBuilding(string mapName, string id)
         {
             MySqlConnection connection = NewConnection();
             await OpenConnection(connection);

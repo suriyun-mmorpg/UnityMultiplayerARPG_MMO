@@ -1,15 +1,15 @@
-﻿using LiteNetLib;
+﻿using Cysharp.Threading.Tasks;
+using LiteNetLib;
 using LiteNetLibManager;
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace MultiplayerARPG.MMO
 {
     public partial class MapNetworkManager
     {
-        private async Task LoadStorageRoutine(StorageId storageId)
+        private async UniTask LoadStorageRoutine(StorageId storageId)
         {
             if (!loadingStorageIds.Contains(storageId))
             {
@@ -25,7 +25,7 @@ namespace MultiplayerARPG.MMO
             }
         }
 
-        private async Task LoadPartyRoutine(int id)
+        private async UniTask LoadPartyRoutine(int id)
         {
             if (id > 0 && !loadingPartyIds.Contains(id))
             {
@@ -39,7 +39,7 @@ namespace MultiplayerARPG.MMO
             }
         }
 
-        private async Task LoadGuildRoutine(int id)
+        private async UniTask LoadGuildRoutine(int id)
         {
             if (id > 0 && !loadingGuildIds.Contains(id))
             {
@@ -53,7 +53,7 @@ namespace MultiplayerARPG.MMO
             }
         }
 
-        private async Task SaveCharacterRoutine(PlayerCharacterData playerCharacterData, string userId)
+        private async UniTask SaveCharacterRoutine(PlayerCharacterData playerCharacterData, string userId)
         {
             if (playerCharacterData != null && !savingCharacters.Contains(playerCharacterData.Id))
             {
@@ -69,7 +69,7 @@ namespace MultiplayerARPG.MMO
             }
         }
 
-        private async void SaveCharactersRoutine()
+        private async UniTaskVoid SaveCharactersRoutine()
         {
             if (savingCharacters.Count == 0)
             {
@@ -81,14 +81,14 @@ namespace MultiplayerARPG.MMO
                 }
                 while (savingCharacters.Count > 0)
                 {
-                    await Task.Yield();
+                    await UniTask.Yield();
                 }
                 if (LogInfo)
                     Logging.Log(LogTag, "Saved " + i + " character(s)");
             }
         }
 
-        private async Task SaveBuildingRoutine(BuildingSaveData buildingSaveData)
+        private async UniTask SaveBuildingRoutine(BuildingSaveData buildingSaveData)
         {
             if (!savingBuildings.Contains(buildingSaveData.Id))
             {
@@ -105,7 +105,7 @@ namespace MultiplayerARPG.MMO
             }
         }
 
-        private async void SaveBuildingsRoutine()
+        private async UniTaskVoid SaveBuildingsRoutine()
         {
             if (savingBuildings.Count == 0)
             {
@@ -118,7 +118,7 @@ namespace MultiplayerARPG.MMO
                 }
                 while (savingBuildings.Count > 0)
                 {
-                    await Task.Yield();
+                    await UniTask.Yield();
                 }
                 if (LogInfo)
                     Logging.Log(LogTag, "Saved " + i + " building(s)");

@@ -4,6 +4,7 @@ using UnityEngine;
 using LiteNetLib;
 using LiteNetLibManager;
 using LiteNetLib.Utils;
+using Cysharp.Threading.Tasks;
 
 namespace MultiplayerARPG.MMO
 {
@@ -46,10 +47,10 @@ namespace MultiplayerARPG.MMO
 
         protected void HandleRequestCharacters(LiteNetLibMessageHandler messageHandler)
         {
-            HandleRequestCharactersRoutine(messageHandler);
+            HandleRequestCharactersRoutine(messageHandler).Forget();
         }
 
-        private async void HandleRequestCharactersRoutine(LiteNetLibMessageHandler messageHandler)
+        private async UniTaskVoid HandleRequestCharactersRoutine(LiteNetLibMessageHandler messageHandler)
         {
             long connectionId = messageHandler.connectionId;
             RequestCharactersMessage message = messageHandler.ReadMessage<RequestCharactersMessage>();
@@ -76,10 +77,10 @@ namespace MultiplayerARPG.MMO
 
         protected void HandleRequestCreateCharacter(LiteNetLibMessageHandler messageHandler)
         {
-            HandleRequestCreateCharacterRoutine(messageHandler);
+            HandleRequestCreateCharacterRoutine(messageHandler).Forget();
         }
 
-        private async void HandleRequestCreateCharacterRoutine(LiteNetLibMessageHandler messageHandler)
+        private async UniTaskVoid HandleRequestCreateCharacterRoutine(LiteNetLibMessageHandler messageHandler)
         {
             long connectionId = messageHandler.connectionId;
             RequestCreateCharacterMessage message = messageHandler.ReadMessage<RequestCreateCharacterMessage>();
@@ -136,10 +137,10 @@ namespace MultiplayerARPG.MMO
 
         protected void HandleRequestDeleteCharacter(LiteNetLibMessageHandler messageHandler)
         {
-            HandleRequestDeleteCharacterRoutine(messageHandler);
+            HandleRequestDeleteCharacterRoutine(messageHandler).Forget();
         }
 
-        private async void HandleRequestDeleteCharacterRoutine(LiteNetLibMessageHandler messageHandler)
+        private async UniTaskVoid HandleRequestDeleteCharacterRoutine(LiteNetLibMessageHandler messageHandler)
         {
             long connectionId = messageHandler.connectionId;
             RequestDeleteCharacterMessage message = messageHandler.ReadMessage<RequestDeleteCharacterMessage>();
@@ -164,10 +165,10 @@ namespace MultiplayerARPG.MMO
 
         protected void HandleRequestSelectCharacter(LiteNetLibMessageHandler messageHandler)
         {
-            HandleRequestSelectCharacterRoutine(messageHandler);
+            HandleRequestSelectCharacterRoutine(messageHandler).Forget();
         }
 
-        private async void HandleRequestSelectCharacterRoutine(LiteNetLibMessageHandler messageHandler)
+        private async UniTaskVoid HandleRequestSelectCharacterRoutine(LiteNetLibMessageHandler messageHandler)
         {
             long connectionId = messageHandler.connectionId;
             RequestSelectCharacterMessage message = messageHandler.ReadMessage<RequestSelectCharacterMessage>();

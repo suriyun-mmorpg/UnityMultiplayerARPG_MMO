@@ -4,7 +4,7 @@ using UnityEngine;
 using LiteNetLib;
 using LiteNetLib.Utils;
 using LiteNetLibManager;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 
 namespace MultiplayerARPG.MMO
 {
@@ -120,11 +120,11 @@ namespace MultiplayerARPG.MMO
                 if (tempUnscaledTime - lastSaveTime > autoSaveDuration)
                 {
                     lastSaveTime = tempUnscaledTime;
-                    SaveCharactersRoutine();
+                    SaveCharactersRoutine().Forget();
                     if (!IsInstanceMap())
                     {
                         // Don't save building if it's instance map
-                        SaveBuildingsRoutine();
+                        SaveBuildingsRoutine().Forget();
                     }
                 }
                 if (IsInstanceMap())
@@ -256,10 +256,10 @@ namespace MultiplayerARPG.MMO
 
         public override void OnPeerDisconnected(long connectionId, DisconnectInfo disconnectInfo)
         {
-            OnPeerDisconnectedRoutine(connectionId, disconnectInfo);
+            OnPeerDisconnectedRoutine(connectionId, disconnectInfo).Forget();
         }
 
-        private async void OnPeerDisconnectedRoutine(long connectionId, DisconnectInfo disconnectInfo)
+        private async UniTaskVoid OnPeerDisconnectedRoutine(long connectionId, DisconnectInfo disconnectInfo)
         {
             // Save player character data
             BasePlayerCharacterEntity playerCharacterEntity;
@@ -268,7 +268,7 @@ namespace MultiplayerARPG.MMO
                 PlayerCharacterData saveCharacterData = playerCharacterEntity.CloneTo(new PlayerCharacterData());
                 while (savingCharacters.Contains(saveCharacterData.Id))
                 {
-                    await Task.Yield();
+                    await UniTask.Yield();
                 }
                 await SaveCharacterRoutine(saveCharacterData, playerCharacterEntity.UserId);
             }
@@ -298,7 +298,7 @@ namespace MultiplayerARPG.MMO
                 onClientDisconnected.Invoke(disconnectInfo);
         }
 
-        protected override async Task PreSpawnEntities()
+        protected override async UniTask PreSpawnEntities()
         {
             // Spawn buildings
             if (!IsInstanceMap())
@@ -326,14 +326,14 @@ namespace MultiplayerARPG.MMO
                 // Wait until all building storage loaded
                 while (loadingStorageIds.Count > 0)
                 {
-                    await Task.Yield();
+                    await UniTask.Yield();
                 }
             }
         }
 
-        protected override async Task PostSpawnEntities()
+        protected override async UniTask PostSpawnEntities()
         {
-            await Task.Yield();
+            await UniTask.Yield();
             CentralAppServerRegister.OnStartServer();
         }
 
@@ -384,10 +384,10 @@ namespace MultiplayerARPG.MMO
 
             player.IsReady = true;
 
-            SetPlayerReadyRoutine(connectionId, userId, accessToken, selectCharacterId);
+            SetPlayerReadyRoutine(connectionId, userId, accessToken, selectCharacterId).Forget();
         }
 
-        private async void SetPlayerReadyRoutine(long connectionId, string userId, string accessToken, string selectCharacterId)
+        private async UniTaskVoid SetPlayerReadyRoutine(long connectionId, string userId, string accessToken, string selectCharacterId)
         {
             // Validate access token
             ValidateAccessTokenResp validateAccessTokenResp = await DbServiceClient.ValidateAccessTokenAsync(new ValidateAccessTokenReq()
@@ -592,10 +592,10 @@ namespace MultiplayerARPG.MMO
 
         protected override void HandleRequestCashShopInfo(LiteNetLibMessageHandler messageHandler)
         {
-            HandleRequestCashShopInfoRoutine(messageHandler);
+            HandleRequestCashShopInfoRoutine(messageHandler).Forget();
         }
 
-        private async void HandleRequestCashShopInfoRoutine(LiteNetLibMessageHandler messageHandler)
+        private async UniTaskVoid HandleRequestCashShopInfoRoutine(LiteNetLibMessageHandler messageHandler)
         {
             long connectionId = messageHandler.connectionId;
             BaseAckMessage message = messageHandler.ReadMessage<BaseAckMessage>();
@@ -634,10 +634,10 @@ namespace MultiplayerARPG.MMO
 
         protected override void HandleRequestCashShopBuy(LiteNetLibMessageHandler messageHandler)
         {
-            HandleRequestCashShopBuyRoutine(messageHandler);
+            HandleRequestCashShopBuyRoutine(messageHandler).Forget();
         }
 
-        private async void HandleRequestCashShopBuyRoutine(LiteNetLibMessageHandler messageHandler)
+        private async UniTaskVoid HandleRequestCashShopBuyRoutine(LiteNetLibMessageHandler messageHandler)
         {
             long connectionId = messageHandler.connectionId;
             RequestCashShopBuyMessage message = messageHandler.ReadMessage<RequestCashShopBuyMessage>();
@@ -710,10 +710,10 @@ namespace MultiplayerARPG.MMO
 
         protected override void HandleRequestCashPackageInfo(LiteNetLibMessageHandler messageHandler)
         {
-            HandleRequestCashPackageInfoRoutine(messageHandler);
+            HandleRequestCashPackageInfoRoutine(messageHandler).Forget();
         }
 
-        private async void HandleRequestCashPackageInfoRoutine(LiteNetLibMessageHandler messageHandler)
+        private async UniTaskVoid HandleRequestCashPackageInfoRoutine(LiteNetLibMessageHandler messageHandler)
         {
             long connectionId = messageHandler.connectionId;
             BaseAckMessage message = messageHandler.ReadMessage<BaseAckMessage>();
@@ -752,10 +752,10 @@ namespace MultiplayerARPG.MMO
 
         protected override void HandleRequestCashPackageBuyValidation(LiteNetLibMessageHandler messageHandler)
         {
-            HandleRequestCashPackageBuyValidationRoutine(messageHandler);
+            HandleRequestCashPackageBuyValidationRoutine(messageHandler).Forget();
         }
 
-        private async void HandleRequestCashPackageBuyValidationRoutine(LiteNetLibMessageHandler messageHandler)
+        private async UniTaskVoid HandleRequestCashPackageBuyValidationRoutine(LiteNetLibMessageHandler messageHandler)
         {
             long connectionId = messageHandler.connectionId;
             RequestCashPackageBuyValidationMessage message = messageHandler.ReadMessage<RequestCashPackageBuyValidationMessage>();

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Mono.Data.Sqlite;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 
 namespace MultiplayerARPG.MMO
 {
@@ -30,9 +30,9 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public override async Task CreateBuilding(string mapName, IBuildingSaveData saveData)
+        public override async UniTask CreateBuilding(string mapName, IBuildingSaveData saveData)
         {
-            await Task.Yield();
+            await UniTask.Yield();
             ExecuteNonQuery("INSERT INTO buildings (id, parentId, entityId, currentHp, remainsLifeTime, mapName, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, creatorId, creatorName) VALUES (@id, @parentId, @entityId, @currentHp, @remainsLifeTime, @mapName, @positionX, @positionY, @positionZ, @rotationX, @rotationY, @rotationZ, @creatorId, @creatorName)",
                 new SqliteParameter("@id", saveData.Id),
                 new SqliteParameter("@parentId", saveData.ParentId),
@@ -50,9 +50,9 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@creatorName", saveData.CreatorName));
         }
 
-        public override async Task<List<BuildingSaveData>> ReadBuildings(string mapName)
+        public override async UniTask<List<BuildingSaveData>> ReadBuildings(string mapName)
         {
-            await Task.Yield();
+            await UniTask.Yield();
             List<BuildingSaveData> result = new List<BuildingSaveData>();
             ExecuteReader((reader) =>
             {
@@ -65,9 +65,9 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public override async Task UpdateBuilding(string mapName, IBuildingSaveData building)
+        public override async UniTask UpdateBuilding(string mapName, IBuildingSaveData building)
         {
-            await Task.Yield();
+            await UniTask.Yield();
             ExecuteNonQuery("UPDATE buildings SET " +
                 "parentId=@parentId, " +
                 "entityId=@entityId, " +
@@ -102,9 +102,9 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@mapName", mapName));
         }
 
-        public override async Task DeleteBuilding(string mapName, string id)
+        public override async UniTask DeleteBuilding(string mapName, string id)
         {
-            await Task.Yield();
+            await UniTask.Yield();
             ExecuteNonQuery("DELETE FROM buildings WHERE id=@id AND mapName=@mapName", new SqliteParameter("@id", id), new SqliteParameter("@mapName", mapName));
         }
     }

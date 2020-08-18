@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using MySqlConnector;
 
 namespace MultiplayerARPG.MMO
@@ -19,7 +19,7 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public async Task CreateCharacterSkill(MySqlConnection connection, MySqlTransaction transaction, int idx, string characterId, CharacterSkill characterSkill)
+        public async UniTask CreateCharacterSkill(MySqlConnection connection, MySqlTransaction transaction, int idx, string characterId, CharacterSkill characterSkill)
         {
             await ExecuteNonQuery(connection, transaction, "INSERT INTO characterskill (id, idx, characterId, dataId, level) VALUES (@id, @idx, @characterId, @dataId, @level)",
                 new MySqlParameter("@id", characterId + "_" + idx),
@@ -29,7 +29,7 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@level", characterSkill.level));
         }
 
-        public async Task<List<CharacterSkill>> ReadCharacterSkills(string characterId, List<CharacterSkill> result = null)
+        public async UniTask<List<CharacterSkill>> ReadCharacterSkills(string characterId, List<CharacterSkill> result = null)
         {
             if (result == null)
                 result = new List<CharacterSkill>();
@@ -45,7 +45,7 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public async Task DeleteCharacterSkills(MySqlConnection connection, MySqlTransaction transaction, string characterId)
+        public async UniTask DeleteCharacterSkills(MySqlConnection connection, MySqlTransaction transaction, string characterId)
         {
             await ExecuteNonQuery(connection, transaction, "DELETE FROM characterskill WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
         }

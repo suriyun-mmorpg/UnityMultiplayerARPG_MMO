@@ -5,8 +5,8 @@ using System.IO;
 using LiteNetLibManager;
 using UnityEngine;
 using MiniJSON;
-using System.Threading.Tasks;
 using System;
+using Cysharp.Threading.Tasks;
 
 namespace MultiplayerARPG.MMO
 {
@@ -455,9 +455,9 @@ namespace MultiplayerARPG.MMO
             }
         }
 
-        public override async Task<string> ValidateUserLogin(string username, string password)
+        public override async UniTask<string> ValidateUserLogin(string username, string password)
         {
-            await Task.Yield();
+            await UniTask.Yield();
             string id = string.Empty;
             ExecuteReader((reader) =>
             {
@@ -471,18 +471,18 @@ namespace MultiplayerARPG.MMO
             return id;
         }
 
-        public override async Task<bool> ValidateAccessToken(string userId, string accessToken)
+        public override async UniTask<bool> ValidateAccessToken(string userId, string accessToken)
         {
-            await Task.Yield();
+            await UniTask.Yield();
             object result = ExecuteScalar("SELECT COUNT(*) FROM userlogin WHERE id=@id AND accessToken=@accessToken",
                 new SqliteParameter("@id", userId),
                 new SqliteParameter("@accessToken", accessToken));
             return (result != null ? (long)result : 0) > 0;
         }
 
-        public override async Task<byte> GetUserLevel(string userId)
+        public override async UniTask<byte> GetUserLevel(string userId)
         {
-            await Task.Yield();
+            await UniTask.Yield();
             byte userLevel = 0;
             ExecuteReader((reader) =>
             {
@@ -493,9 +493,9 @@ namespace MultiplayerARPG.MMO
             return userLevel;
         }
 
-        public override async Task<int> GetGold(string userId)
+        public override async UniTask<int> GetGold(string userId)
         {
-            await Task.Yield();
+            await UniTask.Yield();
             int gold = 0;
             ExecuteReader((reader) =>
             {
@@ -506,17 +506,17 @@ namespace MultiplayerARPG.MMO
             return gold;
         }
 
-        public override async Task UpdateGold(string userId, int gold)
+        public override async UniTask UpdateGold(string userId, int gold)
         {
-            await Task.Yield();
+            await UniTask.Yield();
             ExecuteNonQuery("UPDATE userlogin SET gold=@gold WHERE id=@id",
                 new SqliteParameter("@id", userId),
                 new SqliteParameter("@gold", gold));
         }
 
-        public override async Task<int> GetCash(string userId)
+        public override async UniTask<int> GetCash(string userId)
         {
-            await Task.Yield();
+            await UniTask.Yield();
             int cash = 0;
             ExecuteReader((reader) =>
             {
@@ -527,25 +527,25 @@ namespace MultiplayerARPG.MMO
             return cash;
         }
 
-        public override async Task UpdateCash(string userId, int cash)
+        public override async UniTask UpdateCash(string userId, int cash)
         {
-            await Task.Yield();
+            await UniTask.Yield();
             ExecuteNonQuery("UPDATE userlogin SET cash=@cash WHERE id=@id",
                 new SqliteParameter("@id", userId),
                 new SqliteParameter("@cash", cash));
         }
 
-        public override async Task UpdateAccessToken(string userId, string accessToken)
+        public override async UniTask UpdateAccessToken(string userId, string accessToken)
         {
-            await Task.Yield();
+            await UniTask.Yield();
             ExecuteNonQuery("UPDATE userlogin SET accessToken=@accessToken WHERE id=@id",
                 new SqliteParameter("@id", userId),
                 new SqliteParameter("@accessToken", accessToken));
         }
 
-        public override async Task CreateUserLogin(string username, string password)
+        public override async UniTask CreateUserLogin(string username, string password)
         {
-            await Task.Yield();
+            await UniTask.Yield();
             ExecuteNonQuery("INSERT INTO userlogin (id, username, password, email, authType) VALUES (@id, @username, @password, @email, @authType)",
                 new SqliteParameter("@id", GenericUtils.GetUniqueId()),
                 new SqliteParameter("@username", username),
@@ -554,9 +554,9 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@authType", AUTH_TYPE_NORMAL));
         }
 
-        public override async Task<long> FindUsername(string username)
+        public override async UniTask<long> FindUsername(string username)
         {
-            await Task.Yield();
+            await UniTask.Yield();
             object result = ExecuteScalar("SELECT COUNT(*) FROM userlogin WHERE username LIKE @username",
                 new SqliteParameter("@username", username));
             return result != null ? (long)result : 0;

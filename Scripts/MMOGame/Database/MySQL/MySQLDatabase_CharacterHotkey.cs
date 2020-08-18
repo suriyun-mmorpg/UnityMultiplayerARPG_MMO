@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using MySqlConnector;
 
 namespace MultiplayerARPG.MMO
@@ -20,7 +20,7 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public async Task CreateCharacterHotkey(MySqlConnection connection, MySqlTransaction transaction, string characterId, CharacterHotkey characterHotkey)
+        public async UniTask CreateCharacterHotkey(MySqlConnection connection, MySqlTransaction transaction, string characterId, CharacterHotkey characterHotkey)
         {
             await ExecuteNonQuery(connection, transaction, "INSERT INTO characterhotkey (id, characterId, hotkeyId, type, relateId) VALUES (@id, @characterId, @hotkeyId, @type, @relateId)",
                 new MySqlParameter("@id", characterId + "_" + characterHotkey.hotkeyId),
@@ -30,7 +30,7 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@relateId", characterHotkey.relateId));
         }
 
-        public async Task<List<CharacterHotkey>> ReadCharacterHotkeys(string characterId, List<CharacterHotkey> result = null)
+        public async UniTask<List<CharacterHotkey>> ReadCharacterHotkeys(string characterId, List<CharacterHotkey> result = null)
         {
             if (result == null)
                 result = new List<CharacterHotkey>();
@@ -46,7 +46,7 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public async Task DeleteCharacterHotkeys(MySqlConnection connection, MySqlTransaction transaction, string characterId)
+        public async UniTask DeleteCharacterHotkeys(MySqlConnection connection, MySqlTransaction transaction, string characterId)
         {
             await ExecuteNonQuery(connection, transaction, "DELETE FROM characterhotkey WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
         }

@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using MySqlConnector;
 
 namespace MultiplayerARPG.MMO
@@ -29,7 +29,7 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        private async Task CreateCharacterItem(MySqlConnection connection, MySqlTransaction transaction, int idx, string characterId, InventoryType inventoryType, CharacterItem characterItem)
+        private async UniTask CreateCharacterItem(MySqlConnection connection, MySqlTransaction transaction, int idx, string characterId, InventoryType inventoryType, CharacterItem characterItem)
         {
             if (string.IsNullOrEmpty(characterItem.id))
                 return;
@@ -71,7 +71,7 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        private async Task<List<CharacterItem>> ReadCharacterItems(string characterId, InventoryType inventoryType, List<CharacterItem> result = null)
+        private async UniTask<List<CharacterItem>> ReadCharacterItems(string characterId, InventoryType inventoryType, List<CharacterItem> result = null)
         {
             if (result == null)
                 result = new List<CharacterItem>();
@@ -88,7 +88,7 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public async Task<List<EquipWeapons>> ReadCharacterEquipWeapons(string characterId, List<EquipWeapons> result = null)
+        public async UniTask<List<EquipWeapons>> ReadCharacterEquipWeapons(string characterId, List<EquipWeapons> result = null)
         {
             if (result == null)
                 result = new List<EquipWeapons>();
@@ -117,34 +117,34 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public async Task CreateCharacterEquipWeapons(MySqlConnection connection, MySqlTransaction transaction, byte equipWeaponSet, string characterId, EquipWeapons equipWeapons)
+        public async UniTask CreateCharacterEquipWeapons(MySqlConnection connection, MySqlTransaction transaction, byte equipWeaponSet, string characterId, EquipWeapons equipWeapons)
         {
-            await Task.WhenAll(
+            await UniTask.WhenAll(
                 CreateCharacterItem(connection, transaction, equipWeaponSet, characterId, InventoryType.EquipWeaponRight, equipWeapons.rightHand),
                 CreateCharacterItem(connection, transaction, equipWeaponSet, characterId, InventoryType.EquipWeaponLeft, equipWeapons.leftHand));
         }
 
-        public async Task CreateCharacterEquipItem(MySqlConnection connection, MySqlTransaction transaction, int idx, string characterId, CharacterItem characterItem)
+        public async UniTask CreateCharacterEquipItem(MySqlConnection connection, MySqlTransaction transaction, int idx, string characterId, CharacterItem characterItem)
         {
             await CreateCharacterItem(connection, transaction, idx, characterId, InventoryType.EquipItems, characterItem);
         }
 
-        public async Task<List<CharacterItem>> ReadCharacterEquipItems(string characterId, List<CharacterItem> result = null)
+        public async UniTask<List<CharacterItem>> ReadCharacterEquipItems(string characterId, List<CharacterItem> result = null)
         {
             return await ReadCharacterItems(characterId, InventoryType.EquipItems, result);
         }
 
-        public async Task CreateCharacterNonEquipItem(MySqlConnection connection, MySqlTransaction transaction, int idx, string characterId, CharacterItem characterItem)
+        public async UniTask CreateCharacterNonEquipItem(MySqlConnection connection, MySqlTransaction transaction, int idx, string characterId, CharacterItem characterItem)
         {
             await CreateCharacterItem(connection, transaction, idx, characterId, InventoryType.NonEquipItems, characterItem);
         }
 
-        public async Task<List<CharacterItem>> ReadCharacterNonEquipItems(string characterId, List<CharacterItem> result = null)
+        public async UniTask<List<CharacterItem>> ReadCharacterNonEquipItems(string characterId, List<CharacterItem> result = null)
         {
             return await ReadCharacterItems(characterId, InventoryType.NonEquipItems, result);
         }
 
-        public async Task DeleteCharacterItems(MySqlConnection connection, MySqlTransaction transaction, string characterId)
+        public async UniTask DeleteCharacterItems(MySqlConnection connection, MySqlTransaction transaction, string characterId)
         {
             await ExecuteNonQuery(connection, transaction, "DELETE FROM characteritem WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
         }

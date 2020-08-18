@@ -1,4 +1,5 @@
-﻿using LiteNetLib;
+﻿using Cysharp.Threading.Tasks;
+using LiteNetLib;
 using LiteNetLibManager;
 using System;
 using System.Collections;
@@ -40,10 +41,10 @@ namespace MultiplayerARPG.MMO
 
         protected void HandleRequestUserLogin(LiteNetLibMessageHandler messageHandler)
         {
-            HandleRequestUserLoginRoutine(messageHandler);
+            HandleRequestUserLoginRoutine(messageHandler).Forget();
         }
 
-        private async void HandleRequestUserLoginRoutine(LiteNetLibMessageHandler messageHandler)
+        private async UniTaskVoid HandleRequestUserLoginRoutine(LiteNetLibMessageHandler messageHandler)
         {
             long connectionId = messageHandler.connectionId;
             RequestUserLoginMessage message = messageHandler.ReadMessage<RequestUserLoginMessage>();
@@ -90,10 +91,10 @@ namespace MultiplayerARPG.MMO
 
         protected void HandleRequestUserRegister(LiteNetLibMessageHandler messageHandler)
         {
-            HandleRequestUserRegisterRoutine(messageHandler);
+            HandleRequestUserRegisterRoutine(messageHandler).Forget();
         }
 
-        private async void HandleRequestUserRegisterRoutine(LiteNetLibMessageHandler messageHandler)
+        private async UniTaskVoid HandleRequestUserRegisterRoutine(LiteNetLibMessageHandler messageHandler)
         {
             long connectionId = messageHandler.connectionId;
             RequestUserRegisterMessage message = messageHandler.ReadMessage<RequestUserRegisterMessage>();
@@ -129,10 +130,10 @@ namespace MultiplayerARPG.MMO
 
         protected void HandleRequestUserLogout(LiteNetLibMessageHandler messageHandler)
         {
-            HandleRequestUserLogoutRoutine(messageHandler);
+            HandleRequestUserLogoutRoutine(messageHandler).Forget();
         }
 
-        private async void HandleRequestUserLogoutRoutine(LiteNetLibMessageHandler messageHandler)
+        private async UniTaskVoid HandleRequestUserLogoutRoutine(LiteNetLibMessageHandler messageHandler)
         {
             long connectionId = messageHandler.connectionId;
             BaseAckMessage message = messageHandler.ReadMessage<BaseAckMessage>();
@@ -155,10 +156,10 @@ namespace MultiplayerARPG.MMO
 
         protected void HandleRequestValidateAccessToken(LiteNetLibMessageHandler messageHandler)
         {
-            HandleRequestValidateAccessTokenRoutine(messageHandler);
+            HandleRequestValidateAccessTokenRoutine(messageHandler).Forget();
         }
 
-        private async void HandleRequestValidateAccessTokenRoutine(LiteNetLibMessageHandler messageHandler)
+        private async UniTaskVoid HandleRequestValidateAccessTokenRoutine(LiteNetLibMessageHandler messageHandler)
         {
             long connectionId = messageHandler.connectionId;
             RequestValidateAccessTokenMessage message = messageHandler.ReadMessage<RequestValidateAccessTokenMessage>();

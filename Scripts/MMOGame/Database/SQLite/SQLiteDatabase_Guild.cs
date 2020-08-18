@@ -1,15 +1,15 @@
-﻿using Mono.Data.Sqlite;
+﻿using Cysharp.Threading.Tasks;
+using Mono.Data.Sqlite;
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace MultiplayerARPG.MMO
 {
     public partial class SQLiteDatabase
     {
-        public override async Task<int> CreateGuild(string guildName, string leaderId)
+        public override async UniTask<int> CreateGuild(string guildName, string leaderId)
         {
-            await Task.Yield();
+            await UniTask.Yield();
             int id = 0;
             ExecuteReader((reader) =>
             {
@@ -26,9 +26,9 @@ namespace MultiplayerARPG.MMO
             return id;
         }
 
-        public override async Task<GuildData> ReadGuild(int id, GuildRoleData[] defaultGuildRoles)
+        public override async UniTask<GuildData> ReadGuild(int id, GuildRoleData[] defaultGuildRoles)
         {
-            await Task.Yield();
+            await UniTask.Yield();
             GuildData result = null;
             ExecuteReader((reader) =>
             {
@@ -94,9 +94,9 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public override async Task UpdateGuildLevel(int id, short level, int exp, short skillPoint)
+        public override async UniTask UpdateGuildLevel(int id, short level, int exp, short skillPoint)
         {
-            await Task.Yield();
+            await UniTask.Yield();
             ExecuteNonQuery("UPDATE guild SET level=@level, exp=@exp, skillPoint=@skillPoint WHERE id=@id",
                 new SqliteParameter("@level", level),
                 new SqliteParameter("@exp", exp),
@@ -104,25 +104,25 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@id", id));
         }
 
-        public override async Task UpdateGuildLeader(int id, string leaderId)
+        public override async UniTask UpdateGuildLeader(int id, string leaderId)
         {
-            await Task.Yield();
+            await UniTask.Yield();
             ExecuteNonQuery("UPDATE guild SET leaderId=@leaderId WHERE id=@id",
                 new SqliteParameter("@leaderId", leaderId),
                 new SqliteParameter("@id", id));
         }
 
-        public override async Task UpdateGuildMessage(int id, string guildMessage)
+        public override async UniTask UpdateGuildMessage(int id, string guildMessage)
         {
-            await Task.Yield();
+            await UniTask.Yield();
             ExecuteNonQuery("UPDATE guild SET guildMessage=@guildMessage WHERE id=@id",
                 new SqliteParameter("@guildMessage", guildMessage),
                 new SqliteParameter("@id", id));
         }
 
-        public override async Task UpdateGuildRole(int id, byte guildRole, string name, bool canInvite, bool canKick, byte shareExpPercentage)
+        public override async UniTask UpdateGuildRole(int id, byte guildRole, string name, bool canInvite, bool canKick, byte shareExpPercentage)
         {
-            await Task.Yield();
+            await UniTask.Yield();
             ExecuteNonQuery("DELETE FROM guildrole WHERE guildId=@guildId AND guildRole=@guildRole",
                 new SqliteParameter("@guildId", id),
                 new SqliteParameter("@guildRole", guildRole));
@@ -136,17 +136,17 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@shareExpPercentage", shareExpPercentage));
         }
 
-        public override async Task UpdateGuildMemberRole(string characterId, byte guildRole)
+        public override async UniTask UpdateGuildMemberRole(string characterId, byte guildRole)
         {
-            await Task.Yield();
+            await UniTask.Yield();
             ExecuteNonQuery("UPDATE characters SET guildRole=@guildRole WHERE id=@characterId",
                 new SqliteParameter("@characterId", characterId),
                 new SqliteParameter("@guildRole", guildRole));
         }
 
-        public override async Task UpdateGuildSkillLevel(int id, int dataId, short level, short skillPoint)
+        public override async UniTask UpdateGuildSkillLevel(int id, int dataId, short level, short skillPoint)
         {
-            await Task.Yield();
+            await UniTask.Yield();
             ExecuteNonQuery("DELETE FROM guildskill WHERE guildId=@guildId AND dataId=@dataId",
                 new SqliteParameter("@guildId", id),
                 new SqliteParameter("@dataId", dataId));
@@ -160,34 +160,34 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@id", id));
         }
 
-        public override async Task DeleteGuild(int id)
+        public override async UniTask DeleteGuild(int id)
         {
-            await Task.Yield();
+            await UniTask.Yield();
             ExecuteNonQuery("DELETE FROM guild WHERE id=@id;" +
                 "UPDATE characters SET guildId=0 WHERE guildId=@id;",
                 new SqliteParameter("@id", id));
         }
 
-        public override async Task<long> FindGuildName(string guildName)
+        public override async UniTask<long> FindGuildName(string guildName)
         {
-            await Task.Yield();
+            await UniTask.Yield();
             object result = ExecuteScalar("SELECT COUNT(*) FROM guild WHERE guildName LIKE @guildName",
                 new SqliteParameter("@guildName", guildName));
             return result != null ? (long)result : 0;
         }
 
-        public override async Task UpdateCharacterGuild(string characterId, int guildId, byte guildRole)
+        public override async UniTask UpdateCharacterGuild(string characterId, int guildId, byte guildRole)
         {
-            await Task.Yield();
+            await UniTask.Yield();
             ExecuteNonQuery("UPDATE characters SET guildId=@guildId, guildRole=@guildRole WHERE id=@characterId",
                 new SqliteParameter("@characterId", characterId),
                 new SqliteParameter("@guildId", guildId),
                 new SqliteParameter("@guildRole", guildRole));
         }
 
-        public override async Task<int> GetGuildGold(int guildId)
+        public override async UniTask<int> GetGuildGold(int guildId)
         {
-            await Task.Yield();
+            await UniTask.Yield();
             int gold = 0;
             ExecuteReader((reader) =>
             {
@@ -198,9 +198,9 @@ namespace MultiplayerARPG.MMO
             return gold;
         }
 
-        public override async Task UpdateGuildGold(int guildId, int gold)
+        public override async UniTask UpdateGuildGold(int guildId, int gold)
         {
-            await Task.Yield();
+            await UniTask.Yield();
             ExecuteNonQuery("UPDATE guild SET gold=@gold WHERE id=@id",
                 new SqliteParameter("@id", guildId),
                 new SqliteParameter("@gold", gold));

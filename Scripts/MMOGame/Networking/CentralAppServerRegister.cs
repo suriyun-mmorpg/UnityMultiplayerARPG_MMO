@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using LiteNetLib;
 using LiteNetLibManager;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 
 namespace MultiplayerARPG.MMO
 {
@@ -36,7 +36,7 @@ namespace MultiplayerARPG.MMO
                 case ENetworkEvent.DisconnectEvent:
                     Logging.Log(LogTag, "OnPeerDisconnected. disconnectInfo.Reason: " + eventData.disconnectInfo.Reason);
                     StopClient();
-                    OnCentralServerDisconnected(eventData.disconnectInfo);
+                    OnCentralServerDisconnected(eventData.disconnectInfo).Forget();
                     break;
                 case ENetworkEvent.ErrorEvent:
                     Logging.LogError(LogTag, "OnNetworkError endPoint: " + eventData.endPoint + " socketErrorCode " + eventData.socketError);
@@ -82,21 +82,21 @@ namespace MultiplayerARPG.MMO
             SendRequest(MMOMessageTypes.RequestAppServerRegister, message, OnAppServerRegistered);
         }
 
-        public async void OnCentralServerDisconnected(DisconnectInfo disconnectInfo)
+        public async UniTaskVoid OnCentralServerDisconnected(DisconnectInfo disconnectInfo)
         {
             Logging.Log(LogTag, "[" + appServer.PeerType + "] Disconnected from Central Server");
             IsRegisteredToCentralServer = false;
-            await Task.Delay(500);
+            await UniTask.Delay(500);
             Logging.Log(LogTag, "[" + appServer.PeerType + "] Reconnect to central in 5 seconds...");
-            await Task.Delay(1000);
+            await UniTask.Delay(1000);
             Logging.Log(LogTag, "[" + appServer.PeerType + "] Reconnect to central in 4 seconds...");
-            await Task.Delay(1000);
+            await UniTask.Delay(1000);
             Logging.Log(LogTag, "[" + appServer.PeerType + "] Reconnect to central in 3 seconds...");
-            await Task.Delay(1000);
+            await UniTask.Delay(1000);
             Logging.Log(LogTag, "[" + appServer.PeerType + "] Reconnect to central in 2 seconds...");
-            await Task.Delay(1000);
+            await UniTask.Delay(1000);
             Logging.Log(LogTag, "[" + appServer.PeerType + "] Reconnect to central in 1 seconds...");
-            await Task.Delay(1000);
+            await UniTask.Delay(1000);
             ConnectToCentralServer();
         }
 

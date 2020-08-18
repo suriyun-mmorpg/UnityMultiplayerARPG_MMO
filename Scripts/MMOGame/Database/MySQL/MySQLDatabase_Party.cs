@@ -1,11 +1,11 @@
-﻿using MySqlConnector;
-using System.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
+using MySqlConnector;
 
 namespace MultiplayerARPG.MMO
 {
     public partial class MySQLDatabase
     {
-        public override async Task<int> CreateParty(bool shareExp, bool shareItem, string leaderId)
+        public override async UniTask<int> CreateParty(bool shareExp, bool shareItem, string leaderId)
         {
             int id = 0;
             await ExecuteReader((reader) =>
@@ -24,7 +24,7 @@ namespace MultiplayerARPG.MMO
             return id;
         }
 
-        public override async Task<PartyData> ReadParty(int id)
+        public override async UniTask<PartyData> ReadParty(int id)
         {
             PartyData result = null;
             await ExecuteReader((reader) =>
@@ -61,14 +61,14 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public override async Task UpdatePartyLeader(int id, string leaderId)
+        public override async UniTask UpdatePartyLeader(int id, string leaderId)
         {
             await ExecuteNonQuery("UPDATE party SET leaderId=@leaderId WHERE id=@id",
                 new MySqlParameter("@leaderId", leaderId),
                 new MySqlParameter("@id", id));
         }
 
-        public override async Task UpdateParty(int id, bool shareExp, bool shareItem)
+        public override async UniTask UpdateParty(int id, bool shareExp, bool shareItem)
         {
             await ExecuteNonQuery("UPDATE party SET shareExp=@shareExp, shareItem=@shareItem WHERE id=@id",
                 new MySqlParameter("@shareExp", shareExp),
@@ -76,14 +76,14 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@id", id));
         }
 
-        public override async Task DeleteParty(int id)
+        public override async UniTask DeleteParty(int id)
         {
             await ExecuteNonQuery("DELETE FROM party WHERE id=@id;" +
                 "UPDATE characters SET partyId=0 WHERE partyId=@id;",
                 new MySqlParameter("@id", id));
         }
 
-        public override async Task UpdateCharacterParty(string characterId, int partyId)
+        public override async UniTask UpdateCharacterParty(string characterId, int partyId)
         {
             await ExecuteNonQuery("UPDATE characters SET partyId=@partyId WHERE id=@characterId",
                 new MySqlParameter("@characterId", characterId),

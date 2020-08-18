@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Mono.Data.Sqlite;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 
 namespace MultiplayerARPG.MMO
 {
@@ -64,9 +64,9 @@ namespace MultiplayerARPG.MMO
             }
         }
 
-        public override async Task CreateCharacter(string userId, IPlayerCharacterData characterData)
+        public override async UniTask CreateCharacter(string userId, IPlayerCharacterData characterData)
         {
-            await Task.Yield();
+            await UniTask.Yield();
             BeginTransaction();
             ExecuteNonQuery("INSERT INTO characters " +
                 "(id, userId, dataId, entityId, factionId, characterName, level, exp, currentHp, currentMp, currentStamina, currentFood, currentWater, equipWeaponSet, statPoint, skillPoint, gold, currentMapName, currentPositionX, currentPositionY, currentPositionZ, respawnMapName, respawnPositionX, respawnPositionY, respawnPositionZ, mountDataId) VALUES " +
@@ -145,7 +145,7 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public override async Task<PlayerCharacterData> ReadCharacter(
+        public override async UniTask<PlayerCharacterData> ReadCharacter(
             string id,
             bool withEquipWeapons = true,
             bool withAttributes = true,
@@ -158,7 +158,7 @@ namespace MultiplayerARPG.MMO
             bool withHotkeys = true,
             bool withQuests = true)
         {
-            await Task.Yield();
+            await UniTask.Yield();
             PlayerCharacterData result = null;
             ExecuteReader((reader) =>
             {
@@ -213,7 +213,7 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public override async Task<List<PlayerCharacterData>> ReadCharacters(string userId)
+        public override async UniTask<List<PlayerCharacterData>> ReadCharacters(string userId)
         {
             List<PlayerCharacterData> result = new List<PlayerCharacterData>();
             List<string> characterIds = new List<string>();
@@ -231,9 +231,9 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public override async Task UpdateCharacter(IPlayerCharacterData character)
+        public override async UniTask UpdateCharacter(IPlayerCharacterData character)
         {
-            await Task.Yield();
+            await UniTask.Yield();
             BeginTransaction();
             ExecuteNonQuery("UPDATE characters SET " +
                 "dataId=@dataId, " +
@@ -291,9 +291,9 @@ namespace MultiplayerARPG.MMO
             EndTransaction();
         }
 
-        public override async Task DeleteCharacter(string userId, string id)
+        public override async UniTask DeleteCharacter(string userId, string id)
         {
-            await Task.Yield();
+            await UniTask.Yield();
             object result = ExecuteScalar("SELECT COUNT(*) FROM characters WHERE id=@id AND userId=@userId",
                 new SqliteParameter("@id", id),
                 new SqliteParameter("@userId", userId));
@@ -315,17 +315,17 @@ namespace MultiplayerARPG.MMO
             }
         }
 
-        public override async Task<long> FindCharacterName(string characterName)
+        public override async UniTask<long> FindCharacterName(string characterName)
         {
-            await Task.Yield();
+            await UniTask.Yield();
             object result = ExecuteScalar("SELECT COUNT(*) FROM characters WHERE characterName LIKE @characterName",
                 new SqliteParameter("@characterName", characterName));
             return result != null ? (long)result : 0;
         }
 
-        public override async Task<List<SocialCharacterData>> FindCharacters(string characterName)
+        public override async UniTask<List<SocialCharacterData>> FindCharacters(string characterName)
         {
-            await Task.Yield();
+            await UniTask.Yield();
             List<SocialCharacterData> result = new List<SocialCharacterData>();
             ExecuteReader((reader) =>
             {
@@ -345,7 +345,7 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public override async Task CreateFriend(string id1, string id2)
+        public override async UniTask CreateFriend(string id1, string id2)
         {
             await DeleteFriend(id1, id2);
             ExecuteNonQuery("INSERT INTO friend " +
@@ -355,9 +355,9 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@characterId2", id2));
         }
 
-        public override async Task DeleteFriend(string id1, string id2)
+        public override async UniTask DeleteFriend(string id1, string id2)
         {
-            await Task.Yield();
+            await UniTask.Yield();
             ExecuteNonQuery("DELETE FROM friend WHERE " +
                 "characterId1 LIKE @characterId1 AND " +
                 "characterId2 LIKE @characterId2",
@@ -365,9 +365,9 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@characterId2", id2));
         }
 
-        public override async Task<List<SocialCharacterData>> ReadFriends(string id1)
+        public override async UniTask<List<SocialCharacterData>> ReadFriends(string id1)
         {
-            await Task.Yield();
+            await UniTask.Yield();
             List<SocialCharacterData> result = new List<SocialCharacterData>();
             List<string> characterIds = new List<string>();
             ExecuteReader((reader) =>

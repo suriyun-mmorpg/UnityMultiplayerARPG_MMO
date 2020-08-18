@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using MySqlConnector;
 
 namespace MultiplayerARPG.MMO
@@ -20,7 +20,7 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public async Task CreateCharacterSkillUsage(MySqlConnection connection, MySqlTransaction transaction, string characterId, CharacterSkillUsage characterSkillUsage)
+        public async UniTask CreateCharacterSkillUsage(MySqlConnection connection, MySqlTransaction transaction, string characterId, CharacterSkillUsage characterSkillUsage)
         {
             await ExecuteNonQuery(connection, transaction, "INSERT INTO characterskillusage (id, characterId, type, dataId, coolDownRemainsDuration) VALUES (@id, @characterId, @type, @dataId, @coolDownRemainsDuration)",
                 new MySqlParameter("@id", characterId + "_" + characterSkillUsage.type + "_" + characterSkillUsage.dataId),
@@ -30,7 +30,7 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@coolDownRemainsDuration", characterSkillUsage.coolDownRemainsDuration));
         }
 
-        public async Task<List<CharacterSkillUsage>> ReadCharacterSkillUsages(string characterId, List<CharacterSkillUsage> result = null)
+        public async UniTask<List<CharacterSkillUsage>> ReadCharacterSkillUsages(string characterId, List<CharacterSkillUsage> result = null)
         {
             if (result == null)
                 result = new List<CharacterSkillUsage>();
@@ -46,7 +46,7 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public async Task DeleteCharacterSkillUsages(MySqlConnection connection, MySqlTransaction transaction, string characterId)
+        public async UniTask DeleteCharacterSkillUsages(MySqlConnection connection, MySqlTransaction transaction, string characterId)
         {
             await ExecuteNonQuery(connection, transaction, "DELETE FROM characterskillusage WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
         }
