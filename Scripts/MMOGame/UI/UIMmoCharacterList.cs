@@ -67,6 +67,10 @@ namespace MultiplayerARPG.MMO
             else
                 eventOnAbleToCreateCharacter.Invoke();
 
+            // Clear selected character data, will select first in list if available
+            selectedPlayerCharacterData = null;
+
+            // Generate list entry by saved characters
             if (selectableCharacters.Count > 0)
             {
                 selectableCharacters.Sort(new PlayerCharacterDataLastUpdateComparer().Desc());
