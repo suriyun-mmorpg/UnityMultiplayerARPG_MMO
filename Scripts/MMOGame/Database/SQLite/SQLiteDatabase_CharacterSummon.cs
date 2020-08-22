@@ -24,9 +24,9 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public void CreateCharacterSummon(int idx, string characterId, CharacterSummon characterSummon)
+        public void CreateCharacterSummon(SqliteTransaction transaction, int idx, string characterId, CharacterSummon characterSummon)
         {
-            ExecuteNonQuery("INSERT INTO charactersummon (id, characterId, type, dataId, summonRemainsDuration, level, exp, currentHp, currentMp) VALUES (@id, @characterId, @type, @dataId, @summonRemainsDuration, @level, @exp, @currentHp, @currentMp)",
+            ExecuteNonQuery(transaction, "INSERT INTO charactersummon (id, characterId, type, dataId, summonRemainsDuration, level, exp, currentHp, currentMp) VALUES (@id, @characterId, @type, @dataId, @summonRemainsDuration, @level, @exp, @currentHp, @currentMp)",
                 new SqliteParameter("@id", characterId + "_" + characterSummon.type + "_" + idx),
                 new SqliteParameter("@characterId", characterId),
                 new SqliteParameter("@type", (byte)characterSummon.type),
@@ -53,9 +53,9 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public void DeleteCharacterSummons(string characterId)
+        public void DeleteCharacterSummons(SqliteTransaction transaction, string characterId)
         {
-            ExecuteNonQuery("DELETE FROM charactersummon WHERE characterId=@characterId", new SqliteParameter("@characterId", characterId));
+            ExecuteNonQuery(transaction, "DELETE FROM charactersummon WHERE characterId=@characterId", new SqliteParameter("@characterId", characterId));
         }
     }
 }

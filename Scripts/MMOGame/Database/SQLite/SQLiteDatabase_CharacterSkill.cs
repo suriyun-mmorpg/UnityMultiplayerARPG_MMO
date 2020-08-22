@@ -20,9 +20,9 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public void CreateCharacterSkill(int idx, string characterId, CharacterSkill characterSkill)
+        public void CreateCharacterSkill(SqliteTransaction transaction, int idx, string characterId, CharacterSkill characterSkill)
         {
-            ExecuteNonQuery("INSERT INTO characterskill (id, idx, characterId, dataId, level, coolDownRemainsDuration) VALUES (@id, @idx, @characterId, @dataId, @level, 0)",
+            ExecuteNonQuery(transaction, "INSERT INTO characterskill (id, idx, characterId, dataId, level, coolDownRemainsDuration) VALUES (@id, @idx, @characterId, @dataId, @level, 0)",
                 new SqliteParameter("@id", characterId + "_" + idx),
                 new SqliteParameter("@idx", idx),
                 new SqliteParameter("@characterId", characterId),
@@ -45,9 +45,9 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public void DeleteCharacterSkills(string characterId)
+        public void DeleteCharacterSkills(SqliteTransaction transaction, string characterId)
         {
-            ExecuteNonQuery("DELETE FROM characterskill WHERE characterId=@characterId", new SqliteParameter("@characterId", characterId));
+            ExecuteNonQuery(transaction, "DELETE FROM characterskill WHERE characterId=@characterId", new SqliteParameter("@characterId", characterId));
         }
     }
 }

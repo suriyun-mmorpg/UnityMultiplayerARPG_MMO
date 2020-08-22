@@ -20,9 +20,9 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public void CreateCharacterAttribute(int idx, string characterId, CharacterAttribute characterAttribute)
+        public void CreateCharacterAttribute(SqliteTransaction transaction, int idx, string characterId, CharacterAttribute characterAttribute)
         {
-            ExecuteNonQuery("INSERT INTO characterattribute (id, idx, characterId, dataId, amount) VALUES (@id, @idx, @characterId, @dataId, @amount)",
+            ExecuteNonQuery(transaction, "INSERT INTO characterattribute (id, idx, characterId, dataId, amount) VALUES (@id, @idx, @characterId, @dataId, @amount)",
                 new SqliteParameter("@id", characterId + "_" + idx),
                 new SqliteParameter("@idx", idx),
                 new SqliteParameter("@characterId", characterId),
@@ -45,9 +45,9 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public void DeleteCharacterAttributes(string characterId)
+        public void DeleteCharacterAttributes(SqliteTransaction transaction, string characterId)
         {
-            ExecuteNonQuery("DELETE FROM characterattribute WHERE characterId=@characterId", new SqliteParameter("@characterId", characterId));
+            ExecuteNonQuery(transaction, "DELETE FROM characterattribute WHERE characterId=@characterId", new SqliteParameter("@characterId", characterId));
         }
     }
 }

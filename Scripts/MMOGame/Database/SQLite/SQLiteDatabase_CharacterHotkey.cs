@@ -21,9 +21,9 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public void CreateCharacterHotkey(string characterId, CharacterHotkey characterHotkey)
+        public void CreateCharacterHotkey(SqliteTransaction transaction, string characterId, CharacterHotkey characterHotkey)
         {
-            ExecuteNonQuery("INSERT INTO characterhotkey (id, characterId, hotkeyId, type, relateId) VALUES (@id, @characterId, @hotkeyId, @type, @relateId)",
+            ExecuteNonQuery(transaction, "INSERT INTO characterhotkey (id, characterId, hotkeyId, type, relateId) VALUES (@id, @characterId, @hotkeyId, @type, @relateId)",
                 new SqliteParameter("@id", characterId + "_" + characterHotkey.hotkeyId),
                 new SqliteParameter("@characterId", characterId),
                 new SqliteParameter("@hotkeyId", characterHotkey.hotkeyId),
@@ -46,9 +46,9 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public void DeleteCharacterHotkeys(string characterId)
+        public void DeleteCharacterHotkeys(SqliteTransaction transaction, string characterId)
         {
-            ExecuteNonQuery("DELETE FROM characterhotkey WHERE characterId=@characterId", new SqliteParameter("@characterId", characterId));
+            ExecuteNonQuery(transaction, "DELETE FROM characterhotkey WHERE characterId=@characterId", new SqliteParameter("@characterId", characterId));
         }
     }
 }

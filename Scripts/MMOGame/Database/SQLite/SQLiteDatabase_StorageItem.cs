@@ -1,4 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
+using LiteNetLibManager;
 using Mono.Data.Sqlite;
 using System.Collections;
 using System.Collections.Generic;
@@ -8,9 +9,9 @@ namespace MultiplayerARPG.MMO
 {
     public partial class SQLiteDatabase
     {
-        private void CreateStorageItem(int idx, StorageType storageType, string storageOwnerId, CharacterItem characterItem)
+        private void CreateStorageItem(SqliteTransaction transaction, int idx, StorageType storageType, string storageOwnerId, CharacterItem characterItem)
         {
-            ExecuteNonQuery("INSERT INTO storageitem (id, idx, storageType, storageOwnerId, dataId, level, amount, durability, exp, lockRemainsDuration, ammo, sockets) VALUES (@id, @idx, @storageType, @storageOwnerId, @dataId, @level, @amount, @durability, @exp, @lockRemainsDuration, @ammo, @sockets)",
+            ExecuteNonQuery(transaction, "INSERT INTO storageitem (id, idx, storageType, storageOwnerId, dataId, level, amount, durability, exp, lockRemainsDuration, ammo, sockets) VALUES (@id, @idx, @storageType, @storageOwnerId, @dataId, @level, @amount, @durability, @exp, @lockRemainsDuration, @ammo, @sockets)",
                 new SqliteParameter("@id", new StorageItemId(storageType, storageOwnerId, idx).GetId()),
                 new SqliteParameter("@idx", idx),
                 new SqliteParameter("@storageType", (byte)storageType),
@@ -64,18 +65,28 @@ namespace MultiplayerARPG.MMO
         public override async UniTask UpdateStorageItems(StorageType storageType, string storageOwnerId, IList<CharacterItem> characterItems)
         {
             await UniTask.Yield();
-            BeginTransaction();
-            DeleteStorageItems(storageType, storageOwnerId);
-            for (int i = 0; i < characterItems.Count; ++i)
+            SqliteTransaction transaction = connection.BeginTransaction();
+            try
             {
-                CreateStorageItem(i, storageType, storageOwnerId, characterItems[i]);
+                DeleteStorageItems(transaction, storageType, storageOwnerId);
+                for (int i = 0; i < characterItems.Count; ++i)
+                {
+                    CreateStorageItem(transaction, i, storageType, storageOwnerId, characterItems[i]);
+                }
+                transaction.Commit();
             }
-            EndTransaction();
+            catch (System.Exception ex)
+            {
+                Logging.LogError(ToString(), "Transaction, Error occurs while replacing storage items");
+                Logging.LogException(ToString(), ex);
+                transaction.Rollback();
+            }
+            transaction.Dispose();
         }
 
-        public void DeleteStorageItems(StorageType storageType, string storageOwnerId)
+        public void DeleteStorageItems(SqliteTransaction transaction, StorageType storageType, string storageOwnerId)
         {
-            ExecuteNonQuery("DELETE FROM storageitem WHERE storageType=@storageType AND storageOwnerId=@storageOwnerId",
+            ExecuteNonQuery(transaction, "DELETE FROM storageitem WHERE storageType=@storageType AND storageOwnerId=@storageOwnerId",
                 new SqliteParameter("@storageType", (byte)storageType),
                 new SqliteParameter("@storageOwnerId", storageOwnerId));
         }

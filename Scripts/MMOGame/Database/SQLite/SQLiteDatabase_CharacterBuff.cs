@@ -22,9 +22,9 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public void CreateCharacterBuff(string characterId, CharacterBuff characterBuff)
+        public void CreateCharacterBuff(SqliteTransaction transaction, string characterId, CharacterBuff characterBuff)
         {
-            ExecuteNonQuery("INSERT INTO characterbuff (id, characterId, type, dataId, level, buffRemainsDuration) VALUES (@id, @characterId, @type, @dataId, @level, @buffRemainsDuration)",
+            ExecuteNonQuery(transaction, "INSERT INTO characterbuff (id, characterId, type, dataId, level, buffRemainsDuration) VALUES (@id, @characterId, @type, @dataId, @level, @buffRemainsDuration)",
                 new SqliteParameter("@id", characterId + "_" + characterBuff.type + "_" + characterBuff.dataId),
                 new SqliteParameter("@characterId", characterId),
                 new SqliteParameter("@type", (byte)characterBuff.type),
@@ -48,9 +48,9 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public void DeleteCharacterBuffs(string characterId)
+        public void DeleteCharacterBuffs(SqliteTransaction transaction, string characterId)
         {
-            ExecuteNonQuery("DELETE FROM characterbuff WHERE characterId=@characterId", new SqliteParameter("@characterId", characterId));
+            ExecuteNonQuery(transaction, "DELETE FROM characterbuff WHERE characterId=@characterId", new SqliteParameter("@characterId", characterId));
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mono.Data.Sqlite;
 using Cysharp.Threading.Tasks;
+using LiteNetLibManager;
 
 namespace MultiplayerARPG.MMO
 {
@@ -12,62 +13,73 @@ namespace MultiplayerARPG.MMO
         {
             // Delete all character then add all of them
             string characterId = characterData.Id;
-            DeleteCharacterAttributes(characterId);
-            DeleteCharacterBuffs(characterId);
-            DeleteCharacterHotkeys(characterId);
-            DeleteCharacterItems(characterId);
-            DeleteCharacterQuests(characterId);
-            DeleteCharacterSkills(characterId);
-            DeleteCharacterSkillUsages(characterId);
-            DeleteCharacterSummons(characterId);
+            SqliteTransaction transaction = connection.BeginTransaction();
+            try
+            {
+                DeleteCharacterAttributes(transaction, characterId);
+                DeleteCharacterBuffs(transaction, characterId);
+                DeleteCharacterHotkeys(transaction, characterId);
+                DeleteCharacterItems(transaction, characterId);
+                DeleteCharacterQuests(transaction, characterId);
+                DeleteCharacterSkills(transaction, characterId);
+                DeleteCharacterSkillUsages(transaction, characterId);
+                DeleteCharacterSummons(transaction, characterId);
 
-            int i;
-            for (i = 0; i < characterData.SelectableWeaponSets.Count; ++i)
-            {
-                CreateCharacterEquipWeapons((byte)i, characterData.Id, characterData.SelectableWeaponSets[i]);
+                int i;
+                for (i = 0; i < characterData.SelectableWeaponSets.Count; ++i)
+                {
+                    CreateCharacterEquipWeapons(transaction, (byte)i, characterData.Id, characterData.SelectableWeaponSets[i]);
+                }
+                for (i = 0; i < characterData.EquipItems.Count; ++i)
+                {
+                    CreateCharacterEquipItem(transaction, i, characterData.Id, characterData.EquipItems[i]);
+                }
+                for (i = 0; i < characterData.NonEquipItems.Count; ++i)
+                {
+                    CreateCharacterNonEquipItem(transaction, i, characterData.Id, characterData.NonEquipItems[i]);
+                }
+                for (i = 0; i < characterData.Attributes.Count; ++i)
+                {
+                    CreateCharacterAttribute(transaction, i, characterData.Id, characterData.Attributes[i]);
+                }
+                for (i = 0; i < characterData.Skills.Count; ++i)
+                {
+                    CreateCharacterSkill(transaction, i, characterData.Id, characterData.Skills[i]);
+                }
+                for (i = 0; i < characterData.SkillUsages.Count; ++i)
+                {
+                    CreateCharacterSkillUsage(transaction, characterData.Id, characterData.SkillUsages[i]);
+                }
+                for (i = 0; i < characterData.Summons.Count; ++i)
+                {
+                    CreateCharacterSummon(transaction, i, characterData.Id, characterData.Summons[i]);
+                }
+                for (i = 0; i < characterData.Quests.Count; ++i)
+                {
+                    CreateCharacterQuest(transaction, i, characterData.Id, characterData.Quests[i]);
+                }
+                for (i = 0; i < characterData.Buffs.Count; ++i)
+                {
+                    CreateCharacterBuff(transaction, characterData.Id, characterData.Buffs[i]);
+                }
+                for (i = 0; i < characterData.Hotkeys.Count; ++i)
+                {
+                    CreateCharacterHotkey(transaction, characterData.Id, characterData.Hotkeys[i]);
+                }
+                transaction.Commit();
             }
-            for (i = 0; i < characterData.EquipItems.Count; ++i)
+            catch (System.Exception ex)
             {
-                CreateCharacterEquipItem(i, characterData.Id, characterData.EquipItems[i]);
+                Logging.LogError(ToString(), "Transaction, Error occurs while filling character relates data");
+                Logging.LogException(ToString(), ex);
+                transaction.Rollback();
             }
-            for (i = 0; i < characterData.NonEquipItems.Count; ++i)
-            {
-                CreateCharacterNonEquipItem(i, characterData.Id, characterData.NonEquipItems[i]);
-            }
-            for (i = 0; i < characterData.Attributes.Count; ++i)
-            {
-                CreateCharacterAttribute(i, characterData.Id, characterData.Attributes[i]);
-            }
-            for (i = 0; i < characterData.Skills.Count; ++i)
-            {
-                CreateCharacterSkill(i, characterData.Id, characterData.Skills[i]);
-            }
-            for (i = 0; i < characterData.SkillUsages.Count; ++i)
-            {
-                CreateCharacterSkillUsage(characterData.Id, characterData.SkillUsages[i]);
-            }
-            for (i = 0; i < characterData.Summons.Count; ++i)
-            {
-                CreateCharacterSummon(i, characterData.Id, characterData.Summons[i]);
-            }
-            for (i = 0; i < characterData.Quests.Count; ++i)
-            {
-                CreateCharacterQuest(i, characterData.Id, characterData.Quests[i]);
-            }
-            for (i = 0; i < characterData.Buffs.Count; ++i)
-            {
-                CreateCharacterBuff(characterData.Id, characterData.Buffs[i]);
-            }
-            for (i = 0; i < characterData.Hotkeys.Count; ++i)
-            {
-                CreateCharacterHotkey(characterData.Id, characterData.Hotkeys[i]);
-            }
+            transaction.Dispose();
         }
 
         public override async UniTask CreateCharacter(string userId, IPlayerCharacterData characterData)
         {
             await UniTask.Yield();
-            BeginTransaction();
             ExecuteNonQuery("INSERT INTO characters " +
                 "(id, userId, dataId, entityId, factionId, characterName, level, exp, currentHp, currentMp, currentStamina, currentFood, currentWater, equipWeaponSet, statPoint, skillPoint, gold, currentMapName, currentPositionX, currentPositionY, currentPositionZ, respawnMapName, respawnPositionX, respawnPositionY, respawnPositionZ, mountDataId) VALUES " +
                 "(@id, @userId, @dataId, @entityId, @factionId, @characterName, @level, @exp, @currentHp, @currentMp, @currentStamina, @currentFood, @currentWater, @equipWeaponSet, @statPoint, @skillPoint, @gold, @currentMapName, @currentPositionX, @currentPositionY, @currentPositionZ, @respawnMapName, @respawnPositionX, @respawnPositionY, @respawnPositionZ, @mountDataId)",
@@ -99,7 +111,6 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@mountDataId", characterData.MountDataId));
             FillCharacterRelatesData(characterData);
             this.InvokeInstanceDevExtMethods("CreateCharacter", userId, characterData);
-            EndTransaction();
         }
 
         private bool ReadCharacter(SqliteDataReader reader, out PlayerCharacterData result)
@@ -234,7 +245,6 @@ namespace MultiplayerARPG.MMO
         public override async UniTask UpdateCharacter(IPlayerCharacterData character)
         {
             await UniTask.Yield();
-            BeginTransaction();
             ExecuteNonQuery("UPDATE characters SET " +
                 "dataId=@dataId, " +
                 "entityId=@entityId, " +
@@ -288,7 +298,6 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@id", character.Id));
             FillCharacterRelatesData(character);
             this.InvokeInstanceDevExtMethods("UpdateCharacter", character);
-            EndTransaction();
         }
 
         public override async UniTask DeleteCharacter(string userId, string id)
@@ -300,18 +309,28 @@ namespace MultiplayerARPG.MMO
             long count = result != null ? (long)result : 0;
             if (count > 0)
             {
-                BeginTransaction();
-                ExecuteNonQuery("DELETE FROM characters WHERE id=@characterId", new SqliteParameter("@characterId", id));
-                DeleteCharacterAttributes(id);
-                DeleteCharacterBuffs(id);
-                DeleteCharacterHotkeys(id);
-                DeleteCharacterItems(id);
-                DeleteCharacterQuests(id);
-                DeleteCharacterSkills(id);
-                DeleteCharacterSkillUsages(id);
-                DeleteCharacterSummons(id);
+                SqliteTransaction transaction = connection.BeginTransaction();
+                try
+                {
+                    ExecuteNonQuery(transaction, "DELETE FROM characters WHERE id=@characterId", new SqliteParameter("@characterId", id));
+                    DeleteCharacterAttributes(transaction, id);
+                    DeleteCharacterBuffs(transaction, id);
+                    DeleteCharacterHotkeys(transaction, id);
+                    DeleteCharacterItems(transaction, id);
+                    DeleteCharacterQuests(transaction, id);
+                    DeleteCharacterSkills(transaction, id);
+                    DeleteCharacterSkillUsages(transaction, id);
+                    DeleteCharacterSummons(transaction, id);
+                    transaction.Commit();
+                }
+                catch (System.Exception ex)
+                {
+                    Logging.LogError(ToString(), "Transaction, Error occurs while deleting character: " + id);
+                    Logging.LogException(ToString(), ex);
+                    transaction.Rollback();
+                }
+                transaction.Dispose();
                 this.InvokeInstanceDevExtMethods("DeleteCharacter", userId, id);
-                EndTransaction();
             }
         }
 

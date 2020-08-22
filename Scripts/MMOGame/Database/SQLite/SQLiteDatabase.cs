@@ -415,9 +415,16 @@ namespace MultiplayerARPG.MMO
 
         public int ExecuteNonQuery(string sql, params SqliteParameter[] args)
         {
+            return ExecuteNonQuery(null, sql, args);
+        }
+
+        public int ExecuteNonQuery(SqliteTransaction transaction, string sql, params SqliteParameter[] args)
+        {
             int numRows = 0;
             using (SqliteCommand cmd = new SqliteCommand(sql, connection))
             {
+                if (transaction != null)
+                    cmd.Transaction = transaction;
                 foreach (SqliteParameter arg in args)
                 {
                     cmd.Parameters.Add(arg);
@@ -429,9 +436,16 @@ namespace MultiplayerARPG.MMO
 
         public object ExecuteScalar(string sql, params SqliteParameter[] args)
         {
+            return ExecuteScalar(null, sql, args);
+        }
+
+        public object ExecuteScalar(SqliteTransaction transaction, string sql, params SqliteParameter[] args)
+        {
             object result;
             using (SqliteCommand cmd = new SqliteCommand(sql, connection))
             {
+                if (transaction != null)
+                    cmd.Transaction = transaction;
                 foreach (SqliteParameter arg in args)
                 {
                     cmd.Parameters.Add(arg);
@@ -443,8 +457,15 @@ namespace MultiplayerARPG.MMO
 
         public void ExecuteReader(Action<SqliteDataReader> onRead, string sql, params SqliteParameter[] args)
         {
+            ExecuteReader(null, onRead, sql, args);
+        }
+
+        public void ExecuteReader(SqliteTransaction transaction, Action<SqliteDataReader> onRead, string sql, params SqliteParameter[] args)
+        {
             using (SqliteCommand cmd = new SqliteCommand(sql, connection))
             {
+                if (transaction != null)
+                    cmd.Transaction = transaction;
                 foreach (SqliteParameter arg in args)
                 {
                     cmd.Parameters.Add(arg);
@@ -561,7 +582,7 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@username", username));
             return result != null ? (long)result : 0;
         }
-
+        /*
         public void BeginTransaction()
         {
             transactionCount++;
@@ -577,5 +598,6 @@ namespace MultiplayerARPG.MMO
                 return;
             ExecuteNonQuery("END");
         }
+        */
     }
 }

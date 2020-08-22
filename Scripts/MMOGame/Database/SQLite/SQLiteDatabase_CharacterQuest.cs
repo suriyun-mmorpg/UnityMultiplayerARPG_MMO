@@ -47,9 +47,9 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public void CreateCharacterQuest(int idx, string characterId, CharacterQuest characterQuest)
+        public void CreateCharacterQuest(SqliteTransaction transaction, int idx, string characterId, CharacterQuest characterQuest)
         {
-            ExecuteNonQuery("INSERT INTO characterquest (id, idx, characterId, dataId, isComplete, killedMonsters) VALUES (@id, @idx, @characterId, @dataId, @isComplete, @killedMonsters)",
+            ExecuteNonQuery(transaction, "INSERT INTO characterquest (id, idx, characterId, dataId, isComplete, killedMonsters) VALUES (@id, @idx, @characterId, @dataId, @isComplete, @killedMonsters)",
                 new SqliteParameter("@id", characterId + "_" + idx),
                 new SqliteParameter("@idx", idx),
                 new SqliteParameter("@characterId", characterId),
@@ -73,9 +73,9 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public void DeleteCharacterQuests(string characterId)
+        public void DeleteCharacterQuests(SqliteTransaction transaction, string characterId)
         {
-            ExecuteNonQuery("DELETE FROM characterquest WHERE characterId=@characterId", new SqliteParameter("@characterId", characterId));
+            ExecuteNonQuery(transaction, "DELETE FROM characterquest WHERE characterId=@characterId", new SqliteParameter("@characterId", characterId));
         }
     }
 }

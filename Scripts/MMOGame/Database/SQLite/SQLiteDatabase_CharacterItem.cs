@@ -28,12 +28,12 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        private void CreateCharacterItem(int idx, string characterId, InventoryType inventoryType, CharacterItem characterItem)
+        private void CreateCharacterItem(SqliteTransaction transaction, int idx, string characterId, InventoryType inventoryType, CharacterItem characterItem)
         {
             if (string.IsNullOrEmpty(characterItem.id))
                 return;
 
-            ExecuteNonQuery("INSERT INTO characteritem (id, idx, inventoryType, characterId, dataId, level, amount, equipSlotIndex, durability, exp, lockRemainsDuration, ammo, sockets) VALUES (@id, @idx, @inventoryType, @characterId, @dataId, @level, @amount, @equipSlotIndex, @durability, @exp, @lockRemainsDuration, @ammo, @sockets)",
+            ExecuteNonQuery(transaction, "INSERT INTO characteritem (id, idx, inventoryType, characterId, dataId, level, amount, equipSlotIndex, durability, exp, lockRemainsDuration, ammo, sockets) VALUES (@id, @idx, @inventoryType, @characterId, @dataId, @level, @amount, @equipSlotIndex, @durability, @exp, @lockRemainsDuration, @ammo, @sockets)",
                 new SqliteParameter("@id", characterItem.id),
                 new SqliteParameter("@idx", idx),
                 new SqliteParameter("@inventoryType", (byte)inventoryType),
@@ -85,7 +85,7 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@inventoryType", (byte)inventoryType));
             return result;
         }
-        
+
         public List<EquipWeapons> ReadCharacterEquipWeapons(string characterId)
         {
             List<EquipWeapons> result = new List<EquipWeapons>();
@@ -114,15 +114,15 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public void CreateCharacterEquipWeapons(byte equipWeaponSet, string characterId, EquipWeapons equipWeapons)
+        public void CreateCharacterEquipWeapons(SqliteTransaction transaction, byte equipWeaponSet, string characterId, EquipWeapons equipWeapons)
         {
-            CreateCharacterItem(equipWeaponSet, characterId, InventoryType.EquipWeaponRight, equipWeapons.rightHand);
-            CreateCharacterItem(equipWeaponSet, characterId, InventoryType.EquipWeaponLeft, equipWeapons.leftHand);
+            CreateCharacterItem(transaction, equipWeaponSet, characterId, InventoryType.EquipWeaponRight, equipWeapons.rightHand);
+            CreateCharacterItem(transaction, equipWeaponSet, characterId, InventoryType.EquipWeaponLeft, equipWeapons.leftHand);
         }
 
-        public void CreateCharacterEquipItem(int idx, string characterId, CharacterItem characterItem)
+        public void CreateCharacterEquipItem(SqliteTransaction transaction, int idx, string characterId, CharacterItem characterItem)
         {
-            CreateCharacterItem(idx, characterId, InventoryType.EquipItems, characterItem);
+            CreateCharacterItem(transaction, idx, characterId, InventoryType.EquipItems, characterItem);
         }
 
         public List<CharacterItem> ReadCharacterEquipItems(string characterId)
@@ -130,9 +130,9 @@ namespace MultiplayerARPG.MMO
             return ReadCharacterItems(characterId, InventoryType.EquipItems);
         }
 
-        public void CreateCharacterNonEquipItem(int idx, string characterId, CharacterItem characterItem)
+        public void CreateCharacterNonEquipItem(SqliteTransaction transaction, int idx, string characterId, CharacterItem characterItem)
         {
-            CreateCharacterItem(idx, characterId, InventoryType.NonEquipItems, characterItem);
+            CreateCharacterItem(transaction, idx, characterId, InventoryType.NonEquipItems, characterItem);
         }
 
         public List<CharacterItem> ReadCharacterNonEquipItems(string characterId)
@@ -140,9 +140,9 @@ namespace MultiplayerARPG.MMO
             return ReadCharacterItems(characterId, InventoryType.NonEquipItems);
         }
 
-        public void DeleteCharacterItems(string characterId)
+        public void DeleteCharacterItems(SqliteTransaction transaction, string characterId)
         {
-            ExecuteNonQuery("DELETE FROM characteritem WHERE characterId=@characterId", new SqliteParameter("@characterId", characterId));
+            ExecuteNonQuery(transaction, "DELETE FROM characteritem WHERE characterId=@characterId", new SqliteParameter("@characterId", characterId));
         }
     }
 }
