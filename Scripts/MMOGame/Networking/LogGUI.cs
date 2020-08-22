@@ -32,8 +32,11 @@ public class LogGUI : MonoBehaviour
         if (!Directory.Exists(@"./log"))
             Directory.CreateDirectory(@"./log");
         logSavePath = @"./log/" + logFileName + ".txt";
-        if (openLogDir)
+        if (openLogDir && !Application.isConsolePlatform && !Application.isMobilePlatform)
+        {
+            // Open log folder while running standalone platforms
             Application.OpenURL(@"./log/");
+        }
         // Write log file header
         using (StreamWriter writer = new StreamWriter(logSavePath, true, Encoding.UTF8))
         {
