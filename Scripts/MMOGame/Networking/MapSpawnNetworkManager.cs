@@ -34,11 +34,10 @@ namespace MultiplayerARPG.MMO
         private readonly object mainThreadLock = new object();
         private readonly List<Action> mainThreadActions = new List<Action>();
         private readonly object processLock = new object();
-        private uint processIdCounter = 0;
         /// <summary>
-        /// Dictionary of Map servers processes
+        /// Map servers processe id
         /// </summary>
-        private readonly Dictionary<uint, Process> processes = new Dictionary<uint, Process>();
+        private readonly HashSet<int> processes = new HashSet<int>();
         /// <summary>
         /// List of Map servers that restarting in update loop
         /// </summary>
@@ -106,10 +105,9 @@ namespace MultiplayerARPG.MMO
             portCounter = -1;
             freePorts.Clear();
             mainThreadActions.Clear();
-            processIdCounter = 0;
-            foreach (Process process in processes.Values)
+            foreach (int process in processes)
             {
-                process.Kill();
+                Process.GetProcessById(process).Kill();
             }
             processes.Clear();
             restartingScenes.Clear();
@@ -263,7 +261,7 @@ namespace MultiplayerARPG.MMO
             if (LogInfo)
                 Logging.Log(LogTag, "Starting process with args: " + startProcessInfo.Arguments);
 
-            uint processId = ++processIdCounter;
+            int processId = 0;
             bool processStarted = false;
             try
             {
@@ -273,10 +271,11 @@ namespace MultiplayerARPG.MMO
                     {
                         using (Process process = Process.Start(startProcessInfo))
                         {
+                            processId = process.Id;
                             lock (processLock)
                             {
                                 // Save the process
-                                processes[processId] = process;
+                                processes.Add(processId);
                             }
 
                             processStarted = true;
