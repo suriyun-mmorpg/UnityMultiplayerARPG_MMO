@@ -27,6 +27,7 @@ CREATE TABLE `__migrations` (
 ) ENGINE = InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 INSERT INTO `__migrations` (`migrationId`) VALUES ('1.57b');
+INSERT INTO `__migrations` (`migrationId`) VALUES ('1.58');
 
 -- --------------------------------------------------------
 
@@ -80,7 +81,7 @@ CREATE TABLE `characterattribute` (
 CREATE TABLE `characterbuff` (
   `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `characterId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-  `type` tinyint(4) NOT NULL DEFAULT '0',
+  `type` tinyint(3) UNSIGNED NOT NULL DEFAULT '0',
   `dataId` int(11) NOT NULL DEFAULT '0',
   `level` int(11) NOT NULL DEFAULT '1',
   `buffRemainsDuration` float NOT NULL DEFAULT '0',
@@ -98,7 +99,7 @@ CREATE TABLE `characterhotkey` (
   `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `characterId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `hotkeyId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-  `type` tinyint(4) NOT NULL DEFAULT '0',
+  `type` tinyint(3) UNSIGNED NOT NULL DEFAULT '0',
   `relateId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -113,7 +114,7 @@ CREATE TABLE `characterhotkey` (
 CREATE TABLE `characteritem` (
   `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `idx` int(11) NOT NULL,
-  `inventoryType` tinyint(4) NOT NULL DEFAULT '0',
+  `inventoryType` tinyint(3) UNSIGNED NOT NULL DEFAULT '0',
   `characterId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `dataId` int(11) NOT NULL DEFAULT '0',
   `level` int(11) NOT NULL DEFAULT '1',
@@ -211,7 +212,7 @@ CREATE TABLE `characterskill` (
 CREATE TABLE `characterskillusage` (
   `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `characterId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-  `type` tinyint(4) NOT NULL DEFAULT '0',
+  `type` tinyint(3) UNSIGNED NOT NULL DEFAULT '0',
   `dataId` int(11) NOT NULL DEFAULT '0',
   `level` int(11) NOT NULL DEFAULT '1',
   `coolDownRemainsDuration` float NOT NULL DEFAULT '0',
@@ -228,7 +229,7 @@ CREATE TABLE `characterskillusage` (
 CREATE TABLE `charactersummon` (
   `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `characterId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-  `type` tinyint(4) NOT NULL DEFAULT '0',
+  `type` tinyint(3) UNSIGNED NOT NULL DEFAULT '0',
   `dataId` int(11) NOT NULL DEFAULT '0',
   `summonRemainsDuration` float NOT NULL DEFAULT '0',
   `level` int(11) NOT NULL DEFAULT '0',
@@ -319,7 +320,7 @@ CREATE TABLE `party` (
 CREATE TABLE `storageitem` (
   `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `idx` int(11) NOT NULL,
-  `storageType` tinyint(4) NOT NULL DEFAULT '0',
+  `storageType` tinyint(3) UNSIGNED NOT NULL DEFAULT '0',
   `storageOwnerId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `dataId` int(11) NOT NULL DEFAULT '0',
   `level` int(11) NOT NULL DEFAULT '1',
@@ -346,9 +347,9 @@ CREATE TABLE `userlogin` (
   `gold` int(11) NOT NULL DEFAULT '0',
   `cash` int(11) NOT NULL DEFAULT '0',
   `email` varchar(50) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `authType` tinyint(4) NOT NULL DEFAULT '1',
+  `authType` tinyint(3) UNSIGNED NOT NULL DEFAULT '1',
   `accessToken` varchar(36) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `userLevel` tinyint(4) NOT NULL DEFAULT '0',
+  `userLevel` tinyint(3) UNSIGNED NOT NULL DEFAULT '0',
   `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
