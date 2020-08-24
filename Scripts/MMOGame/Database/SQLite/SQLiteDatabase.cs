@@ -150,13 +150,16 @@ namespace MultiplayerARPG.MMO
               guildRole INTEGER NOT NULL DEFAULT 0,
               sharedGuildExp INTEGER NOT NULL DEFAULT 0,
               currentMapName TEXT NOT NULL,
-              currentPositionX REAL NOT NULL,
-              currentPositionY REAL NOT NULL,
-              currentPositionZ REAL NOT NULL,
+              currentPositionX REAL NOT NULL DEFAULT 0,
+              currentPositionY REAL NOT NULL DEFAULT 0,
+              currentPositionZ REAL NOT NULL DEFAULT 0,
+              currentRotationX REAL NOT NULL DEFAULT 0,
+              currentRotationY REAL NOT NULL DEFAULT 0,
+              currentRotationZ REAL NOT NULL DEFAULT 0,
               respawnMapName TEXT NOT NULL,
-              respawnPositionX REAL NOT NULL,
-              respawnPositionY REAL NOT NULL,
-              respawnPositionZ REAL NOT NULL,
+              respawnPositionX REAL NOT NULL DEFAULT 0,
+              respawnPositionY REAL NOT NULL DEFAULT 0,
+              respawnPositionZ REAL NOT NULL DEFAULT 0,
               mountDataId INTEGER NOT NULL DEFAULT 0,
               createAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
               updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -358,6 +361,15 @@ namespace MultiplayerARPG.MMO
 
             if (!IsColumnExist("characters", "mountDataId"))
                 ExecuteNonQuery("ALTER TABLE characters ADD mountDataId INTEGER NOT NULL DEFAULT 0;");
+
+            if (!IsColumnExist("characters", "currentRotationX"))
+                ExecuteNonQuery("ALTER TABLE characters ADD currentRotationX REAL NOT NULL DEFAULT 0;");
+
+            if (!IsColumnExist("characters", "currentRotationY"))
+                ExecuteNonQuery("ALTER TABLE characters ADD currentRotationY REAL NOT NULL DEFAULT 0;");
+
+            if (!IsColumnExist("characters", "currentRotationZ"))
+                ExecuteNonQuery("ALTER TABLE characters ADD currentRotationZ REAL NOT NULL DEFAULT 0;");
 
             if (!IsColumnExist("guild", "gold"))
                 ExecuteNonQuery("ALTER TABLE guild ADD gold INTEGER NOT NULL DEFAULT 0;");
