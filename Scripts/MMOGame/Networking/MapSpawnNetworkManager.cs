@@ -248,7 +248,7 @@ namespace MultiplayerARPG.MMO
                 CreateNoWindow = false,
                 UseShellExecute = false,
                 Arguments = !NotSpawnInBatchMode ? "-batchmode -nographics " : string.Empty +
-                    $"{MMOServerInstance.ARG_MAP_ID} {mapId}" +
+                    $"{MMOServerInstance.ARG_MAP_ID} {mapId} " +
                     (message != null ?
                         $"{MMOServerInstance.ARG_INSTANCE_ID} {message.instanceId} " +
                         $"{MMOServerInstance.ARG_INSTANCE_POSITION_X} {message.instanceWarpPosition.x} " +
