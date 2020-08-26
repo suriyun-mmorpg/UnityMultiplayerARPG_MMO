@@ -55,7 +55,7 @@ namespace MultiplayerARPG.MMO
             return true;
         }
 
-        public static bool ReadArgs(string[] args, string argName, out string result, string defaultValue = null)
+        public static bool ReadArgs(string[] args, string argName, out string result, string defaultValue)
         {
             result = defaultValue;
 
@@ -71,22 +71,31 @@ namespace MultiplayerARPG.MMO
             return true;
         }
 
-        public static bool ReadArgs(string[] args, string argName, out int result, int defaultValue = -1)
+        public static bool ReadArgs(string[] args, string argName, out int result, int defaultValue)
         {
             result = defaultValue;
-            string text = string.Empty;
+            string text;
             if (ReadArgs(args, argName, out text, defaultValue.ToString()) && int.TryParse(text, out result))
                 return true;
             return false;
         }
 
-        public static bool ReadArgs(string[] args, string argName, out List<string> result, List<string> defaultValue = null)
+        public static bool ReadArgs(string[] args, string argName, out float result, float defaultValue)
         {
             result = defaultValue;
-            string text = string.Empty;
-            if (ReadArgs(args, argName, out text, ""))
+            string text;
+            if (ReadArgs(args, argName, out text, defaultValue.ToString()) && float.TryParse(text, out result))
+                return true;
+            return false;
+        }
+
+        public static bool ReadArgs(string[] args, string argName, out List<string> result, List<string> defaultValue)
+        {
+            result = new List<string>();
+            string text;
+            if (ReadArgs(args, argName, out text, string.Empty))
             {
-                result = new List<string>(text.Split('|'));
+                result.AddRange(text.Split('|'));
                 return true;
             }
             return false;

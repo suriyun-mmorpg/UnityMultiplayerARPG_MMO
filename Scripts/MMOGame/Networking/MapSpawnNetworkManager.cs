@@ -247,15 +247,23 @@ namespace MultiplayerARPG.MMO
             {
                 CreateNoWindow = false,
                 UseShellExecute = false,
-                Arguments = " " +
-                    (!NotSpawnInBatchMode ? "-batchmode -nographics " : "") +
-                    string.Format("{0} {1} ", MMOServerInstance.ARG_MAP_ID, mapId) +
-                    (message != null ? string.Format("{0} {1} ", MMOServerInstance.ARG_INSTANCE_ID, message.instanceId) : "") +
-                    string.Format("{0} {1} ", MMOServerInstance.ARG_CENTRAL_ADDRESS, centralNetworkAddress) +
-                    string.Format("{0} {1} ", MMOServerInstance.ARG_CENTRAL_PORT, centralNetworkPort) +
-                    string.Format("{0} {1} ", MMOServerInstance.ARG_MACHINE_ADDRESS, machineAddress) +
-                    string.Format("{0} {1} ", MMOServerInstance.ARG_MAP_PORT, port) +
-                    " " + MMOServerInstance.ARG_START_MAP_SERVER,
+                Arguments = !NotSpawnInBatchMode ? "-batchmode -nographics " : string.Empty +
+                    $"{MMOServerInstance.ARG_MAP_ID} {mapId}" +
+                    (message != null ?
+                        $"{MMOServerInstance.ARG_INSTANCE_ID} {message.instanceId} " +
+                        $"{MMOServerInstance.ARG_INSTANCE_POSITION_X} {message.instanceWarpPosition.x} " +
+                        $"{MMOServerInstance.ARG_INSTANCE_POSITION_Y} {message.instanceWarpPosition.y} " +
+                        $"{MMOServerInstance.ARG_INSTANCE_POSITION_Z} {message.instanceWarpPosition.z} " +
+                        $"{(message.instanceWarpOverrideRotation ? MMOServerInstance.ARG_INSTANCE_OVERRIDE_ROTATION : string.Empty)} " +
+                        $"{MMOServerInstance.ARG_INSTANCE_ROTATION_X} {message.instanceWarpRotation.x} " +
+                        $"{MMOServerInstance.ARG_INSTANCE_ROTATION_Y} {message.instanceWarpRotation.y} " +
+                        $"{MMOServerInstance.ARG_INSTANCE_ROTATION_Z} {message.instanceWarpRotation.z} "
+                        : string.Empty) +
+                    $"{MMOServerInstance.ARG_CENTRAL_ADDRESS} {centralNetworkAddress} " +
+                    $"{MMOServerInstance.ARG_CENTRAL_PORT} {centralNetworkPort} " +
+                    $"{MMOServerInstance.ARG_MACHINE_ADDRESS} {machineAddress} " +
+                    $"{MMOServerInstance.ARG_MAP_PORT} {port} " +
+                    $"{MMOServerInstance.ARG_START_MAP_SERVER} ",
             };
 
             if (LogInfo)

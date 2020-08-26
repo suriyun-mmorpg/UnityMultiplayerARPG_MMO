@@ -134,6 +134,9 @@ namespace MultiplayerARPG.MMO
             {
                 mapId = mapName,
                 instanceId = instanceId,
+                instanceWarpPosition = position,
+                instanceWarpOverrideRotation = overrideRotation,
+                instanceWarpRotation = rotation,
             }, OnRequestSpawnMap);
         }
 
@@ -157,7 +160,6 @@ namespace MultiplayerARPG.MMO
                 // Clone character data to save
                 PlayerCharacterData savingCharacterData = new PlayerCharacterData();
                 playerCharacterEntity.CloneTo(savingCharacterData);
-                // TODO: Set instance map position and rotation
                 // Wait to save character before move to instance map
                 while (savingCharacters.Contains(savingCharacterData.Id))
                 {

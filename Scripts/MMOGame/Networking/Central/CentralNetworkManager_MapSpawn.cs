@@ -7,11 +7,14 @@ namespace MultiplayerARPG.MMO
 {
     public partial class CentralNetworkManager
     {
-        public uint RequestSpawnMap(long connectionId, string sceneName, string instanceId, AckMessageCallback callback)
+        public uint RequestSpawnMap(long connectionId, string sceneName, string instanceId, Vector3 instanceWarpPosition, bool instanceWarpOverrideRotation, Vector3 instanceWarpRotation, AckMessageCallback callback)
         {
             RequestSpawnMapMessage message = new RequestSpawnMapMessage();
             message.mapId = sceneName;
             message.instanceId = instanceId;
+            message.instanceWarpPosition = instanceWarpPosition;
+            message.instanceWarpOverrideRotation = instanceWarpOverrideRotation;
+            message.instanceWarpRotation = instanceWarpRotation;
             return RequestSpawnMap(connectionId, message, callback);
         }
 

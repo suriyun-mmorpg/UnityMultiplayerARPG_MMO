@@ -46,6 +46,20 @@ namespace MultiplayerARPG.MMO
         public const string ARG_MAP_ID = "-" + CONFIG_MAP_ID;
         public const string CONFIG_INSTANCE_ID = "instanceId";
         public const string ARG_INSTANCE_ID = "-" + CONFIG_INSTANCE_ID;
+        public const string CONFIG_INSTANCE_POSITION_X = "instancePositionX";
+        public const string ARG_INSTANCE_POSITION_X = "-" + CONFIG_INSTANCE_POSITION_X;
+        public const string CONFIG_INSTANCE_POSITION_Y = "instancePositionY";
+        public const string ARG_INSTANCE_POSITION_Y = "-" + CONFIG_INSTANCE_POSITION_Y;
+        public const string CONFIG_INSTANCE_POSITION_Z = "instancePositionZ";
+        public const string ARG_INSTANCE_POSITION_Z = "-" + CONFIG_INSTANCE_POSITION_Z;
+        public const string CONFIG_INSTANCE_OVERRIDE_ROTATION = "instanceOverrideRotation";
+        public const string ARG_INSTANCE_OVERRIDE_ROTATION = "-" + CONFIG_INSTANCE_OVERRIDE_ROTATION;
+        public const string CONFIG_INSTANCE_ROTATION_X = "instanceRotationX";
+        public const string ARG_INSTANCE_ROTATION_X = "-" + CONFIG_INSTANCE_ROTATION_X;
+        public const string CONFIG_INSTANCE_ROTATION_Y = "instanceRotationY";
+        public const string ARG_INSTANCE_ROTATION_Y = "-" + CONFIG_INSTANCE_ROTATION_Y;
+        public const string CONFIG_INSTANCE_ROTATION_Z = "instanceRotationZ";
+        public const string ARG_INSTANCE_ROTATION_Z = "-" + CONFIG_INSTANCE_ROTATION_Z;
         // Chat server
         public const string CONFIG_CHAT_PORT = "chatPort";
         public const string ARG_CHAT_PORT = "-" + CONFIG_CHAT_PORT;
@@ -273,7 +287,7 @@ namespace MultiplayerARPG.MMO
 
                 // Map scene name
                 string mapId = string.Empty;
-                if (ConfigReader.ReadArgs(args, ARG_MAP_ID, out mapId) ||
+                if (ConfigReader.ReadArgs(args, ARG_MAP_ID, out mapId, string.Empty) ||
                     ConfigReader.ReadConfigs(jsonConfig, CONFIG_MAP_ID, out mapId))
                 {
                     startingMapId = mapId;
@@ -281,9 +295,29 @@ namespace MultiplayerARPG.MMO
 
                 // Instance Id
                 string instanceId = string.Empty;
-                if (ConfigReader.ReadArgs(args, ARG_INSTANCE_ID, out instanceId))
+                if (ConfigReader.ReadArgs(args, ARG_INSTANCE_ID, out instanceId, string.Empty))
                 {
                     mapNetworkManager.MapInstanceId = instanceId;
+                }
+
+                // Instance Warp Position
+                float instancePosX, instancePosY, instancePosZ;
+                if (ConfigReader.ReadArgs(args, ARG_INSTANCE_POSITION_X, out instancePosX, 0f) &&
+                    ConfigReader.ReadArgs(args, ARG_INSTANCE_POSITION_Y, out instancePosY, 0f) &&
+                    ConfigReader.ReadArgs(args, ARG_INSTANCE_POSITION_Z, out instancePosZ, 0f))
+                {
+                    mapNetworkManager.MapInstanceWarpToPosition = new Vector3(instancePosX, instancePosY, instancePosZ);
+                }
+
+                // Instance Warp Override Rotation, Instance Warp Rotation
+                mapNetworkManager.MapInstanceWarpOverrideRotation = ConfigReader.IsArgsProvided(args, ARG_INSTANCE_OVERRIDE_ROTATION);
+                float instanceRotX, instanceRotY, instanceRotZ;
+                if (mapNetworkManager.MapInstanceWarpOverrideRotation &&
+                    ConfigReader.ReadArgs(args, ARG_INSTANCE_ROTATION_X, out instanceRotX, 0f) &&
+                    ConfigReader.ReadArgs(args, ARG_INSTANCE_ROTATION_Y, out instanceRotY, 0f) &&
+                    ConfigReader.ReadArgs(args, ARG_INSTANCE_ROTATION_Z, out instanceRotZ, 0f))
+                {
+                    mapNetworkManager.MapInstanceWarpToRotation = new Vector3(instanceRotX, instanceRotY, instanceRotZ);
                 }
 
                 // Chat network port

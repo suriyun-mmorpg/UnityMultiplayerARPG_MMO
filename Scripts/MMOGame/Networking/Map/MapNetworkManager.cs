@@ -29,7 +29,14 @@ namespace MultiplayerARPG.MMO
             public Vector3 rotation;
         }
 
+        /// <summary>
+        /// If this is not empty it mean this is temporary instance map
+        /// So it won't have to save current map, current position to database
+        /// </summary>
         public string MapInstanceId { get; set; }
+        public Vector3 MapInstanceWarpToPosition { get; set; }
+        public bool MapInstanceWarpOverrideRotation { get; set; }
+        public Vector3 MapInstanceWarpToRotation { get; set; }
 
         [Header("Central Network Connection")]
         public BaseTransportFactory centralTransportFactory;
@@ -40,8 +47,8 @@ namespace MultiplayerARPG.MMO
         [Header("Database")]
         public float autoSaveDuration = 2f;
 
-        public System.Action onClientConnected;
-        public System.Action<DisconnectInfo> onClientDisconnected;
+        public Action onClientConnected;
+        public Action<DisconnectInfo> onClientDisconnected;
 
         private float terminatingTime;
 
@@ -441,9 +448,12 @@ namespace MultiplayerARPG.MMO
                         string savingCurrentMapName = playerCharacterData.CurrentMapName;
                         Vector3 savingCurrentPosition = playerCharacterData.CurrentPosition;
 
-                        // Move character to map info → start position
                         if (IsInstanceMap())
-                            playerCharacterData.CurrentPosition = CurrentMapInfo.StartPosition;
+                        {
+                            playerCharacterData.CurrentPosition = MapInstanceWarpToPosition;
+                            if (MapInstanceWarpOverrideRotation)
+                                playerCharacterData.CurrentRotation = MapInstanceWarpToRotation;
+                        }
 
                         // Spawn character entity and set its data
                         GameObject spawnObj = Instantiate(entityPrefab.gameObject, playerCharacterData.CurrentPosition, Quaternion.identity);
