@@ -5,6 +5,7 @@ using LiteNetLib;
 using LiteNetLib.Utils;
 using LiteNetLibManager;
 using Cysharp.Threading.Tasks;
+using System;
 
 namespace MultiplayerARPG.MMO
 {
@@ -19,9 +20,16 @@ namespace MultiplayerARPG.MMO
             public string accessToken;
             public string selectCharacterId;
         }
-        private readonly List<PendingSpawnPlayerCharacter> pendingSpawnPlayerCharacters = new List<PendingSpawnPlayerCharacter>();
 
-        public string mapInstanceId;
+        public struct InstanceMapWarpingLocation
+        {
+            public string mapName;
+            public Vector3 position;
+            public bool overrideRotation;
+            public Vector3 rotation;
+        }
+
+        public string MapInstanceId { get; set; }
 
         [Header("Central Network Connection")]
         public BaseTransportFactory centralTransportFactory;
@@ -60,7 +68,7 @@ namespace MultiplayerARPG.MMO
             get
             {
                 if (IsInstanceMap())
-                    return mapInstanceId;
+                    return MapInstanceId;
                 return CurrentMapInfo.Id;
             }
         }
@@ -75,11 +83,12 @@ namespace MultiplayerARPG.MMO
         }
         private float lastSaveTime;
         // Listing
+        private readonly List<PendingSpawnPlayerCharacter> pendingSpawnPlayerCharacters = new List<PendingSpawnPlayerCharacter>();
         private readonly Dictionary<uint, KeyValuePair<string, Vector3>> instanceMapCurrentLocations = new Dictionary<uint, KeyValuePair<string, Vector3>>();
         private readonly Dictionary<string, CentralServerPeerInfo> mapServerConnectionIdsBySceneName = new Dictionary<string, CentralServerPeerInfo>();
         private readonly Dictionary<string, CentralServerPeerInfo> instanceMapServerConnectionIdsByInstanceId = new Dictionary<string, CentralServerPeerInfo>();
         private readonly Dictionary<string, HashSet<uint>> instanceMapWarpingCharactersByInstanceId = new Dictionary<string, HashSet<uint>>();
-        private readonly Dictionary<string, KeyValuePair<string, Vector3>> instanceMapWarpingLocations = new Dictionary<string, KeyValuePair<string, Vector3>>();
+        private readonly Dictionary<string, InstanceMapWarpingLocation> instanceMapWarpingLocations = new Dictionary<string, InstanceMapWarpingLocation>();
         private readonly Dictionary<string, UserCharacterData> usersById = new Dictionary<string, UserCharacterData>();
         private readonly Dictionary<StorageId, List<CharacterItem>> allStorageItems = new Dictionary<StorageId, List<CharacterItem>>();
         private readonly Dictionary<StorageId, HashSet<uint>> usingStorageCharacters = new Dictionary<StorageId, HashSet<uint>>();
@@ -831,7 +840,7 @@ namespace MultiplayerARPG.MMO
                                 Logging.Log(LogTag, "Register instance map server: " + peerInfo.extra);
                             instanceMapServerConnectionIdsByInstanceId[peerInfo.extra] = peerInfo;
                             // Warp characters
-                            HashSet<uint> warpingCharacters = new HashSet<uint>();
+                            HashSet<uint> warpingCharacters;
                             if (instanceMapWarpingCharactersByInstanceId.TryGetValue(peerInfo.extra, out warpingCharacters))
                             {
                                 BasePlayerCharacterEntity warpingCharacterEntity;
@@ -839,7 +848,7 @@ namespace MultiplayerARPG.MMO
                                 {
                                     if (!Assets.TryGetSpawnedObject(warpingCharacter, out warpingCharacterEntity))
                                         continue;
-                                    WarpCharacterToInstanceRoutine(warpingCharacterEntity, peerInfo.extra);
+                                    WarpCharacterToInstanceRoutine(warpingCharacterEntity, peerInfo.extra).Forget();
                                 }
                             }
                         }

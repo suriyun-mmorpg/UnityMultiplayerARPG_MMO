@@ -283,7 +283,7 @@ namespace MultiplayerARPG.MMO
                 string instanceId = string.Empty;
                 if (ConfigReader.ReadArgs(args, ARG_INSTANCE_ID, out instanceId))
                 {
-                    mapNetworkManager.mapInstanceId = instanceId;
+                    mapNetworkManager.MapInstanceId = instanceId;
                 }
 
                 // Chat network port

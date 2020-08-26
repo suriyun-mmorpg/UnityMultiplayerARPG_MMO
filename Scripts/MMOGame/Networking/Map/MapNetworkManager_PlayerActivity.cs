@@ -24,7 +24,7 @@ namespace MultiplayerARPG.MMO
             return instanceMapCurrentLocations[playerCharacterEntity.ObjectId].Value;
         }
 
-        protected override void WarpCharacter(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position)
+        protected override void WarpCharacter(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position, bool overrideRotation, Vector3 rotation)
         {
             if (!CanWarpCharacter(playerCharacterEntity))
                 return;
@@ -32,11 +32,13 @@ namespace MultiplayerARPG.MMO
             // If map name is empty, just teleport character to target position
             if (string.IsNullOrEmpty(mapName) || (mapName.Equals(CurrentMapInfo.Id) && !IsInstanceMap()))
             {
+                if (overrideRotation)
+                    playerCharacterEntity.CurrentRotation = rotation;
                 playerCharacterEntity.Teleport(position);
                 return;
             }
 
-            WarpCharacterRoutine(playerCharacterEntity, mapName, position).Forget();
+            WarpCharacterRoutine(playerCharacterEntity, mapName, position, overrideRotation, rotation).Forget();
         }
 
         /// <summary>
@@ -45,8 +47,10 @@ namespace MultiplayerARPG.MMO
         /// <param name="playerCharacterEntity"></param>
         /// <param name="mapName"></param>
         /// <param name="position"></param>
+        /// <param name="overrideRotation"></param>
+        /// <param name="rotation"></param>
         /// <returns></returns>
-        private async UniTaskVoid WarpCharacterRoutine(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position)
+        private async UniTaskVoid WarpCharacterRoutine(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position, bool overrideRotation, Vector3 rotation)
         {
             // If warping to different map
             long connectionId = playerCharacterEntity.ConnectionId;
@@ -67,6 +71,8 @@ namespace MultiplayerARPG.MMO
                 playerCharacterEntity.CloneTo(savingCharacterData);
                 savingCharacterData.CurrentMapName = mapName;
                 savingCharacterData.CurrentPosition = position;
+                if (overrideRotation)
+                    savingCharacterData.CurrentRotation = rotation;
                 while (savingCharacters.Contains(savingCharacterData.Id))
                 {
                     await UniTask.Yield();
@@ -84,15 +90,12 @@ namespace MultiplayerARPG.MMO
             }
         }
 
-        protected override void WarpCharacterToInstance(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position)
+        protected override void WarpCharacterToInstance(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position, bool overrideRotation, Vector3 rotation)
         {
             if (!CanWarpCharacter(playerCharacterEntity))
                 return;
             // Generate instance id
             string instanceId = GenericUtils.GetUniqueId();
-            RequestSpawnMapMessage requestSpawnMapMessage = new RequestSpawnMapMessage();
-            requestSpawnMapMessage.mapId = mapName;
-            requestSpawnMapMessage.instanceId = instanceId;
             // Prepare data for warp character later when instance map server registered to this map server
             HashSet<uint> instanceMapWarpingCharacters = new HashSet<uint>();
             PartyData party;
@@ -120,8 +123,18 @@ namespace MultiplayerARPG.MMO
                 playerCharacterEntity.IsWarping = true;
             }
             instanceMapWarpingCharactersByInstanceId.Add(instanceId, instanceMapWarpingCharacters);
-            instanceMapWarpingLocations.Add(instanceId, new KeyValuePair<string, Vector3>(mapName, position));
-            CentralAppServerRegister.SendRequest(MMOMessageTypes.RequestSpawnMap, requestSpawnMapMessage, OnRequestSpawnMap);
+            instanceMapWarpingLocations.Add(instanceId, new InstanceMapWarpingLocation()
+            {
+                mapName = mapName,
+                position = position,
+                overrideRotation = overrideRotation,
+                rotation = rotation,
+            });
+            CentralAppServerRegister.SendRequest(MMOMessageTypes.RequestSpawnMap, new RequestSpawnMapMessage()
+            {
+                mapId = mapName,
+                instanceId = instanceId,
+            }, OnRequestSpawnMap);
         }
 
         private async UniTaskVoid WarpCharacterToInstanceRoutine(BasePlayerCharacterEntity playerCharacterEntity, string instanceId)
@@ -129,12 +142,12 @@ namespace MultiplayerARPG.MMO
             // If warping to different map
             long connectionId = playerCharacterEntity.ConnectionId;
             CentralServerPeerInfo peerInfo;
-            KeyValuePair<string, Vector3> warpingLocation;
+            InstanceMapWarpingLocation warpingLocation;
             BaseMapInfo mapInfo;
             if (playerCharacters.ContainsKey(connectionId) &&
                 instanceMapWarpingLocations.TryGetValue(instanceId, out warpingLocation) &&
                 instanceMapServerConnectionIdsByInstanceId.TryGetValue(instanceId, out peerInfo) &&
-                GameInstance.MapInfos.TryGetValue(warpingLocation.Key, out mapInfo) &&
+                GameInstance.MapInfos.TryGetValue(warpingLocation.mapName, out mapInfo) &&
                 mapInfo.IsSceneSet())
             {
                 // Add this character to warping list
@@ -144,6 +157,8 @@ namespace MultiplayerARPG.MMO
                 // Clone character data to save
                 PlayerCharacterData savingCharacterData = new PlayerCharacterData();
                 playerCharacterEntity.CloneTo(savingCharacterData);
+                // TODO: Set instance map position and rotation
+                // Wait to save character before move to instance map
                 while (savingCharacters.Contains(savingCharacterData.Id))
                 {
                     await UniTask.Yield();
@@ -187,7 +202,7 @@ namespace MultiplayerARPG.MMO
 
         protected override bool IsInstanceMap()
         {
-            return !string.IsNullOrEmpty(mapInstanceId);
+            return !string.IsNullOrEmpty(MapInstanceId);
         }
 
         public override void CreateParty(BasePlayerCharacterEntity playerCharacterEntity, bool shareExp, bool shareItem)
