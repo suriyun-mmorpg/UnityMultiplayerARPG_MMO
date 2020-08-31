@@ -180,6 +180,12 @@ namespace MultiplayerARPG.MMO
 
         private void OnRequestSpawnMap(AckResponseCode responseCode, BaseAckMessage messageData)
         {
+            if (responseCode == AckResponseCode.Timeout)
+            {
+                if (LogError)
+                    Logging.Log(LogTag, "Spawn Map Ack Id: " + messageData.ackId + " Timeout.");
+                return;
+            }
             ResponseSpawnMapMessage castedMessage = messageData as ResponseSpawnMapMessage;
             if (LogInfo)
                 Logging.Log(LogTag, "Spawn Map Ack Id: " + messageData.ackId + "  Status: " + responseCode + " Error: " + castedMessage.error);
