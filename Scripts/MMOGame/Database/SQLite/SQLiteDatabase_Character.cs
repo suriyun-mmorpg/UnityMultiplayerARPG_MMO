@@ -180,22 +180,7 @@ namespace MultiplayerARPG.MMO
             PlayerCharacterData result = null;
             ExecuteReader((reader) =>
             {
-                if (ReadCharacter(reader, out result))
-                {
-                    // Invoke dev extension methods
-                    this.InvokeInstanceDevExtMethods("ReadCharacter",
-                        result,
-                        withEquipWeapons,
-                        withAttributes,
-                        withSkills,
-                        withSkillUsages,
-                        withBuffs,
-                        withEquipItems,
-                        withNonEquipItems,
-                        withSummons,
-                        withHotkeys,
-                        withQuests);
-                }
+                ReadCharacter(reader, out result);
             }, "SELECT " +
                 "id, dataId, entityId, factionId, characterName, level, exp, " +
                 "currentHp, currentMp, currentStamina, currentFood, currentWater, " +
@@ -227,6 +212,19 @@ namespace MultiplayerARPG.MMO
                     result.Hotkeys = ReadCharacterHotkeys(id);
                 if (withQuests)
                     result.Quests = ReadCharacterQuests(id);
+                // Invoke dev extension methods
+                this.InvokeInstanceDevExtMethods("ReadCharacter",
+                    result,
+                    withEquipWeapons,
+                    withAttributes,
+                    withSkills,
+                    withSkillUsages,
+                    withBuffs,
+                    withEquipItems,
+                    withNonEquipItems,
+                    withSummons,
+                    withHotkeys,
+                    withQuests);
             }
             return result;
         }
