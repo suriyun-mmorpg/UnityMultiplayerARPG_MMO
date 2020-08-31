@@ -41,7 +41,7 @@ namespace MultiplayerARPG.MMO
                 {
                     result.Add(tempHotkey);
                 }
-            }, "SELECT * FROM characterhotkey WHERE characterId=@characterId",
+            }, "SELECT hotkeyId, type, relateId FROM characterhotkey WHERE characterId=@characterId",
                 new MySqlParameter("@characterId", characterId));
             return result;
         }
