@@ -14,10 +14,10 @@ namespace MultiplayerARPG.MMO
 
         private void OnRequestedCharacters(AckResponseCode responseCode, BaseAckMessage message)
         {
-            ResponseCharactersMessage castedMessage = message as ResponseCharactersMessage;
+            // Clear character list
             CacheCharacterSelectionManager.Clear();
             CacheCharacterList.HideAll();
-            // Unenabled buttons
+            // Unable buttons
             buttonStart.gameObject.SetActive(false);
             buttonDelete.gameObject.SetActive(false);
             // Remove all models
@@ -25,9 +25,16 @@ namespace MultiplayerARPG.MMO
             CharacterModelById.Clear();
             // Remove all cached data
             PlayerCharacterDataById.Clear();
-
+            // Don't make character list if timeout
+            if (responseCode == AckResponseCode.Timeout)
+            {
+                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
+                return;
+            }
+            // Prepare character list
             List<PlayerCharacterData> selectableCharacters = new List<PlayerCharacterData>();
-
+            // Read response message
+            ResponseCharactersMessage castedMessage = message as ResponseCharactersMessage;
             switch (responseCode)
             {
                 case AckResponseCode.Error:
@@ -39,9 +46,6 @@ namespace MultiplayerARPG.MMO
                             break;
                     }
                     UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), errorMessage);
-                    break;
-                case AckResponseCode.Timeout:
-                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
                     break;
                 default:
                     selectableCharacters = castedMessage.characters;
@@ -131,8 +135,12 @@ namespace MultiplayerARPG.MMO
 
         private void OnRequestedSelectCharacter(AckResponseCode responseCode, BaseAckMessage message)
         {
+            if (responseCode == AckResponseCode.Timeout)
+            {
+                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
+                return;
+            }
             ResponseSelectCharacterMessage castedMessage = message as ResponseSelectCharacterMessage;
-            
             switch (responseCode)
             {
                 case AckResponseCode.Error:
@@ -153,9 +161,6 @@ namespace MultiplayerARPG.MMO
                             break;
                     }
                     UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), errorMessage);
-                    break;
-                case AckResponseCode.Timeout:
-                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
                     break;
                 default:
                     MMOClientInstance.Singleton.StartMapClient(castedMessage.sceneName, castedMessage.networkAddress, castedMessage.networkPort);
@@ -179,8 +184,12 @@ namespace MultiplayerARPG.MMO
 
         private void OnRequestedDeleteCharacter(AckResponseCode responseCode, BaseAckMessage message)
         {
+            if (responseCode == AckResponseCode.Timeout)
+            {
+                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
+                return;
+            }
             ResponseDeleteCharacterMessage castedMessage = message as ResponseDeleteCharacterMessage;
-            
             switch (responseCode)
             {
                 case AckResponseCode.Error:
@@ -192,9 +201,6 @@ namespace MultiplayerARPG.MMO
                             break;
                     }
                     UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), errorMessage);
-                    break;
-                case AckResponseCode.Timeout:
-                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
                     break;
                 default:
                     // Reload characters

@@ -43,9 +43,8 @@ namespace MultiplayerARPG.MMO
             MMOClientInstance.Singleton.StartCentralClient(data.networkAddress, data.networkPort);
         }
 
-        public override void Show()
+        protected virtual void OnEnable()
         {
-            base.Show();
             SelectionManager.DeselectSelectedUI();
             SelectionManager.Clear();
 

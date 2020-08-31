@@ -76,6 +76,13 @@ namespace MultiplayerARPG.MMO
         public void OnRegister(AckResponseCode responseCode, BaseAckMessage message)
         {
             Registering = false;
+            if (responseCode == AckResponseCode.Timeout)
+            {
+                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
+                if (onRegisterFail != null)
+                    onRegisterFail.Invoke();
+                return;
+            }
             ResponseUserRegisterMessage castedMessage = message as ResponseUserRegisterMessage;
             switch (responseCode)
             {
@@ -97,11 +104,6 @@ namespace MultiplayerARPG.MMO
                             break;
                     }
                     UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), errorMessage);
-                    if (onRegisterFail != null)
-                        onRegisterFail.Invoke();
-                    break;
-                case AckResponseCode.Timeout:
-                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
                     if (onRegisterFail != null)
                         onRegisterFail.Invoke();
                     break;
