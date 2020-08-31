@@ -187,14 +187,14 @@ namespace MultiplayerARPG.MMO
         private void OnRequestUserLogin(AckResponseCode responseCode, BaseAckMessage messageData, AckMessageCallback callback)
         {
             if (callback != null)
-                callback(responseCode, messageData);
+                callback.Invoke(responseCode, messageData);
 
             UserId = string.Empty;
             AccessToken = string.Empty;
             SelectCharacterId = string.Empty;
-            ResponseUserLoginMessage castedMessage = messageData as ResponseUserLoginMessage;
-            if (castedMessage.responseCode == AckResponseCode.Success)
+            if (messageData.responseCode == AckResponseCode.Success)
             {
+                ResponseUserLoginMessage castedMessage = messageData as ResponseUserLoginMessage;
                 UserId = castedMessage.userId;
                 AccessToken = castedMessage.accessToken;
                 SelectCharacterId = string.Empty;
@@ -214,13 +214,13 @@ namespace MultiplayerARPG.MMO
         private void OnRequestValidateAccessToken(AckResponseCode responseCode, BaseAckMessage messageData, AckMessageCallback callback)
         {
             if (callback != null)
-                callback(responseCode, messageData);
+                callback.Invoke(responseCode, messageData);
 
             UserId = string.Empty;
             AccessToken = string.Empty;
-            ResponseValidateAccessTokenMessage castedMessage = messageData as ResponseValidateAccessTokenMessage;
-            if (castedMessage.responseCode == AckResponseCode.Success)
+            if (messageData.responseCode == AckResponseCode.Success)
             {
+                ResponseValidateAccessTokenMessage castedMessage = messageData as ResponseValidateAccessTokenMessage;
                 UserId = castedMessage.userId;
                 AccessToken = castedMessage.accessToken;
             }
@@ -229,12 +229,13 @@ namespace MultiplayerARPG.MMO
         private void OnRequestSelectCharacter(AckResponseCode responseCode, BaseAckMessage messageData, string characterId, AckMessageCallback callback)
         {
             if (callback != null)
-                callback(responseCode, messageData);
+                callback.Invoke(responseCode, messageData);
 
             SelectCharacterId = string.Empty;
-            ResponseSelectCharacterMessage castedMessage = messageData as ResponseSelectCharacterMessage;
-            if (castedMessage.responseCode == AckResponseCode.Success)
+            if (messageData.responseCode == AckResponseCode.Success)
+            {
                 SelectCharacterId = characterId;
+            }
         }
         #endregion
     }
