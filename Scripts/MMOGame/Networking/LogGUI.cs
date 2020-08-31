@@ -47,11 +47,13 @@ public class LogGUI : MonoBehaviour
     private void OnEnable()
     {
         Logging.onLog += HandleLog;
+        Application.logMessageReceivedThreaded += HandleLog;
     }
 
     private void OnDisable()
     {
         Logging.onLog -= HandleLog;
+        Application.logMessageReceivedThreaded -= HandleLog;
     }
 
     private void HandleLog(LogType type, string tag, string logString)
@@ -78,6 +80,37 @@ public class LogGUI : MonoBehaviour
         logList.Add(new LogData()
         {
             logText = "[" + tag + "] " + logString,
+            logColor = color,
+        });
+        if (logList.Count > showLogSize)
+            logList.RemoveAt(0);
+        shouldScrollToBottom = true;
+    }
+
+    private void HandleLog(string condition, string stackTrace, LogType type)
+    {
+        if (string.IsNullOrEmpty(logSavePath))
+            return;
+        using (StreamWriter writer = new StreamWriter(logSavePath, true, Encoding.UTF8))
+        {
+            writer.WriteLine("(" + type + ") " + stackTrace + "\n");
+        }
+        Color color = Color.white;
+        switch (type)
+        {
+            case LogType.Error:
+                color = Color.red;
+                break;
+            case LogType.Warning:
+                color = Color.yellow;
+                break;
+            case LogType.Exception:
+                color = Color.magenta;
+                break;
+        }
+        logList.Add(new LogData()
+        {
+            logText = " " + stackTrace,
             logColor = color,
         });
         if (logList.Count > showLogSize)
