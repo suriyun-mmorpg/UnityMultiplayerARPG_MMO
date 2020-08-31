@@ -80,7 +80,7 @@ namespace MultiplayerARPG.MMO
                 Logging.Log(ToString(), "Migrating up to 1.58");
                 await ExecuteNonQuery("ALTER TABLE `characterbuff` CHANGE `type` `type` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0';");
                 await ExecuteNonQuery("ALTER TABLE `characterhotkey` CHANGE `type` `type` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0';");
-                await ExecuteNonQuery("ALTER TABLE `characteritem` CHANGE `type` `type` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0';");
+                await ExecuteNonQuery("ALTER TABLE `characteritem` CHANGE `inventoryType` `inventoryType` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0';");
                 await ExecuteNonQuery("ALTER TABLE `characterskillusage` CHANGE `type` `type` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0';");
                 await ExecuteNonQuery("ALTER TABLE `charactersummon` CHANGE `type` `type` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0';");
                 await ExecuteNonQuery("ALTER TABLE `storageitem` CHANGE `storageType` `storageType` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0';");
