@@ -328,17 +328,16 @@ namespace MultiplayerARPG.MMO
         public override async Task<BuildingsResp> ReadBuildings(ReadBuildingsReq request, ServerCallContext context)
         {
             BuildingsResp resp = new BuildingsResp();
-            List<BuildingSaveData> buildings;
+            List<BuildingSaveData> buildings = new List<BuildingSaveData>();
             if (cachedBuilding.ContainsKey(request.MapName))
             {
                 // Get buildings from cache
-                buildings = new List<BuildingSaveData>(cachedBuilding[request.MapName].Values);
+                buildings.AddRange(cachedBuilding[request.MapName].Values);
             }
-            else
+            else if (cachedBuilding.TryAdd(request.MapName, new Dictionary<string, BuildingSaveData>()))
             {
                 // Store buildings to cache
-                cachedBuilding[request.MapName] = new Dictionary<string, BuildingSaveData>();
-                buildings = await Database.ReadBuildings(request.MapName);
+                buildings.AddRange(await Database.ReadBuildings(request.MapName));
                 foreach (BuildingSaveData building in buildings)
                 {
                     cachedBuilding[request.MapName][building.Id] = building;
