@@ -135,6 +135,18 @@ namespace MultiplayerARPG.MMO
             }
         }
 
+        private void OpenConnectionSync(MySqlConnection connection)
+        {
+            try
+            {
+                connection.Open();
+            }
+            catch (MySqlException ex)
+            {
+                Logging.LogException(ex);
+            }
+        }
+
         public async UniTask<long> ExecuteInsertData(string sql, params MySqlParameter[] args)
         {
             MySqlConnection connection = NewConnection();
@@ -168,6 +180,42 @@ namespace MultiplayerARPG.MMO
             }
             if (createLocalConnection)
                 await connection.CloseAsync();
+            return result;
+        }
+
+        public long ExecuteInsertDataSync(string sql, params MySqlParameter[] args)
+        {
+            MySqlConnection connection = NewConnection();
+            OpenConnectionSync(connection);
+            long result = ExecuteInsertDataSync(connection, null, sql, args);
+            connection.Close();
+            return result;
+        }
+
+        public long ExecuteInsertDataSync(MySqlConnection connection, MySqlTransaction transaction, string sql, params MySqlParameter[] args)
+        {
+            bool createLocalConnection = false;
+            if (connection == null)
+            {
+                connection = NewConnection();
+                transaction = null;
+                OpenConnectionSync(connection);
+                createLocalConnection = true;
+            }
+            long result = 0;
+            using (MySqlCommand cmd = new MySqlCommand(sql, connection))
+            {
+                if (transaction != null)
+                    cmd.Transaction = transaction;
+                foreach (MySqlParameter arg in args)
+                {
+                    cmd.Parameters.Add(arg);
+                }
+                cmd.ExecuteNonQuery();
+                result = cmd.LastInsertedId;
+            }
+            if (createLocalConnection)
+                connection.Close();
             return result;
         }
 
@@ -206,6 +254,41 @@ namespace MultiplayerARPG.MMO
             return numRows;
         }
 
+        public int ExecuteNonQuerySync(string sql, params MySqlParameter[] args)
+        {
+            MySqlConnection connection = NewConnection();
+            OpenConnectionSync(connection);
+            int result = ExecuteNonQuerySync(connection, null, sql, args);
+            connection.Close();
+            return result;
+        }
+
+        public int ExecuteNonQuerySync(MySqlConnection connection, MySqlTransaction transaction, string sql, params MySqlParameter[] args)
+        {
+            bool createLocalConnection = false;
+            if (connection == null)
+            {
+                connection = NewConnection();
+                transaction = null;
+                OpenConnectionSync(connection);
+                createLocalConnection = true;
+            }
+            int numRows = 0;
+            using (MySqlCommand cmd = new MySqlCommand(sql, connection))
+            {
+                if (transaction != null)
+                    cmd.Transaction = transaction;
+                foreach (MySqlParameter arg in args)
+                {
+                    cmd.Parameters.Add(arg);
+                }
+                numRows = cmd.ExecuteNonQuery();
+            }
+            if (createLocalConnection)
+                connection.Close();
+            return numRows;
+        }
+
         public async UniTask<object> ExecuteScalar(string sql, params MySqlParameter[] args)
         {
             MySqlConnection connection = NewConnection();
@@ -241,6 +324,41 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
+        public object ExecuteScalarSync(string sql, params MySqlParameter[] args)
+        {
+            MySqlConnection connection = NewConnection();
+            OpenConnectionSync(connection);
+            object result = ExecuteScalarSync(connection, null, sql, args);
+            connection.Close();
+            return result;
+        }
+
+        public object ExecuteScalarSync(MySqlConnection connection, MySqlTransaction transaction, string sql, params MySqlParameter[] args)
+        {
+            bool createLocalConnection = false;
+            if (connection == null)
+            {
+                connection = NewConnection();
+                transaction = null;
+                OpenConnectionSync(connection);
+                createLocalConnection = true;
+            }
+            object result;
+            using (MySqlCommand cmd = new MySqlCommand(sql, connection))
+            {
+                if (transaction != null)
+                    cmd.Transaction = transaction;
+                foreach (MySqlParameter arg in args)
+                {
+                    cmd.Parameters.Add(arg);
+                }
+                result = cmd.ExecuteScalar();
+            }
+            if (createLocalConnection)
+                connection.Close();
+            return result;
+        }
+
         public async UniTask ExecuteReader(Action<MySqlDataReader> onRead, string sql, params MySqlParameter[] args)
         {
             MySqlConnection connection = NewConnection();
@@ -273,6 +391,40 @@ namespace MultiplayerARPG.MMO
             }
             if (createLocalConnection)
                 await connection.CloseAsync();
+        }
+
+        public void ExecuteReaderSync(Action<MySqlDataReader> onRead, string sql, params MySqlParameter[] args)
+        {
+            MySqlConnection connection = NewConnection();
+            OpenConnectionSync(connection);
+            ExecuteReaderSync(connection, null, onRead, sql, args);
+            connection.Close();
+        }
+
+        public void ExecuteReaderSync(MySqlConnection connection, MySqlTransaction transaction, Action<MySqlDataReader> onRead, string sql, params MySqlParameter[] args)
+        {
+            bool createLocalConnection = false;
+            if (connection == null)
+            {
+                connection = NewConnection();
+                transaction = null;
+                OpenConnectionSync(connection);
+                createLocalConnection = true;
+            }
+            using (MySqlCommand cmd = new MySqlCommand(sql, connection))
+            {
+                if (transaction != null)
+                    cmd.Transaction = transaction;
+                foreach (MySqlParameter arg in args)
+                {
+                    cmd.Parameters.Add(arg);
+                }
+                MySqlDataReader dataReader = cmd.ExecuteReader();
+                if (onRead != null) onRead.Invoke(dataReader);
+                dataReader.Close();
+            }
+            if (createLocalConnection)
+                connection.Close();
         }
 
         public override async UniTask<string> ValidateUserLogin(string username, string password)
