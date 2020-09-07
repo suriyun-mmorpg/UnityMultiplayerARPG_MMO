@@ -441,7 +441,14 @@ namespace MultiplayerARPG.MMO
                 {
                     cmd.Parameters.Add(arg);
                 }
-                numRows = cmd.ExecuteNonQuery();
+                try
+                {
+                    numRows = cmd.ExecuteNonQuery();
+                }
+                catch (Exception ex)
+                {
+                    Logging.LogException(ToString(), ex);
+                }
             }
             return numRows;
         }
@@ -453,7 +460,7 @@ namespace MultiplayerARPG.MMO
 
         public object ExecuteScalar(SqliteTransaction transaction, string sql, params SqliteParameter[] args)
         {
-            object result;
+            object result = null;
             using (SqliteCommand cmd = new SqliteCommand(sql, connection))
             {
                 if (transaction != null)
@@ -462,7 +469,14 @@ namespace MultiplayerARPG.MMO
                 {
                     cmd.Parameters.Add(arg);
                 }
-                result = cmd.ExecuteScalar();
+                try
+                {
+                    result = cmd.ExecuteScalar();
+                }
+                catch (Exception ex)
+                {
+                    Logging.LogException(ToString(), ex);
+                }
             }
             return result;
         }
@@ -482,9 +496,16 @@ namespace MultiplayerARPG.MMO
                 {
                     cmd.Parameters.Add(arg);
                 }
-                SqliteDataReader dataReader = cmd.ExecuteReader();
-                if (onRead != null) onRead.Invoke(dataReader);
-                dataReader.Close();
+                try
+                {
+                    SqliteDataReader dataReader = cmd.ExecuteReader();
+                    if (onRead != null) onRead.Invoke(dataReader);
+                    dataReader.Close();
+                }
+                catch (Exception ex)
+                {
+                    Logging.LogException(ToString(), ex);
+                }
             }
         }
 
