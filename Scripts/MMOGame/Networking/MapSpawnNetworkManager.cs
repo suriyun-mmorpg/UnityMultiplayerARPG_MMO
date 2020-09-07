@@ -2,12 +2,12 @@
 using UnityEngine;
 using LiteNetLibManager;
 using System.Diagnostics;
-using LiteNetLib;
 using System.IO;
 using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using System.Collections.Concurrent;
+using ConcurrentCollections;
 
 namespace MultiplayerARPG.MMO
 {
@@ -43,7 +43,7 @@ namespace MultiplayerARPG.MMO
         /// <summary>
         /// Map servers processes id
         /// </summary>
-        private readonly ConcurrentDictionary<int, Process> processes = new ConcurrentDictionary<int, Process>();
+        private readonly ConcurrentHashSet<int> processes = new ConcurrentHashSet<int>();
         /// <summary>
         /// List of Map servers that restarting in update loop
         /// </summary>
@@ -122,12 +122,11 @@ namespace MultiplayerARPG.MMO
                 // Do nothing
             }
             // Clear processes
-            List<int> processIds = new List<int>(processes.Keys);
-            Process tempProcess;
+            List<int> processIds = new List<int>(processes);
             foreach (int processId in processIds)
             {
-                if (processes.TryRemove(processId, out tempProcess))
-                    tempProcess.Kill();
+                Process.GetProcessById(processId).Kill();
+                processes.TryRemove(processId);
             }
             // Clear restarting scenes
             string tempRestartingScenes;
@@ -312,7 +311,7 @@ namespace MultiplayerARPG.MMO
                         using (Process process = Process.Start(startProcessInfo))
                         {
                             processId = process.Id;
-                            processes.TryAdd(processId, process);
+                            processes.Add(processId);
 
                             processStarted = true;
 
@@ -348,8 +347,7 @@ namespace MultiplayerARPG.MMO
                     finally
                     {
                         // Remove the process
-                        Process tempProcess;
-                        processes.TryRemove(processId, out tempProcess);
+                        processes.TryRemove(processId);
 
                         // Restarting scene
                         if (autoRestart)

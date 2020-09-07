@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Grpc.Core;
 using Google.Protobuf;
+using System.Collections.Concurrent;
+using ConcurrentCollections;
+using System;
 
 namespace MultiplayerARPG.MMO
 {
@@ -15,19 +18,19 @@ namespace MultiplayerARPG.MMO
         // In the future it may implements Redis
         // It's going to get some data from all tables but not every records
         // Just some records that players were requested
-        private HashSet<string> cachedUsernames = new HashSet<string>();
-        private HashSet<string> cachedCharacterNames = new HashSet<string>();
-        private HashSet<string> cachedGuildNames = new HashSet<string>();
-        private Dictionary<string, string> cachedUserAccessToken = new Dictionary<string, string>();
-        private Dictionary<string, int> cachedUserGold = new Dictionary<string, int>();
-        private Dictionary<string, int> cachedUserCash = new Dictionary<string, int>();
-        private Dictionary<string, PlayerCharacterData> cachedUserCharacter = new Dictionary<string, PlayerCharacterData>();
-        private Dictionary<string, SocialCharacterData> cachedSocialCharacter = new Dictionary<string, SocialCharacterData>();
-        private Dictionary<string, Dictionary<string, BuildingSaveData>> cachedBuilding = new Dictionary<string, Dictionary<string, BuildingSaveData>>();
-        private Dictionary<string, List<SocialCharacterData>> cachedFriend = new Dictionary<string, List<SocialCharacterData>>();
-        private Dictionary<int, PartyData> cachedParty = new Dictionary<int, PartyData>();
-        private Dictionary<int, GuildData> cachedGuild = new Dictionary<int, GuildData>();
-        private Dictionary<StorageId, List<CharacterItem>> cachedStorageItems = new Dictionary<StorageId, List<CharacterItem>>();
+        private ConcurrentHashSet<string> cachedUsernames = new ConcurrentHashSet<string>(StringComparer.OrdinalIgnoreCase);
+        private ConcurrentHashSet<string> cachedCharacterNames = new ConcurrentHashSet<string>(StringComparer.OrdinalIgnoreCase);
+        private ConcurrentHashSet<string> cachedGuildNames = new ConcurrentHashSet<string>(StringComparer.OrdinalIgnoreCase);
+        private ConcurrentDictionary<string, string> cachedUserAccessToken = new ConcurrentDictionary<string, string>();
+        private ConcurrentDictionary<string, int> cachedUserGold = new ConcurrentDictionary<string, int>();
+        private ConcurrentDictionary<string, int> cachedUserCash = new ConcurrentDictionary<string, int>();
+        private ConcurrentDictionary<string, PlayerCharacterData> cachedUserCharacter = new ConcurrentDictionary<string, PlayerCharacterData>();
+        private ConcurrentDictionary<string, SocialCharacterData> cachedSocialCharacter = new ConcurrentDictionary<string, SocialCharacterData>();
+        private ConcurrentDictionary<string, Dictionary<string, BuildingSaveData>> cachedBuilding = new ConcurrentDictionary<string, Dictionary<string, BuildingSaveData>>();
+        private ConcurrentDictionary<string, List<SocialCharacterData>> cachedFriend = new ConcurrentDictionary<string, List<SocialCharacterData>>();
+        private ConcurrentDictionary<int, PartyData> cachedParty = new ConcurrentDictionary<int, PartyData>();
+        private ConcurrentDictionary<int, GuildData> cachedGuild = new ConcurrentDictionary<int, GuildData>();
+        private ConcurrentDictionary<StorageId, List<CharacterItem>> cachedStorageItems = new ConcurrentDictionary<StorageId, List<CharacterItem>>();
 
         public DatabaseServiceImplement(BaseDatabase database)
         {
@@ -207,8 +210,9 @@ namespace MultiplayerARPG.MMO
             if (cachedUserCharacter.ContainsKey(request.CharacterId))
             {
                 string characterName = cachedUserCharacter[request.CharacterId].CharacterName;
-                cachedCharacterNames.Remove(characterName);
-                cachedUserCharacter.Remove(request.CharacterId);
+                cachedCharacterNames.TryRemove(characterName);
+                PlayerCharacterData playerCharacterData;
+                cachedUserCharacter.TryRemove(request.CharacterId, out playerCharacterData);
             }
             // Delete data from database
             await Database.DeleteCharacter(request.UserId, request.CharacterId);
@@ -507,8 +511,9 @@ namespace MultiplayerARPG.MMO
             if (cachedGuild.ContainsKey(request.GuildId))
             {
                 string characterName = cachedGuild[request.GuildId].guildName;
-                cachedGuildNames.Remove(characterName);
-                cachedGuild.Remove(request.GuildId);
+                cachedGuildNames.TryRemove(characterName);
+                GuildData guildData;
+                cachedGuild.TryRemove(request.GuildId, out guildData);
             }
             // Remove data from database
             await Database.DeleteGuild(request.GuildId);
@@ -586,7 +591,7 @@ namespace MultiplayerARPG.MMO
             GuildData guild = await ReadGuild(request.GuildId);
             // Update to cache
             guild = GameInstance.Singleton.SocialSystemSetting.IncreaseGuildExp(guild, request.Exp);
-            cachedGuild[guild.id] = guild;
+            cachedGuild.TryAdd(guild.id, guild);
             // Update to database
             await Database.UpdateGuildLevel(request.GuildId, guild.level, guild.exp, guild.skillPoint);
             return new GuildResp()
@@ -639,12 +644,7 @@ namespace MultiplayerARPG.MMO
             // Prepare storage data
             StorageId storageId = new StorageId((StorageType)request.StorageType, request.StorageOwnerId);
             List<CharacterItem> storageItems;
-            if (cachedStorageItems.ContainsKey(storageId))
-            {
-                // Already cached data, so get data from cache
-                storageItems = cachedStorageItems[storageId];
-            }
-            else
+            if (!cachedStorageItems.TryGetValue(storageId, out storageItems))
             {
                 // Doesn't cached yet, so get data from database
                 storageItems = await Database.ReadStorageItems(storageId.storageType, storageId.storageOwnerId);
@@ -677,7 +677,7 @@ namespace MultiplayerARPG.MMO
                 resp.Error = EStorageError.StorageErrorInvalidCharacter;
                 return resp;
             }
-            if (request.InventoryItemIndex <= 0 || 
+            if (request.InventoryItemIndex <= 0 ||
                 request.InventoryItemIndex > character.NonEquipItems.Count)
             {
                 // Invalid inventory index
@@ -939,12 +939,7 @@ namespace MultiplayerARPG.MMO
         public async Task<int> ReadGold(string userId)
         {
             int gold;
-            if (cachedUserGold.ContainsKey(userId))
-            {
-                // Already cached data, so get data from cache
-                gold = cachedUserGold[userId];
-            }
-            else
+            if (!cachedUserGold.TryGetValue(userId, out gold))
             {
                 // Doesn't cached yet, so get data from database and cache it
                 gold = await Database.GetGold(userId);
@@ -956,12 +951,7 @@ namespace MultiplayerARPG.MMO
         public async Task<int> ReadCash(string userId)
         {
             int cash;
-            if (cachedUserCash.ContainsKey(userId))
-            {
-                // Already cached data, so get data from cache
-                cash = cachedUserCash[userId];
-            }
-            else
+            if (!cachedUserCash.TryGetValue(userId, out cash))
             {
                 // Doesn't cached yet, so get data from database and cache it
                 cash = await Database.GetCash(userId);
@@ -973,12 +963,7 @@ namespace MultiplayerARPG.MMO
         public async Task<PlayerCharacterData> ReadCharacter(string id)
         {
             PlayerCharacterData character;
-            if (cachedUserCharacter.ContainsKey(id))
-            {
-                // Already cached data, so get data from cache
-                character = cachedUserCharacter[id];
-            }
-            else
+            if (!cachedUserCharacter.TryGetValue(id, out character))
             {
                 // Doesn't cached yet, so get data from database
                 character = await Database.ReadCharacter(id);
@@ -996,12 +981,7 @@ namespace MultiplayerARPG.MMO
         {
             //cachedSocialCharacter
             SocialCharacterData character;
-            if (cachedSocialCharacter.ContainsKey(id))
-            {
-                // Already cached data, so get data from cache
-                character = cachedSocialCharacter[id];
-            }
-            else
+            if (!cachedSocialCharacter.TryGetValue(id, out character))
             {
                 // Doesn't cached yet, so get data from database
                 character = SocialCharacterData.Create(await Database.ReadCharacter(id, false, false, false, false, false, false, false, false, false, false));
@@ -1014,12 +994,7 @@ namespace MultiplayerARPG.MMO
         public async Task<List<SocialCharacterData>> ReadFriends(string id)
         {
             List<SocialCharacterData> friends;
-            if (cachedFriend.ContainsKey(id))
-            {
-                // Already cached data, so get data from cache
-                friends = cachedFriend[id];
-            }
-            else
+            if (!cachedFriend.TryGetValue(id, out friends))
             {
                 // Doesn't cached yet, so get data from database
                 friends = await Database.ReadFriends(id);
@@ -1036,12 +1011,7 @@ namespace MultiplayerARPG.MMO
         public async Task<PartyData> ReadParty(int id)
         {
             PartyData party;
-            if (cachedParty.ContainsKey(id))
-            {
-                // Already cached data, so get data from cache
-                party = cachedParty[id];
-            }
-            else
+            if (!cachedParty.TryGetValue(id, out party))
             {
                 // Doesn't cached yet, so get data from database
                 party = await Database.ReadParty(id);
@@ -1058,12 +1028,7 @@ namespace MultiplayerARPG.MMO
         public async Task<GuildData> ReadGuild(int id)
         {
             GuildData guild;
-            if (cachedGuild.ContainsKey(id))
-            {
-                // Already cached data, so get data from cache
-                guild = cachedGuild[id];
-            }
-            else
+            if (!cachedGuild.TryGetValue(id, out guild))
             {
                 // Doesn't cached yet, so get data from database
                 guild = await Database.ReadGuild(id, GameInstance.Singleton.SocialSystemSetting.GuildMemberRoles);
