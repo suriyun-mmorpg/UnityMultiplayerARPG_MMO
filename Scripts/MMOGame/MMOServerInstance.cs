@@ -120,7 +120,7 @@ namespace MultiplayerARPG.MMO
         public bool startCentralOnAwake;
         public bool startMapSpawnOnAwake;
         public bool startChatOnAwake;
-        public bool startDatabaseManagerOnAwake;
+        public bool startDatabaseOnAwake;
         public bool startMapOnAwake;
         public BaseMapInfo startingMap;
         public int databaseOptionIndex;
@@ -356,6 +356,17 @@ namespace MultiplayerARPG.MMO
                 bool startLog = false;
                 bool tempStartServer;
 
+                if (ConfigReader.IsArgsProvided(args, ARG_START_DATABASE_SERVER) ||
+                    (ConfigReader.ReadConfigs(jsonConfig, CONFIG_START_DATABASE_SERVER, out tempStartServer) && tempStartServer))
+                {
+                    if (!string.IsNullOrEmpty(logFileName))
+                        logFileName += "_";
+                    logFileName += "Database";
+                    startLog = true;
+                    gameInstance.SetOnGameDataLoadedCallback(OnGameDataLoaded);
+                    startingDatabaseServer = true;
+                }
+
                 if (ConfigReader.IsArgsProvided(args, ARG_START_CENTRAL_SERVER) ||
                     (ConfigReader.ReadConfigs(jsonConfig, CONFIG_START_CENTRAL_SERVER, out tempStartServer) && tempStartServer))
                 {
@@ -365,6 +376,17 @@ namespace MultiplayerARPG.MMO
                     startLog = true;
                     gameInstance.SetOnGameDataLoadedCallback(OnGameDataLoaded);
                     startingCentralServer = true;
+                }
+
+                if (ConfigReader.IsArgsProvided(args, ARG_START_CHAT_SERVER) ||
+                    (ConfigReader.ReadConfigs(jsonConfig, CONFIG_START_CHAT_SERVER, out tempStartServer) && tempStartServer))
+                {
+                    if (!string.IsNullOrEmpty(logFileName))
+                        logFileName += "_";
+                    logFileName += "Chat";
+                    startLog = true;
+                    gameInstance.SetOnGameDataLoadedCallback(OnGameDataLoaded);
+                    startingChatServer = true;
                 }
 
                 if (ConfigReader.IsArgsProvided(args, ARG_START_MAP_SPAWN_SERVER) ||
@@ -389,28 +411,6 @@ namespace MultiplayerARPG.MMO
                     startingMapServer = true;
                 }
 
-                if (ConfigReader.IsArgsProvided(args, ARG_START_CHAT_SERVER) ||
-                    (ConfigReader.ReadConfigs(jsonConfig, CONFIG_START_CHAT_SERVER, out tempStartServer) && tempStartServer))
-                {
-                    if (!string.IsNullOrEmpty(logFileName))
-                        logFileName += "_";
-                    logFileName += "Chat";
-                    startLog = true;
-                    gameInstance.SetOnGameDataLoadedCallback(OnGameDataLoaded);
-                    startingChatServer = true;
-                }
-
-                if (ConfigReader.IsArgsProvided(args, ARG_START_DATABASE_SERVER) ||
-                    (ConfigReader.ReadConfigs(jsonConfig, CONFIG_START_DATABASE_SERVER, out tempStartServer) && tempStartServer))
-                {
-                    if (!string.IsNullOrEmpty(logFileName))
-                        logFileName += "_";
-                    logFileName += "Database";
-                    startLog = true;
-                    gameInstance.SetOnGameDataLoadedCallback(OnGameDataLoaded);
-                    startingDatabaseServer = true;
-                }
-
                 if (startLog)
                 {
                     CacheLogGUI.logFileName = logFileName;
@@ -427,17 +427,17 @@ namespace MultiplayerARPG.MMO
 
                 DatabaseNetworkManager.SetDatabaseByOptionIndex(databaseOptionIndex);
 
+                if (startDatabaseOnAwake)
+                    startingDatabaseServer = true;
+
                 if (startCentralOnAwake)
                     startingCentralServer = true;
-
-                if (startMapSpawnOnAwake)
-                    startingMapSpawnServer = true;
 
                 if (startChatOnAwake)
                     startingChatServer = true;
 
-                if (startDatabaseManagerOnAwake)
-                    startingDatabaseServer = true;
+                if (startMapSpawnOnAwake)
+                    startingMapSpawnServer = true;
 
                 if (startMapOnAwake)
                 {
@@ -451,10 +451,22 @@ namespace MultiplayerARPG.MMO
 
         private void OnGameDataLoaded()
         {
+            if (startingDatabaseServer)
+            {
+                // Start database manager server
+                StartDatabaseManagerServer();
+            }
+
             if (startingCentralServer)
             {
                 // Start central server
                 StartCentralServer();
+            }
+
+            if (startingChatServer)
+            {
+                // Start chat manager server
+                StartChatServer();
             }
 
             if (startingMapSpawnServer)
@@ -483,18 +495,6 @@ namespace MultiplayerARPG.MMO
                     mapNetworkManager.SetMapInfo(tempMapInfo);
                 }
                 StartMapServer();
-            }
-
-            if (startingChatServer)
-            {
-                // Start chat manager server
-                StartChatServer();
-            }
-
-            if (startingDatabaseServer)
-            {
-                // Start database manager server
-                StartDatabaseManagerServer();
             }
 
             if (startingCentralServer ||
