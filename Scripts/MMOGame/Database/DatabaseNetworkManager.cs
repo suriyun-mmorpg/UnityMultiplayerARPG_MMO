@@ -43,6 +43,7 @@ namespace MultiplayerARPG.MMO
                 Client.ShutDown();
             Logging.Log("DatabaseNetworkManager", "Start Client");
             Client = new DatabaseManagerClient(networkAddress, networkPort);
+            Client.Connect();
         }
 
         public DatabaseService.DatabaseServiceClient ServiceClient
