@@ -6,6 +6,7 @@ using LiteNetLib;
 using System.IO;
 using System;
 using System.Threading;
+using Cysharp.Threading.Tasks;
 
 namespace MultiplayerARPG.MMO
 {
@@ -158,7 +159,6 @@ namespace MultiplayerARPG.MMO
                             {
                                 actions.Invoke();
                             }
-
                             mainThreadActions.Clear();
                         }
                     }
@@ -204,10 +204,17 @@ namespace MultiplayerARPG.MMO
                     spawningMaps = new List<BaseMapInfo>();
                     spawningMaps.AddRange(GameInstance.MapInfos.Values);
                 }
-                foreach (BaseMapInfo map in spawningMaps)
-                {
-                    SpawnMap(map.Id, true);
-                }
+                SpawnMaps(spawningMaps).Forget();
+            }
+        }
+
+        private async UniTaskVoid SpawnMaps(List<BaseMapInfo> spawningMaps)
+        {
+            foreach (BaseMapInfo map in spawningMaps)
+            {
+                SpawnMap(map.Id, true);
+                // Add some delay before spawn next map
+                await UniTask.Delay(100, true);
             }
         }
 
