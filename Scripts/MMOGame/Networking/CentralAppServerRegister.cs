@@ -86,17 +86,16 @@ namespace MultiplayerARPG.MMO
         {
             Logging.Log(LogTag, "[" + appServer.PeerType + "] Disconnected from Central Server");
             IsRegisteredToCentralServer = false;
-            await UniTask.Delay(500);
             Logging.Log(LogTag, "[" + appServer.PeerType + "] Reconnect to central in 5 seconds...");
-            await UniTask.Delay(1000);
+            await UniTask.Delay(1000, true);
             Logging.Log(LogTag, "[" + appServer.PeerType + "] Reconnect to central in 4 seconds...");
-            await UniTask.Delay(1000);
+            await UniTask.Delay(1000, true);
             Logging.Log(LogTag, "[" + appServer.PeerType + "] Reconnect to central in 3 seconds...");
-            await UniTask.Delay(1000);
+            await UniTask.Delay(1000, true);
             Logging.Log(LogTag, "[" + appServer.PeerType + "] Reconnect to central in 2 seconds...");
-            await UniTask.Delay(1000);
+            await UniTask.Delay(1000, true);
             Logging.Log(LogTag, "[" + appServer.PeerType + "] Reconnect to central in 1 seconds...");
-            await UniTask.Delay(1000);
+            await UniTask.Delay(1000, true);
             ConnectToCentralServer();
         }
 
