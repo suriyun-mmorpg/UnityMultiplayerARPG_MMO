@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Grpc.Core;
 using Google.Protobuf;
-using UnityEngine;
 
 namespace MultiplayerARPG.MMO
 {
