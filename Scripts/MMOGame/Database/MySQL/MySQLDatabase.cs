@@ -27,10 +27,10 @@ namespace MultiplayerARPG.MMO
             // Json file read
             string configFilePath = "./config/mySqlConfig.json";
             Dictionary<string, object> jsonConfig = new Dictionary<string, object>();
-            Logging.Log(ToString(), "Reading config file from " + configFilePath);
+            Logging.Log("Reading config file from " + configFilePath);
             if (File.Exists(configFilePath))
             {
-                Logging.Log(ToString(), "Found config file");
+                Logging.Log("Found config file");
                 string dataAsJson = File.ReadAllText(configFilePath);
                 jsonConfig = Json.Deserialize(dataAsJson) as Dictionary<string, object>;
             }
@@ -50,7 +50,7 @@ namespace MultiplayerARPG.MMO
             string migrationId = "1.57b";
             if (!await HasMigrationId(migrationId))
             {
-                Logging.Log(ToString(), "Migrating up to 1.57b");
+                Logging.Log("Migrating up to 1.57b");
                 // Migrate data
                 try
                 {
@@ -72,12 +72,12 @@ namespace MultiplayerARPG.MMO
                 catch { }
                 // Insert migrate history
                 await InsertMigrationId(migrationId);
-                Logging.Log(ToString(), "Migrated");
+                Logging.Log("Migrated to 1.57b");
             }
             migrationId = "1.58";
             if (!await HasMigrationId(migrationId))
             {
-                Logging.Log(ToString(), "Migrating up to 1.58");
+                Logging.Log("Migrating up to 1.58");
                 await ExecuteNonQuery("ALTER TABLE `characterbuff` CHANGE `type` `type` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0';");
                 await ExecuteNonQuery("ALTER TABLE `characterhotkey` CHANGE `type` `type` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0';");
                 await ExecuteNonQuery("ALTER TABLE `characteritem` CHANGE `inventoryType` `inventoryType` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0';");
@@ -91,7 +91,7 @@ namespace MultiplayerARPG.MMO
                 await ExecuteNonQuery("ALTER TABLE `characters` ADD `currentRotationZ` FLOAT NOT NULL DEFAULT '0' AFTER `currentRotationY`;");
                 // Insert migrate history
                 await InsertMigrationId(migrationId);
-                Logging.Log(ToString(), "Migrated");
+                Logging.Log("Migrated to 1.58");
             }
         }
 
@@ -175,8 +175,15 @@ namespace MultiplayerARPG.MMO
                 {
                     cmd.Parameters.Add(arg);
                 }
-                await cmd.ExecuteNonQueryAsync();
-                result = cmd.LastInsertedId;
+                try
+                {
+                    await cmd.ExecuteNonQueryAsync();
+                    result = cmd.LastInsertedId;
+                }
+                catch (MySqlException ex)
+                {
+                    Logging.LogException(ex);
+                }
             }
             if (createLocalConnection)
                 await connection.CloseAsync();
@@ -211,8 +218,15 @@ namespace MultiplayerARPG.MMO
                 {
                     cmd.Parameters.Add(arg);
                 }
-                cmd.ExecuteNonQuery();
-                result = cmd.LastInsertedId;
+                try
+                {
+                    cmd.ExecuteNonQuery();
+                    result = cmd.LastInsertedId;
+                }
+                catch (MySqlException ex)
+                {
+                    Logging.LogException(ex);
+                }
             }
             if (createLocalConnection)
                 connection.Close();
@@ -247,7 +261,14 @@ namespace MultiplayerARPG.MMO
                 {
                     cmd.Parameters.Add(arg);
                 }
-                numRows = await cmd.ExecuteNonQueryAsync();
+                try
+                {
+                    numRows = await cmd.ExecuteNonQueryAsync();
+                }
+                catch (MySqlException ex)
+                {
+                    Logging.LogException(ex);
+                }
             }
             if (createLocalConnection)
                 await connection.CloseAsync();
@@ -282,7 +303,14 @@ namespace MultiplayerARPG.MMO
                 {
                     cmd.Parameters.Add(arg);
                 }
-                numRows = cmd.ExecuteNonQuery();
+                try
+                {
+                    numRows = cmd.ExecuteNonQuery();
+                }
+                catch (MySqlException ex)
+                {
+                    Logging.LogException(ex);
+                }
             }
             if (createLocalConnection)
                 connection.Close();
@@ -308,7 +336,7 @@ namespace MultiplayerARPG.MMO
                 await OpenConnection(connection);
                 createLocalConnection = true;
             }
-            object result;
+            object result = null;
             using (MySqlCommand cmd = new MySqlCommand(sql, connection))
             {
                 if (transaction != null)
@@ -317,7 +345,14 @@ namespace MultiplayerARPG.MMO
                 {
                     cmd.Parameters.Add(arg);
                 }
-                result = await cmd.ExecuteScalarAsync();
+                try
+                {
+                    result = await cmd.ExecuteScalarAsync();
+                }
+                catch (MySqlException ex)
+                {
+                    Logging.LogException(ex);
+                }
             }
             if (createLocalConnection)
                 await connection.CloseAsync();
@@ -343,7 +378,7 @@ namespace MultiplayerARPG.MMO
                 OpenConnectionSync(connection);
                 createLocalConnection = true;
             }
-            object result;
+            object result = null;
             using (MySqlCommand cmd = new MySqlCommand(sql, connection))
             {
                 if (transaction != null)
@@ -352,7 +387,14 @@ namespace MultiplayerARPG.MMO
                 {
                     cmd.Parameters.Add(arg);
                 }
-                result = cmd.ExecuteScalar();
+                try
+                {
+                    result = cmd.ExecuteScalar();
+                }
+                catch (MySqlException ex)
+                {
+                    Logging.LogException(ex);
+                }
             }
             if (createLocalConnection)
                 connection.Close();
@@ -385,9 +427,16 @@ namespace MultiplayerARPG.MMO
                 {
                     cmd.Parameters.Add(arg);
                 }
-                MySqlDataReader dataReader = await cmd.ExecuteReaderAsync();
-                if (onRead != null) onRead.Invoke(dataReader);
-                dataReader.Close();
+                try
+                {
+                    MySqlDataReader dataReader = await cmd.ExecuteReaderAsync();
+                    if (onRead != null) onRead.Invoke(dataReader);
+                    dataReader.Close();
+                }
+                catch (MySqlException ex)
+                {
+                    Logging.LogException(ex);
+                }
             }
             if (createLocalConnection)
                 await connection.CloseAsync();
@@ -419,9 +468,16 @@ namespace MultiplayerARPG.MMO
                 {
                     cmd.Parameters.Add(arg);
                 }
-                MySqlDataReader dataReader = cmd.ExecuteReader();
-                if (onRead != null) onRead.Invoke(dataReader);
-                dataReader.Close();
+                try
+                {
+                    MySqlDataReader dataReader = cmd.ExecuteReader();
+                    if (onRead != null) onRead.Invoke(dataReader);
+                    dataReader.Close();
+                }
+                catch (MySqlException ex)
+                {
+                    Logging.LogException(ex);
+                }
             }
             if (createLocalConnection)
                 connection.Close();

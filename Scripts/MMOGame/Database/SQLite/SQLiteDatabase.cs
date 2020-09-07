@@ -19,17 +19,16 @@ namespace MultiplayerARPG.MMO
         [Tooltip("You should set this to where you build app to make database path as same as map server")]
         private string editorDbPath = "./mmorpgtemplate.sqlite3";
         private SqliteConnection connection;
-        private int transactionCount;
 
         public override void Initialize()
         {
             // Json file read
             string configFilePath = "./config/sqliteConfig.json";
             Dictionary<string, object> jsonConfig = new Dictionary<string, object>();
-            Logging.Log(ToString(), "Reading config file from " + configFilePath);
+            Logging.Log("Reading config file from " + configFilePath);
             if (File.Exists(configFilePath))
             {
-                Logging.Log(ToString(), "Found config file");
+                Logging.Log("Found config file");
                 string dataAsJson = File.ReadAllText(configFilePath);
                 jsonConfig = Json.Deserialize(dataAsJson) as Dictionary<string, object>;
             }
@@ -38,7 +37,6 @@ namespace MultiplayerARPG.MMO
 
             connection = NewConnection();
             connection.Open();
-            transactionCount = 0;
             Init();
         }
 
@@ -277,17 +275,19 @@ namespace MultiplayerARPG.MMO
             )");
 
             // Migrate data
-            try
+            if (IsColumnExist("buildings", "dataId"))
             {
-                // Avoid exception which occuring when `dataId` field not found
+                if (!IsColumnExist("buildings", "entityId"))
+                    ExecuteNonQuery("ALTER TABLE buildings ADD entityId INTEGER NOT NULL DEFAULT 0;");
+                // Avoid error which occuring when `dataId` field not found
                 foreach (BuildingEntity prefab in GameInstance.BuildingEntities.Values)
                 {
                     ExecuteNonQuery("UPDATE buildings SET entityId=@entityId, dataId=0 WHERE dataId=@dataId",
                         new SqliteParameter("entityId", prefab.EntityId),
                         new SqliteParameter("dataId", prefab.name.GenerateHashId()));
                 }
+                ExecuteNonQuery("ALTER TABLE buildings DROP dataId;");
             }
-            catch { }
 
             // Migrate fields
             if (!IsColumnExist("characterhotkey", "relateId"))
@@ -331,12 +331,6 @@ namespace MultiplayerARPG.MMO
 
             if (!IsColumnExist("buildings", "lockPassword"))
                 ExecuteNonQuery("ALTER TABLE buildings ADD lockPassword TEXT NOT NULL DEFAULT '';");
-
-            if (!IsColumnExist("buildings", "entityId"))
-                ExecuteNonQuery("ALTER TABLE buildings ADD entityId INTEGER NOT NULL DEFAULT 0;");
-
-            if (IsColumnExist("buildings", "dataId"))
-                ExecuteNonQuery("ALTER TABLE buildings DROP dataId;");
 
             if (!IsColumnExist("characters", "partyId"))
                 ExecuteNonQuery("ALTER TABLE characters ADD partyId INTEGER NOT NULL DEFAULT 0;");
@@ -445,9 +439,9 @@ namespace MultiplayerARPG.MMO
                 {
                     numRows = cmd.ExecuteNonQuery();
                 }
-                catch (Exception ex)
+                catch (SqliteException ex)
                 {
-                    Logging.LogException(ToString(), ex);
+                    Logging.LogException(ex);
                 }
             }
             return numRows;
@@ -473,9 +467,9 @@ namespace MultiplayerARPG.MMO
                 {
                     result = cmd.ExecuteScalar();
                 }
-                catch (Exception ex)
+                catch (SqliteException ex)
                 {
-                    Logging.LogException(ToString(), ex);
+                    Logging.LogException(ex);
                 }
             }
             return result;
@@ -502,9 +496,9 @@ namespace MultiplayerARPG.MMO
                     if (onRead != null) onRead.Invoke(dataReader);
                     dataReader.Close();
                 }
-                catch (Exception ex)
+                catch (SqliteException ex)
                 {
-                    Logging.LogException(ToString(), ex);
+                    Logging.LogException(ex);
                 }
             }
         }
@@ -615,22 +609,5 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@username", username));
             return result != null ? (long)result : 0;
         }
-        /*
-        public void BeginTransaction()
-        {
-            transactionCount++;
-            if (transactionCount > 1)
-                return;
-            ExecuteNonQuery("BEGIN");
-        }
-
-        public void EndTransaction()
-        {
-            transactionCount--;
-            if (transactionCount > 0)
-                return;
-            ExecuteNonQuery("END");
-        }
-        */
     }
 }
