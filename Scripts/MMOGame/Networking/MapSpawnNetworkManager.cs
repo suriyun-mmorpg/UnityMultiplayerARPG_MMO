@@ -7,6 +7,7 @@ using System.IO;
 using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using System.Collections.Concurrent;
 
 namespace MultiplayerARPG.MMO
 {
@@ -31,18 +32,22 @@ namespace MultiplayerARPG.MMO
 
         private int spawningPort = -1;
         private int portCounter = -1;
-        private readonly Queue<int> freePorts = new Queue<int>();
-        private readonly object mainThreadLock = new object();
-        private readonly List<Action> mainThreadActions = new List<Action>();
-        private readonly object processLock = new object();
         /// <summary>
-        /// Map servers processe id
+        /// Free ports which can use for start map server
         /// </summary>
-        private readonly HashSet<int> processes = new HashSet<int>();
+        private readonly ConcurrentQueue<int> freePorts = new ConcurrentQueue<int>();
+        /// <summary>
+        /// Actions which will invokes in main thread
+        /// </summary>
+        private readonly ConcurrentQueue<Action> mainThreadActions = new ConcurrentQueue<Action>();
+        /// <summary>
+        /// Map servers processes id
+        /// </summary>
+        private readonly ConcurrentDictionary<int, Process> processes = new ConcurrentDictionary<int, Process>();
         /// <summary>
         /// List of Map servers that restarting in update loop
         /// </summary>
-        private readonly List<string> restartingScenes = new List<string>();
+        private readonly ConcurrentQueue<string> restartingScenes = new ConcurrentQueue<string>();
 
         public string ExePath
         {
@@ -104,14 +109,32 @@ namespace MultiplayerARPG.MMO
             this.InvokeInstanceDevExtMethods("Clean");
             spawningPort = -1;
             portCounter = -1;
-            freePorts.Clear();
-            mainThreadActions.Clear();
-            foreach (int process in processes)
+            // Clear free ports
+            int tempFreePort;
+            while (freePorts.TryDequeue(out tempFreePort))
             {
-                Process.GetProcessById(process).Kill();
+                // Do nothing
             }
-            processes.Clear();
-            restartingScenes.Clear();
+            // Clear main thread actions
+            Action tempMainThreadAction;
+            while (mainThreadActions.TryDequeue(out tempMainThreadAction))
+            {
+                // Do nothing
+            }
+            // Clear processes
+            List<int> processIds = new List<int>(processes.Keys);
+            Process tempProcess;
+            foreach (int processId in processIds)
+            {
+                if (processes.TryRemove(processId, out tempProcess))
+                    tempProcess.Kill();
+            }
+            // Clear restarting scenes
+            string tempRestartingScenes;
+            while (restartingScenes.TryDequeue(out tempRestartingScenes))
+            {
+                // Do nothing
+            }
         }
 
         public override void OnStartServer()
@@ -151,24 +174,22 @@ namespace MultiplayerARPG.MMO
                 CentralAppServerRegister.Update();
                 if (CentralAppServerRegister.IsRegisteredToCentralServer)
                 {
-                    if (mainThreadActions.Count > 0)
-                    {
-                        lock (mainThreadLock)
-                        {
-                            foreach (Action actions in mainThreadActions)
-                            {
-                                actions.Invoke();
-                            }
-                            mainThreadActions.Clear();
-                        }
-                    }
                     if (restartingScenes.Count > 0)
                     {
-                        foreach (string scene in restartingScenes)
+                        string tempRestartingScenes;
+                        while (restartingScenes.TryDequeue(out tempRestartingScenes))
                         {
-                            SpawnMap(scene, true);
+                            SpawnMap(tempRestartingScenes, true);
                         }
-                        restartingScenes.Clear();
+                    }
+                }
+                if (mainThreadActions.Count > 0)
+                {
+                    Action tempMainThreadAction;
+                    while (mainThreadActions.TryDequeue(out tempMainThreadAction))
+                    {
+                        if (tempMainThreadAction != null)
+                            tempMainThreadAction.Invoke();
                     }
                 }
             }
@@ -232,9 +253,13 @@ namespace MultiplayerARPG.MMO
         {
             // Port to run map server
             if (freePorts.Count > 0)
-                spawningPort = freePorts.Dequeue();
+            {
+                freePorts.TryDequeue(out spawningPort);
+            }
             else
+            {
                 spawningPort = portCounter++;
+            }
             int port = spawningPort;
 
             // Path to executable
@@ -287,18 +312,14 @@ namespace MultiplayerARPG.MMO
                         using (Process process = Process.Start(startProcessInfo))
                         {
                             processId = process.Id;
-                            lock (processLock)
-                            {
-                                // Save the process
-                                processes.Add(processId);
-                            }
+                            processes.TryAdd(processId, process);
 
                             processStarted = true;
 
-                            ExecuteOnMainThread(() =>
+                            mainThreadActions.Enqueue(() =>
                             {
                                 if (LogInfo)
-                                    Logging.Log(LogTag, "Process started. Spawn Id: " + processId + ", pid: " + process.Id);
+                                    Logging.Log(LogTag, "Process started. Id: " + processId);
                                 // Notify server that it's successfully handled the request
                                 if (message != null)
                                     ReponseMapSpawn(message.ackId, ResponseSpawnMapMessage.Error.None);
@@ -310,7 +331,7 @@ namespace MultiplayerARPG.MMO
                     {
                         if (!processStarted)
                         {
-                            ExecuteOnMainThread(() =>
+                            mainThreadActions.Enqueue(() =>
                             {
                                 if (LogFatal)
                                 {
@@ -326,17 +347,15 @@ namespace MultiplayerARPG.MMO
                     }
                     finally
                     {
-                        lock (processLock)
-                        {
-                            // Remove the process
-                            processes.Remove(processId);
+                        // Remove the process
+                        Process tempProcess;
+                        processes.TryRemove(processId, out tempProcess);
 
-                            // Restarting scene
-                            if (autoRestart)
-                                restartingScenes.Add(mapId);
-                        }
+                        // Restarting scene
+                        if (autoRestart)
+                            restartingScenes.Enqueue(mapId);
 
-                        ExecuteOnMainThread(() =>
+                        mainThreadActions.Enqueue(() =>
                         {
                             // Release the port number
                             FreePort(port);
@@ -355,7 +374,7 @@ namespace MultiplayerARPG.MMO
 
                 // Restarting scene
                 if (autoRestart)
-                    restartingScenes.Add(mapId);
+                    restartingScenes.Enqueue(mapId);
 
                 if (LogFatal)
                     Logging.LogException(LogTag, e);
@@ -369,14 +388,6 @@ namespace MultiplayerARPG.MMO
             responseMessage.responseCode = error == ResponseSpawnMapMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
             responseMessage.error = error;
             CentralAppServerRegister.SendResponse(MMOMessageTypes.ResponseSpawnMap, responseMessage);
-        }
-
-        private void ExecuteOnMainThread(Action action)
-        {
-            lock (mainThreadLock)
-            {
-                mainThreadActions.Add(action);
-            }
         }
     }
 }
