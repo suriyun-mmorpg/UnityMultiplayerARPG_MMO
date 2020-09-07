@@ -14,10 +14,14 @@ namespace MultiplayerARPG.MMO
         private BaseDatabase[] databaseOptions;
         public string networkAddress = "localhost";
         public int networkPort = 7770;
-        
+
         public DatabaseManagerClient Client { get; private set; }
         public DatabaseManagerServer Server { get; private set; }
         public BaseDatabase Database { get { return database == null ? databaseOptions.FirstOrDefault() : database; } }
+        public DatabaseService.DatabaseServiceClient ServiceClient
+        {
+            get { return Client.Client; }
+        }
 
         public void SetDatabaseByOptionIndex(int index)
         {
@@ -44,11 +48,6 @@ namespace MultiplayerARPG.MMO
             Logging.Log("DatabaseNetworkManager", "Start Client");
             Client = new DatabaseManagerClient(networkAddress, networkPort);
             Client.Connect();
-        }
-
-        public DatabaseService.DatabaseServiceClient ServiceClient
-        {
-            get { return Client.Client; }
         }
     }
 }
