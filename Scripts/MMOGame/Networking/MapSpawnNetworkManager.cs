@@ -277,9 +277,6 @@ namespace MultiplayerARPG.MMO
                 {
                     try
                     {
-                        // Sleep 1 sec before start process
-                        // Because when start it locally it may too fast, it may start before database started
-                        Thread.Sleep(1000);
                         using (Process process = Process.Start(startProcessInfo))
                         {
                             processId = process.Id;
