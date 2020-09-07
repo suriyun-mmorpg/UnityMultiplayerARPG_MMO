@@ -74,15 +74,14 @@ namespace MultiplayerARPG.MMO
             if (savingCharacters.Count == 0)
             {
                 int i = 0;
+                List<UniTask> tasks = new List<UniTask>();
                 foreach (BasePlayerCharacterEntity playerCharacter in playerCharacters.Values)
                 {
-                    await SaveCharacterRoutine(playerCharacter.CloneTo(new PlayerCharacterData()), playerCharacter.UserId);
+                    if (playerCharacter == null) continue;
+                    tasks.Add(SaveCharacterRoutine(playerCharacter.CloneTo(new PlayerCharacterData()), playerCharacter.UserId));
                     ++i;
                 }
-                while (savingCharacters.Count > 0)
-                {
-                    await UniTask.Yield();
-                }
+                await UniTask.WhenAll(tasks);
                 if (LogInfo)
                     Logging.Log(LogTag, "Saved " + i + " character(s)");
             }
@@ -110,16 +109,14 @@ namespace MultiplayerARPG.MMO
             if (savingBuildings.Count == 0)
             {
                 int i = 0;
+                List<UniTask> tasks = new List<UniTask>();
                 foreach (BuildingEntity buildingEntity in buildingEntities.Values)
                 {
                     if (buildingEntity == null) continue;
-                    await SaveBuildingRoutine(buildingEntity.CloneTo(new BuildingSaveData()));
+                    tasks.Add(SaveBuildingRoutine(buildingEntity.CloneTo(new BuildingSaveData())));
                     ++i;
                 }
-                while (savingBuildings.Count > 0)
-                {
-                    await UniTask.Yield();
-                }
+                await UniTask.WhenAll(tasks);
                 if (LogInfo)
                     Logging.Log(LogTag, "Saved " + i + " building(s)");
             }

@@ -334,16 +334,14 @@ namespace MultiplayerARPG.MMO
                     if (buildingEntity is StorageEntity)
                         storageIds.Add(new StorageId(StorageType.Building, (buildingEntity as StorageEntity).Id));
                 }
+                List<UniTask> tasks = new List<UniTask>();
                 // Load building storage
                 foreach (StorageId storageId in storageIds)
                 {
-                    await LoadStorageRoutine(storageId);
+                    tasks.Add(LoadStorageRoutine(storageId));
                 }
                 // Wait until all building storage loaded
-                while (loadingStorageIds.Count > 0)
-                {
-                    await UniTask.Yield();
-                }
+                await UniTask.WhenAll(tasks);
             }
         }
 
