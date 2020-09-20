@@ -375,20 +375,13 @@ namespace MultiplayerARPG.MMO
         {
             using (SqliteCommand cmd = new SqliteCommand("PRAGMA table_info(" + tableName + ");", connection))
             {
-                DataTable table = new DataTable();
-
-                SqliteDataAdapter adp = null;
-                try
+                SqliteDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
                 {
-                    adp = new SqliteDataAdapter(cmd);
-                    adp.Fill(table);
-                    for (int i = 0; i < table.Rows.Count; ++i)
-                    {
-                        if (table.Rows[i]["name"].ToString().Equals(findingColumn))
-                            return true;
-                    }
+                    if (reader.GetString(1).Equals(findingColumn))
+                        return true;
                 }
-                catch { }
+                reader.Close();
             }
             return false;
         }
