@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿#if UNITY_STANDALONE && !CLIENT_BUILD
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Grpc.Core;
@@ -1081,3 +1081,4 @@ namespace MultiplayerARPG.MMO
         }
     }
 }
+#endif

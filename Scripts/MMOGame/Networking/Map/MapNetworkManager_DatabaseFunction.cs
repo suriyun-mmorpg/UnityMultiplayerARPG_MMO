@@ -9,6 +9,7 @@ namespace MultiplayerARPG.MMO
 {
     public partial class MapNetworkManager
     {
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private async UniTask LoadStorageRoutine(StorageId storageId)
         {
             if (!loadingStorageIds.Contains(storageId))
@@ -24,7 +25,9 @@ namespace MultiplayerARPG.MMO
                 loadingStorageIds.Remove(storageId);
             }
         }
+#endif
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private async UniTask LoadPartyRoutine(int id)
         {
             if (id > 0 && !loadingPartyIds.Contains(id))
@@ -38,7 +41,9 @@ namespace MultiplayerARPG.MMO
                 loadingPartyIds.Remove(id);
             }
         }
+#endif
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private async UniTask LoadGuildRoutine(int id)
         {
             if (id > 0 && !loadingGuildIds.Contains(id))
@@ -52,7 +57,9 @@ namespace MultiplayerARPG.MMO
                 loadingGuildIds.Remove(id);
             }
         }
+#endif
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private async UniTask SaveCharacterRoutine(PlayerCharacterData playerCharacterData, string userId)
         {
             if (playerCharacterData != null && !savingCharacters.Contains(playerCharacterData.Id))
@@ -68,7 +75,9 @@ namespace MultiplayerARPG.MMO
                     Logging.Log(LogTag, "Character [" + playerCharacterData.Id + "] Saved");
             }
         }
+#endif
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private async UniTaskVoid SaveCharactersRoutine()
         {
             if (savingCharacters.Count == 0)
@@ -86,7 +95,9 @@ namespace MultiplayerARPG.MMO
                     Logging.Log(LogTag, "Saved " + i + " character(s)");
             }
         }
+#endif
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private async UniTask SaveBuildingRoutine(BuildingSaveData buildingSaveData)
         {
             if (!savingBuildings.Contains(buildingSaveData.Id))
@@ -103,7 +114,9 @@ namespace MultiplayerARPG.MMO
                     Logging.Log(LogTag, "Building [" + buildingSaveData.Id + "] Saved");
             }
         }
+#endif
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private async UniTaskVoid SaveBuildingsRoutine()
         {
             if (savingBuildings.Count == 0)
@@ -121,7 +134,9 @@ namespace MultiplayerARPG.MMO
                     Logging.Log(LogTag, "Saved " + i + " building(s)");
             }
         }
+#endif
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         public override BuildingEntity CreateBuildingEntity(BuildingSaveData saveData, bool initialize)
         {
             if (!initialize)
@@ -134,7 +149,9 @@ namespace MultiplayerARPG.MMO
             }
             return base.CreateBuildingEntity(saveData, initialize);
         }
+#endif
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         public override void DestroyBuildingEntity(string id)
         {
             base.DestroyBuildingEntity(id);
@@ -144,5 +161,6 @@ namespace MultiplayerARPG.MMO
                 BuildingId = id
             });
         }
+#endif
     }
 }

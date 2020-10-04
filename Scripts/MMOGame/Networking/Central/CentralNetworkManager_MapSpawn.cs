@@ -23,6 +23,7 @@ namespace MultiplayerARPG.MMO
             return ServerSendRequest(connectionId, MMOMessageTypes.RequestSpawnMap, message, callback);
         }
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         /// <summary>
         /// This is function which read request from map server to spawn another map servers
         /// Then it will response back when requested map server is ready
@@ -38,7 +39,9 @@ namespace MultiplayerARPG.MMO
             // To send map spawn response to map-server
             requestSpawnMapHandlers.Add(ackId, new KeyValuePair<TransportHandler, uint>(messageHandler.transportHandler, message.ackId));
         }
+#endif
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         protected void OnRequestSpawnMap(AckResponseCode responseCode, BaseAckMessage messageData)
         {
             if (responseCode == AckResponseCode.Timeout)
@@ -55,6 +58,7 @@ namespace MultiplayerARPG.MMO
             if (requestSpawnMapHandlers.TryGetValue(castedMessage.ackId, out requestSpawnMapHandler))
                 requestSpawnMapHandler.Key.ReadResponse(requestSpawnMapHandler.Value, castedMessage.responseCode, castedMessage);
         }
+#endif
 
         /// <summary>
         /// This is function which read response from map spawn server

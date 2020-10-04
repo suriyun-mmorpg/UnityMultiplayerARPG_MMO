@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿#if UNITY_STANDALONE && !CLIENT_BUILD
 using Grpc.Core;
 using Client = DatabaseService.DatabaseServiceClient;
 
@@ -33,3 +32,4 @@ namespace MultiplayerARPG.MMO
         }
     }
 }
+#endif

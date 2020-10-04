@@ -57,14 +57,20 @@ namespace MultiplayerARPG.MMO
             get { return centralTransportFactory; }
         }
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         public CentralAppServerRegister CentralAppServerRegister { get; private set; }
+#endif
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         public ChatNetworkManager ChatNetworkManager { get; private set; }
-        
+#endif
+
+#if UNITY_STANDALONE && !CLIENT_BUILD
         public DatabaseService.DatabaseServiceClient DbServiceClient
         {
             get { return MMOServerInstance.Singleton.DatabaseNetworkManager.ServiceClient; }
         }
+#endif
 
         public string CentralNetworkAddress { get { return centralNetworkAddress; } }
         public int CentralNetworkPort { get { return centralNetworkPort; } }
@@ -90,6 +96,7 @@ namespace MultiplayerARPG.MMO
         }
         private float lastSaveTime;
         // Listing
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private readonly List<PendingSpawnPlayerCharacter> pendingSpawnPlayerCharacters = new List<PendingSpawnPlayerCharacter>();
         private readonly Dictionary<uint, KeyValuePair<string, Vector3>> instanceMapCurrentLocations = new Dictionary<uint, KeyValuePair<string, Vector3>>();
         private readonly Dictionary<string, CentralServerPeerInfo> mapServerConnectionIdsBySceneName = new Dictionary<string, CentralServerPeerInfo>();
@@ -105,6 +112,7 @@ namespace MultiplayerARPG.MMO
         private readonly HashSet<int> loadingGuildIds = new HashSet<int>();
         private readonly HashSet<string> savingCharacters = new HashSet<string>();
         private readonly HashSet<string> savingBuildings = new HashSet<string>();
+#endif
 
         protected override void Awake()
         {
@@ -119,16 +127,19 @@ namespace MultiplayerARPG.MMO
                 if (centralTransportFactory == null)
                     centralTransportFactory = gameObject.AddComponent<LiteNetLibTransportFactory>();
             }
+#if UNITY_STANDALONE && !CLIENT_BUILD
             CentralAppServerRegister = new CentralAppServerRegister(CentralTransportFactory.Build(), this);
             CentralAppServerRegister.onAppServerRegistered = OnAppServerRegistered;
             CentralAppServerRegister.RegisterMessage(MMOMessageTypes.ResponseAppServerAddress, HandleResponseAppServerAddress);
             this.InvokeInstanceDevExtMethods("OnInitCentralAppServerRegister");
             ChatNetworkManager = gameObject.AddComponent<ChatNetworkManager>();
+#endif
         }
 
         protected override void LateUpdate()
         {
             base.LateUpdate();
+#if UNITY_STANDALONE && !CLIENT_BUILD
             float tempUnscaledTime = Time.unscaledTime;
             if (IsServer)
             {
@@ -162,11 +173,13 @@ namespace MultiplayerARPG.MMO
                     pendingSpawnPlayerCharacters.Clear();
                 }
             }
+#endif
         }
 
         protected override void Clean()
         {
             base.Clean();
+#if UNITY_STANDALONE && !CLIENT_BUILD
             instanceMapCurrentLocations.Clear();
             mapServerConnectionIdsBySceneName.Clear();
             instanceMapServerConnectionIdsByInstanceId.Clear();
@@ -180,12 +193,13 @@ namespace MultiplayerARPG.MMO
             loadingGuildIds.Clear();
             savingCharacters.Clear();
             savingBuildings.Clear();
+#endif
         }
 
         protected override void UpdateOnlineCharacter(BasePlayerCharacterEntity playerCharacterEntity)
         {
             base.UpdateOnlineCharacter(playerCharacterEntity);
-
+#if UNITY_STANDALONE && !CLIENT_BUILD
             UserCharacterData tempUserData;
             if (ChatNetworkManager.IsClientConnected && usersById.TryGetValue(playerCharacterEntity.Id, out tempUserData))
             {
@@ -200,11 +214,13 @@ namespace MultiplayerARPG.MMO
                 usersById[playerCharacterEntity.Id] = tempUserData;
                 UpdateMapUser(ChatNetworkManager.Client, UpdateUserCharacterMessage.UpdateType.Online, tempUserData);
             }
+#endif
         }
 
         protected override void OnDestroy()
         {
             // Save immediately
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (IsServer)
             {
                 foreach (BasePlayerCharacterEntity playerCharacter in playerCharacters.Values)
@@ -226,9 +242,11 @@ namespace MultiplayerARPG.MMO
                     });
                 }
             }
+#endif
             base.OnDestroy();
         }
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         public override void RegisterPlayerCharacter(BasePlayerCharacterEntity playerCharacterEntity)
         {
             // Set user data to map server
@@ -252,7 +270,9 @@ namespace MultiplayerARPG.MMO
             }
             base.RegisterPlayerCharacter(playerCharacterEntity);
         }
+#endif
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         public override void UnregisterPlayerCharacter(long connectionId)
         {
             // Send remove character from map server
@@ -269,12 +289,16 @@ namespace MultiplayerARPG.MMO
             }
             base.UnregisterPlayerCharacter(connectionId);
         }
+#endif
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         public override void OnPeerDisconnected(long connectionId, DisconnectInfo disconnectInfo)
         {
             OnPeerDisconnectedRoutine(connectionId, disconnectInfo).Forget();
         }
+#endif
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private async UniTaskVoid OnPeerDisconnectedRoutine(long connectionId, DisconnectInfo disconnectInfo)
         {
             // Save player character data
@@ -291,7 +315,9 @@ namespace MultiplayerARPG.MMO
             UnregisterPlayerCharacter(connectionId);
             base.OnPeerDisconnected(connectionId, disconnectInfo);
         }
+#endif
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         public override void OnStopServer()
         {
             base.OnStopServer();
@@ -299,6 +325,7 @@ namespace MultiplayerARPG.MMO
             if (ChatNetworkManager.IsClientConnected)
                 ChatNetworkManager.StopClient();
         }
+#endif
 
         public override void OnClientConnected()
         {
@@ -314,6 +341,7 @@ namespace MultiplayerARPG.MMO
                 onClientDisconnected.Invoke(disconnectInfo);
         }
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         protected override async UniTask PreSpawnEntities()
         {
             // Spawn buildings
@@ -344,12 +372,15 @@ namespace MultiplayerARPG.MMO
                 await UniTask.WhenAll(tasks);
             }
         }
+#endif
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         protected override async UniTask PostSpawnEntities()
         {
             await UniTask.Yield();
             CentralAppServerRegister.OnStartServer();
         }
+#endif
 
         #region Character spawn function
         public override void SerializeClientReadyExtra(NetDataWriter writer)
@@ -359,6 +390,7 @@ namespace MultiplayerARPG.MMO
             writer.Put(MMOClientInstance.SelectCharacterId);
         }
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         public override void SetPlayerReady(long connectionId, NetDataReader reader)
         {
             if (!IsServer)
@@ -366,7 +398,9 @@ namespace MultiplayerARPG.MMO
 
             SetPlayerReady(connectionId, reader.GetString(), reader.GetString(), reader.GetString());
         }
+#endif
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private void SetPlayerReady(long connectionId, string userId, string accessToken, string selectCharacterId)
         {
             if (!IsReadyToInstantiateObjects())
@@ -400,7 +434,9 @@ namespace MultiplayerARPG.MMO
 
             SetPlayerReadyRoutine(connectionId, userId, accessToken, selectCharacterId).Forget();
         }
+#endif
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private async UniTaskVoid SetPlayerReadyRoutine(long connectionId, string userId, string accessToken, string selectCharacterId)
         {
             // Validate access token
@@ -564,6 +600,7 @@ namespace MultiplayerARPG.MMO
                 }
             }
         }
+#endif
         #endregion
 
         #region Network message handlers
@@ -575,6 +612,7 @@ namespace MultiplayerARPG.MMO
             StartClient(message.networkAddress, message.networkPort);
         }
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         protected override void HandleChatAtServer(LiteNetLibMessageHandler messageHandler)
         {
             ChatMessage message = FillChatChannelId(messageHandler.ReadMessage<ChatMessage>());
@@ -606,12 +644,16 @@ namespace MultiplayerARPG.MMO
                 ChatNetworkManager.SendEnterChat(null, MMOMessageTypes.Chat, message.channel, message.message, message.sender, message.receiver, message.channelId);
             }
         }
+#endif
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         protected override void HandleRequestCashShopInfo(LiteNetLibMessageHandler messageHandler)
         {
             HandleRequestCashShopInfoRoutine(messageHandler).Forget();
         }
+#endif
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private async UniTaskVoid HandleRequestCashShopInfoRoutine(LiteNetLibMessageHandler messageHandler)
         {
             long connectionId = messageHandler.connectionId;
@@ -648,12 +690,16 @@ namespace MultiplayerARPG.MMO
             responseMessage.cashShopItemIds = cashShopItemIds.ToArray();
             ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.CashShopInfo, responseMessage);
         }
+#endif
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         protected override void HandleRequestCashShopBuy(LiteNetLibMessageHandler messageHandler)
         {
             HandleRequestCashShopBuyRoutine(messageHandler).Forget();
         }
+#endif
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private async UniTaskVoid HandleRequestCashShopBuyRoutine(LiteNetLibMessageHandler messageHandler)
         {
             long connectionId = messageHandler.connectionId;
@@ -724,12 +770,16 @@ namespace MultiplayerARPG.MMO
             responseMessage.cash = cash;
             ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.CashShopBuy, responseMessage);
         }
+#endif
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         protected override void HandleRequestCashPackageInfo(LiteNetLibMessageHandler messageHandler)
         {
             HandleRequestCashPackageInfoRoutine(messageHandler).Forget();
         }
+#endif
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private async UniTaskVoid HandleRequestCashPackageInfoRoutine(LiteNetLibMessageHandler messageHandler)
         {
             long connectionId = messageHandler.connectionId;
@@ -766,12 +816,16 @@ namespace MultiplayerARPG.MMO
             responseMessage.cashPackageIds = cashPackageIds.ToArray();
             ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.CashPackageInfo, responseMessage);
         }
+#endif
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         protected override void HandleRequestCashPackageBuyValidation(LiteNetLibMessageHandler messageHandler)
         {
             HandleRequestCashPackageBuyValidationRoutine(messageHandler).Forget();
         }
+#endif
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private async UniTaskVoid HandleRequestCashPackageBuyValidationRoutine(LiteNetLibMessageHandler messageHandler)
         {
             long connectionId = messageHandler.connectionId;
@@ -824,7 +878,9 @@ namespace MultiplayerARPG.MMO
             responseMessage.cash = cash;
             ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.CashPackageBuyValidation, responseMessage);
         }
+#endif
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private void HandleResponseAppServerAddress(LiteNetLibMessageHandler messageHandler)
         {
             ResponseAppServerAddressMessage message = messageHandler.ReadMessage<ResponseAppServerAddressMessage>();
@@ -872,29 +928,37 @@ namespace MultiplayerARPG.MMO
                 }
             }
         }
+#endif
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private void OnAppServerRegistered(AckResponseCode responseCode, BaseAckMessage message)
         {
             if (responseCode == AckResponseCode.Success)
                 UpdateMapUsers(CentralAppServerRegister, UpdateUserCharacterMessage.UpdateType.Add);
         }
+#endif
         #endregion
 
         #region Connect to chat server
         public void OnChatServerConnected()
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (LogInfo)
                 Logging.Log(LogTag, "Connected to chat server");
             UpdateMapUsers(ChatNetworkManager.Client, UpdateUserCharacterMessage.UpdateType.Add);
+#endif
         }
 
         public void OnChatMessageReceive(ChatMessage message)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             ReadChatMessage(message);
+#endif
         }
 
         public void OnUpdateMapUser(UpdateUserCharacterMessage message)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             int socialId;
             PartyData party;
             GuildData guild;
@@ -927,6 +991,7 @@ namespace MultiplayerARPG.MMO
                     }
                     break;
             }
+#endif
         }
 
         public void OnUpdatePartyMember(UpdateSocialMemberMessage message)
@@ -1095,18 +1160,22 @@ namespace MultiplayerARPG.MMO
         #region Update map user functions
         private void UpdateMapUsers(LiteNetLibClient transportHandler, UpdateUserCharacterMessage.UpdateType updateType)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             foreach (UserCharacterData user in usersById.Values)
             {
                 UpdateMapUser(transportHandler, updateType, user);
             }
+#endif
         }
 
         private void UpdateMapUser(LiteNetLibClient transportHandler, UpdateUserCharacterMessage.UpdateType updateType, UserCharacterData userData)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             UpdateUserCharacterMessage updateMapUserMessage = new UpdateUserCharacterMessage();
             updateMapUserMessage.type = updateType;
             updateMapUserMessage.data = userData;
             transportHandler.SendPacket(DeliveryMethod.ReliableOrdered, MMOMessageTypes.UpdateMapUser, updateMapUserMessage.Serialize);
+#endif
         }
         #endregion
     }

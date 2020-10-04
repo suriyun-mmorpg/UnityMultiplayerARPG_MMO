@@ -1,11 +1,13 @@
-﻿using MySqlConnector;
+﻿#if UNITY_STANDALONE && !CLIENT_BUILD
+using MySqlConnector;
 using System.Collections.Generic;
 using LiteNetLibManager;
-using UnityEngine;
 using MiniJSON;
 using System;
 using System.IO;
 using Cysharp.Threading.Tasks;
+#endif
+using UnityEngine;
 
 namespace MultiplayerARPG.MMO
 {
@@ -22,6 +24,7 @@ namespace MultiplayerARPG.MMO
         [SerializeField]
         private string dbName = "mmorpgtemplate";
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         public override void Initialize()
         {
             // Json file read
@@ -581,5 +584,6 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@username", username));
             return result != null ? (long)result : 0;
         }
+#endif
     }
 }

@@ -7,6 +7,7 @@ namespace MultiplayerARPG.MMO
 {
     public partial class CentralNetworkManager : LiteNetLibManager.LiteNetLibManager
     {
+#if UNITY_STANDALONE && !CLIENT_BUILD
         protected readonly Dictionary<long, CentralServerPeerInfo> mapSpawnServerPeers = new Dictionary<long, CentralServerPeerInfo>();
         // Map server peers
         protected readonly Dictionary<long, CentralServerPeerInfo> mapServerPeers = new Dictionary<long, CentralServerPeerInfo>();
@@ -23,6 +24,7 @@ namespace MultiplayerARPG.MMO
         protected readonly Dictionary<long, HashSet<string>> mapUserIds = new Dictionary<long, HashSet<string>>();
         // <Ack Id, <Map-Server Transport Handler, Map-Server Ack Id> dictionary
         private readonly Dictionary<uint, KeyValuePair<TransportHandler, uint>> requestSpawnMapHandlers = new Dictionary<uint, KeyValuePair<TransportHandler, uint>>();
+#endif
 
         [Header("Account configuration")]
         public int minUsernameLength = 2;
@@ -30,14 +32,16 @@ namespace MultiplayerARPG.MMO
         public int minPasswordLength = 2;
         public int minCharacterNameLength = 2;
         public int maxCharacterNameLength = 16;
-        
+
         public System.Action onClientConnected;
         public System.Action<DisconnectInfo> onClientDisconnected;
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         public DatabaseService.DatabaseServiceClient DbServiceClient
         {
             get { return MMOServerInstance.Singleton.DatabaseNetworkManager.ServiceClient; }
         }
+#endif
 
         // This server will collect servers data
         // All Map servers addresses, Login server address, Chat server address, Database server configs
@@ -57,6 +61,7 @@ namespace MultiplayerARPG.MMO
             RegisterClientMessage(MMOMessageTypes.ResponseValidateAccessToken, HandleResponseValidateAccessToken);
         }
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         protected override void RegisterServerMessages()
         {
             this.InvokeInstanceDevExtMethods("RegisterServerMessages");
@@ -75,10 +80,12 @@ namespace MultiplayerARPG.MMO
             RegisterServerMessage(MMOMessageTypes.RequestValidateAccessToken, HandleRequestValidateAccessToken);
             RegisterServerMessage(MMOMessageTypes.UpdateMapUser, HandleUpdateMapUser);
         }
+#endif
 
         protected virtual void Clean()
         {
             this.InvokeInstanceDevExtMethods("Clean");
+#if UNITY_STANDALONE && !CLIENT_BUILD
             mapSpawnServerPeers.Clear();
             mapServerPeers.Clear();
             mapServerPeersBySceneName.Clear();
@@ -89,19 +96,24 @@ namespace MultiplayerARPG.MMO
             userPeersByUserId.Clear();
             mapUserIds.Clear();
             requestSpawnMapHandlers.Clear();
+#endif
         }
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         public override void OnStartServer()
         {
             this.InvokeInstanceDevExtMethods("OnStartServer");
             base.OnStartServer();
         }
+#endif
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         public override void OnStopServer()
         {
             Clean();
             base.OnStopServer();
         }
+#endif
 
         public override void OnStartClient(LiteNetLibClient client)
         {
@@ -116,6 +128,7 @@ namespace MultiplayerARPG.MMO
             base.OnStopClient();
         }
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         public override void OnPeerDisconnected(long connectionId, DisconnectInfo disconnectInfo)
         {
             base.OnPeerDisconnected(connectionId, disconnectInfo);
@@ -147,6 +160,7 @@ namespace MultiplayerARPG.MMO
                 userPeers.Remove(connectionId);
             }
         }
+#endif
 
         public override void OnClientConnected()
         {
@@ -162,6 +176,7 @@ namespace MultiplayerARPG.MMO
                 onClientDisconnected.Invoke(disconnectInfo);
         }
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         public bool MapContainsUser(string userId)
         {
             foreach (HashSet<string> mapUser in mapUserIds.Values)
@@ -171,5 +186,6 @@ namespace MultiplayerARPG.MMO
             }
             return false;
         }
+#endif
     }
 }

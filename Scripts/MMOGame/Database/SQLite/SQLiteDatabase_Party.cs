@@ -1,7 +1,6 @@
-﻿using Cysharp.Threading.Tasks;
+﻿#if UNITY_STANDALONE && !CLIENT_BUILD
+using Cysharp.Threading.Tasks;
 using Mono.Data.Sqlite;
-using System.Collections;
-using System.Collections.Generic;
 
 namespace MultiplayerARPG.MMO
 {
@@ -97,3 +96,4 @@ namespace MultiplayerARPG.MMO
         }
     }
 }
+#endif

@@ -12,20 +12,34 @@ namespace MultiplayerARPG.MMO
     {
         public override string GetCurrentMapId(BasePlayerCharacterEntity playerCharacterEntity)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (!IsInstanceMap())
                 return base.GetCurrentMapId(playerCharacterEntity);
             return instanceMapCurrentLocations[playerCharacterEntity.ObjectId].Key;
+#else
+            return string.Empty;
+#endif
         }
 
         public override Vector3 GetCurrentPosition(BasePlayerCharacterEntity playerCharacterEntity)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (!IsInstanceMap())
                 return base.GetCurrentPosition(playerCharacterEntity);
             return instanceMapCurrentLocations[playerCharacterEntity.ObjectId].Value;
+#else
+            return Vector3.zero;
+#endif
+        }
+
+        protected override bool IsInstanceMap()
+        {
+            return !string.IsNullOrEmpty(MapInstanceId);
         }
 
         protected override void WarpCharacter(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position, bool overrideRotation, Vector3 rotation)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (!CanWarpCharacter(playerCharacterEntity))
                 return;
 
@@ -39,8 +53,10 @@ namespace MultiplayerARPG.MMO
             }
 
             WarpCharacterRoutine(playerCharacterEntity, mapName, position, overrideRotation, rotation).Forget();
+#endif
         }
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         /// <summary>
         /// Warp to different map.
         /// </summary>
@@ -89,9 +105,11 @@ namespace MultiplayerARPG.MMO
                 ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.Warp, message);
             }
         }
+#endif
 
         protected override void WarpCharacterToInstance(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position, bool overrideRotation, Vector3 rotation)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (!CanWarpCharacter(playerCharacterEntity))
                 return;
             // Generate instance id
@@ -138,8 +156,10 @@ namespace MultiplayerARPG.MMO
                 instanceWarpOverrideRotation = overrideRotation,
                 instanceWarpRotation = rotation,
             }, OnRequestSpawnMap);
+#endif
         }
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private async UniTaskVoid WarpCharacterToInstanceRoutine(BasePlayerCharacterEntity playerCharacterEntity, string instanceId)
         {
             // If warping to different map
@@ -177,7 +197,9 @@ namespace MultiplayerARPG.MMO
                 ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.Warp, message);
             }
         }
+#endif
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private void OnRequestSpawnMap(AckResponseCode responseCode, BaseAckMessage messageData)
         {
             if (responseCode == AckResponseCode.Timeout)
@@ -207,19 +229,18 @@ namespace MultiplayerARPG.MMO
                 instanceMapWarpingLocations.Remove(castedMessage.instanceId);
             }
         }
-
-        protected override bool IsInstanceMap()
-        {
-            return !string.IsNullOrEmpty(MapInstanceId);
-        }
+#endif
 
         public override void CreateParty(BasePlayerCharacterEntity playerCharacterEntity, bool shareExp, bool shareItem)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (!CanCreateParty(playerCharacterEntity))
                 return;
             CreatePartyRoutine(playerCharacterEntity, shareExp, shareItem).Forget();
+#endif
         }
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private async UniTaskVoid CreatePartyRoutine(BasePlayerCharacterEntity playerCharacterEntity, bool shareExp, bool shareItem)
         {
             PartyResp createPartyResp = await DbServiceClient.CreatePartyAsync(new CreatePartyReq()
@@ -241,9 +262,11 @@ namespace MultiplayerARPG.MMO
                 ChatNetworkManager.SendAddSocialMember(null, MMOMessageTypes.UpdatePartyMember, party.id, playerCharacterEntity.Id, playerCharacterEntity.CharacterName, playerCharacterEntity.DataId, playerCharacterEntity.Level);
             }
         }
+#endif
 
         public override void ChangePartyLeader(BasePlayerCharacterEntity playerCharacterEntity, string characterId)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             int partyId;
             PartyData party;
             if (!CanChangePartyLeader(playerCharacterEntity, characterId, out partyId, out party))
@@ -259,10 +282,12 @@ namespace MultiplayerARPG.MMO
             // Broadcast via chat server
             if (ChatNetworkManager.IsClientConnected)
                 ChatNetworkManager.SendChangePartyLeader(null, MMOMessageTypes.UpdateParty, partyId, characterId);
+#endif
         }
 
         public override void PartySetting(BasePlayerCharacterEntity playerCharacterEntity, bool shareExp, bool shareItem)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             int partyId;
             PartyData party;
             if (!CanPartySetting(playerCharacterEntity, out partyId, out party))
@@ -279,10 +304,12 @@ namespace MultiplayerARPG.MMO
             // Broadcast via chat server
             if (ChatNetworkManager.IsClientConnected)
                 ChatNetworkManager.SendPartySetting(null, MMOMessageTypes.UpdateParty, partyId, shareExp, shareItem);
+#endif
         }
 
         public override void AddPartyMember(BasePlayerCharacterEntity inviteCharacterEntity, BasePlayerCharacterEntity acceptCharacterEntity)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             int partyId;
             PartyData party;
             if (!CanAddPartyMember(inviteCharacterEntity, acceptCharacterEntity, out partyId, out party))
@@ -298,10 +325,12 @@ namespace MultiplayerARPG.MMO
             // Broadcast via chat server
             if (ChatNetworkManager.IsClientConnected)
                 ChatNetworkManager.SendAddSocialMember(null, MMOMessageTypes.UpdatePartyMember, partyId, acceptCharacterEntity.Id, acceptCharacterEntity.CharacterName, acceptCharacterEntity.DataId, acceptCharacterEntity.Level);
+#endif
         }
 
         public override void KickFromParty(BasePlayerCharacterEntity playerCharacterEntity, string characterId)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             int partyId;
             PartyData party;
             if (!CanKickFromParty(playerCharacterEntity, characterId, out partyId, out party))
@@ -316,10 +345,12 @@ namespace MultiplayerARPG.MMO
             // Broadcast via chat server
             if (ChatNetworkManager.IsClientConnected)
                 ChatNetworkManager.SendRemoveSocialMember(null, MMOMessageTypes.UpdatePartyMember, partyId, characterId);
+#endif
         }
 
         public override void LeaveParty(BasePlayerCharacterEntity playerCharacterEntity)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             int partyId;
             PartyData party;
             if (!CanLeaveParty(playerCharacterEntity, out partyId, out party))
@@ -371,15 +402,19 @@ namespace MultiplayerARPG.MMO
                 if (ChatNetworkManager.IsClientConnected)
                     ChatNetworkManager.SendRemoveSocialMember(null, MMOMessageTypes.UpdatePartyMember, partyId, playerCharacterEntity.Id);
             }
+#endif
         }
 
         public override void CreateGuild(BasePlayerCharacterEntity playerCharacterEntity, string guildName)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (!CanCreateGuild(playerCharacterEntity, guildName))
                 return;
             CreateGuildRoutine(playerCharacterEntity, guildName).Forget();
+#endif
         }
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private async UniTaskVoid CreateGuildRoutine(BasePlayerCharacterEntity playerCharacterEntity, string guildName)
         {
             FindGuildNameResp findGuildNameResp = await DbServiceClient.FindGuildNameAsync(new FindGuildNameReq()
@@ -416,9 +451,11 @@ namespace MultiplayerARPG.MMO
                 }
             }
         }
+#endif
 
         public override void ChangeGuildLeader(BasePlayerCharacterEntity playerCharacterEntity, string characterId)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             int guildId;
             GuildData guild;
             if (!CanChangeGuildLeader(playerCharacterEntity, characterId, out guildId, out guild))
@@ -439,10 +476,12 @@ namespace MultiplayerARPG.MMO
             // Broadcast via chat server
             if (ChatNetworkManager.IsClientConnected)
                 ChatNetworkManager.SendChangeGuildLeader(null, MMOMessageTypes.UpdateGuild, guildId, characterId);
+#endif
         }
 
         public override void SetGuildMessage(BasePlayerCharacterEntity playerCharacterEntity, string guildMessage)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             int guildId;
             GuildData guild;
             if (!CanSetGuildMessage(playerCharacterEntity, guildMessage, out guildId, out guild))
@@ -458,10 +497,12 @@ namespace MultiplayerARPG.MMO
             // Broadcast via chat server
             if (ChatNetworkManager.IsClientConnected)
                 ChatNetworkManager.SendSetGuildMessage(null, MMOMessageTypes.UpdateGuild, guildId, guildMessage);
+#endif
         }
 
         public override void SetGuildRole(BasePlayerCharacterEntity playerCharacterEntity, byte guildRole, string roleName, bool canInvite, bool canKick, byte shareExpPercentage)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             int guildId;
             GuildData guild;
             if (!CanSetGuildRole(playerCharacterEntity, guildRole, roleName, out guildId, out guild))
@@ -498,10 +539,12 @@ namespace MultiplayerARPG.MMO
             // Broadcast via chat server
             if (ChatNetworkManager.IsClientConnected)
                 ChatNetworkManager.SendSetGuildRole(null, MMOMessageTypes.UpdateGuild, guildId, guildRole, roleName, canInvite, canKick, shareExpPercentage);
+#endif
         }
 
         public override void SetGuildMemberRole(BasePlayerCharacterEntity playerCharacterEntity, string characterId, byte guildRole)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             int guildId;
             GuildData guild;
             if (!CanSetGuildMemberRole(playerCharacterEntity, out guildId, out guild))
@@ -517,10 +560,12 @@ namespace MultiplayerARPG.MMO
             // Broadcast via chat server
             if (ChatNetworkManager.IsClientConnected)
                 ChatNetworkManager.SendSetGuildMemberRole(null, MMOMessageTypes.UpdateGuild, guildId, characterId, guildRole);
+#endif
         }
 
         public override void AddGuildMember(BasePlayerCharacterEntity inviteCharacterEntity, BasePlayerCharacterEntity acceptCharacterEntity)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             int guildId;
             GuildData guild;
             if (!CanAddGuildMember(inviteCharacterEntity, acceptCharacterEntity, out guildId, out guild))
@@ -537,10 +582,12 @@ namespace MultiplayerARPG.MMO
             // Broadcast via chat server
             if (ChatNetworkManager.IsClientConnected)
                 ChatNetworkManager.SendAddSocialMember(null, MMOMessageTypes.UpdateGuildMember, guildId, acceptCharacterEntity.Id, acceptCharacterEntity.CharacterName, acceptCharacterEntity.DataId, acceptCharacterEntity.Level);
+#endif
         }
 
         public override void KickFromGuild(BasePlayerCharacterEntity playerCharacterEntity, string characterId)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             int guildId;
             GuildData guild;
             if (!CanKickFromGuild(playerCharacterEntity, characterId, out guildId, out guild))
@@ -555,10 +602,12 @@ namespace MultiplayerARPG.MMO
             // Broadcast via chat server
             if (ChatNetworkManager.IsClientConnected)
                 ChatNetworkManager.SendRemoveSocialMember(null, MMOMessageTypes.UpdateGuildMember, guildId, characterId);
+#endif
         }
 
         public override void LeaveGuild(BasePlayerCharacterEntity playerCharacterEntity)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             int guildId;
             GuildData guild;
             if (!CanLeaveGuild(playerCharacterEntity, out guildId, out guild))
@@ -610,14 +659,17 @@ namespace MultiplayerARPG.MMO
                 if (ChatNetworkManager.IsClientConnected)
                     ChatNetworkManager.SendRemoveSocialMember(null, MMOMessageTypes.UpdateGuildMember, guildId, playerCharacterEntity.Id);
             }
+#endif
         }
 
         public override void IncreaseGuildExp(BasePlayerCharacterEntity playerCharacterEntity, int exp)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             IncreaseGuildExpRoutine(playerCharacterEntity, exp).Forget();
+#endif
         }
 
-
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private async UniTaskVoid IncreaseGuildExpRoutine(BasePlayerCharacterEntity playerCharacterEntity, int exp)
         {
             int guildId;
@@ -637,12 +689,16 @@ namespace MultiplayerARPG.MMO
             if (ChatNetworkManager.IsClientConnected)
                 ChatNetworkManager.SendGuildLevelExpSkillPoint(null, MMOMessageTypes.UpdateGuild, guildId, guild.level, guild.exp, guild.skillPoint);
         }
+#endif
 
         public override void AddGuildSkill(BasePlayerCharacterEntity playerCharacterEntity, int dataId)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             AddGuildSkillRoutine(playerCharacterEntity, dataId).Forget();
+#endif
         }
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private async UniTaskVoid AddGuildSkillRoutine(BasePlayerCharacterEntity playerCharacterEntity, int dataId)
         {
             int guildId;
@@ -666,19 +722,25 @@ namespace MultiplayerARPG.MMO
                 ChatNetworkManager.SendGuildLevelExpSkillPoint(null, MMOMessageTypes.UpdateGuild, guildId, guild.level, guild.exp, guild.skillPoint);
             }
         }
+#endif
 
         public override List<CharacterItem> GetStorageEntityItems(StorageEntity storageEntity)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (storageEntity == null)
                 return new List<CharacterItem>();
             StorageId id = new StorageId(StorageType.Building, storageEntity.Id);
             if (!allStorageItems.ContainsKey(id))
                 allStorageItems[id] = new List<CharacterItem>();
             return allStorageItems[id];
+#else
+            return new List<CharacterItem>();
+#endif
         }
 
         public override void OpenStorage(BasePlayerCharacterEntity playerCharacterEntity)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (!CanAccessStorage(playerCharacterEntity, playerCharacterEntity.CurrentStorageId))
             {
                 SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.CannotAccessStorage);
@@ -688,8 +750,10 @@ namespace MultiplayerARPG.MMO
                 usingStorageCharacters[playerCharacterEntity.CurrentStorageId] = new HashSet<uint>();
             usingStorageCharacters[playerCharacterEntity.CurrentStorageId].Add(playerCharacterEntity.ObjectId);
             OpenStorageRoutine(playerCharacterEntity).Forget();
+#endif
         }
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private async UniTaskVoid OpenStorageRoutine(BasePlayerCharacterEntity playerCharacterEntity)
         {
             ReadStorageItemsReq req = new ReadStorageItemsReq();
@@ -700,24 +764,30 @@ namespace MultiplayerARPG.MMO
             playerCharacterEntity.StorageItems = storageItems.ToArray();
             allStorageItems[playerCharacterEntity.CurrentStorageId] = storageItems;
         }
+#endif
 
         public override void CloseStorage(BasePlayerCharacterEntity playerCharacterEntity)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (usingStorageCharacters.ContainsKey(playerCharacterEntity.CurrentStorageId))
                 usingStorageCharacters[playerCharacterEntity.CurrentStorageId].Remove(playerCharacterEntity.ObjectId);
             playerCharacterEntity.StorageItems = new CharacterItem[0];
+#endif
         }
 
         public override void MoveItemToStorage(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short nonEquipIndex, short amount, short storageItemIndex)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (!CanAccessStorage(playerCharacterEntity, storageId))
             {
                 SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.CannotAccessStorage);
                 return;
             }
             MoveItemToStorageRoutine(playerCharacterEntity, storageId, nonEquipIndex, amount, storageItemIndex).Forget();
+#endif
         }
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private async UniTaskVoid MoveItemToStorageRoutine(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short nonEquipIndex, short amount, short storageItemIndex)
         {
             MoveItemToStorageReq req = new MoveItemToStorageReq();
@@ -739,17 +809,21 @@ namespace MultiplayerARPG.MMO
             UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItems);
             allStorageItems[storageId] = storageItems;
         }
+#endif
 
         public override void MoveItemFromStorage(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short storageItemIndex, short amount, short nonEquipIndex)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (!CanAccessStorage(playerCharacterEntity, storageId))
             {
                 SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.CannotAccessStorage);
                 return;
             }
             MoveItemFromStorageRoutine(playerCharacterEntity, storageId, storageItemIndex, amount, nonEquipIndex).Forget();
+#endif
         }
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private async UniTaskVoid MoveItemFromStorageRoutine(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short storageItemIndex, short amount, short nonEquipIndex)
         {
             MoveItemFromStorageReq req = new MoveItemFromStorageReq();
@@ -771,12 +845,16 @@ namespace MultiplayerARPG.MMO
             UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItems);
             allStorageItems[storageId] = storageItems;
         }
+#endif
 
         public override void IncreaseStorageItems(StorageId storageId, CharacterItem addingItem, Action<bool> callback)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             IncreaseStorageItemsRoutine(storageId, addingItem, callback).Forget();
+#endif
         }
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private async UniTaskVoid IncreaseStorageItemsRoutine(StorageId storageId, CharacterItem addingItem, Action<bool> callback)
         {
             IncreaseStorageItemsReq req = new IncreaseStorageItemsReq();
@@ -798,12 +876,16 @@ namespace MultiplayerARPG.MMO
             if (callback != null)
                 callback.Invoke(true);
         }
+#endif
 
         public override void DecreaseStorageItems(StorageId storageId, int dataId, short amount, Action<bool, Dictionary<int, short>> callback)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             DecreaseStorageItemsRoutine(storageId, dataId, amount, callback).Forget();
+#endif
         }
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private async UniTaskVoid DecreaseStorageItemsRoutine(StorageId storageId, int dataId, short amount, Action<bool, Dictionary<int, short>> callback)
         {
             DecreaseStorageItemsReq req = new DecreaseStorageItemsReq();
@@ -831,17 +913,21 @@ namespace MultiplayerARPG.MMO
             if (callback != null)
                 callback.Invoke(true, decreasedItems);
         }
+#endif
 
         public override void SwapOrMergeStorageItem(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short fromIndex, short toIndex)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (!CanAccessStorage(playerCharacterEntity, storageId))
             {
                 SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.CannotAccessStorage);
                 return;
             }
             SwapOrMergeStorageItemRoutine(playerCharacterEntity, storageId, fromIndex, toIndex).Forget();
+#endif
         }
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private async UniTaskVoid SwapOrMergeStorageItemRoutine(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short fromIndex, short toIndex)
         {
             SwapOrMergeStorageItemReq req = new SwapOrMergeStorageItemReq();
@@ -861,16 +947,22 @@ namespace MultiplayerARPG.MMO
             UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItems);
             allStorageItems[storageId] = storageItems;
         }
+#endif
 
         public override bool IsStorageEntityOpen(StorageEntity storageEntity)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (storageEntity == null)
                 return false;
             StorageId id = new StorageId(StorageType.Building, storageEntity.Id);
             return usingStorageCharacters.ContainsKey(id) &&
                 usingStorageCharacters[id].Count > 0;
+#else
+            return false;
+#endif
         }
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private void UpdateStorageItemsToCharacters(HashSet<uint> objectIds, List<CharacterItem> items)
         {
             BasePlayerCharacterEntity playerCharacterEntity;
@@ -884,12 +976,16 @@ namespace MultiplayerARPG.MMO
                 }
             }
         }
+#endif
 
         public override void DepositGold(BasePlayerCharacterEntity playerCharacterEntity, int amount)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             DepositGoldRoutine(playerCharacterEntity, amount).Forget();
+#endif
         }
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private async UniTaskVoid DepositGoldRoutine(BasePlayerCharacterEntity playerCharacterEntity, int amount)
         {
             if (playerCharacterEntity.Gold - amount >= 0)
@@ -906,12 +1002,16 @@ namespace MultiplayerARPG.MMO
             else
                 SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotEnoughGoldToDeposit);
         }
+#endif
 
         public override void WithdrawGold(BasePlayerCharacterEntity playerCharacterEntity, int amount)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             WithdrawGoldRoutine(playerCharacterEntity, amount).Forget();
+#endif
         }
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private async UniTaskVoid WithdrawGoldRoutine(BasePlayerCharacterEntity playerCharacterEntity, int amount)
         {
             // Get gold amount
@@ -934,12 +1034,16 @@ namespace MultiplayerARPG.MMO
             else
                 SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotEnoughGoldToWithdraw);
         }
+#endif
 
         public override void DepositGuildGold(BasePlayerCharacterEntity playerCharacterEntity, int amount)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             DepositGuildGoldRoutine(playerCharacterEntity, amount).Forget();
+#endif
         }
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private async UniTaskVoid DepositGuildGoldRoutine(BasePlayerCharacterEntity playerCharacterEntity, int amount)
         {
             GuildData guild;
@@ -964,12 +1068,16 @@ namespace MultiplayerARPG.MMO
             else
                 SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotJoinedGuild);
         }
+#endif
 
         public override void WithdrawGuildGold(BasePlayerCharacterEntity playerCharacterEntity, int amount)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             WithdrawGuildGoldRoutine(playerCharacterEntity, amount).Forget();
+#endif
         }
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private async UniTaskVoid WithdrawGuildGoldRoutine(BasePlayerCharacterEntity playerCharacterEntity, int amount)
         {
             GuildData guild;
@@ -1000,12 +1108,16 @@ namespace MultiplayerARPG.MMO
             else
                 SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotJoinedGuild);
         }
+#endif
 
         public override void FindCharacters(BasePlayerCharacterEntity playerCharacterEntity, string characterName)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             FindCharactersRoutine(playerCharacterEntity, characterName).Forget();
+#endif
         }
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private async UniTaskVoid FindCharactersRoutine(BasePlayerCharacterEntity playerCharacterEntity, string characterName)
         {
             FindCharactersResp resp = await DbServiceClient.FindCharactersAsync(new FindCharactersReq()
@@ -1014,12 +1126,16 @@ namespace MultiplayerARPG.MMO
             });
             SendUpdateFoundCharactersToClient(playerCharacterEntity.ConnectionId, resp.List.MakeArrayFromRepeatedByteString<SocialCharacterData>());
         }
+#endif
 
         public override void AddFriend(BasePlayerCharacterEntity playerCharacterEntity, string friendCharacterId)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             AddFriendRoutine(playerCharacterEntity, friendCharacterId).Forget();
+#endif
         }
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private async UniTaskVoid AddFriendRoutine(BasePlayerCharacterEntity playerCharacterEntity, string friendCharacterId)
         {
             ReadFriendsResp resp = await DbServiceClient.CreateFriendAsync(new CreateFriendReq()
@@ -1029,12 +1145,16 @@ namespace MultiplayerARPG.MMO
             });
             SendUpdateFriendsToClient(playerCharacterEntity.ConnectionId, resp.List.MakeArrayFromRepeatedByteString<SocialCharacterData>());
         }
+#endif
 
         public override void RemoveFriend(BasePlayerCharacterEntity playerCharacterEntity, string friendCharacterId)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             RemoveFriendRoutine(playerCharacterEntity, friendCharacterId).Forget();
+#endif
         }
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private async UniTaskVoid RemoveFriendRoutine(BasePlayerCharacterEntity playerCharacterEntity, string friendCharacterId)
         {
             ReadFriendsResp resp = await DbServiceClient.DeleteFriendAsync(new DeleteFriendReq()
@@ -1044,12 +1164,16 @@ namespace MultiplayerARPG.MMO
             });
             SendUpdateFriendsToClient(playerCharacterEntity.ConnectionId, resp.List.MakeArrayFromRepeatedByteString<SocialCharacterData>());
         }
+#endif
 
         public override void GetFriends(BasePlayerCharacterEntity playerCharacterEntity)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             GetFriendsRoutine(playerCharacterEntity).Forget();
+#endif
         }
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private async UniTaskVoid GetFriendsRoutine(BasePlayerCharacterEntity playerCharacterEntity)
         {
             ReadFriendsResp readFriendsResp = await DbServiceClient.ReadFriendsAsync(new ReadFriendsReq()
@@ -1058,5 +1182,6 @@ namespace MultiplayerARPG.MMO
             });
             SendUpdateFriendsToClient(playerCharacterEntity.ConnectionId, readFriendsResp.List.MakeArrayFromRepeatedByteString<SocialCharacterData>());
         }
+#endif
     }
 }

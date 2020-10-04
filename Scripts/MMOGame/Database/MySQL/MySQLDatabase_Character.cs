@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿#if UNITY_STANDALONE && !CLIENT_BUILD
+using System.Collections.Generic;
 using LiteNetLibManager;
 using UnityEngine;
 using MySqlConnector;
@@ -610,3 +611,4 @@ namespace MultiplayerARPG.MMO
         }
     }
 }
+#endif

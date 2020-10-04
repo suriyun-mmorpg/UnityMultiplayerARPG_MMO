@@ -39,11 +39,14 @@ namespace MultiplayerARPG.MMO
             return ClientSendRequest(MMOMessageTypes.RequestValidateAccessToken, message, callback);
         }
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         protected void HandleRequestUserLogin(LiteNetLibMessageHandler messageHandler)
         {
             HandleRequestUserLoginRoutine(messageHandler).Forget();
         }
+#endif
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private async UniTaskVoid HandleRequestUserLoginRoutine(LiteNetLibMessageHandler messageHandler)
         {
             long connectionId = messageHandler.connectionId;
@@ -88,12 +91,16 @@ namespace MultiplayerARPG.MMO
             responseMessage.accessToken = accessToken;
             ServerSendResponse(connectionId, MMOMessageTypes.ResponseUserLogin, responseMessage);
         }
+#endif
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         protected void HandleRequestUserRegister(LiteNetLibMessageHandler messageHandler)
         {
             HandleRequestUserRegisterRoutine(messageHandler).Forget();
         }
+#endif
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private async UniTaskVoid HandleRequestUserRegisterRoutine(LiteNetLibMessageHandler messageHandler)
         {
             long connectionId = messageHandler.connectionId;
@@ -127,12 +134,16 @@ namespace MultiplayerARPG.MMO
             responseMessage.error = error;
             ServerSendResponse(connectionId, MMOMessageTypes.ResponseUserRegister, responseMessage);
         }
+#endif
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         protected void HandleRequestUserLogout(LiteNetLibMessageHandler messageHandler)
         {
             HandleRequestUserLogoutRoutine(messageHandler).Forget();
         }
+#endif
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private async UniTaskVoid HandleRequestUserLogoutRoutine(LiteNetLibMessageHandler messageHandler)
         {
             long connectionId = messageHandler.connectionId;
@@ -153,12 +164,16 @@ namespace MultiplayerARPG.MMO
             responseMessage.responseCode = AckResponseCode.Success;
             ServerSendResponse(connectionId, MMOMessageTypes.ResponseUserLogout, responseMessage);
         }
+#endif
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         protected void HandleRequestValidateAccessToken(LiteNetLibMessageHandler messageHandler)
         {
             HandleRequestValidateAccessTokenRoutine(messageHandler).Forget();
         }
+#endif
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private async UniTaskVoid HandleRequestValidateAccessTokenRoutine(LiteNetLibMessageHandler messageHandler)
         {
             long connectionId = messageHandler.connectionId;
@@ -205,6 +220,7 @@ namespace MultiplayerARPG.MMO
             responseMessage.accessToken = accessToken;
             ServerSendResponse(connectionId, MMOMessageTypes.ResponseValidateAccessToken, responseMessage);
         }
+#endif
 
         protected void HandleResponseUserLogin(LiteNetLibMessageHandler messageHandler)
         {

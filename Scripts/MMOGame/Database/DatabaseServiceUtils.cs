@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿#if UNITY_STANDALONE && !CLIENT_BUILD
+using System.Collections.Generic;
 using Google.Protobuf;
 using Google.Protobuf.Collections;
 using LiteNetLib.Utils;
@@ -75,3 +76,4 @@ namespace MultiplayerARPG.MMO
         }
     }
 }
+#endif

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿#if UNITY_STANDALONE && !CLIENT_BUILD
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using MySqlConnector;
 
@@ -52,3 +53,4 @@ namespace MultiplayerARPG.MMO
         }
     }
 }
+#endif

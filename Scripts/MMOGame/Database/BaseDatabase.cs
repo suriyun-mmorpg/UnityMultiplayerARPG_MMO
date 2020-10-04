@@ -1,11 +1,14 @@
-﻿using Cysharp.Threading.Tasks;
+﻿#if UNITY_STANDALONE && !CLIENT_BUILD
+using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
+#endif
 using UnityEngine;
 
 namespace MultiplayerARPG.MMO
 {
     public abstract partial class BaseDatabase : MonoBehaviour
     {
+#if UNITY_STANDALONE && !CLIENT_BUILD
         public const byte AUTH_TYPE_NORMAL = 1;
 
         public virtual void Initialize() { }
@@ -72,5 +75,6 @@ namespace MultiplayerARPG.MMO
 
         public abstract UniTask UpdateStorageItems(StorageType storageType, string storageOwnerId, IList<CharacterItem> storageCharacterItems);
         public abstract UniTask<List<CharacterItem>> ReadStorageItems(StorageType storageType, string storageOwnerId);
+#endif
     }
 }

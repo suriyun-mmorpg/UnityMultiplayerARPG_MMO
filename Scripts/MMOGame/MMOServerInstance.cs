@@ -125,6 +125,7 @@ namespace MultiplayerARPG.MMO
         public BaseMapInfo startingMap;
         public int databaseOptionIndex;
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private List<string> spawningMapIds;
         private string startingMapId;
         private bool startingCentralServer;
@@ -132,6 +133,7 @@ namespace MultiplayerARPG.MMO
         private bool startingMapServer;
         private bool startingChatServer;
         private bool startingDatabaseServer;
+#endif
 
         private void Awake()
         {
@@ -155,6 +157,7 @@ namespace MultiplayerARPG.MMO
             ChatNetworkManager.useWebSocket = UseWebSocket;
 
             CacheLogGUI.enabled = false;
+#if UNITY_STANDALONE && !CLIENT_BUILD
             if (!Application.isEditor)
             {
                 // Json file read
@@ -447,8 +450,10 @@ namespace MultiplayerARPG.MMO
                     startingMapServer = true;
                 }
             }
+#endif
         }
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private void OnGameDataLoaded()
         {
             if (startingDatabaseServer)
@@ -507,8 +512,10 @@ namespace MultiplayerARPG.MMO
                 StartDatabaseManagerClient();
             }
         }
+#endif
 
-        #region Server functions
+#if UNITY_STANDALONE && !CLIENT_BUILD
+#region Server functions
         public void StartCentralServer()
         {
             centralNetworkManager.StartServer();
@@ -538,6 +545,7 @@ namespace MultiplayerARPG.MMO
         {
             DatabaseNetworkManager.StartClient();
         }
-        #endregion
+#endregion
+#endif
     }
 }

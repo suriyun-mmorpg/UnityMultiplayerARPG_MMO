@@ -45,11 +45,14 @@ namespace MultiplayerARPG.MMO
             return ClientSendRequest(MMOMessageTypes.RequestSelectCharacter, message, callback);
         }
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         protected void HandleRequestCharacters(LiteNetLibMessageHandler messageHandler)
         {
             HandleRequestCharactersRoutine(messageHandler).Forget();
         }
+#endif
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private async UniTaskVoid HandleRequestCharactersRoutine(LiteNetLibMessageHandler messageHandler)
         {
             long connectionId = messageHandler.connectionId;
@@ -74,12 +77,16 @@ namespace MultiplayerARPG.MMO
             responseMessage.characters = characters;
             ServerSendResponse(connectionId, MMOMessageTypes.ResponseCharacters, responseMessage);
         }
+#endif
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         protected void HandleRequestCreateCharacter(LiteNetLibMessageHandler messageHandler)
         {
             HandleRequestCreateCharacterRoutine(messageHandler).Forget();
         }
+#endif
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private async UniTaskVoid HandleRequestCreateCharacterRoutine(LiteNetLibMessageHandler messageHandler)
         {
             long connectionId = messageHandler.connectionId;
@@ -129,17 +136,23 @@ namespace MultiplayerARPG.MMO
             responseMessage.error = error;
             ServerSendResponse(connectionId, MMOMessageTypes.ResponseCreateCharacter, responseMessage);
         }
+#endif
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private void DeserializeCreateCharacterExtra(PlayerCharacterData characterData, NetDataReader reader)
         {
             this.InvokeInstanceDevExtMethods("DeserializeCreateCharacterExtra", characterData, reader);
         }
+#endif
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         protected void HandleRequestDeleteCharacter(LiteNetLibMessageHandler messageHandler)
         {
             HandleRequestDeleteCharacterRoutine(messageHandler).Forget();
         }
+#endif
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private async UniTaskVoid HandleRequestDeleteCharacterRoutine(LiteNetLibMessageHandler messageHandler)
         {
             long connectionId = messageHandler.connectionId;
@@ -162,12 +175,16 @@ namespace MultiplayerARPG.MMO
             responseMessage.error = error;
             ServerSendResponse(connectionId, MMOMessageTypes.ResponseDeleteCharacter, responseMessage);
         }
+#endif
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         protected void HandleRequestSelectCharacter(LiteNetLibMessageHandler messageHandler)
         {
             HandleRequestSelectCharacterRoutine(messageHandler).Forget();
         }
+#endif
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private async UniTaskVoid HandleRequestSelectCharacterRoutine(LiteNetLibMessageHandler messageHandler)
         {
             long connectionId = messageHandler.connectionId;
@@ -202,6 +219,7 @@ namespace MultiplayerARPG.MMO
             }
             ServerSendResponse(connectionId, MMOMessageTypes.ResponseSelectCharacter, responseMessage);
         }
+#endif
 
         protected void HandleResponseCharacters(LiteNetLibMessageHandler messageHandler)
         {

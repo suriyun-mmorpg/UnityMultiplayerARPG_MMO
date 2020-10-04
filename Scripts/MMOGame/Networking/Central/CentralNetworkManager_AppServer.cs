@@ -26,6 +26,7 @@ namespace MultiplayerARPG.MMO
             return ClientSendRequest(MMOMessageTypes.RequestAppServerAddress, message, callback);
         }
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         protected void HandleRequestAppServerRegister(LiteNetLibMessageHandler messageHandler)
         {
             long connectionId = messageHandler.connectionId;
@@ -110,7 +111,9 @@ namespace MultiplayerARPG.MMO
             responseMessage.error = error;
             ServerSendResponse(connectionId, MMOMessageTypes.ResponseAppServerRegister, responseMessage);
         }
+#endif
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         /// <summary>
         /// This function will be used to send connection information to connected map servers and chat servers
         /// </summary>
@@ -146,7 +149,9 @@ namespace MultiplayerARPG.MMO
                 ServerSendResponse(connectionId, MMOMessageTypes.ResponseAppServerAddress, appServerAddressMessage);
             }
         }
+#endif
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         protected void HandleRequestAppServerAddress(LiteNetLibMessageHandler messageHandler)
         {
             long connectionId = messageHandler.connectionId;
@@ -201,21 +206,9 @@ namespace MultiplayerARPG.MMO
             responseMessage.peerInfo = peerInfo;
             ServerSendResponse(connectionId, MMOMessageTypes.ResponseAppServerAddress, responseMessage);
         }
+#endif
 
-        protected void HandleResponseAppServerRegister(LiteNetLibMessageHandler messageHandler)
-        {
-            TransportHandler transportHandler = messageHandler.transportHandler;
-            ResponseAppServerRegisterMessage message = messageHandler.ReadMessage<ResponseAppServerRegisterMessage>();
-            transportHandler.ReadResponse(message.ackId, message.responseCode, message);
-        }
-
-        protected void HandleResponseAppServerAddress(LiteNetLibMessageHandler messageHandler)
-        {
-            TransportHandler transportHandler = messageHandler.transportHandler;
-            ResponseAppServerAddressMessage message = messageHandler.ReadMessage<ResponseAppServerAddressMessage>();
-            transportHandler.ReadResponse(message.ackId, message.responseCode, message);
-        }
-
+#if UNITY_STANDALONE && !CLIENT_BUILD
         protected void HandleUpdateMapUser(LiteNetLibMessageHandler messageHandler)
         {
             long connectionId = messageHandler.connectionId;
@@ -240,10 +233,24 @@ namespace MultiplayerARPG.MMO
                 }
             }
         }
+#endif
+
+        protected void HandleResponseAppServerRegister(LiteNetLibMessageHandler messageHandler)
+        {
+            TransportHandler transportHandler = messageHandler.transportHandler;
+            ResponseAppServerRegisterMessage message = messageHandler.ReadMessage<ResponseAppServerRegisterMessage>();
+            transportHandler.ReadResponse(message.ackId, message.responseCode, message);
+        }
+
+        protected void HandleResponseAppServerAddress(LiteNetLibMessageHandler messageHandler)
+        {
+            TransportHandler transportHandler = messageHandler.transportHandler;
+            ResponseAppServerAddressMessage message = messageHandler.ReadMessage<ResponseAppServerAddressMessage>();
+            transportHandler.ReadResponse(message.ackId, message.responseCode, message);
+        }
 
         public static string GetAppServerRegisterHash(CentralServerPeerType peerType, int time)
         {
-            // TODO: Add salt
             MD5 algorithm = MD5.Create();  // or use SHA256.Create();
             return Encoding.UTF8.GetString(algorithm.ComputeHash(Encoding.UTF8.GetBytes(peerType.ToString() + time.ToString())));
         }

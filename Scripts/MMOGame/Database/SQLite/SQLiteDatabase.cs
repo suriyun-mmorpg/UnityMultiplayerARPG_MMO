@@ -1,12 +1,13 @@
-﻿using Mono.Data.Sqlite;
+﻿#if UNITY_STANDALONE && !CLIENT_BUILD
+using Mono.Data.Sqlite;
 using System.Collections.Generic;
-using System.Data;
 using System.IO;
 using LiteNetLibManager;
-using UnityEngine;
 using MiniJSON;
 using System;
 using Cysharp.Threading.Tasks;
+#endif
+using UnityEngine;
 
 namespace MultiplayerARPG.MMO
 {
@@ -14,10 +15,12 @@ namespace MultiplayerARPG.MMO
     {
         [SerializeField]
         private string dbPath = "./mmorpgtemplate.sqlite3";
+
         [Header("Running In Editor")]
         [SerializeField]
         [Tooltip("You should set this to where you build app to make database path as same as map server")]
         private string editorDbPath = "./mmorpgtemplate.sqlite3";
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private SqliteConnection connection;
 
         public override void Initialize()
@@ -602,5 +605,6 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@username", username));
             return result != null ? (long)result : 0;
         }
+#endif
     }
 }
