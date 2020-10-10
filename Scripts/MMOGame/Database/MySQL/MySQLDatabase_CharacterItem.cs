@@ -120,9 +120,8 @@ namespace MultiplayerARPG.MMO
 
         public async UniTask CreateCharacterEquipWeapons(MySqlConnection connection, MySqlTransaction transaction, byte equipWeaponSet, string characterId, EquipWeapons equipWeapons)
         {
-            await UniTask.WhenAll(
-                CreateCharacterItem(connection, transaction, equipWeaponSet, characterId, InventoryType.EquipWeaponRight, equipWeapons.rightHand),
-                CreateCharacterItem(connection, transaction, equipWeaponSet, characterId, InventoryType.EquipWeaponLeft, equipWeapons.leftHand));
+            await CreateCharacterItem(connection, transaction, equipWeaponSet, characterId, InventoryType.EquipWeaponRight, equipWeapons.rightHand);
+            await CreateCharacterItem(connection, transaction, equipWeaponSet, characterId, InventoryType.EquipWeaponLeft, equipWeapons.leftHand);
         }
 
         public async UniTask CreateCharacterEquipItem(MySqlConnection connection, MySqlTransaction transaction, int idx, string characterId, CharacterItem characterItem)
