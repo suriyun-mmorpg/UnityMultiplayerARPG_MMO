@@ -19,12 +19,12 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        private string WriteSockets(List<int> killMonsters)
+        private string WriteSockets(List<int> sockets)
         {
             string result = "";
-            foreach (int killMonster in killMonsters)
+            foreach (int socket in sockets)
             {
-                result += killMonster + ";";
+                result += socket + ";";
             }
             return result;
         }
