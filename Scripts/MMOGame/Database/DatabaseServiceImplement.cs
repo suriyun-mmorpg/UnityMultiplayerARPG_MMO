@@ -26,7 +26,7 @@ namespace MultiplayerARPG.MMO
         private ConcurrentDictionary<string, int> cachedUserCash = new ConcurrentDictionary<string, int>();
         private ConcurrentDictionary<string, PlayerCharacterData> cachedUserCharacter = new ConcurrentDictionary<string, PlayerCharacterData>();
         private ConcurrentDictionary<string, SocialCharacterData> cachedSocialCharacter = new ConcurrentDictionary<string, SocialCharacterData>();
-        private ConcurrentDictionary<string, Dictionary<string, BuildingSaveData>> cachedBuilding = new ConcurrentDictionary<string, Dictionary<string, BuildingSaveData>>();
+        private ConcurrentDictionary<string, ConcurrentDictionary<string, BuildingSaveData>> cachedBuilding = new ConcurrentDictionary<string, ConcurrentDictionary<string, BuildingSaveData>>();
         private ConcurrentDictionary<string, List<SocialCharacterData>> cachedFriend = new ConcurrentDictionary<string, List<SocialCharacterData>>();
         private ConcurrentDictionary<int, PartyData> cachedParty = new ConcurrentDictionary<int, PartyData>();
         private ConcurrentDictionary<int, GuildData> cachedGuild = new ConcurrentDictionary<int, GuildData>();
@@ -211,8 +211,7 @@ namespace MultiplayerARPG.MMO
             {
                 string characterName = cachedUserCharacter[request.CharacterId].CharacterName;
                 cachedCharacterNames.TryRemove(characterName);
-                PlayerCharacterData playerCharacterData;
-                cachedUserCharacter.TryRemove(request.CharacterId, out playerCharacterData);
+                cachedUserCharacter.TryRemove(request.CharacterId, out _);
             }
             // Delete data from database
             await Database.DeleteCharacter(request.UserId, request.CharacterId);
@@ -292,12 +291,17 @@ namespace MultiplayerARPG.MMO
             BuildingSaveData building = DatabaseServiceUtils.FromByteString<BuildingSaveData>(request.BuildingData);
             // Cache building data
             if (cachedBuilding.ContainsKey(request.MapName))
-                cachedBuilding[request.MapName][building.Id] = building;
+            {
+                if (cachedBuilding[request.MapName].ContainsKey(building.Id))
+                    cachedBuilding[request.MapName][building.Id] = building;
+                else
+                    cachedBuilding[request.MapName].TryAdd(building.Id, building);
+            }
             // Insert data to database
             await Database.CreateBuilding(request.MapName, building);
             return new BuildingResp()
             {
-                BuildingData = DatabaseServiceUtils.ToByteString(building)
+                BuildingData = request.BuildingData
             };
         }
 
@@ -306,12 +310,17 @@ namespace MultiplayerARPG.MMO
             BuildingSaveData building = DatabaseServiceUtils.FromByteString<BuildingSaveData>(request.BuildingData);
             // Cache building data
             if (cachedBuilding.ContainsKey(request.MapName))
-                cachedBuilding[request.MapName][building.Id] = building;
+            {
+                if (cachedBuilding[request.MapName].ContainsKey(building.Id))
+                    cachedBuilding[request.MapName][building.Id] = building;
+                else
+                    cachedBuilding[request.MapName].TryAdd(building.Id, building);
+            }
             // Update data to database
             await Database.UpdateBuilding(request.MapName, building);
             return new BuildingResp()
             {
-                BuildingData = DatabaseServiceUtils.ToByteString(building)
+                BuildingData = request.BuildingData
             };
         }
 
@@ -319,7 +328,7 @@ namespace MultiplayerARPG.MMO
         {
             // Remove from cache
             if (cachedBuilding.ContainsKey(request.MapName))
-                cachedBuilding[request.MapName].Remove(request.BuildingId);
+                cachedBuilding[request.MapName].TryRemove(request.BuildingId, out _);
             // Remove from database
             await Database.DeleteBuilding(request.MapName, request.BuildingId);
             return new VoidResp();
@@ -334,13 +343,13 @@ namespace MultiplayerARPG.MMO
                 // Get buildings from cache
                 buildings.AddRange(cachedBuilding[request.MapName].Values);
             }
-            else if (cachedBuilding.TryAdd(request.MapName, new Dictionary<string, BuildingSaveData>()))
+            else if (cachedBuilding.TryAdd(request.MapName, new ConcurrentDictionary<string, BuildingSaveData>()))
             {
                 // Store buildings to cache
                 buildings.AddRange(await Database.ReadBuildings(request.MapName));
                 foreach (BuildingSaveData building in buildings)
                 {
-                    cachedBuilding[request.MapName][building.Id] = building;
+                    cachedBuilding[request.MapName].TryAdd(building.Id, building);
                 }
             }
             DatabaseServiceUtils.CopyToRepeatedByteString(buildings, resp.List);
@@ -511,8 +520,7 @@ namespace MultiplayerARPG.MMO
             {
                 string characterName = cachedGuild[request.GuildId].guildName;
                 cachedGuildNames.TryRemove(characterName);
-                GuildData guildData;
-                cachedGuild.TryRemove(request.GuildId, out guildData);
+                cachedGuild.TryRemove(request.GuildId, out _);
             }
             // Remove data from database
             await Database.DeleteGuild(request.GuildId);

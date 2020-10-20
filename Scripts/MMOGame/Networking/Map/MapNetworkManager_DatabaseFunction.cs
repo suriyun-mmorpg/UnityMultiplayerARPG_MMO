@@ -139,15 +139,20 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
         public override BuildingEntity CreateBuildingEntity(BuildingSaveData saveData, bool initialize)
         {
+            CreateBuildingEntityRoutine(saveData, initialize).Forget();
+            return base.CreateBuildingEntity(saveData, initialize);
+        }
+
+        private async UniTask CreateBuildingEntityRoutine(BuildingSaveData saveData, bool initialize)
+        {
             if (!initialize)
             {
-                DbServiceClient.CreateBuildingAsync(new CreateBuildingReq()
+                await DbServiceClient.CreateBuildingAsync(new CreateBuildingReq()
                 {
                     MapName = Assets.onlineScene.SceneName,
                     BuildingData = saveData.ToByteString()
                 });
             }
-            return base.CreateBuildingEntity(saveData, initialize);
         }
 #endif
 
@@ -155,7 +160,12 @@ namespace MultiplayerARPG.MMO
         public override void DestroyBuildingEntity(string id)
         {
             base.DestroyBuildingEntity(id);
-            DbServiceClient.DeleteBuildingAsync(new DeleteBuildingReq()
+            DestroyBuildingEntityRoutine(id).Forget();
+        }
+
+        private async UniTask DestroyBuildingEntityRoutine(string id)
+        {
+            await DbServiceClient.DeleteBuildingAsync(new DeleteBuildingReq()
             {
                 MapName = Assets.onlineScene.SceneName,
                 BuildingId = id
