@@ -76,13 +76,13 @@ namespace MultiplayerARPG.MMO
                 "isLocked=@isLocked, " +
                 "lockPassword=@lockPassword, " +
                 "creatorId=@creatorId, " +
-                "creatorName=@creatorName " +
+                "creatorName=@creatorName, " +
                 "positionX=@positionX, " +
                 "positionY=@positionY, " +
                 "positionZ=@positionZ, " +
                 "rotationX=@rotationX, " +
                 "rotationY=@rotationY, " +
-                "rotationZ=@rotationZ, " +
+                "rotationZ=@rotationZ " +
                 "WHERE id=@id AND mapName=@mapName",
                 new SqliteParameter("@id", building.Id),
                 new SqliteParameter("@parentId", building.ParentId),
