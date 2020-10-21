@@ -6,6 +6,7 @@ using Google.Protobuf;
 using System.Collections.Concurrent;
 using ConcurrentCollections;
 using System;
+using Cysharp.Threading.Tasks;
 
 namespace MultiplayerARPG.MMO
 {
@@ -684,13 +685,14 @@ namespace MultiplayerARPG.MMO
                 resp.Error = EStorageError.StorageErrorInvalidCharacter;
                 return resp;
             }
-            if (request.InventoryItemIndex <= 0 ||
-                request.InventoryItemIndex > character.NonEquipItems.Count)
+            if (request.InventoryItemIndex < 0 ||
+                request.InventoryItemIndex >= character.NonEquipItems.Count)
             {
                 // Invalid inventory index
                 resp.Error = EStorageError.StorageErrorInvalidInventoryIndex;
                 return resp;
             }
+            await UniTask.SwitchToMainThread();
             bool isLimitWeight = storage.weightLimit > 0;
             bool isLimitSlot = storage.slotLimit > 0;
             short weightLimit = storage.weightLimit;
@@ -757,13 +759,14 @@ namespace MultiplayerARPG.MMO
                 resp.Error = EStorageError.StorageErrorInvalidCharacter;
                 return resp;
             }
-            if (request.StorageItemIndex <= 0 ||
-                request.StorageItemIndex > storageItemList.Count)
+            if (request.StorageItemIndex < 0 ||
+                request.StorageItemIndex >= storageItemList.Count)
             {
                 // Invalid storage index
                 resp.Error = EStorageError.StorageErrorInvalidStorageIndex;
                 return resp;
             }
+            await UniTask.SwitchToMainThread();
             bool isLimitSlot = storage.slotLimit > 0;
             short slotLimit = storage.slotLimit;
             // Prepare item data
@@ -819,6 +822,7 @@ namespace MultiplayerARPG.MMO
                 resp.Error = EStorageError.StorageErrorInvalidStorage;
                 return resp;
             }
+            await UniTask.SwitchToMainThread();
             bool isLimitSlot = storage.slotLimit > 0;
             short slotLimit = storage.slotLimit;
             // Prepare item data
@@ -874,6 +878,7 @@ namespace MultiplayerARPG.MMO
                 resp.Error = EStorageError.StorageErrorInvalidStorage;
                 return resp;
             }
+            await UniTask.SwitchToMainThread();
             bool isLimitWeight = storage.weightLimit > 0;
             bool isLimitSlot = storage.slotLimit > 0;
             short weightLimit = storage.weightLimit;
@@ -912,6 +917,7 @@ namespace MultiplayerARPG.MMO
                 resp.Error = EStorageError.StorageErrorInvalidStorage;
                 return resp;
             }
+            await UniTask.SwitchToMainThread();
             bool isLimitSlot = storage.slotLimit > 0;
             short slotLimit = storage.slotLimit;
             // Increase item to storage
