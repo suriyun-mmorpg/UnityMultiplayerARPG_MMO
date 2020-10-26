@@ -14,19 +14,18 @@ namespace MultiplayerARPG.MMO
             MMOClientInstance.Singleton.RequestCreateCharacter(characterData, OnRequestedCreateCharacter);
         }
 
-        private void OnRequestedCreateCharacter(AckResponseCode responseCode, BaseAckMessage message)
+        private void OnRequestedCreateCharacter(ResponseCreateCharacterMessage message)
         {
-            if (responseCode == AckResponseCode.Timeout)
+            if (message.responseCode == AckResponseCode.Timeout)
             {
                 UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
                 return;
             }
-            ResponseCreateCharacterMessage castedMessage = message as ResponseCreateCharacterMessage;
-            switch (responseCode)
+            switch (message.responseCode)
             {
                 case AckResponseCode.Error:
                     string errorMessage = string.Empty;
-                    switch (castedMessage.error)
+                    switch (message.error)
                     {
                         case ResponseCreateCharacterMessage.Error.NotLoggedin:
                             errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_NOT_LOGGED_IN.ToString());

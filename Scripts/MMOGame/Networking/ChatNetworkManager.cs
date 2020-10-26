@@ -5,7 +5,7 @@ using LiteNetLib;
 
 namespace MultiplayerARPG.MMO
 {
-    public partial class ChatNetworkManager : LiteNetLibManager.LiteNetLibManager, IAppServer
+    public partial class ChatNetworkManager : BaseAppNetworkManager, IAppServer
     {
         [Header("Central Network Connection")]
         public BaseTransportFactory centralTransportFactory;

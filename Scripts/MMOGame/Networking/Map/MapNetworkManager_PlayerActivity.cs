@@ -154,7 +154,7 @@ namespace MultiplayerARPG.MMO
                 instanceWarpPosition = position,
                 instanceWarpOverrideRotation = overrideRotation,
                 instanceWarpRotation = rotation,
-            }, (responseCode, messageData) => OnRequestSpawnMap(responseCode, messageData, instanceId), duration: 0);
+            }, (ResponseSpawnMapMessage messageData) => OnRequestSpawnMap(messageData, instanceId), duration: 0);
 #endif
         }
 
@@ -199,12 +199,12 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        private void OnRequestSpawnMap(AckResponseCode responseCode, BaseAckMessage messageData, string instanceId)
+        private void OnRequestSpawnMap(ResponseSpawnMapMessage message, string instanceId)
         {
             if (LogInfo)
-                Logging.Log(LogTag, "Spawn Map Ack Id: " + messageData.ackId + "  Status: " + responseCode);
-            if (responseCode == AckResponseCode.Error ||
-                responseCode == AckResponseCode.Timeout)
+                Logging.Log(LogTag, "Spawn Map Ack Id: " + message.ackId + "  Status: " + message.responseCode);
+            if (message.responseCode == AckResponseCode.Error ||
+                message.responseCode == AckResponseCode.Timeout)
             {
                 // Remove warping characters who warping to instance map
                 HashSet<uint> instanceMapWarpingCharacters;

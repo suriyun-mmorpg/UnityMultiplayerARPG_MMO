@@ -37,7 +37,7 @@ namespace MultiplayerARPG.MMO
         private void UpdateUI()
         {
             if (rootObject != null)
-                rootObject.SetActive(MMOClientInstance.Singleton.CentralNetworkManager.IsClientConnected && MMOClientInstance.Singleton.CentralNetworkManager.Client.AckCallbacksCount > 0);
+                rootObject.SetActive(MMOClientInstance.Singleton.CentralNetworkManager.IsClientConnected && MMOClientInstance.Singleton.CentralNetworkManager.Client.RequestsCount > 0);
         }
     }
 }

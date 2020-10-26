@@ -58,15 +58,15 @@ namespace MultiplayerARPG.MMO
             Application.Quit();
         }
 
-        private void OnUserLogout(AckResponseCode responseCode, BaseAckMessage messageData)
+        private void OnUserLogout(BaseAckMessage messageData)
         {
             ClearHistory();
             Next(uiLogin);
         }
 
-        private void OnValidateAccessToken(AckResponseCode responseCode, BaseAckMessage messageData)
+        private void OnValidateAccessToken(ResponseValidateAccessTokenMessage messageData)
         {
-            if (responseCode == AckResponseCode.Success)
+            if (messageData.responseCode == AckResponseCode.Success)
             {
                 if (onValidateAccessTokenSuccess != null)
                     onValidateAccessTokenSuccess.Invoke();

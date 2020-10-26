@@ -91,24 +91,23 @@ namespace MultiplayerARPG.MMO
             MMOClientInstance.Singleton.RequestUserLogin(Username, Password, OnLogin);
         }
 
-        public void OnLogin(AckResponseCode responseCode, BaseAckMessage message)
+        public void OnLogin(ResponseUserLoginMessage message)
         {
             LoggingIn = false;
             string storingUsername = string.Empty;
             string storingPassword = string.Empty;
-            if (responseCode == AckResponseCode.Timeout)
+            if (message.responseCode == AckResponseCode.Timeout)
             {
                 UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
                 if (onLoginFail != null)
                     onLoginFail.Invoke();
                 return;
             }
-            ResponseUserLoginMessage castedMessage = message as ResponseUserLoginMessage;
-            switch (responseCode)
+            switch (message.responseCode)
             {
                 case AckResponseCode.Error:
                     string errorMessage = string.Empty;
-                    switch (castedMessage.error)
+                    switch (message.error)
                     {
                         case ResponseUserLoginMessage.Error.AlreadyLogin:
                             errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_ALREADY_LOGGED_IN.ToString());

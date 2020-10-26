@@ -11,7 +11,7 @@ using ConcurrentCollections;
 
 namespace MultiplayerARPG.MMO
 {
-    public partial class MapSpawnNetworkManager : LiteNetLibManager.LiteNetLibManager, IAppServer
+    public partial class MapSpawnNetworkManager : BaseAppNetworkManager, IAppServer
     {
         [Header("Central Network Connection")]
         public BaseTransportFactory centralTransportFactory;
@@ -378,11 +378,12 @@ namespace MultiplayerARPG.MMO
 
         private void ReponseMapSpawn(uint ackId, ResponseSpawnMapMessage.Error error)
         {
-            ResponseSpawnMapMessage responseMessage = new ResponseSpawnMapMessage();
-            responseMessage.ackId = ackId;
-            responseMessage.responseCode = error == ResponseSpawnMapMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
-            responseMessage.error = error;
-            CentralAppServerRegister.SendResponse(MMOMessageTypes.ResponseSpawnMap, responseMessage);
+            CentralAppServerRegister.SendResponse(MMOMessageTypes.GenericResponse, new ResponseSpawnMapMessage()
+            {
+                ackId = ackId,
+                responseCode = error == ResponseSpawnMapMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error,
+                error = error,
+            });
         }
     }
 }

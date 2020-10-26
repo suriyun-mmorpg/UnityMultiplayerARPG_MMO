@@ -133,7 +133,6 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
             CentralAppServerRegister = new CentralAppServerRegister(CentralTransportFactory.Build(), this);
             CentralAppServerRegister.onAppServerRegistered = OnAppServerRegistered;
-            CentralAppServerRegister.RegisterMessage(MMOMessageTypes.ResponseAppServerAddress, HandleResponseAppServerAddress);
             this.InvokeInstanceDevExtMethods("OnInitCentralAppServerRegister");
             ChatNetworkManager = gameObject.AddComponent<ChatNetworkManager>();
 #endif
@@ -386,7 +385,7 @@ namespace MultiplayerARPG.MMO
 #endif
 
         #region Character spawn function
-        public override void SerializeClientReadyExtra(NetDataWriter writer)
+        public override void SerializeClientReadyData(NetDataWriter writer)
         {
             writer.Put(MMOClientInstance.UserId);
             writer.Put(MMOClientInstance.AccessToken);
@@ -394,12 +393,13 @@ namespace MultiplayerARPG.MMO
         }
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        public override void SetPlayerReady(long connectionId, NetDataReader reader)
+        public override bool SetPlayerReady(long connectionId, NetDataReader reader)
         {
             if (!IsServer)
-                return;
+                return false;
 
             SetPlayerReady(connectionId, reader.GetString(), reader.GetString(), reader.GetString());
+            return true;
         }
 #endif
 

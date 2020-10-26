@@ -9,7 +9,7 @@ namespace MultiplayerARPG.MMO
 {
     public partial class CentralNetworkManager
     {
-        public uint RequestUserLogin(string username, string password, AckMessageCallback callback)
+        public uint RequestUserLogin(string username, string password, AckMessageCallback<ResponseUserLoginMessage> callback)
         {
             RequestUserLoginMessage message = new RequestUserLoginMessage();
             message.username = username;
@@ -17,7 +17,7 @@ namespace MultiplayerARPG.MMO
             return ClientSendRequest(MMOMessageTypes.RequestUserLogin, message, callback);
         }
 
-        public uint RequestUserRegister(string username, string password, AckMessageCallback callback)
+        public uint RequestUserRegister(string username, string password, AckMessageCallback<ResponseUserRegisterMessage> callback)
         {
             RequestUserRegisterMessage message = new RequestUserRegisterMessage();
             message.username = username;
@@ -25,13 +25,13 @@ namespace MultiplayerARPG.MMO
             return ClientSendRequest(MMOMessageTypes.RequestUserRegister, message, callback);
         }
 
-        public uint RequestUserLogout(AckMessageCallback callback)
+        public uint RequestUserLogout(AckMessageCallback<BaseAckMessage> callback)
         {
             BaseAckMessage message = new BaseAckMessage();
             return ClientSendRequest(MMOMessageTypes.RequestUserLogout, message, callback);
         }
 
-        public uint RequestValidateAccessToken(string userId, string accessToken, AckMessageCallback callback)
+        public uint RequestValidateAccessToken(string userId, string accessToken, AckMessageCallback<ResponseValidateAccessTokenMessage> callback)
         {
             RequestValidateAccessTokenMessage message = new RequestValidateAccessTokenMessage();
             message.userId = userId;
@@ -83,13 +83,14 @@ namespace MultiplayerARPG.MMO
                     AccessToken = accessToken
                 });
             }
-            ResponseUserLoginMessage responseMessage = new ResponseUserLoginMessage();
-            responseMessage.ackId = message.ackId;
-            responseMessage.responseCode = error == ResponseUserLoginMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
-            responseMessage.error = error;
-            responseMessage.userId = userId;
-            responseMessage.accessToken = accessToken;
-            ServerSendResponse(connectionId, MMOMessageTypes.ResponseUserLogin, responseMessage);
+            ServerSendResponse(connectionId, new ResponseUserLoginMessage()
+            {
+                ackId = message.ackId,
+                responseCode = error == ResponseUserLoginMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error,
+                error = error,
+                userId = userId,
+                accessToken = accessToken,
+            });
         }
 #endif
 
@@ -128,11 +129,12 @@ namespace MultiplayerARPG.MMO
                     Password = password
                 });
             }
-            ResponseUserRegisterMessage responseMessage = new ResponseUserRegisterMessage();
-            responseMessage.ackId = message.ackId;
-            responseMessage.responseCode = error == ResponseUserRegisterMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
-            responseMessage.error = error;
-            ServerSendResponse(connectionId, MMOMessageTypes.ResponseUserRegister, responseMessage);
+            ServerSendResponse(connectionId, new ResponseUserRegisterMessage()
+            {
+                ackId = message.ackId,
+                responseCode = error == ResponseUserRegisterMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error,
+                error = error,
+            });
         }
 #endif
 
@@ -159,10 +161,11 @@ namespace MultiplayerARPG.MMO
                     AccessToken = string.Empty
                 });
             }
-            BaseAckMessage responseMessage = new BaseAckMessage();
-            responseMessage.ackId = message.ackId;
-            responseMessage.responseCode = AckResponseCode.Success;
-            ServerSendResponse(connectionId, MMOMessageTypes.ResponseUserLogout, responseMessage);
+            ServerSendResponse(connectionId, new BaseAckMessage()
+            {
+                ackId = message.ackId,
+                responseCode = AckResponseCode.Success,
+            });
         }
 #endif
 
@@ -212,42 +215,15 @@ namespace MultiplayerARPG.MMO
                     AccessToken = accessToken
                 });
             }
-            ResponseValidateAccessTokenMessage responseMessage = new ResponseValidateAccessTokenMessage();
-            responseMessage.ackId = message.ackId;
-            responseMessage.responseCode = error == ResponseValidateAccessTokenMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
-            responseMessage.error = error;
-            responseMessage.userId = userId;
-            responseMessage.accessToken = accessToken;
-            ServerSendResponse(connectionId, MMOMessageTypes.ResponseValidateAccessToken, responseMessage);
+            ServerSendResponse(connectionId, new ResponseValidateAccessTokenMessage()
+            {
+                ackId = message.ackId,
+                responseCode = error == ResponseValidateAccessTokenMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error,
+                error = error,
+                userId = userId,
+                accessToken = accessToken,
+            });
         }
 #endif
-
-        protected void HandleResponseUserLogin(LiteNetLibMessageHandler messageHandler)
-        {
-            TransportHandler transportHandler = messageHandler.transportHandler;
-            ResponseUserLoginMessage message = messageHandler.ReadMessage<ResponseUserLoginMessage>();
-            transportHandler.ReadResponse(message.ackId, message.responseCode, message);
-        }
-
-        protected void HandleResponseUserRegister(LiteNetLibMessageHandler messageHandler)
-        {
-            TransportHandler transportHandler = messageHandler.transportHandler;
-            ResponseUserRegisterMessage message = messageHandler.ReadMessage<ResponseUserRegisterMessage>();
-            transportHandler.ReadResponse(message.ackId, message.responseCode, message);
-        }
-
-        protected void HandleResponseUserLogout(LiteNetLibMessageHandler messageHandler)
-        {
-            TransportHandler transportHandler = messageHandler.transportHandler;
-            BaseAckMessage message = messageHandler.ReadMessage<BaseAckMessage>();
-            transportHandler.ReadResponse(message.ackId, message.responseCode, message);
-        }
-
-        protected void HandleResponseValidateAccessToken(LiteNetLibMessageHandler messageHandler)
-        {
-            TransportHandler transportHandler = messageHandler.transportHandler;
-            ResponseValidateAccessTokenMessage message = messageHandler.ReadMessage<ResponseValidateAccessTokenMessage>();
-            transportHandler.ReadResponse(message.ackId, message.responseCode, message);
-        }
     }
 }

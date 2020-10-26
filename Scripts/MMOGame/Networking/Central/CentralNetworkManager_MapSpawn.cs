@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using LiteNetLib;
+using LiteNetLib.Utils;
 using LiteNetLibManager;
 using UnityEngine;
 
@@ -7,18 +8,19 @@ namespace MultiplayerARPG.MMO
 {
     public partial class CentralNetworkManager
     {
-        public uint RequestSpawnMap(long connectionId, string sceneName, string instanceId, Vector3 instanceWarpPosition, bool instanceWarpOverrideRotation, Vector3 instanceWarpRotation, AckMessageCallback callback)
+        public uint RequestSpawnMap(long connectionId, string sceneName, string instanceId, Vector3 instanceWarpPosition, bool instanceWarpOverrideRotation, Vector3 instanceWarpRotation, AckMessageCallback<ResponseSpawnMapMessage> callback)
         {
-            RequestSpawnMapMessage message = new RequestSpawnMapMessage();
-            message.mapId = sceneName;
-            message.instanceId = instanceId;
-            message.instanceWarpPosition = instanceWarpPosition;
-            message.instanceWarpOverrideRotation = instanceWarpOverrideRotation;
-            message.instanceWarpRotation = instanceWarpRotation;
-            return RequestSpawnMap(connectionId, message, callback);
+            return RequestSpawnMap(connectionId, new RequestSpawnMapMessage()
+            {
+                mapId = sceneName,
+                instanceId = instanceId,
+                instanceWarpPosition = instanceWarpPosition,
+                instanceWarpOverrideRotation = instanceWarpOverrideRotation,
+                instanceWarpRotation = instanceWarpRotation,
+            }, callback);
         }
 
-        public uint RequestSpawnMap(long connectionId, RequestSpawnMapMessage message, AckMessageCallback callback)
+        public uint RequestSpawnMap(long connectionId, RequestSpawnMapMessage message, AckMessageCallback<ResponseSpawnMapMessage> callback)
         {
             return ServerSendRequest(connectionId, MMOMessageTypes.RequestSpawnMap, message, callback, duration: mapSpawnDuration);
         }
@@ -42,33 +44,23 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        protected void OnRequestSpawnMap(AckResponseCode responseCode, BaseAckMessage messageData)
+        protected void OnRequestSpawnMap(ResponseSpawnMapMessage messageData)
         {
-            if (responseCode == AckResponseCode.Timeout)
+            if (messageData.responseCode == AckResponseCode.Timeout)
             {
                 if (LogError)
                     Logging.Log(LogTag, "Spawn Map Ack Id: " + messageData.ackId + " Timeout.");
                 return;
             }
-            ResponseSpawnMapMessage castedMessage = messageData as ResponseSpawnMapMessage;
             if (LogInfo)
-                Logging.Log(LogTag, "Spawn Map Ack Id: " + messageData.ackId + "  Status: " + responseCode + " Error: " + castedMessage.error);
+                Logging.Log(LogTag, "Spawn Map Ack Id: " + messageData.ackId + "  Status: " + messageData.responseCode + " Error: " + messageData.error);
             // Forward responses to map server transport handler
+            NetDataWriter forwardWriter = new NetDataWriter();
+            messageData.Serialize(forwardWriter);
             KeyValuePair<TransportHandler, uint> requestSpawnMapHandler;
-            if (requestSpawnMapHandlers.TryGetValue(castedMessage.ackId, out requestSpawnMapHandler))
-                requestSpawnMapHandler.Key.ReadResponse(requestSpawnMapHandler.Value, castedMessage.responseCode, castedMessage);
+            if (requestSpawnMapHandlers.TryGetValue(messageData.ackId, out requestSpawnMapHandler))
+                requestSpawnMapHandler.Key.ReadResponse(new NetDataReader(forwardWriter.Data));
         }
 #endif
-
-        /// <summary>
-        /// This is function which read response from map spawn server
-        /// </summary>
-        /// <param name="messageHandler"></param>
-        protected void HandleResponseSpawnMap(LiteNetLibMessageHandler messageHandler)
-        {
-            TransportHandler transportHandler = messageHandler.transportHandler;
-            ResponseSpawnMapMessage message = messageHandler.ReadMessage<ResponseSpawnMapMessage>();
-            transportHandler.ReadResponse(message.ackId, message.responseCode, message);
-        }
     }
 }

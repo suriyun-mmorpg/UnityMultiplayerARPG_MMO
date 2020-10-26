@@ -5,7 +5,7 @@ using LiteNetLibManager;
 
 namespace MultiplayerARPG.MMO
 {
-    public partial class CentralNetworkManager : LiteNetLibManager.LiteNetLibManager
+    public partial class CentralNetworkManager : BaseAppNetworkManager
     {
 #if UNITY_STANDALONE && !CLIENT_BUILD
         protected readonly Dictionary<long, CentralServerPeerInfo> mapSpawnServerPeers = new Dictionary<long, CentralServerPeerInfo>();
@@ -52,16 +52,6 @@ namespace MultiplayerARPG.MMO
         {
             this.InvokeInstanceDevExtMethods("RegisterClientMessages");
             base.RegisterClientMessages();
-            RegisterClientMessage(MMOMessageTypes.ResponseAppServerRegister, HandleResponseAppServerRegister);
-            RegisterClientMessage(MMOMessageTypes.ResponseAppServerAddress, HandleResponseAppServerAddress);
-            RegisterClientMessage(MMOMessageTypes.ResponseUserLogin, HandleResponseUserLogin);
-            RegisterClientMessage(MMOMessageTypes.ResponseUserRegister, HandleResponseUserRegister);
-            RegisterClientMessage(MMOMessageTypes.ResponseUserLogout, HandleResponseUserLogout);
-            RegisterClientMessage(MMOMessageTypes.ResponseCharacters, HandleResponseCharacters);
-            RegisterClientMessage(MMOMessageTypes.ResponseCreateCharacter, HandleResponseCreateCharacter);
-            RegisterClientMessage(MMOMessageTypes.ResponseDeleteCharacter, HandleResponseDeleteCharacter);
-            RegisterClientMessage(MMOMessageTypes.ResponseSelectCharacter, HandleResponseSelectCharacter);
-            RegisterClientMessage(MMOMessageTypes.ResponseValidateAccessToken, HandleResponseValidateAccessToken);
         }
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
@@ -79,7 +69,6 @@ namespace MultiplayerARPG.MMO
             RegisterServerMessage(MMOMessageTypes.RequestDeleteCharacter, HandleRequestDeleteCharacter);
             RegisterServerMessage(MMOMessageTypes.RequestSelectCharacter, HandleRequestSelectCharacter);
             RegisterServerMessage(MMOMessageTypes.RequestSpawnMap, HandleRequestSpawnMap);
-            RegisterServerMessage(MMOMessageTypes.ResponseSpawnMap, HandleResponseSpawnMap);
             RegisterServerMessage(MMOMessageTypes.RequestValidateAccessToken, HandleRequestValidateAccessToken);
             RegisterServerMessage(MMOMessageTypes.UpdateMapUser, HandleUpdateMapUser);
         }

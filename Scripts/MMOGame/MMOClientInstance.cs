@@ -144,92 +144,90 @@ namespace MultiplayerARPG.MMO
             SelectCharacterId = string.Empty;
         }
 
-        public void RequestUserLogin(string username, string password, AckMessageCallback callback)
+        public void RequestUserLogin(string username, string password, AckMessageCallback<ResponseUserLoginMessage> callback)
         {
-            centralNetworkManager.RequestUserLogin(username, password, (responseCode, messageData) => OnRequestUserLogin(responseCode, messageData, callback));
+            centralNetworkManager.RequestUserLogin(username, password, (messageData) => OnRequestUserLogin(messageData, callback));
         }
 
-        public void RequestUserRegister(string username, string password, AckMessageCallback callback)
+        public void RequestUserRegister(string username, string password, AckMessageCallback<ResponseUserRegisterMessage> callback)
         {
             centralNetworkManager.RequestUserRegister(username, password, callback);
         }
 
-        public void RequestUserLogout(AckMessageCallback callback)
+        public void RequestUserLogout(AckMessageCallback<BaseAckMessage> callback)
         {
-            centralNetworkManager.RequestUserLogout((responseCode, messageData) => OnRequestUserLogout(responseCode, messageData, callback));
+            centralNetworkManager.RequestUserLogout((messageData) => OnRequestUserLogout(messageData, callback));
         }
 
-        public void RequestValidateAccessToken(string userId, string accessToken, AckMessageCallback callback)
+        public void RequestValidateAccessToken(string userId, string accessToken, AckMessageCallback<ResponseValidateAccessTokenMessage> callback)
         {
-            centralNetworkManager.RequestValidateAccessToken(userId, accessToken, (responseCode, messageData) => OnRequestValidateAccessToken(responseCode, messageData, callback));
+            centralNetworkManager.RequestValidateAccessToken(userId, accessToken, (messageData) => OnRequestValidateAccessToken(messageData, callback));
         }
 
-        public void RequestCharacters(AckMessageCallback callback)
+        public void RequestCharacters(AckMessageCallback<ResponseCharactersMessage> callback)
         {
             centralNetworkManager.RequestCharacters(callback);
         }
 
-        public void RequestCreateCharacter(PlayerCharacterData characterData, AckMessageCallback callback)
+        public void RequestCreateCharacter(PlayerCharacterData characterData, AckMessageCallback<ResponseCreateCharacterMessage> callback)
         {
             centralNetworkManager.RequestCreateCharacter(characterData, callback);
         }
 
-        public void RequestDeleteCharacter(string characterId, AckMessageCallback callback)
+        public void RequestDeleteCharacter(string characterId, AckMessageCallback<ResponseDeleteCharacterMessage> callback)
         {
             centralNetworkManager.RequestDeleteCharacter(characterId, callback);
         }
 
-        public void RequestSelectCharacter(string characterId, AckMessageCallback callback)
+        public void RequestSelectCharacter(string characterId, AckMessageCallback<ResponseSelectCharacterMessage> callback)
         {
-            centralNetworkManager.RequestSelectCharacter(characterId, (responseCode, messageData) => OnRequestSelectCharacter(responseCode, messageData, characterId, callback));
+            centralNetworkManager.RequestSelectCharacter(characterId, (messageData) => OnRequestSelectCharacter(messageData, characterId, callback));
         }
 
-        private void OnRequestUserLogin(AckResponseCode responseCode, BaseAckMessage messageData, AckMessageCallback callback)
+        private void OnRequestUserLogin(ResponseUserLoginMessage messageData, AckMessageCallback<ResponseUserLoginMessage> callback)
         {
             if (callback != null)
-                callback.Invoke(responseCode, messageData);
+                callback.Invoke(messageData);
 
             UserId = string.Empty;
             AccessToken = string.Empty;
             SelectCharacterId = string.Empty;
             if (messageData.responseCode == AckResponseCode.Success)
             {
-                ResponseUserLoginMessage castedMessage = messageData as ResponseUserLoginMessage;
-                UserId = castedMessage.userId;
-                AccessToken = castedMessage.accessToken;
+                UserId = messageData.userId;
+                AccessToken = messageData.accessToken;
                 SelectCharacterId = string.Empty;
             }
         }
 
-        private void OnRequestUserLogout(AckResponseCode responseCode, BaseAckMessage messageData, AckMessageCallback callback)
+        private void OnRequestUserLogout(BaseAckMessage messageData, AckMessageCallback<BaseAckMessage> callback)
         {
             if (callback != null)
-                callback(responseCode, messageData);
+                callback.Invoke(messageData);
 
             UserId = string.Empty;
             AccessToken = string.Empty;
             SelectCharacterId = string.Empty;
         }
 
-        private void OnRequestValidateAccessToken(AckResponseCode responseCode, BaseAckMessage messageData, AckMessageCallback callback)
+        private void OnRequestValidateAccessToken(ResponseValidateAccessTokenMessage messageData, AckMessageCallback<ResponseValidateAccessTokenMessage> callback)
         {
             if (callback != null)
-                callback.Invoke(responseCode, messageData);
+                callback.Invoke(messageData);
 
             UserId = string.Empty;
             AccessToken = string.Empty;
             if (messageData.responseCode == AckResponseCode.Success)
             {
-                ResponseValidateAccessTokenMessage castedMessage = messageData as ResponseValidateAccessTokenMessage;
-                UserId = castedMessage.userId;
-                AccessToken = castedMessage.accessToken;
+                UserId = messageData.userId;
+                AccessToken = messageData.accessToken;
             }
         }
 
-        private void OnRequestSelectCharacter(AckResponseCode responseCode, BaseAckMessage messageData, string characterId, AckMessageCallback callback)
+        private void OnRequestSelectCharacter(ResponseSelectCharacterMessage messageData, string characterId, AckMessageCallback<ResponseSelectCharacterMessage> callback)
         {
             if (callback != null)
-                callback.Invoke(responseCode, messageData);
+                callback.Invoke(messageData);
 
             SelectCharacterId = string.Empty;
             if (messageData.responseCode == AckResponseCode.Success)

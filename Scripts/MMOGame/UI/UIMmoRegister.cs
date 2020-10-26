@@ -73,22 +73,21 @@ namespace MultiplayerARPG.MMO
             MMOClientInstance.Singleton.RequestUserRegister(Username, Password, OnRegister);
         }
 
-        public void OnRegister(AckResponseCode responseCode, BaseAckMessage message)
+        public void OnRegister(ResponseUserRegisterMessage message)
         {
             Registering = false;
-            if (responseCode == AckResponseCode.Timeout)
+            if (message.responseCode == AckResponseCode.Timeout)
             {
                 UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
                 if (onRegisterFail != null)
                     onRegisterFail.Invoke();
                 return;
             }
-            ResponseUserRegisterMessage castedMessage = message as ResponseUserRegisterMessage;
-            switch (responseCode)
+            switch (message.responseCode)
             {
                 case AckResponseCode.Error:
                     string errorMessage = string.Empty;
-                    switch (castedMessage.error)
+                    switch (message.error)
                     {
                         case ResponseUserRegisterMessage.Error.TooShortUsername:
                             errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_USERNAME_TOO_SHORT.ToString());
