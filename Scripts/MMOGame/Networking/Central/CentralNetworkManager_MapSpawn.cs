@@ -20,7 +20,7 @@ namespace MultiplayerARPG.MMO
 
         public uint RequestSpawnMap(long connectionId, RequestSpawnMapMessage message, AckMessageCallback callback)
         {
-            return ServerSendRequest(connectionId, MMOMessageTypes.RequestSpawnMap, message, callback);
+            return ServerSendRequest(connectionId, MMOMessageTypes.RequestSpawnMap, message, callback, duration: mapSpawnDuration);
         }
 
 #if UNITY_STANDALONE && !CLIENT_BUILD

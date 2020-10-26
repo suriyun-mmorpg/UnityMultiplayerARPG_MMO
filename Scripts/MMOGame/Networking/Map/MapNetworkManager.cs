@@ -47,6 +47,9 @@ namespace MultiplayerARPG.MMO
         [Header("Database")]
         public float autoSaveDuration = 2f;
 
+        [Header("Map Spawn")]
+        public long mapSpawnDuration = 0;
+
         public Action onClientConnected;
         public Action<DisconnectInfo> onClientDisconnected;
 

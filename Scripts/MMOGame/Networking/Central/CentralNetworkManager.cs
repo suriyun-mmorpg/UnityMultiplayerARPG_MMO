@@ -26,7 +26,10 @@ namespace MultiplayerARPG.MMO
         private readonly Dictionary<uint, KeyValuePair<TransportHandler, uint>> requestSpawnMapHandlers = new Dictionary<uint, KeyValuePair<TransportHandler, uint>>();
 #endif
 
-        [Header("Account configuration")]
+        [Header("Map Spawn")]
+        public long mapSpawnDuration = 0;
+
+        [Header("User Account")]
         public int minUsernameLength = 2;
         public int maxUsernameLength = 24;
         public int minPasswordLength = 2;
