@@ -110,14 +110,12 @@ namespace MultiplayerARPG.MMO
             spawningPort = -1;
             portCounter = -1;
             // Clear free ports
-            int tempFreePort;
-            while (freePorts.TryDequeue(out tempFreePort))
+            while (freePorts.TryDequeue(out _))
             {
                 // Do nothing
             }
             // Clear main thread actions
-            Action tempMainThreadAction;
-            while (mainThreadActions.TryDequeue(out tempMainThreadAction))
+            while (mainThreadActions.TryDequeue(out _))
             {
                 // Do nothing
             }
@@ -129,8 +127,7 @@ namespace MultiplayerARPG.MMO
                 processes.TryRemove(processId);
             }
             // Clear restarting scenes
-            string tempRestartingScenes;
-            while (restartingScenes.TryDequeue(out tempRestartingScenes))
+            while (restartingScenes.TryDequeue(out _))
             {
                 // Do nothing
             }
