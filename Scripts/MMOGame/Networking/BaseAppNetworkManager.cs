@@ -25,7 +25,7 @@ namespace MultiplayerARPG.MMO
         public void ClientSendResponse<TResponse>(TResponse response, System.Action<NetDataWriter> extraSerializer = null)
             where TResponse : BaseAckMessage, new()
         {
-            Client.SendResponse(MMOMessageTypes.GenericResponse, response, extraSerializer);
+            Client.SendPacket(MMOMessageTypes.GenericResponse, response, extraSerializer);
         }
 
         public void ServerSendResponse<TResponse>(long connectionId, TResponse response, System.Action<NetDataWriter> extraSerializer = null)

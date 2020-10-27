@@ -1,11 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using LiteNetLibManager;
-using LiteNetLib.Utils;
+﻿using LiteNetLib.Utils;
 
 namespace MultiplayerARPG.MMO
 {
-    public class ResponseDeleteCharacterMessage : BaseAckMessage
+    public class ResponseDeleteCharacterMessage : INetSerializable
     {
         public enum Error : byte
         {
@@ -14,12 +11,12 @@ namespace MultiplayerARPG.MMO
         }
         public Error error;
 
-        public override void DeserializeData(NetDataReader reader)
+        public void Deserialize(NetDataReader reader)
         {
             error = (Error)reader.GetByte();
         }
 
-        public override void SerializeData(NetDataWriter writer)
+        public void Serialize(NetDataWriter writer)
         {
             writer.Put((byte)error);
         }

@@ -6,40 +6,43 @@ using System.Text;
 using UnityEngine;
 using LiteNetLib;
 using LiteNetLibManager;
+using LiteNetLib.Utils;
+using Cysharp.Threading.Tasks;
 
 namespace MultiplayerARPG.MMO
 {
     public partial class CentralNetworkManager
     {
-        public uint RequestAppServerRegister(CentralServerPeerInfo peerInfo, AckMessageCallback<ResponseAppServerRegisterMessage> callback)
+        public bool RequestAppServerRegister(CentralServerPeerInfo peerInfo)
         {
-            return ClientSendRequest(MMOMessageTypes.RequestAppServerRegister, new RequestAppServerRegisterMessage()
+            return ClientSendRequest(MMORequestTypes.RequestAppServerRegister, new RequestAppServerRegisterMessage()
             {
                 peerInfo = peerInfo,
-            }, callback);
+            });
         }
 
-        public uint RequestAppServerAddress(CentralServerPeerType peerType, string extra, AckMessageCallback<ResponseAppServerAddressMessage> callback)
+        public bool RequestAppServerAddress(CentralServerPeerType peerType, string extra)
         {
-            return ClientSendRequest(MMOMessageTypes.RequestAppServerAddress, new RequestAppServerAddressMessage()
+            return ClientSendRequest(MMORequestTypes.RequestAppServerRegister, new RequestAppServerAddressMessage()
             {
                 peerType = peerType,
                 extra = extra,
-            }, callback);
+            });
         }
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        protected void HandleRequestAppServerRegister(LiteNetLibMessageHandler messageHandler)
+        protected UniTask HandleRequestAppServerRegister(
+            long connectionId, NetDataReader reader,
+            RequestAppServerRegisterMessage request,
+            RequestProceedResultDelegate<ResponseAppServerRegisterMessage> result)
         {
-            long connectionId = messageHandler.connectionId;
-            RequestAppServerRegisterMessage message = messageHandler.ReadMessage<RequestAppServerRegisterMessage>();
             ResponseAppServerRegisterMessage.Error error = ResponseAppServerRegisterMessage.Error.None;
-            if (message.ValidateHash())
+            if (request.ValidateHash())
             {
                 ResponseAppServerAddressMessage responseAppServerAddressMessage;
-                CentralServerPeerInfo peerInfo = message.peerInfo;
+                CentralServerPeerInfo peerInfo = request.peerInfo;
                 peerInfo.connectionId = connectionId;
-                switch (message.peerInfo.peerType)
+                switch (request.peerInfo.peerType)
                 {
                     case CentralServerPeerType.MapSpawnServer:
                         mapSpawnServerPeers[connectionId] = peerInfo;
@@ -89,13 +92,12 @@ namespace MultiplayerARPG.MMO
                         // Send chat peer info to map servers
                         responseAppServerAddressMessage = new ResponseAppServerAddressMessage()
                         {
-                            responseCode = AckResponseCode.Success,
                             error = ResponseAppServerAddressMessage.Error.None,
                             peerInfo = peerInfo,
                         };
                         foreach (CentralServerPeerInfo mapServerPeer in mapServerPeers.Values)
                         {
-                            ServerSendResponse(mapServerPeer.connectionId, responseAppServerAddressMessage);
+                            ServerSendPacket(mapServerPeer.connectionId, DeliveryMethod.ReliableOrdered, MMOMessageTypes.AppServerAddress, responseAppServerAddressMessage);
                         }
                         if (LogInfo)
                             Logging.Log(LogTag, "Register Chat Server: [" + connectionId + "]");
@@ -108,13 +110,14 @@ namespace MultiplayerARPG.MMO
                 if (LogInfo)
                     Logging.Log(LogTag, "Register Server Failed: [" + connectionId + "] [" + error + "]");
             }
-
-            ServerSendResponse(connectionId, new ResponseAppServerRegisterMessage()
-            {
-                ackId = message.ackId,
-                responseCode = error == ResponseAppServerRegisterMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error,
-                error = error,
-            });
+            // Response
+            result.Invoke(
+                error == ResponseAppServerRegisterMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error,
+                new ResponseAppServerRegisterMessage()
+                {
+                    error = error,
+                });
+            return default;
         }
 #endif
 
@@ -123,34 +126,31 @@ namespace MultiplayerARPG.MMO
         /// This function will be used to send connection information to connected map servers and chat servers
         /// </summary>
         /// <param name="connectionId"></param>
-        /// <param name="peerInfo"></param>
-        protected void BroadcastAppServers(long connectionId, CentralServerPeerInfo peerInfo)
+        /// <param name="broadcastPeerInfo"></param>
+        protected void BroadcastAppServers(long connectionId, CentralServerPeerInfo broadcastPeerInfo)
         {
             // Send map peer info to other map server
-            foreach (CentralServerPeerInfo mapServerPeer in mapServerPeers.Values)
+            foreach (CentralServerPeerInfo mapPeerInfo in mapServerPeers.Values)
             {
                 // Send other info to current peer
-                ServerSendResponse(connectionId, new ResponseAppServerAddressMessage()
+                ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MMOMessageTypes.AppServerAddress, new ResponseAppServerAddressMessage()
                 {
-                    responseCode = AckResponseCode.Success,
                     error = ResponseAppServerAddressMessage.Error.None,
-                    peerInfo = mapServerPeer,
+                    peerInfo = mapPeerInfo,
                 });
                 // Send current info to other peer
-                ServerSendResponse(mapServerPeer.connectionId, new ResponseAppServerAddressMessage()
+                ServerSendPacket(mapPeerInfo.connectionId, DeliveryMethod.ReliableOrdered, MMOMessageTypes.AppServerAddress, new ResponseAppServerAddressMessage()
                 {
-                    responseCode = AckResponseCode.Success,
                     error = ResponseAppServerAddressMessage.Error.None,
-                    peerInfo = peerInfo,
+                    peerInfo = broadcastPeerInfo,
                 });
             }
             // Send chat peer info to new map server
             if (chatServerPeers.Count > 0)
             {
                 CentralServerPeerInfo chatPeerInfo = chatServerPeers.Values.First();
-                ServerSendResponse(connectionId, new ResponseAppServerAddressMessage()
+                ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MMOMessageTypes.AppServerAddress, new ResponseAppServerAddressMessage()
                 {
-                    responseCode = AckResponseCode.Success,
                     error = ResponseAppServerAddressMessage.Error.None,
                     peerInfo = chatPeerInfo,
                 });
@@ -159,13 +159,14 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        protected void HandleRequestAppServerAddress(LiteNetLibMessageHandler messageHandler)
+        protected UniTask HandleRequestAppServerAddress(
+            long connectionId, NetDataReader reader,
+            RequestAppServerAddressMessage request,
+            RequestProceedResultDelegate<ResponseAppServerAddressMessage> result)
         {
-            long connectionId = messageHandler.connectionId;
-            RequestAppServerAddressMessage message = messageHandler.ReadMessage<RequestAppServerAddressMessage>();
             ResponseAppServerAddressMessage.Error error = ResponseAppServerAddressMessage.Error.None;
             CentralServerPeerInfo peerInfo = new CentralServerPeerInfo();
-            switch (message.peerType)
+            switch (request.peerType)
             {
                 // TODO: Balancing servers when there are multiple servers with same type
                 case CentralServerPeerType.MapSpawnServer:
@@ -183,7 +184,7 @@ namespace MultiplayerARPG.MMO
                     }
                     break;
                 case CentralServerPeerType.MapServer:
-                    string mapName = message.extra;
+                    string mapName = request.extra;
                     if (!mapServerPeersBySceneName.TryGetValue(mapName, out peerInfo))
                     {
                         error = ResponseAppServerAddressMessage.Error.ServerNotFound;
@@ -206,13 +207,15 @@ namespace MultiplayerARPG.MMO
                     }
                     break;
             }
-            ServerSendResponse(connectionId, new ResponseAppServerAddressMessage()
-            {
-                ackId = message.ackId,
-                responseCode = error == ResponseAppServerAddressMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error,
-                error = error,
-                peerInfo = peerInfo,
-            });
+            // Response
+            result.Invoke(
+                error == ResponseAppServerAddressMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error,
+                new ResponseAppServerAddressMessage()
+                {
+                    error = error,
+                    peerInfo = peerInfo,
+                });
+            return default;
         }
 #endif
 

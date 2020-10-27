@@ -1,11 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using LiteNetLibManager;
-using LiteNetLib.Utils;
+﻿using LiteNetLib.Utils;
 
 namespace MultiplayerARPG.MMO
 {
-    public class ResponseSpawnMapMessage : BaseAckMessage
+    public class ResponseSpawnMapMessage : INetSerializable
     {
         public enum Error : byte
         {
@@ -18,17 +15,20 @@ namespace MultiplayerARPG.MMO
         }
         public Error error;
         public string instanceId;
+        public string requestId;
 
-        public override void DeserializeData(NetDataReader reader)
+        public void Deserialize(NetDataReader reader)
         {
             error = (Error)reader.GetByte();
             instanceId = reader.GetString();
+            requestId = reader.GetString();
         }
 
-        public override void SerializeData(NetDataWriter writer)
+        public void Serialize(NetDataWriter writer)
         {
             writer.Put((byte)error);
             writer.Put(instanceId);
+            writer.Put(requestId);
         }
     }
 }

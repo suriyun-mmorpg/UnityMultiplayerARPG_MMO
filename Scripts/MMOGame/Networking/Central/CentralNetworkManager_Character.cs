@@ -10,20 +10,21 @@ namespace MultiplayerARPG.MMO
 {
     public partial class CentralNetworkManager
     {
-        public uint RequestCharacters(AckMessageCallback<ResponseCharactersMessage> callback)
+        public bool RequestCharacters()
         {
-            RequestCharactersMessage message = new RequestCharactersMessage();
-            return ClientSendRequest(MMOMessageTypes.RequestCharacters, message, callback);
+            return ClientSendRequest(MMORequestTypes.RequestCharacters, new EmptyMessage());
         }
 
-        public uint RequestCreateCharacter(PlayerCharacterData characterData, AckMessageCallback<ResponseCreateCharacterMessage> callback)
+        public bool RequestCreateCharacter(PlayerCharacterData characterData)
         {
-            RequestCreateCharacterMessage message = new RequestCreateCharacterMessage();
-            message.characterName = characterData.CharacterName;
-            message.dataId = characterData.DataId;
-            message.entityId = characterData.EntityId;
-            message.factionId = characterData.FactionId;
-            return ClientSendRequest(MMOMessageTypes.RequestCreateCharacter, message, callback, (writer) => SerializeCreateCharacterExtra(characterData, writer));
+            return ClientSendRequest(MMORequestTypes.RequestCreateCharacter,
+                new RequestCreateCharacterMessage()
+                {
+                    characterName = characterData.CharacterName,
+                    dataId = characterData.DataId,
+                    entityId = characterData.EntityId,
+                    factionId = characterData.FactionId,
+                }, (writer) => SerializeCreateCharacterExtra(characterData, writer));
         }
 
         private void SerializeCreateCharacterExtra(PlayerCharacterData characterData, NetDataWriter writer)
@@ -31,32 +32,28 @@ namespace MultiplayerARPG.MMO
             this.InvokeInstanceDevExtMethods("SerializeCreateCharacterExtra", characterData, writer);
         }
 
-        public uint RequestDeleteCharacter(string characterId, AckMessageCallback<ResponseDeleteCharacterMessage> callback)
+        public bool RequestDeleteCharacter(string characterId)
         {
-            RequestDeleteCharacterMessage message = new RequestDeleteCharacterMessage();
-            message.characterId = characterId;
-            return ClientSendRequest(MMOMessageTypes.RequestDeleteCharacter, message, callback);
+            return ClientSendRequest(MMORequestTypes.RequestDeleteCharacter, new RequestDeleteCharacterMessage()
+            {
+                characterId = characterId,
+            });
         }
 
-        public uint RequestSelectCharacter(string characterId, AckMessageCallback<ResponseSelectCharacterMessage> callback)
+        public bool RequestSelectCharacter(string characterId)
         {
-            RequestSelectCharacterMessage message = new RequestSelectCharacterMessage();
-            message.characterId = characterId;
-            return ClientSendRequest(MMOMessageTypes.RequestSelectCharacter, message, callback);
+            return ClientSendRequest(MMORequestTypes.RequestSelectCharacter, new RequestSelectCharacterMessage()
+            {
+                characterId = characterId,
+            });
         }
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        protected void HandleRequestCharacters(LiteNetLibMessageHandler messageHandler)
+        protected async UniTaskVoid HandleRequestCharacters(
+            long connectionId, NetDataReader reader,
+            EmptyMessage request,
+            RequestProceedResultDelegate<ResponseCharactersMessage> result)
         {
-            HandleRequestCharactersRoutine(messageHandler).Forget();
-        }
-#endif
-
-#if UNITY_STANDALONE && !CLIENT_BUILD
-        private async UniTaskVoid HandleRequestCharactersRoutine(LiteNetLibMessageHandler messageHandler)
-        {
-            long connectionId = messageHandler.connectionId;
-            RequestCharactersMessage message = messageHandler.ReadMessage<RequestCharactersMessage>();
             ResponseCharactersMessage.Error error = ResponseCharactersMessage.Error.None;
             List<PlayerCharacterData> characters = null;
             CentralUserPeerInfo userPeerInfo;
@@ -70,33 +67,28 @@ namespace MultiplayerARPG.MMO
                 });
                 characters = DatabaseServiceUtils.MakeListFromRepeatedByteString<PlayerCharacterData>(charactersResp.List);
             }
-            ServerSendResponse(connectionId, new ResponseCharactersMessage()
-            {
-                ackId = message.ackId,
-                responseCode = error == ResponseCharactersMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error,
-                error = error,
-                characters = characters,
-            });
+            // Response
+            result.Invoke(
+                error == ResponseCharactersMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error,
+                new ResponseCharactersMessage()
+                {
+                    error = error,
+                    characters = characters,
+                });
         }
 #endif
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        protected void HandleRequestCreateCharacter(LiteNetLibMessageHandler messageHandler)
+        protected async UniTaskVoid HandleRequestCreateCharacter(
+            long connectionId, NetDataReader reader,
+            RequestCreateCharacterMessage request,
+            RequestProceedResultDelegate<ResponseCreateCharacterMessage> result)
         {
-            HandleRequestCreateCharacterRoutine(messageHandler).Forget();
-        }
-#endif
-
-#if UNITY_STANDALONE && !CLIENT_BUILD
-        private async UniTaskVoid HandleRequestCreateCharacterRoutine(LiteNetLibMessageHandler messageHandler)
-        {
-            long connectionId = messageHandler.connectionId;
-            RequestCreateCharacterMessage message = messageHandler.ReadMessage<RequestCreateCharacterMessage>();
             ResponseCreateCharacterMessage.Error error = ResponseCreateCharacterMessage.Error.None;
-            string characterName = message.characterName;
-            int dataId = message.dataId;
-            int entityId = message.entityId;
-            int factionId = message.factionId;
+            string characterName = request.characterName;
+            int dataId = request.dataId;
+            int entityId = request.entityId;
+            int factionId = request.factionId;
             CentralUserPeerInfo userPeerInfo;
             FindCharacterNameResp findCharacterNameResp = await DbServiceClient.FindCharacterNameAsync(new FindCharacterNameReq()
             {
@@ -124,19 +116,20 @@ namespace MultiplayerARPG.MMO
                 characterData.Id = characterId;
                 characterData.SetNewPlayerCharacterData(characterName, dataId, entityId);
                 characterData.FactionId = factionId;
-                DeserializeCreateCharacterExtra(characterData, messageHandler.reader);
+                DeserializeCreateCharacterExtra(characterData, reader);
                 await DbServiceClient.CreateCharacterAsync(new CreateCharacterReq()
                 {
                     UserId = userPeerInfo.userId,
                     CharacterData = characterData.ToByteString()
                 });
             }
-            ServerSendResponse(connectionId, new ResponseCreateCharacterMessage()
-            {
-                ackId = message.ackId,
-                responseCode = error == ResponseCreateCharacterMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error,
-                error = error,
-            });
+            // Response
+            result.Invoke(
+                error == ResponseCreateCharacterMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error,
+                new ResponseCreateCharacterMessage()
+                {
+                    error = error,
+                });
         }
 #endif
 
@@ -148,17 +141,11 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        protected void HandleRequestDeleteCharacter(LiteNetLibMessageHandler messageHandler)
+        protected async UniTaskVoid HandleRequestDeleteCharacter(
+            long connectionId, NetDataReader reader,
+            RequestDeleteCharacterMessage request,
+            RequestProceedResultDelegate<ResponseDeleteCharacterMessage> result)
         {
-            HandleRequestDeleteCharacterRoutine(messageHandler).Forget();
-        }
-#endif
-
-#if UNITY_STANDALONE && !CLIENT_BUILD
-        private async UniTaskVoid HandleRequestDeleteCharacterRoutine(LiteNetLibMessageHandler messageHandler)
-        {
-            long connectionId = messageHandler.connectionId;
-            RequestDeleteCharacterMessage message = messageHandler.ReadMessage<RequestDeleteCharacterMessage>();
             ResponseDeleteCharacterMessage.Error error = ResponseDeleteCharacterMessage.Error.None;
             CentralUserPeerInfo userPeerInfo;
             if (!userPeers.TryGetValue(connectionId, out userPeerInfo))
@@ -168,32 +155,27 @@ namespace MultiplayerARPG.MMO
                 await DbServiceClient.DeleteCharacterAsync(new DeleteCharacterReq()
                 {
                     UserId = userPeerInfo.userId,
-                    CharacterId = message.characterId
+                    CharacterId = request.characterId
                 });
             }
-            ServerSendResponse(connectionId, new ResponseDeleteCharacterMessage()
-            {
-                ackId = message.ackId,
-                responseCode = error == ResponseDeleteCharacterMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error,
-                error = error,
-            });
+            // Response
+            result.Invoke(
+                error == ResponseDeleteCharacterMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error,
+                new ResponseDeleteCharacterMessage()
+                {
+                    error = error,
+                });
         }
 #endif
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        protected void HandleRequestSelectCharacter(LiteNetLibMessageHandler messageHandler)
+        protected async UniTaskVoid HandleRequestSelectCharacter(
+            long connectionId, NetDataReader reader,
+            RequestSelectCharacterMessage request,
+            RequestProceedResultDelegate<ResponseSelectCharacterMessage> result)
         {
-            HandleRequestSelectCharacterRoutine(messageHandler).Forget();
-        }
-#endif
-
-#if UNITY_STANDALONE && !CLIENT_BUILD
-        private async UniTaskVoid HandleRequestSelectCharacterRoutine(LiteNetLibMessageHandler messageHandler)
-        {
-            long connectionId = messageHandler.connectionId;
-            RequestSelectCharacterMessage message = messageHandler.ReadMessage<RequestSelectCharacterMessage>();
             ResponseSelectCharacterMessage.Error error = ResponseSelectCharacterMessage.Error.None;
-            CentralServerPeerInfo mapServerPeerInfo = default(CentralServerPeerInfo);
+            CentralServerPeerInfo mapServerPeerInfo = default;
             CentralUserPeerInfo userPeerInfo;
             if (!userPeers.TryGetValue(connectionId, out userPeerInfo))
                 error = ResponseSelectCharacterMessage.Error.NotLoggedin;
@@ -202,7 +184,7 @@ namespace MultiplayerARPG.MMO
                 CharacterResp characterResp = await DbServiceClient.ReadCharacterAsync(new ReadCharacterReq()
                 {
                     UserId = userPeerInfo.userId,
-                    CharacterId = message.characterId
+                    CharacterId = request.characterId
                 });
                 PlayerCharacterData character = characterResp.CharacterData.FromByteString<PlayerCharacterData>();
                 if (character == null)
@@ -210,17 +192,17 @@ namespace MultiplayerARPG.MMO
                 else if (!mapServerPeersBySceneName.TryGetValue(character.CurrentMapName, out mapServerPeerInfo))
                     error = ResponseSelectCharacterMessage.Error.MapNotReady;
             }
-            ResponseSelectCharacterMessage responseMessage = new ResponseSelectCharacterMessage();
-            responseMessage.ackId = message.ackId;
-            responseMessage.responseCode = error == ResponseSelectCharacterMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
-            responseMessage.error = error;
+            AckResponseCode responseCode = error == ResponseSelectCharacterMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
+            ResponseSelectCharacterMessage response = new ResponseSelectCharacterMessage();
+            response.error = error;
             if (error != ResponseSelectCharacterMessage.Error.MapNotReady)
             {
-                responseMessage.sceneName = mapServerPeerInfo.extra;
-                responseMessage.networkAddress = mapServerPeerInfo.networkAddress;
-                responseMessage.networkPort = mapServerPeerInfo.networkPort;
+                response.sceneName = mapServerPeerInfo.extra;
+                response.networkAddress = mapServerPeerInfo.networkAddress;
+                response.networkPort = mapServerPeerInfo.networkPort;
             }
-            ServerSendResponse(connectionId, responseMessage);
+            // Response
+            result.Invoke(responseCode, response);
         }
 #endif
     }

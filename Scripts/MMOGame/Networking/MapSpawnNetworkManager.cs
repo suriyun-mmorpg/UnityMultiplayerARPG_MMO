@@ -8,6 +8,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using System.Collections.Concurrent;
 using ConcurrentCollections;
+using LiteNetLib.Utils;
 
 namespace MultiplayerARPG.MMO
 {
@@ -197,19 +198,29 @@ namespace MultiplayerARPG.MMO
             base.OnDestroy();
         }
 
-        private void HandleRequestSpawnMap(LiteNetLibMessageHandler messageHandler)
+        private UniTaskVoid HandleRequestSpawnMap(
+            long connectionId, NetDataReader reader,
+            RequestSpawnMapMessage request,
+            RequestProceedResultDelegate<ResponseSpawnMapMessage> result)
         {
-            RequestSpawnMapMessage message = messageHandler.ReadMessage<RequestSpawnMapMessage>();
             ResponseSpawnMapMessage.Error error = ResponseSpawnMapMessage.Error.None;
             if (!CentralAppServerRegister.IsRegisteredToCentralServer)
                 error = ResponseSpawnMapMessage.Error.NotReady;
-            else if (string.IsNullOrEmpty(message.mapId))
+            else if (string.IsNullOrEmpty(request.mapId))
                 error = ResponseSpawnMapMessage.Error.EmptySceneName;
 
             if (error != ResponseSpawnMapMessage.Error.None)
-                ReponseMapSpawn(message.ackId, error);
+            {
+                result.Invoke(AckResponseCode.Error, new ResponseSpawnMapMessage()
+                {
+                    error = error
+                });
+            }
             else
-                SpawnMap(message, false);
+            {
+                SpawnMap(request, result, false);
+            }
+            return default;
         }
 
         private void OnAppServerRegistered(AckResponseCode responseCode, BaseAckMessage message)
@@ -240,12 +251,18 @@ namespace MultiplayerARPG.MMO
             freePorts.Enqueue(port);
         }
 
-        private void SpawnMap(RequestSpawnMapMessage message, bool autoRestart)
+        private void SpawnMap(
+            RequestSpawnMapMessage message,
+            RequestProceedResultDelegate<ResponseSpawnMapMessage> result,
+            bool autoRestart)
         {
-            SpawnMap(message.mapId, autoRestart, message);
+            SpawnMap(message.mapId, autoRestart, message, result);
         }
 
-        private void SpawnMap(string mapId, bool autoRestart, RequestSpawnMapMessage message = null)
+        private void SpawnMap(
+            string mapId, bool autoRestart,
+            RequestSpawnMapMessage request = null,
+            RequestProceedResultDelegate<ResponseSpawnMapMessage> result = null)
         {
             // Port to run map server
             if (freePorts.Count > 0)
@@ -277,15 +294,15 @@ namespace MultiplayerARPG.MMO
                 UseShellExecute = false,
                 Arguments = (!NotSpawnInBatchMode ? "-batchmode -nographics " : string.Empty) +
                     $"{MMOServerInstance.ARG_MAP_ID} {mapId} " +
-                    (message != null ?
-                        $"{MMOServerInstance.ARG_INSTANCE_ID} {message.instanceId} " +
-                        $"{MMOServerInstance.ARG_INSTANCE_POSITION_X} {message.instanceWarpPosition.x} " +
-                        $"{MMOServerInstance.ARG_INSTANCE_POSITION_Y} {message.instanceWarpPosition.y} " +
-                        $"{MMOServerInstance.ARG_INSTANCE_POSITION_Z} {message.instanceWarpPosition.z} " +
-                        $"{(message.instanceWarpOverrideRotation ? MMOServerInstance.ARG_INSTANCE_OVERRIDE_ROTATION : string.Empty)} " +
-                        $"{MMOServerInstance.ARG_INSTANCE_ROTATION_X} {message.instanceWarpRotation.x} " +
-                        $"{MMOServerInstance.ARG_INSTANCE_ROTATION_Y} {message.instanceWarpRotation.y} " +
-                        $"{MMOServerInstance.ARG_INSTANCE_ROTATION_Z} {message.instanceWarpRotation.z} "
+                    (request != null ?
+                        $"{MMOServerInstance.ARG_INSTANCE_ID} {request.instanceId} " +
+                        $"{MMOServerInstance.ARG_INSTANCE_POSITION_X} {request.instanceWarpPosition.x} " +
+                        $"{MMOServerInstance.ARG_INSTANCE_POSITION_Y} {request.instanceWarpPosition.y} " +
+                        $"{MMOServerInstance.ARG_INSTANCE_POSITION_Z} {request.instanceWarpPosition.z} " +
+                        $"{(request.instanceWarpOverrideRotation ? MMOServerInstance.ARG_INSTANCE_OVERRIDE_ROTATION : string.Empty)} " +
+                        $"{MMOServerInstance.ARG_INSTANCE_ROTATION_X} {request.instanceWarpRotation.x} " +
+                        $"{MMOServerInstance.ARG_INSTANCE_ROTATION_Y} {request.instanceWarpRotation.y} " +
+                        $"{MMOServerInstance.ARG_INSTANCE_ROTATION_Z} {request.instanceWarpRotation.z} "
                         : string.Empty) +
                     $"{MMOServerInstance.ARG_CENTRAL_ADDRESS} {centralNetworkAddress} " +
                     $"{MMOServerInstance.ARG_CENTRAL_PORT} {centralNetworkPort} " +
@@ -317,8 +334,15 @@ namespace MultiplayerARPG.MMO
                                 if (LogInfo)
                                     Logging.Log(LogTag, "Process started. Id: " + processId);
                                 // Notify server that it's successfully handled the request
-                                if (message != null)
-                                    ReponseMapSpawn(message.ackId, ResponseSpawnMapMessage.Error.None);
+                                if (request != null && result != null)
+                                {
+                                    result.Invoke(AckResponseCode.Success, new ResponseSpawnMapMessage()
+                                    {
+                                        error = ResponseSpawnMapMessage.Error.None,
+                                        instanceId = request.instanceId,
+                                        requestId = request.requestId,
+                                    });
+                                }
                             });
                             process.WaitForExit();
                         }
@@ -336,8 +360,15 @@ namespace MultiplayerARPG.MMO
                                 }
 
                                 // Notify server that it failed to spawn map scene handled the request
-                                if (message != null)
-                                    ReponseMapSpawn(message.ackId, ResponseSpawnMapMessage.Error.CannotExecute);
+                                if (request != null && result != null)
+                                {
+                                    result.Invoke(AckResponseCode.Error, new ResponseSpawnMapMessage()
+                                    {
+                                        error = ResponseSpawnMapMessage.Error.CannotExecute,
+                                        instanceId = request.instanceId,
+                                        requestId = request.requestId,
+                                    });
+                                }
                             });
                         }
                     }
@@ -364,8 +395,15 @@ namespace MultiplayerARPG.MMO
             }
             catch (Exception e)
             {
-                if (message != null)
-                    ReponseMapSpawn(message.ackId, ResponseSpawnMapMessage.Error.Unknow);
+                if (request != null && result != null)
+                {
+                    result.Invoke(AckResponseCode.Error, new ResponseSpawnMapMessage()
+                    {
+                        error = ResponseSpawnMapMessage.Error.Unknow,
+                        instanceId = request.instanceId,
+                        requestId = request.requestId,
+                    });
+                }
 
                 // Restarting scene
                 if (autoRestart)
@@ -374,16 +412,6 @@ namespace MultiplayerARPG.MMO
                 if (LogFatal)
                     Logging.LogException(LogTag, e);
             }
-        }
-
-        private void ReponseMapSpawn(uint ackId, ResponseSpawnMapMessage.Error error)
-        {
-            CentralAppServerRegister.SendResponse(MMOMessageTypes.GenericResponse, new ResponseSpawnMapMessage()
-            {
-                ackId = ackId,
-                responseCode = error == ResponseSpawnMapMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error,
-                error = error,
-            });
         }
     }
 }

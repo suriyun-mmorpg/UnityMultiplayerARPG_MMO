@@ -1,22 +1,19 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using LiteNetLibManager;
-using LiteNetLib.Utils;
+﻿using LiteNetLib.Utils;
 
 namespace MultiplayerARPG.MMO
 {
-    public class RequestValidateAccessTokenMessage : BaseAckMessage
+    public class RequestValidateAccessTokenMessage : INetSerializable
     {
         public string userId;
         public string accessToken;
 
-        public override void DeserializeData(NetDataReader reader)
+        public void Deserialize(NetDataReader reader)
         {
             userId = reader.GetString();
             accessToken = reader.GetString();
         }
 
-        public override void SerializeData(NetDataWriter writer)
+        public void Serialize(NetDataWriter writer)
         {
             writer.Put(userId);
             writer.Put(accessToken);

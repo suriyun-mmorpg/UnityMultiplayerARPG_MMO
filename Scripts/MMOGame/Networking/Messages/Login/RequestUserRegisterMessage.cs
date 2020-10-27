@@ -1,22 +1,19 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using LiteNetLibManager;
-using LiteNetLib.Utils;
+﻿using LiteNetLib.Utils;
 
 namespace MultiplayerARPG.MMO
 {
-    public class RequestUserRegisterMessage : BaseAckMessage
+    public class RequestUserRegisterMessage : INetSerializable
     {
         public string username;
         public string password;
 
-        public override void DeserializeData(NetDataReader reader)
+        public void Deserialize(NetDataReader reader)
         {
             username = reader.GetString();
             password = reader.GetString();
         }
 
-        public override void SerializeData(NetDataWriter writer)
+        public void Serialize(NetDataWriter writer)
         {
             writer.Put(username);
             writer.Put(password);

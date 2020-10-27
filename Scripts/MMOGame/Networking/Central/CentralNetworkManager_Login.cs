@@ -1,61 +1,55 @@
 ﻿using Cysharp.Threading.Tasks;
-using LiteNetLib;
+using LiteNetLib.Utils;
 using LiteNetLibManager;
-using System;
-using System.Collections;
 using System.Text.RegularExpressions;
 
 namespace MultiplayerARPG.MMO
 {
     public partial class CentralNetworkManager
     {
-        public uint RequestUserLogin(string username, string password, AckMessageCallback<ResponseUserLoginMessage> callback)
+        public bool RequestUserLogin(string username, string password)
         {
-            RequestUserLoginMessage message = new RequestUserLoginMessage();
-            message.username = username;
-            message.password = password;
-            return ClientSendRequest(MMOMessageTypes.RequestUserLogin, message, callback);
+            return ClientSendRequest(MMORequestTypes.RequestUserLogin, new RequestUserLoginMessage()
+            {
+                username = username,
+                password = password,
+            });
         }
 
-        public uint RequestUserRegister(string username, string password, AckMessageCallback<ResponseUserRegisterMessage> callback)
+        public bool RequestUserRegister(string username, string password)
         {
-            RequestUserRegisterMessage message = new RequestUserRegisterMessage();
-            message.username = username;
-            message.password = password;
-            return ClientSendRequest(MMOMessageTypes.RequestUserRegister, message, callback);
+            return ClientSendRequest(MMORequestTypes.RequestUserRegister, new RequestUserRegisterMessage()
+            {
+                username = username,
+                password = password,
+            });
         }
 
-        public uint RequestUserLogout(AckMessageCallback<BaseAckMessage> callback)
+        public bool RequestUserLogout()
         {
-            BaseAckMessage message = new BaseAckMessage();
-            return ClientSendRequest(MMOMessageTypes.RequestUserLogout, message, callback);
+            return ClientSendRequest(MMORequestTypes.RequestUserLogout, new EmptyMessage());
         }
 
-        public uint RequestValidateAccessToken(string userId, string accessToken, AckMessageCallback<ResponseValidateAccessTokenMessage> callback)
+        public bool RequestValidateAccessToken(string userId, string accessToken)
         {
-            RequestValidateAccessTokenMessage message = new RequestValidateAccessTokenMessage();
-            message.userId = userId;
-            message.accessToken = accessToken;
-            return ClientSendRequest(MMOMessageTypes.RequestValidateAccessToken, message, callback);
+            return ClientSendRequest(MMORequestTypes.RequestValidateAccessToken, new RequestValidateAccessTokenMessage()
+            {
+                userId = userId,
+                accessToken = accessToken,
+            });
         }
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        protected void HandleRequestUserLogin(LiteNetLibMessageHandler messageHandler)
+        protected async UniTaskVoid HandleRequestUserLogin(
+            long connectionId, NetDataReader reader,
+            RequestUserLoginMessage request,
+            RequestProceedResultDelegate<ResponseUserLoginMessage> result)
         {
-            HandleRequestUserLoginRoutine(messageHandler).Forget();
-        }
-#endif
-
-#if UNITY_STANDALONE && !CLIENT_BUILD
-        private async UniTaskVoid HandleRequestUserLoginRoutine(LiteNetLibMessageHandler messageHandler)
-        {
-            long connectionId = messageHandler.connectionId;
-            RequestUserLoginMessage message = messageHandler.ReadMessage<RequestUserLoginMessage>();
             ResponseUserLoginMessage.Error error = ResponseUserLoginMessage.Error.None;
             ValidateUserLoginResp validateUserLoginResp = await DbServiceClient.ValidateUserLoginAsync(new ValidateUserLoginReq()
             {
-                Username = message.username,
-                Password = message.password
+                Username = request.username,
+                Password = request.password
             });
             string userId = validateUserLoginResp.UserId;
             string accessToken = string.Empty;
@@ -74,7 +68,7 @@ namespace MultiplayerARPG.MMO
                 CentralUserPeerInfo userPeerInfo = new CentralUserPeerInfo();
                 userPeerInfo.connectionId = connectionId;
                 userPeerInfo.userId = userId;
-                userPeerInfo.accessToken = accessToken = Regex.Replace(Convert.ToBase64String(Guid.NewGuid().ToByteArray()), "[/+=]", "");
+                userPeerInfo.accessToken = accessToken = Regex.Replace(System.Convert.ToBase64String(System.Guid.NewGuid().ToByteArray()), "[/+=]", "");
                 userPeersByUserId[userId] = userPeerInfo;
                 userPeers[connectionId] = userPeerInfo;
                 await DbServiceClient.UpdateAccessTokenAsync(new UpdateAccessTokenReq()
@@ -83,32 +77,27 @@ namespace MultiplayerARPG.MMO
                     AccessToken = accessToken
                 });
             }
-            ServerSendResponse(connectionId, new ResponseUserLoginMessage()
-            {
-                ackId = message.ackId,
-                responseCode = error == ResponseUserLoginMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error,
-                error = error,
-                userId = userId,
-                accessToken = accessToken,
-            });
+            // Response
+            result.Invoke(
+                error == ResponseUserLoginMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error,
+                new ResponseUserLoginMessage()
+                {
+                    error = error,
+                    userId = userId,
+                    accessToken = accessToken,
+                });
         }
 #endif
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        protected void HandleRequestUserRegister(LiteNetLibMessageHandler messageHandler)
+        protected async UniTaskVoid HandleRequestUserRegister(
+            long connectionId, NetDataReader reader,
+            RequestUserRegisterMessage request,
+            RequestProceedResultDelegate<ResponseUserRegisterMessage> result)
         {
-            HandleRequestUserRegisterRoutine(messageHandler).Forget();
-        }
-#endif
-
-#if UNITY_STANDALONE && !CLIENT_BUILD
-        private async UniTaskVoid HandleRequestUserRegisterRoutine(LiteNetLibMessageHandler messageHandler)
-        {
-            long connectionId = messageHandler.connectionId;
-            RequestUserRegisterMessage message = messageHandler.ReadMessage<RequestUserRegisterMessage>();
             ResponseUserRegisterMessage.Error error = ResponseUserRegisterMessage.Error.None;
-            string username = message.username;
-            string password = message.password;
+            string username = request.username;
+            string password = request.password;
             FindUsernameResp findUsernameResp = await DbServiceClient.FindUsernameAsync(new FindUsernameReq()
             {
                 Username = username
@@ -129,27 +118,22 @@ namespace MultiplayerARPG.MMO
                     Password = password
                 });
             }
-            ServerSendResponse(connectionId, new ResponseUserRegisterMessage()
-            {
-                ackId = message.ackId,
-                responseCode = error == ResponseUserRegisterMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error,
-                error = error,
-            });
+            // Response
+            result.Invoke(
+                error == ResponseUserRegisterMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error,
+                new ResponseUserRegisterMessage()
+                {
+                    error = error,
+                });
         }
 #endif
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        protected void HandleRequestUserLogout(LiteNetLibMessageHandler messageHandler)
+        protected async UniTaskVoid HandleRequestUserLogout(
+            long connectionId, NetDataReader reader,
+            EmptyMessage request,
+            RequestProceedResultDelegate<EmptyMessage> result)
         {
-            HandleRequestUserLogoutRoutine(messageHandler).Forget();
-        }
-#endif
-
-#if UNITY_STANDALONE && !CLIENT_BUILD
-        private async UniTaskVoid HandleRequestUserLogoutRoutine(LiteNetLibMessageHandler messageHandler)
-        {
-            long connectionId = messageHandler.connectionId;
-            BaseAckMessage message = messageHandler.ReadMessage<BaseAckMessage>();
             CentralUserPeerInfo userPeerInfo;
             if (userPeers.TryGetValue(connectionId, out userPeerInfo))
             {
@@ -161,29 +145,20 @@ namespace MultiplayerARPG.MMO
                     AccessToken = string.Empty
                 });
             }
-            ServerSendResponse(connectionId, new BaseAckMessage()
-            {
-                ackId = message.ackId,
-                responseCode = AckResponseCode.Success,
-            });
+            // Response
+            result.Invoke(AckResponseCode.Success, new EmptyMessage());
         }
 #endif
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        protected void HandleRequestValidateAccessToken(LiteNetLibMessageHandler messageHandler)
+        protected async UniTaskVoid HandleRequestValidateAccessToken(
+            long connectionId, NetDataReader reader,
+            RequestValidateAccessTokenMessage request,
+            RequestProceedResultDelegate<ResponseValidateAccessTokenMessage> result)
         {
-            HandleRequestValidateAccessTokenRoutine(messageHandler).Forget();
-        }
-#endif
-
-#if UNITY_STANDALONE && !CLIENT_BUILD
-        private async UniTaskVoid HandleRequestValidateAccessTokenRoutine(LiteNetLibMessageHandler messageHandler)
-        {
-            long connectionId = messageHandler.connectionId;
-            RequestValidateAccessTokenMessage message = messageHandler.ReadMessage<RequestValidateAccessTokenMessage>();
             ResponseValidateAccessTokenMessage.Error error = ResponseValidateAccessTokenMessage.Error.None;
-            string userId = message.userId;
-            string accessToken = message.accessToken;
+            string userId = request.userId;
+            string accessToken = request.accessToken;
             ValidateAccessTokenResp validateAccessTokenResp = await DbServiceClient.ValidateAccessTokenAsync(new ValidateAccessTokenReq()
             {
                 UserId = userId,
@@ -206,7 +181,7 @@ namespace MultiplayerARPG.MMO
                 userPeerInfo = new CentralUserPeerInfo();
                 userPeerInfo.connectionId = connectionId;
                 userPeerInfo.userId = userId;
-                userPeerInfo.accessToken = accessToken = Regex.Replace(Convert.ToBase64String(Guid.NewGuid().ToByteArray()), "[/+=]", "");
+                userPeerInfo.accessToken = accessToken = Regex.Replace(System.Convert.ToBase64String(System.Guid.NewGuid().ToByteArray()), "[/+=]", "");
                 userPeersByUserId[userId] = userPeerInfo;
                 userPeers[connectionId] = userPeerInfo;
                 await DbServiceClient.UpdateAccessTokenAsync(new UpdateAccessTokenReq()
@@ -215,14 +190,15 @@ namespace MultiplayerARPG.MMO
                     AccessToken = accessToken
                 });
             }
-            ServerSendResponse(connectionId, new ResponseValidateAccessTokenMessage()
-            {
-                ackId = message.ackId,
-                responseCode = error == ResponseValidateAccessTokenMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error,
-                error = error,
-                userId = userId,
-                accessToken = accessToken,
-            });
+            // Response
+            result.Invoke(
+                error == ResponseValidateAccessTokenMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error,
+                new ResponseValidateAccessTokenMessage()
+                {
+                    error = error,
+                    userId = userId,
+                    accessToken = accessToken,
+                });
         }
 #endif
     }

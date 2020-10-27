@@ -1,11 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using LiteNetLibManager;
-using LiteNetLib.Utils;
+﻿using LiteNetLib.Utils;
 
 namespace MultiplayerARPG.MMO
 {
-    public class ResponseUserLoginMessage : BaseAckMessage
+    public class ResponseUserLoginMessage : INetSerializable
     {
         public enum Error : byte
         {
@@ -17,14 +14,14 @@ namespace MultiplayerARPG.MMO
         public string userId;
         public string accessToken;
 
-        public override void DeserializeData(NetDataReader reader)
+        public void Deserialize(NetDataReader reader)
         {
             error = (Error)reader.GetByte();
             userId = reader.GetString();
             accessToken = reader.GetString();
         }
 
-        public override void SerializeData(NetDataWriter writer)
+        public void Serialize(NetDataWriter writer)
         {
             writer.Put((byte)error);
             writer.Put(userId);

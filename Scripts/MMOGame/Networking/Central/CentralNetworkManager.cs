@@ -23,7 +23,7 @@ namespace MultiplayerARPG.MMO
         // Map users, users whom connected to map server / instance map server will be kept in this list
         protected readonly Dictionary<long, HashSet<string>> mapUserIds = new Dictionary<long, HashSet<string>>();
         // <Ack Id, <Map-Server Transport Handler, Map-Server Ack Id> dictionary
-        private readonly Dictionary<uint, KeyValuePair<TransportHandler, uint>> requestSpawnMapHandlers = new Dictionary<uint, KeyValuePair<TransportHandler, uint>>();
+        protected readonly Dictionary<string, RequestProceedResultDelegate<ResponseSpawnMapMessage>> requestSpawnMapHandlers = new Dictionary<string, RequestProceedResultDelegate<ResponseSpawnMapMessage>>();
 #endif
 
         [Header("Map Spawn")]
@@ -59,8 +59,9 @@ namespace MultiplayerARPG.MMO
         {
             this.InvokeInstanceDevExtMethods("RegisterServerMessages");
             base.RegisterServerMessages();
-            RegisterServerMessage(MMOMessageTypes.RequestAppServerRegister, HandleRequestAppServerRegister);
-            RegisterServerMessage(MMOMessageTypes.RequestAppServerAddress, HandleRequestAppServerAddress);
+            EnableServerRequestResponse(MMOMessageTypes.Request, MMOMessageTypes.Response);
+            RegisterServerMessage(MMOMessageTypes.AppServerRegister, HandleRequestAppServerRegister);
+            RegisterServerMessage(MMOMessageTypes.AppServerAddress, HandleRequestAppServerAddress);
             RegisterServerMessage(MMOMessageTypes.RequestUserLogin, HandleRequestUserLogin);
             RegisterServerMessage(MMOMessageTypes.RequestUserRegister, HandleRequestUserRegister);
             RegisterServerMessage(MMOMessageTypes.RequestUserLogout, HandleRequestUserLogout);

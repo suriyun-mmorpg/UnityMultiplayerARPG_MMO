@@ -19,6 +19,7 @@ namespace MultiplayerARPG.MMO
         public CentralAppServerRegister(ITransport transport, IAppServer appServer) : base(transport)
         {
             this.appServer = appServer;
+            EnableRequestResponse(MMOMessageTypes.Request, MMOMessageTypes.Response);
             RegisterMessage(MMOMessageTypes.GenericResponse, HandleGenericResponse);
         }
 
@@ -77,7 +78,7 @@ namespace MultiplayerARPG.MMO
             peerInfo.networkPort = appServer.AppPort;
             peerInfo.extra = appServer.AppExtra;
             // Send Request
-            SendRequest<RequestAppServerRegisterMessage, ResponseAppServerRegisterMessage>(MMOMessageTypes.RequestAppServerRegister, new RequestAppServerRegisterMessage()
+            SendRequest<RequestAppServerRegisterMessage, ResponseAppServerRegisterMessage>(MMOMessageTypes.AppServerRegister, new RequestAppServerRegisterMessage()
             {
                 peerInfo = peerInfo,
             }, OnAppServerRegistered);

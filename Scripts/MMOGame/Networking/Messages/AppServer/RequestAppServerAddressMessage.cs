@@ -1,22 +1,19 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using LiteNetLibManager;
-using LiteNetLib.Utils;
+﻿using LiteNetLib.Utils;
 
 namespace MultiplayerARPG.MMO
 {
-    public class RequestAppServerAddressMessage : BaseAckMessage
+    public class RequestAppServerAddressMessage : INetSerializable
     {
         public CentralServerPeerType peerType;
         public string extra;
 
-        public override void DeserializeData(NetDataReader reader)
+        public void Deserialize(NetDataReader reader)
         {
             peerType = (CentralServerPeerType)reader.GetByte();
             extra = reader.GetString();
         }
 
-        public override void SerializeData(NetDataWriter writer)
+        public void Serialize(NetDataWriter writer)
         {
             writer.Put((byte)peerType);
             writer.Put(extra);

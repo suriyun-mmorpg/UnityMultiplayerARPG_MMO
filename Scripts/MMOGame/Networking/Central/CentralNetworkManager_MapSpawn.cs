@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using LiteNetLib;
+using Cysharp.Threading.Tasks;
 using LiteNetLib.Utils;
 using LiteNetLibManager;
 using UnityEngine;
@@ -8,7 +8,7 @@ namespace MultiplayerARPG.MMO
 {
     public partial class CentralNetworkManager
     {
-        public uint RequestSpawnMap(long connectionId, string sceneName, string instanceId, Vector3 instanceWarpPosition, bool instanceWarpOverrideRotation, Vector3 instanceWarpRotation, AckMessageCallback<ResponseSpawnMapMessage> callback)
+        public bool RequestSpawnMap(long connectionId, string sceneName, string instanceId, Vector3 instanceWarpPosition, bool instanceWarpOverrideRotation, Vector3 instanceWarpRotation)
         {
             return RequestSpawnMap(connectionId, new RequestSpawnMapMessage()
             {
@@ -17,12 +17,12 @@ namespace MultiplayerARPG.MMO
                 instanceWarpPosition = instanceWarpPosition,
                 instanceWarpOverrideRotation = instanceWarpOverrideRotation,
                 instanceWarpRotation = instanceWarpRotation,
-            }, callback);
+            });
         }
 
-        public uint RequestSpawnMap(long connectionId, RequestSpawnMapMessage message, AckMessageCallback<ResponseSpawnMapMessage> callback)
+        public bool RequestSpawnMap(long connectionId, RequestSpawnMapMessage message)
         {
-            return ServerSendRequest(connectionId, MMOMessageTypes.RequestSpawnMap, message, callback, duration: mapSpawnDuration);
+            return ServerSendRequest(connectionId, MMORequestTypes.RequestSpawnMap, message, duration: mapSpawnDuration);
         }
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
@@ -31,35 +31,33 @@ namespace MultiplayerARPG.MMO
         /// Then it will response back when requested map server is ready
         /// </summary>
         /// <param name="messageHandler"></param>
-        protected void HandleRequestSpawnMap(LiteNetLibMessageHandler messageHandler)
+        protected UniTaskVoid HandleRequestSpawnMap(
+            long connectionId, NetDataReader reader,
+            RequestSpawnMapMessage request,
+            RequestProceedResultDelegate<ResponseSpawnMapMessage> result)
         {
-            RequestSpawnMapMessage message = messageHandler.ReadMessage<RequestSpawnMapMessage>();
+            string requestId = GenericUtils.GetUniqueId();
+            request.requestId = requestId;
             List<long> connectionIds = new List<long>(mapSpawnServerPeers.Keys);
             // Random map-spawn server to spawn map, will use returning ackId as reference to map-server's transport handler and ackId
-            uint ackId = RequestSpawnMap(connectionIds[Random.Range(0, connectionIds.Count)], message, OnRequestSpawnMap);
+            RequestSpawnMap(connectionIds[Random.Range(0, connectionIds.Count)], request);
             // Add ack Id / transport handler to dictionary which will be used in OnRequestSpawnMap() function 
             // To send map spawn response to map-server
-            requestSpawnMapHandlers.Add(ackId, new KeyValuePair<TransportHandler, uint>(messageHandler.transportHandler, message.ackId));
+            requestSpawnMapHandlers.Add(requestId, result);
+            return default;
         }
 #endif
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        protected void OnRequestSpawnMap(ResponseSpawnMapMessage messageData)
+        protected void HandleResponseSpawnMap(
+            long connectionId, NetDataReader reader,
+            AckResponseCode responseCode,
+            ResponseSpawnMapMessage response)
         {
-            if (messageData.responseCode == AckResponseCode.Timeout)
-            {
-                if (LogError)
-                    Logging.Log(LogTag, "Spawn Map Ack Id: " + messageData.ackId + " Timeout.");
-                return;
-            }
-            if (LogInfo)
-                Logging.Log(LogTag, "Spawn Map Ack Id: " + messageData.ackId + "  Status: " + messageData.responseCode + " Error: " + messageData.error);
             // Forward responses to map server transport handler
-            NetDataWriter forwardWriter = new NetDataWriter();
-            messageData.Serialize(forwardWriter);
-            KeyValuePair<TransportHandler, uint> requestSpawnMapHandler;
-            if (requestSpawnMapHandlers.TryGetValue(messageData.ackId, out requestSpawnMapHandler))
-                requestSpawnMapHandler.Key.ReadResponse(new NetDataReader(forwardWriter.Data));
+            RequestProceedResultDelegate<ResponseSpawnMapMessage> result;
+            if (requestSpawnMapHandlers.TryGetValue(response.requestId, out result))
+                result.Invoke(responseCode, response);
         }
 #endif
     }
