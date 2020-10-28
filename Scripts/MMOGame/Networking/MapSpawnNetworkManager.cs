@@ -199,7 +199,7 @@ namespace MultiplayerARPG.MMO
         }
 
         private UniTaskVoid HandleRequestSpawnMap(
-            long connectionId, NetDataReader reader,
+            RequestHandlerData requestHandler,
             RequestSpawnMapMessage request,
             RequestProceedResultDelegate<ResponseSpawnMapMessage> result)
         {

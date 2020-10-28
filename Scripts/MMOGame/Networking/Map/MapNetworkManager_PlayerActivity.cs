@@ -1,5 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using LiteNetLib;
+using LiteNetLib.Utils;
 using LiteNetLibManager;
 using System;
 using System.Collections.Generic;
@@ -154,7 +155,7 @@ namespace MultiplayerARPG.MMO
                 instanceWarpPosition = position,
                 instanceWarpOverrideRotation = overrideRotation,
                 instanceWarpRotation = rotation,
-            }, (ResponseSpawnMapMessage messageData) => OnRequestSpawnMap(messageData, instanceId), duration: 0);
+            }, responseDelegate: (responseHandler, responseCode, response) => OnRequestSpawnMap(responseHandler, responseCode, response, instanceId), duration: mapSpawnDuration);
 #endif
         }
 
@@ -199,12 +200,10 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        private void OnRequestSpawnMap(ResponseSpawnMapMessage message, string instanceId)
+        private void OnRequestSpawnMap(ResponseHandlerData requestHandler, AckResponseCode responseCode, INetSerializable response, string instanceId)
         {
-            if (LogInfo)
-                Logging.Log(LogTag, "Spawn Map Ack Id: " + message.ackId + "  Status: " + message.responseCode);
-            if (message.responseCode == AckResponseCode.Error ||
-                message.responseCode == AckResponseCode.Timeout)
+            if (responseCode == AckResponseCode.Error ||
+                responseCode == AckResponseCode.Timeout)
             {
                 // Remove warping characters who warping to instance map
                 HashSet<uint> instanceMapWarpingCharacters;

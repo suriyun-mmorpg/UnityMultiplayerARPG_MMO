@@ -59,7 +59,7 @@ namespace MultiplayerARPG.MMO
             Application.Quit();
         }
 
-        private void OnUserLogout(AckResponseCode responseCode, INetSerializable response)
+        private void OnUserLogout(ResponseHandlerData responseHandler, AckResponseCode responseCode, INetSerializable response)
         {
             if (responseCode == AckResponseCode.Success)
             {
@@ -68,7 +68,7 @@ namespace MultiplayerARPG.MMO
             }
         }
 
-        private void OnValidateAccessToken(AckResponseCode responseCode, INetSerializable response)
+        private void OnValidateAccessToken(ResponseHandlerData responseHandler, AckResponseCode responseCode, INetSerializable response)
         {
             if (responseCode == AckResponseCode.Success)
             {

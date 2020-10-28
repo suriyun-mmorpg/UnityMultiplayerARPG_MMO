@@ -14,7 +14,7 @@ namespace MultiplayerARPG.MMO
             MMOClientInstance.Singleton.RequestCreateCharacter(characterData, OnRequestedCreateCharacter);
         }
 
-        private void OnRequestedCreateCharacter(AckResponseCode responseCode, INetSerializable response)
+        private void OnRequestedCreateCharacter(ResponseHandlerData responseHandler, AckResponseCode responseCode, INetSerializable response)
         {
             if (responseCode == AckResponseCode.Timeout)
             {
