@@ -134,6 +134,7 @@ namespace MultiplayerARPG.MMO
             CentralAppServerRegister = new CentralAppServerRegister(CentralTransportFactory.Build(), this);
             CentralAppServerRegister.onAppServerRegistered = OnAppServerRegistered;
             CentralAppServerRegister.RegisterMessage(MMOMessageTypes.AppServerAddress, HandleResponseAppServerAddress);
+            CentralAppServerRegister.RegisterResponse<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.RequestSpawnMap);
             this.InvokeInstanceDevExtMethods("OnInitCentralAppServerRegister");
             ChatNetworkManager = gameObject.AddComponent<ChatNetworkManager>();
 #endif
