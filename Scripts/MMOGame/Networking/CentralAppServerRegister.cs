@@ -21,7 +21,7 @@ namespace MultiplayerARPG.MMO
         {
             this.appServer = appServer;
             EnableRequestResponse(MMOMessageTypes.Request, MMOMessageTypes.Response);
-            RegisterResponse<RequestAppServerRegisterMessage, ResponseAppServerRegisterMessage>(MMORequestTypes.RequestSpawnMap, OnAppServerRegistered);
+            RegisterResponse<RequestAppServerRegisterMessage, ResponseAppServerRegisterMessage>(MMORequestTypes.RequestAppServerRegister, OnAppServerRegistered);
         }
 
         public override void OnClientReceive(TransportEventData eventData)
