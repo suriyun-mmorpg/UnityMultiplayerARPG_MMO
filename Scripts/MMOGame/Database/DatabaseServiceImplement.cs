@@ -166,7 +166,7 @@ namespace MultiplayerARPG.MMO
         {
             PlayerCharacterData character = DatabaseServiceUtils.FromByteString<PlayerCharacterData>(request.CharacterData);
             // Store character to the dictionary, it will be used later
-            cachedUserCharacter[request.UserId] = character;
+            cachedUserCharacter[character.Id] = character;
             cachedCharacterNames.Add(character.CharacterName);
             // Insert new character to database
             await Database.CreateCharacter(request.UserId, character);
