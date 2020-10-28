@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using LiteNetLib;
 using LiteNetLibManager;
+using LiteNetLib.Utils;
 
 namespace MultiplayerARPG.MMO
 {
@@ -58,15 +59,18 @@ namespace MultiplayerARPG.MMO
             Application.Quit();
         }
 
-        private void OnUserLogout(BaseAckMessage messageData)
+        private void OnUserLogout(AckResponseCode responseCode, INetSerializable response)
         {
-            ClearHistory();
-            Next(uiLogin);
+            if (responseCode == AckResponseCode.Success)
+            {
+                ClearHistory();
+                Next(uiLogin);
+            }
         }
 
-        private void OnValidateAccessToken(ResponseValidateAccessTokenMessage messageData)
+        private void OnValidateAccessToken(AckResponseCode responseCode, INetSerializable response)
         {
-            if (messageData.responseCode == AckResponseCode.Success)
+            if (responseCode == AckResponseCode.Success)
             {
                 if (onValidateAccessTokenSuccess != null)
                     onValidateAccessTokenSuccess.Invoke();

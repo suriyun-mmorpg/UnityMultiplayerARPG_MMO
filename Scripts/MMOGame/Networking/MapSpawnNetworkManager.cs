@@ -12,7 +12,7 @@ using LiteNetLib.Utils;
 
 namespace MultiplayerARPG.MMO
 {
-    public partial class MapSpawnNetworkManager : BaseAppNetworkManager, IAppServer
+    public partial class MapSpawnNetworkManager : LiteNetLibManager.LiteNetLibManager, IAppServer
     {
         [Header("Central Network Connection")]
         public BaseTransportFactory centralTransportFactory;
@@ -101,7 +101,7 @@ namespace MultiplayerARPG.MMO
             }
             CentralAppServerRegister = new CentralAppServerRegister(CentralTransportFactory.Build(), this);
             CentralAppServerRegister.onAppServerRegistered = OnAppServerRegistered;
-            CentralAppServerRegister.RegisterMessage(MMOMessageTypes.RequestSpawnMap, HandleRequestSpawnMap);
+            CentralAppServerRegister.RegisterRequest<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.RequestSpawnMap, HandleRequestSpawnMap);
             this.InvokeInstanceDevExtMethods("OnInitCentralAppServerRegister");
         }
 
@@ -223,7 +223,7 @@ namespace MultiplayerARPG.MMO
             return default;
         }
 
-        private void OnAppServerRegistered(AckResponseCode responseCode, BaseAckMessage message)
+        private void OnAppServerRegistered(AckResponseCode responseCode)
         {
             if (responseCode == AckResponseCode.Success)
             {

@@ -133,6 +133,7 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
             CentralAppServerRegister = new CentralAppServerRegister(CentralTransportFactory.Build(), this);
             CentralAppServerRegister.onAppServerRegistered = OnAppServerRegistered;
+            CentralAppServerRegister.RegisterMessage(MMOMessageTypes.AppServerAddress, HandleResponseAppServerAddress);
             this.InvokeInstanceDevExtMethods("OnInitCentralAppServerRegister");
             ChatNetworkManager = gameObject.AddComponent<ChatNetworkManager>();
 #endif
@@ -607,7 +608,7 @@ namespace MultiplayerARPG.MMO
         #endregion
 
         #region Network message handlers
-        protected override void HandleWarpAtClient(LiteNetLibMessageHandler messageHandler)
+        protected override void HandleWarpAtClient(MessageHandlerData messageHandler)
         {
             MMOWarpMessage message = messageHandler.ReadMessage<MMOWarpMessage>();
             Assets.offlineScene.SceneName = string.Empty;
@@ -616,7 +617,7 @@ namespace MultiplayerARPG.MMO
         }
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        protected override void HandleChatAtServer(LiteNetLibMessageHandler messageHandler)
+        protected override void HandleChatAtServer(MessageHandlerData messageHandler)
         {
             ChatMessage message = FillChatChannelId(messageHandler.ReadMessage<ChatMessage>());
             // Local chat will processes immediately, not have to be sent to chat server
@@ -650,24 +651,17 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        protected override void HandleRequestCashShopInfo(LiteNetLibMessageHandler messageHandler)
+        protected override async UniTaskVoid HandleRequestCashShopInfo(
+            RequestHandlerData requestHandler, EmptyMessage request,
+            RequestProceedResultDelegate<ResponseCashShopInfoMessage> result)
         {
-            HandleRequestCashShopInfoRoutine(messageHandler).Forget();
-        }
-#endif
-
-#if UNITY_STANDALONE && !CLIENT_BUILD
-        private async UniTaskVoid HandleRequestCashShopInfoRoutine(LiteNetLibMessageHandler messageHandler)
-        {
-            long connectionId = messageHandler.connectionId;
-            BaseAckMessage message = messageHandler.ReadMessage<BaseAckMessage>();
             // Set response data
             ResponseCashShopInfoMessage.Error error = ResponseCashShopInfoMessage.Error.None;
             int cash = 0;
             List<int> cashShopItemIds = new List<int>();
             BasePlayerCharacterEntity playerCharacter;
             UserCharacterData userData;
-            if (!playerCharacters.TryGetValue(connectionId, out playerCharacter) ||
+            if (!playerCharacters.TryGetValue(requestHandler.ConnectionId, out playerCharacter) ||
                 !usersById.TryGetValue(playerCharacter.Id, out userData))
             {
                 // Canot find user
@@ -685,35 +679,29 @@ namespace MultiplayerARPG.MMO
                 cashShopItemIds.AddRange(GameInstance.CashShopItems.Keys);
             }
             // Send response message
-            ResponseCashShopInfoMessage responseMessage = new ResponseCashShopInfoMessage();
-            responseMessage.ackId = message.ackId;
-            responseMessage.responseCode = error == ResponseCashShopInfoMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
-            responseMessage.error = error;
-            responseMessage.cash = cash;
-            responseMessage.cashShopItemIds = cashShopItemIds.ToArray();
-            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.CashShopInfo, responseMessage);
+            result.Invoke(
+                error == ResponseCashShopInfoMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error,
+                new ResponseCashShopInfoMessage()
+                {
+                    error = error,
+                    cash = cash,
+                    cashShopItemIds = cashShopItemIds.ToArray(),
+                });
         }
 #endif
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        protected override void HandleRequestCashShopBuy(LiteNetLibMessageHandler messageHandler)
+        protected override async UniTaskVoid HandleRequestCashShopBuy(
+            RequestHandlerData requestHandler, RequestCashShopBuyMessage request,
+            RequestProceedResultDelegate<ResponseCashShopBuyMessage> result)
         {
-            HandleRequestCashShopBuyRoutine(messageHandler).Forget();
-        }
-#endif
-
-#if UNITY_STANDALONE && !CLIENT_BUILD
-        private async UniTaskVoid HandleRequestCashShopBuyRoutine(LiteNetLibMessageHandler messageHandler)
-        {
-            long connectionId = messageHandler.connectionId;
-            RequestCashShopBuyMessage message = messageHandler.ReadMessage<RequestCashShopBuyMessage>();
             // Set response data
             ResponseCashShopBuyMessage.Error error = ResponseCashShopBuyMessage.Error.None;
-            int dataId = message.dataId;
+            int dataId = request.dataId;
             int cash = 0;
             BasePlayerCharacterEntity playerCharacter;
             UserCharacterData userData;
-            if (!playerCharacters.TryGetValue(connectionId, out playerCharacter) ||
+            if (!playerCharacters.TryGetValue(requestHandler.ConnectionId, out playerCharacter) ||
                 !usersById.TryGetValue(playerCharacter.Id, out userData))
             {
                 // Canot find user
@@ -765,35 +753,29 @@ namespace MultiplayerARPG.MMO
                 }
             }
             // Send response message
-            ResponseCashShopBuyMessage responseMessage = new ResponseCashShopBuyMessage();
-            responseMessage.ackId = message.ackId;
-            responseMessage.responseCode = error == ResponseCashShopBuyMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
-            responseMessage.error = error;
-            responseMessage.dataId = dataId;
-            responseMessage.cash = cash;
-            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.CashShopBuy, responseMessage);
+            result.Invoke(
+                error == ResponseCashShopBuyMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error,
+                new ResponseCashShopBuyMessage()
+                {
+                    error = error,
+                    dataId = dataId,
+                    cash = cash,
+                });
         }
 #endif
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        protected override void HandleRequestCashPackageInfo(LiteNetLibMessageHandler messageHandler)
+        protected override async UniTaskVoid HandleRequestCashPackageInfo(
+            RequestHandlerData requestHandler, EmptyMessage request,
+            RequestProceedResultDelegate<ResponseCashPackageInfoMessage> result)
         {
-            HandleRequestCashPackageInfoRoutine(messageHandler).Forget();
-        }
-#endif
-
-#if UNITY_STANDALONE && !CLIENT_BUILD
-        private async UniTaskVoid HandleRequestCashPackageInfoRoutine(LiteNetLibMessageHandler messageHandler)
-        {
-            long connectionId = messageHandler.connectionId;
-            BaseAckMessage message = messageHandler.ReadMessage<BaseAckMessage>();
             // Set response data
             ResponseCashPackageInfoMessage.Error error = ResponseCashPackageInfoMessage.Error.None;
             int cash = 0;
             List<int> cashPackageIds = new List<int>();
             BasePlayerCharacterEntity playerCharacter;
             UserCharacterData userData;
-            if (!playerCharacters.TryGetValue(connectionId, out playerCharacter) ||
+            if (!playerCharacters.TryGetValue(requestHandler.ConnectionId, out playerCharacter) ||
                 !usersById.TryGetValue(playerCharacter.Id, out userData))
             {
                 // Canot find user
@@ -811,36 +793,30 @@ namespace MultiplayerARPG.MMO
                 cashPackageIds.AddRange(GameInstance.CashPackages.Keys);
             }
             // Send response message
-            ResponseCashPackageInfoMessage responseMessage = new ResponseCashPackageInfoMessage();
-            responseMessage.ackId = message.ackId;
-            responseMessage.responseCode = error == ResponseCashPackageInfoMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
-            responseMessage.error = error;
-            responseMessage.cash = cash;
-            responseMessage.cashPackageIds = cashPackageIds.ToArray();
-            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.CashPackageInfo, responseMessage);
+            result.Invoke(
+                error == ResponseCashPackageInfoMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error,
+                new ResponseCashPackageInfoMessage()
+                {
+                    error = error,
+                    cash = cash,
+                    cashPackageIds = cashPackageIds.ToArray(),
+                });
         }
 #endif
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        protected override void HandleRequestCashPackageBuyValidation(LiteNetLibMessageHandler messageHandler)
+        protected override async UniTaskVoid HandleRequestCashPackageBuyValidation(
+            RequestHandlerData requestHandler, RequestCashPackageBuyValidationMessage request,
+            RequestProceedResultDelegate<ResponseCashPackageBuyValidationMessage> result)
         {
-            HandleRequestCashPackageBuyValidationRoutine(messageHandler).Forget();
-        }
-#endif
-
-#if UNITY_STANDALONE && !CLIENT_BUILD
-        private async UniTaskVoid HandleRequestCashPackageBuyValidationRoutine(LiteNetLibMessageHandler messageHandler)
-        {
-            long connectionId = messageHandler.connectionId;
-            RequestCashPackageBuyValidationMessage message = messageHandler.ReadMessage<RequestCashPackageBuyValidationMessage>();
             // TODO: Validate purchasing at server side
             // Set response data
             ResponseCashPackageBuyValidationMessage.Error error = ResponseCashPackageBuyValidationMessage.Error.None;
-            int dataId = message.dataId;
+            int dataId = request.dataId;
             int cash = 0;
             BasePlayerCharacterEntity playerCharacter;
             UserCharacterData userData;
-            if (!playerCharacters.TryGetValue(connectionId, out playerCharacter) ||
+            if (!playerCharacters.TryGetValue(requestHandler.ConnectionId, out playerCharacter) ||
                 !usersById.TryGetValue(playerCharacter.Id, out userData))
             {
                 // Canot find user
@@ -873,68 +849,66 @@ namespace MultiplayerARPG.MMO
                 }
             }
             // Send response message
-            ResponseCashPackageBuyValidationMessage responseMessage = new ResponseCashPackageBuyValidationMessage();
-            responseMessage.ackId = message.ackId;
-            responseMessage.responseCode = error == ResponseCashPackageBuyValidationMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
-            responseMessage.error = error;
-            responseMessage.dataId = dataId;
-            responseMessage.cash = cash;
-            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MsgTypes.CashPackageBuyValidation, responseMessage);
+            result.Invoke(
+                error == ResponseCashPackageBuyValidationMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error,
+                new ResponseCashPackageBuyValidationMessage()
+                {
+                    error = error,
+                    dataId = dataId,
+                    cash = cash,
+                });
         }
 #endif
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        private void HandleResponseAppServerAddress(LiteNetLibMessageHandler messageHandler)
+        private void HandleResponseAppServerAddress(MessageHandlerData messageHandler)
         {
             ResponseAppServerAddressMessage message = messageHandler.ReadMessage<ResponseAppServerAddressMessage>();
-            if (message.responseCode == AckResponseCode.Success)
+            CentralServerPeerInfo peerInfo = message.peerInfo;
+            switch (peerInfo.peerType)
             {
-                CentralServerPeerInfo peerInfo = message.peerInfo;
-                switch (peerInfo.peerType)
-                {
-                    case CentralServerPeerType.MapServer:
-                        if (!string.IsNullOrEmpty(peerInfo.extra))
+                case CentralServerPeerType.MapServer:
+                    if (!string.IsNullOrEmpty(peerInfo.extra))
+                    {
+                        if (LogInfo)
+                            Logging.Log(LogTag, "Register map server: " + peerInfo.extra);
+                        mapServerConnectionIdsBySceneName[peerInfo.extra] = peerInfo;
+                    }
+                    break;
+                case CentralServerPeerType.InstanceMapServer:
+                    if (!string.IsNullOrEmpty(peerInfo.extra))
+                    {
+                        if (LogInfo)
+                            Logging.Log(LogTag, "Register instance map server: " + peerInfo.extra);
+                        instanceMapServerConnectionIdsByInstanceId[peerInfo.extra] = peerInfo;
+                        // Warp characters
+                        HashSet<uint> warpingCharacters;
+                        if (instanceMapWarpingCharactersByInstanceId.TryGetValue(peerInfo.extra, out warpingCharacters))
                         {
-                            if (LogInfo)
-                                Logging.Log(LogTag, "Register map server: " + peerInfo.extra);
-                            mapServerConnectionIdsBySceneName[peerInfo.extra] = peerInfo;
-                        }
-                        break;
-                    case CentralServerPeerType.InstanceMapServer:
-                        if (!string.IsNullOrEmpty(peerInfo.extra))
-                        {
-                            if (LogInfo)
-                                Logging.Log(LogTag, "Register instance map server: " + peerInfo.extra);
-                            instanceMapServerConnectionIdsByInstanceId[peerInfo.extra] = peerInfo;
-                            // Warp characters
-                            HashSet<uint> warpingCharacters;
-                            if (instanceMapWarpingCharactersByInstanceId.TryGetValue(peerInfo.extra, out warpingCharacters))
+                            BasePlayerCharacterEntity warpingCharacterEntity;
+                            foreach (uint warpingCharacter in warpingCharacters)
                             {
-                                BasePlayerCharacterEntity warpingCharacterEntity;
-                                foreach (uint warpingCharacter in warpingCharacters)
-                                {
-                                    if (!Assets.TryGetSpawnedObject(warpingCharacter, out warpingCharacterEntity))
-                                        continue;
-                                    WarpCharacterToInstanceRoutine(warpingCharacterEntity, peerInfo.extra).Forget();
-                                }
+                                if (!Assets.TryGetSpawnedObject(warpingCharacter, out warpingCharacterEntity))
+                                    continue;
+                                WarpCharacterToInstanceRoutine(warpingCharacterEntity, peerInfo.extra).Forget();
                             }
                         }
-                        break;
-                    case CentralServerPeerType.Chat:
-                        if (!ChatNetworkManager.IsClientConnected)
-                        {
-                            if (LogInfo)
-                                Logging.Log(LogTag, "Connecting to chat server");
-                            ChatNetworkManager.StartClient(this, peerInfo.networkAddress, peerInfo.networkPort);
-                        }
-                        break;
-                }
+                    }
+                    break;
+                case CentralServerPeerType.Chat:
+                    if (!ChatNetworkManager.IsClientConnected)
+                    {
+                        if (LogInfo)
+                            Logging.Log(LogTag, "Connecting to chat server");
+                        ChatNetworkManager.StartClient(this, peerInfo.networkAddress, peerInfo.networkPort);
+                    }
+                    break;
             }
         }
 #endif
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        private void OnAppServerRegistered(AckResponseCode responseCode, BaseAckMessage message)
+        private void OnAppServerRegistered(AckResponseCode responseCode)
         {
             if (responseCode == AckResponseCode.Success)
                 UpdateMapUsers(CentralAppServerRegister, UpdateUserCharacterMessage.UpdateType.Add);

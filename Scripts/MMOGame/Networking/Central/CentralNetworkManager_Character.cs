@@ -10,12 +10,12 @@ namespace MultiplayerARPG.MMO
 {
     public partial class CentralNetworkManager
     {
-        public bool RequestCharacters()
+        public bool RequestCharacters(ResponseDelegate callback)
         {
-            return ClientSendRequest(MMORequestTypes.RequestCharacters, new EmptyMessage());
+            return ClientSendRequest(MMORequestTypes.RequestCharacters, new EmptyMessage(), responseDelegate: callback);
         }
 
-        public bool RequestCreateCharacter(PlayerCharacterData characterData)
+        public bool RequestCreateCharacter(PlayerCharacterData characterData, ResponseDelegate callback)
         {
             return ClientSendRequest(MMORequestTypes.RequestCreateCharacter,
                 new RequestCreateCharacterMessage()
@@ -24,7 +24,7 @@ namespace MultiplayerARPG.MMO
                     dataId = characterData.DataId,
                     entityId = characterData.EntityId,
                     factionId = characterData.FactionId,
-                }, (writer) => SerializeCreateCharacterExtra(characterData, writer));
+                }, (writer) => SerializeCreateCharacterExtra(characterData, writer), responseDelegate: callback);
         }
 
         private void SerializeCreateCharacterExtra(PlayerCharacterData characterData, NetDataWriter writer)
@@ -32,20 +32,20 @@ namespace MultiplayerARPG.MMO
             this.InvokeInstanceDevExtMethods("SerializeCreateCharacterExtra", characterData, writer);
         }
 
-        public bool RequestDeleteCharacter(string characterId)
+        public bool RequestDeleteCharacter(string characterId, ResponseDelegate callback)
         {
             return ClientSendRequest(MMORequestTypes.RequestDeleteCharacter, new RequestDeleteCharacterMessage()
             {
                 characterId = characterId,
-            });
+            }, responseDelegate: callback);
         }
 
-        public bool RequestSelectCharacter(string characterId)
+        public bool RequestSelectCharacter(string characterId, ResponseDelegate callback)
         {
             return ClientSendRequest(MMORequestTypes.RequestSelectCharacter, new RequestSelectCharacterMessage()
             {
                 characterId = characterId,
-            });
+            }, responseDelegate: callback);
         }
 
 #if UNITY_STANDALONE && !CLIENT_BUILD

@@ -220,9 +220,9 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        protected void HandleUpdateMapUser(LiteNetLibMessageHandler messageHandler)
+        protected void HandleUpdateMapUser(MessageHandlerData messageHandler)
         {
-            long connectionId = messageHandler.connectionId;
+            long connectionId = messageHandler.ConnectionId;
             UpdateUserCharacterMessage message = messageHandler.ReadMessage<UpdateUserCharacterMessage>();
             if (mapUserIds.ContainsKey(connectionId))
             {

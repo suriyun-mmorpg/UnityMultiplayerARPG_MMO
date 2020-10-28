@@ -5,7 +5,7 @@ using LiteNetLibManager;
 
 namespace MultiplayerARPG.MMO
 {
-    public partial class CentralNetworkManager : BaseAppNetworkManager
+    public partial class CentralNetworkManager : LiteNetLibManager.LiteNetLibManager
     {
 #if UNITY_STANDALONE && !CLIENT_BUILD
         protected readonly Dictionary<long, CentralServerPeerInfo> mapSpawnServerPeers = new Dictionary<long, CentralServerPeerInfo>();
@@ -60,18 +60,19 @@ namespace MultiplayerARPG.MMO
             this.InvokeInstanceDevExtMethods("RegisterServerMessages");
             base.RegisterServerMessages();
             EnableServerRequestResponse(MMOMessageTypes.Request, MMOMessageTypes.Response);
-            RegisterServerMessage(MMOMessageTypes.AppServerRegister, HandleRequestAppServerRegister);
-            RegisterServerMessage(MMOMessageTypes.AppServerAddress, HandleRequestAppServerAddress);
-            RegisterServerMessage(MMOMessageTypes.RequestUserLogin, HandleRequestUserLogin);
-            RegisterServerMessage(MMOMessageTypes.RequestUserRegister, HandleRequestUserRegister);
-            RegisterServerMessage(MMOMessageTypes.RequestUserLogout, HandleRequestUserLogout);
-            RegisterServerMessage(MMOMessageTypes.RequestCharacters, HandleRequestCharacters);
-            RegisterServerMessage(MMOMessageTypes.RequestCreateCharacter, HandleRequestCreateCharacter);
-            RegisterServerMessage(MMOMessageTypes.RequestDeleteCharacter, HandleRequestDeleteCharacter);
-            RegisterServerMessage(MMOMessageTypes.RequestSelectCharacter, HandleRequestSelectCharacter);
-            RegisterServerMessage(MMOMessageTypes.RequestSpawnMap, HandleRequestSpawnMap);
-            RegisterServerMessage(MMOMessageTypes.RequestValidateAccessToken, HandleRequestValidateAccessToken);
             RegisterServerMessage(MMOMessageTypes.UpdateMapUser, HandleUpdateMapUser);
+            // Requests
+            RegisterServerRequest<RequestAppServerAddressMessage, ResponseAppServerAddressMessage>(MMORequestTypes.RequestAppServerRegister, HandleRequestAppServerRegister);
+            RegisterServerRequest(MMORequestTypes.RequestAppServerAddress, HandleRequestAppServerAddress);
+            RegisterServerRequest(MMORequestTypes.RequestUserLogin, HandleRequestUserLogin);
+            RegisterServerRequest(MMORequestTypes.RequestUserRegister, HandleRequestUserRegister);
+            RegisterServerRequest(MMORequestTypes.RequestUserLogout, HandleRequestUserLogout);
+            RegisterServerRequest(MMORequestTypes.RequestCharacters, HandleRequestCharacters);
+            RegisterServerRequest(MMORequestTypes.RequestCreateCharacter, HandleRequestCreateCharacter);
+            RegisterServerRequest(MMORequestTypes.RequestDeleteCharacter, HandleRequestDeleteCharacter);
+            RegisterServerRequest(MMORequestTypes.RequestSelectCharacter, HandleRequestSelectCharacter);
+            RegisterServerRequest(MMORequestTypes.RequestSpawnMap, HandleRequestSpawnMap);
+            RegisterServerRequest(MMORequestTypes.RequestValidateAccessToken, HandleRequestValidateAccessToken);
         }
 #endif
 

@@ -1,5 +1,5 @@
-﻿using LiteNetLibManager;
-using UnityEngine;
+﻿using LiteNetLib.Utils;
+using LiteNetLibManager;
 
 namespace MultiplayerARPG.MMO
 {
@@ -14,18 +14,20 @@ namespace MultiplayerARPG.MMO
             MMOClientInstance.Singleton.RequestCreateCharacter(characterData, OnRequestedCreateCharacter);
         }
 
-        private void OnRequestedCreateCharacter(ResponseCreateCharacterMessage message)
+        private void OnRequestedCreateCharacter(AckResponseCode responseCode, INetSerializable response)
         {
-            if (message.responseCode == AckResponseCode.Timeout)
+            if (responseCode == AckResponseCode.Timeout)
             {
                 UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
                 return;
             }
-            switch (message.responseCode)
+            // Proceed response
+            ResponseCreateCharacterMessage castedResponse = response as ResponseCreateCharacterMessage;
+            switch (responseCode)
             {
                 case AckResponseCode.Error:
                     string errorMessage = string.Empty;
-                    switch (message.error)
+                    switch (castedResponse.error)
                     {
                         case ResponseCreateCharacterMessage.Error.NotLoggedin:
                             errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_NOT_LOGGED_IN.ToString());

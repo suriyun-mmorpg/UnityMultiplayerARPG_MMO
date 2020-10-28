@@ -1,9 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.Events;
+﻿using UnityEngine.Events;
 using UnityEngine.UI;
 using LiteNetLibManager;
+using LiteNetLib.Utils;
 
 namespace MultiplayerARPG.MMO
 {
@@ -73,21 +71,22 @@ namespace MultiplayerARPG.MMO
             MMOClientInstance.Singleton.RequestUserRegister(Username, Password, OnRegister);
         }
 
-        public void OnRegister(ResponseUserRegisterMessage message)
+        public void OnRegister(ResponseHandlerData responseHandler, AckResponseCode responseCode, INetSerializable response)
         {
             Registering = false;
-            if (message.responseCode == AckResponseCode.Timeout)
+            if (responseCode == AckResponseCode.Timeout)
             {
                 UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
                 if (onRegisterFail != null)
                     onRegisterFail.Invoke();
                 return;
             }
-            switch (message.responseCode)
+            ResponseUserRegisterMessage castedResponse = response as ResponseUserRegisterMessage;
+            switch (responseCode)
             {
                 case AckResponseCode.Error:
                     string errorMessage = string.Empty;
-                    switch (message.error)
+                    switch (castedResponse.error)
                     {
                         case ResponseUserRegisterMessage.Error.TooShortUsername:
                             errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_USERNAME_TOO_SHORT.ToString());

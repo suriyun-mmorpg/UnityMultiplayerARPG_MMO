@@ -7,36 +7,36 @@ namespace MultiplayerARPG.MMO
 {
     public partial class CentralNetworkManager
     {
-        public bool RequestUserLogin(string username, string password)
+        public bool RequestUserLogin(string username, string password, ResponseDelegate callback)
         {
             return ClientSendRequest(MMORequestTypes.RequestUserLogin, new RequestUserLoginMessage()
             {
                 username = username,
                 password = password,
-            });
+            }, responseDelegate: callback);
         }
 
-        public bool RequestUserRegister(string username, string password)
+        public bool RequestUserRegister(string username, string password, ResponseDelegate callback)
         {
             return ClientSendRequest(MMORequestTypes.RequestUserRegister, new RequestUserRegisterMessage()
             {
                 username = username,
                 password = password,
-            });
+            }, responseDelegate: callback);
         }
 
-        public bool RequestUserLogout()
+        public bool RequestUserLogout(ResponseDelegate callback)
         {
-            return ClientSendRequest(MMORequestTypes.RequestUserLogout, new EmptyMessage());
+            return ClientSendRequest(MMORequestTypes.RequestUserLogout, new EmptyMessage(), responseDelegate: callback);
         }
 
-        public bool RequestValidateAccessToken(string userId, string accessToken)
+        public bool RequestValidateAccessToken(string userId, string accessToken, ResponseDelegate callback)
         {
             return ClientSendRequest(MMORequestTypes.RequestValidateAccessToken, new RequestValidateAccessTokenMessage()
             {
                 userId = userId,
                 accessToken = accessToken,
-            });
+            }, responseDelegate: callback);
         }
 
 #if UNITY_STANDALONE && !CLIENT_BUILD

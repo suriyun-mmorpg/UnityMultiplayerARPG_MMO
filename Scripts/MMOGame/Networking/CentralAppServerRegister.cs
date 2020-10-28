@@ -4,6 +4,7 @@ using UnityEngine;
 using LiteNetLib;
 using LiteNetLibManager;
 using Cysharp.Threading.Tasks;
+using LiteNetLib.Utils;
 
 namespace MultiplayerARPG.MMO
 {
@@ -14,13 +15,13 @@ namespace MultiplayerARPG.MMO
         public bool IsRegisteredToCentralServer { get; private set; }
 
         // Events
-        public System.Action<AckResponseCode, BaseAckMessage> onAppServerRegistered;
+        public System.Action<AckResponseCode> onAppServerRegistered;
 
         public CentralAppServerRegister(ITransport transport, IAppServer appServer) : base(transport)
         {
             this.appServer = appServer;
             EnableRequestResponse(MMOMessageTypes.Request, MMOMessageTypes.Response);
-            RegisterMessage(MMOMessageTypes.GenericResponse, HandleGenericResponse);
+            RegisterResponse<RequestAppServerRegisterMessage, ResponseAppServerRegisterMessage>(MMORequestTypes.RequestSpawnMap, OnAppServerRegistered);
         }
 
         public override void OnClientReceive(TransportEventData eventData)
@@ -78,10 +79,10 @@ namespace MultiplayerARPG.MMO
             peerInfo.networkPort = appServer.AppPort;
             peerInfo.extra = appServer.AppExtra;
             // Send Request
-            SendRequest<RequestAppServerRegisterMessage, ResponseAppServerRegisterMessage>(MMOMessageTypes.AppServerRegister, new RequestAppServerRegisterMessage()
+            SendRequest(MMORequestTypes.RequestAppServerRegister, new RequestAppServerRegisterMessage()
             {
                 peerInfo = peerInfo,
-            }, OnAppServerRegistered);
+            });
         }
 
         public async UniTaskVoid OnCentralServerDisconnected(DisconnectInfo disconnectInfo)
@@ -101,17 +102,16 @@ namespace MultiplayerARPG.MMO
             ConnectToCentralServer();
         }
 
-        private void HandleGenericResponse(LiteNetLibMessageHandler messageHandler)
+        public UniTaskVoid OnAppServerRegistered(
+            ResponseHandlerData responseHandler,
+            AckResponseCode responseCode,
+            ResponseAppServerRegisterMessage response)
         {
-            messageHandler.ReadResponse();
-        }
-
-        public void OnAppServerRegistered(ResponseAppServerRegisterMessage message)
-        {
-            if (message.responseCode == AckResponseCode.Success)
+            if (responseCode == AckResponseCode.Success)
                 IsRegisteredToCentralServer = true;
             if (onAppServerRegistered != null)
-                onAppServerRegistered.Invoke(message.responseCode, message);
+                onAppServerRegistered.Invoke(responseCode);
+            return default;
         }
     }
 }

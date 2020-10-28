@@ -147,7 +147,7 @@ namespace MultiplayerARPG.MMO
                 overrideRotation = overrideRotation,
                 rotation = rotation,
             });
-            CentralAppServerRegister.SendRequest(MMOMessageTypes.RequestSpawnMap, new RequestSpawnMapMessage()
+            CentralAppServerRegister.SendRequest(MMORequestTypes.RequestSpawnMap, new RequestSpawnMapMessage()
             {
                 mapId = mapName,
                 instanceId = instanceId,
