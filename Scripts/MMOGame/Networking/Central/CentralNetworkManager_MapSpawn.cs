@@ -32,7 +32,7 @@ namespace MultiplayerARPG.MMO
         /// </summary>
         /// <param name="messageHandler"></param>
         protected UniTaskVoid HandleRequestSpawnMap(
-            long connectionId, NetDataReader reader,
+            RequestHandlerData requestHandler,
             RequestSpawnMapMessage request,
             RequestProceedResultDelegate<ResponseSpawnMapMessage> result)
         {
@@ -49,8 +49,8 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        protected void HandleResponseSpawnMap(
-            long connectionId, NetDataReader reader,
+        protected UniTaskVoid HandleResponseSpawnMap(
+            ResponseHandlerData requestHandler,
             AckResponseCode responseCode,
             ResponseSpawnMapMessage response)
         {
@@ -58,6 +58,7 @@ namespace MultiplayerARPG.MMO
             RequestProceedResultDelegate<ResponseSpawnMapMessage> result;
             if (requestSpawnMapHandlers.TryGetValue(response.requestId, out result))
                 result.Invoke(responseCode, response);
+            return default;
         }
 #endif
     }

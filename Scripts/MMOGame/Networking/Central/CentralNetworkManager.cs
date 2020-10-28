@@ -52,6 +52,19 @@ namespace MultiplayerARPG.MMO
         {
             this.InvokeInstanceDevExtMethods("RegisterClientMessages");
             base.RegisterClientMessages();
+            EnableClientRequestResponse(MMOMessageTypes.Request, MMOMessageTypes.Response);
+            // Responses
+            RegisterClientResponse<RequestAppServerRegisterMessage, ResponseAppServerRegisterMessage>(MMORequestTypes.RequestAppServerRegister);
+            RegisterClientResponse<RequestAppServerAddressMessage, ResponseAppServerAddressMessage>(MMORequestTypes.RequestAppServerAddress);
+            RegisterClientResponse<RequestUserLoginMessage, ResponseUserLoginMessage>(MMORequestTypes.RequestUserLogin);
+            RegisterClientResponse<RequestUserRegisterMessage, ResponseUserRegisterMessage>(MMORequestTypes.RequestUserRegister);
+            RegisterClientResponse<EmptyMessage, EmptyMessage>(MMORequestTypes.RequestUserLogout);
+            RegisterClientResponse<EmptyMessage, ResponseCharactersMessage>(MMORequestTypes.RequestCharacters);
+            RegisterClientResponse<RequestCreateCharacterMessage, ResponseCreateCharacterMessage>(MMORequestTypes.RequestCreateCharacter);
+            RegisterClientResponse<RequestDeleteCharacterMessage, ResponseDeleteCharacterMessage>(MMORequestTypes.RequestDeleteCharacter);
+            RegisterClientResponse<RequestSelectCharacterMessage, ResponseSelectCharacterMessage>(MMORequestTypes.RequestSelectCharacter);
+            RegisterClientResponse<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.RequestSpawnMap);
+            RegisterClientResponse<RequestValidateAccessTokenMessage, ResponseValidateAccessTokenMessage>(MMORequestTypes.RequestValidateAccessToken);
         }
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
@@ -62,17 +75,19 @@ namespace MultiplayerARPG.MMO
             EnableServerRequestResponse(MMOMessageTypes.Request, MMOMessageTypes.Response);
             RegisterServerMessage(MMOMessageTypes.UpdateMapUser, HandleUpdateMapUser);
             // Requests
-            RegisterServerRequest<RequestAppServerAddressMessage, ResponseAppServerAddressMessage>(MMORequestTypes.RequestAppServerRegister, HandleRequestAppServerRegister);
-            RegisterServerRequest(MMORequestTypes.RequestAppServerAddress, HandleRequestAppServerAddress);
-            RegisterServerRequest(MMORequestTypes.RequestUserLogin, HandleRequestUserLogin);
-            RegisterServerRequest(MMORequestTypes.RequestUserRegister, HandleRequestUserRegister);
-            RegisterServerRequest(MMORequestTypes.RequestUserLogout, HandleRequestUserLogout);
-            RegisterServerRequest(MMORequestTypes.RequestCharacters, HandleRequestCharacters);
-            RegisterServerRequest(MMORequestTypes.RequestCreateCharacter, HandleRequestCreateCharacter);
-            RegisterServerRequest(MMORequestTypes.RequestDeleteCharacter, HandleRequestDeleteCharacter);
-            RegisterServerRequest(MMORequestTypes.RequestSelectCharacter, HandleRequestSelectCharacter);
-            RegisterServerRequest(MMORequestTypes.RequestSpawnMap, HandleRequestSpawnMap);
-            RegisterServerRequest(MMORequestTypes.RequestValidateAccessToken, HandleRequestValidateAccessToken);
+            RegisterServerRequest<RequestAppServerRegisterMessage, ResponseAppServerRegisterMessage>(MMORequestTypes.RequestAppServerRegister, HandleRequestAppServerRegister);
+            RegisterServerRequest<RequestAppServerAddressMessage, ResponseAppServerAddressMessage>(MMORequestTypes.RequestAppServerAddress, HandleRequestAppServerAddress);
+            RegisterServerRequest<RequestUserLoginMessage, ResponseUserLoginMessage>(MMORequestTypes.RequestUserLogin, HandleRequestUserLogin);
+            RegisterServerRequest<RequestUserRegisterMessage, ResponseUserRegisterMessage>(MMORequestTypes.RequestUserRegister, HandleRequestUserRegister);
+            RegisterServerRequest<EmptyMessage, EmptyMessage>(MMORequestTypes.RequestUserLogout, HandleRequestUserLogout);
+            RegisterServerRequest<EmptyMessage, ResponseCharactersMessage>(MMORequestTypes.RequestCharacters, HandleRequestCharacters);
+            RegisterServerRequest<RequestCreateCharacterMessage, ResponseCreateCharacterMessage>(MMORequestTypes.RequestCreateCharacter, HandleRequestCreateCharacter);
+            RegisterServerRequest<RequestDeleteCharacterMessage, ResponseDeleteCharacterMessage>(MMORequestTypes.RequestDeleteCharacter, HandleRequestDeleteCharacter);
+            RegisterServerRequest<RequestSelectCharacterMessage, ResponseSelectCharacterMessage>(MMORequestTypes.RequestSelectCharacter, HandleRequestSelectCharacter);
+            RegisterServerRequest<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.RequestSpawnMap, HandleRequestSpawnMap);
+            RegisterServerRequest<RequestValidateAccessTokenMessage, ResponseValidateAccessTokenMessage>(MMORequestTypes.RequestValidateAccessToken, HandleRequestValidateAccessToken);
+            // Responses
+            RegisterServerResponse<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.RequestSpawnMap, HandleResponseSpawnMap);
         }
 #endif
 

@@ -31,11 +31,12 @@ namespace MultiplayerARPG.MMO
         }
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        protected UniTask HandleRequestAppServerRegister(
-            long connectionId, NetDataReader reader,
+        protected UniTaskVoid HandleRequestAppServerRegister(
+            RequestHandlerData requestHandler,
             RequestAppServerRegisterMessage request,
             RequestProceedResultDelegate<ResponseAppServerRegisterMessage> result)
         {
+            long connectionId = requestHandler.ConnectionId;
             ResponseAppServerRegisterMessage.Error error = ResponseAppServerRegisterMessage.Error.None;
             if (request.ValidateHash())
             {
@@ -159,11 +160,12 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        protected UniTask HandleRequestAppServerAddress(
-            long connectionId, NetDataReader reader,
+        protected UniTaskVoid HandleRequestAppServerAddress(
+            RequestHandlerData requestHandler,
             RequestAppServerAddressMessage request,
             RequestProceedResultDelegate<ResponseAppServerAddressMessage> result)
         {
+            long connectionId = requestHandler.ConnectionId;
             ResponseAppServerAddressMessage.Error error = ResponseAppServerAddressMessage.Error.None;
             CentralServerPeerInfo peerInfo = new CentralServerPeerInfo();
             switch (request.peerType)

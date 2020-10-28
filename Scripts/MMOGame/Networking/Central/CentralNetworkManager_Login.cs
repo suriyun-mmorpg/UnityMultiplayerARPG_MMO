@@ -41,10 +41,11 @@ namespace MultiplayerARPG.MMO
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
         protected async UniTaskVoid HandleRequestUserLogin(
-            long connectionId, NetDataReader reader,
+            RequestHandlerData requestHandler,
             RequestUserLoginMessage request,
             RequestProceedResultDelegate<ResponseUserLoginMessage> result)
         {
+            long connectionId = requestHandler.ConnectionId;
             ResponseUserLoginMessage.Error error = ResponseUserLoginMessage.Error.None;
             ValidateUserLoginResp validateUserLoginResp = await DbServiceClient.ValidateUserLoginAsync(new ValidateUserLoginReq()
             {
@@ -91,7 +92,7 @@ namespace MultiplayerARPG.MMO
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
         protected async UniTaskVoid HandleRequestUserRegister(
-            long connectionId, NetDataReader reader,
+            RequestHandlerData requestHandler,
             RequestUserRegisterMessage request,
             RequestProceedResultDelegate<ResponseUserRegisterMessage> result)
         {
@@ -130,10 +131,11 @@ namespace MultiplayerARPG.MMO
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
         protected async UniTaskVoid HandleRequestUserLogout(
-            long connectionId, NetDataReader reader,
+            RequestHandlerData requestHandler,
             EmptyMessage request,
             RequestProceedResultDelegate<EmptyMessage> result)
         {
+            long connectionId = requestHandler.ConnectionId;
             CentralUserPeerInfo userPeerInfo;
             if (userPeers.TryGetValue(connectionId, out userPeerInfo))
             {
@@ -152,10 +154,11 @@ namespace MultiplayerARPG.MMO
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
         protected async UniTaskVoid HandleRequestValidateAccessToken(
-            long connectionId, NetDataReader reader,
+            RequestHandlerData requestHandler,
             RequestValidateAccessTokenMessage request,
             RequestProceedResultDelegate<ResponseValidateAccessTokenMessage> result)
         {
+            long connectionId = requestHandler.ConnectionId;
             ResponseValidateAccessTokenMessage.Error error = ResponseValidateAccessTokenMessage.Error.None;
             string userId = request.userId;
             string accessToken = request.accessToken;

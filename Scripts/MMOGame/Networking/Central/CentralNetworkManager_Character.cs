@@ -50,10 +50,11 @@ namespace MultiplayerARPG.MMO
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
         protected async UniTaskVoid HandleRequestCharacters(
-            long connectionId, NetDataReader reader,
+            RequestHandlerData requestHandler,
             EmptyMessage request,
             RequestProceedResultDelegate<ResponseCharactersMessage> result)
         {
+            long connectionId = requestHandler.ConnectionId;
             ResponseCharactersMessage.Error error = ResponseCharactersMessage.Error.None;
             List<PlayerCharacterData> characters = null;
             CentralUserPeerInfo userPeerInfo;
@@ -80,10 +81,12 @@ namespace MultiplayerARPG.MMO
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
         protected async UniTaskVoid HandleRequestCreateCharacter(
-            long connectionId, NetDataReader reader,
+            RequestHandlerData requestHandler,
             RequestCreateCharacterMessage request,
             RequestProceedResultDelegate<ResponseCreateCharacterMessage> result)
         {
+            long connectionId = requestHandler.ConnectionId;
+            NetDataReader reader = requestHandler.Reader;
             ResponseCreateCharacterMessage.Error error = ResponseCreateCharacterMessage.Error.None;
             string characterName = request.characterName;
             int dataId = request.dataId;
@@ -142,10 +145,11 @@ namespace MultiplayerARPG.MMO
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
         protected async UniTaskVoid HandleRequestDeleteCharacter(
-            long connectionId, NetDataReader reader,
+            RequestHandlerData requestHandler,
             RequestDeleteCharacterMessage request,
             RequestProceedResultDelegate<ResponseDeleteCharacterMessage> result)
         {
+            long connectionId = requestHandler.ConnectionId;
             ResponseDeleteCharacterMessage.Error error = ResponseDeleteCharacterMessage.Error.None;
             CentralUserPeerInfo userPeerInfo;
             if (!userPeers.TryGetValue(connectionId, out userPeerInfo))
@@ -170,10 +174,11 @@ namespace MultiplayerARPG.MMO
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
         protected async UniTaskVoid HandleRequestSelectCharacter(
-            long connectionId, NetDataReader reader,
+            RequestHandlerData requestHandler,
             RequestSelectCharacterMessage request,
             RequestProceedResultDelegate<ResponseSelectCharacterMessage> result)
         {
+            long connectionId = requestHandler.ConnectionId;
             ResponseSelectCharacterMessage.Error error = ResponseSelectCharacterMessage.Error.None;
             CentralServerPeerInfo mapServerPeerInfo = default;
             CentralUserPeerInfo userPeerInfo;
