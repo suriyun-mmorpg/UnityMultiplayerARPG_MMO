@@ -152,7 +152,7 @@ namespace MultiplayerARPG.MMO
                 {
                     lastSaveTime = tempUnscaledTime;
                     SaveCharactersRoutine().Forget();
-                    if (!IsInstanceMap())
+                    if (!IsInstanceMap() && CurrentMapInfo.SaveCurrentMapPosition)
                     {
                         // Don't save building if it's instance map
                         SaveBuildingsRoutine().Forget();
@@ -349,7 +349,7 @@ namespace MultiplayerARPG.MMO
         protected override async UniTask PreSpawnEntities()
         {
             // Spawn buildings
-            if (!IsInstanceMap())
+            if (!IsInstanceMap() && CurrentMapInfo.SaveCurrentMapPosition)
             {
                 // Load buildings
                 // Don't load buildings if it's instance map
@@ -487,7 +487,7 @@ namespace MultiplayerARPG.MMO
                         string savingCurrentMapName = playerCharacterData.CurrentMapName;
                         Vector3 savingCurrentPosition = playerCharacterData.CurrentPosition;
 
-                        if (IsInstanceMap())
+                        if (IsInstanceMap() || !CurrentMapInfo.SaveCurrentMapPosition)
                         {
                             playerCharacterData.CurrentPosition = MapInstanceWarpToPosition;
                             if (MapInstanceWarpOverrideRotation)
@@ -515,7 +515,7 @@ namespace MultiplayerARPG.MMO
                         playerCharacterEntity.UserCash = getCashResp.Cash;
 
                         // Prepare saving location for this character
-                        if (IsInstanceMap())
+                        if (IsInstanceMap() || !CurrentMapInfo.SaveCurrentMapPosition)
                             instanceMapCurrentLocations.Add(playerCharacterEntity.ObjectId, new KeyValuePair<string, Vector3>(savingCurrentMapName, savingCurrentPosition));
 
                         // Set user Id
