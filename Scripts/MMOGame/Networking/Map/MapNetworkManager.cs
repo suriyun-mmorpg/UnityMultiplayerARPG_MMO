@@ -584,9 +584,9 @@ namespace MultiplayerARPG.MMO
 
                         // Notify clients that this character is spawn or dead
                         if (!playerCharacterEntity.IsDead())
-                            playerCharacterEntity.CallOwnerOnRespawn();
+                            playerCharacterEntity.CallAllOnRespawn();
                         else
-                            playerCharacterEntity.CallOwnerOnDead();
+                            playerCharacterEntity.CallAllOnDead();
 
                         // Register player character entity to the server
                         RegisterPlayerCharacter(playerCharacterEntity);
