@@ -217,6 +217,7 @@ namespace MultiplayerARPG.MMO
             switch (message.channel)
             {
                 case ChatChannel.Global:
+                case ChatChannel.System:
                     ServerSendPacketToAllConnections(DeliveryMethod.ReliableOrdered, MMOMessageTypes.Chat, message);
                     break;
                 case ChatChannel.Party:
