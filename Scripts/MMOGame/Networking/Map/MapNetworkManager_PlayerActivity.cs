@@ -13,7 +13,7 @@ namespace MultiplayerARPG.MMO
         public override string GetCurrentMapId(BasePlayerCharacterEntity playerCharacterEntity)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            if (!IsInstanceMap() && CurrentMapInfo.SaveCurrentMapPosition)
+            if (!IsInstanceMap())
                 return base.GetCurrentMapId(playerCharacterEntity);
             return instanceMapCurrentLocations[playerCharacterEntity.ObjectId].Key;
 #else
@@ -24,7 +24,7 @@ namespace MultiplayerARPG.MMO
         public override Vector3 GetCurrentPosition(BasePlayerCharacterEntity playerCharacterEntity)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            if (!IsInstanceMap() && CurrentMapInfo.SaveCurrentMapPosition)
+            if (!IsInstanceMap())
                 return base.GetCurrentPosition(playerCharacterEntity);
             return instanceMapCurrentLocations[playerCharacterEntity.ObjectId].Value;
 #else
