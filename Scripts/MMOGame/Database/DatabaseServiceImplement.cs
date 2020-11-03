@@ -154,7 +154,8 @@ namespace MultiplayerARPG.MMO
                 // Doesn't cached yet, so try validate from database
                 foundAmount = await Database.FindUsername(request.Username);
                 // Cache username, it will be used to validate later
-                cachedUsernames.Add(request.Username);
+                if (foundAmount > 0)
+                    cachedUsernames.Add(request.Username);
             }
             return new FindUsernameResp()
             {
@@ -232,7 +233,8 @@ namespace MultiplayerARPG.MMO
                 // Doesn't cached yet, so try validate from database
                 foundAmount = await Database.FindCharacterName(request.CharacterName);
                 // Cache character name, it will be used to validate later
-                cachedCharacterNames.Add(request.CharacterName);
+                if (foundAmount > 0)
+                    cachedCharacterNames.Add(request.CharacterName);
             }
             return new FindCharacterNameResp()
             {
@@ -519,8 +521,8 @@ namespace MultiplayerARPG.MMO
             // Remove data from cache
             if (cachedGuild.ContainsKey(request.GuildId))
             {
-                string characterName = cachedGuild[request.GuildId].guildName;
-                cachedGuildNames.TryRemove(characterName);
+                string guildName = cachedGuild[request.GuildId].guildName;
+                cachedGuildNames.TryRemove(guildName);
                 cachedGuild.TryRemove(request.GuildId, out _);
             }
             // Remove data from database
@@ -576,8 +578,9 @@ namespace MultiplayerARPG.MMO
             {
                 // Doesn't cached yet, so try validate from database
                 foundAmount = await Database.FindGuildName(request.GuildName);
-                // Cache username, it will be used to validate later
-                cachedGuildNames.Add(request.GuildName);
+                // Cache guild name, it will be used to validate later
+                if (foundAmount > 0)
+                    cachedGuildNames.Add(request.GuildName);
             }
             return new FindGuildNameResp()
             {
