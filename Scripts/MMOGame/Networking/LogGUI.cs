@@ -93,7 +93,7 @@ public class LogGUI : MonoBehaviour
             return;
         using (StreamWriter writer = new StreamWriter(logSavePath, true, Encoding.UTF8))
         {
-            writer.WriteLine("(" + type + ") " + stackTrace + "\n");
+            writer.WriteLine("(" + type + ") " + condition + "\n");
         }
         Color color = Color.white;
         switch (type)
@@ -110,7 +110,7 @@ public class LogGUI : MonoBehaviour
         }
         logList.Add(new LogData()
         {
-            logText = " " + stackTrace,
+            logText = " " + condition,
             logColor = color,
         });
         if (logList.Count > showLogSize)
