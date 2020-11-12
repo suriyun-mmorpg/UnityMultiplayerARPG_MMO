@@ -22,7 +22,7 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@exp", characterItem.exp),
                 new SqliteParameter("@lockRemainsDuration", characterItem.lockRemainsDuration),
                 new SqliteParameter("@ammo", characterItem.ammo),
-                new SqliteParameter("@sockets", WriteSockets(characterItem.sockets)));
+                new SqliteParameter("@sockets", characterItem.WriteSockets()));
         }
 
         private bool ReadStorageItem(SqliteDataReader reader, out CharacterItem result)
@@ -37,7 +37,7 @@ namespace MultiplayerARPG.MMO
                 result.exp = reader.GetInt32(4);
                 result.lockRemainsDuration = reader.GetFloat(5);
                 result.ammo = reader.GetInt16(6);
-                result.sockets = ReadSockets(reader.GetString(7));
+                result.ReadSockets(reader.GetString(7));
                 return true;
             }
             result = CharacterItem.Empty;

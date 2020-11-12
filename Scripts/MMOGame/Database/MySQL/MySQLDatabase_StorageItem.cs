@@ -22,7 +22,7 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@exp", characterItem.exp),
                 new MySqlParameter("@lockRemainsDuration", characterItem.lockRemainsDuration),
                 new MySqlParameter("@ammo", characterItem.ammo),
-                new MySqlParameter("@sockets", WriteSockets(characterItem.sockets)));
+                new MySqlParameter("@sockets", characterItem.WriteSockets()));
         }
 
         private bool ReadStorageItem(MySqlDataReader reader, out CharacterItem result)
@@ -37,7 +37,7 @@ namespace MultiplayerARPG.MMO
                 result.exp = reader.GetInt32(4);
                 result.lockRemainsDuration = reader.GetFloat(5);
                 result.ammo = reader.GetInt16(6);
-                result.sockets = ReadSockets(reader.GetString(7));
+                result.ReadSockets(reader.GetString(7));
                 return true;
             }
             result = CharacterItem.Empty;
