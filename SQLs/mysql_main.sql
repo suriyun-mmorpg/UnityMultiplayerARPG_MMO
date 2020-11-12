@@ -143,7 +143,7 @@ CREATE TABLE `characterquest` (
   `dataId` int(11) NOT NULL DEFAULT '0',
   `isComplete` tinyint(1) NOT NULL DEFAULT '0',
   `killedMonsters` text COLLATE utf8_unicode_ci NOT NULL,
-  `talkedNpcs` text COLLATE utf8_unicode_ci NOT NULL,
+  `completedTasks` text COLLATE utf8_unicode_ci NOT NULL,
   `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;

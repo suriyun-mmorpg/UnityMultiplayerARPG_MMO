@@ -124,7 +124,7 @@ namespace MultiplayerARPG.MMO
               dataId INTEGER NOT NULL,
               isComplete INTEGER NOT NULL DEFAULT 0,
               killedMonsters TEXT NOT NULL DEFAULT '',
-              talkedNpcs TEXT NOT NULL DEFAULT '',
+              completedTasks TEXT NOT NULL DEFAULT '',
               createAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
               updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
@@ -315,8 +315,8 @@ namespace MultiplayerARPG.MMO
             if (!IsColumnExist("characteritem", "sockets"))
                 ExecuteNonQuery("ALTER TABLE characteritem ADD sockets TEXT NOT NULL DEFAULT '';");
 
-            if (!IsColumnExist("characterquest", "talkedNpcs"))
-                ExecuteNonQuery("ALTER TABLE characterquest ADD talkedNpcs TEXT NOT NULL DEFAULT '';");
+            if (!IsColumnExist("characterquest", "completedTasks"))
+                ExecuteNonQuery("ALTER TABLE characterquest ADD completedTasks TEXT NOT NULL DEFAULT '';");
 
             if (!IsColumnExist("storageitem", "sockets"))
                 ExecuteNonQuery("ALTER TABLE storageitem ADD sockets TEXT NOT NULL DEFAULT '';");

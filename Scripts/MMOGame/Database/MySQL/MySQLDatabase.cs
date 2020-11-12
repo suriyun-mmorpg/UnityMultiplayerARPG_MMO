@@ -100,7 +100,7 @@ namespace MultiplayerARPG.MMO
             if (!await HasMigrationId(migrationId))
             {
                 Logging.Log("Migrating up to 1.60c");
-                await ExecuteNonQuery("ALTER TABLE `characterquest` ADD `talkedNpcs` TEXT NOT NULL AFTER `killedMonsters`;");
+                await ExecuteNonQuery("ALTER TABLE `characterquest` ADD `completedTasks` TEXT NOT NULL AFTER `killedMonsters`;");
                 // Insert migrate history
                 await InsertMigrationId(migrationId);
                 Logging.Log("Migrated to 1.60c");
