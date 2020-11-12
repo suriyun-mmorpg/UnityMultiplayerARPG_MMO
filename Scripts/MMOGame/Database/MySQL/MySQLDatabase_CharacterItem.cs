@@ -7,29 +7,6 @@ namespace MultiplayerARPG.MMO
 {
     public partial class MySQLDatabase
     {
-        private List<int> ReadSockets(string sockets)
-        {
-            List<int> result = new List<int>();
-            string[] splitTexts = sockets.Split(';');
-            foreach (string text in splitTexts)
-            {
-                if (string.IsNullOrEmpty(text))
-                    continue;
-                result.Add(int.Parse(text));
-            }
-            return result;
-        }
-
-        private string WriteSockets(List<int> sockets)
-        {
-            string result = "";
-            foreach (int socket in sockets)
-            {
-                result += socket + ";";
-            }
-            return result;
-        }
-
         private async UniTask CreateCharacterItem(MySqlConnection connection, MySqlTransaction transaction, int idx, string characterId, InventoryType inventoryType, CharacterItem characterItem)
         {
             if (string.IsNullOrEmpty(characterItem.id))
@@ -48,7 +25,7 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@exp", characterItem.exp),
                 new MySqlParameter("@lockRemainsDuration", characterItem.lockRemainsDuration),
                 new MySqlParameter("@ammo", characterItem.ammo),
-                new MySqlParameter("@sockets", WriteSockets(characterItem.sockets)));
+                new MySqlParameter("@sockets", characterItem.WriteSockets()));
         }
 
         private bool ReadCharacterItem(MySqlDataReader reader, out CharacterItem result)
@@ -65,7 +42,7 @@ namespace MultiplayerARPG.MMO
                 result.exp = reader.GetInt32(6);
                 result.lockRemainsDuration = reader.GetFloat(7);
                 result.ammo = reader.GetInt16(8);
-                result.sockets = ReadSockets(reader.GetString(9));
+                result.ReadSockets(reader.GetString(9));
                 return true;
             }
             result = CharacterItem.Empty;

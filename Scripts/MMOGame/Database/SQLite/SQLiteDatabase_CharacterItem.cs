@@ -6,29 +6,6 @@ namespace MultiplayerARPG.MMO
 {
     public partial class SQLiteDatabase
     {
-        private List<int> ReadSockets(string sockets)
-        {
-            List<int> result = new List<int>();
-            string[] splitTexts = sockets.Split(';');
-            foreach (string text in splitTexts)
-            {
-                if (string.IsNullOrEmpty(text))
-                    continue;
-                result.Add(int.Parse(text));
-            }
-            return result;
-        }
-
-        private string WriteSockets(List<int> sockets)
-        {
-            string result = "";
-            foreach (int socket in sockets)
-            {
-                result += socket + ";";
-            }
-            return result;
-        }
-
         private void CreateCharacterItem(SqliteTransaction transaction, int idx, string characterId, InventoryType inventoryType, CharacterItem characterItem)
         {
             if (string.IsNullOrEmpty(characterItem.id))
@@ -47,7 +24,7 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@exp", characterItem.exp),
                 new SqliteParameter("@lockRemainsDuration", characterItem.lockRemainsDuration),
                 new SqliteParameter("@ammo", characterItem.ammo),
-                new SqliteParameter("@sockets", WriteSockets(characterItem.sockets)));
+                new SqliteParameter("@sockets", characterItem.WriteSockets()));
         }
 
         private bool ReadCharacterItem(SqliteDataReader reader, out CharacterItem result)
@@ -64,7 +41,7 @@ namespace MultiplayerARPG.MMO
                 result.exp = reader.GetInt32(6);
                 result.lockRemainsDuration = reader.GetFloat(7);
                 result.ammo = reader.GetInt16(8);
-                result.sockets = ReadSockets(reader.GetString(9));
+                result.ReadSockets(reader.GetString(9));
                 return true;
             }
             result = CharacterItem.Empty;

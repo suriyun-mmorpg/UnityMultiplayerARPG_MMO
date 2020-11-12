@@ -7,32 +7,6 @@ namespace MultiplayerARPG.MMO
 {
     public partial class MySQLDatabase
     {
-        private Dictionary<int, int> ReadKillMonsters(string killMonsters)
-        {
-            Dictionary<int, int> result = new Dictionary<int, int>();
-            string[] splitSets = killMonsters.Split(';');
-            foreach (string set in splitSets)
-            {
-                if (string.IsNullOrEmpty(set))
-                    continue;
-                string[] splitData = set.Split(':');
-                if (splitData.Length != 2)
-                    continue;
-                result[int.Parse(splitData[0])] = int.Parse(splitData[1]);
-            }
-            return result;
-        }
-
-        private string WriteKillMonsters(Dictionary<int, int> killMonsters)
-        {
-            string result = "";
-            foreach (KeyValuePair<int, int> keyValue in killMonsters)
-            {
-                result += keyValue.Key + ":" + keyValue.Value + ";";
-            }
-            return result;
-        }
-
         private bool ReadCharacterQuest(MySqlDataReader reader, out CharacterQuest result)
         {
             if (reader.Read())
@@ -40,7 +14,8 @@ namespace MultiplayerARPG.MMO
                 result = new CharacterQuest();
                 result.dataId = reader.GetInt32(0);
                 result.isComplete = reader.GetBoolean(1);
-                result.killedMonsters = ReadKillMonsters(reader.GetString(2));
+                result.ReadKillMonsters(reader.GetString(2));
+                result.ReadCompletedTasks(reader.GetString(3));
                 return true;
             }
             result = CharacterQuest.Empty;
@@ -49,13 +24,14 @@ namespace MultiplayerARPG.MMO
 
         public async UniTask CreateCharacterQuest(MySqlConnection connection, MySqlTransaction transaction, int idx, string characterId, CharacterQuest characterQuest)
         {
-            await ExecuteNonQuery(connection, transaction, "INSERT INTO characterquest (id, idx, characterId, dataId, isComplete, killedMonsters) VALUES (@id, @idx, @characterId, @dataId, @isComplete, @killedMonsters)",
+            await ExecuteNonQuery(connection, transaction, "INSERT INTO characterquest (id, idx, characterId, dataId, isComplete, killedMonsters, completedTasks) VALUES (@id, @idx, @characterId, @dataId, @isComplete, @killedMonsters, @completedTasks)",
                 new MySqlParameter("@id", characterId + "_" + idx),
                 new MySqlParameter("@idx", idx),
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@dataId", characterQuest.dataId),
                 new MySqlParameter("@isComplete", characterQuest.isComplete),
-                new MySqlParameter("@killedMonsters", WriteKillMonsters(characterQuest.killedMonsters)));
+                new MySqlParameter("@killedMonsters", characterQuest.WriteKillMonsters()),
+                new MySqlParameter("@completedTasks", characterQuest.WriteCompletedTasks()));
         }
 
         public async UniTask<List<CharacterQuest>> ReadCharacterQuests(string characterId, List<CharacterQuest> result = null)
@@ -69,7 +45,7 @@ namespace MultiplayerARPG.MMO
                 {
                     result.Add(tempQuest);
                 }
-            }, "SELECT dataId, isComplete, killedMonsters FROM characterquest WHERE characterId=@characterId ORDER BY idx ASC",
+            }, "SELECT dataId, isComplete, killedMonsters, completedTasks FROM characterquest WHERE characterId=@characterId ORDER BY idx ASC",
                 new MySqlParameter("@characterId", characterId));
             return result;
         }
