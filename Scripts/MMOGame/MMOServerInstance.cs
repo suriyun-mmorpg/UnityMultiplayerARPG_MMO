@@ -146,6 +146,7 @@ namespace MultiplayerARPG.MMO
             Singleton = this;
 
             GameInstance gameInstance = FindObjectOfType<GameInstance>();
+            gameInstance.DoNotLoadHomeScene = true;
 
             // Always accept SSL
             ServicePointManager.ServerCertificateValidationCallback += new RemoteCertificateValidationCallback((sender, certificate, chain, policyErrors) => { return true; });
@@ -366,7 +367,7 @@ namespace MultiplayerARPG.MMO
                         logFileName += "_";
                     logFileName += "Database";
                     startLog = true;
-                    gameInstance.SetOnGameDataLoadedCallback(OnGameDataLoaded);
+                    gameInstance.onGameDataLoaded = OnGameDataLoaded;
                     startingDatabaseServer = true;
                 }
 
@@ -377,7 +378,7 @@ namespace MultiplayerARPG.MMO
                         logFileName += "_";
                     logFileName += "Central";
                     startLog = true;
-                    gameInstance.SetOnGameDataLoadedCallback(OnGameDataLoaded);
+                    gameInstance.onGameDataLoaded = OnGameDataLoaded;
                     startingCentralServer = true;
                 }
 
@@ -388,7 +389,7 @@ namespace MultiplayerARPG.MMO
                         logFileName += "_";
                     logFileName += "Chat";
                     startLog = true;
-                    gameInstance.SetOnGameDataLoadedCallback(OnGameDataLoaded);
+                    gameInstance.onGameDataLoaded = OnGameDataLoaded;
                     startingChatServer = true;
                 }
 
@@ -399,7 +400,7 @@ namespace MultiplayerARPG.MMO
                         logFileName += "_";
                     logFileName += "MapSpawn";
                     startLog = true;
-                    gameInstance.SetOnGameDataLoadedCallback(OnGameDataLoaded);
+                    gameInstance.onGameDataLoaded = OnGameDataLoaded;
                     startingMapSpawnServer = true;
                 }
 
@@ -410,7 +411,7 @@ namespace MultiplayerARPG.MMO
                         logFileName += "_";
                     logFileName += "Map(" + mapId + ") Instance(" + instanceId + ")";
                     startLog = true;
-                    gameInstance.SetOnGameDataLoadedCallback(OnGameDataLoaded);
+                    gameInstance.onGameDataLoaded = OnGameDataLoaded;
                     startingMapServer = true;
                 }
 
@@ -422,11 +423,12 @@ namespace MultiplayerARPG.MMO
             }
             else
             {
-                gameInstance.SetOnGameDataLoadedCallback(() =>
+                gameInstance.onGameDataLoaded = () =>
                 {
                     OnGameDataLoaded();
-                    gameInstance.OnGameDataLoaded();
-                });
+                    gameInstance.DoNotLoadHomeScene = false;
+                    gameInstance.LoadHomeScene();
+                };
 
                 DatabaseNetworkManager.SetDatabaseByOptionIndex(databaseOptionIndex);
 
@@ -445,7 +447,7 @@ namespace MultiplayerARPG.MMO
                 if (startMapOnAwake)
                 {
                     // If run map-server, don't load home scene (home scene load in `Game Instance`)
-                    gameInstance.SetOnGameDataLoadedCallback(OnGameDataLoaded);
+                    gameInstance.onGameDataLoaded = OnGameDataLoaded;
                     startingMapId = startingMap.Id;
                     startingMapServer = true;
                 }
@@ -456,6 +458,9 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
         private void OnGameDataLoaded()
         {
+            GameInstance gameInstance = FindObjectOfType<GameInstance>();
+            gameInstance.DoNotLoadHomeScene = false;
+
             if (startingDatabaseServer)
             {
                 // Start database manager server
