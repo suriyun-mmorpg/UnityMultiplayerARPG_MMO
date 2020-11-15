@@ -145,9 +145,6 @@ namespace MultiplayerARPG.MMO
             DontDestroyOnLoad(gameObject);
             Singleton = this;
 
-            GameInstance gameInstance = FindObjectOfType<GameInstance>();
-            gameInstance.DoNotLoadHomeScene = true;
-
             // Always accept SSL
             ServicePointManager.ServerCertificateValidationCallback += new RemoteCertificateValidationCallback((sender, certificate, chain, policyErrors) => { return true; });
 
@@ -159,6 +156,9 @@ namespace MultiplayerARPG.MMO
 
             CacheLogGUI.enabled = false;
 #if UNITY_STANDALONE && !CLIENT_BUILD
+            GameInstance gameInstance = FindObjectOfType<GameInstance>();
+            gameInstance.onGameDataLoaded = OnGameDataLoaded;
+
             if (!Application.isEditor)
             {
                 // Json file read
@@ -367,7 +367,6 @@ namespace MultiplayerARPG.MMO
                         logFileName += "_";
                     logFileName += "Database";
                     startLog = true;
-                    gameInstance.onGameDataLoaded = OnGameDataLoaded;
                     startingDatabaseServer = true;
                 }
 
@@ -378,7 +377,6 @@ namespace MultiplayerARPG.MMO
                         logFileName += "_";
                     logFileName += "Central";
                     startLog = true;
-                    gameInstance.onGameDataLoaded = OnGameDataLoaded;
                     startingCentralServer = true;
                 }
 
@@ -389,7 +387,6 @@ namespace MultiplayerARPG.MMO
                         logFileName += "_";
                     logFileName += "Chat";
                     startLog = true;
-                    gameInstance.onGameDataLoaded = OnGameDataLoaded;
                     startingChatServer = true;
                 }
 
@@ -400,7 +397,6 @@ namespace MultiplayerARPG.MMO
                         logFileName += "_";
                     logFileName += "MapSpawn";
                     startLog = true;
-                    gameInstance.onGameDataLoaded = OnGameDataLoaded;
                     startingMapSpawnServer = true;
                 }
 
@@ -411,7 +407,6 @@ namespace MultiplayerARPG.MMO
                         logFileName += "_";
                     logFileName += "Map(" + mapId + ") Instance(" + instanceId + ")";
                     startLog = true;
-                    gameInstance.onGameDataLoaded = OnGameDataLoaded;
                     startingMapServer = true;
                 }
 
@@ -423,13 +418,6 @@ namespace MultiplayerARPG.MMO
             }
             else
             {
-                gameInstance.onGameDataLoaded = () =>
-                {
-                    OnGameDataLoaded();
-                    gameInstance.DoNotLoadHomeScene = false;
-                    gameInstance.LoadHomeScene();
-                };
-
                 DatabaseNetworkManager.SetDatabaseByOptionIndex(databaseOptionIndex);
 
                 if (startDatabaseOnAwake)
@@ -447,7 +435,6 @@ namespace MultiplayerARPG.MMO
                 if (startMapOnAwake)
                 {
                     // If run map-server, don't load home scene (home scene load in `Game Instance`)
-                    gameInstance.onGameDataLoaded = OnGameDataLoaded;
                     startingMapId = startingMap.Id;
                     startingMapServer = true;
                 }
@@ -458,9 +445,6 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
         private void OnGameDataLoaded()
         {
-            GameInstance gameInstance = FindObjectOfType<GameInstance>();
-            gameInstance.DoNotLoadHomeScene = false;
-
             if (startingDatabaseServer)
             {
                 // Start database manager server
@@ -507,13 +491,20 @@ namespace MultiplayerARPG.MMO
                 StartMapServer();
             }
 
-            if (startingCentralServer ||
-                startingMapSpawnServer ||
-                startingChatServer ||
-                startingMapServer)
+            GameInstance gameInstance = FindObjectOfType<GameInstance>();
+            if (!startingCentralServer &&
+                !startingMapSpawnServer &&
+                !startingChatServer &&
+                !startingMapServer)
+            {
+                // No starting servers, so it is just a client and should load home scene
+                gameInstance.DoNotLoadHomeScene = false;
+            }
+            else
             {
                 // Start database manager client, it will connect to database manager server
                 // To request database functions
+                gameInstance.DoNotLoadHomeScene = true;
                 StartDatabaseManagerClient();
             }
         }
