@@ -105,17 +105,7 @@ namespace MultiplayerARPG.MMO
 
         protected override void OnSelectCharacter(IPlayerCharacterData playerCharacterData)
         {
-            if (buttonStart)
-                buttonStart.gameObject.SetActive(true);
-            if (buttonDelete)
-                buttonDelete.gameObject.SetActive(true);
-            characterModelContainer.SetChildrenActive(false);
-            // Load selected character and also set selected player character data
-            PlayerCharacterDataById.TryGetValue(playerCharacterData.Id, out selectedPlayerCharacterData);
-            // Show selected character model
-            CharacterModelById.TryGetValue(playerCharacterData.Id, out selectedModel);
-            if (SelectedModel != null)
-                SelectedModel.gameObject.SetActive(true);
+            // Do nothing
         }
 
         public override void OnClickStart()
