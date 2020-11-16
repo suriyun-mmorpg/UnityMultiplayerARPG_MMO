@@ -17,7 +17,6 @@ namespace MultiplayerARPG.MMO
         {
             public long connectionId;
             public string userId;
-            public string accessToken;
             public string selectCharacterId;
         }
 
@@ -170,9 +169,13 @@ namespace MultiplayerARPG.MMO
                 if (pendingSpawnPlayerCharacters.Count > 0 && IsReadyToInstantiateObjects())
                 {
                     // Spawn pending player characters
+                    LiteNetLibPlayer player;
                     foreach (PendingSpawnPlayerCharacter spawnPlayerCharacter in pendingSpawnPlayerCharacters)
                     {
-                        SetPlayerReady(spawnPlayerCharacter.connectionId, spawnPlayerCharacter.userId, spawnPlayerCharacter.accessToken, spawnPlayerCharacter.selectCharacterId);
+                        if (!Players.TryGetValue(spawnPlayerCharacter.connectionId, out player))
+                            continue;
+                        player.IsReady = true;
+                        SetPlayerReadyRoutine(spawnPlayerCharacter.connectionId, spawnPlayerCharacter.userId, spawnPlayerCharacter.selectCharacterId).Forget();
                     }
                     pendingSpawnPlayerCharacters.Clear();
                 }
@@ -395,214 +398,197 @@ namespace MultiplayerARPG.MMO
         }
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        public override async UniTask<bool> SetPlayerReady(long connectionId, NetDataReader reader)
+        public override async UniTask<bool> DeserializeClientReadyData(LiteNetLibIdentity playerIdentity, long connectionId, NetDataReader reader)
         {
-            await UniTask.Yield();
-
-            if (!IsServer)
-                return false;
-
-            SetPlayerReady(connectionId, reader.GetString(), reader.GetString(), reader.GetString());
-            return true;
-        }
-#endif
-
-#if UNITY_STANDALONE && !CLIENT_BUILD
-        private void SetPlayerReady(long connectionId, string userId, string accessToken, string selectCharacterId)
-        {
-            if (!IsReadyToInstantiateObjects())
-            {
-                if (LogError)
-                    Logging.LogError(LogTag, "Not ready to spawn player: " + userId);
-                // Add to pending list to spawn player later when map server is ready to instantiate object
-                pendingSpawnPlayerCharacters.Add(new PendingSpawnPlayerCharacter()
-                {
-                    connectionId = connectionId,
-                    userId = userId,
-                    accessToken = accessToken,
-                    selectCharacterId = selectCharacterId
-                });
-                return;
-            }
+            string userId = reader.GetString();
+            string accessToken = reader.GetString();
+            string selectCharacterId = reader.GetString();
 
             if (playerCharacters.ContainsKey(connectionId))
             {
                 if (LogError)
                     Logging.LogError(LogTag, "User trying to hack: " + userId);
                 Transport.ServerDisconnect(connectionId);
-                return;
+                return false;
             }
 
-            LiteNetLibPlayer player = GetPlayer(connectionId);
-            if (player.IsReady)
-                return;
-
-            player.IsReady = true;
-
-            SetPlayerReadyRoutine(connectionId, userId, accessToken, selectCharacterId).Forget();
-        }
-#endif
-
-#if UNITY_STANDALONE && !CLIENT_BUILD
-        private async UniTaskVoid SetPlayerReadyRoutine(long connectionId, string userId, string accessToken, string selectCharacterId)
-        {
-            // Validate access token
             ValidateAccessTokenResp validateAccessTokenResp = await DbServiceClient.ValidateAccessTokenAsync(new ValidateAccessTokenReq()
             {
                 UserId = userId,
                 AccessToken = accessToken
             });
+
             if (!validateAccessTokenResp.IsPass)
             {
                 if (LogError)
                     Logging.LogError(LogTag, "Invalid access token for user: " + userId);
                 Transport.ServerDisconnect(connectionId);
             }
+
+            if (!IsReadyToInstantiateObjects())
+            {
+                if (LogWarn)
+                    Logging.LogWarning(LogTag, "Not ready to spawn player: " + userId);
+                // Add to pending list to spawn player later when map server is ready to instantiate object
+                pendingSpawnPlayerCharacters.Add(new PendingSpawnPlayerCharacter()
+                {
+                    connectionId = connectionId,
+                    userId = userId,
+                    selectCharacterId = selectCharacterId
+                });
+                return false;
+            }
+
+            SetPlayerReadyRoutine(connectionId, userId, selectCharacterId).Forget();
+            return true;
+        }
+#endif
+
+#if UNITY_STANDALONE && !CLIENT_BUILD
+        private async UniTaskVoid SetPlayerReadyRoutine(long connectionId, string userId, string selectCharacterId)
+        {
+            CharacterResp characterResp = await DbServiceClient.ReadCharacterAsync(new ReadCharacterReq()
+            {
+                UserId = userId,
+                CharacterId = selectCharacterId
+            });
+            PlayerCharacterData playerCharacterData = characterResp.CharacterData.FromByteString<PlayerCharacterData>();
+            // If data is empty / cannot find character, disconnect user
+            if (playerCharacterData == null)
+            {
+                if (LogError)
+                    Logging.LogError(LogTag, "Cannot find select character: " + selectCharacterId + " for user: " + userId);
+                Transport.ServerDisconnect(connectionId);
+            }
             else
             {
-                CharacterResp characterResp = await DbServiceClient.ReadCharacterAsync(new ReadCharacterReq()
-                {
-                    UserId = userId,
-                    CharacterId = selectCharacterId
-                });
-                PlayerCharacterData playerCharacterData = characterResp.CharacterData.FromByteString<PlayerCharacterData>();
-                // If data is empty / cannot find character, disconnect user
-                if (playerCharacterData == null)
+                BasePlayerCharacterEntity entityPrefab = playerCharacterData.GetEntityPrefab() as BasePlayerCharacterEntity;
+                // If it is not allow this character data, disconnect user
+                if (entityPrefab == null)
                 {
                     if (LogError)
-                        Logging.LogError(LogTag, "Cannot find select character: " + selectCharacterId + " for user: " + userId);
+                        Logging.LogError(LogTag, "Cannot find player character with entity Id: " + playerCharacterData.EntityId);
                     Transport.ServerDisconnect(connectionId);
                 }
                 else
                 {
-                    BasePlayerCharacterEntity entityPrefab = playerCharacterData.GetEntityPrefab() as BasePlayerCharacterEntity;
-                    // If it is not allow this character data, disconnect user
-                    if (entityPrefab == null)
+                    // Prepare saving location for this character
+                    string savingCurrentMapName = playerCharacterData.CurrentMapName;
+                    Vector3 savingCurrentPosition = playerCharacterData.CurrentPosition;
+
+                    if (IsInstanceMap())
                     {
-                        if (LogError)
-                            Logging.LogError(LogTag, "Cannot find player character with entity Id: " + playerCharacterData.EntityId);
-                        Transport.ServerDisconnect(connectionId);
+                        playerCharacterData.CurrentPosition = MapInstanceWarpToPosition;
+                        if (MapInstanceWarpOverrideRotation)
+                            playerCharacterData.CurrentRotation = MapInstanceWarpToRotation;
                     }
-                    else
+
+                    // Spawn character entity and set its data
+                    GameObject spawnObj = Instantiate(entityPrefab.gameObject, playerCharacterData.CurrentPosition, Quaternion.identity);
+                    BasePlayerCharacterEntity playerCharacterEntity = spawnObj.GetComponent<BasePlayerCharacterEntity>();
+                    playerCharacterData.CloneTo(playerCharacterEntity);
+                    Assets.NetworkSpawn(spawnObj, 0, connectionId);
+
+                    // Set currencies
+                    // Gold
+                    GoldResp getGoldResp = await DbServiceClient.GetGoldAsync(new GetGoldReq()
                     {
-                        // Prepare saving location for this character
-                        string savingCurrentMapName = playerCharacterData.CurrentMapName;
-                        Vector3 savingCurrentPosition = playerCharacterData.CurrentPosition;
+                        UserId = userId
+                    });
+                    playerCharacterEntity.UserGold = getGoldResp.Gold;
+                    // Cash
+                    CashResp getCashResp = await DbServiceClient.GetCashAsync(new GetCashReq()
+                    {
+                        UserId = userId
+                    });
+                    playerCharacterEntity.UserCash = getCashResp.Cash;
 
-                        if (IsInstanceMap())
+                    // Prepare saving location for this character
+                    if (IsInstanceMap())
+                        instanceMapCurrentLocations.Add(playerCharacterEntity.ObjectId, new KeyValuePair<string, Vector3>(savingCurrentMapName, savingCurrentPosition));
+
+                    // Set user Id
+                    playerCharacterEntity.UserId = userId;
+
+                    // Load user level
+                    GetUserLevelResp getUserLevelResp = await DbServiceClient.GetUserLevelAsync(new GetUserLevelReq()
+                    {
+                        UserId = userId
+                    });
+                    playerCharacterEntity.UserLevel = (byte)getUserLevelResp.UserLevel;
+
+                    // Load party data, if this map-server does not have party data
+                    if (playerCharacterEntity.PartyId > 0)
+                    {
+                        if (!parties.ContainsKey(playerCharacterEntity.PartyId))
+                            await LoadPartyRoutine(playerCharacterEntity.PartyId);
+                        if (parties.ContainsKey(playerCharacterEntity.PartyId))
                         {
-                            playerCharacterData.CurrentPosition = MapInstanceWarpToPosition;
-                            if (MapInstanceWarpOverrideRotation)
-                                playerCharacterData.CurrentRotation = MapInstanceWarpToRotation;
+                            PartyData party = parties[playerCharacterEntity.PartyId];
+                            SendCreatePartyToClient(playerCharacterEntity.ConnectionId, party);
+                            SendAddPartyMembersToClient(playerCharacterEntity.ConnectionId, party);
                         }
-
-                        // Spawn character entity and set its data
-                        GameObject spawnObj = Instantiate(entityPrefab.gameObject, playerCharacterData.CurrentPosition, Quaternion.identity);
-                        BasePlayerCharacterEntity playerCharacterEntity = spawnObj.GetComponent<BasePlayerCharacterEntity>();
-                        playerCharacterData.CloneTo(playerCharacterEntity);
-                        Assets.NetworkSpawn(spawnObj, 0, connectionId);
-
-                        // Set currencies
-                        // Gold
-                        GoldResp getGoldResp = await DbServiceClient.GetGoldAsync(new GetGoldReq()
-                        {
-                            UserId = userId
-                        });
-                        playerCharacterEntity.UserGold = getGoldResp.Gold;
-                        // Cash
-                        CashResp getCashResp = await DbServiceClient.GetCashAsync(new GetCashReq()
-                        {
-                            UserId = userId
-                        });
-                        playerCharacterEntity.UserCash = getCashResp.Cash;
-
-                        // Prepare saving location for this character
-                        if (IsInstanceMap())
-                            instanceMapCurrentLocations.Add(playerCharacterEntity.ObjectId, new KeyValuePair<string, Vector3>(savingCurrentMapName, savingCurrentPosition));
-
-                        // Set user Id
-                        playerCharacterEntity.UserId = userId;
-
-                        // Load user level
-                        GetUserLevelResp getUserLevelResp = await DbServiceClient.GetUserLevelAsync(new GetUserLevelReq()
-                        {
-                            UserId = userId
-                        });
-                        playerCharacterEntity.UserLevel = (byte)getUserLevelResp.UserLevel;
-
-                        // Load party data, if this map-server does not have party data
-                        if (playerCharacterEntity.PartyId > 0)
-                        {
-                            if (!parties.ContainsKey(playerCharacterEntity.PartyId))
-                                await LoadPartyRoutine(playerCharacterEntity.PartyId);
-                            if (parties.ContainsKey(playerCharacterEntity.PartyId))
-                            {
-                                PartyData party = parties[playerCharacterEntity.PartyId];
-                                SendCreatePartyToClient(playerCharacterEntity.ConnectionId, party);
-                                SendAddPartyMembersToClient(playerCharacterEntity.ConnectionId, party);
-                            }
-                            else
-                                playerCharacterEntity.ClearParty();
-                        }
-
-                        // Load guild data, if this map-server does not have guild data
-                        if (playerCharacterEntity.GuildId > 0)
-                        {
-                            if (!guilds.ContainsKey(playerCharacterEntity.GuildId))
-                                await LoadGuildRoutine(playerCharacterEntity.GuildId);
-                            if (guilds.ContainsKey(playerCharacterEntity.GuildId))
-                            {
-                                GuildData guild = guilds[playerCharacterEntity.GuildId];
-                                playerCharacterEntity.GuildName = guild.guildName;
-                                playerCharacterEntity.GuildRole = guild.GetMemberRole(playerCharacterEntity.Id);
-                                SendCreateGuildToClient(playerCharacterEntity.ConnectionId, guild);
-                                SendAddGuildMembersToClient(playerCharacterEntity.ConnectionId, guild);
-                                SendSetGuildMessageToClient(playerCharacterEntity.ConnectionId, guild);
-                                SendSetGuildRolesToClient(playerCharacterEntity.ConnectionId, guild);
-                                SendSetGuildMemberRolesToClient(playerCharacterEntity.ConnectionId, guild);
-                                SendSetGuildSkillLevelsToClient(playerCharacterEntity.ConnectionId, guild);
-                                SendSetGuildGoldToClient(playerCharacterEntity.ConnectionId, guild);
-                                SendGuildLevelExpSkillPointToClient(playerCharacterEntity.ConnectionId, guild);
-                            }
-                            else
-                                playerCharacterEntity.ClearGuild();
-                        }
-
-                        // Summon saved summons
-                        for (int i = 0; i < playerCharacterEntity.Summons.Count; ++i)
-                        {
-                            CharacterSummon summon = playerCharacterEntity.Summons[i];
-                            summon.Summon(playerCharacterEntity, summon.Level, summon.summonRemainsDuration, summon.Exp, summon.CurrentHp, summon.CurrentMp);
-                            playerCharacterEntity.Summons[i] = summon;
-                        }
-
-                        // Summon saved mount entity
-                        if (GameInstance.VehicleEntities.ContainsKey(playerCharacterData.MountDataId))
-                            playerCharacterEntity.Mount(GameInstance.VehicleEntities[playerCharacterData.MountDataId]);
-
-                        // Force make caches, to calculate current stats to fill empty slots items
-                        playerCharacterEntity.ForceMakeCaches();
-                        playerCharacterEntity.FillEmptySlots();
-
-                        // Notify clients that this character is spawn or dead
-                        if (!playerCharacterEntity.IsDead())
-                            playerCharacterEntity.CallAllOnRespawn();
                         else
-                            playerCharacterEntity.CallAllOnDead();
+                            playerCharacterEntity.ClearParty();
+                    }
 
-                        // Register player character entity to the server
-                        RegisterPlayerCharacter(playerCharacterEntity);
-
-                        // Setup subscribers
-                        LiteNetLibPlayer player = GetPlayer(connectionId);
-                        foreach (LiteNetLibIdentity spawnedObject in Assets.GetSpawnedObjects())
+                    // Load guild data, if this map-server does not have guild data
+                    if (playerCharacterEntity.GuildId > 0)
+                    {
+                        if (!guilds.ContainsKey(playerCharacterEntity.GuildId))
+                            await LoadGuildRoutine(playerCharacterEntity.GuildId);
+                        if (guilds.ContainsKey(playerCharacterEntity.GuildId))
                         {
-                            if (spawnedObject.ConnectionId == player.ConnectionId)
-                                continue;
-
-                            if (spawnedObject.ShouldAddSubscriber(player))
-                                spawnedObject.AddSubscriber(player);
+                            GuildData guild = guilds[playerCharacterEntity.GuildId];
+                            playerCharacterEntity.GuildName = guild.guildName;
+                            playerCharacterEntity.GuildRole = guild.GetMemberRole(playerCharacterEntity.Id);
+                            SendCreateGuildToClient(playerCharacterEntity.ConnectionId, guild);
+                            SendAddGuildMembersToClient(playerCharacterEntity.ConnectionId, guild);
+                            SendSetGuildMessageToClient(playerCharacterEntity.ConnectionId, guild);
+                            SendSetGuildRolesToClient(playerCharacterEntity.ConnectionId, guild);
+                            SendSetGuildMemberRolesToClient(playerCharacterEntity.ConnectionId, guild);
+                            SendSetGuildSkillLevelsToClient(playerCharacterEntity.ConnectionId, guild);
+                            SendSetGuildGoldToClient(playerCharacterEntity.ConnectionId, guild);
+                            SendGuildLevelExpSkillPointToClient(playerCharacterEntity.ConnectionId, guild);
                         }
+                        else
+                            playerCharacterEntity.ClearGuild();
+                    }
+
+                    // Summon saved summons
+                    for (int i = 0; i < playerCharacterEntity.Summons.Count; ++i)
+                    {
+                        CharacterSummon summon = playerCharacterEntity.Summons[i];
+                        summon.Summon(playerCharacterEntity, summon.Level, summon.summonRemainsDuration, summon.Exp, summon.CurrentHp, summon.CurrentMp);
+                        playerCharacterEntity.Summons[i] = summon;
+                    }
+
+                    // Summon saved mount entity
+                    if (GameInstance.VehicleEntities.ContainsKey(playerCharacterData.MountDataId))
+                        playerCharacterEntity.Mount(GameInstance.VehicleEntities[playerCharacterData.MountDataId]);
+
+                    // Force make caches, to calculate current stats to fill empty slots items
+                    playerCharacterEntity.ForceMakeCaches();
+                    playerCharacterEntity.FillEmptySlots();
+
+                    // Notify clients that this character is spawn or dead
+                    if (!playerCharacterEntity.IsDead())
+                        playerCharacterEntity.CallAllOnRespawn();
+                    else
+                        playerCharacterEntity.CallAllOnDead();
+
+                    // Register player character entity to the server
+                    RegisterPlayerCharacter(playerCharacterEntity);
+
+                    // Setup subscribers
+                    LiteNetLibPlayer player = GetPlayer(connectionId);
+                    foreach (LiteNetLibIdentity spawnedObject in Assets.GetSpawnedObjects())
+                    {
+                        if (spawnedObject.ConnectionId == player.ConnectionId)
+                            continue;
+
+                        if (spawnedObject.ShouldAddSubscriber(player))
+                            spawnedObject.AddSubscriber(player);
                     }
                 }
             }
