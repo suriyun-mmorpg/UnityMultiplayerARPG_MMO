@@ -492,20 +492,23 @@ namespace MultiplayerARPG.MMO
             }
 
             GameInstance gameInstance = FindObjectOfType<GameInstance>();
-            if (!startingCentralServer &&
-                !startingMapSpawnServer &&
-                !startingChatServer &&
-                !startingMapServer)
-            {
-                // No starting servers, so it is just a client and should load home scene
-                gameInstance.DoNotLoadHomeScene = false;
-            }
-            else
+            gameInstance.DoNotLoadHomeScene = false;
+
+            if (startingCentralServer ||
+                startingMapSpawnServer ||
+                startingChatServer ||
+                startingMapServer)
             {
                 // Start database manager client, it will connect to database manager server
                 // To request database functions
                 gameInstance.DoNotLoadHomeScene = true;
                 StartDatabaseManagerClient();
+            }
+
+            if (Application.isEditor)
+            {
+                // If testing in editor, still load home scene
+                gameInstance.DoNotLoadHomeScene = !startingMapServer;
             }
         }
 #endif
