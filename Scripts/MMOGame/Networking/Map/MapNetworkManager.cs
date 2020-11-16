@@ -395,8 +395,10 @@ namespace MultiplayerARPG.MMO
         }
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        public override bool SetPlayerReady(long connectionId, NetDataReader reader)
+        public override async UniTask<bool> SetPlayerReady(long connectionId, NetDataReader reader)
         {
+            await UniTask.Yield();
+
             if (!IsServer)
                 return false;
 
