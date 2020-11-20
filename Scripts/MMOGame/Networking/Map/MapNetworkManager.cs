@@ -238,13 +238,13 @@ namespace MultiplayerARPG.MMO
                         CharacterData = playerCharacter.CloneTo(new PlayerCharacterData()).ToByteString()
                     });
                 }
-                string sceneName = Assets.onlineScene.SceneName;
+                string mapName = CurrentMapInfo.Id;
                 foreach (BuildingEntity buildingEntity in buildingEntities.Values)
                 {
                     if (buildingEntity == null) continue;
                     DbServiceClient.UpdateBuilding(new UpdateBuildingReq()
                     {
-                        MapName = sceneName,
+                        MapName = mapName,
                         BuildingData = buildingEntity.CloneTo(new BuildingSaveData()).ToByteString()
                     });
                 }
@@ -358,7 +358,7 @@ namespace MultiplayerARPG.MMO
                 // Don't load buildings if it's instance map
                 BuildingsResp resp = await DbServiceClient.ReadBuildingsAsync(new ReadBuildingsReq()
                 {
-                    MapName = Assets.onlineScene.SceneName
+                    MapName = CurrentMapInfo.Id,
                 });
                 HashSet<StorageId> storageIds = new HashSet<StorageId>();
                 List<BuildingSaveData> buildings = resp.List.MakeListFromRepeatedByteString<BuildingSaveData>();
