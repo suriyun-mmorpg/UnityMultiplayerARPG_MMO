@@ -105,7 +105,7 @@ namespace MultiplayerARPG.MMO
         private readonly Dictionary<string, CentralServerPeerInfo> instanceMapServerConnectionIdsByInstanceId = new Dictionary<string, CentralServerPeerInfo>();
         private readonly Dictionary<string, HashSet<uint>> instanceMapWarpingCharactersByInstanceId = new Dictionary<string, HashSet<uint>>();
         private readonly Dictionary<string, InstanceMapWarpingLocation> instanceMapWarpingLocations = new Dictionary<string, InstanceMapWarpingLocation>();
-        private readonly Dictionary<string, UserCharacterData> usersById = new Dictionary<string, UserCharacterData>();
+        private readonly Dictionary<string, SocialCharacterData> usersById = new Dictionary<string, SocialCharacterData>();
         private readonly Dictionary<StorageId, List<CharacterItem>> allStorageItems = new Dictionary<StorageId, List<CharacterItem>>();
         private readonly Dictionary<StorageId, HashSet<uint>> usingStorageCharacters = new Dictionary<StorageId, HashSet<uint>>();
         // Database operations
@@ -207,7 +207,7 @@ namespace MultiplayerARPG.MMO
         {
             base.UpdateOnlineCharacter(playerCharacterEntity);
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            UserCharacterData tempUserData;
+            SocialCharacterData tempUserData;
             if (ChatNetworkManager.IsClientConnected && usersById.TryGetValue(playerCharacterEntity.Id, out tempUserData))
             {
                 tempUserData.dataId = playerCharacterEntity.DataId;
@@ -259,7 +259,7 @@ namespace MultiplayerARPG.MMO
             // Set user data to map server
             if (!usersById.ContainsKey(playerCharacterEntity.Id))
             {
-                UserCharacterData userData = new UserCharacterData();
+                SocialCharacterData userData = new SocialCharacterData();
                 userData.userId = playerCharacterEntity.UserId;
                 userData.id = playerCharacterEntity.Id;
                 userData.characterName = playerCharacterEntity.CharacterName;
@@ -284,7 +284,7 @@ namespace MultiplayerARPG.MMO
         {
             // Send remove character from map server
             BasePlayerCharacterEntity playerCharacter;
-            UserCharacterData userData;
+            SocialCharacterData userData;
             if (playerCharacters.TryGetValue(connectionId, out playerCharacter) &&
                 usersById.TryGetValue(playerCharacter.Id, out userData))
             {
@@ -645,7 +645,7 @@ namespace MultiplayerARPG.MMO
             int cash = 0;
             List<int> cashShopItemIds = new List<int>();
             BasePlayerCharacterEntity playerCharacter;
-            UserCharacterData userData;
+            SocialCharacterData userData;
             if (!playerCharacters.TryGetValue(requestHandler.ConnectionId, out playerCharacter) ||
                 !usersById.TryGetValue(playerCharacter.Id, out userData))
             {
@@ -685,7 +685,7 @@ namespace MultiplayerARPG.MMO
             int dataId = request.dataId;
             int cash = 0;
             BasePlayerCharacterEntity playerCharacter;
-            UserCharacterData userData;
+            SocialCharacterData userData;
             if (!playerCharacters.TryGetValue(requestHandler.ConnectionId, out playerCharacter) ||
                 !usersById.TryGetValue(playerCharacter.Id, out userData))
             {
@@ -759,7 +759,7 @@ namespace MultiplayerARPG.MMO
             int cash = 0;
             List<int> cashPackageIds = new List<int>();
             BasePlayerCharacterEntity playerCharacter;
-            UserCharacterData userData;
+            SocialCharacterData userData;
             if (!playerCharacters.TryGetValue(requestHandler.ConnectionId, out playerCharacter) ||
                 !usersById.TryGetValue(playerCharacter.Id, out userData))
             {
@@ -800,7 +800,7 @@ namespace MultiplayerARPG.MMO
             int dataId = request.dataId;
             int cash = 0;
             BasePlayerCharacterEntity playerCharacter;
-            UserCharacterData userData;
+            SocialCharacterData userData;
             if (!playerCharacters.TryGetValue(requestHandler.ConnectionId, out playerCharacter) ||
                 !usersById.TryGetValue(playerCharacter.Id, out userData))
             {
@@ -940,13 +940,13 @@ namespace MultiplayerARPG.MMO
                         socialId = message.data.partyId;
                         if (socialId > 0 && parties.TryGetValue(socialId, out party))
                         {
-                            party.UpdateMember(message.data.ToSocialCharacterData());
+                            party.UpdateMember(message.data);
                             parties[socialId] = party;
                         }
                         socialId = message.data.guildId;
                         if (socialId > 0 && guilds.TryGetValue(socialId, out guild))
                         {
-                            guild.UpdateMember(message.data.ToSocialCharacterData());
+                            guild.UpdateMember(message.data);
                             guilds[socialId] = guild;
                         }
                         usersById[message.data.id] = message.data;
@@ -1123,14 +1123,14 @@ namespace MultiplayerARPG.MMO
         private void UpdateMapUsers(LiteNetLibClient transportHandler, UpdateUserCharacterMessage.UpdateType updateType)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            foreach (UserCharacterData user in usersById.Values)
+            foreach (SocialCharacterData user in usersById.Values)
             {
                 UpdateMapUser(transportHandler, updateType, user);
             }
 #endif
         }
 
-        private void UpdateMapUser(LiteNetLibClient transportHandler, UpdateUserCharacterMessage.UpdateType updateType, UserCharacterData userData)
+        private void UpdateMapUser(LiteNetLibClient transportHandler, UpdateUserCharacterMessage.UpdateType updateType, SocialCharacterData userData)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             UpdateUserCharacterMessage updateMapUserMessage = new UpdateUserCharacterMessage();

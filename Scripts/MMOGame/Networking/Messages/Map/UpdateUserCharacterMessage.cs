@@ -11,7 +11,7 @@ namespace MultiplayerARPG.MMO
             Online,
         }
         public UpdateType type;
-        public UserCharacterData data;
+        public SocialCharacterData data;
 
         public void Deserialize(NetDataReader reader)
         {

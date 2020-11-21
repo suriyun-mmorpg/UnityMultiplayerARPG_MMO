@@ -28,7 +28,7 @@ namespace MultiplayerARPG.MMO
         public CentralServerPeerType PeerType { get { return CentralServerPeerType.Chat; } }
         private MapNetworkManager mapNetworkManager;
         private readonly HashSet<long> mapServerConnectionIds = new HashSet<long>();
-        private readonly Dictionary<string, UserCharacterData> mapUsersById = new Dictionary<string, UserCharacterData>();
+        private readonly Dictionary<string, SocialCharacterData> mapUsersById = new Dictionary<string, SocialCharacterData>();
         private readonly Dictionary<string, long> connectionIdsByCharacterId = new Dictionary<string, long>();
         private readonly Dictionary<string, long> connectionIdsByCharacterName = new Dictionary<string, long>();
 
@@ -133,7 +133,7 @@ namespace MultiplayerARPG.MMO
             {
                 mapServerConnectionIds.Add(connectionId);
                 // Send add map users
-                foreach (UserCharacterData userData in mapUsersById.Values)
+                foreach (SocialCharacterData userData in mapUsersById.Values)
                 {
                     UpdateMapUser(connectionId, UpdateUserCharacterMessage.UpdateType.Add, userData);
                 }
@@ -145,7 +145,7 @@ namespace MultiplayerARPG.MMO
             base.OnPeerDisconnected(connectionId, disconnectInfo);
             if (mapServerConnectionIds.Remove(connectionId))
             {
-                UserCharacterData userData;
+                SocialCharacterData userData;
                 foreach (KeyValuePair<string, long> entry in connectionIdsByCharacterId)
                 {
                     // Find characters which connected to disconnecting map server
@@ -246,7 +246,7 @@ namespace MultiplayerARPG.MMO
             UpdateUserCharacterMessage message = messageHandler.ReadMessage<UpdateUserCharacterMessage>();
             if (mapServerConnectionIds.Contains(connectionId))
             {
-                UserCharacterData userData;
+                SocialCharacterData userData;
                 switch (message.type)
                 {
                     case UpdateUserCharacterMessage.UpdateType.Add:
@@ -340,7 +340,7 @@ namespace MultiplayerARPG.MMO
             }
         }
 
-        private void UpdateMapUser(UpdateUserCharacterMessage.UpdateType updateType, UserCharacterData userData, long exceptConnectionId)
+        private void UpdateMapUser(UpdateUserCharacterMessage.UpdateType updateType, SocialCharacterData userData, long exceptConnectionId)
         {
             foreach (long mapServerConnectionId in mapServerConnectionIds)
             {
@@ -351,7 +351,7 @@ namespace MultiplayerARPG.MMO
             }
         }
 
-        private void UpdateMapUser(long connectionId, UpdateUserCharacterMessage.UpdateType updateType, UserCharacterData userData)
+        private void UpdateMapUser(long connectionId, UpdateUserCharacterMessage.UpdateType updateType, SocialCharacterData userData)
         {
             UpdateUserCharacterMessage updateMapUserMessage = new UpdateUserCharacterMessage();
             updateMapUserMessage.type = updateType;
