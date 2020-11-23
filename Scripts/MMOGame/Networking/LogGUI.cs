@@ -28,13 +28,13 @@ public class LogGUI : MonoBehaviour
 
     private void Start()
     {
-        if (!Directory.Exists(@"./log"))
-            Directory.CreateDirectory(@"./log");
-        logSavePath = @$"./log/{logFileName}.txt";
+        if (!Directory.Exists("./log"))
+            Directory.CreateDirectory("./log");
+        logSavePath = $"./log/{logFileName}.txt";
         if (openLogDir && !Application.isConsolePlatform && !Application.isMobilePlatform)
         {
             // Open log folder while running standalone platforms
-            Application.OpenURL(@"./log/");
+            Application.OpenURL("./log/");
         }
         // Write log file header
         using (StreamWriter writer = new StreamWriter(logSavePath, true, Encoding.UTF8))
