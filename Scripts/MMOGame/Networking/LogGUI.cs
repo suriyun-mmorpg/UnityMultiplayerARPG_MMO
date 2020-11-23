@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using UnityEngine;
@@ -31,7 +30,7 @@ public class LogGUI : MonoBehaviour
     {
         if (!Directory.Exists(@"./log"))
             Directory.CreateDirectory(@"./log");
-        logSavePath = @"./log/" + logFileName + ".txt";
+        logSavePath = @$"./log/{logFileName}.txt";
         if (openLogDir && !Application.isConsolePlatform && !Application.isMobilePlatform)
         {
             // Open log folder while running standalone platforms
@@ -40,7 +39,7 @@ public class LogGUI : MonoBehaviour
         // Write log file header
         using (StreamWriter writer = new StreamWriter(logSavePath, true, Encoding.UTF8))
         {
-            writer.WriteLine("\n\n -- Log Start: " + System.DateTime.Now);
+            writer.WriteLine($"\n\n -- Log Start: {System.DateTime.Now}");
         }
     }
 
@@ -62,7 +61,7 @@ public class LogGUI : MonoBehaviour
             return;
         using (StreamWriter writer = new StreamWriter(logSavePath, true, Encoding.UTF8))
         {
-            writer.WriteLine("(" + type + ") [" + tag + "]" + logString + "\n");
+            writer.WriteLine($"({type})[{tag}] {logString}\n");
         }
         Color color = Color.white;
         switch (type)
@@ -79,7 +78,7 @@ public class LogGUI : MonoBehaviour
         }
         logList.Add(new LogData()
         {
-            logText = "[" + tag + "] " + logString,
+            logText = $"[{tag}] {logString}",
             logColor = color,
         });
         if (logList.Count > showLogSize)
@@ -93,7 +92,7 @@ public class LogGUI : MonoBehaviour
             return;
         using (StreamWriter writer = new StreamWriter(logSavePath, true, Encoding.UTF8))
         {
-            writer.WriteLine("(" + type + ") " + condition + "\n");
+            writer.WriteLine($"({type})[UnityEngine.Debug] {condition}\n");
         }
         Color color = Color.white;
         switch (type)
@@ -110,7 +109,7 @@ public class LogGUI : MonoBehaviour
         }
         logList.Add(new LogData()
         {
-            logText = " " + condition,
+            logText = $"[UnityEngine.Debug] {condition}",
             logColor = color,
         });
         if (logList.Count > showLogSize)
