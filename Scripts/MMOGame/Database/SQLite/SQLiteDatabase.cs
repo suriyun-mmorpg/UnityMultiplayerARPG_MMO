@@ -61,6 +61,16 @@ namespace MultiplayerARPG.MMO
               updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
 
+            ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS charactercurrency (
+              id TEXT NOT NULL PRIMARY KEY,
+              idx INTEGER NOT NULL,
+              characterId TEXT NOT NULL,
+              dataId INTEGER NOT NULL,
+              amount INTEGER NOT NULL,
+              createAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+              updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+            )");
+
             ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characterbuff (
               id TEXT NOT NULL PRIMARY KEY,
               characterId TEXT NOT NULL,

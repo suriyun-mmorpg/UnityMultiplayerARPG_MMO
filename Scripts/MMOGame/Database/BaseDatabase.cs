@@ -37,7 +37,8 @@ namespace MultiplayerARPG.MMO
             bool withNonEquipItems = true,
             bool withSummons = true,
             bool withHotkeys = true,
-            bool withQuests = true);
+            bool withQuests = true,
+            bool withCurrencies = true);
         public abstract UniTask<List<PlayerCharacterData>> ReadCharacters(string userId);
         public abstract UniTask UpdateCharacter(IPlayerCharacterData character);
         public abstract UniTask DeleteCharacter(string userId, string id);

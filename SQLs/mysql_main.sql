@@ -93,6 +93,22 @@ CREATE TABLE `characterbuff` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `charactercurrency`
+--
+
+CREATE TABLE `charactercurrency` (
+  `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `idx` int(11) NOT NULL,
+  `characterId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `dataId` int(11) NOT NULL DEFAULT '0',
+  `amount` int(11) NOT NULL DEFAULT '0',
+  `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `characterhotkey`
 --
 
@@ -379,6 +395,12 @@ ALTER TABLE `characterattribute`
 -- Indexes for table `characterbuff`
 --
 ALTER TABLE `characterbuff`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `charactercurrency`
+--
+ALTER TABLE `charactercurrency`
   ADD PRIMARY KEY (`id`);
 
 --

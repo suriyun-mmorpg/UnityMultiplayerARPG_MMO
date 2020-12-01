@@ -17,6 +17,7 @@ namespace MultiplayerARPG.MMO
             try
             {
                 DeleteCharacterAttributes(transaction, characterId);
+                DeleteCharacterCurrencies(transaction, characterId);
                 DeleteCharacterBuffs(transaction, characterId);
                 DeleteCharacterHotkeys(transaction, characterId);
                 DeleteCharacterItems(transaction, characterId);
@@ -41,6 +42,10 @@ namespace MultiplayerARPG.MMO
                 for (i = 0; i < characterData.Attributes.Count; ++i)
                 {
                     CreateCharacterAttribute(transaction, i, characterData.Id, characterData.Attributes[i]);
+                }
+                for (i = 0; i < characterData.Currencies.Count; ++i)
+                {
+                    CreateCharacterCurrency(transaction, i, characterData.Id, characterData.Currencies[i]);
                 }
                 for (i = 0; i < characterData.Skills.Count; ++i)
                 {
@@ -174,7 +179,8 @@ namespace MultiplayerARPG.MMO
             bool withNonEquipItems = true,
             bool withSummons = true,
             bool withHotkeys = true,
-            bool withQuests = true)
+            bool withQuests = true,
+            bool withCurrencies = true)
         {
             await UniTask.Yield();
             PlayerCharacterData result = null;
@@ -212,6 +218,8 @@ namespace MultiplayerARPG.MMO
                     result.Hotkeys = ReadCharacterHotkeys(id);
                 if (withQuests)
                     result.Quests = ReadCharacterQuests(id);
+                if (withCurrencies)
+                    result.Currencies = ReadCharacterCurrencies(id);
                 // Invoke dev extension methods
                 this.InvokeInstanceDevExtMethods("ReadCharacter",
                     result,
@@ -224,7 +232,8 @@ namespace MultiplayerARPG.MMO
                     withNonEquipItems,
                     withSummons,
                     withHotkeys,
-                    withQuests);
+                    withQuests,
+                    withCurrencies);
             }
             return result;
         }
@@ -325,6 +334,7 @@ namespace MultiplayerARPG.MMO
                 {
                     ExecuteNonQuery(transaction, "DELETE FROM characters WHERE id=@characterId", new SqliteParameter("@characterId", id));
                     DeleteCharacterAttributes(transaction, id);
+                    DeleteCharacterCurrencies(transaction, id);
                     DeleteCharacterBuffs(transaction, id);
                     DeleteCharacterHotkeys(transaction, id);
                     DeleteCharacterItems(transaction, id);

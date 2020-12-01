@@ -142,6 +142,31 @@ namespace MultiplayerARPG.MMO
             await connection.CloseAsync();
         }
 
+        private async UniTask FillCharacterCurrencies(IPlayerCharacterData characterData)
+        {
+            MySqlConnection connection = NewConnection();
+            await OpenConnection(connection);
+            MySqlTransaction transaction = await connection.BeginTransactionAsync();
+            try
+            {
+                await DeleteCharacterCurrencies(connection, transaction, characterData.Id);
+                int i;
+                for (i = 0; i < characterData.Currencies.Count; ++i)
+                {
+                    await CreateCharacterCurrency(connection, transaction, i, characterData.Id, characterData.Currencies[i]);
+                }
+                await transaction.CommitAsync();
+            }
+            catch (System.Exception ex)
+            {
+                Logging.LogError(ToString(), "Transaction, Error occurs while replacing currencies of character: " + characterData.Id);
+                Logging.LogException(ToString(), ex);
+                await transaction.RollbackAsync();
+            }
+            await transaction.DisposeAsync();
+            await connection.CloseAsync();
+        }
+
         private async UniTask FillCharacterSkills(IPlayerCharacterData characterData)
         {
             MySqlConnection connection = NewConnection();
@@ -220,6 +245,7 @@ namespace MultiplayerARPG.MMO
         private async UniTask FillCharacterRelatesData(IPlayerCharacterData characterData)
         {
             await UniTask.WhenAll(FillCharacterAttributes(characterData),
+                FillCharacterCurrencies(characterData),
                 FillCharacterBuffs(characterData),
                 FillCharacterHotkeys(characterData),
                 FillCharacterItems(characterData),
@@ -325,7 +351,8 @@ namespace MultiplayerARPG.MMO
             bool withNonEquipItems = true,
             bool withSummons = true,
             bool withHotkeys = true,
-            bool withQuests = true)
+            bool withQuests = true,
+            bool withCurrencies = true)
         {
             PlayerCharacterData result = null;
             await ExecuteReader((reader) =>
@@ -352,6 +379,7 @@ namespace MultiplayerARPG.MMO
                 List<CharacterSummon> summons = new List<CharacterSummon>();
                 List<CharacterHotkey> hotkeys = new List<CharacterHotkey>();
                 List<CharacterQuest> quests = new List<CharacterQuest>();
+                List<CharacterCurrency> currencies = new List<CharacterCurrency>();
                 // Read data
                 List<UniTask> tasks = new List<UniTask>();
                 if (withEquipWeapons)
@@ -374,6 +402,8 @@ namespace MultiplayerARPG.MMO
                     tasks.Add(ReadCharacterHotkeys(id, hotkeys));
                 if (withQuests)
                     tasks.Add(ReadCharacterQuests(id, quests));
+                if (withCurrencies)
+                    tasks.Add(ReadCharacterCurrencies(id, currencies));
                 await UniTask.WhenAll(tasks);
                 // Assign read data
                 if (withEquipWeapons)
@@ -396,6 +426,8 @@ namespace MultiplayerARPG.MMO
                     result.Hotkeys = hotkeys;
                 if (withQuests)
                     result.Quests = quests;
+                if (withCurrencies)
+                    result.Currencies = currencies;
                 // Invoke dev extension methods
                 this.InvokeInstanceDevExtMethods("ReadCharacter",
                     result,
@@ -408,7 +440,8 @@ namespace MultiplayerARPG.MMO
                     withNonEquipItems,
                     withSummons,
                     withHotkeys,
-                    withQuests);
+                    withQuests,
+                    withCurrencies);
             }
             return result;
         }
@@ -509,6 +542,7 @@ namespace MultiplayerARPG.MMO
                 {
                     await ExecuteNonQuery(connection, transaction, "DELETE FROM characters WHERE id=@characterId", new MySqlParameter("@characterId", id));
                     await DeleteCharacterAttributes(connection, transaction, id);
+                    await DeleteCharacterCurrencies(connection, transaction, id);
                     await DeleteCharacterBuffs(connection, transaction, id);
                     await DeleteCharacterHotkeys(connection, transaction, id);
                     await DeleteCharacterItems(connection, transaction, id);
