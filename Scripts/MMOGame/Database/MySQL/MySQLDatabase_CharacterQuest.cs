@@ -14,7 +14,7 @@ namespace MultiplayerARPG.MMO
                 result = new CharacterQuest();
                 result.dataId = reader.GetInt32(0);
                 result.isComplete = reader.GetBoolean(1);
-                result.ReadKillMonsters(reader.GetString(2));
+                result.ReadKilledMonsters(reader.GetString(2));
                 result.ReadCompletedTasks(reader.GetString(3));
                 return true;
             }
@@ -30,7 +30,7 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@dataId", characterQuest.dataId),
                 new MySqlParameter("@isComplete", characterQuest.isComplete),
-                new MySqlParameter("@killedMonsters", characterQuest.WriteKillMonsters()),
+                new MySqlParameter("@killedMonsters", characterQuest.WriteKilledMonsters()),
                 new MySqlParameter("@completedTasks", characterQuest.WriteCompletedTasks()));
         }
 
