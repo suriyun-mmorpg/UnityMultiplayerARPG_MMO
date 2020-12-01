@@ -116,9 +116,25 @@ namespace MultiplayerARPG.MMO
                     + "`dataId` int(11) NOT NULL DEFAULT '0',"
                     + "`amount` int(11) NOT NULL DEFAULT '0',"
                     + "`createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,"
-                    + "`updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"
-                    + ") ENGINE = InnoDB DEFAULT CHARSET = utf8 COLLATE = utf8_unicode_ci;");
-                await ExecuteNonQuery("ALTER TABLE `charactercurrency` ADD PRIMARY KEY(`id`);");
+                    + "`updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,"
+                    + "PRIMARY KEY(`id`)) ENGINE = InnoDB DEFAULT CHARSET = utf8 COLLATE = utf8_unicode_ci;");
+                await ExecuteNonQuery("CREATE TABLE `mail` ("
+                    + "`id` BIGINT NOT NULL AUTO_INCREMENT,"
+                    + "`eventId` VARCHAR(50) NULL DEFAULT NULL,"
+                    + "`senderId` VARCHAR(50) NULL DEFAULT NULL,"
+                    + "`senderName` VARCHAR(32) NULL DEFAULT NULL,"
+                    + "`receiverId` VARCHAR(50) NOT NULL,"
+                    + "`title` VARCHAR(160) NOT NULL,"
+                    + "`content` TEXT NOT NULL,"
+                    + "`gold` INT NOT NULL,"
+                    + "`currencies` TEXT NOT NULL,"
+                    + "`items` TEXT NOT NULL,"
+                    + "`isRead` BOOLEAN NOT NULL DEFAULT FALSE,"
+                    + "`readTimestamp` TIMESTAMP NULL DEFAULT NULL,"
+                    + "`isDelete` BOOLEAN NOT NULL DEFAULT FALSE,"
+                    + "`deleteTimestamp` TIMESTAMP NULL DEFAULT NULL,"
+                    + "`sentTimestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,"
+                    + "PRIMARY KEY(`id`)) ENGINE = InnoDB DEFAULT CHARSET = utf8 COLLATE utf8_unicode_ci;");
                 // Insert migrate history
                 await InsertMigrationId(migrationId);
                 Logging.Log("Migrated to 1.61");

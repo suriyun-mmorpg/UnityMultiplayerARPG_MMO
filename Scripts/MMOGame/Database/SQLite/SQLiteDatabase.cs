@@ -57,8 +57,8 @@ namespace MultiplayerARPG.MMO
               characterId TEXT NOT NULL,
               dataId INTEGER NOT NULL,
               amount INTEGER NOT NULL,
-              createAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-              updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+              createAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+              updateAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
 
             ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS charactercurrency (
@@ -67,8 +67,8 @@ namespace MultiplayerARPG.MMO
               characterId TEXT NOT NULL,
               dataId INTEGER NOT NULL,
               amount INTEGER NOT NULL,
-              createAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-              updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+              createAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+              updateAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
 
             ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characterbuff (
@@ -78,8 +78,8 @@ namespace MultiplayerARPG.MMO
               dataId INTEGER NOT NULL,
               level INTEGER NOT NULL,
               buffRemainsDuration REAL NOT NULL,
-              createAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-              updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+              createAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+              updateAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
 
             ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characterhotkey (
@@ -88,8 +88,8 @@ namespace MultiplayerARPG.MMO
               hotkeyId TEXT NOT NULL,
               type INTEGER NOT NULL,
               relateId TEXT NOT NULL DEFAULT '',
-              createAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-              updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+              createAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+              updateAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
 
             ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characteritem (
@@ -106,8 +106,8 @@ namespace MultiplayerARPG.MMO
               lockRemainsDuration REAL NOT NULL DEFAULT 0,
               ammo INTEGER NOT NULL DEFAULT 0,
               sockets TEXT NOT NULL DEFAULT '',
-              createAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-              updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+              createAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+              updateAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
 
             ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS storageitem (
@@ -123,8 +123,8 @@ namespace MultiplayerARPG.MMO
               lockRemainsDuration REAL NOT NULL DEFAULT 0,
               ammo INTEGER NOT NULL DEFAULT 0,
               sockets TEXT NOT NULL DEFAULT '',
-              createAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-              updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+              createAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+              updateAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
 
             ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characterquest (
@@ -135,8 +135,8 @@ namespace MultiplayerARPG.MMO
               isComplete INTEGER NOT NULL DEFAULT 0,
               killedMonsters TEXT NOT NULL DEFAULT '',
               completedTasks TEXT NOT NULL DEFAULT '',
-              createAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-              updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+              createAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+              updateAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
 
             ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characters (
@@ -173,8 +173,8 @@ namespace MultiplayerARPG.MMO
               respawnPositionY REAL NOT NULL DEFAULT 0,
               respawnPositionZ REAL NOT NULL DEFAULT 0,
               mountDataId INTEGER NOT NULL DEFAULT 0,
-              createAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-              updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+              createAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+              updateAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
 
             ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characterskill (
@@ -184,8 +184,8 @@ namespace MultiplayerARPG.MMO
               dataId INTEGER NOT NULL,
               level INTEGER NOT NULL,
               coolDownRemainsDuration REAL NOT NULL,
-              createAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-              updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+              createAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+              updateAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
 
             ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characterskillusage (
@@ -194,8 +194,8 @@ namespace MultiplayerARPG.MMO
               type INTEGER NOT NULL DEFAULT 0,
               dataId INTEGER NOT NULL DEFAULT 0,
               coolDownRemainsDuration REAL NOT NULL DEFAULT 0,
-              createAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-              updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+              createAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+              updateAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
 
             ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS charactersummon (
@@ -208,16 +208,16 @@ namespace MultiplayerARPG.MMO
               exp INTEGER NOT NULL DEFAULT 0,
               currentHp INTEGER NOT NULL DEFAULT 0,
               currentMp INTEGER NOT NULL DEFAULT 0,
-              createAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-              updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+              createAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+              updateAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
 
             ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS friend (
               id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
               characterId1 TEXT NOT NULL,
               characterId2 TEXT NOT NULL,
-              createAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-              updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+              createAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+              updateAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
 
             ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS userlogin (
@@ -230,8 +230,8 @@ namespace MultiplayerARPG.MMO
               email TEXT NOT NULL,
               authType INTEGER NOT NULL,
               accessToken TEXT,
-              createAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-              updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+              createAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+              updateAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
 
             ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS buildings (
@@ -251,8 +251,8 @@ namespace MultiplayerARPG.MMO
               lockPassword TEXT NOT NULL DEFAULT '',
               creatorId TEXT NOT NULL,
               creatorName TEXT NOT NULL,
-              createAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-              updateAt timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+              createAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+              updateAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
 
             ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS guild (
@@ -286,6 +286,24 @@ namespace MultiplayerARPG.MMO
               shareExp INTEGER NOT NULL,
               shareItem INTEGER NOT NULL,
               leaderId TEXT NOT NULL
+            )");
+
+            ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS mail (
+              id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+              eventId TEXT NULL DEFAULT NULL,
+              senderId TEXT NULL DEFAULT NULL,
+              senderName TEXT NULL DEFAULT NULL,
+              receiverId TEXT NOT NULL,
+              title TEXT NOT NULL,
+              content TEXT NOT NULL,
+              gold TEXT NOT NULL,
+              currencies TEXT NOT NULL,
+              items TEXT NOT NULL,
+              isRead INTEGER NOT NULL DEFAULT 0,
+              readTimestamp TIMESTAMP NULL DEFAULT NULL,
+              isDelete INTEGER NOT NULL DEFAULT 0,
+              deleteTimestamp TIMESTAMP NULL DEFAULT NULL,
+              sentTimestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
 
             // Migrate data
