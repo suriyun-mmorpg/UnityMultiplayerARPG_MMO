@@ -769,27 +769,22 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public override void MoveItemToStorage(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short nonEquipIndex, short amount, short storageItemIndex)
+        public override void MoveItemToStorage(IPlayerCharacterData playerCharacter, StorageId storageId, InventoryType inventoryType, short inventoryIndex, short amount, short storageItemIndex)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            if (!CanAccessStorage(playerCharacterEntity, storageId))
-            {
-                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.CannotAccessStorage);
-                return;
-            }
-            MoveItemToStorageRoutine(playerCharacterEntity, storageId, nonEquipIndex, amount, storageItemIndex).Forget();
+            MoveItemToStorageRoutine(playerCharacter, storageId, inventoryType, inventoryIndex, amount, storageItemIndex).Forget();
 #endif
         }
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        private async UniTaskVoid MoveItemToStorageRoutine(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short nonEquipIndex, short amount, short storageItemIndex)
+        private async UniTaskVoid MoveItemToStorageRoutine(IPlayerCharacterData playerCharacter, StorageId storageId, InventoryType inventoryType, short inventoryIndex, short amount, short storageItemIndex)
         {
             MoveItemToStorageReq req = new MoveItemToStorageReq();
             req.StorageType = (EStorageType)storageId.storageType;
             req.StorageOwnerId = storageId.storageOwnerId;
-            req.CharacterId = playerCharacterEntity.Id;
+            req.CharacterId = playerCharacter.Id;
             req.MapName = CurrentMapInfo.Id;
-            req.InventoryItemIndex = nonEquipIndex;
+            req.InventoryItemIndex = inventoryIndex;
             req.InventoryItemAmount = amount;
             req.StorageItemIndex = storageItemIndex;
             MoveItemToStorageResp resp = await DbServiceClient.MoveItemToStorageAsync(req);
@@ -798,43 +793,38 @@ namespace MultiplayerARPG.MMO
                 // TODO: May push error message
                 return;
             }
-            playerCharacterEntity.NonEquipItems = DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.InventoryItemItems);
+            playerCharacter.NonEquipItems = DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.InventoryItemItems);
             List<CharacterItem> storageItems = DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.StorageCharacterItems);
             UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItems);
             allStorageItems[storageId] = storageItems;
         }
 #endif
 
-        public override void MoveItemFromStorage(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short storageItemIndex, short amount, short nonEquipIndex)
+        public override void MoveItemFromStorage(IPlayerCharacterData playerCharacter, StorageId storageId, short storageItemIndex, short amount, InventoryType inventoryType, short inventoryIndex)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            if (!CanAccessStorage(playerCharacterEntity, storageId))
-            {
-                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.CannotAccessStorage);
-                return;
-            }
-            MoveItemFromStorageRoutine(playerCharacterEntity, storageId, storageItemIndex, amount, nonEquipIndex).Forget();
+            MoveItemFromStorageRoutine(playerCharacter, storageId, storageItemIndex, amount, inventoryType, inventoryIndex).Forget();
 #endif
         }
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        private async UniTaskVoid MoveItemFromStorageRoutine(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short storageItemIndex, short amount, short nonEquipIndex)
+        private async UniTaskVoid MoveItemFromStorageRoutine(IPlayerCharacterData playerCharacter, StorageId storageId, short storageItemIndex, short amount, InventoryType inventoryType, short inventoryIndex)
         {
             MoveItemFromStorageReq req = new MoveItemFromStorageReq();
             req.StorageType = (EStorageType)storageId.storageType;
             req.StorageOwnerId = storageId.storageOwnerId;
-            req.CharacterId = playerCharacterEntity.Id;
+            req.CharacterId = playerCharacter.Id;
             req.MapName = CurrentMapInfo.Id;
             req.StorageItemIndex = storageItemIndex;
             req.StorageItemAmount = amount;
-            req.InventoryItemIndex = nonEquipIndex;
+            req.InventoryItemIndex = inventoryIndex;
             MoveItemFromStorageResp resp = await DbServiceClient.MoveItemFromStorageAsync(req);
             if (resp.Error != EStorageError.StorageErrorNone)
             {
                 // TODO: May push error message
                 return;
             }
-            playerCharacterEntity.NonEquipItems = DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.InventoryItemItems);
+            playerCharacter.NonEquipItems = DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.InventoryItemItems);
             List<CharacterItem> storageItems = DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.StorageCharacterItems);
             UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItems);
             allStorageItems[storageId] = storageItems;
