@@ -667,8 +667,7 @@ namespace MultiplayerARPG.MMO
         private async UniTaskVoid IncreaseGuildExpRoutine(BasePlayerCharacterEntity playerCharacterEntity, int exp)
         {
             int guildId;
-            GuildData guild;
-            if (!CanIncreaseGuildExp(playerCharacterEntity, exp, out guildId, out guild))
+            if (!CanIncreaseGuildExp(playerCharacterEntity, exp, out guildId, out _))
                 return;
             // Save to database
             GuildResp resp = await DbServiceClient.IncreaseGuildExpAsync(new IncreaseGuildExpReq()
@@ -676,7 +675,7 @@ namespace MultiplayerARPG.MMO
                 GuildId = guildId,
                 Exp = exp
             });
-            guild = DatabaseServiceUtils.FromByteString<GuildData>(resp.GuildData);
+            GuildData guild = DatabaseServiceUtils.FromByteString<GuildData>(resp.GuildData);
             guilds[guildId] = guild;
             SendGuildLevelExpSkillPointToClients(guild);
             // Broadcast via chat server
@@ -696,8 +695,7 @@ namespace MultiplayerARPG.MMO
         private async UniTaskVoid AddGuildSkillRoutine(BasePlayerCharacterEntity playerCharacterEntity, int dataId)
         {
             int guildId;
-            GuildData guild;
-            if (!CanAddGuildSkill(playerCharacterEntity, dataId, out guildId, out guild))
+            if (!CanAddGuildSkill(playerCharacterEntity, dataId, out guildId, out _))
                 return;
             // Save to database
             GuildResp resp = await DbServiceClient.AddGuildSkillAsync(new AddGuildSkillReq()
@@ -705,6 +703,7 @@ namespace MultiplayerARPG.MMO
                 GuildId = guildId,
                 SkillId = dataId
             });
+            GuildData guild = resp.GuildData.FromByteString<GuildData>();
             guilds[guildId] = guild;
             SendSetGuildSkillLevelToClients(guild, dataId);
             SendGuildLevelExpSkillPointToClients(guild);

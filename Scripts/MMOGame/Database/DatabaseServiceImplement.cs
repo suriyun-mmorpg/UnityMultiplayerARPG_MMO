@@ -600,8 +600,9 @@ namespace MultiplayerARPG.MMO
         {
             // TODO: May validate guild by character
             GuildData guild = await ReadGuild(request.GuildId);
-            // Update to cache
+            await UniTask.SwitchToMainThread();
             guild = GameInstance.Singleton.SocialSystemSetting.IncreaseGuildExp(guild, request.Exp);
+            // Update to cache
             cachedGuild.TryAdd(guild.id, guild);
             // Update to database
             await Database.UpdateGuildLevel(request.GuildId, guild.level, guild.exp, guild.skillPoint);
@@ -615,11 +616,15 @@ namespace MultiplayerARPG.MMO
         {
             // TODO: May validate guild by character
             GuildData guild = await ReadGuild(request.GuildId);
-            // Update to cache
-            guild.AddSkillLevel(request.SkillId);
-            cachedGuild[guild.id] = guild;
-            // Update to database
-            await Database.UpdateGuildSkillLevel(request.GuildId, request.SkillId, guild.GetSkillLevel(request.SkillId), guild.skillPoint);
+            await UniTask.SwitchToMainThread();
+            if (!guild.IsSkillReachedMaxLevel(request.SkillId) && guild.skillPoint > 0)
+            {
+                guild.AddSkillLevel(request.SkillId);
+                // Update to cache
+                cachedGuild[guild.id] = guild;
+                // Update to database
+                await Database.UpdateGuildSkillLevel(request.GuildId, request.SkillId, guild.GetSkillLevel(request.SkillId), guild.skillPoint);
+            }
             return new GuildResp()
             {
                 GuildData = DatabaseServiceUtils.ToByteString(guild)
