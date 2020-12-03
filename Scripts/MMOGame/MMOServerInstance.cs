@@ -504,12 +504,6 @@ namespace MultiplayerARPG.MMO
                 gameInstance.DoNotLoadHomeScene = true;
                 StartDatabaseManagerClient();
             }
-
-            if (Application.isEditor)
-            {
-                // If testing in editor, still load home scene
-                gameInstance.DoNotLoadHomeScene = !startingMapServer;
-            }
         }
 #endif
 
