@@ -1,12 +1,3 @@
--- phpMyAdmin SQL Dump
--- version 4.7.4
--- https://www.phpmyadmin.net/
---
--- Host: 127.0.0.1:3306
--- Generation Time: Dec 09, 2018 at 11:50 PM
--- Server version: 10.1.28-MariaDB
--- PHP Version: 7.1.11
-
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET AUTOCOMMIT = 0;
 START TRANSACTION;
@@ -29,6 +20,7 @@ CREATE TABLE `__migrations` (
 INSERT INTO `__migrations` (`migrationId`) VALUES ('1.57b');
 INSERT INTO `__migrations` (`migrationId`) VALUES ('1.58');
 INSERT INTO `__migrations` (`migrationId`) VALUES ('1.60c');
+INSERT INTO `__migrations` (`migrationId`) VALUES ('1.61');
 
 -- --------------------------------------------------------
 
@@ -322,6 +314,30 @@ CREATE TABLE `guildskill` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `mail`
+--
+
+CREATE TABLE `mail` (
+  `id` bigint(20) NOT NULL,
+  `eventId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `senderId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `senderName` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
+  `receiverId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `title` varchar(160) COLLATE utf8_unicode_ci NOT NULL,
+  `content` text COLLATE utf8_unicode_ci NOT NULL,
+  `gold` int(11) NOT NULL,
+  `currencies` text COLLATE utf8_unicode_ci NOT NULL,
+  `items` text COLLATE utf8_unicode_ci NOT NULL,
+  `isRead` tinyint(1) NOT NULL DEFAULT '0',
+  `readTimestamp` timestamp NULL DEFAULT NULL,
+  `isDelete` tinyint(1) NOT NULL DEFAULT '0',
+  `deleteTimestamp` timestamp NULL DEFAULT NULL,
+  `sentTimestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `party`
 --
 
@@ -497,6 +513,12 @@ ALTER TABLE `friend`
 --
 ALTER TABLE `guild`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `mail`
+--
+ALTER TABLE `mail`
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `party`
