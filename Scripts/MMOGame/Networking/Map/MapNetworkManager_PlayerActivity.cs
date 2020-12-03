@@ -769,15 +769,15 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public override void MoveItemToStorage(IPlayerCharacterData playerCharacter, StorageId storageId, InventoryType inventoryType, short inventoryIndex, short amount, short storageItemIndex)
+        public override void MoveItemToStorage(IPlayerCharacterData playerCharacter, StorageId storageId, short inventoryIndex, short amount, short storageItemIndex)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            MoveItemToStorageRoutine(playerCharacter, storageId, inventoryType, inventoryIndex, amount, storageItemIndex).Forget();
+            MoveItemToStorageRoutine(playerCharacter, storageId, inventoryIndex, amount, storageItemIndex).Forget();
 #endif
         }
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        private async UniTaskVoid MoveItemToStorageRoutine(IPlayerCharacterData playerCharacter, StorageId storageId, InventoryType inventoryType, short inventoryIndex, short amount, short storageItemIndex)
+        private async UniTaskVoid MoveItemToStorageRoutine(IPlayerCharacterData playerCharacter, StorageId storageId, short inventoryIndex, short amount, short storageItemIndex)
         {
             MoveItemToStorageReq req = new MoveItemToStorageReq();
             req.StorageType = (EStorageType)storageId.storageType;
@@ -800,15 +800,15 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-        public override void MoveItemFromStorage(IPlayerCharacterData playerCharacter, StorageId storageId, short storageItemIndex, short amount, InventoryType inventoryType, short inventoryIndex)
+        public override void MoveItemFromStorage(IPlayerCharacterData playerCharacter, StorageId storageId, short storageItemIndex, short amount, short inventoryIndex)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            MoveItemFromStorageRoutine(playerCharacter, storageId, storageItemIndex, amount, inventoryType, inventoryIndex).Forget();
+            MoveItemFromStorageRoutine(playerCharacter, storageId, storageItemIndex, amount, inventoryIndex).Forget();
 #endif
         }
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        private async UniTaskVoid MoveItemFromStorageRoutine(IPlayerCharacterData playerCharacter, StorageId storageId, short storageItemIndex, short amount, InventoryType inventoryType, short inventoryIndex)
+        private async UniTaskVoid MoveItemFromStorageRoutine(IPlayerCharacterData playerCharacter, StorageId storageId, short storageItemIndex, short amount, short inventoryIndex)
         {
             MoveItemFromStorageReq req = new MoveItemFromStorageReq();
             req.StorageType = (EStorageType)storageId.storageType;
@@ -899,25 +899,20 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-        public override void SwapOrMergeStorageItem(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short fromIndex, short toIndex)
+        public override void SwapOrMergeStorageItem(IPlayerCharacterData playerCharacter, StorageId storageId, short fromIndex, short toIndex)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            if (!CanAccessStorage(playerCharacterEntity, storageId))
-            {
-                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.CannotAccessStorage);
-                return;
-            }
-            SwapOrMergeStorageItemRoutine(playerCharacterEntity, storageId, fromIndex, toIndex).Forget();
+            SwapOrMergeStorageItemRoutine(playerCharacter, storageId, fromIndex, toIndex).Forget();
 #endif
         }
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        private async UniTaskVoid SwapOrMergeStorageItemRoutine(BasePlayerCharacterEntity playerCharacterEntity, StorageId storageId, short fromIndex, short toIndex)
+        private async UniTaskVoid SwapOrMergeStorageItemRoutine(IPlayerCharacterData playerCharacter, StorageId storageId, short fromIndex, short toIndex)
         {
             SwapOrMergeStorageItemReq req = new SwapOrMergeStorageItemReq();
             req.StorageType = (EStorageType)storageId.storageType;
             req.StorageOwnerId = storageId.storageOwnerId;
-            req.CharacterId = playerCharacterEntity.Id;
+            req.CharacterId = playerCharacter.Id;
             req.MapName = CurrentMapInfo.Id;
             req.FromIndex = fromIndex;
             req.ToIndex = toIndex;
