@@ -58,6 +58,12 @@ service DatabaseService {
     rpc SwapOrMergeStorageItem (SwapOrMergeStorageItemReq) returns (SwapOrMergeStorageItemResp);
     rpc IncreaseStorageItems (IncreaseStorageItemsReq) returns (IncreaseStorageItemsResp);
     rpc DecreaseStorageItems (DecreaseStorageItemsReq) returns (DecreaseStorageItemsResp);
+    // Mail
+    rpc MailList (MailListReq) returns (MailListResp);
+    rpc ReadMail (ReadMailReq) returns (ReadMailResp);
+    rpc ClaimMailItems (ClaimMailItemsReq) returns (ClaimMailItemsResp);
+    rpc DeleteMail (DeleteMailReq) returns (DeleteMailResp);
+    rpc SendMail (SendMailReq) returns (SendMailResp);
     // Other
     rpc Custom (CustomReq) returns (CustomResp);
 }
@@ -78,6 +84,31 @@ enum EStorageError
     STORAGE_ERROR_STORAGE_WILL_OVERWHELMING = 5;
     STORAGE_ERROR_INVENTORY_WILL_OVERWHELMING = 6;
     STORAGE_ERROR_DECREASE_ITEM_NOT_ENOUGH = 7;
+}
+enum EReadMailError
+{
+    READ_MAIL_ERROR_NONE = 0;
+    READ_MAIL_ERROR_NOT_AVAILABLE = 1;
+    READ_MAIL_ERROR_NOT_ALLOWED = 2;
+}
+enum EClaimMailItemsError
+{
+    CLIAM_MAIL_ITEMS_ERROR_NONE = 0;
+    CLIAM_MAIL_ITEMS_ERROR_NOT_AVAILABLE = 1;
+    CLIAM_MAIL_ITEMS_ERROR_NOT_ALLOWED = 2;
+    CLIAM_MAIL_ITEMS_ERROR_ALREADY_CLAIMED = 3;
+}
+enum EDeleteMailError
+{
+    DELETE_MAIL_ERROR_NONE = 0;
+    DELETE_MAIL_ERROR_NOT_AVAILABLE = 1;
+    DELETE_MAIL_ERROR_NOT_ALLOWED = 2;
+}
+enum ESendMailError
+{
+    SEND_MAIL_ERROR_NONE = 0;
+    SEND_MAIL_ERROR_NOT_AVAILABLE = 1;
+    SEND_MAIL_ERROR_NO_RECEIVER = 2;
 }
 // Map
 message ItemIndexAmountMap {
@@ -433,6 +464,46 @@ message DecreaseStorageItemsResp {
     EStorageError error = 1;
     repeated bytes storage_character_items = 2;
     repeated ItemIndexAmountMap decreased_items = 3;
+}
+// Mail
+message MailListReq {
+    string user_id = 1;
+}
+message MailListResp {
+    repeated bytes list = 1;
+}
+message ReadMailReq {
+    string mail_id = 1;
+    string user_id = 2;
+}
+message ReadMailResp {
+    EReadMailError error = 1;
+    bytes mail = 2;
+}
+message ClaimMailItemsReq {
+    string mail_id = 1;
+    string user_id = 2;
+}
+message ClaimMailItemsResp {
+    EClaimMailItemsError error = 1;
+    bytes mail = 2;
+}
+message DeleteMailReq {
+    string mail_id = 1;
+    string user_id = 2;
+}
+message DeleteMailResp {
+    EDeleteMailError error = 1;
+}
+message SendMailReq {
+    string user_id = 1;
+    string sender_name = 2;
+    string title = 3;
+    string content = 4;
+    int32 gold = 5;
+}
+message SendMailResp {
+    ESendMailError error = 1;
 }
 // Custom
 message CustomReq {

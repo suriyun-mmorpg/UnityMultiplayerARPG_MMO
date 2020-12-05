@@ -880,6 +880,7 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
         protected override UniTaskVoid HandleRequestSendMail(RequestHandlerData requestHandler, RequestSendMailMessage request, RequestProceedResultDelegate<ResponseSendMailMessage> result)
         {
+            // TODO: Validate receiver, gold then send message
             return base.HandleRequestSendMail(requestHandler, request, result);
         }
 #endif
