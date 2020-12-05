@@ -108,7 +108,8 @@ enum ESendMailError
 {
     SEND_MAIL_ERROR_NONE = 0;
     SEND_MAIL_ERROR_NOT_AVAILABLE = 1;
-    SEND_MAIL_ERROR_NO_RECEIVER = 2;
+    SEND_MAIL_ERROR_NOT_ALLOWED = 2;
+    SEND_MAIL_ERROR_NO_RECEIVER = 3;
 }
 // Map
 message ItemIndexAmountMap {
@@ -468,6 +469,7 @@ message DecreaseStorageItemsResp {
 // Mail
 message MailListReq {
     string user_id = 1;
+    bool only_new_mails = 2;
 }
 message MailListResp {
     repeated bytes list = 1;

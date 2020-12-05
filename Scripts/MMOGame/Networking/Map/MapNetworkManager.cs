@@ -645,11 +645,9 @@ namespace MultiplayerARPG.MMO
             int cash = 0;
             List<int> cashShopItemIds = new List<int>();
             BasePlayerCharacterEntity playerCharacter;
-            SocialCharacterData userData;
-            if (!playerCharacters.TryGetValue(requestHandler.ConnectionId, out playerCharacter) ||
-                !usersById.TryGetValue(playerCharacter.Id, out userData))
+            if (!playerCharacters.TryGetValue(requestHandler.ConnectionId, out playerCharacter))
             {
-                // Canot find user
+                // Cannot find user
                 error = ResponseCashShopInfoMessage.Error.UserNotFound;
             }
             else
@@ -657,7 +655,7 @@ namespace MultiplayerARPG.MMO
                 // Get user cash amount
                 CashResp getCashResp = await DbServiceClient.GetCashAsync(new GetCashReq()
                 {
-                    UserId = userData.userId
+                    UserId = playerCharacter.UserId
                 });
                 cash = getCashResp.Cash;
                 // Set cash shop item ids
@@ -685,11 +683,9 @@ namespace MultiplayerARPG.MMO
             int dataId = request.dataId;
             int cash = 0;
             BasePlayerCharacterEntity playerCharacter;
-            SocialCharacterData userData;
-            if (!playerCharacters.TryGetValue(requestHandler.ConnectionId, out playerCharacter) ||
-                !usersById.TryGetValue(playerCharacter.Id, out userData))
+            if (!playerCharacters.TryGetValue(requestHandler.ConnectionId, out playerCharacter))
             {
-                // Canot find user
+                // Cannot find user
                 error = ResponseCashShopBuyMessage.Error.UserNotFound;
             }
             else
@@ -697,7 +693,7 @@ namespace MultiplayerARPG.MMO
                 // Get user cash amount
                 CashResp getCashResp = await DbServiceClient.GetCashAsync(new GetCashReq()
                 {
-                    UserId = userData.userId
+                    UserId = playerCharacter.UserId
                 });
                 cash = getCashResp.Cash;
                 CashShopItem cashShopItem;
@@ -721,7 +717,7 @@ namespace MultiplayerARPG.MMO
                     // Decrease cash amount
                     CashResp changeCashResp = await DbServiceClient.ChangeCashAsync(new ChangeCashReq()
                     {
-                        UserId = userData.userId,
+                        UserId = playerCharacter.UserId,
                         ChangeAmount = -cashShopItem.sellPrice
                     });
                     cash = changeCashResp.Cash;
@@ -759,11 +755,9 @@ namespace MultiplayerARPG.MMO
             int cash = 0;
             List<int> cashPackageIds = new List<int>();
             BasePlayerCharacterEntity playerCharacter;
-            SocialCharacterData userData;
-            if (!playerCharacters.TryGetValue(requestHandler.ConnectionId, out playerCharacter) ||
-                !usersById.TryGetValue(playerCharacter.Id, out userData))
+            if (!playerCharacters.TryGetValue(requestHandler.ConnectionId, out playerCharacter))
             {
-                // Canot find user
+                // Cannot find user
                 error = ResponseCashPackageInfoMessage.Error.UserNotFound;
             }
             else
@@ -771,7 +765,7 @@ namespace MultiplayerARPG.MMO
                 // Get user cash amount
                 CashResp getCashResp = await DbServiceClient.GetCashAsync(new GetCashReq()
                 {
-                    UserId = userData.userId
+                    UserId = playerCharacter.UserId
                 });
                 cash = getCashResp.Cash;
                 // Set cash package ids
@@ -800,11 +794,9 @@ namespace MultiplayerARPG.MMO
             int dataId = request.dataId;
             int cash = 0;
             BasePlayerCharacterEntity playerCharacter;
-            SocialCharacterData userData;
-            if (!playerCharacters.TryGetValue(requestHandler.ConnectionId, out playerCharacter) ||
-                !usersById.TryGetValue(playerCharacter.Id, out userData))
+            if (!playerCharacters.TryGetValue(requestHandler.ConnectionId, out playerCharacter))
             {
-                // Canot find user
+                // Cannot find user
                 error = ResponseCashPackageBuyValidationMessage.Error.UserNotFound;
             }
             else
@@ -812,7 +804,7 @@ namespace MultiplayerARPG.MMO
                 // Get user cash amount
                 CashResp getCashResp = await DbServiceClient.GetCashAsync(new GetCashReq()
                 {
-                    UserId = userData.userId
+                    UserId = playerCharacter.UserId
                 });
                 cash = getCashResp.Cash;
                 CashPackage cashPackage;
@@ -826,7 +818,7 @@ namespace MultiplayerARPG.MMO
                     // Increase cash amount
                     CashResp changeCashResp = await DbServiceClient.ChangeCashAsync(new ChangeCashReq()
                     {
-                        UserId = userData.userId,
+                        UserId = playerCharacter.UserId,
                         ChangeAmount = cashPackage.cashAmount
                     });
                     cash = changeCashResp.Cash;
@@ -846,42 +838,145 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        protected override UniTaskVoid HandleRequestMailList(RequestHandlerData requestHandler, RequestMailListMessage request, RequestProceedResultDelegate<ResponseMailListMessage> result)
+        protected override async UniTaskVoid HandleRequestMailList(RequestHandlerData requestHandler, RequestMailListMessage request, RequestProceedResultDelegate<ResponseMailListMessage> result)
         {
-            // TODO: Retrieve mail list from database
-            return base.HandleRequestMailList(requestHandler, request, result);
+            List<MailListEntry> mails = new List<MailListEntry>();
+            BasePlayerCharacterEntity playerCharacter;
+            if (playerCharacters.TryGetValue(requestHandler.ConnectionId, out playerCharacter))
+            {
+                MailListResp resp = await DbServiceClient.MailListAsync(new MailListReq()
+                {
+                    UserId = playerCharacter.UserId,
+                    OnlyNewMails = request.onlyNewMails,
+                });
+                resp.List.MakeListFromRepeatedByteString<MailListEntry>();
+            }
+            result.Invoke(AckResponseCode.Success, new ResponseMailListMessage()
+            {
+                onlyNewMails = request.onlyNewMails,
+                mails = mails.ToArray(),
+            });
         }
 #endif
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        protected override UniTaskVoid HandleRequestReadMail(RequestHandlerData requestHandler, RequestReadMailMessage request, RequestProceedResultDelegate<ResponseReadMailMessage> result)
+        protected override async UniTaskVoid HandleRequestReadMail(RequestHandlerData requestHandler, RequestReadMailMessage request, RequestProceedResultDelegate<ResponseReadMailMessage> result)
         {
-            // TODO: Validate mail owner then update read state
-            return base.HandleRequestReadMail(requestHandler, request, result);
+            BasePlayerCharacterEntity playerCharacter;
+            if (playerCharacters.TryGetValue(requestHandler.ConnectionId, out playerCharacter))
+            {
+                ReadMailResp resp = await DbServiceClient.ReadMailAsync(new ReadMailReq()
+                {
+                    MailId = request.id,
+                    UserId = playerCharacter.UserId,
+                });
+                ResponseReadMailMessage.Error error = (ResponseReadMailMessage.Error)resp.Error;
+                result.Invoke(
+                    error == ResponseReadMailMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error, 
+                    new ResponseReadMailMessage()
+                    {
+                        error = error,
+                        mail = resp.Mail.FromByteString<Mail>(),
+                    });
+            }
+            else
+            {
+                result.Invoke(AckResponseCode.Error, new ResponseReadMailMessage()
+                {
+                    error = ResponseReadMailMessage.Error.NotAvailable,
+                });
+            }
         }
 #endif
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        protected override UniTaskVoid HandleRequestClaimMailItems(RequestHandlerData requestHandler, RequestClaimMailItemsMessage request, RequestProceedResultDelegate<ResponseClaimMailItemsMessage> result)
+        protected override async UniTaskVoid HandleRequestClaimMailItems(RequestHandlerData requestHandler, RequestClaimMailItemsMessage request, RequestProceedResultDelegate<ResponseClaimMailItemsMessage> result)
         {
-            // TODO: Validate mail owner then add an items and update claim state
-            return base.HandleRequestClaimMailItems(requestHandler, request, result);
+            BasePlayerCharacterEntity playerCharacter;
+            if (playerCharacters.TryGetValue(requestHandler.ConnectionId, out playerCharacter))
+            {
+                ClaimMailItemsResp resp = await DbServiceClient.ClaimMailItemsAsync(new ClaimMailItemsReq()
+                {
+                    MailId = request.id,
+                    UserId = playerCharacter.UserId,
+                });
+                ResponseClaimMailItemsMessage.Error error = (ResponseClaimMailItemsMessage.Error)resp.Error;
+                result.Invoke(
+                    error == ResponseClaimMailItemsMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error,
+                    new ResponseClaimMailItemsMessage()
+                    {
+                        error = error,
+                        mail = resp.Mail.FromByteString<Mail>(),
+                    });
+            }
+            else
+            {
+                result.Invoke(AckResponseCode.Error, new ResponseClaimMailItemsMessage()
+                {
+                    error = ResponseClaimMailItemsMessage.Error.NotAvailable,
+                });
+            }
         }
 #endif
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        protected override UniTaskVoid HandleRequestDeleteMail(RequestHandlerData requestHandler, RequestDeleteMailMessage request, RequestProceedResultDelegate<ResponseDeleteMailMessage> result)
+        protected override async UniTaskVoid HandleRequestDeleteMail(RequestHandlerData requestHandler, RequestDeleteMailMessage request, RequestProceedResultDelegate<ResponseDeleteMailMessage> result)
         {
-            // TODO: Validate mail owner then update delete state
-            return base.HandleRequestDeleteMail(requestHandler, request, result);
+            BasePlayerCharacterEntity playerCharacter;
+            if (playerCharacters.TryGetValue(requestHandler.ConnectionId, out playerCharacter))
+            {
+                DeleteMailResp resp = await DbServiceClient.DeleteMailAsync(new DeleteMailReq()
+                {
+                    MailId = request.id,
+                    UserId = playerCharacter.UserId,
+                });
+                ResponseDeleteMailMessage.Error error = (ResponseDeleteMailMessage.Error)resp.Error;
+                result.Invoke(
+                    error == ResponseDeleteMailMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error,
+                    new ResponseDeleteMailMessage()
+                    {
+                        error = error,
+                    });
+            }
+            else
+            {
+                result.Invoke(AckResponseCode.Error, new ResponseDeleteMailMessage()
+                {
+                    error = ResponseDeleteMailMessage.Error.NotAvailable,
+                });
+            }
         }
 #endif
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        protected override UniTaskVoid HandleRequestSendMail(RequestHandlerData requestHandler, RequestSendMailMessage request, RequestProceedResultDelegate<ResponseSendMailMessage> result)
+        protected override async UniTaskVoid HandleRequestSendMail(RequestHandlerData requestHandler, RequestSendMailMessage request, RequestProceedResultDelegate<ResponseSendMailMessage> result)
         {
-            // TODO: Validate receiver, gold then send message
-            return base.HandleRequestSendMail(requestHandler, request, result);
+            BasePlayerCharacterEntity playerCharacter;
+            if (playerCharacters.TryGetValue(requestHandler.ConnectionId, out playerCharacter))
+            {
+                SendMailResp resp = await DbServiceClient.SendMailAsync(new SendMailReq()
+                {
+                    UserId = playerCharacter.UserId,
+                    SenderName = playerCharacter.CharacterName,
+                    Title = request.title,
+                    Content = request.content,
+                    Gold = request.gold,
+                });
+                ResponseSendMailMessage.Error error = (ResponseSendMailMessage.Error)resp.Error;
+                result.Invoke(
+                    error == ResponseSendMailMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error,
+                    new ResponseSendMailMessage()
+                    {
+                        error = error,
+                    });
+            }
+            else
+            {
+                result.Invoke(AckResponseCode.Error, new ResponseSendMailMessage()
+                {
+                    error = ResponseSendMailMessage.Error.NotAvailable,
+                });
+            }
         }
 #endif
 

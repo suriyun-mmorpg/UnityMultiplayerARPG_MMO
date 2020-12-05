@@ -952,6 +952,31 @@ namespace MultiplayerARPG.MMO
             return resp;
         }
 
+        public override Task<MailListResp> MailList(MailListReq request, ServerCallContext context)
+        {
+            return base.MailList(request, context);
+        }
+
+        public override Task<ReadMailResp> ReadMail(ReadMailReq request, ServerCallContext context)
+        {
+            return base.ReadMail(request, context);
+        }
+
+        public override Task<ClaimMailItemsResp> ClaimMailItems(ClaimMailItemsReq request, ServerCallContext context)
+        {
+            return base.ClaimMailItems(request, context);
+        }
+
+        public override Task<DeleteMailResp> DeleteMail(DeleteMailReq request, ServerCallContext context)
+        {
+            return base.DeleteMail(request, context);
+        }
+
+        public override Task<SendMailResp> SendMail(SendMailReq request, ServerCallContext context)
+        {
+            return base.SendMail(request, context);
+        }
+
         public override async Task<CustomResp> Custom(CustomReq request, ServerCallContext context)
         {
             return await onCustomRequest.Invoke(request.Type, request.Data);
