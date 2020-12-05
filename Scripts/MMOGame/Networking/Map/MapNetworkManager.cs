@@ -846,6 +846,45 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
+        protected override UniTaskVoid HandleRequestMailList(RequestHandlerData requestHandler, RequestMailListMessage request, RequestProceedResultDelegate<ResponseMailListMessage> result)
+        {
+            // TODO: Retrieve mail list from database
+            return base.HandleRequestMailList(requestHandler, request, result);
+        }
+#endif
+
+#if UNITY_STANDALONE && !CLIENT_BUILD
+        protected override UniTaskVoid HandleRequestReadMail(RequestHandlerData requestHandler, RequestReadMailMessage request, RequestProceedResultDelegate<ResponseReadMailMessage> result)
+        {
+            // TODO: Validate mail owner then update read state
+            return base.HandleRequestReadMail(requestHandler, request, result);
+        }
+#endif
+
+#if UNITY_STANDALONE && !CLIENT_BUILD
+        protected override UniTaskVoid HandleRequestClaimMailItems(RequestHandlerData requestHandler, RequestClaimMailItemsMessage request, RequestProceedResultDelegate<ResponseClaimMailItemsMessage> result)
+        {
+            // TODO: Validate mail owner then add an items and update claim state
+            return base.HandleRequestClaimMailItems(requestHandler, request, result);
+        }
+#endif
+
+#if UNITY_STANDALONE && !CLIENT_BUILD
+        protected override UniTaskVoid HandleRequestDeleteMail(RequestHandlerData requestHandler, RequestDeleteMailMessage request, RequestProceedResultDelegate<ResponseDeleteMailMessage> result)
+        {
+            // TODO: Validate mail owner then update delete state
+            return base.HandleRequestDeleteMail(requestHandler, request, result);
+        }
+#endif
+
+#if UNITY_STANDALONE && !CLIENT_BUILD
+        protected override UniTaskVoid HandleRequestSendMail(RequestHandlerData requestHandler, RequestSendMailMessage request, RequestProceedResultDelegate<ResponseSendMailMessage> result)
+        {
+            return base.HandleRequestSendMail(requestHandler, request, result);
+        }
+#endif
+
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private void HandleResponseAppServerAddress(MessageHandlerData messageHandler)
         {
             ResponseAppServerAddressMessage message = messageHandler.ReadMessage<ResponseAppServerAddressMessage>();
