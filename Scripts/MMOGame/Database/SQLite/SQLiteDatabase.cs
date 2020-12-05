@@ -301,6 +301,8 @@ namespace MultiplayerARPG.MMO
               items TEXT NOT NULL,
               isRead INTEGER NOT NULL DEFAULT 0,
               readTimestamp TIMESTAMP NULL DEFAULT NULL,
+              isClaim INTEGER NOT NULL DEFAULT 0,
+              claimTimestamp TIMESTAMP NULL DEFAULT NULL,
               isDelete INTEGER NOT NULL DEFAULT 0,
               deleteTimestamp TIMESTAMP NULL DEFAULT NULL,
               sentTimestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -402,6 +404,12 @@ namespace MultiplayerARPG.MMO
 
             if (!IsColumnExist("guild", "gold"))
                 ExecuteNonQuery("ALTER TABLE guild ADD gold INTEGER NOT NULL DEFAULT 0;");
+
+            if (!IsColumnExist("mail", "isClaim"))
+                ExecuteNonQuery("ALTER TABLE mail ADD isClaim INTEGER NOT NULL DEFAULT 0;");
+
+            if (!IsColumnExist("mail", "claimTimestamp"))
+                ExecuteNonQuery("ALTER TABLE mail ADD claimTimestamp TIMESTAMP NULL DEFAULT NULL;");
 
             this.InvokeInstanceDevExtMethods("Init");
         }

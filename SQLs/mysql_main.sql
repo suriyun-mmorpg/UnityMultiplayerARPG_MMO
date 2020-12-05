@@ -21,6 +21,7 @@ INSERT INTO `__migrations` (`migrationId`) VALUES ('1.57b');
 INSERT INTO `__migrations` (`migrationId`) VALUES ('1.58');
 INSERT INTO `__migrations` (`migrationId`) VALUES ('1.60c');
 INSERT INTO `__migrations` (`migrationId`) VALUES ('1.61');
+INSERT INTO `__migrations` (`migrationId`) VALUES ('1.61b');
 
 -- --------------------------------------------------------
 
@@ -330,6 +331,8 @@ CREATE TABLE `mail` (
   `items` text COLLATE utf8_unicode_ci NOT NULL,
   `isRead` tinyint(1) NOT NULL DEFAULT '0',
   `readTimestamp` timestamp NULL DEFAULT NULL,
+  `isClaim` tinyint(1) NOT NULL DEFAULT '0',
+  `claimTimestamp` timestamp NULL DEFAULT NULL,
   `isDelete` tinyint(1) NOT NULL DEFAULT '0',
   `deleteTimestamp` timestamp NULL DEFAULT NULL,
   `sentTimestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
