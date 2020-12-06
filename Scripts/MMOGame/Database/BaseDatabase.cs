@@ -76,6 +76,13 @@ namespace MultiplayerARPG.MMO
 
         public abstract UniTask UpdateStorageItems(StorageType storageType, string storageOwnerId, IList<CharacterItem> storageCharacterItems);
         public abstract UniTask<List<CharacterItem>> ReadStorageItems(StorageType storageType, string storageOwnerId);
+
+        public abstract UniTask<List<MailListEntry>> MailList(string userId, bool onlyNewMails);
+        public abstract UniTask<Mail> GetMail(string mailId, string userId);
+        public abstract UniTask<long> UpdateReadMailState(string mailId, string userId);
+        public abstract UniTask<long> UpdateClaimMailItemsState(string mailId, string userId);
+        public abstract UniTask<long> UpdateDeleteMailState(string mailId, string userId);
+        public abstract UniTask<int> CreateMail(Mail mail);
 #endif
     }
 }

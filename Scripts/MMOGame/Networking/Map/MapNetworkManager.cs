@@ -723,7 +723,7 @@ namespace MultiplayerARPG.MMO
                     cash = changeCashResp.Cash;
                     playerCharacter.UserCash = cash;
                     // Increase character gold
-                    playerCharacter.Gold += cashShopItem.receiveGold;
+                    playerCharacter.Gold = playerCharacter.Gold.Increase(cashShopItem.receiveGold);
                     // Increase character item
                     foreach (ItemAmount receiveItem in cashShopItem.receiveItems)
                     {
@@ -865,7 +865,7 @@ namespace MultiplayerARPG.MMO
             BasePlayerCharacterEntity playerCharacter;
             if (playerCharacters.TryGetValue(requestHandler.ConnectionId, out playerCharacter))
             {
-                ReadMailResp resp = await DbServiceClient.ReadMailAsync(new ReadMailReq()
+                UpdateReadMailStateResp resp = await DbServiceClient.UpdateReadMailStateAsync(new UpdateReadMailStateReq()
                 {
                     MailId = request.id,
                     UserId = playerCharacter.UserId,
@@ -895,12 +895,63 @@ namespace MultiplayerARPG.MMO
             BasePlayerCharacterEntity playerCharacter;
             if (playerCharacters.TryGetValue(requestHandler.ConnectionId, out playerCharacter))
             {
-                ClaimMailItemsResp resp = await DbServiceClient.ClaimMailItemsAsync(new ClaimMailItemsReq()
+                ResponseClaimMailItemsMessage.Error error = ResponseClaimMailItemsMessage.Error.None;
+                GetMailResp mailResp = await DbServiceClient.GetMailAsync(new GetMailReq()
                 {
                     MailId = request.id,
                     UserId = playerCharacter.UserId,
                 });
-                ResponseClaimMailItemsMessage.Error error = (ResponseClaimMailItemsMessage.Error)resp.Error;
+                Mail mail = mailResp.Mail.FromByteString<Mail>();
+                if (mail.IsClaim)
+                {
+                    error = ResponseClaimMailItemsMessage.Error.AlreadyClaimed;
+                }
+                else if (mail.IsDelete)
+                {
+                    error = ResponseClaimMailItemsMessage.Error.NotAllowed;
+                }
+                else
+                {
+                    if (mail.Items.Count > 0)
+                    {
+                        List<CharacterItem> increasingItems = new List<CharacterItem>();
+                        foreach (KeyValuePair<int, short> mailItem in mail.Items)
+                        {
+                            increasingItems.Add(CharacterItem.Create(mailItem.Key, amount: mailItem.Value));
+                        }
+                        if (playerCharacter.IncreasingItemsWillOverwhelming(increasingItems))
+                            error = ResponseClaimMailItemsMessage.Error.CannotCarry;
+                        else
+                            playerCharacter.IncreaseItems(increasingItems);
+                    }
+                    if (error == ResponseClaimMailItemsMessage.Error.None && mail.Currencies.Count > 0)
+                    {
+                        List<CharacterCurrency> increasingCurrencies = new List<CharacterCurrency>();
+                        foreach (KeyValuePair<int, int> mailCurrency in mail.Currencies)
+                        {
+                            increasingCurrencies.Add(CharacterCurrency.Create(mailCurrency.Key, amount: mailCurrency.Value));
+                        }
+                        playerCharacter.IncreaseCurrencies(increasingCurrencies);
+                    }
+                    if (error == ResponseClaimMailItemsMessage.Error.None && mail.Gold > 0)
+                    {
+                        playerCharacter.Gold = playerCharacter.Gold.Increase(mail.Gold);
+                    }
+                }
+                if (error != ResponseClaimMailItemsMessage.Error.None)
+                {
+                    result.Invoke(AckResponseCode.Error, new ResponseClaimMailItemsMessage()
+                    {
+                        error = error,
+                    });
+                    return;
+                }
+                UpdateClaimMailItemsStateResp resp = await DbServiceClient.UpdateClaimMailItemsStateAsync(new UpdateClaimMailItemsStateReq()
+                {
+                    MailId = request.id,
+                    UserId = playerCharacter.UserId,
+                });
+                error = (ResponseClaimMailItemsMessage.Error)resp.Error;
                 result.Invoke(
                     error == ResponseClaimMailItemsMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error,
                     new ResponseClaimMailItemsMessage()
@@ -925,7 +976,7 @@ namespace MultiplayerARPG.MMO
             BasePlayerCharacterEntity playerCharacter;
             if (playerCharacters.TryGetValue(requestHandler.ConnectionId, out playerCharacter))
             {
-                DeleteMailResp resp = await DbServiceClient.DeleteMailAsync(new DeleteMailReq()
+                UpdateDeleteMailStateResp resp = await DbServiceClient.UpdateDeleteMailStateAsync(new UpdateDeleteMailStateReq()
                 {
                     MailId = request.id,
                     UserId = playerCharacter.UserId,
@@ -954,13 +1005,32 @@ namespace MultiplayerARPG.MMO
             BasePlayerCharacterEntity playerCharacter;
             if (playerCharacters.TryGetValue(requestHandler.ConnectionId, out playerCharacter))
             {
-                SendMailResp resp = await DbServiceClient.SendMailAsync(new SendMailReq()
+                // Find receiver
+                GetUserIdByCharacterNameResp userIdResp = await DbServiceClient.GetUserIdByCharacterNameAsync(new GetUserIdByCharacterNameReq()
                 {
-                    UserId = playerCharacter.UserId,
+                    CharacterName = request.receiverName,
+                });
+                string receiverId = userIdResp.UserId;
+                if (string.IsNullOrEmpty(receiverId))
+                {
+                    result.Invoke(AckResponseCode.Error, new ResponseSendMailMessage()
+                    {
+                        error = ResponseSendMailMessage.Error.NoReceiver,
+                    });
+                    return;
+                }
+                Mail mail = new Mail()
+                {
+                    SenderId = playerCharacter.UserId,
                     SenderName = playerCharacter.CharacterName,
+                    ReceiverId = receiverId,
                     Title = request.title,
                     Content = request.content,
                     Gold = request.gold,
+                };
+                SendMailResp resp = await DbServiceClient.SendMailAsync(new SendMailReq()
+                {
+                    Mail = DatabaseServiceUtils.ToByteString(mail),
                 });
                 ResponseSendMailMessage.Error error = (ResponseSendMailMessage.Error)resp.Error;
                 result.Invoke(

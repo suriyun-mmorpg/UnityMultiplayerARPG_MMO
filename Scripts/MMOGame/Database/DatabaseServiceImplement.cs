@@ -952,29 +952,65 @@ namespace MultiplayerARPG.MMO
             return resp;
         }
 
-        public override Task<MailListResp> MailList(MailListReq request, ServerCallContext context)
+        public override async Task<MailListResp> MailList(MailListReq request, ServerCallContext context)
         {
-            return base.MailList(request, context);
+            MailListResp resp = new MailListResp();
+            List<MailListEntry> list = await Database.MailList(request.UserId, request.OnlyNewMails);
+            DatabaseServiceUtils.CopyToRepeatedByteString(list, resp.List);
+            return resp;
         }
 
-        public override Task<ReadMailResp> ReadMail(ReadMailReq request, ServerCallContext context)
+        public override async Task<UpdateReadMailStateResp> UpdateReadMailState(UpdateReadMailStateReq request, ServerCallContext context)
         {
-            return base.ReadMail(request, context);
+            UpdateReadMailStateResp resp = new UpdateReadMailStateResp();
+            long updated = await Database.UpdateReadMailState(request.MailId, request.UserId);
+            if (updated > 0)
+                resp.Mail = DatabaseServiceUtils.ToByteString(await Database.GetMail(request.MailId, request.UserId));
+            else
+                resp.Error = EUpdateReadMailStateError.ReadMailErrorNotAllowed;
+            return resp;
         }
 
-        public override Task<ClaimMailItemsResp> ClaimMailItems(ClaimMailItemsReq request, ServerCallContext context)
+        public override async Task<UpdateClaimMailItemsStateResp> UpdateClaimMailItemsState(UpdateClaimMailItemsStateReq request, ServerCallContext context)
         {
-            return base.ClaimMailItems(request, context);
+            UpdateClaimMailItemsStateResp resp = new UpdateClaimMailItemsStateResp();
+            long updated = await Database.UpdateClaimMailItemsState(request.MailId, request.UserId);
+            if (updated > 0)
+                resp.Mail = DatabaseServiceUtils.ToByteString(await Database.GetMail(request.MailId, request.UserId));
+            else
+                resp.Error = EUpdateClaimMailItemsStateError.ClaimMailItemsErrorNotAllowed;
+            return resp;
         }
 
-        public override Task<DeleteMailResp> DeleteMail(DeleteMailReq request, ServerCallContext context)
+        public override async Task<UpdateDeleteMailStateResp> UpdateDeleteMailState(UpdateDeleteMailStateReq request, ServerCallContext context)
         {
-            return base.DeleteMail(request, context);
+            UpdateDeleteMailStateResp resp = new UpdateDeleteMailStateResp();
+            long updated = await Database.UpdateDeleteMailState(request.MailId, request.UserId);
+            if (updated <= 0)
+                resp.Error = EUpdateDeleteMailStateError.DeleteMailErrorNotAllowed;
+            return resp;
         }
 
-        public override Task<SendMailResp> SendMail(SendMailReq request, ServerCallContext context)
+        public override async Task<SendMailResp> SendMail(SendMailReq request, ServerCallContext context)
         {
-            return base.SendMail(request, context);
+            Mail mail = DatabaseServiceUtils.FromByteString<Mail>(request.Mail);
+            if (string.IsNullOrEmpty(mail.ReceiverId))
+            {
+                return new SendMailResp()
+                {
+                    Error = ESendMailError.SendMailErrorNoReceiver,
+                };
+            }
+            await Database.CreateMail(mail);
+            return new SendMailResp();
+        }
+
+        public override async Task<GetMailResp> GetMail(GetMailReq request, ServerCallContext context)
+        {
+            return new GetMailResp()
+            {
+                Mail = DatabaseServiceUtils.ToByteString(await Database.GetMail(request.MailId, request.UserId)),
+            };
         }
 
         public override async Task<CustomResp> Custom(CustomReq request, ServerCallContext context)

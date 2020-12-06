@@ -38,6 +38,10 @@ public static partial class DatabaseService
   static readonly grpc::Marshaller<global::DeleteCharacterReq> __Marshaller_DeleteCharacterReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::DeleteCharacterReq.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::FindCharacterNameReq> __Marshaller_FindCharacterNameReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::FindCharacterNameReq.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::FindCharacterNameResp> __Marshaller_FindCharacterNameResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::FindCharacterNameResp.Parser.ParseFrom);
+  static readonly grpc::Marshaller<global::GetIdByCharacterNameReq> __Marshaller_GetIdByCharacterNameReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::GetIdByCharacterNameReq.Parser.ParseFrom);
+  static readonly grpc::Marshaller<global::GetIdByCharacterNameResp> __Marshaller_GetIdByCharacterNameResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::GetIdByCharacterNameResp.Parser.ParseFrom);
+  static readonly grpc::Marshaller<global::GetUserIdByCharacterNameReq> __Marshaller_GetUserIdByCharacterNameReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::GetUserIdByCharacterNameReq.Parser.ParseFrom);
+  static readonly grpc::Marshaller<global::GetUserIdByCharacterNameResp> __Marshaller_GetUserIdByCharacterNameResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::GetUserIdByCharacterNameResp.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::FindCharactersReq> __Marshaller_FindCharactersReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::FindCharactersReq.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::FindCharactersResp> __Marshaller_FindCharactersResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::FindCharactersResp.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::CreateFriendReq> __Marshaller_CreateFriendReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::CreateFriendReq.Parser.ParseFrom);
@@ -89,14 +93,16 @@ public static partial class DatabaseService
   static readonly grpc::Marshaller<global::DecreaseStorageItemsResp> __Marshaller_DecreaseStorageItemsResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::DecreaseStorageItemsResp.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::MailListReq> __Marshaller_MailListReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::MailListReq.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::MailListResp> __Marshaller_MailListResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::MailListResp.Parser.ParseFrom);
-  static readonly grpc::Marshaller<global::ReadMailReq> __Marshaller_ReadMailReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::ReadMailReq.Parser.ParseFrom);
-  static readonly grpc::Marshaller<global::ReadMailResp> __Marshaller_ReadMailResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::ReadMailResp.Parser.ParseFrom);
-  static readonly grpc::Marshaller<global::ClaimMailItemsReq> __Marshaller_ClaimMailItemsReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::ClaimMailItemsReq.Parser.ParseFrom);
-  static readonly grpc::Marshaller<global::ClaimMailItemsResp> __Marshaller_ClaimMailItemsResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::ClaimMailItemsResp.Parser.ParseFrom);
-  static readonly grpc::Marshaller<global::DeleteMailReq> __Marshaller_DeleteMailReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::DeleteMailReq.Parser.ParseFrom);
-  static readonly grpc::Marshaller<global::DeleteMailResp> __Marshaller_DeleteMailResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::DeleteMailResp.Parser.ParseFrom);
+  static readonly grpc::Marshaller<global::UpdateReadMailStateReq> __Marshaller_UpdateReadMailStateReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::UpdateReadMailStateReq.Parser.ParseFrom);
+  static readonly grpc::Marshaller<global::UpdateReadMailStateResp> __Marshaller_UpdateReadMailStateResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::UpdateReadMailStateResp.Parser.ParseFrom);
+  static readonly grpc::Marshaller<global::UpdateClaimMailItemsStateReq> __Marshaller_UpdateClaimMailItemsStateReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::UpdateClaimMailItemsStateReq.Parser.ParseFrom);
+  static readonly grpc::Marshaller<global::UpdateClaimMailItemsStateResp> __Marshaller_UpdateClaimMailItemsStateResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::UpdateClaimMailItemsStateResp.Parser.ParseFrom);
+  static readonly grpc::Marshaller<global::UpdateDeleteMailStateReq> __Marshaller_UpdateDeleteMailStateReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::UpdateDeleteMailStateReq.Parser.ParseFrom);
+  static readonly grpc::Marshaller<global::UpdateDeleteMailStateResp> __Marshaller_UpdateDeleteMailStateResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::UpdateDeleteMailStateResp.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::SendMailReq> __Marshaller_SendMailReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::SendMailReq.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::SendMailResp> __Marshaller_SendMailResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::SendMailResp.Parser.ParseFrom);
+  static readonly grpc::Marshaller<global::GetMailReq> __Marshaller_GetMailReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::GetMailReq.Parser.ParseFrom);
+  static readonly grpc::Marshaller<global::GetMailResp> __Marshaller_GetMailResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::GetMailResp.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::CustomReq> __Marshaller_CustomReq = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::CustomReq.Parser.ParseFrom);
   static readonly grpc::Marshaller<global::CustomResp> __Marshaller_CustomResp = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::CustomResp.Parser.ParseFrom);
 
@@ -211,6 +217,20 @@ public static partial class DatabaseService
       "FindCharacterName",
       __Marshaller_FindCharacterNameReq,
       __Marshaller_FindCharacterNameResp);
+
+  static readonly grpc::Method<global::GetIdByCharacterNameReq, global::GetIdByCharacterNameResp> __Method_GetIdByCharacterName = new grpc::Method<global::GetIdByCharacterNameReq, global::GetIdByCharacterNameResp>(
+      grpc::MethodType.Unary,
+      __ServiceName,
+      "GetIdByCharacterName",
+      __Marshaller_GetIdByCharacterNameReq,
+      __Marshaller_GetIdByCharacterNameResp);
+
+  static readonly grpc::Method<global::GetUserIdByCharacterNameReq, global::GetUserIdByCharacterNameResp> __Method_GetUserIdByCharacterName = new grpc::Method<global::GetUserIdByCharacterNameReq, global::GetUserIdByCharacterNameResp>(
+      grpc::MethodType.Unary,
+      __ServiceName,
+      "GetUserIdByCharacterName",
+      __Marshaller_GetUserIdByCharacterNameReq,
+      __Marshaller_GetUserIdByCharacterNameResp);
 
   static readonly grpc::Method<global::FindCharactersReq, global::FindCharactersResp> __Method_FindCharacters = new grpc::Method<global::FindCharactersReq, global::FindCharactersResp>(
       grpc::MethodType.Unary,
@@ -464,26 +484,26 @@ public static partial class DatabaseService
       __Marshaller_MailListReq,
       __Marshaller_MailListResp);
 
-  static readonly grpc::Method<global::ReadMailReq, global::ReadMailResp> __Method_ReadMail = new grpc::Method<global::ReadMailReq, global::ReadMailResp>(
+  static readonly grpc::Method<global::UpdateReadMailStateReq, global::UpdateReadMailStateResp> __Method_UpdateReadMailState = new grpc::Method<global::UpdateReadMailStateReq, global::UpdateReadMailStateResp>(
       grpc::MethodType.Unary,
       __ServiceName,
-      "ReadMail",
-      __Marshaller_ReadMailReq,
-      __Marshaller_ReadMailResp);
+      "UpdateReadMailState",
+      __Marshaller_UpdateReadMailStateReq,
+      __Marshaller_UpdateReadMailStateResp);
 
-  static readonly grpc::Method<global::ClaimMailItemsReq, global::ClaimMailItemsResp> __Method_ClaimMailItems = new grpc::Method<global::ClaimMailItemsReq, global::ClaimMailItemsResp>(
+  static readonly grpc::Method<global::UpdateClaimMailItemsStateReq, global::UpdateClaimMailItemsStateResp> __Method_UpdateClaimMailItemsState = new grpc::Method<global::UpdateClaimMailItemsStateReq, global::UpdateClaimMailItemsStateResp>(
       grpc::MethodType.Unary,
       __ServiceName,
-      "ClaimMailItems",
-      __Marshaller_ClaimMailItemsReq,
-      __Marshaller_ClaimMailItemsResp);
+      "UpdateClaimMailItemsState",
+      __Marshaller_UpdateClaimMailItemsStateReq,
+      __Marshaller_UpdateClaimMailItemsStateResp);
 
-  static readonly grpc::Method<global::DeleteMailReq, global::DeleteMailResp> __Method_DeleteMail = new grpc::Method<global::DeleteMailReq, global::DeleteMailResp>(
+  static readonly grpc::Method<global::UpdateDeleteMailStateReq, global::UpdateDeleteMailStateResp> __Method_UpdateDeleteMailState = new grpc::Method<global::UpdateDeleteMailStateReq, global::UpdateDeleteMailStateResp>(
       grpc::MethodType.Unary,
       __ServiceName,
-      "DeleteMail",
-      __Marshaller_DeleteMailReq,
-      __Marshaller_DeleteMailResp);
+      "UpdateDeleteMailState",
+      __Marshaller_UpdateDeleteMailStateReq,
+      __Marshaller_UpdateDeleteMailStateResp);
 
   static readonly grpc::Method<global::SendMailReq, global::SendMailResp> __Method_SendMail = new grpc::Method<global::SendMailReq, global::SendMailResp>(
       grpc::MethodType.Unary,
@@ -491,6 +511,13 @@ public static partial class DatabaseService
       "SendMail",
       __Marshaller_SendMailReq,
       __Marshaller_SendMailResp);
+
+  static readonly grpc::Method<global::GetMailReq, global::GetMailResp> __Method_GetMail = new grpc::Method<global::GetMailReq, global::GetMailResp>(
+      grpc::MethodType.Unary,
+      __ServiceName,
+      "GetMail",
+      __Marshaller_GetMailReq,
+      __Marshaller_GetMailResp);
 
   static readonly grpc::Method<global::CustomReq, global::CustomResp> __Method_Custom = new grpc::Method<global::CustomReq, global::CustomResp>(
       grpc::MethodType.Unary,
@@ -591,6 +618,16 @@ public static partial class DatabaseService
     }
 
     public virtual global::System.Threading.Tasks.Task<global::FindCharacterNameResp> FindCharacterName(global::FindCharacterNameReq request, grpc::ServerCallContext context)
+    {
+      throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+    }
+
+    public virtual global::System.Threading.Tasks.Task<global::GetIdByCharacterNameResp> GetIdByCharacterName(global::GetIdByCharacterNameReq request, grpc::ServerCallContext context)
+    {
+      throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+    }
+
+    public virtual global::System.Threading.Tasks.Task<global::GetUserIdByCharacterNameResp> GetUserIdByCharacterName(global::GetUserIdByCharacterNameReq request, grpc::ServerCallContext context)
     {
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
@@ -811,22 +848,27 @@ public static partial class DatabaseService
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
 
-    public virtual global::System.Threading.Tasks.Task<global::ReadMailResp> ReadMail(global::ReadMailReq request, grpc::ServerCallContext context)
+    public virtual global::System.Threading.Tasks.Task<global::UpdateReadMailStateResp> UpdateReadMailState(global::UpdateReadMailStateReq request, grpc::ServerCallContext context)
     {
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
 
-    public virtual global::System.Threading.Tasks.Task<global::ClaimMailItemsResp> ClaimMailItems(global::ClaimMailItemsReq request, grpc::ServerCallContext context)
+    public virtual global::System.Threading.Tasks.Task<global::UpdateClaimMailItemsStateResp> UpdateClaimMailItemsState(global::UpdateClaimMailItemsStateReq request, grpc::ServerCallContext context)
     {
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
 
-    public virtual global::System.Threading.Tasks.Task<global::DeleteMailResp> DeleteMail(global::DeleteMailReq request, grpc::ServerCallContext context)
+    public virtual global::System.Threading.Tasks.Task<global::UpdateDeleteMailStateResp> UpdateDeleteMailState(global::UpdateDeleteMailStateReq request, grpc::ServerCallContext context)
     {
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
 
     public virtual global::System.Threading.Tasks.Task<global::SendMailResp> SendMail(global::SendMailReq request, grpc::ServerCallContext context)
+    {
+      throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+    }
+
+    public virtual global::System.Threading.Tasks.Task<global::GetMailResp> GetMail(global::GetMailReq request, grpc::ServerCallContext context)
     {
       throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
     }
@@ -1150,6 +1192,38 @@ public static partial class DatabaseService
     public virtual grpc::AsyncUnaryCall<global::FindCharacterNameResp> FindCharacterNameAsync(global::FindCharacterNameReq request, grpc::CallOptions options)
     {
       return CallInvoker.AsyncUnaryCall(__Method_FindCharacterName, null, options, request);
+    }
+    public virtual global::GetIdByCharacterNameResp GetIdByCharacterName(global::GetIdByCharacterNameReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    {
+      return GetIdByCharacterName(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+    }
+    public virtual global::GetIdByCharacterNameResp GetIdByCharacterName(global::GetIdByCharacterNameReq request, grpc::CallOptions options)
+    {
+      return CallInvoker.BlockingUnaryCall(__Method_GetIdByCharacterName, null, options, request);
+    }
+    public virtual grpc::AsyncUnaryCall<global::GetIdByCharacterNameResp> GetIdByCharacterNameAsync(global::GetIdByCharacterNameReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    {
+      return GetIdByCharacterNameAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+    }
+    public virtual grpc::AsyncUnaryCall<global::GetIdByCharacterNameResp> GetIdByCharacterNameAsync(global::GetIdByCharacterNameReq request, grpc::CallOptions options)
+    {
+      return CallInvoker.AsyncUnaryCall(__Method_GetIdByCharacterName, null, options, request);
+    }
+    public virtual global::GetUserIdByCharacterNameResp GetUserIdByCharacterName(global::GetUserIdByCharacterNameReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    {
+      return GetUserIdByCharacterName(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+    }
+    public virtual global::GetUserIdByCharacterNameResp GetUserIdByCharacterName(global::GetUserIdByCharacterNameReq request, grpc::CallOptions options)
+    {
+      return CallInvoker.BlockingUnaryCall(__Method_GetUserIdByCharacterName, null, options, request);
+    }
+    public virtual grpc::AsyncUnaryCall<global::GetUserIdByCharacterNameResp> GetUserIdByCharacterNameAsync(global::GetUserIdByCharacterNameReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    {
+      return GetUserIdByCharacterNameAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+    }
+    public virtual grpc::AsyncUnaryCall<global::GetUserIdByCharacterNameResp> GetUserIdByCharacterNameAsync(global::GetUserIdByCharacterNameReq request, grpc::CallOptions options)
+    {
+      return CallInvoker.AsyncUnaryCall(__Method_GetUserIdByCharacterName, null, options, request);
     }
     public virtual global::FindCharactersResp FindCharacters(global::FindCharactersReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
@@ -1895,53 +1969,53 @@ public static partial class DatabaseService
     {
       return CallInvoker.AsyncUnaryCall(__Method_MailList, null, options, request);
     }
-    public virtual global::ReadMailResp ReadMail(global::ReadMailReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    public virtual global::UpdateReadMailStateResp UpdateReadMailState(global::UpdateReadMailStateReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
-      return ReadMail(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      return UpdateReadMailState(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual global::ReadMailResp ReadMail(global::ReadMailReq request, grpc::CallOptions options)
+    public virtual global::UpdateReadMailStateResp UpdateReadMailState(global::UpdateReadMailStateReq request, grpc::CallOptions options)
     {
-      return CallInvoker.BlockingUnaryCall(__Method_ReadMail, null, options, request);
+      return CallInvoker.BlockingUnaryCall(__Method_UpdateReadMailState, null, options, request);
     }
-    public virtual grpc::AsyncUnaryCall<global::ReadMailResp> ReadMailAsync(global::ReadMailReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    public virtual grpc::AsyncUnaryCall<global::UpdateReadMailStateResp> UpdateReadMailStateAsync(global::UpdateReadMailStateReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
-      return ReadMailAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      return UpdateReadMailStateAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual grpc::AsyncUnaryCall<global::ReadMailResp> ReadMailAsync(global::ReadMailReq request, grpc::CallOptions options)
+    public virtual grpc::AsyncUnaryCall<global::UpdateReadMailStateResp> UpdateReadMailStateAsync(global::UpdateReadMailStateReq request, grpc::CallOptions options)
     {
-      return CallInvoker.AsyncUnaryCall(__Method_ReadMail, null, options, request);
+      return CallInvoker.AsyncUnaryCall(__Method_UpdateReadMailState, null, options, request);
     }
-    public virtual global::ClaimMailItemsResp ClaimMailItems(global::ClaimMailItemsReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    public virtual global::UpdateClaimMailItemsStateResp UpdateClaimMailItemsState(global::UpdateClaimMailItemsStateReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
-      return ClaimMailItems(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      return UpdateClaimMailItemsState(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual global::ClaimMailItemsResp ClaimMailItems(global::ClaimMailItemsReq request, grpc::CallOptions options)
+    public virtual global::UpdateClaimMailItemsStateResp UpdateClaimMailItemsState(global::UpdateClaimMailItemsStateReq request, grpc::CallOptions options)
     {
-      return CallInvoker.BlockingUnaryCall(__Method_ClaimMailItems, null, options, request);
+      return CallInvoker.BlockingUnaryCall(__Method_UpdateClaimMailItemsState, null, options, request);
     }
-    public virtual grpc::AsyncUnaryCall<global::ClaimMailItemsResp> ClaimMailItemsAsync(global::ClaimMailItemsReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    public virtual grpc::AsyncUnaryCall<global::UpdateClaimMailItemsStateResp> UpdateClaimMailItemsStateAsync(global::UpdateClaimMailItemsStateReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
-      return ClaimMailItemsAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      return UpdateClaimMailItemsStateAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual grpc::AsyncUnaryCall<global::ClaimMailItemsResp> ClaimMailItemsAsync(global::ClaimMailItemsReq request, grpc::CallOptions options)
+    public virtual grpc::AsyncUnaryCall<global::UpdateClaimMailItemsStateResp> UpdateClaimMailItemsStateAsync(global::UpdateClaimMailItemsStateReq request, grpc::CallOptions options)
     {
-      return CallInvoker.AsyncUnaryCall(__Method_ClaimMailItems, null, options, request);
+      return CallInvoker.AsyncUnaryCall(__Method_UpdateClaimMailItemsState, null, options, request);
     }
-    public virtual global::DeleteMailResp DeleteMail(global::DeleteMailReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    public virtual global::UpdateDeleteMailStateResp UpdateDeleteMailState(global::UpdateDeleteMailStateReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
-      return DeleteMail(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      return UpdateDeleteMailState(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual global::DeleteMailResp DeleteMail(global::DeleteMailReq request, grpc::CallOptions options)
+    public virtual global::UpdateDeleteMailStateResp UpdateDeleteMailState(global::UpdateDeleteMailStateReq request, grpc::CallOptions options)
     {
-      return CallInvoker.BlockingUnaryCall(__Method_DeleteMail, null, options, request);
+      return CallInvoker.BlockingUnaryCall(__Method_UpdateDeleteMailState, null, options, request);
     }
-    public virtual grpc::AsyncUnaryCall<global::DeleteMailResp> DeleteMailAsync(global::DeleteMailReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    public virtual grpc::AsyncUnaryCall<global::UpdateDeleteMailStateResp> UpdateDeleteMailStateAsync(global::UpdateDeleteMailStateReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
-      return DeleteMailAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      return UpdateDeleteMailStateAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
     }
-    public virtual grpc::AsyncUnaryCall<global::DeleteMailResp> DeleteMailAsync(global::DeleteMailReq request, grpc::CallOptions options)
+    public virtual grpc::AsyncUnaryCall<global::UpdateDeleteMailStateResp> UpdateDeleteMailStateAsync(global::UpdateDeleteMailStateReq request, grpc::CallOptions options)
     {
-      return CallInvoker.AsyncUnaryCall(__Method_DeleteMail, null, options, request);
+      return CallInvoker.AsyncUnaryCall(__Method_UpdateDeleteMailState, null, options, request);
     }
     public virtual global::SendMailResp SendMail(global::SendMailReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
     {
@@ -1958,6 +2032,22 @@ public static partial class DatabaseService
     public virtual grpc::AsyncUnaryCall<global::SendMailResp> SendMailAsync(global::SendMailReq request, grpc::CallOptions options)
     {
       return CallInvoker.AsyncUnaryCall(__Method_SendMail, null, options, request);
+    }
+    public virtual global::GetMailResp GetMail(global::GetMailReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    {
+      return GetMail(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+    }
+    public virtual global::GetMailResp GetMail(global::GetMailReq request, grpc::CallOptions options)
+    {
+      return CallInvoker.BlockingUnaryCall(__Method_GetMail, null, options, request);
+    }
+    public virtual grpc::AsyncUnaryCall<global::GetMailResp> GetMailAsync(global::GetMailReq request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+    {
+      return GetMailAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+    }
+    public virtual grpc::AsyncUnaryCall<global::GetMailResp> GetMailAsync(global::GetMailReq request, grpc::CallOptions options)
+    {
+      return CallInvoker.AsyncUnaryCall(__Method_GetMail, null, options, request);
     }
     /// <summary>
     /// Other
@@ -2031,6 +2121,8 @@ public static partial class DatabaseService
         .AddMethod(__Method_UpdateCharacter, serviceImpl.UpdateCharacter)
         .AddMethod(__Method_DeleteCharacter, serviceImpl.DeleteCharacter)
         .AddMethod(__Method_FindCharacterName, serviceImpl.FindCharacterName)
+        .AddMethod(__Method_GetIdByCharacterName, serviceImpl.GetIdByCharacterName)
+        .AddMethod(__Method_GetUserIdByCharacterName, serviceImpl.GetUserIdByCharacterName)
         .AddMethod(__Method_FindCharacters, serviceImpl.FindCharacters)
         .AddMethod(__Method_CreateFriend, serviceImpl.CreateFriend)
         .AddMethod(__Method_DeleteFriend, serviceImpl.DeleteFriend)
@@ -2067,10 +2159,11 @@ public static partial class DatabaseService
         .AddMethod(__Method_IncreaseStorageItems, serviceImpl.IncreaseStorageItems)
         .AddMethod(__Method_DecreaseStorageItems, serviceImpl.DecreaseStorageItems)
         .AddMethod(__Method_MailList, serviceImpl.MailList)
-        .AddMethod(__Method_ReadMail, serviceImpl.ReadMail)
-        .AddMethod(__Method_ClaimMailItems, serviceImpl.ClaimMailItems)
-        .AddMethod(__Method_DeleteMail, serviceImpl.DeleteMail)
+        .AddMethod(__Method_UpdateReadMailState, serviceImpl.UpdateReadMailState)
+        .AddMethod(__Method_UpdateClaimMailItemsState, serviceImpl.UpdateClaimMailItemsState)
+        .AddMethod(__Method_UpdateDeleteMailState, serviceImpl.UpdateDeleteMailState)
         .AddMethod(__Method_SendMail, serviceImpl.SendMail)
+        .AddMethod(__Method_GetMail, serviceImpl.GetMail)
         .AddMethod(__Method_Custom, serviceImpl.Custom).Build();
   }
 
@@ -2096,6 +2189,8 @@ public static partial class DatabaseService
     serviceBinder.AddMethod(__Method_UpdateCharacter, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::UpdateCharacterReq, global::CharacterResp>(serviceImpl.UpdateCharacter));
     serviceBinder.AddMethod(__Method_DeleteCharacter, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::DeleteCharacterReq, global::VoidResp>(serviceImpl.DeleteCharacter));
     serviceBinder.AddMethod(__Method_FindCharacterName, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::FindCharacterNameReq, global::FindCharacterNameResp>(serviceImpl.FindCharacterName));
+    serviceBinder.AddMethod(__Method_GetIdByCharacterName, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::GetIdByCharacterNameReq, global::GetIdByCharacterNameResp>(serviceImpl.GetIdByCharacterName));
+    serviceBinder.AddMethod(__Method_GetUserIdByCharacterName, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::GetUserIdByCharacterNameReq, global::GetUserIdByCharacterNameResp>(serviceImpl.GetUserIdByCharacterName));
     serviceBinder.AddMethod(__Method_FindCharacters, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::FindCharactersReq, global::FindCharactersResp>(serviceImpl.FindCharacters));
     serviceBinder.AddMethod(__Method_CreateFriend, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::CreateFriendReq, global::ReadFriendsResp>(serviceImpl.CreateFriend));
     serviceBinder.AddMethod(__Method_DeleteFriend, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::DeleteFriendReq, global::ReadFriendsResp>(serviceImpl.DeleteFriend));
@@ -2132,10 +2227,11 @@ public static partial class DatabaseService
     serviceBinder.AddMethod(__Method_IncreaseStorageItems, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::IncreaseStorageItemsReq, global::IncreaseStorageItemsResp>(serviceImpl.IncreaseStorageItems));
     serviceBinder.AddMethod(__Method_DecreaseStorageItems, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::DecreaseStorageItemsReq, global::DecreaseStorageItemsResp>(serviceImpl.DecreaseStorageItems));
     serviceBinder.AddMethod(__Method_MailList, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::MailListReq, global::MailListResp>(serviceImpl.MailList));
-    serviceBinder.AddMethod(__Method_ReadMail, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::ReadMailReq, global::ReadMailResp>(serviceImpl.ReadMail));
-    serviceBinder.AddMethod(__Method_ClaimMailItems, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::ClaimMailItemsReq, global::ClaimMailItemsResp>(serviceImpl.ClaimMailItems));
-    serviceBinder.AddMethod(__Method_DeleteMail, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::DeleteMailReq, global::DeleteMailResp>(serviceImpl.DeleteMail));
+    serviceBinder.AddMethod(__Method_UpdateReadMailState, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::UpdateReadMailStateReq, global::UpdateReadMailStateResp>(serviceImpl.UpdateReadMailState));
+    serviceBinder.AddMethod(__Method_UpdateClaimMailItemsState, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::UpdateClaimMailItemsStateReq, global::UpdateClaimMailItemsStateResp>(serviceImpl.UpdateClaimMailItemsState));
+    serviceBinder.AddMethod(__Method_UpdateDeleteMailState, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::UpdateDeleteMailStateReq, global::UpdateDeleteMailStateResp>(serviceImpl.UpdateDeleteMailState));
     serviceBinder.AddMethod(__Method_SendMail, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::SendMailReq, global::SendMailResp>(serviceImpl.SendMail));
+    serviceBinder.AddMethod(__Method_GetMail, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::GetMailReq, global::GetMailResp>(serviceImpl.GetMail));
     serviceBinder.AddMethod(__Method_Custom, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::CustomReq, global::CustomResp>(serviceImpl.Custom));
   }
 

@@ -18,6 +18,8 @@ service DatabaseService {
     rpc UpdateCharacter (UpdateCharacterReq) returns (CharacterResp);
     rpc DeleteCharacter (DeleteCharacterReq) returns (VoidResp);
     rpc FindCharacterName (FindCharacterNameReq) returns (FindCharacterNameResp);
+    rpc GetIdByCharacterName (GetIdByCharacterNameReq) returns (GetIdByCharacterNameResp);
+    rpc GetUserIdByCharacterName (GetUserIdByCharacterNameReq) returns (GetUserIdByCharacterNameResp);
     rpc FindCharacters (FindCharactersReq) returns (FindCharactersResp);
     // Friend
     rpc CreateFriend (CreateFriendReq) returns (ReadFriendsResp);
@@ -60,10 +62,11 @@ service DatabaseService {
     rpc DecreaseStorageItems (DecreaseStorageItemsReq) returns (DecreaseStorageItemsResp);
     // Mail
     rpc MailList (MailListReq) returns (MailListResp);
-    rpc ReadMail (ReadMailReq) returns (ReadMailResp);
-    rpc ClaimMailItems (ClaimMailItemsReq) returns (ClaimMailItemsResp);
-    rpc DeleteMail (DeleteMailReq) returns (DeleteMailResp);
+    rpc UpdateReadMailState (UpdateReadMailStateReq) returns (UpdateReadMailStateResp);
+    rpc UpdateClaimMailItemsState (UpdateClaimMailItemsStateReq) returns (UpdateClaimMailItemsStateResp);
+    rpc UpdateDeleteMailState (UpdateDeleteMailStateReq) returns (UpdateDeleteMailStateResp);
     rpc SendMail (SendMailReq) returns (SendMailResp);
+    rpc GetMail (GetMailReq) returns (GetMailResp);
     // Other
     rpc Custom (CustomReq) returns (CustomResp);
 }
@@ -85,20 +88,21 @@ enum EStorageError
     STORAGE_ERROR_INVENTORY_WILL_OVERWHELMING = 6;
     STORAGE_ERROR_DECREASE_ITEM_NOT_ENOUGH = 7;
 }
-enum EReadMailError
+enum EUpdateReadMailStateError
 {
     READ_MAIL_ERROR_NONE = 0;
     READ_MAIL_ERROR_NOT_AVAILABLE = 1;
     READ_MAIL_ERROR_NOT_ALLOWED = 2;
 }
-enum EClaimMailItemsError
+enum EUpdateClaimMailItemsStateError
 {
-    CLIAM_MAIL_ITEMS_ERROR_NONE = 0;
-    CLIAM_MAIL_ITEMS_ERROR_NOT_AVAILABLE = 1;
-    CLIAM_MAIL_ITEMS_ERROR_NOT_ALLOWED = 2;
-    CLIAM_MAIL_ITEMS_ERROR_ALREADY_CLAIMED = 3;
+    CLAIM_MAIL_ITEMS_ERROR_NONE = 0;
+    CLAIM_MAIL_ITEMS_ERROR_NOT_AVAILABLE = 1;
+    CLAIM_MAIL_ITEMS_ERROR_NOT_ALLOWED = 2;
+    CLAIM_MAIL_ITEMS_ERROR_ALREADY_CLAIMED = 3;
+    CLAIM_MAIL_ITEMS_ERROR_CANNOT_CARRY = 4;
 }
-enum EDeleteMailError
+enum EUpdateDeleteMailStateError
 {
     DELETE_MAIL_ERROR_NONE = 0;
     DELETE_MAIL_ERROR_NOT_AVAILABLE = 1;
@@ -221,6 +225,18 @@ message FindCharacterNameReq {
 }
 message FindCharacterNameResp {
     int64 found_amount = 1;
+}
+message GetIdByCharacterNameReq {
+    string character_name = 1;
+}
+message GetIdByCharacterNameResp {
+    string id = 1;
+}
+message GetUserIdByCharacterNameReq {
+    string character_name = 1;
+}
+message GetUserIdByCharacterNameResp {
+    string user_id = 1;
 }
 // Find characters
 message FindCharactersReq {
@@ -474,38 +490,41 @@ message MailListReq {
 message MailListResp {
     repeated bytes list = 1;
 }
-message ReadMailReq {
+message UpdateReadMailStateReq {
     string mail_id = 1;
     string user_id = 2;
 }
-message ReadMailResp {
-    EReadMailError error = 1;
+message UpdateReadMailStateResp {
+    EUpdateReadMailStateError error = 1;
     bytes mail = 2;
 }
-message ClaimMailItemsReq {
+message UpdateClaimMailItemsStateReq {
     string mail_id = 1;
     string user_id = 2;
 }
-message ClaimMailItemsResp {
-    EClaimMailItemsError error = 1;
+message UpdateClaimMailItemsStateResp {
+    EUpdateClaimMailItemsStateError error = 1;
     bytes mail = 2;
 }
-message DeleteMailReq {
+message UpdateDeleteMailStateReq {
     string mail_id = 1;
     string user_id = 2;
 }
-message DeleteMailResp {
-    EDeleteMailError error = 1;
+message UpdateDeleteMailStateResp {
+    EUpdateDeleteMailStateError error = 1;
 }
 message SendMailReq {
-    string user_id = 1;
-    string sender_name = 2;
-    string title = 3;
-    string content = 4;
-    int32 gold = 5;
+    bytes mail = 1;
 }
 message SendMailResp {
     ESendMailError error = 1;
+}
+message GetMailReq {
+    string mail_id = 1;
+    string user_id = 2;
+}
+message GetMailResp {
+    bytes mail = 1;
 }
 // Custom
 message CustomReq {
