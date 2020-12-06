@@ -535,13 +535,14 @@ MonoBehaviour:
   onSpawnEntitiesFinish:
     m_PersistentCalls:
       m_Calls: []
-  writeAddonLog: 0
-  mapInstanceId: 
+  guildWarStatusMsgType: 200
+  recoverMonstersWhenRoundEnd: 1
   centralTransportFactory: {fileID: 0}
   centralNetworkAddress: 127.0.0.1
   centralNetworkPort: 6000
   machineAddress: 127.0.0.1
-  autoSaveDuration: 5
+  autoSaveDuration: 30
+  mapSpawnDuration: 0
 --- !u!114 &1127565839
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -593,6 +594,9 @@ MonoBehaviour:
   onlineScene:
     sceneAsset: {fileID: 0}
     sceneName: 
+  onInitialize:
+    m_PersistentCalls:
+      m_Calls: []
   onLoadSceneStart:
     m_PersistentCalls:
       m_Calls:
@@ -635,7 +639,10 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  onInitialize:
+  onObjectSpawn:
+    m_PersistentCalls:
+      m_Calls: []
+  onObjectDestroy:
     m_PersistentCalls:
       m_Calls: []
 --- !u!1 &1232480984
@@ -767,6 +774,7 @@ MonoBehaviour:
   dimensionType: 0
   saveSystem: {fileID: 0}
   gameplayRule: {fileID: 11400000, guid: 3bfe680a81b27ce4ba9642ddff7baa17, type: 2}
+  dayNightTimeUpdater: {fileID: 0}
   gmCommands: {fileID: 0}
   networkSetting: {fileID: 11400000, guid: c0825e8ee894749459ab4c8dda26dfe6, type: 2}
   itemDropEntityPrefab: {fileID: 114247390284341630, guid: 611b907cf80c87a4eb9e0d5d4a8688f5,
@@ -831,7 +839,7 @@ MonoBehaviour:
     layerIndex: 13
   harvestableLayer:
     layerIndex: 14
-  nonTargetingLayers:
+  ignoreRaycastLayers:
   - layerIndex: 11
   itemAppearDuration: 60
   itemLootLockDuration: 5
@@ -865,6 +873,9 @@ MonoBehaviour:
   guildStorage:
     weightLimit: 0
     slotLimit: 0
+  enhancerRemoval:
+    returnEnhancerItem: 0
+    requireGold: 0
   minSummonDistance: 2
   maxSummonDistance: 3
   minFollowSummonerDistance: 5
