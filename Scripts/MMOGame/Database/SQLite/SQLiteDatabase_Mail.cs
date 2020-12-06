@@ -96,7 +96,7 @@ namespace MultiplayerARPG.MMO
 
         public override async UniTask<long> UpdateClaimMailItemsState(string mailId, string userId)
         {
-            object result = ExecuteScalar("SELECT COUNT(*) FROM mail WHERE id=@id AND receiverId=@receiverId AND isClaim=0",
+            object result = ExecuteScalar("SELECT COUNT(*) FROM mail WHERE id=@id AND receiverId=@receiverId",
                 new SqliteParameter("@id", mailId),
                 new SqliteParameter("@receiverId", userId));
             long count = result != null ? (long)result : 0;
@@ -112,7 +112,7 @@ namespace MultiplayerARPG.MMO
 
         public override async UniTask<long> UpdateDeleteMailState(string mailId, string userId)
         {
-            object result = ExecuteScalar("SELECT COUNT(*) FROM mail WHERE id=@id AND receiverId=@receiverId AND isDelete=0",
+            object result = ExecuteScalar("SELECT COUNT(*) FROM mail WHERE id=@id AND receiverId=@receiverId",
                 new SqliteParameter("@id", mailId),
                 new SqliteParameter("@receiverId", userId));
             long count = result != null ? (long)result : 0;
