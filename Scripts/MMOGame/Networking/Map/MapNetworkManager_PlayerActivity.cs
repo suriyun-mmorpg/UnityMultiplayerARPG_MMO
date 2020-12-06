@@ -1007,7 +1007,7 @@ namespace MultiplayerARPG.MMO
                     ChangeAmount = -amount
                 });
                 playerCharacterEntity.UserGold = changeGoldResp.Gold;
-                playerCharacterEntity.Gold += amount;
+                playerCharacterEntity.Gold = playerCharacterEntity.Gold.Increase(amount);
             }
             else
                 SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.NotEnoughGoldToWithdraw);
@@ -1076,7 +1076,7 @@ namespace MultiplayerARPG.MMO
                         ChangeAmount = -amount
                     });
                     guild.gold = changeGoldResp.GuildGold;
-                    playerCharacterEntity.Gold += amount;
+                    playerCharacterEntity.Gold = playerCharacterEntity.Gold.Increase(amount);
                     guilds[playerCharacterEntity.GuildId] = guild;
                     SendSetGuildGoldToClients(guild);
                 }
