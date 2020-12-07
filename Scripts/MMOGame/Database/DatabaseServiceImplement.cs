@@ -1013,6 +1013,22 @@ namespace MultiplayerARPG.MMO
             };
         }
 
+        public override async Task<GetIdByCharacterNameResp> GetIdByCharacterName(GetIdByCharacterNameReq request, ServerCallContext context)
+        {
+            return new GetIdByCharacterNameResp()
+            {
+                Id = await Database.GetIdByCharacterName(request.CharacterName),
+            };
+        }
+
+        public override async Task<GetUserIdByCharacterNameResp> GetUserIdByCharacterName(GetUserIdByCharacterNameReq request, ServerCallContext context)
+        {
+            return new GetUserIdByCharacterNameResp()
+            {
+                UserId = await Database.GetUserIdByCharacterName(request.CharacterName),
+            };
+        }
+
         public override async Task<CustomResp> Custom(CustomReq request, ServerCallContext context)
         {
             return await onCustomRequest.Invoke(request.Type, request.Data);

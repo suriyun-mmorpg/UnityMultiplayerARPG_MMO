@@ -571,6 +571,20 @@ namespace MultiplayerARPG.MMO
             return result != null ? (long)result : 0;
         }
 
+        public override async UniTask<string> GetIdByCharacterName(string characterName)
+        {
+            object result = await ExecuteScalar("SELECT id FROM characters WHERE characterName LIKE @characterName LIMIT 1",
+                new MySqlParameter("@characterName", characterName));
+            return result != null ? (string)result : string.Empty;
+        }
+
+        public override async UniTask<string> GetUserIdByCharacterName(string characterName)
+        {
+            object result = await ExecuteScalar("SELECT userId FROM characters WHERE characterName LIKE @characterName LIMIT 1",
+                new MySqlParameter("@characterName", characterName));
+            return result != null ? (string)result : string.Empty;
+        }
+
         public override async UniTask<List<SocialCharacterData>> FindCharacters(string characterName)
         {
             List<SocialCharacterData> result = new List<SocialCharacterData>();

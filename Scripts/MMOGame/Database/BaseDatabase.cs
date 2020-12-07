@@ -47,6 +47,8 @@ namespace MultiplayerARPG.MMO
         public abstract UniTask CreateFriend(string id1, string id2);
         public abstract UniTask DeleteFriend(string id1, string id2);
         public abstract UniTask<List<SocialCharacterData>> ReadFriends(string id1);
+        public abstract UniTask<string> GetIdByCharacterName(string characterName);
+        public abstract UniTask<string> GetUserIdByCharacterName(string characterName);
 
         public abstract UniTask CreateBuilding(string mapName, IBuildingSaveData saveData);
         public abstract UniTask<List<BuildingSaveData>> ReadBuildings(string mapName);
