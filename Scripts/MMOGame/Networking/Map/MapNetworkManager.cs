@@ -849,7 +849,7 @@ namespace MultiplayerARPG.MMO
                     UserId = playerCharacter.UserId,
                     OnlyNewMails = request.onlyNewMails,
                 });
-                resp.List.MakeListFromRepeatedByteString<MailListEntry>();
+                mails.AddRange(resp.List.MakeListFromRepeatedByteString<MailListEntry>());
             }
             result.Invoke(AckResponseCode.Success, new ResponseMailListMessage()
             {
