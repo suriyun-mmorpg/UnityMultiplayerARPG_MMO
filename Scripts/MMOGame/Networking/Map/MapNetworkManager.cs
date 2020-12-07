@@ -1005,6 +1005,21 @@ namespace MultiplayerARPG.MMO
             BasePlayerCharacterEntity playerCharacter;
             if (playerCharacters.TryGetValue(requestHandler.ConnectionId, out playerCharacter))
             {
+                // Validate gold
+                if (request.gold < 0)
+                    request.gold = 0;
+                if (playerCharacter.Gold >= request.gold)
+                {
+                    playerCharacter.Gold -= request.gold;
+                }
+                else
+                {
+                    result.Invoke(AckResponseCode.Error, new ResponseSendMailMessage()
+                    {
+                        error = ResponseSendMailMessage.Error.NotEnoughGold,
+                    });
+                    return;
+                }
                 // Find receiver
                 GetUserIdByCharacterNameResp userIdResp = await DbServiceClient.GetUserIdByCharacterNameAsync(new GetUserIdByCharacterNameReq()
                 {
