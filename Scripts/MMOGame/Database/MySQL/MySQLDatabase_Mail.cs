@@ -40,7 +40,7 @@ namespace MultiplayerARPG.MMO
                         result.Add(tempMail);
                     }
                 }
-            }, "SELECT id, senderName, title, gold, currencies, items, isRead, isClaim, sentTimestamp FROM mail WHERE receiverId=@receiverId AND isDelete=0 ORDER BY sentTimestamp DESC",
+            }, "SELECT id, senderName, title, gold, currencies, items, isRead, isClaim, sentTimestamp FROM mail WHERE receiverId=@receiverId AND isDelete=0 ORDER BY isRead ASC, sentTimestamp DESC",
                 new MySqlParameter("@receiverId", userId));
             return result;
         }
