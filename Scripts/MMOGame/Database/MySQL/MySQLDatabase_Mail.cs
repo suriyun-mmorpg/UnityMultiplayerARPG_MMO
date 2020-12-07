@@ -26,7 +26,7 @@ namespace MultiplayerARPG.MMO
                         Title = reader.GetString(2),
                         IsRead = reader.GetBoolean(6),
                         IsClaim = reader.GetBoolean(7),
-                        SentTimestamp = (int)(reader.GetDateTime(8).Ticks / TimeSpan.TicksPerMillisecond),
+                        SentTimestamp = (int)((DateTimeOffset)reader.GetDateTime(8)).ToUnixTimeSeconds(),
                     };
                     if (onlyNewMails)
                     {
@@ -64,11 +64,11 @@ namespace MultiplayerARPG.MMO
                     result.ReadItems(reader.GetString(9));
                     result.IsRead = reader.GetBoolean(10);
                     if (reader[11] != DBNull.Value)
-                        result.ReadTimestamp = (int)(reader.GetDateTime(11).Ticks / TimeSpan.TicksPerMillisecond);
+                        result.ReadTimestamp = (int)((DateTimeOffset)reader.GetDateTime(11)).ToUnixTimeSeconds();
                     result.IsClaim = reader.GetBoolean(12);
                     if (reader[13] != DBNull.Value)
-                        result.ClaimTimestamp = (int)(reader.GetDateTime(13).Ticks / TimeSpan.TicksPerMillisecond);
-                    result.SentTimestamp = (int)(reader.GetDateTime(14).Ticks / TimeSpan.TicksPerMillisecond);
+                        result.ClaimTimestamp = (int)((DateTimeOffset)reader.GetDateTime(13)).ToUnixTimeSeconds();
+                    result.SentTimestamp = (int)((DateTimeOffset)reader.GetDateTime(14)).ToUnixTimeSeconds();
                 }
             }, "SELECT id, eventId, senderId, senderName, receiverId, title, content, gold, currencies, items, isRead, readTimestamp, isClaim, claimTimestamp, sentTimestamp FROM mail WHERE id=@id AND receiverId=@receiverId AND isDelete=0",
                 new MySqlParameter("@id", mailId),

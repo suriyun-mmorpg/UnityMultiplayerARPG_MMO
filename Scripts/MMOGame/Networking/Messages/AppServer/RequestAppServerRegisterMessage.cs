@@ -17,7 +17,7 @@ namespace MultiplayerARPG.MMO
 
         public void Serialize(NetDataWriter writer)
         {
-            time = (int)(System.DateTime.Now.Ticks / System.TimeSpan.TicksPerMillisecond);
+            time = (int)System.DateTimeOffset.Now.ToUnixTimeSeconds();
             hash = CentralNetworkManager.GetAppServerRegisterHash(peerInfo.peerType, time);
             peerInfo.Serialize(writer);
             writer.Put(time);

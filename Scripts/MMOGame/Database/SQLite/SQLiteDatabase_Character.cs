@@ -161,7 +161,7 @@ namespace MultiplayerARPG.MMO
                     reader.GetFloat(29),
                     reader.GetFloat(30));
                 result.MountDataId = reader.GetInt32(31);
-                result.LastUpdate = (int)(reader.GetDateTime(32).Ticks / System.TimeSpan.TicksPerMillisecond);
+                result.LastUpdate = (int)((System.DateTimeOffset)reader.GetDateTime(32)).ToUnixTimeSeconds();
                 return true;
             }
             result = null;
