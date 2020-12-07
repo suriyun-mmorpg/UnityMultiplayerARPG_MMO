@@ -296,7 +296,7 @@ namespace MultiplayerARPG.MMO
               receiverId TEXT NOT NULL,
               title TEXT NOT NULL,
               content TEXT NOT NULL,
-              gold TEXT NOT NULL,
+              gold INTEGER NOT NULL DEFAULT 0,
               currencies TEXT NOT NULL,
               items TEXT NOT NULL,
               isRead INTEGER NOT NULL DEFAULT 0,
@@ -411,6 +411,15 @@ namespace MultiplayerARPG.MMO
             if (!IsColumnExist("mail", "claimTimestamp"))
                 ExecuteNonQuery("ALTER TABLE mail ADD claimTimestamp TIMESTAMP NULL DEFAULT NULL;");
 
+            if (!IsColumnType("mail", "gold", "integer"))
+            {
+                ExecuteNonQuery("CREATE TABLE mail_backup AS SELECT id, eventId, senderId, senderName, receiverId, title, content, currencies, items, isRead, readTimestamp, isClaim, claimTimestamp, isDelete, deleteTimestamp, sentTimestamp FROM mail;" +
+                    "\nDROP TABLE mail;" +
+                    "\nALTER TABLE mail_backup RENAME TO mail;" +
+                    "\nALTER TABLE mail ADD gold INTEGER NOT NULL DEFAULT 0;");
+
+            }
+
             this.InvokeInstanceDevExtMethods("Init");
         }
 
@@ -423,6 +432,21 @@ namespace MultiplayerARPG.MMO
                 {
                     if (reader.GetString(1).Equals(findingColumn))
                         return true;
+                }
+                reader.Close();
+            }
+            return false;
+        }
+
+        private bool IsColumnType(string tableName, string findingColumn, string type)
+        {
+            using (SqliteCommand cmd = new SqliteCommand("PRAGMA table_info(" + tableName + ");", connection))
+            {
+                SqliteDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    if (reader.GetString(1).Equals(findingColumn))
+                        return reader.GetString(2).ToLower().Equals(type.ToLower());
                 }
                 reader.Close();
             }

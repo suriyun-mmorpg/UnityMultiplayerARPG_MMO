@@ -10,7 +10,6 @@ namespace MultiplayerARPG.MMO
     {
         public override async UniTask<List<MailListEntry>> MailList(string userId, bool onlyNewMails)
         {
-            
             await UniTask.Yield();
             List<MailListEntry> result = new List<MailListEntry>();
             ExecuteReader((reader) =>
@@ -23,7 +22,7 @@ namespace MultiplayerARPG.MMO
                     string items = reader.GetString(5);
                     tempMail = new MailListEntry()
                     {
-                        Id = reader.GetInt64(0).ToString(),
+                        Id = reader.GetInt32(0).ToString(),
                         SenderName = reader.GetString(1),
                         Title = reader.GetString(2),
                         IsRead = reader.GetBoolean(6),
@@ -49,14 +48,13 @@ namespace MultiplayerARPG.MMO
 
         public override async UniTask<Mail> GetMail(string mailId, string userId)
         {
-            
             await UniTask.Yield();
             Mail result = new Mail();
             ExecuteReader((reader) =>
             {
                 if (reader.Read())
                 {
-                    result.Id = reader.GetInt64(0).ToString();
+                    result.Id = reader.GetInt32(0).ToString();
                     result.EventId = reader.GetString(1);
                     result.SenderId = reader.GetString(2);
                     result.SenderName = reader.GetString(3);
