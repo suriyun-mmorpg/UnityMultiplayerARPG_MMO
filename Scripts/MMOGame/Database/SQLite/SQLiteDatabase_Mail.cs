@@ -41,7 +41,7 @@ namespace MultiplayerARPG.MMO
                         result.Add(tempMail);
                     }
                 }
-            }, "SELECT id, senderName, title, gold, currencies, items, isRead, isClaim, sentTimestamp FROM mail WHERE receiverId=@receiverId AND isDelete=0 ORDER BY isRead ASC, sentTimestamp DESC",
+            }, "SELECT id, senderName, title, gold, currencies, items, isRead, isClaim, sentTimestamp FROM mail WHERE receiverId LIKE @receiverId AND isDelete=0 ORDER BY isRead ASC, sentTimestamp DESC",
                 new SqliteParameter("@receiverId", userId));
             return result;
         }
@@ -72,7 +72,7 @@ namespace MultiplayerARPG.MMO
                         result.ClaimTimestamp = (int)(reader.GetDateTime(13).Ticks / TimeSpan.TicksPerMillisecond);
                     result.SentTimestamp = (int)(reader.GetDateTime(14).Ticks / TimeSpan.TicksPerMillisecond);
                 }
-            }, "SELECT id, eventId, senderId, senderName, receiverId, title, content, gold, currencies, items, isRead, readTimestamp, isClaim, claimTimestamp, sentTimestamp FROM mail WHERE id=@id AND receiverId=@receiverId AND isDelete=0",
+            }, "SELECT id, eventId, senderId, senderName, receiverId, title, content, gold, currencies, items, isRead, readTimestamp, isClaim, claimTimestamp, sentTimestamp FROM mail WHERE id=@id AND receiverId LIKE @receiverId AND isDelete=0",
                 new SqliteParameter("@id", mailId),
                 new SqliteParameter("@receiverId", userId));
             return result;
@@ -80,14 +80,14 @@ namespace MultiplayerARPG.MMO
 
         public override async UniTask<long> UpdateReadMailState(string mailId, string userId)
         {
-            object result = ExecuteScalar("SELECT COUNT(*) FROM mail WHERE id=@id AND receiverId=@receiverId",
+            object result = ExecuteScalar("SELECT COUNT(*) FROM mail WHERE id=@id AND receiverId LIKE @receiverId",
                 new SqliteParameter("@id", mailId),
                 new SqliteParameter("@receiverId", userId));
             long count = result != null ? (long)result : 0;
             if (count > 0)
             {
                 await UniTask.Yield();
-                ExecuteNonQuery("UPDATE mail SET isRead=1, readTimestamp=NOW() WHERE id=@id AND receiverId=@receiverId AND isRead=0",
+                ExecuteNonQuery("UPDATE mail SET isRead=1, readTimestamp=datetime('now') WHERE id=@id AND receiverId LIKE @receiverId AND isRead=0",
                     new SqliteParameter("@id", mailId),
                     new SqliteParameter("@receiverId", userId));
             }
@@ -96,14 +96,14 @@ namespace MultiplayerARPG.MMO
 
         public override async UniTask<long> UpdateClaimMailItemsState(string mailId, string userId)
         {
-            object result = ExecuteScalar("SELECT COUNT(*) FROM mail WHERE id=@id AND receiverId=@receiverId",
+            object result = ExecuteScalar("SELECT COUNT(*) FROM mail WHERE id=@id AND receiverId LIKE @receiverId",
                 new SqliteParameter("@id", mailId),
                 new SqliteParameter("@receiverId", userId));
             long count = result != null ? (long)result : 0;
             if (count > 0)
             {
                 await UniTask.Yield();
-                ExecuteNonQuery("UPDATE mail SET isClaim=1, claimTimestamp=NOW() WHERE id=@id AND receiverId=@receiverId AND isClaim=0",
+                ExecuteNonQuery("UPDATE mail SET isClaim=1, claimTimestamp=datetime('now') WHERE id=@id AND receiverId LIKE @receiverId AND isClaim=0",
                     new SqliteParameter("@id", mailId),
                     new SqliteParameter("@receiverId", userId));
             }
@@ -112,14 +112,14 @@ namespace MultiplayerARPG.MMO
 
         public override async UniTask<long> UpdateDeleteMailState(string mailId, string userId)
         {
-            object result = ExecuteScalar("SELECT COUNT(*) FROM mail WHERE id=@id AND receiverId=@receiverId",
+            object result = ExecuteScalar("SELECT COUNT(*) FROM mail WHERE id=@id AND receiverId LIKE @receiverId",
                 new SqliteParameter("@id", mailId),
                 new SqliteParameter("@receiverId", userId));
             long count = result != null ? (long)result : 0;
             if (count > 0)
             {
                 await UniTask.Yield();
-                ExecuteNonQuery("UPDATE mail SET isDelete=1, deleteTimestamp=NOW() WHERE id=@id AND receiverId=@receiverId AND isDelete=0",
+                ExecuteNonQuery("UPDATE mail SET isDelete=1, deleteTimestamp=datetime('now') WHERE id=@id AND receiverId LIKE @receiverId AND isDelete=0",
                     new SqliteParameter("@id", mailId),
                     new SqliteParameter("@receiverId", userId));
             }
