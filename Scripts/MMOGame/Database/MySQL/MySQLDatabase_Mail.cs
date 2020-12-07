@@ -21,7 +21,7 @@ namespace MultiplayerARPG.MMO
                     string items = reader.GetString(5);
                     tempMail = new MailListEntry()
                     {
-                        Id = reader.GetString(0),
+                        Id = reader.GetInt64(0).ToString(),
                         SenderName = reader.GetString(1),
                         Title = reader.GetString(2),
                         IsRead = reader.GetBoolean(6),
@@ -52,7 +52,7 @@ namespace MultiplayerARPG.MMO
             {
                 if (reader.Read())
                 {
-                    result.Id = reader.GetString(0);
+                    result.Id = reader.GetInt64(0).ToString();
                     result.EventId = reader.GetString(1);
                     result.SenderId = reader.GetString(2);
                     result.SenderName = reader.GetString(3);
@@ -78,7 +78,7 @@ namespace MultiplayerARPG.MMO
 
         public override async UniTask<long> UpdateReadMailState(string mailId, string userId)
         {
-            object result = ExecuteScalar("SELECT COUNT(*) FROM mail WHERE id=@id AND receiverId=@receiverId",
+            object result = await ExecuteScalar("SELECT COUNT(*) FROM mail WHERE id=@id AND receiverId=@receiverId",
                 new MySqlParameter("@id", mailId),
                 new MySqlParameter("@receiverId", userId));
             long count = result != null ? (long)result : 0;
@@ -93,7 +93,7 @@ namespace MultiplayerARPG.MMO
 
         public override async UniTask<long> UpdateClaimMailItemsState(string mailId, string userId)
         {
-            object result = ExecuteScalar("SELECT COUNT(*) FROM mail WHERE id=@id AND receiverId=@receiverId",
+            object result = await ExecuteScalar("SELECT COUNT(*) FROM mail WHERE id=@id AND receiverId=@receiverId",
                 new MySqlParameter("@id", mailId),
                 new MySqlParameter("@receiverId", userId));
             long count = result != null ? (long)result : 0;
@@ -108,7 +108,7 @@ namespace MultiplayerARPG.MMO
 
         public override async UniTask<long> UpdateDeleteMailState(string mailId, string userId)
         {
-            object result = ExecuteScalar("SELECT COUNT(*) FROM mail WHERE id=@id AND receiverId=@receiverId",
+            object result = await ExecuteScalar("SELECT COUNT(*) FROM mail WHERE id=@id AND receiverId=@receiverId",
                 new MySqlParameter("@id", mailId),
                 new MySqlParameter("@receiverId", userId));
             long count = result != null ? (long)result : 0;
