@@ -395,10 +395,6 @@ CREATE TABLE `userlogin` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
--- Indexes for dumped tables
---
-
---
 -- Indexes for table `buildings`
 --
 ALTER TABLE `buildings`
@@ -489,6 +485,12 @@ ALTER TABLE `guildskill`
   ADD PRIMARY KEY (`guildId`,`dataId`) USING BTREE;
 
 --
+-- Indexes for table `mail`
+--
+ALTER TABLE `mail`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `party`
 --
 ALTER TABLE `party`
@@ -500,10 +502,6 @@ ALTER TABLE `party`
 ALTER TABLE `userlogin`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `username` (`username`);
-
---
--- AUTO_INCREMENT for dumped tables
---
 
 --
 -- AUTO_INCREMENT for table `friend`
