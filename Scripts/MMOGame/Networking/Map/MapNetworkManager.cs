@@ -484,7 +484,7 @@ namespace MultiplayerARPG.MMO
                     }
 
                     // Spawn character entity and set its data
-                    GameObject spawnObj = Instantiate(entityPrefab.gameObject, playerCharacterData.CurrentPosition, Quaternion.identity);
+                    GameObject spawnObj = Instantiate(entityPrefab.gameObject, playerCharacterData.CurrentPosition, Quaternion.Euler(playerCharacterData.CurrentRotation));
                     BasePlayerCharacterEntity playerCharacterEntity = spawnObj.GetComponent<BasePlayerCharacterEntity>();
                     playerCharacterData.CloneTo(playerCharacterEntity);
                     Assets.NetworkSpawn(spawnObj, 0, connectionId);
