@@ -10,7 +10,7 @@ namespace MultiplayerARPG.MMO
         private readonly Dictionary<StorageId, HashSet<long>> usingStorageCharacters = new Dictionary<StorageId, HashSet<long>>();
 #endif
 
-        public void OpenStorage(BasePlayerCharacterEntity playerCharacterEntity)
+        public async UniTaskVoid OpenStorage(BasePlayerCharacterEntity playerCharacterEntity)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             if (!CanAccessStorage(playerCharacterEntity.CurrentStorageId, playerCharacterEntity))
@@ -21,15 +21,26 @@ namespace MultiplayerARPG.MMO
             if (!usingStorageCharacters.ContainsKey(playerCharacterEntity.CurrentStorageId))
                 usingStorageCharacters[playerCharacterEntity.CurrentStorageId] = new HashSet<long>();
             usingStorageCharacters[playerCharacterEntity.CurrentStorageId].Add(playerCharacterEntity.ConnectionId);
+            ReadStorageItemsReq req = new ReadStorageItemsReq();
+            req.StorageType = (EStorageType)playerCharacterEntity.CurrentStorageId.storageType;
+            req.StorageOwnerId = playerCharacterEntity.CurrentStorageId.storageOwnerId;
+            ReadStorageItemsResp resp = await DbServiceClient.ReadStorageItemsAsync(req);
+            List<CharacterItem> storageItems = DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.StorageCharacterItems);
+            SetStorageItems(playerCharacterEntity.CurrentStorageId, storageItems);
+            NotifyStorageItemsToCharacters(new HashSet<long>()
+            {
+                playerCharacterEntity.ConnectionId
+            });
 #endif
         }
 
-        public void CloseStorage(BasePlayerCharacterEntity playerCharacterEntity)
+        public async UniTaskVoid CloseStorage(BasePlayerCharacterEntity playerCharacterEntity)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             if (usingStorageCharacters.ContainsKey(playerCharacterEntity.CurrentStorageId))
                 usingStorageCharacters[playerCharacterEntity.CurrentStorageId].Remove(playerCharacterEntity.ConnectionId);
 #endif
+            await UniTask.Yield();
         }
 
         public async UniTask<bool> IncreaseStorageItems(StorageId storageId, CharacterItem addingItem)
