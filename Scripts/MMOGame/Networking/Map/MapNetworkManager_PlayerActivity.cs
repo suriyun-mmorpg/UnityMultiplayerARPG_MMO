@@ -2,7 +2,6 @@
 using LiteNetLib;
 using LiteNetLib.Utils;
 using LiteNetLibManager;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -200,8 +199,9 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        private void OnRequestSpawnMap(ResponseHandlerData requestHandler, AckResponseCode responseCode, INetSerializable response, string instanceId)
+        private async UniTaskVoid OnRequestSpawnMap(ResponseHandlerData requestHandler, AckResponseCode responseCode, INetSerializable response, string instanceId)
         {
+            await UniTask.Yield();
             if (responseCode == AckResponseCode.Error ||
                 responseCode == AckResponseCode.Timeout)
             {
