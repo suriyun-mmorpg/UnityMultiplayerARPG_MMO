@@ -20,8 +20,7 @@ namespace MultiplayerARPG.MMO
                     StorageType = (EStorageType)storageId.storageType,
                     StorageOwnerId = storageId.storageOwnerId
                 });
-
-                allStorageItems[storageId] = readStorageItemsResp.StorageCharacterItems.MakeListFromRepeatedByteString<CharacterItem>();
+                SetStorageItems(storageId, readStorageItemsResp.StorageCharacterItems.MakeListFromRepeatedByteString<CharacterItem>());
                 loadingStorageIds.Remove(storageId);
             }
         }
