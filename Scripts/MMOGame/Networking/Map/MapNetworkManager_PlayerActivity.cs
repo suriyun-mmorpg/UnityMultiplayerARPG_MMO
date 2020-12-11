@@ -73,7 +73,7 @@ namespace MultiplayerARPG.MMO
             CentralServerPeerInfo peerInfo;
             BaseMapInfo mapInfo;
             if (!string.IsNullOrEmpty(mapName) &&
-                playerCharacters.ContainsKey(connectionId) &&
+                PlayerCharacters.ContainsKey(connectionId) &&
                 mapServerConnectionIdsBySceneName.TryGetValue(mapName, out peerInfo) &&
                 GameInstance.MapInfos.TryGetValue(mapName, out mapInfo) &&
                 mapInfo.IsSceneSet())
@@ -117,7 +117,7 @@ namespace MultiplayerARPG.MMO
             // Prepare data for warp character later when instance map server registered to this map server
             HashSet<uint> instanceMapWarpingCharacters = new HashSet<uint>();
             PartyData party;
-            if (parties.TryGetValue(playerCharacterEntity.PartyId, out party))
+            if (Parties.TryGetValue(playerCharacterEntity.PartyId, out party))
             {
                 // If character is party member, will bring party member to join instance
                 if (party.IsLeader(playerCharacterEntity))
@@ -167,7 +167,7 @@ namespace MultiplayerARPG.MMO
             CentralServerPeerInfo peerInfo;
             InstanceMapWarpingLocation warpingLocation;
             BaseMapInfo mapInfo;
-            if (playerCharacters.ContainsKey(connectionId) &&
+            if (PlayerCharacters.ContainsKey(connectionId) &&
                 instanceMapWarpingLocations.TryGetValue(instanceId, out warpingLocation) &&
                 instanceMapServerConnectionIdsByInstanceId.TryGetValue(instanceId, out peerInfo) &&
                 GameInstance.MapInfos.TryGetValue(warpingLocation.mapName, out mapInfo) &&
@@ -245,7 +245,7 @@ namespace MultiplayerARPG.MMO
             });
             PartyData party = DatabaseServiceUtils.FromByteString<PartyData>(createPartyResp.PartyData);
             // Created party, notify to players
-            parties[party.id] = party;
+            Parties[party.id] = party;
             playerCharacterEntity.PartyId = party.id;
             SendCreatePartyToClient(playerCharacterEntity.ConnectionId, party);
             SendAddPartyMembersToClient(playerCharacterEntity.ConnectionId, party);
@@ -356,7 +356,7 @@ namespace MultiplayerARPG.MMO
                 foreach (string memberId in party.GetMemberIds())
                 {
                     BasePlayerCharacterEntity memberCharacterEntity;
-                    if (playerCharactersById.TryGetValue(memberId, out memberCharacterEntity))
+                    if (this.TryGetPlayerCharacterById(memberId, out memberCharacterEntity))
                     {
                         memberCharacterEntity.ClearParty();
                         SendPartyTerminateToClient(memberCharacterEntity.ConnectionId, partyId);
@@ -370,7 +370,7 @@ namespace MultiplayerARPG.MMO
                     if (ChatNetworkManager.IsClientConnected)
                         ChatNetworkManager.SendRemoveSocialMember(null, MMOMessageTypes.UpdatePartyMember, partyId, memberId);
                 }
-                parties.Remove(partyId);
+                Parties.Remove(partyId);
                 // Save to database
                 DbServiceClient.DeletePartyAsync(new DeletePartyReq()
                 {
@@ -385,7 +385,7 @@ namespace MultiplayerARPG.MMO
                 playerCharacterEntity.ClearParty();
                 SendPartyTerminateToClient(playerCharacterEntity.ConnectionId, partyId);
                 party.RemoveMember(playerCharacterEntity.Id);
-                parties[partyId] = party;
+                Parties[partyId] = party;
                 SendRemovePartyMemberToClients(party, playerCharacterEntity.Id);
                 // Save to database
                 DbServiceClient.ClearCharacterPartyAsync(new ClearCharacterPartyReq()
@@ -430,7 +430,7 @@ namespace MultiplayerARPG.MMO
                 GuildData guild = DatabaseServiceUtils.FromByteString<GuildData>(createGuildResp.GuildData);
                 // Created party, notify to players
                 CurrentGameInstance.SocialSystemSetting.DecreaseCreateGuildResource(playerCharacterEntity);
-                guilds[guild.id] = guild;
+                Guilds[guild.id] = guild;
                 playerCharacterEntity.GuildId = guild.id;
                 playerCharacterEntity.GuildName = guildName;
                 playerCharacterEntity.GuildRole = guild.GetMemberRole(playerCharacterEntity.Id);
@@ -503,12 +503,12 @@ namespace MultiplayerARPG.MMO
                 return;
 
             guild.SetRole(guildRole, roleName, canInvite, canKick, shareExpPercentage);
-            guilds[guildId] = guild;
+            Guilds[guildId] = guild;
             // Change characters guild role
             foreach (string memberId in guild.GetMemberIds())
             {
                 BasePlayerCharacterEntity memberCharacterEntity;
-                if (playerCharactersById.TryGetValue(memberId, out memberCharacterEntity))
+                if (this.TryGetPlayerCharacterById(memberId, out memberCharacterEntity))
                 {
                     memberCharacterEntity.GuildRole = guildRole;
                     // Save to database
@@ -613,7 +613,7 @@ namespace MultiplayerARPG.MMO
                 foreach (string memberId in guild.GetMemberIds())
                 {
                     BasePlayerCharacterEntity memberCharacterEntity;
-                    if (playerCharactersById.TryGetValue(memberId, out memberCharacterEntity))
+                    if (this.TryGetPlayerCharacterById(memberId, out memberCharacterEntity))
                     {
                         memberCharacterEntity.ClearGuild();
                         SendGuildTerminateToClient(memberCharacterEntity.ConnectionId, guildId);
@@ -627,7 +627,7 @@ namespace MultiplayerARPG.MMO
                     if (ChatNetworkManager.IsClientConnected)
                         ChatNetworkManager.SendRemoveSocialMember(null, MMOMessageTypes.UpdateGuildMember, guildId, memberId);
                 }
-                guilds.Remove(guildId);
+                Guilds.Remove(guildId);
                 // Save to database
                 DbServiceClient.DeleteGuildAsync(new DeleteGuildReq()
                 {
@@ -642,7 +642,7 @@ namespace MultiplayerARPG.MMO
                 playerCharacterEntity.ClearGuild();
                 SendGuildTerminateToClient(playerCharacterEntity.ConnectionId, guildId);
                 guild.RemoveMember(playerCharacterEntity.Id);
-                guilds[guildId] = guild;
+                Guilds[guildId] = guild;
                 SendRemoveGuildMemberToClients(guild, playerCharacterEntity.Id);
                 // Save to database
                 DbServiceClient.ClearCharacterGuildAsync(new ClearCharacterGuildReq()
@@ -676,7 +676,7 @@ namespace MultiplayerARPG.MMO
                 Exp = exp
             });
             GuildData guild = DatabaseServiceUtils.FromByteString<GuildData>(resp.GuildData);
-            guilds[guildId] = guild;
+            Guilds[guildId] = guild;
             SendGuildLevelExpSkillPointToClients(guild);
             // Broadcast via chat server
             if (ChatNetworkManager.IsClientConnected)
@@ -704,7 +704,7 @@ namespace MultiplayerARPG.MMO
                 SkillId = dataId
             });
             GuildData guild = resp.GuildData.FromByteString<GuildData>();
-            guilds[guildId] = guild;
+            Guilds[guildId] = guild;
             SendSetGuildSkillLevelToClients(guild, dataId);
             SendGuildLevelExpSkillPointToClients(guild);
             // Broadcast via chat server
@@ -713,245 +713,6 @@ namespace MultiplayerARPG.MMO
                 ChatNetworkManager.SendSetGuildSkillLevel(null, MMOMessageTypes.UpdateGuild, guildId, dataId, guild.GetSkillLevel(dataId));
                 ChatNetworkManager.SendSetGuildGold(null, MMOMessageTypes.UpdateGuild, guildId, guild.gold);
                 ChatNetworkManager.SendGuildLevelExpSkillPoint(null, MMOMessageTypes.UpdateGuild, guildId, guild.level, guild.exp, guild.skillPoint);
-            }
-        }
-#endif
-
-        public override List<CharacterItem> GetStorageEntityItems(StorageEntity storageEntity)
-        {
-#if UNITY_STANDALONE && !CLIENT_BUILD
-            if (storageEntity == null)
-                return new List<CharacterItem>();
-            StorageId id = new StorageId(StorageType.Building, storageEntity.Id);
-            if (!allStorageItems.ContainsKey(id))
-                allStorageItems[id] = new List<CharacterItem>();
-            return allStorageItems[id];
-#else
-            return new List<CharacterItem>();
-#endif
-        }
-
-        public override void OpenStorage(BasePlayerCharacterEntity playerCharacterEntity)
-        {
-#if UNITY_STANDALONE && !CLIENT_BUILD
-            if (!CanAccessStorage(playerCharacterEntity, playerCharacterEntity.CurrentStorageId))
-            {
-                SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.CannotAccessStorage);
-                return;
-            }
-            if (!usingStorageCharacters.ContainsKey(playerCharacterEntity.CurrentStorageId))
-                usingStorageCharacters[playerCharacterEntity.CurrentStorageId] = new HashSet<uint>();
-            usingStorageCharacters[playerCharacterEntity.CurrentStorageId].Add(playerCharacterEntity.ObjectId);
-            OpenStorageRoutine(playerCharacterEntity).Forget();
-#endif
-        }
-
-#if UNITY_STANDALONE && !CLIENT_BUILD
-        private async UniTaskVoid OpenStorageRoutine(BasePlayerCharacterEntity playerCharacterEntity)
-        {
-            ReadStorageItemsReq req = new ReadStorageItemsReq();
-            req.StorageType = (EStorageType)playerCharacterEntity.CurrentStorageId.storageType;
-            req.StorageOwnerId = playerCharacterEntity.CurrentStorageId.storageOwnerId;
-            ReadStorageItemsResp resp = await DbServiceClient.ReadStorageItemsAsync(req);
-            List<CharacterItem> storageItems = DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.StorageCharacterItems);
-            playerCharacterEntity.StorageItems = storageItems.ToArray();
-            allStorageItems[playerCharacterEntity.CurrentStorageId] = storageItems;
-        }
-#endif
-
-        public override void CloseStorage(BasePlayerCharacterEntity playerCharacterEntity)
-        {
-#if UNITY_STANDALONE && !CLIENT_BUILD
-            if (usingStorageCharacters.ContainsKey(playerCharacterEntity.CurrentStorageId))
-                usingStorageCharacters[playerCharacterEntity.CurrentStorageId].Remove(playerCharacterEntity.ObjectId);
-            playerCharacterEntity.StorageItems = new CharacterItem[0];
-#endif
-        }
-
-        public override void MoveItemToStorage(IPlayerCharacterData playerCharacter, StorageId storageId, short inventoryIndex, short amount, short storageItemIndex)
-        {
-#if UNITY_STANDALONE && !CLIENT_BUILD
-            MoveItemToStorageRoutine(playerCharacter, storageId, inventoryIndex, amount, storageItemIndex).Forget();
-#endif
-        }
-
-#if UNITY_STANDALONE && !CLIENT_BUILD
-        private async UniTaskVoid MoveItemToStorageRoutine(IPlayerCharacterData playerCharacter, StorageId storageId, short inventoryIndex, short amount, short storageItemIndex)
-        {
-            MoveItemToStorageReq req = new MoveItemToStorageReq();
-            req.StorageType = (EStorageType)storageId.storageType;
-            req.StorageOwnerId = storageId.storageOwnerId;
-            req.CharacterId = playerCharacter.Id;
-            req.MapName = CurrentMapInfo.Id;
-            req.InventoryItemIndex = inventoryIndex;
-            req.InventoryItemAmount = amount;
-            req.StorageItemIndex = storageItemIndex;
-            MoveItemToStorageResp resp = await DbServiceClient.MoveItemToStorageAsync(req);
-            if (resp.Error != EStorageError.StorageErrorNone)
-            {
-                // TODO: May push error message
-                return;
-            }
-            playerCharacter.NonEquipItems = DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.InventoryItemItems);
-            List<CharacterItem> storageItems = DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.StorageCharacterItems);
-            UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItems);
-            allStorageItems[storageId] = storageItems;
-        }
-#endif
-
-        public override void MoveItemFromStorage(IPlayerCharacterData playerCharacter, StorageId storageId, short storageItemIndex, short amount, short inventoryIndex)
-        {
-#if UNITY_STANDALONE && !CLIENT_BUILD
-            MoveItemFromStorageRoutine(playerCharacter, storageId, storageItemIndex, amount, inventoryIndex).Forget();
-#endif
-        }
-
-#if UNITY_STANDALONE && !CLIENT_BUILD
-        private async UniTaskVoid MoveItemFromStorageRoutine(IPlayerCharacterData playerCharacter, StorageId storageId, short storageItemIndex, short amount, short inventoryIndex)
-        {
-            MoveItemFromStorageReq req = new MoveItemFromStorageReq();
-            req.StorageType = (EStorageType)storageId.storageType;
-            req.StorageOwnerId = storageId.storageOwnerId;
-            req.CharacterId = playerCharacter.Id;
-            req.MapName = CurrentMapInfo.Id;
-            req.StorageItemIndex = storageItemIndex;
-            req.StorageItemAmount = amount;
-            req.InventoryItemIndex = inventoryIndex;
-            MoveItemFromStorageResp resp = await DbServiceClient.MoveItemFromStorageAsync(req);
-            if (resp.Error != EStorageError.StorageErrorNone)
-            {
-                // TODO: May push error message
-                return;
-            }
-            playerCharacter.NonEquipItems = DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.InventoryItemItems);
-            List<CharacterItem> storageItems = DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.StorageCharacterItems);
-            UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItems);
-            allStorageItems[storageId] = storageItems;
-        }
-#endif
-
-        public override void IncreaseStorageItems(StorageId storageId, CharacterItem addingItem, Action<bool> callback)
-        {
-#if UNITY_STANDALONE && !CLIENT_BUILD
-            IncreaseStorageItemsRoutine(storageId, addingItem, callback).Forget();
-#endif
-        }
-
-#if UNITY_STANDALONE && !CLIENT_BUILD
-        private async UniTaskVoid IncreaseStorageItemsRoutine(StorageId storageId, CharacterItem addingItem, Action<bool> callback)
-        {
-            IncreaseStorageItemsReq req = new IncreaseStorageItemsReq();
-            req.StorageType = (EStorageType)storageId.storageType;
-            req.StorageOwnerId = storageId.storageOwnerId;
-            req.MapName = CurrentMapInfo.Id;
-            req.Item = DatabaseServiceUtils.ToByteString(addingItem);
-            IncreaseStorageItemsResp resp = await DbServiceClient.IncreaseStorageItemsAsync(req);
-            if (resp.Error != EStorageError.StorageErrorNone)
-            {
-                // TODO: May push error message
-                if (resp.Error == EStorageError.StorageErrorStorageWillOverwhelming && callback != null)
-                    callback.Invoke(false);
-                return;
-            }
-            List<CharacterItem> storageItems = DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.StorageCharacterItems);
-            UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItems);
-            allStorageItems[storageId] = storageItems;
-            if (callback != null)
-                callback.Invoke(true);
-        }
-#endif
-
-        public override void DecreaseStorageItems(StorageId storageId, int dataId, short amount, Action<bool, Dictionary<int, short>> callback)
-        {
-#if UNITY_STANDALONE && !CLIENT_BUILD
-            DecreaseStorageItemsRoutine(storageId, dataId, amount, callback).Forget();
-#endif
-        }
-
-#if UNITY_STANDALONE && !CLIENT_BUILD
-        private async UniTaskVoid DecreaseStorageItemsRoutine(StorageId storageId, int dataId, short amount, Action<bool, Dictionary<int, short>> callback)
-        {
-            DecreaseStorageItemsReq req = new DecreaseStorageItemsReq();
-            req.StorageType = (EStorageType)storageId.storageType;
-            req.StorageOwnerId = storageId.storageOwnerId;
-            req.MapName = CurrentMapInfo.Id;
-            req.DataId = dataId;
-            req.Amount = amount;
-            DecreaseStorageItemsResp resp = await DbServiceClient.DecreaseStorageItemsAsync(req);
-            if (resp.Error != EStorageError.StorageErrorNone)
-            {
-                // TODO: May push error message
-                if (resp.Error == EStorageError.StorageErrorStorageWillOverwhelming && callback != null)
-                    callback.Invoke(false, new Dictionary<int, short>());
-                return;
-            }
-            List<CharacterItem> storageItems = DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.StorageCharacterItems);
-            UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItems);
-            allStorageItems[storageId] = storageItems;
-            Dictionary<int, short> decreasedItems = new Dictionary<int, short>();
-            foreach (ItemIndexAmountMap entry in resp.DecreasedItems)
-            {
-                decreasedItems.Add(entry.Index, (short)entry.Amount);
-            }
-            if (callback != null)
-                callback.Invoke(true, decreasedItems);
-        }
-#endif
-
-        public override void SwapOrMergeStorageItem(IPlayerCharacterData playerCharacter, StorageId storageId, short fromIndex, short toIndex)
-        {
-#if UNITY_STANDALONE && !CLIENT_BUILD
-            SwapOrMergeStorageItemRoutine(playerCharacter, storageId, fromIndex, toIndex).Forget();
-#endif
-        }
-
-#if UNITY_STANDALONE && !CLIENT_BUILD
-        private async UniTaskVoid SwapOrMergeStorageItemRoutine(IPlayerCharacterData playerCharacter, StorageId storageId, short fromIndex, short toIndex)
-        {
-            SwapOrMergeStorageItemReq req = new SwapOrMergeStorageItemReq();
-            req.StorageType = (EStorageType)storageId.storageType;
-            req.StorageOwnerId = storageId.storageOwnerId;
-            req.CharacterId = playerCharacter.Id;
-            req.MapName = CurrentMapInfo.Id;
-            req.FromIndex = fromIndex;
-            req.ToIndex = toIndex;
-            SwapOrMergeStorageItemResp resp = await DbServiceClient.SwapOrMergeStorageItemAsync(req);
-            if (resp.Error != EStorageError.StorageErrorNone)
-            {
-                // TODO: May push error message
-                return;
-            }
-            List<CharacterItem> storageItems = DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.StorageCharacterItems);
-            UpdateStorageItemsToCharacters(usingStorageCharacters[storageId], storageItems);
-            allStorageItems[storageId] = storageItems;
-        }
-#endif
-
-        public override bool IsStorageEntityOpen(StorageEntity storageEntity)
-        {
-#if UNITY_STANDALONE && !CLIENT_BUILD
-            if (storageEntity == null)
-                return false;
-            StorageId id = new StorageId(StorageType.Building, storageEntity.Id);
-            return usingStorageCharacters.ContainsKey(id) &&
-                usingStorageCharacters[id].Count > 0;
-#else
-            return false;
-#endif
-        }
-
-#if UNITY_STANDALONE && !CLIENT_BUILD
-        private void UpdateStorageItemsToCharacters(HashSet<uint> objectIds, List<CharacterItem> items)
-        {
-            BasePlayerCharacterEntity playerCharacterEntity;
-            CharacterItem[] storageItems = items.ToArray();
-            foreach (uint objectId in objectIds)
-            {
-                if (Assets.TryGetSpawnedObject(objectId, out playerCharacterEntity))
-                {
-                    // Update storage items
-                    playerCharacterEntity.StorageItems = storageItems;
-                }
             }
         }
 #endif
@@ -1025,7 +786,7 @@ namespace MultiplayerARPG.MMO
         private async UniTaskVoid DepositGuildGoldRoutine(BasePlayerCharacterEntity playerCharacterEntity, int amount)
         {
             GuildData guild;
-            if (guilds.TryGetValue(playerCharacterEntity.GuildId, out guild))
+            if (Guilds.TryGetValue(playerCharacterEntity.GuildId, out guild))
             {
                 if (playerCharacterEntity.Gold - amount >= 0)
                 {
@@ -1037,7 +798,7 @@ namespace MultiplayerARPG.MMO
                     });
                     guild.gold = changeGoldResp.GuildGold;
                     playerCharacterEntity.Gold -= amount;
-                    guilds[playerCharacterEntity.GuildId] = guild;
+                    Guilds[playerCharacterEntity.GuildId] = guild;
                     SendSetGuildGoldToClients(guild);
                 }
                 else
@@ -1059,7 +820,7 @@ namespace MultiplayerARPG.MMO
         private async UniTaskVoid WithdrawGuildGoldRoutine(BasePlayerCharacterEntity playerCharacterEntity, int amount)
         {
             GuildData guild;
-            if (guilds.TryGetValue(playerCharacterEntity.GuildId, out guild))
+            if (Guilds.TryGetValue(playerCharacterEntity.GuildId, out guild))
             {
                 // Get gold amount
                 GuildGoldResp goldResp = await DbServiceClient.GetGuildGoldAsync(new GetGuildGoldReq()
@@ -1077,7 +838,7 @@ namespace MultiplayerARPG.MMO
                     });
                     guild.gold = changeGoldResp.GuildGold;
                     playerCharacterEntity.Gold = playerCharacterEntity.Gold.Increase(amount);
-                    guilds[playerCharacterEntity.GuildId] = guild;
+                    Guilds[playerCharacterEntity.GuildId] = guild;
                     SendSetGuildGoldToClients(guild);
                 }
                 else

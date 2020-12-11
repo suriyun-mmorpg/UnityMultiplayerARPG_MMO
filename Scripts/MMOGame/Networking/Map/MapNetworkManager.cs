@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using LiteNetLib;
 using LiteNetLib.Utils;
@@ -9,7 +8,7 @@ using System;
 
 namespace MultiplayerARPG.MMO
 {
-    public sealed partial class MapNetworkManager : BaseGameNetworkManager, IAppServer
+    public sealed partial class MapNetworkManager : BaseGameNetworkManager, IAppServer, IServerStorageHandlers
     {
         public const float TERMINATE_INSTANCE_DELAY = 30f;  // Close instance when no clients connected within 30 seconds
 
@@ -106,8 +105,6 @@ namespace MultiplayerARPG.MMO
         private readonly Dictionary<string, HashSet<uint>> instanceMapWarpingCharactersByInstanceId = new Dictionary<string, HashSet<uint>>();
         private readonly Dictionary<string, InstanceMapWarpingLocation> instanceMapWarpingLocations = new Dictionary<string, InstanceMapWarpingLocation>();
         private readonly Dictionary<string, SocialCharacterData> usersById = new Dictionary<string, SocialCharacterData>();
-        private readonly Dictionary<StorageId, List<CharacterItem>> allStorageItems = new Dictionary<StorageId, List<CharacterItem>>();
-        private readonly Dictionary<StorageId, HashSet<uint>> usingStorageCharacters = new Dictionary<StorageId, HashSet<uint>>();
         // Database operations
         private readonly HashSet<StorageId> loadingStorageIds = new HashSet<StorageId>();
         private readonly HashSet<int> loadingPartyIds = new HashSet<int>();
@@ -193,7 +190,7 @@ namespace MultiplayerARPG.MMO
             instanceMapWarpingCharactersByInstanceId.Clear();
             instanceMapWarpingLocations.Clear();
             usersById.Clear();
-            allStorageItems.Clear();
+            storageItems.Clear();
             usingStorageCharacters.Clear();
             loadingStorageIds.Clear();
             loadingPartyIds.Clear();
@@ -230,7 +227,7 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
             if (IsServer)
             {
-                foreach (BasePlayerCharacterEntity playerCharacter in playerCharacters.Values)
+                foreach (BasePlayerCharacterEntity playerCharacter in PlayerCharacters.Values)
                 {
                     if (playerCharacter == null) continue;
                     DbServiceClient.UpdateCharacter(new UpdateCharacterReq()
@@ -239,7 +236,7 @@ namespace MultiplayerARPG.MMO
                     });
                 }
                 string mapName = CurrentMapInfo.Id;
-                foreach (BuildingEntity buildingEntity in buildingEntities.Values)
+                foreach (BuildingEntity buildingEntity in BuildingEntities.Values)
                 {
                     if (buildingEntity == null) continue;
                     DbServiceClient.UpdateBuilding(new UpdateBuildingReq()
@@ -285,7 +282,7 @@ namespace MultiplayerARPG.MMO
             // Send remove character from map server
             BasePlayerCharacterEntity playerCharacter;
             SocialCharacterData userData;
-            if (playerCharacters.TryGetValue(connectionId, out playerCharacter) &&
+            if (this.TryGetPlayerCharacter(connectionId, out playerCharacter) &&
                 usersById.TryGetValue(playerCharacter.Id, out userData))
             {
                 usersById.Remove(playerCharacter.Id);
@@ -310,7 +307,7 @@ namespace MultiplayerARPG.MMO
         {
             // Save player character data
             BasePlayerCharacterEntity playerCharacterEntity;
-            if (playerCharacters.TryGetValue(connectionId, out playerCharacterEntity))
+            if (this.TryGetPlayerCharacter(connectionId, out playerCharacterEntity))
             {
                 PlayerCharacterData saveCharacterData = playerCharacterEntity.CloneTo(new PlayerCharacterData());
                 while (savingCharacters.Contains(saveCharacterData.Id))
@@ -404,7 +401,7 @@ namespace MultiplayerARPG.MMO
             string accessToken = reader.GetString();
             string selectCharacterId = reader.GetString();
 
-            if (playerCharacters.ContainsKey(connectionId))
+            if (PlayerCharacters.ContainsKey(connectionId))
             {
                 if (LogError)
                     Logging.LogError(LogTag, "User trying to hack: " + userId);
@@ -520,11 +517,11 @@ namespace MultiplayerARPG.MMO
                     // Load party data, if this map-server does not have party data
                     if (playerCharacterEntity.PartyId > 0)
                     {
-                        if (!parties.ContainsKey(playerCharacterEntity.PartyId))
+                        if (!Parties.ContainsKey(playerCharacterEntity.PartyId))
                             await LoadPartyRoutine(playerCharacterEntity.PartyId);
-                        if (parties.ContainsKey(playerCharacterEntity.PartyId))
+                        if (Parties.ContainsKey(playerCharacterEntity.PartyId))
                         {
-                            PartyData party = parties[playerCharacterEntity.PartyId];
+                            PartyData party = Parties[playerCharacterEntity.PartyId];
                             SendCreatePartyToClient(playerCharacterEntity.ConnectionId, party);
                             SendAddPartyMembersToClient(playerCharacterEntity.ConnectionId, party);
                         }
@@ -535,11 +532,11 @@ namespace MultiplayerARPG.MMO
                     // Load guild data, if this map-server does not have guild data
                     if (playerCharacterEntity.GuildId > 0)
                     {
-                        if (!guilds.ContainsKey(playerCharacterEntity.GuildId))
+                        if (!Guilds.ContainsKey(playerCharacterEntity.GuildId))
                             await LoadGuildRoutine(playerCharacterEntity.GuildId);
-                        if (guilds.ContainsKey(playerCharacterEntity.GuildId))
+                        if (Guilds.ContainsKey(playerCharacterEntity.GuildId))
                         {
-                            GuildData guild = guilds[playerCharacterEntity.GuildId];
+                            GuildData guild = Guilds[playerCharacterEntity.GuildId];
                             playerCharacterEntity.GuildName = guild.guildName;
                             playerCharacterEntity.GuildRole = guild.GetMemberRole(playerCharacterEntity.Id);
                             SendCreateGuildToClient(playerCharacterEntity.ConnectionId, guild);
@@ -631,436 +628,6 @@ namespace MultiplayerARPG.MMO
             if (ChatNetworkManager.IsClientConnected)
             {
                 ChatNetworkManager.SendEnterChat(null, MMOMessageTypes.Chat, message.channel, message.message, message.sender, message.receiver, message.channelId);
-            }
-        }
-#endif
-
-#if UNITY_STANDALONE && !CLIENT_BUILD
-        protected override async UniTaskVoid HandleRequestCashShopInfo(
-            RequestHandlerData requestHandler, EmptyMessage request,
-            RequestProceedResultDelegate<ResponseCashShopInfoMessage> result)
-        {
-            // Set response data
-            ResponseCashShopInfoMessage.Error error = ResponseCashShopInfoMessage.Error.None;
-            int cash = 0;
-            List<int> cashShopItemIds = new List<int>();
-            BasePlayerCharacterEntity playerCharacter;
-            if (!playerCharacters.TryGetValue(requestHandler.ConnectionId, out playerCharacter))
-            {
-                // Cannot find user
-                error = ResponseCashShopInfoMessage.Error.UserNotFound;
-            }
-            else
-            {
-                // Get user cash amount
-                CashResp getCashResp = await DbServiceClient.GetCashAsync(new GetCashReq()
-                {
-                    UserId = playerCharacter.UserId
-                });
-                cash = getCashResp.Cash;
-                // Set cash shop item ids
-                cashShopItemIds.AddRange(GameInstance.CashShopItems.Keys);
-            }
-            // Send response message
-            result.Invoke(
-                error == ResponseCashShopInfoMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error,
-                new ResponseCashShopInfoMessage()
-                {
-                    error = error,
-                    cash = cash,
-                    cashShopItemIds = cashShopItemIds.ToArray(),
-                });
-        }
-#endif
-
-#if UNITY_STANDALONE && !CLIENT_BUILD
-        protected override async UniTaskVoid HandleRequestCashShopBuy(
-            RequestHandlerData requestHandler, RequestCashShopBuyMessage request,
-            RequestProceedResultDelegate<ResponseCashShopBuyMessage> result)
-        {
-            // Set response data
-            ResponseCashShopBuyMessage.Error error = ResponseCashShopBuyMessage.Error.None;
-            int dataId = request.dataId;
-            int cash = 0;
-            BasePlayerCharacterEntity playerCharacter;
-            if (!playerCharacters.TryGetValue(requestHandler.ConnectionId, out playerCharacter))
-            {
-                // Cannot find user
-                error = ResponseCashShopBuyMessage.Error.UserNotFound;
-            }
-            else
-            {
-                // Get user cash amount
-                CashResp getCashResp = await DbServiceClient.GetCashAsync(new GetCashReq()
-                {
-                    UserId = playerCharacter.UserId
-                });
-                cash = getCashResp.Cash;
-                CashShopItem cashShopItem;
-                if (!GameInstance.CashShopItems.TryGetValue(dataId, out cashShopItem))
-                {
-                    // Cannot find item
-                    error = ResponseCashShopBuyMessage.Error.ItemNotFound;
-                }
-                else if (cash < cashShopItem.sellPrice)
-                {
-                    // Not enough cash
-                    error = ResponseCashShopBuyMessage.Error.NotEnoughCash;
-                }
-                else if (playerCharacter.IncreasingItemsWillOverwhelming(cashShopItem.receiveItems))
-                {
-                    // Cannot carry all rewards
-                    error = ResponseCashShopBuyMessage.Error.CannotCarryAllRewards;
-                }
-                else
-                {
-                    // Decrease cash amount
-                    CashResp changeCashResp = await DbServiceClient.ChangeCashAsync(new ChangeCashReq()
-                    {
-                        UserId = playerCharacter.UserId,
-                        ChangeAmount = -cashShopItem.sellPrice
-                    });
-                    cash = changeCashResp.Cash;
-                    playerCharacter.UserCash = cash;
-                    // Increase character gold
-                    playerCharacter.Gold = playerCharacter.Gold.Increase(cashShopItem.receiveGold);
-                    // Increase character item
-                    foreach (ItemAmount receiveItem in cashShopItem.receiveItems)
-                    {
-                        if (receiveItem.item == null || receiveItem.amount <= 0) continue;
-                        playerCharacter.AddOrSetNonEquipItems(CharacterItem.Create(receiveItem.item, 1, receiveItem.amount));
-                    }
-                    playerCharacter.FillEmptySlots();
-                }
-            }
-            // Send response message
-            result.Invoke(
-                error == ResponseCashShopBuyMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error,
-                new ResponseCashShopBuyMessage()
-                {
-                    error = error,
-                    dataId = dataId,
-                    cash = cash,
-                });
-        }
-#endif
-
-#if UNITY_STANDALONE && !CLIENT_BUILD
-        protected override async UniTaskVoid HandleRequestCashPackageInfo(
-            RequestHandlerData requestHandler, EmptyMessage request,
-            RequestProceedResultDelegate<ResponseCashPackageInfoMessage> result)
-        {
-            // Set response data
-            ResponseCashPackageInfoMessage.Error error = ResponseCashPackageInfoMessage.Error.None;
-            int cash = 0;
-            List<int> cashPackageIds = new List<int>();
-            BasePlayerCharacterEntity playerCharacter;
-            if (!playerCharacters.TryGetValue(requestHandler.ConnectionId, out playerCharacter))
-            {
-                // Cannot find user
-                error = ResponseCashPackageInfoMessage.Error.UserNotFound;
-            }
-            else
-            {
-                // Get user cash amount
-                CashResp getCashResp = await DbServiceClient.GetCashAsync(new GetCashReq()
-                {
-                    UserId = playerCharacter.UserId
-                });
-                cash = getCashResp.Cash;
-                // Set cash package ids
-                cashPackageIds.AddRange(GameInstance.CashPackages.Keys);
-            }
-            // Send response message
-            result.Invoke(
-                error == ResponseCashPackageInfoMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error,
-                new ResponseCashPackageInfoMessage()
-                {
-                    error = error,
-                    cash = cash,
-                    cashPackageIds = cashPackageIds.ToArray(),
-                });
-        }
-#endif
-
-#if UNITY_STANDALONE && !CLIENT_BUILD
-        protected override async UniTaskVoid HandleRequestCashPackageBuyValidation(
-            RequestHandlerData requestHandler, RequestCashPackageBuyValidationMessage request,
-            RequestProceedResultDelegate<ResponseCashPackageBuyValidationMessage> result)
-        {
-            // TODO: Validate purchasing at server side
-            // Set response data
-            ResponseCashPackageBuyValidationMessage.Error error = ResponseCashPackageBuyValidationMessage.Error.None;
-            int dataId = request.dataId;
-            int cash = 0;
-            BasePlayerCharacterEntity playerCharacter;
-            if (!playerCharacters.TryGetValue(requestHandler.ConnectionId, out playerCharacter))
-            {
-                // Cannot find user
-                error = ResponseCashPackageBuyValidationMessage.Error.UserNotFound;
-            }
-            else
-            {
-                // Get user cash amount
-                CashResp getCashResp = await DbServiceClient.GetCashAsync(new GetCashReq()
-                {
-                    UserId = playerCharacter.UserId
-                });
-                cash = getCashResp.Cash;
-                CashPackage cashPackage;
-                if (!GameInstance.CashPackages.TryGetValue(dataId, out cashPackage))
-                {
-                    // Cannot find package
-                    error = ResponseCashPackageBuyValidationMessage.Error.PackageNotFound;
-                }
-                else
-                {
-                    // Increase cash amount
-                    CashResp changeCashResp = await DbServiceClient.ChangeCashAsync(new ChangeCashReq()
-                    {
-                        UserId = playerCharacter.UserId,
-                        ChangeAmount = cashPackage.cashAmount
-                    });
-                    cash = changeCashResp.Cash;
-                    playerCharacter.UserCash = cash;
-                }
-            }
-            // Send response message
-            result.Invoke(
-                error == ResponseCashPackageBuyValidationMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error,
-                new ResponseCashPackageBuyValidationMessage()
-                {
-                    error = error,
-                    dataId = dataId,
-                    cash = cash,
-                });
-        }
-#endif
-
-#if UNITY_STANDALONE && !CLIENT_BUILD
-        protected override async UniTaskVoid HandleRequestMailList(RequestHandlerData requestHandler, RequestMailListMessage request, RequestProceedResultDelegate<ResponseMailListMessage> result)
-        {
-            List<MailListEntry> mails = new List<MailListEntry>();
-            BasePlayerCharacterEntity playerCharacter;
-            if (playerCharacters.TryGetValue(requestHandler.ConnectionId, out playerCharacter))
-            {
-                MailListResp resp = await DbServiceClient.MailListAsync(new MailListReq()
-                {
-                    UserId = playerCharacter.UserId,
-                    OnlyNewMails = request.onlyNewMails,
-                });
-                mails.AddRange(resp.List.MakeListFromRepeatedByteString<MailListEntry>());
-            }
-            result.Invoke(AckResponseCode.Success, new ResponseMailListMessage()
-            {
-                onlyNewMails = request.onlyNewMails,
-                mails = mails.ToArray(),
-            });
-        }
-#endif
-
-#if UNITY_STANDALONE && !CLIENT_BUILD
-        protected override async UniTaskVoid HandleRequestReadMail(RequestHandlerData requestHandler, RequestReadMailMessage request, RequestProceedResultDelegate<ResponseReadMailMessage> result)
-        {
-            BasePlayerCharacterEntity playerCharacter;
-            if (playerCharacters.TryGetValue(requestHandler.ConnectionId, out playerCharacter))
-            {
-                UpdateReadMailStateResp resp = await DbServiceClient.UpdateReadMailStateAsync(new UpdateReadMailStateReq()
-                {
-                    MailId = request.id,
-                    UserId = playerCharacter.UserId,
-                });
-                ResponseReadMailMessage.Error error = (ResponseReadMailMessage.Error)resp.Error;
-                result.Invoke(
-                    error == ResponseReadMailMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error, 
-                    new ResponseReadMailMessage()
-                    {
-                        error = error,
-                        mail = resp.Mail.FromByteString<Mail>(),
-                    });
-            }
-            else
-            {
-                result.Invoke(AckResponseCode.Error, new ResponseReadMailMessage()
-                {
-                    error = ResponseReadMailMessage.Error.NotAvailable,
-                });
-            }
-        }
-#endif
-
-#if UNITY_STANDALONE && !CLIENT_BUILD
-        protected override async UniTaskVoid HandleRequestClaimMailItems(RequestHandlerData requestHandler, RequestClaimMailItemsMessage request, RequestProceedResultDelegate<ResponseClaimMailItemsMessage> result)
-        {
-            BasePlayerCharacterEntity playerCharacter;
-            if (playerCharacters.TryGetValue(requestHandler.ConnectionId, out playerCharacter))
-            {
-                ResponseClaimMailItemsMessage.Error error = ResponseClaimMailItemsMessage.Error.None;
-                GetMailResp mailResp = await DbServiceClient.GetMailAsync(new GetMailReq()
-                {
-                    MailId = request.id,
-                    UserId = playerCharacter.UserId,
-                });
-                Mail mail = mailResp.Mail.FromByteString<Mail>();
-                if (mail.IsClaim)
-                {
-                    error = ResponseClaimMailItemsMessage.Error.AlreadyClaimed;
-                }
-                else if (mail.IsDelete)
-                {
-                    error = ResponseClaimMailItemsMessage.Error.NotAllowed;
-                }
-                else
-                {
-                    if (mail.Items.Count > 0)
-                    {
-                        List<CharacterItem> increasingItems = new List<CharacterItem>();
-                        foreach (KeyValuePair<int, short> mailItem in mail.Items)
-                        {
-                            increasingItems.Add(CharacterItem.Create(mailItem.Key, amount: mailItem.Value));
-                        }
-                        if (playerCharacter.IncreasingItemsWillOverwhelming(increasingItems))
-                            error = ResponseClaimMailItemsMessage.Error.CannotCarry;
-                        else
-                            playerCharacter.IncreaseItems(increasingItems);
-                    }
-                    if (error == ResponseClaimMailItemsMessage.Error.None && mail.Currencies.Count > 0)
-                    {
-                        List<CharacterCurrency> increasingCurrencies = new List<CharacterCurrency>();
-                        foreach (KeyValuePair<int, int> mailCurrency in mail.Currencies)
-                        {
-                            increasingCurrencies.Add(CharacterCurrency.Create(mailCurrency.Key, amount: mailCurrency.Value));
-                        }
-                        playerCharacter.IncreaseCurrencies(increasingCurrencies);
-                    }
-                    if (error == ResponseClaimMailItemsMessage.Error.None && mail.Gold > 0)
-                    {
-                        playerCharacter.Gold = playerCharacter.Gold.Increase(mail.Gold);
-                    }
-                }
-                if (error != ResponseClaimMailItemsMessage.Error.None)
-                {
-                    result.Invoke(AckResponseCode.Error, new ResponseClaimMailItemsMessage()
-                    {
-                        error = error,
-                    });
-                    return;
-                }
-                UpdateClaimMailItemsStateResp resp = await DbServiceClient.UpdateClaimMailItemsStateAsync(new UpdateClaimMailItemsStateReq()
-                {
-                    MailId = request.id,
-                    UserId = playerCharacter.UserId,
-                });
-                error = (ResponseClaimMailItemsMessage.Error)resp.Error;
-                result.Invoke(
-                    error == ResponseClaimMailItemsMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error,
-                    new ResponseClaimMailItemsMessage()
-                    {
-                        error = error,
-                        mail = resp.Mail.FromByteString<Mail>(),
-                    });
-            }
-            else
-            {
-                result.Invoke(AckResponseCode.Error, new ResponseClaimMailItemsMessage()
-                {
-                    error = ResponseClaimMailItemsMessage.Error.NotAvailable,
-                });
-            }
-        }
-#endif
-
-#if UNITY_STANDALONE && !CLIENT_BUILD
-        protected override async UniTaskVoid HandleRequestDeleteMail(RequestHandlerData requestHandler, RequestDeleteMailMessage request, RequestProceedResultDelegate<ResponseDeleteMailMessage> result)
-        {
-            BasePlayerCharacterEntity playerCharacter;
-            if (playerCharacters.TryGetValue(requestHandler.ConnectionId, out playerCharacter))
-            {
-                UpdateDeleteMailStateResp resp = await DbServiceClient.UpdateDeleteMailStateAsync(new UpdateDeleteMailStateReq()
-                {
-                    MailId = request.id,
-                    UserId = playerCharacter.UserId,
-                });
-                ResponseDeleteMailMessage.Error error = (ResponseDeleteMailMessage.Error)resp.Error;
-                result.Invoke(
-                    error == ResponseDeleteMailMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error,
-                    new ResponseDeleteMailMessage()
-                    {
-                        error = error,
-                    });
-            }
-            else
-            {
-                result.Invoke(AckResponseCode.Error, new ResponseDeleteMailMessage()
-                {
-                    error = ResponseDeleteMailMessage.Error.NotAvailable,
-                });
-            }
-        }
-#endif
-
-#if UNITY_STANDALONE && !CLIENT_BUILD
-        protected override async UniTaskVoid HandleRequestSendMail(RequestHandlerData requestHandler, RequestSendMailMessage request, RequestProceedResultDelegate<ResponseSendMailMessage> result)
-        {
-            BasePlayerCharacterEntity playerCharacter;
-            if (playerCharacters.TryGetValue(requestHandler.ConnectionId, out playerCharacter))
-            {
-                // Validate gold
-                if (request.gold < 0)
-                    request.gold = 0;
-                if (playerCharacter.Gold >= request.gold)
-                {
-                    playerCharacter.Gold -= request.gold;
-                }
-                else
-                {
-                    result.Invoke(AckResponseCode.Error, new ResponseSendMailMessage()
-                    {
-                        error = ResponseSendMailMessage.Error.NotEnoughGold,
-                    });
-                    return;
-                }
-                // Find receiver
-                GetUserIdByCharacterNameResp userIdResp = await DbServiceClient.GetUserIdByCharacterNameAsync(new GetUserIdByCharacterNameReq()
-                {
-                    CharacterName = request.receiverName,
-                });
-                string receiverId = userIdResp.UserId;
-                if (string.IsNullOrEmpty(receiverId))
-                {
-                    result.Invoke(AckResponseCode.Error, new ResponseSendMailMessage()
-                    {
-                        error = ResponseSendMailMessage.Error.NoReceiver,
-                    });
-                    return;
-                }
-                Mail mail = new Mail()
-                {
-                    SenderId = playerCharacter.UserId,
-                    SenderName = playerCharacter.CharacterName,
-                    ReceiverId = receiverId,
-                    Title = request.title,
-                    Content = request.content,
-                    Gold = request.gold,
-                };
-                SendMailResp resp = await DbServiceClient.SendMailAsync(new SendMailReq()
-                {
-                    Mail = DatabaseServiceUtils.ToByteString(mail),
-                });
-                ResponseSendMailMessage.Error error = (ResponseSendMailMessage.Error)resp.Error;
-                result.Invoke(
-                    error == ResponseSendMailMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error,
-                    new ResponseSendMailMessage()
-                    {
-                        error = error,
-                    });
-            }
-            else
-            {
-                result.Invoke(AckResponseCode.Error, new ResponseSendMailMessage()
-                {
-                    error = ResponseSendMailMessage.Error.NotAvailable,
-                });
             }
         }
 #endif
@@ -1158,16 +725,16 @@ namespace MultiplayerARPG.MMO
                     {
                         NotifyOnlineCharacter(message.data.id);
                         socialId = message.data.partyId;
-                        if (socialId > 0 && parties.TryGetValue(socialId, out party))
+                        if (socialId > 0 && Parties.TryGetValue(socialId, out party))
                         {
                             party.UpdateMember(message.data);
-                            parties[socialId] = party;
+                            Parties[socialId] = party;
                         }
                         socialId = message.data.guildId;
-                        if (socialId > 0 && guilds.TryGetValue(socialId, out guild))
+                        if (socialId > 0 && Guilds.TryGetValue(socialId, out guild))
                         {
                             guild.UpdateMember(message.data);
-                            guilds[socialId] = guild;
+                            Guilds[socialId] = guild;
                         }
                         usersById[message.data.id] = message.data;
                     }
@@ -1180,12 +747,12 @@ namespace MultiplayerARPG.MMO
         {
             PartyData party;
             BasePlayerCharacterEntity playerCharacterEntity;
-            if (parties.TryGetValue(message.id, out party) && UpdateSocialGroupMember(party, message))
+            if (Parties.TryGetValue(message.id, out party) && UpdateSocialGroupMember(party, message))
             {
                 switch (message.type)
                 {
                     case UpdateSocialMemberMessage.UpdateType.Add:
-                        if (playerCharactersById.TryGetValue(message.data.id, out playerCharacterEntity))
+                        if (this.TryGetPlayerCharacterById(message.data.id, out playerCharacterEntity))
                         {
                             playerCharacterEntity.PartyId = message.id;
                             SendCreatePartyToClient(playerCharacterEntity.ConnectionId, party);
@@ -1194,7 +761,7 @@ namespace MultiplayerARPG.MMO
                         SendAddPartyMemberToClients(party, message.data.id, message.data.characterName, message.data.dataId, message.data.level);
                         break;
                     case UpdateSocialMemberMessage.UpdateType.Remove:
-                        if (playerCharactersById.TryGetValue(message.data.id, out playerCharacterEntity))
+                        if (this.TryGetPlayerCharacterById(message.data.id, out playerCharacterEntity))
                         {
                             playerCharacterEntity.ClearParty();
                             SendPartyTerminateToClient(playerCharacterEntity.ConnectionId, message.id);
@@ -1209,30 +776,30 @@ namespace MultiplayerARPG.MMO
         {
             BasePlayerCharacterEntity playerCharacterEntity;
             PartyData party;
-            if (parties.TryGetValue(message.id, out party))
+            if (Parties.TryGetValue(message.id, out party))
             {
                 switch (message.type)
                 {
                     case UpdatePartyMessage.UpdateType.ChangeLeader:
                         party.SetLeader(message.characterId);
-                        parties[message.id] = party;
+                        Parties[message.id] = party;
                         SendChangePartyLeaderToClients(party);
                         break;
                     case UpdatePartyMessage.UpdateType.Setting:
                         party.Setting(message.shareExp, message.shareItem);
-                        parties[message.id] = party;
+                        Parties[message.id] = party;
                         SendPartySettingToClients(party);
                         break;
                     case UpdatePartyMessage.UpdateType.Terminate:
                         foreach (string memberId in party.GetMemberIds())
                         {
-                            if (playerCharactersById.TryGetValue(memberId, out playerCharacterEntity))
+                            if (this.TryGetPlayerCharacterById(memberId, out playerCharacterEntity))
                             {
                                 playerCharacterEntity.ClearParty();
                                 SendPartyTerminateToClient(playerCharacterEntity.ConnectionId, message.id);
                             }
                         }
-                        parties.Remove(message.id);
+                        Parties.Remove(message.id);
                         break;
                 }
             }
@@ -1242,12 +809,12 @@ namespace MultiplayerARPG.MMO
         {
             GuildData guild;
             BasePlayerCharacterEntity playerCharacterEntity;
-            if (guilds.TryGetValue(message.id, out guild) && UpdateSocialGroupMember(guild, message))
+            if (Guilds.TryGetValue(message.id, out guild) && UpdateSocialGroupMember(guild, message))
             {
                 switch (message.type)
                 {
                     case UpdateSocialMemberMessage.UpdateType.Add:
-                        if (playerCharactersById.TryGetValue(message.data.id, out playerCharacterEntity))
+                        if (this.TryGetPlayerCharacterById(message.data.id, out playerCharacterEntity))
                         {
                             playerCharacterEntity.GuildId = message.id;
                             playerCharacterEntity.GuildName = guild.guildName;
@@ -1258,7 +825,7 @@ namespace MultiplayerARPG.MMO
                         SendAddGuildMemberToClients(guild, message.data.id, message.data.characterName, message.data.dataId, message.data.level);
                         break;
                     case UpdateSocialMemberMessage.UpdateType.Remove:
-                        if (playerCharactersById.TryGetValue(message.data.id, out playerCharacterEntity))
+                        if (this.TryGetPlayerCharacterById(message.data.id, out playerCharacterEntity))
                         {
                             playerCharacterEntity.ClearGuild();
                             SendGuildTerminateToClient(playerCharacterEntity.ConnectionId, message.id);
@@ -1273,66 +840,66 @@ namespace MultiplayerARPG.MMO
         {
             BasePlayerCharacterEntity playerCharacterEntity;
             GuildData guild;
-            if (guilds.TryGetValue(message.id, out guild))
+            if (Guilds.TryGetValue(message.id, out guild))
             {
                 switch (message.type)
                 {
                     case UpdateGuildMessage.UpdateType.ChangeLeader:
                         guild.SetLeader(message.characterId);
-                        guilds[message.id] = guild;
-                        if (TryGetPlayerCharacterById(message.characterId, out playerCharacterEntity))
+                        Guilds[message.id] = guild;
+                        if (this.TryGetPlayerCharacterById(message.characterId, out playerCharacterEntity))
                             playerCharacterEntity.GuildRole = guild.GetMemberRole(playerCharacterEntity.Id);
                         SendChangeGuildLeaderToClients(guild);
                         break;
                     case UpdateGuildMessage.UpdateType.SetGuildMessage:
                         guild.guildMessage = message.guildMessage;
-                        guilds[message.id] = guild;
+                        Guilds[message.id] = guild;
                         SendSetGuildMessageToClients(guild);
                         break;
                     case UpdateGuildMessage.UpdateType.SetGuildRole:
                         guild.SetRole(message.guildRole, message.roleName, message.canInvite, message.canKick, message.shareExpPercentage);
-                        guilds[message.id] = guild;
+                        Guilds[message.id] = guild;
                         foreach (string memberId in guild.GetMemberIds())
                         {
-                            if (playerCharactersById.TryGetValue(memberId, out playerCharacterEntity))
+                            if (this.TryGetPlayerCharacterById(memberId, out playerCharacterEntity))
                                 playerCharacterEntity.GuildRole = guild.GetMemberRole(playerCharacterEntity.Id);
                         }
                         SendSetGuildRoleToClients(guild, message.guildRole, message.roleName, message.canInvite, message.canKick, message.shareExpPercentage);
                         break;
                     case UpdateGuildMessage.UpdateType.SetGuildMemberRole:
                         guild.SetMemberRole(message.characterId, message.guildRole);
-                        guilds[message.id] = guild;
-                        if (TryGetPlayerCharacterById(message.characterId, out playerCharacterEntity))
+                        Guilds[message.id] = guild;
+                        if (this.TryGetPlayerCharacterById(message.characterId, out playerCharacterEntity))
                             playerCharacterEntity.GuildRole = guild.GetMemberRole(playerCharacterEntity.Id);
                         SendSetGuildMemberRoleToClients(guild, message.characterId, message.guildRole);
                         break;
                     case UpdateGuildMessage.UpdateType.SetSkillLevel:
                         guild.SetSkillLevel(message.dataId, message.level);
-                        guilds[message.id] = guild;
+                        Guilds[message.id] = guild;
                         SendSetGuildSkillLevelToClients(guild, message.dataId);
                         break;
                     case UpdateGuildMessage.UpdateType.SetGold:
                         guild.gold = message.gold;
-                        guilds[message.id] = guild;
+                        Guilds[message.id] = guild;
                         SendSetGuildGoldToClients(guild);
                         break;
                     case UpdateGuildMessage.UpdateType.LevelExpSkillPoint:
                         guild.level = message.level;
                         guild.exp = message.exp;
                         guild.skillPoint = message.skillPoint;
-                        guilds[message.id] = guild;
+                        Guilds[message.id] = guild;
                         SendGuildLevelExpSkillPointToClients(guild);
                         break;
                     case UpdateGuildMessage.UpdateType.Terminate:
                         foreach (string memberId in guild.GetMemberIds())
                         {
-                            if (playerCharactersById.TryGetValue(memberId, out playerCharacterEntity))
+                            if (this.TryGetPlayerCharacterById(memberId, out playerCharacterEntity))
                             {
                                 playerCharacterEntity.ClearGuild();
                                 SendGuildTerminateToClient(playerCharacterEntity.ConnectionId, message.id);
                             }
                         }
-                        guilds.Remove(message.id);
+                        Guilds.Remove(message.id);
                         break;
                 }
             }
