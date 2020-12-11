@@ -19,6 +19,7 @@ namespace MultiplayerARPG.MMO
 
         public async UniTaskVoid HandleRequestGetStorageItems(RequestHandlerData requestHandler, RequestGetStorageItemsMessage request, RequestProceedResultDelegate<ResponseGetStorageItemsMessage> result)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             StorageId storageId = new StorageId(request.storageType, request.storageOwnerId);
             IPlayerCharacterData playerCharacter;
             if (!ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
@@ -45,10 +46,12 @@ namespace MultiplayerARPG.MMO
                 storageItems = storageItemList,
             });
             await UniTask.Yield();
+#endif
         }
 
         public async UniTaskVoid HandleRequestMoveItemFromStorage(RequestHandlerData requestHandler, RequestMoveItemFromStorageMessage request, RequestProceedResultDelegate<ResponseMoveItemFromStorageMessage> result)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             StorageId storageId = new StorageId(request.storageType, request.storageOwnerId);
             IPlayerCharacterData playerCharacter;
             if (!ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
@@ -102,10 +105,12 @@ namespace MultiplayerARPG.MMO
             ServerStorageHandlers.SetStorageItems(storageId, DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.StorageCharacterItems));
             // Success
             result.Invoke(AckResponseCode.Success, new ResponseMoveItemFromStorageMessage());
+#endif
         }
 
         public async UniTaskVoid HandleRequestMoveItemToStorage(RequestHandlerData requestHandler, RequestMoveItemToStorageMessage request, RequestProceedResultDelegate<ResponseMoveItemToStorageMessage> result)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             StorageId storageId = new StorageId(request.storageType, request.storageOwnerId);
             IPlayerCharacterData playerCharacter;
             if (!ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
@@ -158,10 +163,12 @@ namespace MultiplayerARPG.MMO
             ServerStorageHandlers.SetStorageItems(storageId, DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.StorageCharacterItems));
             // Success
             result.Invoke(AckResponseCode.Success, new ResponseMoveItemToStorageMessage());
+#endif
         }
 
         public async UniTaskVoid HandleRequestSwapOrMergeStorageItem(RequestHandlerData requestHandler, RequestSwapOrMergeStorageItemMessage request, RequestProceedResultDelegate<ResponseSwapOrMergeStorageItemMessage> result)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             StorageId storageId = new StorageId(request.storageType, request.storageOwnerId);
             IPlayerCharacterData playerCharacter;
             if (!ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
@@ -207,6 +214,7 @@ namespace MultiplayerARPG.MMO
             List<CharacterItem> storageItems = DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.StorageCharacterItems);
             // Success
             result.Invoke(AckResponseCode.Success, new ResponseSwapOrMergeStorageItemMessage());
+#endif
         }
     }
 }
