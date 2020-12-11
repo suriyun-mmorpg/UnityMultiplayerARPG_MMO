@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using LiteNetLib;
+﻿using System.Collections.Generic;
 using LiteNetLibManager;
 using LiteNetLib.Utils;
 using Cysharp.Threading.Tasks;
@@ -10,12 +7,12 @@ namespace MultiplayerARPG.MMO
 {
     public partial class CentralNetworkManager
     {
-        public bool RequestCharacters(ResponseDelegate callback)
+        public bool RequestCharacters(ResponseDelegate<ResponseCharactersMessage> callback)
         {
             return ClientSendRequest(MMORequestTypes.RequestCharacters, new EmptyMessage(), responseDelegate: callback);
         }
 
-        public bool RequestCreateCharacter(PlayerCharacterData characterData, ResponseDelegate callback)
+        public bool RequestCreateCharacter(PlayerCharacterData characterData, ResponseDelegate<ResponseCreateCharacterMessage> callback)
         {
             return ClientSendRequest(MMORequestTypes.RequestCreateCharacter,
                 new RequestCreateCharacterMessage()
@@ -32,7 +29,7 @@ namespace MultiplayerARPG.MMO
             this.InvokeInstanceDevExtMethods("SerializeCreateCharacterExtra", characterData, writer);
         }
 
-        public bool RequestDeleteCharacter(string characterId, ResponseDelegate callback)
+        public bool RequestDeleteCharacter(string characterId, ResponseDelegate<ResponseDeleteCharacterMessage> callback)
         {
             return ClientSendRequest(MMORequestTypes.RequestDeleteCharacter, new RequestDeleteCharacterMessage()
             {
@@ -40,7 +37,7 @@ namespace MultiplayerARPG.MMO
             }, responseDelegate: callback);
         }
 
-        public bool RequestSelectCharacter(string characterId, ResponseDelegate callback)
+        public bool RequestSelectCharacter(string characterId, ResponseDelegate<ResponseSelectCharacterMessage> callback)
         {
             return ClientSendRequest(MMORequestTypes.RequestSelectCharacter, new RequestSelectCharacterMessage()
             {

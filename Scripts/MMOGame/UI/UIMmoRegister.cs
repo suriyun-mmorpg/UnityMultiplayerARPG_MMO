@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using LiteNetLibManager;
 using LiteNetLib.Utils;
+using Cysharp.Threading.Tasks;
 
 namespace MultiplayerARPG.MMO
 {
@@ -71,8 +72,9 @@ namespace MultiplayerARPG.MMO
             MMOClientInstance.Singleton.RequestUserRegister(Username, Password, OnRegister);
         }
 
-        public void OnRegister(ResponseHandlerData responseHandler, AckResponseCode responseCode, INetSerializable response)
+        public async UniTaskVoid OnRegister(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseUserRegisterMessage response)
         {
+            await UniTask.Yield();
             Registering = false;
             if (responseCode == AckResponseCode.Timeout)
             {
@@ -81,12 +83,11 @@ namespace MultiplayerARPG.MMO
                     onRegisterFail.Invoke();
                 return;
             }
-            ResponseUserRegisterMessage castedResponse = response as ResponseUserRegisterMessage;
             switch (responseCode)
             {
                 case AckResponseCode.Error:
                     string errorMessage = string.Empty;
-                    switch (castedResponse.error)
+                    switch (response.error)
                     {
                         case ResponseUserRegisterMessage.Error.TooShortUsername:
                             errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_USERNAME_TOO_SHORT.ToString());

@@ -1,11 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Net;
+﻿using System.Net;
 using System.Net.Security;
 using UnityEngine;
 using LiteNetLib;
 using LiteNetLibManager;
 using LiteNetLib.Utils;
+using Cysharp.Threading.Tasks;
 
 namespace MultiplayerARPG.MMO
 {
@@ -145,12 +144,12 @@ namespace MultiplayerARPG.MMO
             SelectCharacterId = string.Empty;
         }
 
-        public void RequestUserLogin(string username, string password, ResponseDelegate callback)
+        public void RequestUserLogin(string username, string password, ResponseDelegate<ResponseUserLoginMessage> callback)
         {
             centralNetworkManager.RequestUserLogin(username, password, (responseHandler, responseCode, response) => OnRequestUserLogin(responseHandler, responseCode, response, callback));
         }
 
-        public void RequestUserRegister(string username, string password, ResponseDelegate callback)
+        public void RequestUserRegister(string username, string password, ResponseDelegate<ResponseUserRegisterMessage> callback)
         {
             centralNetworkManager.RequestUserRegister(username, password, callback);
         }
@@ -160,33 +159,35 @@ namespace MultiplayerARPG.MMO
             centralNetworkManager.RequestUserLogout((responseHandler, responseCode, response) => OnRequestUserLogout(responseHandler, responseCode, response, callback));
         }
 
-        public void RequestValidateAccessToken(string userId, string accessToken, ResponseDelegate callback)
+        public void RequestValidateAccessToken(string userId, string accessToken, ResponseDelegate<ResponseValidateAccessTokenMessage> callback)
         {
             centralNetworkManager.RequestValidateAccessToken(userId, accessToken, (responseHandler, responseCode, response) => OnRequestValidateAccessToken(responseHandler, responseCode, response, callback));
         }
 
-        public void RequestCharacters(ResponseDelegate callback)
+        public void RequestCharacters(ResponseDelegate<ResponseCharactersMessage> callback)
         {
             centralNetworkManager.RequestCharacters(callback);
         }
 
-        public void RequestCreateCharacter(PlayerCharacterData characterData, ResponseDelegate callback)
+        public void RequestCreateCharacter(PlayerCharacterData characterData, ResponseDelegate<ResponseCreateCharacterMessage> callback)
         {
             centralNetworkManager.RequestCreateCharacter(characterData, callback);
         }
 
-        public void RequestDeleteCharacter(string characterId, ResponseDelegate callback)
+        public void RequestDeleteCharacter(string characterId, ResponseDelegate<ResponseDeleteCharacterMessage> callback)
         {
             centralNetworkManager.RequestDeleteCharacter(characterId, callback);
         }
 
-        public void RequestSelectCharacter(string characterId, ResponseDelegate callback)
+        public void RequestSelectCharacter(string characterId, ResponseDelegate<ResponseSelectCharacterMessage> callback)
         {
             centralNetworkManager.RequestSelectCharacter(characterId, (responseHandler, responseCode, response) => OnRequestSelectCharacter(responseHandler, responseCode, response, characterId, callback));
         }
 
-        private void OnRequestUserLogin(ResponseHandlerData responseHandler, AckResponseCode responseCode, INetSerializable response, ResponseDelegate callback)
+        private async UniTaskVoid OnRequestUserLogin(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseUserLoginMessage response, ResponseDelegate<ResponseUserLoginMessage> callback)
         {
+            await UniTask.Yield();
+
             if (callback != null)
                 callback.Invoke(responseHandler, responseCode, response);
 
@@ -195,15 +196,16 @@ namespace MultiplayerARPG.MMO
             SelectCharacterId = string.Empty;
             if (responseCode == AckResponseCode.Success)
             {
-                ResponseUserLoginMessage castedResponse = response as ResponseUserLoginMessage;
-                UserId = castedResponse.userId;
-                AccessToken = castedResponse.accessToken;
+                UserId = response.userId;
+                AccessToken = response.accessToken;
                 SelectCharacterId = string.Empty;
             }
         }
 
-        private void OnRequestUserLogout(ResponseHandlerData responseHandler, AckResponseCode responseCode, INetSerializable response, ResponseDelegate callback)
+        private async UniTaskVoid OnRequestUserLogout(ResponseHandlerData responseHandler, AckResponseCode responseCode, INetSerializable response, ResponseDelegate callback)
         {
+            await UniTask.Yield();
+
             if (callback != null)
                 callback.Invoke(responseHandler, responseCode, response);
 
@@ -212,8 +214,10 @@ namespace MultiplayerARPG.MMO
             SelectCharacterId = string.Empty;
         }
 
-        private void OnRequestValidateAccessToken(ResponseHandlerData responseHandler, AckResponseCode responseCode, INetSerializable response, ResponseDelegate callback)
+        private async UniTaskVoid OnRequestValidateAccessToken(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseValidateAccessTokenMessage response, ResponseDelegate<ResponseValidateAccessTokenMessage> callback)
         {
+            await UniTask.Yield();
+
             if (callback != null)
                 callback.Invoke(responseHandler, responseCode, response);
 
@@ -221,14 +225,15 @@ namespace MultiplayerARPG.MMO
             AccessToken = string.Empty;
             if (responseCode == AckResponseCode.Success)
             {
-                ResponseValidateAccessTokenMessage castedResponse = response as ResponseValidateAccessTokenMessage;
-                UserId = castedResponse.userId;
-                AccessToken = castedResponse.accessToken;
+                UserId = response.userId;
+                AccessToken = response.accessToken;
             }
         }
 
-        private void OnRequestSelectCharacter(ResponseHandlerData responseHandler, AckResponseCode responseCode, INetSerializable response, string characterId, ResponseDelegate callback)
+        private async UniTaskVoid OnRequestSelectCharacter(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseSelectCharacterMessage response, string characterId, ResponseDelegate<ResponseSelectCharacterMessage> callback)
         {
+            await UniTask.Yield();
+
             if (callback != null)
                 callback.Invoke(responseHandler, responseCode, response);
 

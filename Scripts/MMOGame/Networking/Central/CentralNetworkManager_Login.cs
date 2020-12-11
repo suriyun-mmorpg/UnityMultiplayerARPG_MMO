@@ -7,7 +7,7 @@ namespace MultiplayerARPG.MMO
 {
     public partial class CentralNetworkManager
     {
-        public bool RequestUserLogin(string username, string password, ResponseDelegate callback)
+        public bool RequestUserLogin(string username, string password, ResponseDelegate<ResponseUserLoginMessage> callback)
         {
             return ClientSendRequest(MMORequestTypes.RequestUserLogin, new RequestUserLoginMessage()
             {
@@ -16,7 +16,7 @@ namespace MultiplayerARPG.MMO
             }, responseDelegate: callback);
         }
 
-        public bool RequestUserRegister(string username, string password, ResponseDelegate callback)
+        public bool RequestUserRegister(string username, string password, ResponseDelegate<ResponseUserRegisterMessage> callback)
         {
             return ClientSendRequest(MMORequestTypes.RequestUserRegister, new RequestUserRegisterMessage()
             {
@@ -30,7 +30,7 @@ namespace MultiplayerARPG.MMO
             return ClientSendRequest(MMORequestTypes.RequestUserLogout, new EmptyMessage(), responseDelegate: callback);
         }
 
-        public bool RequestValidateAccessToken(string userId, string accessToken, ResponseDelegate callback)
+        public bool RequestValidateAccessToken(string userId, string accessToken, ResponseDelegate<ResponseValidateAccessTokenMessage> callback)
         {
             return ClientSendRequest(MMORequestTypes.RequestValidateAccessToken, new RequestValidateAccessTokenMessage()
             {

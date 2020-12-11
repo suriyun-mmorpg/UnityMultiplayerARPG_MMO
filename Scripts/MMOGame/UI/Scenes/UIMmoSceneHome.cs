@@ -5,6 +5,7 @@ using UnityEngine.Events;
 using LiteNetLib;
 using LiteNetLibManager;
 using LiteNetLib.Utils;
+using Cysharp.Threading.Tasks;
 
 namespace MultiplayerARPG.MMO
 {
@@ -59,8 +60,9 @@ namespace MultiplayerARPG.MMO
             Application.Quit();
         }
 
-        private void OnUserLogout(ResponseHandlerData responseHandler, AckResponseCode responseCode, INetSerializable response)
+        private async UniTaskVoid OnUserLogout(ResponseHandlerData responseHandler, AckResponseCode responseCode, INetSerializable response)
         {
+            await UniTask.Yield();
             if (responseCode == AckResponseCode.Success)
             {
                 ClearHistory();
@@ -68,8 +70,9 @@ namespace MultiplayerARPG.MMO
             }
         }
 
-        private void OnValidateAccessToken(ResponseHandlerData responseHandler, AckResponseCode responseCode, INetSerializable response)
+        private async UniTaskVoid OnValidateAccessToken(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseValidateAccessTokenMessage response)
         {
+            await UniTask.Yield();
             if (responseCode == AckResponseCode.Success)
             {
                 if (onValidateAccessTokenSuccess != null)

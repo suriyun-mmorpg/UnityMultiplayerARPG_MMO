@@ -1,4 +1,5 @@
-﻿using LiteNetLib.Utils;
+﻿using Cysharp.Threading.Tasks;
+using LiteNetLib.Utils;
 using LiteNetLibManager;
 
 namespace MultiplayerARPG.MMO
@@ -14,8 +15,9 @@ namespace MultiplayerARPG.MMO
             MMOClientInstance.Singleton.RequestCreateCharacter(characterData, OnRequestedCreateCharacter);
         }
 
-        private void OnRequestedCreateCharacter(ResponseHandlerData responseHandler, AckResponseCode responseCode, INetSerializable response)
+        private async UniTaskVoid OnRequestedCreateCharacter(ResponseHandlerData responseHandler, AckResponseCode responseCode, INetSerializable response)
         {
+            await UniTask.Yield();
             if (responseCode == AckResponseCode.Timeout)
             {
                 UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));

@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using LiteNetLibManager;
 using UnityEngine;
 using LiteNetLib.Utils;
+using Cysharp.Threading.Tasks;
 
 namespace MultiplayerARPG.MMO
 {
@@ -90,8 +91,9 @@ namespace MultiplayerARPG.MMO
             MMOClientInstance.Singleton.RequestUserLogin(Username, Password, OnLogin);
         }
 
-        public void OnLogin(ResponseHandlerData responseHandler, AckResponseCode responseCode, INetSerializable response)
+        public async UniTaskVoid OnLogin(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseUserLoginMessage response)
         {
+            await UniTask.Yield();
             LoggingIn = false;
             string storingUsername = string.Empty;
             string storingPassword = string.Empty;
@@ -102,12 +104,11 @@ namespace MultiplayerARPG.MMO
                     onLoginFail.Invoke();
                 return;
             }
-            ResponseUserLoginMessage castedResponse = response as ResponseUserLoginMessage;
             switch (responseCode)
             {
                 case AckResponseCode.Error:
                     string errorMessage = string.Empty;
-                    switch (castedResponse.error)
+                    switch (response.error)
                     {
                         case ResponseUserLoginMessage.Error.AlreadyLogin:
                             errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_ALREADY_LOGGED_IN.ToString());
