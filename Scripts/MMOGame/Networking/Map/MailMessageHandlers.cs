@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG.MMO
 {
-    public class MailMessageHandlers : MonoBehaviour, IMailMessageHandlers
+    public class MailMessageHandlers : MonoBehaviour, IServerMailMessageHandlers
     {
         public IServerPlayerCharacterHandlers ServerPlayerCharacterHandlers { get; set; }
 
