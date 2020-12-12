@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG.MMO
 {
-    public class CashShopMessageHandlers : MonoBehaviour, IServerCashShopMessageHandlers
+    public class MMOServerCashShopMessageHandlers : MonoBehaviour, IServerCashShopMessageHandlers
     {
         public IServerPlayerCharacterHandlers ServerPlayerCharacterHandlers { get; set; }
 

@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG.MMO
 {
-    public class StorageMessageHandlers : MonoBehaviour, IServerStorageMessageHandlers
+    public class MMOServerStorageMessageHandlers : MonoBehaviour, IServerStorageMessageHandlers
     {
         public IServerPlayerCharacterHandlers ServerPlayerCharacterHandlers { get; set; }
         public IServerStorageHandlers ServerStorageHandlers { get; set; }
