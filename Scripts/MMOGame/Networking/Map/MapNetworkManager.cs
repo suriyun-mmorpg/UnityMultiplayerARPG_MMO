@@ -133,6 +133,15 @@ namespace MultiplayerARPG.MMO
             CentralAppServerRegister.RegisterResponse<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.RequestSpawnMap);
             this.InvokeInstanceDevExtMethods("OnInitCentralAppServerRegister");
             ChatNetworkManager = gameObject.AddComponent<ChatNetworkManager>();
+            CashShopRequestHandlers = gameObject.GetOrAddComponent<IServerCashShopMessageHandlers, MMOServerCashShopMessageHandlers>();
+            CashShopRequestHandlers.ServerPlayerCharacterHandlers = this;
+            MailRequestHandlers = gameObject.GetOrAddComponent<IServerMailMessageHandlers, MMOServerMailMessageHandlers>();
+            MailRequestHandlers.ServerPlayerCharacterHandlers = this;
+            StorageRequestHandlers = gameObject.GetOrAddComponent<IServerStorageMessageHandlers, MMOServerStorageMessageHandlers>();
+            StorageRequestHandlers.ServerPlayerCharacterHandlers = this;
+            StorageRequestHandlers.ServerStorageHandlers = this;
+            InventoryRequestHandlers = gameObject.GetOrAddComponent<IServerInventoryMessageHandlers, DefaultServerInventoryMessageHandlers>();
+            InventoryRequestHandlers.ServerPlayerCharacterHandlers = this;
 #endif
         }
 
