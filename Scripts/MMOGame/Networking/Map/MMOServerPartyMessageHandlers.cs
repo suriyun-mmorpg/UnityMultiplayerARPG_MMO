@@ -1,4 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
+using LiteNetLib;
 using LiteNetLibManager;
 using UnityEngine;
 
@@ -168,6 +169,15 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             ServerPartyHandlers.AppendPartyInvitation(playerCharacter.PartyId, request.inviteeId);
+            BaseGameNetworkManager.Singleton.SendNotifyPartyInvitationToClient(inviteeCharacter.ConnectionId, new PartyInvitationData()
+            {
+                InviterId = playerCharacter.Id,
+                InviterName = playerCharacter.CharacterName,
+                InviterLevel = playerCharacter.Level,
+                PartyId = validateResult.PartyId,
+                ShareExp = validateResult.Party.shareExp,
+                ShareItem = validateResult.Party.shareItem,
+            });
             result.Invoke(AckResponseCode.Success, new ResponseSendPartyInvitationMessage());
         }
 
