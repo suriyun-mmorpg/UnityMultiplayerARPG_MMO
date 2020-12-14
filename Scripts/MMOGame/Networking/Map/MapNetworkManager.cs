@@ -5,6 +5,7 @@ using LiteNetLib.Utils;
 using LiteNetLibManager;
 using Cysharp.Threading.Tasks;
 using System;
+using System.Collections.Concurrent;
 
 namespace MultiplayerARPG.MMO
 {
@@ -47,9 +48,6 @@ namespace MultiplayerARPG.MMO
 
         [Header("Map Spawn")]
         public long mapSpawnDuration = 0;
-
-        public Action onClientConnected;
-        public Action<DisconnectInfo> onClientDisconnected;
 
         private float terminatingTime;
 
@@ -99,12 +97,12 @@ namespace MultiplayerARPG.MMO
         // Listing
 #if UNITY_STANDALONE && !CLIENT_BUILD
         private readonly List<PendingSpawnPlayerCharacter> pendingSpawnPlayerCharacters = new List<PendingSpawnPlayerCharacter>();
-        private readonly Dictionary<uint, KeyValuePair<string, Vector3>> instanceMapCurrentLocations = new Dictionary<uint, KeyValuePair<string, Vector3>>();
-        private readonly Dictionary<string, CentralServerPeerInfo> mapServerConnectionIdsBySceneName = new Dictionary<string, CentralServerPeerInfo>();
-        private readonly Dictionary<string, CentralServerPeerInfo> instanceMapServerConnectionIdsByInstanceId = new Dictionary<string, CentralServerPeerInfo>();
-        private readonly Dictionary<string, HashSet<uint>> instanceMapWarpingCharactersByInstanceId = new Dictionary<string, HashSet<uint>>();
-        private readonly Dictionary<string, InstanceMapWarpingLocation> instanceMapWarpingLocations = new Dictionary<string, InstanceMapWarpingLocation>();
-        private readonly Dictionary<string, SocialCharacterData> usersById = new Dictionary<string, SocialCharacterData>();
+        private readonly ConcurrentDictionary<uint, KeyValuePair<string, Vector3>> instanceMapCurrentLocations = new ConcurrentDictionary<uint, KeyValuePair<string, Vector3>>();
+        private readonly ConcurrentDictionary<string, CentralServerPeerInfo> mapServerConnectionIdsBySceneName = new ConcurrentDictionary<string, CentralServerPeerInfo>();
+        private readonly ConcurrentDictionary<string, CentralServerPeerInfo> instanceMapServerConnectionIdsByInstanceId = new ConcurrentDictionary<string, CentralServerPeerInfo>();
+        private readonly ConcurrentDictionary<string, HashSet<uint>> instanceMapWarpingCharactersByInstanceId = new ConcurrentDictionary<string, HashSet<uint>>();
+        private readonly ConcurrentDictionary<string, InstanceMapWarpingLocation> instanceMapWarpingLocations = new ConcurrentDictionary<string, InstanceMapWarpingLocation>();
+        private readonly ConcurrentDictionary<string, SocialCharacterData> usersById = new ConcurrentDictionary<string, SocialCharacterData>();
         // Database operations
         private readonly HashSet<StorageId> loadingStorageIds = new HashSet<StorageId>();
         private readonly HashSet<int> loadingPartyIds = new HashSet<int>();
@@ -132,16 +130,23 @@ namespace MultiplayerARPG.MMO
             CentralAppServerRegister.RegisterMessage(MMOMessageTypes.AppServerAddress, HandleResponseAppServerAddress);
             CentralAppServerRegister.RegisterResponse<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.RequestSpawnMap);
             this.InvokeInstanceDevExtMethods("OnInitCentralAppServerRegister");
+
             ChatNetworkManager = gameObject.AddComponent<ChatNetworkManager>();
             CashShopRequestHandlers = gameObject.GetOrAddComponent<IServerCashShopMessageHandlers, MMOServerCashShopMessageHandlers>();
             CashShopRequestHandlers.ServerPlayerCharacterHandlers = this;
             MailRequestHandlers = gameObject.GetOrAddComponent<IServerMailMessageHandlers, MMOServerMailMessageHandlers>();
             MailRequestHandlers.ServerPlayerCharacterHandlers = this;
+            InventoryRequestHandlers = gameObject.GetOrAddComponent<IServerInventoryMessageHandlers, DefaultServerInventoryMessageHandlers>();
+            InventoryRequestHandlers.ServerPlayerCharacterHandlers = this;
             StorageRequestHandlers = gameObject.GetOrAddComponent<IServerStorageMessageHandlers, MMOServerStorageMessageHandlers>();
             StorageRequestHandlers.ServerPlayerCharacterHandlers = this;
             StorageRequestHandlers.ServerStorageHandlers = this;
-            InventoryRequestHandlers = gameObject.GetOrAddComponent<IServerInventoryMessageHandlers, DefaultServerInventoryMessageHandlers>();
-            InventoryRequestHandlers.ServerPlayerCharacterHandlers = this;
+            PartyRequestHandlers = gameObject.GetOrAddComponent<IServerPartyMessageHandlers, MMOServerPartyMessageHandlers>();
+            PartyRequestHandlers.ServerPlayerCharacterHandlers = this;
+            PartyRequestHandlers.ServerPartyHandlers = this;
+            GuildRequestHandlers = gameObject.GetOrAddComponent<IServerGuildMessageHandlers, MMOServerGuildMessageHandlers>();
+            GuildRequestHandlers.ServerPlayerCharacterHandlers = this;
+            GuildRequestHandlers.ServerGuildHandlers = this;
 #endif
         }
 
@@ -199,13 +204,12 @@ namespace MultiplayerARPG.MMO
             instanceMapWarpingCharactersByInstanceId.Clear();
             instanceMapWarpingLocations.Clear();
             usersById.Clear();
-            storageItems.Clear();
-            usingStorageCharacters.Clear();
             loadingStorageIds.Clear();
             loadingPartyIds.Clear();
             loadingGuildIds.Clear();
             savingCharacters.Clear();
             savingBuildings.Clear();
+            ClearStorage();
 #endif
         }
 
@@ -275,7 +279,7 @@ namespace MultiplayerARPG.MMO
                 userData.maxHp = playerCharacterEntity.MaxHp;
                 userData.currentMp = playerCharacterEntity.CurrentMp;
                 userData.maxMp = playerCharacterEntity.MaxMp;
-                usersById.Add(userData.id, userData);
+                usersById.TryAdd(userData.id, userData);
                 // Add map user to central server and chat server
                 UpdateMapUser(CentralAppServerRegister, UpdateUserCharacterMessage.UpdateType.Add, userData);
                 if (ChatNetworkManager.IsClientConnected)
@@ -294,7 +298,7 @@ namespace MultiplayerARPG.MMO
             if (this.TryGetPlayerCharacter(connectionId, out playerCharacter) &&
                 usersById.TryGetValue(playerCharacter.Id, out userData))
             {
-                usersById.Remove(playerCharacter.Id);
+                usersById.TryRemove(playerCharacter.Id, out _);
                 // Remove map user from central server and chat server
                 UpdateMapUser(CentralAppServerRegister, UpdateUserCharacterMessage.UpdateType.Remove, userData);
                 if (ChatNetworkManager.IsClientConnected)
@@ -331,6 +335,14 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
+        public override void OnStartServer()
+        {
+            base.OnStartServer();
+            GameInstance.ServerStorageHandlers = this;
+        }
+#endif
+
+#if UNITY_STANDALONE && !CLIENT_BUILD
         public override void OnStopServer()
         {
             base.OnStopServer();
@@ -339,20 +351,6 @@ namespace MultiplayerARPG.MMO
                 ChatNetworkManager.StopClient();
         }
 #endif
-
-        public override void OnClientConnected()
-        {
-            base.OnClientConnected();
-            if (onClientConnected != null)
-                onClientConnected.Invoke();
-        }
-
-        public override void OnClientDisconnected(DisconnectInfo disconnectInfo)
-        {
-            base.OnClientDisconnected(disconnectInfo);
-            if (onClientDisconnected != null)
-                onClientDisconnected.Invoke(disconnectInfo);
-        }
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
         protected override async UniTask PreSpawnEntities()
@@ -511,7 +509,7 @@ namespace MultiplayerARPG.MMO
 
                     // Prepare saving location for this character
                     if (IsInstanceMap())
-                        instanceMapCurrentLocations.Add(playerCharacterEntity.ObjectId, new KeyValuePair<string, Vector3>(savingCurrentMapName, savingCurrentPosition));
+                        instanceMapCurrentLocations.TryAdd(playerCharacterEntity.ObjectId, new KeyValuePair<string, Vector3>(savingCurrentMapName, savingCurrentPosition));
 
                     // Set user Id
                     playerCharacterEntity.UserId = userId;
@@ -724,10 +722,10 @@ namespace MultiplayerARPG.MMO
             {
                 case UpdateUserCharacterMessage.UpdateType.Add:
                     if (!usersById.ContainsKey(message.data.id))
-                        usersById.Add(message.data.id, message.data);
+                        usersById.TryAdd(message.data.id, message.data);
                     break;
                 case UpdateUserCharacterMessage.UpdateType.Remove:
-                    usersById.Remove(message.data.id);
+                    usersById.TryRemove(message.data.id, out _);
                     break;
                 case UpdateUserCharacterMessage.UpdateType.Online:
                     if (usersById.ContainsKey(message.data.id))
@@ -808,7 +806,7 @@ namespace MultiplayerARPG.MMO
                                 SendPartyTerminateToClient(playerCharacterEntity.ConnectionId, message.id);
                             }
                         }
-                        Parties.Remove(message.id);
+                        Parties.TryRemove(message.id, out _);
                         break;
                 }
             }
@@ -908,7 +906,7 @@ namespace MultiplayerARPG.MMO
                                 SendGuildTerminateToClient(playerCharacterEntity.ConnectionId, message.id);
                             }
                         }
-                        Guilds.Remove(message.id);
+                        Guilds.TryRemove(message.id, out _);
                         break;
                 }
             }

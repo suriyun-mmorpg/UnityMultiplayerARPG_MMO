@@ -35,7 +35,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            ValidateGuildRequestResult validateResult = await ServerGuildHandlers.CanAcceptGuildInvitation(request.guildId, playerCharacter);
+            ValidateGuildRequestResult validateResult = ServerGuildHandlers.CanAcceptGuildInvitation(request.guildId, playerCharacter);
             if (!validateResult.IsSuccess)
             {
                 BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);
@@ -64,7 +64,7 @@ namespace MultiplayerARPG.MMO
             playerCharacter.GuildId = request.guildId;
             validateResult.Guild.AddMember(playerCharacter);
             ServerGuildHandlers.SetGuild(request.guildId, validateResult.Guild);
-            ServerGuildHandlers.DeleteInvitation(request.guildId, playerCharacter.Id);
+            ServerGuildHandlers.RemoveGuildInvitation(request.guildId, playerCharacter.Id);
             // Save to database
             _ = DbServiceClient.UpdateCharacterGuildAsync(new UpdateCharacterGuildReq()
             {
@@ -95,7 +95,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            ValidateGuildRequestResult validateResult = await ServerGuildHandlers.CanDeclineGuildInvitation(request.guildId, playerCharacter);
+            ValidateGuildRequestResult validateResult = ServerGuildHandlers.CanDeclineGuildInvitation(request.guildId, playerCharacter);
             if (!validateResult.IsSuccess)
             {
                 BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);
@@ -118,7 +118,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            ServerGuildHandlers.DeleteInvitation(request.guildId, playerCharacter.Id);
+            ServerGuildHandlers.RemoveGuildInvitation(request.guildId, playerCharacter.Id);
             BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, GameMessage.Type.GuildInvitationDeclined);
             result.Invoke(AckResponseCode.Success, new ResponseDeclineGuildInvitationMessage());
         }
@@ -145,7 +145,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            ValidateGuildRequestResult validateResult = await ServerGuildHandlers.CanSendGuildInvitation(playerCharacter, inviteeCharacter);
+            ValidateGuildRequestResult validateResult = ServerGuildHandlers.CanSendGuildInvitation(playerCharacter, inviteeCharacter);
             if (!validateResult.IsSuccess)
             {
                 BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);
@@ -168,7 +168,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            ServerGuildHandlers.AppendInvitation(playerCharacter.GuildId, request.inviteeId);
+            ServerGuildHandlers.AppendGuildInvitation(playerCharacter.GuildId, request.inviteeId);
             result.Invoke(AckResponseCode.Success, new ResponseSendGuildInvitationMessage());
         }
 
@@ -185,7 +185,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            ValidateGuildRequestResult validateResult = await playerCharacter.CanCreateGuild(request.guildName);
+            ValidateGuildRequestResult validateResult = playerCharacter.CanCreateGuild(request.guildName);
             if (!validateResult.IsSuccess)
             {
                 BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);
@@ -254,7 +254,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            ValidateGuildRequestResult validateResult = await ServerGuildHandlers.CanChangeGuildLeader(playerCharacter, request.memberId);
+            ValidateGuildRequestResult validateResult = ServerGuildHandlers.CanChangeGuildLeader(playerCharacter, request.memberId);
             if (!validateResult.IsSuccess)
             {
                 BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);
@@ -312,7 +312,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            ValidateGuildRequestResult validateResult = await ServerGuildHandlers.CanKickMemberFromGuild(playerCharacter, request.memberId);
+            ValidateGuildRequestResult validateResult = ServerGuildHandlers.CanKickMemberFromGuild(playerCharacter, request.memberId);
             if (!validateResult.IsSuccess)
             {
                 BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);
@@ -372,7 +372,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            ValidateGuildRequestResult validateResult = await ServerGuildHandlers.CanLeaveGuild(playerCharacter);
+            ValidateGuildRequestResult validateResult = ServerGuildHandlers.CanLeaveGuild(playerCharacter);
             if (!validateResult.IsSuccess)
             {
                 BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);
@@ -412,7 +412,7 @@ namespace MultiplayerARPG.MMO
                     if (ChatNetworkManager.IsClientConnected)
                         ChatNetworkManager.SendRemoveSocialMember(null, MMOMessageTypes.UpdateGuildMember, validateResult.GuildId, memberId);
                 }
-                ServerGuildHandlers.DeleteGuild(validateResult.GuildId);
+                ServerGuildHandlers.RemoveGuild(validateResult.GuildId);
                 // Save to database
                 _ = DbServiceClient.DeleteGuildAsync(new DeleteGuildReq()
                 {
@@ -453,7 +453,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            ValidateGuildRequestResult validateResult = await ServerGuildHandlers.CanChangeGuildMessage(playerCharacter, request.message);
+            ValidateGuildRequestResult validateResult = ServerGuildHandlers.CanChangeGuildMessage(playerCharacter, request.message);
             if (!validateResult.IsSuccess)
             {
                 BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);
@@ -503,7 +503,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            ValidateGuildRequestResult validateResult = await ServerGuildHandlers.CanChangeGuildRole(playerCharacter, request.guildRole, request.name);
+            ValidateGuildRequestResult validateResult = ServerGuildHandlers.CanChangeGuildRole(playerCharacter, request.guildRole, request.name);
             if (!validateResult.IsSuccess)
             {
                 BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);
@@ -572,7 +572,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            ValidateGuildRequestResult validateResult = await ServerGuildHandlers.CanSetGuildMemberRole(playerCharacter);
+            ValidateGuildRequestResult validateResult = ServerGuildHandlers.CanSetGuildMemberRole(playerCharacter);
             if (!validateResult.IsSuccess)
             {
                 BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);
@@ -625,7 +625,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            ValidateGuildRequestResult validateResult = await ServerGuildHandlers.CanSetGuildMemberRole(playerCharacter);
+            ValidateGuildRequestResult validateResult = ServerGuildHandlers.CanSetGuildMemberRole(playerCharacter);
             if (!validateResult.IsSuccess)
             {
                 BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);

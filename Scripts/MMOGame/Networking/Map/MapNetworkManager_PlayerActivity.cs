@@ -139,8 +139,8 @@ namespace MultiplayerARPG.MMO
                 instanceMapWarpingCharacters.Add(playerCharacterEntity.ObjectId);
                 playerCharacterEntity.IsWarping = true;
             }
-            instanceMapWarpingCharactersByInstanceId.Add(instanceId, instanceMapWarpingCharacters);
-            instanceMapWarpingLocations.Add(instanceId, new InstanceMapWarpingLocation()
+            instanceMapWarpingCharactersByInstanceId.TryAdd(instanceId, instanceMapWarpingCharacters);
+            instanceMapWarpingLocations.TryAdd(instanceId, new InstanceMapWarpingLocation()
             {
                 mapName = mapName,
                 position = position,
@@ -218,9 +218,9 @@ namespace MultiplayerARPG.MMO
                             SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.ServiceNotAvailable);
                         }
                     }
-                    instanceMapWarpingCharactersByInstanceId.Remove(instanceId);
+                    instanceMapWarpingCharactersByInstanceId.TryRemove(instanceId, out _);
                 }
-                instanceMapWarpingLocations.Remove(instanceId);
+                instanceMapWarpingLocations.TryRemove(instanceId, out _);
             }
         }
 #endif

@@ -35,7 +35,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            ValidatePartyRequestResult validateResult = await ServerPartyHandlers.CanAcceptPartyInvitation(request.partyId, playerCharacter);
+            ValidatePartyRequestResult validateResult = ServerPartyHandlers.CanAcceptPartyInvitation(request.partyId, playerCharacter);
             if (!validateResult.IsSuccess)
             {
                 BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);
@@ -64,7 +64,7 @@ namespace MultiplayerARPG.MMO
             playerCharacter.PartyId = request.partyId;
             validateResult.Party.AddMember(playerCharacter);
             ServerPartyHandlers.SetParty(request.partyId, validateResult.Party);
-            ServerPartyHandlers.DeleteInvitation(request.partyId, playerCharacter.Id);
+            ServerPartyHandlers.RemovePartyInvitation(request.partyId, playerCharacter.Id);
             // Save to database
             _ = DbServiceClient.UpdateCharacterPartyAsync(new UpdateCharacterPartyReq()
             {
@@ -94,7 +94,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            ValidatePartyRequestResult validateResult = await ServerPartyHandlers.CanDeclinePartyInvitation(request.partyId, playerCharacter);
+            ValidatePartyRequestResult validateResult = ServerPartyHandlers.CanDeclinePartyInvitation(request.partyId, playerCharacter);
             if (!validateResult.IsSuccess)
             {
                 BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);
@@ -117,7 +117,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            ServerPartyHandlers.DeleteInvitation(request.partyId, playerCharacter.Id);
+            ServerPartyHandlers.RemovePartyInvitation(request.partyId, playerCharacter.Id);
             BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, GameMessage.Type.PartyInvitationDeclined);
             result.Invoke(AckResponseCode.Success, new ResponseDeclinePartyInvitationMessage());
         }
@@ -144,7 +144,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            ValidatePartyRequestResult validateResult = await ServerPartyHandlers.CanSendPartyInvitation(playerCharacter, inviteeCharacter);
+            ValidatePartyRequestResult validateResult = ServerPartyHandlers.CanSendPartyInvitation(playerCharacter, inviteeCharacter);
             if (!validateResult.IsSuccess)
             {
                 BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);
@@ -167,7 +167,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            ServerPartyHandlers.AppendInvitation(playerCharacter.PartyId, request.inviteeId);
+            ServerPartyHandlers.AppendPartyInvitation(playerCharacter.PartyId, request.inviteeId);
             result.Invoke(AckResponseCode.Success, new ResponseSendPartyInvitationMessage());
         }
 
@@ -184,7 +184,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            ValidatePartyRequestResult validateResult = await playerCharacter.CanCreateParty();
+            ValidatePartyRequestResult validateResult = playerCharacter.CanCreateParty();
             if (!validateResult.IsSuccess)
             {
                 BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);
@@ -236,7 +236,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            ValidatePartyRequestResult validateResult = await ServerPartyHandlers.CanChangePartyLeader(playerCharacter, request.memberId);
+            ValidatePartyRequestResult validateResult = ServerPartyHandlers.CanChangePartyLeader(playerCharacter, request.memberId);
             if (!validateResult.IsSuccess)
             {
                 BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);
@@ -289,7 +289,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            ValidatePartyRequestResult validateResult = await ServerPartyHandlers.CanKickMemberFromParty(playerCharacter, request.memberId);
+            ValidatePartyRequestResult validateResult = ServerPartyHandlers.CanKickMemberFromParty(playerCharacter, request.memberId);
             if (!validateResult.IsSuccess)
             {
                 BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);
@@ -349,7 +349,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            ValidatePartyRequestResult validateResult = await ServerPartyHandlers.CanLeaveParty(playerCharacter);
+            ValidatePartyRequestResult validateResult = ServerPartyHandlers.CanLeaveParty(playerCharacter);
             if (!validateResult.IsSuccess)
             {
                 BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);
@@ -389,7 +389,7 @@ namespace MultiplayerARPG.MMO
                     if (ChatNetworkManager.IsClientConnected)
                         ChatNetworkManager.SendRemoveSocialMember(null, MMOMessageTypes.UpdatePartyMember, validateResult.PartyId, memberId);
                 }
-                ServerPartyHandlers.DeleteParty(validateResult.PartyId);
+                ServerPartyHandlers.RemoveParty(validateResult.PartyId);
                 // Save to database
                 _ = DbServiceClient.DeletePartyAsync(new DeletePartyReq()
                 {
@@ -430,7 +430,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            ValidatePartyRequestResult validateResult = await ServerPartyHandlers.CanChangePartySetting(playerCharacter);
+            ValidatePartyRequestResult validateResult = ServerPartyHandlers.CanChangePartySetting(playerCharacter);
             if (!validateResult.IsSuccess)
             {
                 BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);
