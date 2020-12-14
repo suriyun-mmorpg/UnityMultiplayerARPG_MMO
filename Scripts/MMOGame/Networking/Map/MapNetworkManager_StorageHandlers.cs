@@ -21,16 +21,15 @@ namespace MultiplayerARPG.MMO
             if (!usingStorageCharacters.ContainsKey(playerCharacterEntity.CurrentStorageId))
                 usingStorageCharacters[playerCharacterEntity.CurrentStorageId] = new HashSet<long>();
             usingStorageCharacters[playerCharacterEntity.CurrentStorageId].Add(playerCharacterEntity.ConnectionId);
+            // Load storage items from database
             ReadStorageItemsReq req = new ReadStorageItemsReq();
             req.StorageType = (EStorageType)playerCharacterEntity.CurrentStorageId.storageType;
             req.StorageOwnerId = playerCharacterEntity.CurrentStorageId.storageOwnerId;
             ReadStorageItemsResp resp = await DbServiceClient.ReadStorageItemsAsync(req);
             List<CharacterItem> storageItems = DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.StorageCharacterItems);
             SetStorageItems(playerCharacterEntity.CurrentStorageId, storageItems);
-            NotifyStorageItemsToCharacters(new HashSet<long>()
-            {
-                playerCharacterEntity.ConnectionId
-            });
+            // Notify storage items to client
+            SendNotifyStorageItemsUpdatedToClient(playerCharacterEntity.ConnectionId);
 #endif
         }
 
@@ -61,7 +60,7 @@ namespace MultiplayerARPG.MMO
                 return false;
             }
             storageItems[storageId] = DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.StorageCharacterItems);
-            NotifyStorageItemsToCharacters(usingStorageCharacters[storageId]);
+            SendNotifyStorageItemsUpdatedToClients(usingStorageCharacters[storageId]);
             return true;
 #else
             return false;
@@ -87,7 +86,7 @@ namespace MultiplayerARPG.MMO
                 return new DecreaseStorageItemsResult();
             }
             storageItems[storageId] = DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.StorageCharacterItems);
-            NotifyStorageItemsToCharacters(usingStorageCharacters[storageId]);
+            SendNotifyStorageItemsUpdatedToClients(usingStorageCharacters[storageId]);
             Dictionary<int, short> decreasedItems = new Dictionary<int, short>();
             foreach (ItemIndexAmountMap entry in resp.DecreasedItems)
             {
@@ -197,17 +196,6 @@ namespace MultiplayerARPG.MMO
         {
             storageItems.Clear();
             usingStorageCharacters.Clear();
-        }
-
-        private void NotifyStorageItemsToCharacters(HashSet<long> connectionIds)
-        {
-            foreach (long connectionId in connectionIds)
-            {
-                if (Players.ContainsKey(connectionId))
-                {
-
-                }
-            }
         }
     }
 }
