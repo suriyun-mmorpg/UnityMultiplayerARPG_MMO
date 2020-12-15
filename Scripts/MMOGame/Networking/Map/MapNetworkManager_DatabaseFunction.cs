@@ -20,7 +20,7 @@ namespace MultiplayerARPG.MMO
                     StorageType = (EStorageType)storageId.storageType,
                     StorageOwnerId = storageId.storageOwnerId
                 });
-                SetStorageItems(storageId, readStorageItemsResp.StorageCharacterItems.MakeListFromRepeatedByteString<CharacterItem>());
+                ServerStorageHandlers.SetStorageItems(storageId, readStorageItemsResp.StorageCharacterItems.MakeListFromRepeatedByteString<CharacterItem>());
                 loadingStorageIds.Remove(storageId);
             }
         }
@@ -36,7 +36,7 @@ namespace MultiplayerARPG.MMO
                 {
                     PartyId = id
                 });
-                Parties[id] = resp.PartyData.FromByteString<PartyData>();
+                ServerPartyHandlers.SetParty(id, resp.PartyData.FromByteString<PartyData>());
                 loadingPartyIds.Remove(id);
             }
         }
@@ -52,7 +52,7 @@ namespace MultiplayerARPG.MMO
                 {
                     GuildId = id
                 });
-                Guilds[id] = resp.GuildData.FromByteString<GuildData>();
+                ServerGuildHandlers.SetGuild(id, resp.GuildData.FromByteString<GuildData>());
                 loadingGuildIds.Remove(id);
             }
         }
@@ -83,7 +83,7 @@ namespace MultiplayerARPG.MMO
             {
                 int i = 0;
                 List<UniTask> tasks = new List<UniTask>();
-                foreach (BasePlayerCharacterEntity playerCharacter in PlayerCharacters.Values)
+                foreach (BasePlayerCharacterEntity playerCharacter in ServerPlayerCharacterHandlers.GetPlayerCharacters())
                 {
                     if (playerCharacter == null) continue;
                     tasks.Add(SaveCharacterRoutine(playerCharacter.CloneTo(new PlayerCharacterData()), playerCharacter.UserId));

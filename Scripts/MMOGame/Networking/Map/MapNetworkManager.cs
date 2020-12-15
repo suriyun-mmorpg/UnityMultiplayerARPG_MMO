@@ -9,7 +9,7 @@ using System.Collections.Concurrent;
 
 namespace MultiplayerARPG.MMO
 {
-    public sealed partial class MapNetworkManager : BaseGameNetworkManager, IAppServer, IServerStorageHandlers
+    public sealed partial class MapNetworkManager : BaseGameNetworkManager, IAppServer
     {
         public const float TERMINATE_INSTANCE_DELAY = 30f;  // Close instance when no clients connected within 30 seconds
 
@@ -130,23 +130,26 @@ namespace MultiplayerARPG.MMO
             CentralAppServerRegister.RegisterMessage(MMOMessageTypes.AppServerAddress, HandleResponseAppServerAddress);
             CentralAppServerRegister.RegisterResponse<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.RequestSpawnMap);
             this.InvokeInstanceDevExtMethods("OnInitCentralAppServerRegister");
-
             ChatNetworkManager = gameObject.AddComponent<ChatNetworkManager>();
-            CashShopRequestHandlers = gameObject.GetOrAddComponent<IServerCashShopMessageHandlers, MMOServerCashShopMessageHandlers>();
-            CashShopRequestHandlers.ServerPlayerCharacterHandlers = this;
-            MailRequestHandlers = gameObject.GetOrAddComponent<IServerMailMessageHandlers, MMOServerMailMessageHandlers>();
-            MailRequestHandlers.ServerPlayerCharacterHandlers = this;
-            InventoryRequestHandlers = gameObject.GetOrAddComponent<IServerInventoryMessageHandlers, DefaultServerInventoryMessageHandlers>();
-            InventoryRequestHandlers.ServerPlayerCharacterHandlers = this;
-            StorageRequestHandlers = gameObject.GetOrAddComponent<IServerStorageMessageHandlers, MMOServerStorageMessageHandlers>();
-            StorageRequestHandlers.ServerPlayerCharacterHandlers = this;
-            StorageRequestHandlers.ServerStorageHandlers = this;
-            PartyRequestHandlers = gameObject.GetOrAddComponent<IServerPartyMessageHandlers, MMOServerPartyMessageHandlers>();
-            PartyRequestHandlers.ServerPlayerCharacterHandlers = this;
-            PartyRequestHandlers.ServerPartyHandlers = this;
-            GuildRequestHandlers = gameObject.GetOrAddComponent<IServerGuildMessageHandlers, MMOServerGuildMessageHandlers>();
-            GuildRequestHandlers.ServerPlayerCharacterHandlers = this;
-            GuildRequestHandlers.ServerGuildHandlers = this;
+            // Server Handlers
+            ServerPlayerCharacterHandlers = gameObject.GetOrAddComponent<IServerPlayerCharacterHandlers, DefaultServerPlayerCharacterHandlers>();
+            ServerStorageHandlers = gameObject.GetOrAddComponent<IServerStorageHandlers, LanRpgServerStorageHandlers>();
+            ServerPartyHandlers = gameObject.GetOrAddComponent<IServerPartyHandlers, DefaultServerPartyHandlers>();
+            ServerGuildHandlers = gameObject.GetOrAddComponent<IServerGuildHandlers, DefaultServerGuildHandlers>();
+            // Server Message Handlers
+            ServerCashShopMessageHandlers = gameObject.GetOrAddComponent<IServerCashShopMessageHandlers, MMOServerCashShopMessageHandlers>();
+            ServerMailMessageHandlers = gameObject.GetOrAddComponent<IServerMailMessageHandlers, MMOServerMailMessageHandlers>();
+            ServerInventoryMessageHandlers = gameObject.GetOrAddComponent<IServerInventoryMessageHandlers, DefaultServerInventoryMessageHandlers>();
+            ServerStorageMessageHandlers = gameObject.GetOrAddComponent<IServerStorageMessageHandlers, MMOServerStorageMessageHandlers>();
+            ServerPartyMessageHandlers = gameObject.GetOrAddComponent<IServerPartyMessageHandlers, MMOServerPartyMessageHandlers>();
+            ServerGuildMessageHandlers = gameObject.GetOrAddComponent<IServerGuildMessageHandlers, MMOServerGuildMessageHandlers>();
+            // Client handlers
+            ClientCashShopHandlers = gameObject.GetOrAddComponent<IClientCashShopHandlers, DefaultClientCashShopHandlers>();
+            ClientMailHandlers = gameObject.GetOrAddComponent<IClientMailHandlers, DefaultClientMailHandlers>();
+            ClientStorageHandlers = gameObject.GetOrAddComponent<IClientStorageHandlers, DefaultClientStorageHandlers>();
+            ClientInventoryHandlers = gameObject.GetOrAddComponent<IClientInventoryHandlers, DefaultClientInventoryHandlers>();
+            ClientPartyHandlers = gameObject.GetOrAddComponent<IClientPartyHandlers, DefaultClientPartyHandlers>();
+            ClientGuildHandlers = gameObject.GetOrAddComponent<IClientGuildHandlers, DefaultClientGuildHandlers>();
 #endif
         }
 
@@ -209,7 +212,6 @@ namespace MultiplayerARPG.MMO
             loadingGuildIds.Clear();
             savingCharacters.Clear();
             savingBuildings.Clear();
-            ClearStorage();
 #endif
         }
 
@@ -240,7 +242,7 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
             if (IsServer)
             {
-                foreach (BasePlayerCharacterEntity playerCharacter in PlayerCharacters.Values)
+                foreach (BasePlayerCharacterEntity playerCharacter in ServerPlayerCharacterHandlers.GetPlayerCharacters())
                 {
                     if (playerCharacter == null) continue;
                     DbServiceClient.UpdateCharacter(new UpdateCharacterReq()
@@ -295,7 +297,7 @@ namespace MultiplayerARPG.MMO
             // Send remove character from map server
             BasePlayerCharacterEntity playerCharacter;
             SocialCharacterData userData;
-            if (this.TryGetPlayerCharacter(connectionId, out playerCharacter) &&
+            if (ServerPlayerCharacterHandlers.TryGetPlayerCharacter(connectionId, out playerCharacter) &&
                 usersById.TryGetValue(playerCharacter.Id, out userData))
             {
                 usersById.TryRemove(playerCharacter.Id, out _);
@@ -320,7 +322,7 @@ namespace MultiplayerARPG.MMO
         {
             // Save player character data
             BasePlayerCharacterEntity playerCharacterEntity;
-            if (this.TryGetPlayerCharacter(connectionId, out playerCharacterEntity))
+            if (ServerPlayerCharacterHandlers.TryGetPlayerCharacter(connectionId, out playerCharacterEntity))
             {
                 PlayerCharacterData saveCharacterData = playerCharacterEntity.CloneTo(new PlayerCharacterData());
                 while (savingCharacters.Contains(saveCharacterData.Id))
@@ -331,14 +333,6 @@ namespace MultiplayerARPG.MMO
             }
             UnregisterPlayerCharacter(connectionId);
             base.OnPeerDisconnected(connectionId, disconnectInfo);
-        }
-#endif
-
-#if UNITY_STANDALONE && !CLIENT_BUILD
-        public override void OnStartServer()
-        {
-            base.OnStartServer();
-            GameInstance.ServerStorageHandlers = this;
         }
 #endif
 
@@ -408,7 +402,7 @@ namespace MultiplayerARPG.MMO
             string accessToken = reader.GetString();
             string selectCharacterId = reader.GetString();
 
-            if (PlayerCharacters.ContainsKey(connectionId))
+            if (ServerPlayerCharacterHandlers.TryGetPlayerCharacter(connectionId, out _))
             {
                 if (LogError)
                     Logging.LogError(LogTag, "User trying to hack: " + userId);
@@ -524,11 +518,11 @@ namespace MultiplayerARPG.MMO
                     // Load party data, if this map-server does not have party data
                     if (playerCharacterEntity.PartyId > 0)
                     {
-                        if (!Parties.ContainsKey(playerCharacterEntity.PartyId))
+                        if (!ServerPartyHandlers.ContainsParty(playerCharacterEntity.PartyId))
                             await LoadPartyRoutine(playerCharacterEntity.PartyId);
-                        if (Parties.ContainsKey(playerCharacterEntity.PartyId))
+                        PartyData party;
+                        if (ServerPartyHandlers.TryGetParty(playerCharacterEntity.PartyId, out party))
                         {
-                            PartyData party = Parties[playerCharacterEntity.PartyId];
                             SendCreatePartyToClient(playerCharacterEntity.ConnectionId, party);
                             SendAddPartyMembersToClient(playerCharacterEntity.ConnectionId, party);
                         }
@@ -539,11 +533,11 @@ namespace MultiplayerARPG.MMO
                     // Load guild data, if this map-server does not have guild data
                     if (playerCharacterEntity.GuildId > 0)
                     {
-                        if (!Guilds.ContainsKey(playerCharacterEntity.GuildId))
+                        if (!ServerGuildHandlers.ContainsGuild(playerCharacterEntity.GuildId))
                             await LoadGuildRoutine(playerCharacterEntity.GuildId);
-                        if (Guilds.ContainsKey(playerCharacterEntity.GuildId))
+                        GuildData guild;
+                        if (ServerGuildHandlers.TryGetGuild(playerCharacterEntity.GuildId, out guild))
                         {
-                            GuildData guild = Guilds[playerCharacterEntity.GuildId];
                             playerCharacterEntity.GuildName = guild.guildName;
                             playerCharacterEntity.GuildRole = guild.GetMemberRole(playerCharacterEntity.Id);
                             SendCreateGuildToClient(playerCharacterEntity.ConnectionId, guild);
@@ -732,16 +726,16 @@ namespace MultiplayerARPG.MMO
                     {
                         NotifyOnlineCharacter(message.data.id);
                         socialId = message.data.partyId;
-                        if (socialId > 0 && Parties.TryGetValue(socialId, out party))
+                        if (socialId > 0 && ServerPartyHandlers.TryGetParty(socialId, out party))
                         {
                             party.UpdateMember(message.data);
-                            Parties[socialId] = party;
+                            ServerPartyHandlers.SetParty(socialId, party);
                         }
                         socialId = message.data.guildId;
-                        if (socialId > 0 && Guilds.TryGetValue(socialId, out guild))
+                        if (socialId > 0 && ServerGuildHandlers.TryGetGuild(socialId, out guild))
                         {
                             guild.UpdateMember(message.data);
-                            Guilds[socialId] = guild;
+                            ServerGuildHandlers.SetGuild(socialId, guild);
                         }
                         usersById[message.data.id] = message.data;
                     }
@@ -754,12 +748,12 @@ namespace MultiplayerARPG.MMO
         {
             PartyData party;
             BasePlayerCharacterEntity playerCharacterEntity;
-            if (Parties.TryGetValue(message.id, out party) && UpdateSocialGroupMember(party, message))
+            if (ServerPartyHandlers.TryGetParty(message.id, out party) && UpdateSocialGroupMember(party, message))
             {
                 switch (message.type)
                 {
                     case UpdateSocialMemberMessage.UpdateType.Add:
-                        if (this.TryGetPlayerCharacterById(message.data.id, out playerCharacterEntity))
+                        if (ServerPlayerCharacterHandlers.TryGetPlayerCharacterById(message.data.id, out playerCharacterEntity))
                         {
                             playerCharacterEntity.PartyId = message.id;
                             SendCreatePartyToClient(playerCharacterEntity.ConnectionId, party);
@@ -768,7 +762,7 @@ namespace MultiplayerARPG.MMO
                         SendAddPartyMemberToClients(party, message.data.id, message.data.characterName, message.data.dataId, message.data.level);
                         break;
                     case UpdateSocialMemberMessage.UpdateType.Remove:
-                        if (this.TryGetPlayerCharacterById(message.data.id, out playerCharacterEntity))
+                        if (ServerPlayerCharacterHandlers.TryGetPlayerCharacterById(message.data.id, out playerCharacterEntity))
                         {
                             playerCharacterEntity.ClearParty();
                             SendPartyTerminateToClient(playerCharacterEntity.ConnectionId, message.id);
@@ -783,30 +777,30 @@ namespace MultiplayerARPG.MMO
         {
             BasePlayerCharacterEntity playerCharacterEntity;
             PartyData party;
-            if (Parties.TryGetValue(message.id, out party))
+            if (ServerPartyHandlers.TryGetParty(message.id, out party))
             {
                 switch (message.type)
                 {
                     case UpdatePartyMessage.UpdateType.ChangeLeader:
                         party.SetLeader(message.characterId);
-                        Parties[message.id] = party;
+                        ServerPartyHandlers.SetParty(message.id, party);
                         SendChangePartyLeaderToClients(party);
                         break;
                     case UpdatePartyMessage.UpdateType.Setting:
                         party.Setting(message.shareExp, message.shareItem);
-                        Parties[message.id] = party;
+                        ServerPartyHandlers.SetParty(message.id, party);
                         SendPartySettingToClients(party);
                         break;
                     case UpdatePartyMessage.UpdateType.Terminate:
                         foreach (string memberId in party.GetMemberIds())
                         {
-                            if (this.TryGetPlayerCharacterById(memberId, out playerCharacterEntity))
+                            if (ServerPlayerCharacterHandlers.TryGetPlayerCharacterById(memberId, out playerCharacterEntity))
                             {
                                 playerCharacterEntity.ClearParty();
                                 SendPartyTerminateToClient(playerCharacterEntity.ConnectionId, message.id);
                             }
                         }
-                        Parties.TryRemove(message.id, out _);
+                        ServerPartyHandlers.RemoveParty(message.id);
                         break;
                 }
             }
@@ -816,12 +810,12 @@ namespace MultiplayerARPG.MMO
         {
             GuildData guild;
             BasePlayerCharacterEntity playerCharacterEntity;
-            if (Guilds.TryGetValue(message.id, out guild) && UpdateSocialGroupMember(guild, message))
+            if (ServerGuildHandlers.TryGetGuild(message.id, out guild) && UpdateSocialGroupMember(guild, message))
             {
                 switch (message.type)
                 {
                     case UpdateSocialMemberMessage.UpdateType.Add:
-                        if (this.TryGetPlayerCharacterById(message.data.id, out playerCharacterEntity))
+                        if (ServerPlayerCharacterHandlers.TryGetPlayerCharacterById(message.data.id, out playerCharacterEntity))
                         {
                             playerCharacterEntity.GuildId = message.id;
                             playerCharacterEntity.GuildName = guild.guildName;
@@ -832,7 +826,7 @@ namespace MultiplayerARPG.MMO
                         SendAddGuildMemberToClients(guild, message.data.id, message.data.characterName, message.data.dataId, message.data.level);
                         break;
                     case UpdateSocialMemberMessage.UpdateType.Remove:
-                        if (this.TryGetPlayerCharacterById(message.data.id, out playerCharacterEntity))
+                        if (ServerPlayerCharacterHandlers.TryGetPlayerCharacterById(message.data.id, out playerCharacterEntity))
                         {
                             playerCharacterEntity.ClearGuild();
                             SendGuildTerminateToClient(playerCharacterEntity.ConnectionId, message.id);
@@ -847,66 +841,66 @@ namespace MultiplayerARPG.MMO
         {
             BasePlayerCharacterEntity playerCharacterEntity;
             GuildData guild;
-            if (Guilds.TryGetValue(message.id, out guild))
+            if (ServerGuildHandlers.TryGetGuild(message.id, out guild))
             {
                 switch (message.type)
                 {
                     case UpdateGuildMessage.UpdateType.ChangeLeader:
                         guild.SetLeader(message.characterId);
-                        Guilds[message.id] = guild;
-                        if (this.TryGetPlayerCharacterById(message.characterId, out playerCharacterEntity))
+                        ServerGuildHandlers.SetGuild(message.id, guild);
+                        if (ServerPlayerCharacterHandlers.TryGetPlayerCharacterById(message.characterId, out playerCharacterEntity))
                             playerCharacterEntity.GuildRole = guild.GetMemberRole(playerCharacterEntity.Id);
                         SendChangeGuildLeaderToClients(guild);
                         break;
                     case UpdateGuildMessage.UpdateType.SetGuildMessage:
                         guild.guildMessage = message.guildMessage;
-                        Guilds[message.id] = guild;
+                        ServerGuildHandlers.SetGuild(message.id, guild);
                         SendSetGuildMessageToClients(guild);
                         break;
                     case UpdateGuildMessage.UpdateType.SetGuildRole:
                         guild.SetRole(message.guildRole, message.roleName, message.canInvite, message.canKick, message.shareExpPercentage);
-                        Guilds[message.id] = guild;
+                        ServerGuildHandlers.SetGuild(message.id, guild);
                         foreach (string memberId in guild.GetMemberIds())
                         {
-                            if (this.TryGetPlayerCharacterById(memberId, out playerCharacterEntity))
+                            if (ServerPlayerCharacterHandlers.TryGetPlayerCharacterById(memberId, out playerCharacterEntity))
                                 playerCharacterEntity.GuildRole = guild.GetMemberRole(playerCharacterEntity.Id);
                         }
                         SendSetGuildRoleToClients(guild, message.guildRole, message.roleName, message.canInvite, message.canKick, message.shareExpPercentage);
                         break;
                     case UpdateGuildMessage.UpdateType.SetGuildMemberRole:
                         guild.SetMemberRole(message.characterId, message.guildRole);
-                        Guilds[message.id] = guild;
-                        if (this.TryGetPlayerCharacterById(message.characterId, out playerCharacterEntity))
+                        ServerGuildHandlers.SetGuild(message.id, guild);
+                        if (ServerPlayerCharacterHandlers.TryGetPlayerCharacterById(message.characterId, out playerCharacterEntity))
                             playerCharacterEntity.GuildRole = guild.GetMemberRole(playerCharacterEntity.Id);
                         SendSetGuildMemberRoleToClients(guild, message.characterId, message.guildRole);
                         break;
                     case UpdateGuildMessage.UpdateType.SetSkillLevel:
                         guild.SetSkillLevel(message.dataId, message.level);
-                        Guilds[message.id] = guild;
+                        ServerGuildHandlers.SetGuild(message.id, guild);
                         SendSetGuildSkillLevelToClients(guild, message.dataId);
                         break;
                     case UpdateGuildMessage.UpdateType.SetGold:
                         guild.gold = message.gold;
-                        Guilds[message.id] = guild;
+                        ServerGuildHandlers.SetGuild(message.id, guild);
                         SendSetGuildGoldToClients(guild);
                         break;
                     case UpdateGuildMessage.UpdateType.LevelExpSkillPoint:
                         guild.level = message.level;
                         guild.exp = message.exp;
                         guild.skillPoint = message.skillPoint;
-                        Guilds[message.id] = guild;
+                        ServerGuildHandlers.SetGuild(message.id, guild);
                         SendGuildLevelExpSkillPointToClients(guild);
                         break;
                     case UpdateGuildMessage.UpdateType.Terminate:
                         foreach (string memberId in guild.GetMemberIds())
                         {
-                            if (this.TryGetPlayerCharacterById(memberId, out playerCharacterEntity))
+                            if (ServerPlayerCharacterHandlers.TryGetPlayerCharacterById(memberId, out playerCharacterEntity))
                             {
                                 playerCharacterEntity.ClearGuild();
                                 SendGuildTerminateToClient(playerCharacterEntity.ConnectionId, message.id);
                             }
                         }
-                        Guilds.TryRemove(message.id, out _);
+                        ServerGuildHandlers.RemoveGuild(message.id);
                         break;
                 }
             }

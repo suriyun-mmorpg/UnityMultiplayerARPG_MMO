@@ -7,9 +7,6 @@ namespace MultiplayerARPG.MMO
 {
     public class MMOServerStorageMessageHandlers : MonoBehaviour, IServerStorageMessageHandlers
     {
-        public IServerPlayerCharacterHandlers ServerPlayerCharacterHandlers { get; set; }
-        public IServerStorageHandlers ServerStorageHandlers { get; set; }
-
 #if UNITY_STANDALONE && !CLIENT_BUILD
         public DatabaseService.DatabaseServiceClient DbServiceClient
         {
@@ -22,25 +19,23 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
             StorageId storageId = new StorageId(request.storageType, request.storageOwnerId);
             IPlayerCharacterData playerCharacter;
-            if (!ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                // Error: can't find player's character
                 result.Invoke(AckResponseCode.Error, new ResponseGetStorageItemsMessage()
                 {
                     error = ResponseGetStorageItemsMessage.Error.CharacterNotFound,
                 });
                 return;
             }
-            if (!ServerStorageHandlers.CanAccessStorage(storageId, playerCharacter))
+            if (!GameInstance.ServerStorageHandlers.CanAccessStorage(playerCharacter, storageId))
             {
-                // Error: can't access storage
                 result.Invoke(AckResponseCode.Error, new ResponseGetStorageItemsMessage()
                 {
                     error = ResponseGetStorageItemsMessage.Error.NotAllowed,
                 });
                 return;
             }
-            List<CharacterItem> storageItemList = ServerStorageHandlers.GetStorageItems(storageId);
+            List<CharacterItem> storageItemList = GameInstance.ServerStorageHandlers.GetStorageItems(storageId);
             result.Invoke(AckResponseCode.Success, new ResponseGetStorageItemsMessage()
             {
                 storageItems = storageItemList,
@@ -54,18 +49,16 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
             StorageId storageId = new StorageId(request.storageType, request.storageOwnerId);
             IPlayerCharacterData playerCharacter;
-            if (!ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                // Error: can't find player's character
                 result.Invoke(AckResponseCode.Error, new ResponseMoveItemFromStorageMessage()
                 {
                     error = ResponseMoveItemFromStorageMessage.Error.CharacterNotFound,
                 });
                 return;
             }
-            if (!ServerStorageHandlers.CanAccessStorage(storageId, playerCharacter))
+            if (!GameInstance.ServerStorageHandlers.CanAccessStorage(playerCharacter, storageId))
             {
-                // Error: can't access storage
                 result.Invoke(AckResponseCode.Error, new ResponseMoveItemFromStorageMessage()
                 {
                     error = ResponseMoveItemFromStorageMessage.Error.NotAllowed,
@@ -102,7 +95,8 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             playerCharacter.NonEquipItems = DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.InventoryItemItems);
-            ServerStorageHandlers.SetStorageItems(storageId, DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.StorageCharacterItems));
+            GameInstance.ServerStorageHandlers.SetStorageItems(storageId, DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.StorageCharacterItems));
+            GameInstance.ServerStorageHandlers.NotifyStorageItemsUpdated(request.storageType, request.storageOwnerId);
             // Success
             result.Invoke(AckResponseCode.Success, new ResponseMoveItemFromStorageMessage());
 #endif
@@ -113,18 +107,16 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
             StorageId storageId = new StorageId(request.storageType, request.storageOwnerId);
             IPlayerCharacterData playerCharacter;
-            if (!ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                // Error: can't find player's character
                 result.Invoke(AckResponseCode.Error, new ResponseMoveItemToStorageMessage()
                 {
                     error = ResponseMoveItemToStorageMessage.Error.CharacterNotFound,
                 });
                 return;
             }
-            if (!ServerStorageHandlers.CanAccessStorage(storageId, playerCharacter))
+            if (!GameInstance.ServerStorageHandlers.CanAccessStorage(playerCharacter, storageId))
             {
-                // Error: can't access storage
                 result.Invoke(AckResponseCode.Error, new ResponseMoveItemToStorageMessage()
                 {
                     error = ResponseMoveItemToStorageMessage.Error.NotAllowed,
@@ -160,7 +152,8 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             playerCharacter.NonEquipItems = DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.InventoryItemItems);
-            ServerStorageHandlers.SetStorageItems(storageId, DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.StorageCharacterItems));
+            GameInstance.ServerStorageHandlers.SetStorageItems(storageId, DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.StorageCharacterItems));
+            GameInstance.ServerStorageHandlers.NotifyStorageItemsUpdated(request.storageType, request.storageOwnerId);
             // Success
             result.Invoke(AckResponseCode.Success, new ResponseMoveItemToStorageMessage());
 #endif
@@ -171,18 +164,16 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
             StorageId storageId = new StorageId(request.storageType, request.storageOwnerId);
             IPlayerCharacterData playerCharacter;
-            if (!ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                // Error: can't find player's character
                 result.Invoke(AckResponseCode.Error, new ResponseSwapOrMergeStorageItemMessage()
                 {
                     error = ResponseSwapOrMergeStorageItemMessage.Error.CharacterNotFound,
                 });
                 return;
             }
-            if (!ServerStorageHandlers.CanAccessStorage(storageId, playerCharacter))
+            if (!GameInstance.ServerStorageHandlers.CanAccessStorage(playerCharacter, storageId))
             {
-                // Error: can't access storage
                 result.Invoke(AckResponseCode.Error, new ResponseSwapOrMergeStorageItemMessage()
                 {
                     error = ResponseSwapOrMergeStorageItemMessage.Error.NotAllowed,
@@ -211,7 +202,8 @@ namespace MultiplayerARPG.MMO
                     error = error,
                 });
             }
-            List<CharacterItem> storageItems = DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.StorageCharacterItems);
+            GameInstance.ServerStorageHandlers.SetStorageItems(storageId, DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.StorageCharacterItems));
+            GameInstance.ServerStorageHandlers.NotifyStorageItemsUpdated(request.storageType, request.storageOwnerId);
             // Success
             result.Invoke(AckResponseCode.Success, new ResponseSwapOrMergeStorageItemMessage());
 #endif

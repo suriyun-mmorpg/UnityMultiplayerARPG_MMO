@@ -72,7 +72,7 @@ namespace MultiplayerARPG.MMO
             CentralServerPeerInfo peerInfo;
             BaseMapInfo mapInfo;
             if (!string.IsNullOrEmpty(mapName) &&
-                PlayerCharacters.ContainsKey(connectionId) &&
+                ServerPlayerCharacterHandlers.TryGetPlayerCharacter(connectionId, out _) &&
                 mapServerConnectionIdsBySceneName.TryGetValue(mapName, out peerInfo) &&
                 GameInstance.MapInfos.TryGetValue(mapName, out mapInfo) &&
                 mapInfo.IsSceneSet())
@@ -116,7 +116,7 @@ namespace MultiplayerARPG.MMO
             // Prepare data for warp character later when instance map server registered to this map server
             HashSet<uint> instanceMapWarpingCharacters = new HashSet<uint>();
             PartyData party;
-            if (Parties.TryGetValue(playerCharacterEntity.PartyId, out party))
+            if (ServerPartyHandlers.TryGetParty(playerCharacterEntity.PartyId, out party))
             {
                 // If character is party member, will bring party member to join instance
                 if (party.IsLeader(playerCharacterEntity))
@@ -166,7 +166,7 @@ namespace MultiplayerARPG.MMO
             CentralServerPeerInfo peerInfo;
             InstanceMapWarpingLocation warpingLocation;
             BaseMapInfo mapInfo;
-            if (PlayerCharacters.ContainsKey(connectionId) &&
+            if (ServerPlayerCharacterHandlers.TryGetPlayerCharacter(connectionId, out _) &&
                 instanceMapWarpingLocations.TryGetValue(instanceId, out warpingLocation) &&
                 instanceMapServerConnectionIdsByInstanceId.TryGetValue(instanceId, out peerInfo) &&
                 GameInstance.MapInfos.TryGetValue(warpingLocation.mapName, out mapInfo) &&
@@ -294,7 +294,7 @@ namespace MultiplayerARPG.MMO
         private async UniTaskVoid DepositGuildGoldRoutine(BasePlayerCharacterEntity playerCharacterEntity, int amount)
         {
             GuildData guild;
-            if (Guilds.TryGetValue(playerCharacterEntity.GuildId, out guild))
+            if (ServerGuildHandlers.TryGetGuild(playerCharacterEntity.GuildId, out guild))
             {
                 if (playerCharacterEntity.Gold - amount >= 0)
                 {
@@ -306,7 +306,7 @@ namespace MultiplayerARPG.MMO
                     });
                     guild.gold = changeGoldResp.GuildGold;
                     playerCharacterEntity.Gold -= amount;
-                    Guilds[playerCharacterEntity.GuildId] = guild;
+                    ServerGuildHandlers.SetGuild(playerCharacterEntity.GuildId, guild);
                     SendSetGuildGoldToClients(guild);
                 }
                 else
@@ -328,7 +328,7 @@ namespace MultiplayerARPG.MMO
         private async UniTaskVoid WithdrawGuildGoldRoutine(BasePlayerCharacterEntity playerCharacterEntity, int amount)
         {
             GuildData guild;
-            if (Guilds.TryGetValue(playerCharacterEntity.GuildId, out guild))
+            if (ServerGuildHandlers.TryGetGuild(playerCharacterEntity.GuildId, out guild))
             {
                 // Get gold amount
                 GuildGoldResp goldResp = await DbServiceClient.GetGuildGoldAsync(new GetGuildGoldReq()
@@ -346,7 +346,7 @@ namespace MultiplayerARPG.MMO
                     });
                     guild.gold = changeGoldResp.GuildGold;
                     playerCharacterEntity.Gold = playerCharacterEntity.Gold.Increase(amount);
-                    Guilds[playerCharacterEntity.GuildId] = guild;
+                    ServerGuildHandlers.SetGuild(playerCharacterEntity.GuildId, guild);
                     SendSetGuildGoldToClients(guild);
                 }
                 else

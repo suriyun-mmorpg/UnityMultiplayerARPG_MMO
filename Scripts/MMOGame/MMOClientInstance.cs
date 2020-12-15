@@ -63,16 +63,16 @@ namespace MultiplayerARPG.MMO
         {
             centralNetworkManager.onClientConnected += OnCentralServerConnected;
             centralNetworkManager.onClientDisconnected += OnCentralServerDisconnected;
-            mapNetworkManager.onClientConnected += OnMapServerConnected;
-            mapNetworkManager.onClientDisconnected += OnMapServerDisconnected;
+            ClientGenericActions.onClientConnected += OnMapServerConnected;
+            ClientGenericActions.onClientDisconnected += OnMapServerDisconnected;
         }
 
         private void OnDisable()
         {
             centralNetworkManager.onClientConnected -= OnCentralServerConnected;
             centralNetworkManager.onClientDisconnected -= OnCentralServerDisconnected;
-            mapNetworkManager.onClientConnected -= OnMapServerConnected;
-            mapNetworkManager.onClientDisconnected -= OnMapServerDisconnected;
+            ClientGenericActions.onClientConnected -= OnMapServerConnected;
+            ClientGenericActions.onClientDisconnected -= OnMapServerDisconnected;
         }
 
         public void OnCentralServerConnected()

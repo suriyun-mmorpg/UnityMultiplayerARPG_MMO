@@ -7,8 +7,6 @@ namespace MultiplayerARPG.MMO
 {
     public class MMOServerCashShopMessageHandlers : MonoBehaviour, IServerCashShopMessageHandlers
     {
-        public IServerPlayerCharacterHandlers ServerPlayerCharacterHandlers { get; set; }
-
 #if UNITY_STANDALONE && !CLIENT_BUILD
         public DatabaseService.DatabaseServiceClient DbServiceClient
         {
@@ -26,7 +24,7 @@ namespace MultiplayerARPG.MMO
             int cash = 0;
             List<int> cashShopItemIds = new List<int>();
             IPlayerCharacterData playerCharacter;
-            if (!ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 // Cannot find user
                 error = ResponseCashShopInfoMessage.Error.UserNotFound;
@@ -65,7 +63,7 @@ namespace MultiplayerARPG.MMO
             int dataId = request.dataId;
             int cash = 0;
             IPlayerCharacterData playerCharacter;
-            if (!ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 // Cannot find user
                 error = ResponseCashShopBuyMessage.Error.UserNotFound;
@@ -138,7 +136,7 @@ namespace MultiplayerARPG.MMO
             int cash = 0;
             List<int> cashPackageIds = new List<int>();
             IPlayerCharacterData playerCharacter;
-            if (!ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 // Cannot find user
                 error = ResponseCashPackageInfoMessage.Error.UserNotFound;
@@ -178,7 +176,7 @@ namespace MultiplayerARPG.MMO
             int dataId = request.dataId;
             int cash = 0;
             IPlayerCharacterData playerCharacter;
-            if (!ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 // Cannot find user
                 error = ResponseCashPackageBuyValidationMessage.Error.UserNotFound;
