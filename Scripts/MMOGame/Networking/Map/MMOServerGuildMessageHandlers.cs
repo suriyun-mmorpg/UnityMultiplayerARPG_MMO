@@ -400,7 +400,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             // If it is leader kick all members and terminate guild
-            if (validateResult.Guild.IsLeader(playerCharacter))
+            if (validateResult.Guild.IsLeader(playerCharacter.Id))
             {
                 BasePlayerCharacterEntity memberEntity;
                 foreach (string memberId in validateResult.Guild.GetMemberIds())

@@ -119,12 +119,12 @@ namespace MultiplayerARPG.MMO
             if (ServerPartyHandlers.TryGetParty(playerCharacterEntity.PartyId, out party))
             {
                 // If character is party member, will bring party member to join instance
-                if (party.IsLeader(playerCharacterEntity))
+                if (party.IsLeader(playerCharacterEntity.Id))
                 {
                     List<BasePlayerCharacterEntity> aliveAllies = playerCharacterEntity.FindAliveCharacters<BasePlayerCharacterEntity>(CurrentGameInstance.joinInstanceMapDistance, true, false, false);
                     foreach (BasePlayerCharacterEntity aliveAlly in aliveAllies)
                     {
-                        if (!party.IsMember(aliveAlly))
+                        if (!party.IsMember(aliveAlly.Id))
                             continue;
                         instanceMapWarpingCharacters.Add(aliveAlly.ObjectId);
                         aliveAlly.IsWarping = true;
