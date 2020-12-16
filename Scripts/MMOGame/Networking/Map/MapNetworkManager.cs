@@ -133,7 +133,7 @@ namespace MultiplayerARPG.MMO
             ChatNetworkManager = gameObject.AddComponent<ChatNetworkManager>();
             // Server Handlers
             ServerPlayerCharacterHandlers = gameObject.GetOrAddComponent<IServerPlayerCharacterHandlers, DefaultServerPlayerCharacterHandlers>();
-            ServerStorageHandlers = gameObject.GetOrAddComponent<IServerStorageHandlers, LanRpgServerStorageHandlers>();
+            ServerStorageHandlers = gameObject.GetOrAddComponent<IServerStorageHandlers, MMOServerStorageHandlers>();
             ServerPartyHandlers = gameObject.GetOrAddComponent<IServerPartyHandlers, DefaultServerPartyHandlers>();
             ServerGuildHandlers = gameObject.GetOrAddComponent<IServerGuildHandlers, DefaultServerGuildHandlers>();
             // Server Message Handlers
