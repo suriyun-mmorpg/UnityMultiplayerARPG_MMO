@@ -14,36 +14,6 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-        public async UniTaskVoid HandleRequestGetStorageItems(RequestHandlerData requestHandler, RequestGetStorageItemsMessage request, RequestProceedResultDelegate<ResponseGetStorageItemsMessage> result)
-        {
-#if UNITY_STANDALONE && !CLIENT_BUILD
-            StorageId storageId = new StorageId(request.storageType, request.storageOwnerId);
-            IPlayerCharacterData playerCharacter;
-            if (!GameInstance.ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
-            {
-                result.Invoke(AckResponseCode.Error, new ResponseGetStorageItemsMessage()
-                {
-                    error = ResponseGetStorageItemsMessage.Error.CharacterNotFound,
-                });
-                return;
-            }
-            if (!GameInstance.ServerStorageHandlers.CanAccessStorage(playerCharacter, storageId))
-            {
-                result.Invoke(AckResponseCode.Error, new ResponseGetStorageItemsMessage()
-                {
-                    error = ResponseGetStorageItemsMessage.Error.NotAllowed,
-                });
-                return;
-            }
-            List<CharacterItem> storageItemList = GameInstance.ServerStorageHandlers.GetStorageItems(storageId);
-            result.Invoke(AckResponseCode.Success, new ResponseGetStorageItemsMessage()
-            {
-                storageItems = storageItemList,
-            });
-            await UniTask.Yield();
-#endif
-        }
-
         public async UniTaskVoid HandleRequestMoveItemFromStorage(RequestHandlerData requestHandler, RequestMoveItemFromStorageMessage request, RequestProceedResultDelegate<ResponseMoveItemFromStorageMessage> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
