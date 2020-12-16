@@ -223,7 +223,7 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
             return storageItems;
 #else
-            return null;
+            return new ConcurrentDictionary<StorageId, List<CharacterItem>>();
 #endif
         }
     }
