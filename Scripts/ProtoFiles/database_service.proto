@@ -420,10 +420,11 @@ message MoveItemToStorageReq {
     EStorageType storage_type = 1;
     string storage_owner_id = 2;
     string character_id = 3;
-    string map_name = 4;
-    int32 inventory_item_index = 5;
-    int32 inventory_item_amount = 6;
-    int32 storage_item_index = 7;
+    int32 weight_limit = 4;
+    int32 slot_limit = 5;
+    int32 inventory_item_index = 6;
+    int32 inventory_item_amount = 7;
+    int32 storage_item_index = 8;
 }
 message MoveItemToStorageResp {
     EStorageError error = 1;
@@ -435,10 +436,11 @@ message MoveItemFromStorageReq {
     EStorageType storage_type = 1;
     string storage_owner_id = 2;
     string character_id = 3;
-    string map_name = 4;
-    int32 storage_item_index = 5;
-    int32 storage_item_amount = 6;
-    int32 inventory_item_index = 7;
+    int32 weight_limit = 4;
+    int32 slot_limit = 5;
+    int32 storage_item_index = 6;
+    int32 storage_item_amount = 7;
+    int32 inventory_item_index = 8;
 }
 message MoveItemFromStorageResp {
     EStorageError error = 1;
@@ -450,9 +452,10 @@ message SwapOrMergeStorageItemReq {
     EStorageType storage_type = 1;
     string storage_owner_id = 2;
     string character_id = 3;
-    string map_name = 4;
-    int32 from_index = 5;
-    int32 to_index = 6;
+    int32 weight_limit = 4;
+    int32 slot_limit = 5;
+    int32 from_index = 6;
+    int32 to_index = 7;
 }
 message SwapOrMergeStorageItemResp {
     EStorageError error = 1;
@@ -462,8 +465,9 @@ message SwapOrMergeStorageItemResp {
 message IncreaseStorageItemsReq {
     EStorageType storage_type = 1;
     string storage_owner_id = 2;
-    string map_name = 3;
-    bytes item = 4;
+    int32 weight_limit = 3;
+    int32 slot_limit = 4;
+    bytes item = 5;
 }
 message IncreaseStorageItemsResp {
     EStorageError error = 1;
@@ -473,9 +477,10 @@ message IncreaseStorageItemsResp {
 message DecreaseStorageItemsReq {
     EStorageType storage_type = 1;
     string storage_owner_id = 2;
-    string map_name = 3;
-    int32 data_id = 4;
-    int32 amount = 5;
+    int32 weight_limit = 3;
+    int32 slot_limit = 4;
+    int32 data_id = 5;
+    int32 amount = 6;
 }
 message DecreaseStorageItemsResp {
     EStorageError error = 1;

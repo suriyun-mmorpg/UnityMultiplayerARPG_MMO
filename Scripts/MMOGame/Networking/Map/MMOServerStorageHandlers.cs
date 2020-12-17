@@ -57,10 +57,12 @@ namespace MultiplayerARPG.MMO
         public async UniTask<bool> IncreaseStorageItems(StorageId storageId, CharacterItem addingItem)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
+            Storage storge = GetStorage(storageId, out _);
             IncreaseStorageItemsReq req = new IncreaseStorageItemsReq();
             req.StorageType = (EStorageType)storageId.storageType;
             req.StorageOwnerId = storageId.storageOwnerId;
-            req.MapName = BaseGameNetworkManager.CurrentMapInfo.Id;
+            req.WeightLimit = storge.weightLimit;
+            req.SlotLimit = storge.slotLimit;
             req.Item = DatabaseServiceUtils.ToByteString(addingItem);
             IncreaseStorageItemsResp resp = await DbServiceClient.IncreaseStorageItemsAsync(req);
             if (resp.Error != EStorageError.StorageErrorNone)
@@ -82,10 +84,12 @@ namespace MultiplayerARPG.MMO
         public async UniTask<DecreaseStorageItemsResult> DecreaseStorageItems(StorageId storageId, int dataId, short amount)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
+            Storage storge = GetStorage(storageId, out _);
             DecreaseStorageItemsReq req = new DecreaseStorageItemsReq();
             req.StorageType = (EStorageType)storageId.storageType;
             req.StorageOwnerId = storageId.storageOwnerId;
-            req.MapName = BaseGameNetworkManager.CurrentMapInfo.Id;
+            req.WeightLimit = storge.weightLimit;
+            req.SlotLimit = storge.slotLimit;
             req.DataId = dataId;
             req.Amount = amount;
             DecreaseStorageItemsResp resp = await DbServiceClient.DecreaseStorageItemsAsync(req);

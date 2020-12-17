@@ -662,6 +662,7 @@ namespace MultiplayerARPG.MMO
             List<CharacterItem> storageItems;
             if (!cachedStorageItems.TryGetValue(storageId, out storageItems))
             {
+                LiteNetLibManager.Logging.LogError("read1 " + storageId.GetId());
                 // Doesn't cached yet, so get data from database
                 storageItems = await Database.ReadStorageItems(storageId.storageType, storageId.storageOwnerId);
                 // Cache data, it will be used to validate later
@@ -677,11 +678,10 @@ namespace MultiplayerARPG.MMO
             MoveItemToStorageResp resp = new MoveItemToStorageResp();
             // Prepare storage data
             StorageId storageId = new StorageId((StorageType)request.StorageType, request.StorageOwnerId);
-            Storage storage;
             List<CharacterItem> storageItemList;
-            if (!GetStorage(storageId, request.MapName, out storage) ||
-                !cachedStorageItems.TryGetValue(storageId, out storageItemList))
+            if (!cachedStorageItems.TryGetValue(storageId, out storageItemList))
             {
+                LiteNetLibManager.Logging.LogError("not " + storageId.GetId());
                 // Cannot find storage
                 resp.Error = EStorageError.StorageErrorInvalidStorage;
                 return resp;
@@ -701,10 +701,10 @@ namespace MultiplayerARPG.MMO
                 return resp;
             }
             await UniTask.SwitchToMainThread();
-            bool isLimitWeight = storage.weightLimit > 0;
-            bool isLimitSlot = storage.slotLimit > 0;
-            short weightLimit = storage.weightLimit;
-            short slotLimit = storage.slotLimit;
+            bool isLimitWeight = request.WeightLimit > 0;
+            bool isLimitSlot = request.SlotLimit > 0;
+            short weightLimit = (short)request.WeightLimit;
+            short slotLimit = (short)request.SlotLimit;
             // Prepare character and item data
             CharacterItem movingItem = character.NonEquipItems[request.InventoryItemIndex].Clone(true);
             movingItem.id = GenericUtils.GetUniqueId();
@@ -751,10 +751,8 @@ namespace MultiplayerARPG.MMO
         {
             MoveItemFromStorageResp resp = new MoveItemFromStorageResp();
             StorageId storageId = new StorageId((StorageType)request.StorageType, request.StorageOwnerId);
-            Storage storage;
             List<CharacterItem> storageItemList;
-            if (!GetStorage(storageId, request.MapName, out storage) ||
-                !cachedStorageItems.TryGetValue(storageId, out storageItemList))
+            if (!cachedStorageItems.TryGetValue(storageId, out storageItemList))
             {
                 // Cannot find storage
                 resp.Error = EStorageError.StorageErrorInvalidStorage;
@@ -775,8 +773,8 @@ namespace MultiplayerARPG.MMO
                 return resp;
             }
             await UniTask.SwitchToMainThread();
-            bool isLimitSlot = storage.slotLimit > 0;
-            short slotLimit = storage.slotLimit;
+            bool isLimitSlot = request.SlotLimit > 0;
+            short slotLimit = (short)request.SlotLimit;
             // Prepare item data
             CharacterItem movingItem = storageItemList[request.StorageItemIndex].Clone(true);
             movingItem.amount = (short)request.StorageItemAmount;
@@ -821,18 +819,16 @@ namespace MultiplayerARPG.MMO
             SwapOrMergeStorageItemResp resp = new SwapOrMergeStorageItemResp();
             // Prepare storage data
             StorageId storageId = new StorageId((StorageType)request.StorageType, request.StorageOwnerId);
-            Storage storage;
             List<CharacterItem> storageItemList;
-            if (!GetStorage(storageId, request.MapName, out storage) ||
-                !cachedStorageItems.TryGetValue(storageId, out storageItemList))
+            if (!cachedStorageItems.TryGetValue(storageId, out storageItemList))
             {
                 // Cannot find storage
                 resp.Error = EStorageError.StorageErrorInvalidStorage;
                 return resp;
             }
             await UniTask.SwitchToMainThread();
-            bool isLimitSlot = storage.slotLimit > 0;
-            short slotLimit = storage.slotLimit;
+            bool isLimitSlot = request.SlotLimit > 0;
+            short slotLimit = (short)request.SlotLimit;
             // Prepare item data
             CharacterItem fromItem = storageItemList[request.FromIndex];
             CharacterItem toItem = storageItemList[request.ToIndex];
@@ -877,20 +873,18 @@ namespace MultiplayerARPG.MMO
             IncreaseStorageItemsResp resp = new IncreaseStorageItemsResp();
             // Prepare storage data
             StorageId storageId = new StorageId((StorageType)request.StorageType, request.StorageOwnerId);
-            Storage storage;
             List<CharacterItem> storageItemList;
-            if (!GetStorage(storageId, request.MapName, out storage) ||
-                !cachedStorageItems.TryGetValue(storageId, out storageItemList))
+            if (!cachedStorageItems.TryGetValue(storageId, out storageItemList))
             {
                 // Cannot find storage
                 resp.Error = EStorageError.StorageErrorInvalidStorage;
                 return resp;
             }
             await UniTask.SwitchToMainThread();
-            bool isLimitWeight = storage.weightLimit > 0;
-            bool isLimitSlot = storage.slotLimit > 0;
-            short weightLimit = storage.weightLimit;
-            short slotLimit = storage.slotLimit;
+            bool isLimitWeight = request.WeightLimit > 0;
+            bool isLimitSlot = request.SlotLimit > 0;
+            short weightLimit = (short)request.WeightLimit;
+            short slotLimit = (short)request.SlotLimit;
             CharacterItem addingItem = DatabaseServiceUtils.FromByteString<CharacterItem>(request.Item);
             // Increase item to storage
             bool isOverwhelming = storageItemList.IncreasingItemsWillOverwhelming(
@@ -916,18 +910,16 @@ namespace MultiplayerARPG.MMO
             DecreaseStorageItemsResp resp = new DecreaseStorageItemsResp();
             // Prepare storage data
             StorageId storageId = new StorageId((StorageType)request.StorageType, request.StorageOwnerId);
-            Storage storage;
             List<CharacterItem> storageItemList;
-            if (!GetStorage(storageId, request.MapName, out storage) ||
-                !cachedStorageItems.TryGetValue(storageId, out storageItemList))
+            if (!cachedStorageItems.TryGetValue(storageId, out storageItemList))
             {
                 // Cannot find storage
                 resp.Error = EStorageError.StorageErrorInvalidStorage;
                 return resp;
             }
             await UniTask.SwitchToMainThread();
-            bool isLimitSlot = storage.slotLimit > 0;
-            short slotLimit = storage.slotLimit;
+            bool isLimitSlot = request.SlotLimit > 0;
+            short slotLimit = (short)request.SlotLimit;
             // Increase item to storage
             Dictionary<int, short> decreaseItems;
             if (!storageItemList.DecreaseItems(request.DataId, (short)request.Amount, isLimitSlot, out decreaseItems))
@@ -1147,36 +1139,6 @@ namespace MultiplayerARPG.MMO
             {
                 cachedSocialCharacter[socialCharacter.id] = socialCharacter;
             }
-        }
-
-        public bool GetStorage(StorageId storageId, string mapName, out Storage storage)
-        {
-            storage = default(Storage);
-            switch (storageId.storageType)
-            {
-                case StorageType.Player:
-                    // Get storage setting from game instance
-                    storage = GameInstance.Singleton.playerStorage;
-                    break;
-                case StorageType.Guild:
-                    // Get storage setting from game instance
-                    storage = GameInstance.Singleton.guildStorage;
-                    break;
-                case StorageType.Building:
-                    // Get building from cache, then get building entity from game instance
-                    // And get storage setting from building entity
-                    BuildingSaveData building;
-                    BuildingEntity buildingEntity;
-                    if (cachedBuilding.ContainsKey(mapName) &&
-                        cachedBuilding[mapName].TryGetValue(storageId.storageOwnerId, out building) &&
-                        GameInstance.BuildingEntities.TryGetValue(building.EntityId, out buildingEntity) &&
-                        buildingEntity is StorageEntity)
-                        storage = (buildingEntity as StorageEntity).storage;
-                    else
-                        return false;
-                    break;
-            }
-            return true;
         }
     }
 }

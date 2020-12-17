@@ -132,7 +132,7 @@ namespace MultiplayerARPG.MMO
             this.InvokeInstanceDevExtMethods("OnInitCentralAppServerRegister");
             ChatNetworkManager = gameObject.AddComponent<ChatNetworkManager>();
             // Server Handlers
-            ServerPlayerCharacterHandlers = gameObject.GetOrAddComponent<IServerPlayerCharacterHandlers, DefaultServerPlayerCharacterHandlers>();
+            ServerPlayerCharacterHandlers = gameObject.GetOrAddComponent<IServerUserHandlers, DefaultServerUserHandlers>();
             ServerStorageHandlers = gameObject.GetOrAddComponent<IServerStorageHandlers, MMOServerStorageHandlers>();
             ServerPartyHandlers = gameObject.GetOrAddComponent<IServerPartyHandlers, DefaultServerPartyHandlers>();
             ServerGuildHandlers = gameObject.GetOrAddComponent<IServerGuildHandlers, MMOServerGuildHandlers>();
@@ -154,6 +154,7 @@ namespace MultiplayerARPG.MMO
             ClientGuildHandlers = gameObject.GetOrAddComponent<IClientGuildHandlers, DefaultClientGuildHandlers>();
             ClientFriendHandlers = gameObject.GetOrAddComponent<IClientFriendHandlers, DefaultClientFriendHandlers>();
             ClientBankHandlers = gameObject.GetOrAddComponent<IClientBankHandlers, DefaultClientBankHandlers>();
+            ClientUserHandlers = gameObject.GetOrAddComponent<IClientUserHandlers, DefaultClientUserHandlers>();
 #endif
         }
 

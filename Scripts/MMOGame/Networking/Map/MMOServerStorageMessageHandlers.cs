@@ -1,6 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
 using LiteNetLibManager;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG.MMO
@@ -29,17 +28,20 @@ namespace MultiplayerARPG.MMO
             }
             if (!GameInstance.ServerStorageHandlers.CanAccessStorage(playerCharacter, storageId))
             {
+                BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, GameMessage.Type.CannotAccessStorage);
                 result.Invoke(AckResponseCode.Error, new ResponseMoveItemFromStorageMessage()
                 {
                     error = ResponseMoveItemFromStorageMessage.Error.NotAllowed,
                 });
                 return;
             }
-            // Prepare storage data
+            Storage storage = GameInstance.ServerStorageHandlers.GetStorage(storageId, out _);
             MoveItemFromStorageReq req = new MoveItemFromStorageReq();
             req.StorageType = (EStorageType)request.storageType;
             req.StorageOwnerId = request.storageOwnerId;
             req.CharacterId = request.characterId;
+            req.WeightLimit = storage.weightLimit;
+            req.SlotLimit = storage.slotLimit;
             req.StorageItemIndex = request.storageItemIndex;
             req.StorageItemAmount = request.amount;
             req.InventoryItemIndex = request.inventoryIndex;
@@ -51,10 +53,12 @@ namespace MultiplayerARPG.MMO
                 {
                     case EStorageError.StorageErrorInvalidInventoryIndex:
                     case EStorageError.StorageErrorInvalidStorageIndex:
+                        BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, GameMessage.Type.InvalidItemData);
                         error = ResponseMoveItemFromStorageMessage.Error.InvalidItemIndex;
                         break;
                     case EStorageError.StorageErrorInventoryWillOverwhelming:
                     case EStorageError.StorageErrorStorageWillOverwhelming:
+                        BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, GameMessage.Type.CannotCarryAnymore);
                         error = ResponseMoveItemFromStorageMessage.Error.CannotCarryAllItems;
                         break;
                 }
@@ -87,16 +91,20 @@ namespace MultiplayerARPG.MMO
             }
             if (!GameInstance.ServerStorageHandlers.CanAccessStorage(playerCharacter, storageId))
             {
+                BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, GameMessage.Type.CannotAccessStorage);
                 result.Invoke(AckResponseCode.Error, new ResponseMoveItemToStorageMessage()
                 {
                     error = ResponseMoveItemToStorageMessage.Error.NotAllowed,
                 });
                 return;
             }
+            Storage storage = GameInstance.ServerStorageHandlers.GetStorage(storageId, out _);
             MoveItemToStorageReq req = new MoveItemToStorageReq();
             req.StorageType = (EStorageType)request.storageType;
             req.StorageOwnerId = request.storageOwnerId;
             req.CharacterId = request.characterId;
+            req.WeightLimit = storage.weightLimit;
+            req.SlotLimit = storage.slotLimit;
             req.InventoryItemIndex = request.inventoryIndex;
             req.InventoryItemAmount = request.amount;
             req.StorageItemIndex = request.storageItemIndex;
@@ -108,10 +116,12 @@ namespace MultiplayerARPG.MMO
                 {
                     case EStorageError.StorageErrorInvalidInventoryIndex:
                     case EStorageError.StorageErrorInvalidStorageIndex:
+                        BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, GameMessage.Type.InvalidItemData);
                         error = ResponseMoveItemToStorageMessage.Error.InvalidItemIndex;
                         break;
                     case EStorageError.StorageErrorInventoryWillOverwhelming:
                     case EStorageError.StorageErrorStorageWillOverwhelming:
+                        BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, GameMessage.Type.CannotCarryAnymore);
                         error = ResponseMoveItemToStorageMessage.Error.CannotCarryAllItems;
                         break;
                 }
@@ -144,16 +154,20 @@ namespace MultiplayerARPG.MMO
             }
             if (!GameInstance.ServerStorageHandlers.CanAccessStorage(playerCharacter, storageId))
             {
+                BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, GameMessage.Type.CannotAccessStorage);
                 result.Invoke(AckResponseCode.Error, new ResponseSwapOrMergeStorageItemMessage()
                 {
                     error = ResponseSwapOrMergeStorageItemMessage.Error.NotAllowed,
                 });
                 return;
             }
+            Storage storage = GameInstance.ServerStorageHandlers.GetStorage(storageId, out _);
             SwapOrMergeStorageItemReq req = new SwapOrMergeStorageItemReq();
             req.StorageType = (EStorageType)request.storageType;
             req.StorageOwnerId = request.storageOwnerId;
             req.CharacterId = request.characterId;
+            req.WeightLimit = storage.weightLimit;
+            req.SlotLimit = storage.slotLimit;
             req.FromIndex = request.fromIndex;
             req.ToIndex = request.toIndex;
             SwapOrMergeStorageItemResp resp = await DbServiceClient.SwapOrMergeStorageItemAsync(req);
@@ -164,6 +178,7 @@ namespace MultiplayerARPG.MMO
                 {
                     case EStorageError.StorageErrorInvalidInventoryIndex:
                     case EStorageError.StorageErrorInvalidStorageIndex:
+                        BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, GameMessage.Type.InvalidItemData);
                         error = ResponseSwapOrMergeStorageItemMessage.Error.InvalidItemIndex;
                         break;
                 }
@@ -171,6 +186,7 @@ namespace MultiplayerARPG.MMO
                 {
                     error = error,
                 });
+                return;
             }
             GameInstance.ServerStorageHandlers.SetStorageItems(storageId, DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.StorageCharacterItems));
             GameInstance.ServerStorageHandlers.NotifyStorageItemsUpdated(request.storageType, request.storageOwnerId);
