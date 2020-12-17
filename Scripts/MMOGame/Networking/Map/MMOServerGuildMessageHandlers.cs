@@ -579,7 +579,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanSetGuildMemberRole(playerCharacter);
+            ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanChangeGuildMemberRole(playerCharacter);
             if (!validateResult.IsSuccess)
             {
                 BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);
@@ -632,7 +632,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanSetGuildMemberRole(playerCharacter);
+            ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanIncreaseGuildSkillLevel(playerCharacter, request.dataId);
             if (!validateResult.IsSuccess)
             {
                 BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);
@@ -659,10 +659,10 @@ namespace MultiplayerARPG.MMO
             GuildResp resp = await DbServiceClient.AddGuildSkillAsync(new AddGuildSkillReq()
             {
                 GuildId = validateResult.GuildId,
-                SkillId = request.dataId
+                SkillId = request.dataId,
             });
             GuildData guild = resp.GuildData.FromByteString<GuildData>();
-            GameInstance.ServerGuildHandlers.SetGuild(validateResult.GuildId, validateResult.Guild);
+            GameInstance.ServerGuildHandlers.SetGuild(validateResult.GuildId, guild);
             // Broadcast via chat server
             if (ChatNetworkManager.IsClientConnected)
             {
