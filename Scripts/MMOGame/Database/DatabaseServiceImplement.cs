@@ -19,6 +19,7 @@ namespace MultiplayerARPG.MMO
         // In the future it may implements Redis
         // It's going to get some data from all tables but not every records
         // Just some records that players were requested
+        private ConcurrentHashSet<string> updatingCharacterIds = new ConcurrentHashSet<string>();
         private ConcurrentHashSet<string> cachedUsernames = new ConcurrentHashSet<string>(StringComparer.OrdinalIgnoreCase);
         private ConcurrentHashSet<string> cachedCharacterNames = new ConcurrentHashSet<string>(StringComparer.OrdinalIgnoreCase);
         private ConcurrentHashSet<string> cachedGuildNames = new ConcurrentHashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -195,11 +196,17 @@ namespace MultiplayerARPG.MMO
         public override async Task<CharacterResp> UpdateCharacter(UpdateCharacterReq request, ServerCallContext context)
         {
             PlayerCharacterData character = DatabaseServiceUtils.FromByteString<PlayerCharacterData>(request.CharacterData);
-            // Cache the data, it will be used later
-            cachedUserCharacter[character.Id] = character;
-            // Update data to database
-            // TODO: May update later to reduce amount of processes
-            await Database.UpdateCharacter(character);
+            // Avoid duplicating updates
+            if (!updatingCharacterIds.Contains(character.Id))
+            {
+                updatingCharacterIds.Add(character.Id);
+                // Cache the data, it will be used later
+                cachedUserCharacter[character.Id] = character;
+                // Update data to database
+                // TODO: May update later to reduce amount of processes
+                await Database.UpdateCharacter(character);
+                updatingCharacterIds.TryRemove(character.Id);
+            }
             return new CharacterResp()
             {
                 CharacterData = DatabaseServiceUtils.ToByteString(character)
