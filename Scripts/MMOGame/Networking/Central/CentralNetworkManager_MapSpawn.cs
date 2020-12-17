@@ -22,7 +22,7 @@ namespace MultiplayerARPG.MMO
 
         public bool RequestSpawnMap(long connectionId, RequestSpawnMapMessage message)
         {
-            return ServerSendRequest(connectionId, MMORequestTypes.RequestSpawnMap, message, duration: mapSpawnDuration);
+            return ServerSendRequest(connectionId, MMORequestTypes.RequestSpawnMap, message, millisecondsTimeout: mapSpawnMillisecondsTimeout);
         }
 
 #if UNITY_STANDALONE && !CLIENT_BUILD

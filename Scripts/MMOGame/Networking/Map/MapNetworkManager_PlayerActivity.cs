@@ -154,7 +154,7 @@ namespace MultiplayerARPG.MMO
                 instanceWarpPosition = position,
                 instanceWarpOverrideRotation = overrideRotation,
                 instanceWarpRotation = rotation,
-            }, responseDelegate: (responseHandler, responseCode, response) => OnRequestSpawnMap(responseHandler, responseCode, response, instanceId), duration: mapSpawnDuration);
+            }, responseDelegate: (responseHandler, responseCode, response) => OnRequestSpawnMap(responseHandler, responseCode, response, instanceId), millisecondsTimeout: mapSpawnMillisecondsTimeout);
 #endif
         }
 

@@ -47,7 +47,7 @@ namespace MultiplayerARPG.MMO
         public float autoSaveDuration = 2f;
 
         [Header("Map Spawn")]
-        public long mapSpawnDuration = 0;
+        public int mapSpawnMillisecondsTimeout = 0;
 
         private float terminatingTime;
 

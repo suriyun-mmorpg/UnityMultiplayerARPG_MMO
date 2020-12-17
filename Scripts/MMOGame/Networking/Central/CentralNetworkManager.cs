@@ -27,7 +27,7 @@ namespace MultiplayerARPG.MMO
 #endif
 
         [Header("Map Spawn")]
-        public long mapSpawnDuration = 0;
+        public int mapSpawnMillisecondsTimeout = 0;
 
         [Header("User Account")]
         public int minUsernameLength = 2;
