@@ -670,8 +670,8 @@ namespace MultiplayerARPG.MMO
                 ChatNetworkManager.SendSetGuildGold(null, MMOMessageTypes.UpdateGuild, validateResult.GuildId, guild.gold);
                 ChatNetworkManager.SendGuildLevelExpSkillPoint(null, MMOMessageTypes.UpdateGuild, validateResult.GuildId, guild.level, guild.exp, guild.skillPoint);
             }
-            BaseGameNetworkManager.Singleton.SendSetGuildSkillLevelToClients(validateResult.Guild, request.dataId);
-            BaseGameNetworkManager.Singleton.SendGuildLevelExpSkillPointToClients(validateResult.Guild);
+            BaseGameNetworkManager.Singleton.SendSetGuildSkillLevelToClients(guild, request.dataId);
+            BaseGameNetworkManager.Singleton.SendGuildLevelExpSkillPointToClients(guild);
             result.Invoke(AckResponseCode.Success, new ResponseIncreaseGuildSkillLevelMessage());
         }
     }
