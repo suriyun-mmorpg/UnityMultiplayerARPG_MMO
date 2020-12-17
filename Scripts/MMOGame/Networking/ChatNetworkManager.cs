@@ -256,8 +256,6 @@ namespace MultiplayerARPG.MMO
                             connectionIdsByCharacterId[message.data.id] = connectionId;
                             connectionIdsByCharacterName[message.data.characterName] = connectionId;
                             UpdateMapUser(UpdateUserCharacterMessage.UpdateType.Add, message.data, connectionId);
-                            if (LogInfo)
-                                Logging.Log(LogTag, "Add map user: " + message.data.userId + " by " + connectionId);
                         }
                         break;
                     case UpdateUserCharacterMessage.UpdateType.Remove:
@@ -267,8 +265,6 @@ namespace MultiplayerARPG.MMO
                             connectionIdsByCharacterId.Remove(userData.id);
                             connectionIdsByCharacterName.Remove(userData.characterName);
                             UpdateMapUser(UpdateUserCharacterMessage.UpdateType.Remove, userData, connectionId);
-                            if (LogInfo)
-                                Logging.Log(LogTag, "Remove map user: " + message.data.userId + " by " + connectionId);
                         }
                         break;
                     case UpdateUserCharacterMessage.UpdateType.Online:
@@ -276,8 +272,6 @@ namespace MultiplayerARPG.MMO
                         {
                             mapUsersById[message.data.id] = message.data;
                             UpdateMapUser(UpdateUserCharacterMessage.UpdateType.Online, message.data, connectionId);
-                            if (LogInfo)
-                                Logging.Log(LogTag, "Update map user: " + message.data.userId + " by " + connectionId);
                         }
                         break;
                 }
