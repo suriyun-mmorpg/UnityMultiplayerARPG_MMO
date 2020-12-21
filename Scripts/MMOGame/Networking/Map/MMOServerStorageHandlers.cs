@@ -210,8 +210,10 @@ namespace MultiplayerARPG.MMO
 
         public void ClearStorage()
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             storageItems.Clear();
             usingStorageCharacters.Clear();
+#endif
         }
 
         public void NotifyStorageItemsUpdated(StorageType storageType, string storageOwnerId)

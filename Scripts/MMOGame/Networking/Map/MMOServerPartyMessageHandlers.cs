@@ -23,6 +23,7 @@ namespace MultiplayerARPG.MMO
 
         public async UniTaskVoid HandleRequestAcceptPartyInvitation(RequestHandlerData requestHandler, RequestAcceptPartyInvitationMessage request, RequestProceedResultDelegate<ResponseAcceptPartyInvitationMessage> result)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             await UniTask.Yield();
             BasePlayerCharacterEntity playerCharacter;
             if (!GameInstance.ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
@@ -78,10 +79,12 @@ namespace MultiplayerARPG.MMO
             BaseGameNetworkManager.Singleton.SendAddPartyMembersToClient(requestHandler.ConnectionId, validateResult.Party);
             BaseGameNetworkManager.Singleton.SendAddPartyMemberToClients(validateResult.Party, playerCharacter.Id, playerCharacter.CharacterName, playerCharacter.DataId, playerCharacter.Level);
             result.Invoke(AckResponseCode.Success, new ResponseAcceptPartyInvitationMessage());
+#endif
         }
 
         public async UniTaskVoid HandleRequestDeclinePartyInvitation(RequestHandlerData requestHandler, RequestDeclinePartyInvitationMessage request, RequestProceedResultDelegate<ResponseDeclinePartyInvitationMessage> result)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             await UniTask.Yield();
             BasePlayerCharacterEntity playerCharacter;
             if (!GameInstance.ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
@@ -119,10 +122,12 @@ namespace MultiplayerARPG.MMO
             GameInstance.ServerPartyHandlers.RemovePartyInvitation(request.partyId, playerCharacter.Id);
             BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, GameMessage.Type.PartyInvitationDeclined);
             result.Invoke(AckResponseCode.Success, new ResponseDeclinePartyInvitationMessage());
+#endif
         }
 
         public async UniTaskVoid HandleRequestSendPartyInvitation(RequestHandlerData requestHandler, RequestSendPartyInvitationMessage request, RequestProceedResultDelegate<ResponseSendPartyInvitationMessage> result)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             await UniTask.Yield();
             BasePlayerCharacterEntity playerCharacter;
             if (!GameInstance.ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
@@ -177,10 +182,12 @@ namespace MultiplayerARPG.MMO
                 ShareItem = validateResult.Party.shareItem,
             });
             result.Invoke(AckResponseCode.Success, new ResponseSendPartyInvitationMessage());
+#endif
         }
 
         public async UniTaskVoid HandleRequestCreateParty(RequestHandlerData requestHandler, RequestCreatePartyMessage request, RequestProceedResultDelegate<ResponseCreatePartyMessage> result)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             await UniTask.Yield();
             BasePlayerCharacterEntity playerCharacter;
             if (!GameInstance.ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
@@ -230,10 +237,12 @@ namespace MultiplayerARPG.MMO
             BaseGameNetworkManager.Singleton.SendCreatePartyToClient(requestHandler.ConnectionId, party);
             BaseGameNetworkManager.Singleton.SendAddPartyMembersToClient(requestHandler.ConnectionId, party);
             result.Invoke(AckResponseCode.Success, new ResponseCreatePartyMessage());
+#endif
         }
 
         public async UniTaskVoid HandleRequestChangePartyLeader(RequestHandlerData requestHandler, RequestChangePartyLeaderMessage request, RequestProceedResultDelegate<ResponseChangePartyLeaderMessage> result)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             await UniTask.Yield();
             BasePlayerCharacterEntity playerCharacter;
             if (!GameInstance.ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
@@ -283,10 +292,12 @@ namespace MultiplayerARPG.MMO
                 ChatNetworkManager.SendChangePartyLeader(null, MMOMessageTypes.UpdateParty, validateResult.PartyId, request.memberId);
             BaseGameNetworkManager.Singleton.SendChangePartyLeaderToClients(validateResult.Party);
             result.Invoke(AckResponseCode.Success, new ResponseChangePartyLeaderMessage());
+#endif
         }
 
         public async UniTaskVoid HandleRequestKickMemberFromParty(RequestHandlerData requestHandler, RequestKickMemberFromPartyMessage request, RequestProceedResultDelegate<ResponseKickMemberFromPartyMessage> result)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             await UniTask.Yield();
             BasePlayerCharacterEntity playerCharacter;
             if (!GameInstance.ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
@@ -343,10 +354,12 @@ namespace MultiplayerARPG.MMO
                 ChatNetworkManager.SendRemoveSocialMember(null, MMOMessageTypes.UpdatePartyMember, validateResult.PartyId, request.memberId);
             BaseGameNetworkManager.Singleton.SendRemovePartyMemberToClients(validateResult.Party, request.memberId);
             result.Invoke(AckResponseCode.Success, new ResponseKickMemberFromPartyMessage());
+#endif
         }
 
         public async UniTaskVoid HandleRequestLeaveParty(RequestHandlerData requestHandler, RequestLeavePartyMessage request, RequestProceedResultDelegate<ResponseLeavePartyMessage> result)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             await UniTask.Yield();
             BasePlayerCharacterEntity playerCharacter;
             if (!GameInstance.ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
@@ -424,10 +437,12 @@ namespace MultiplayerARPG.MMO
                     ChatNetworkManager.SendRemoveSocialMember(null, MMOMessageTypes.UpdatePartyMember, validateResult.PartyId, playerCharacter.Id);
             }
             result.Invoke(AckResponseCode.Success, new ResponseLeavePartyMessage());
+#endif
         }
 
         public async UniTaskVoid HandleRequestChangePartySetting(RequestHandlerData requestHandler, RequestChangePartySettingMessage request, RequestProceedResultDelegate<ResponseChangePartySettingMessage> result)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             await UniTask.Yield();
             BasePlayerCharacterEntity playerCharacter;
             if (!GameInstance.ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
@@ -475,6 +490,7 @@ namespace MultiplayerARPG.MMO
                 ChatNetworkManager.SendPartySetting(null, MMOMessageTypes.UpdateParty, validateResult.PartyId, request.shareExp, request.shareItem);
             BaseGameNetworkManager.Singleton.SendPartySettingToClients(validateResult.Party);
             result.Invoke(AckResponseCode.Success, new ResponseChangePartySettingMessage());
+#endif
         }
     }
 }
