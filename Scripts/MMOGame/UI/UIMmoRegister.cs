@@ -76,41 +76,33 @@ namespace MultiplayerARPG.MMO
         {
             await UniTask.Yield();
             Registering = false;
-            if (responseCode == AckResponseCode.Timeout)
+            if (responseCode.ShowUnhandledResponseMessageDialog(() =>
             {
-                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_TIMEOUT.ToString()));
+                string errorMessage = string.Empty;
+                switch (response.error)
+                {
+                    case ResponseUserRegisterMessage.Error.TooShortUsername:
+                        errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_USERNAME_TOO_SHORT.ToString());
+                        break;
+                    case ResponseUserRegisterMessage.Error.TooLongUsername:
+                        errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_USERNAME_TOO_LONG.ToString());
+                        break;
+                    case ResponseUserRegisterMessage.Error.TooShortPassword:
+                        errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_PASSWORD_TOO_SHORT.ToString());
+                        break;
+                    case ResponseUserRegisterMessage.Error.UsernameAlreadyExisted:
+                        errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_USERNAME_EXISTED.ToString());
+                        break;
+                }
+                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), errorMessage);
+            }))
+            {
                 if (onRegisterFail != null)
                     onRegisterFail.Invoke();
                 return;
             }
-            switch (responseCode)
-            {
-                case AckResponseCode.Error:
-                    string errorMessage = string.Empty;
-                    switch (response.error)
-                    {
-                        case ResponseUserRegisterMessage.Error.TooShortUsername:
-                            errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_USERNAME_TOO_SHORT.ToString());
-                            break;
-                        case ResponseUserRegisterMessage.Error.TooLongUsername:
-                            errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_USERNAME_TOO_LONG.ToString());
-                            break;
-                        case ResponseUserRegisterMessage.Error.TooShortPassword:
-                            errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_PASSWORD_TOO_SHORT.ToString());
-                            break;
-                        case ResponseUserRegisterMessage.Error.UsernameAlreadyExisted:
-                            errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_USERNAME_EXISTED.ToString());
-                            break;
-                    }
-                    UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), errorMessage);
-                    if (onRegisterFail != null)
-                        onRegisterFail.Invoke();
-                    break;
-                default:
-                    if (onRegisterSuccess != null)
-                        onRegisterSuccess.Invoke();
-                    break;
-            }
+            if (onRegisterSuccess != null)
+                onRegisterSuccess.Invoke();
         }
     }
 }
