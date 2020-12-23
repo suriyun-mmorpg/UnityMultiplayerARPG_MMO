@@ -31,7 +31,7 @@ namespace MultiplayerARPG.MMO
                 BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, GameMessage.Type.NotFoundCharacter);
                 result.Invoke(AckResponseCode.Error, new ResponseAcceptPartyInvitationMessage()
                 {
-                    error = ResponseAcceptPartyInvitationMessage.Error.CharacterNotFound,
+                    error = ResponseAcceptPartyInvitationMessage.Error.NotLoggedIn,
                 });
                 return;
             }
@@ -92,7 +92,7 @@ namespace MultiplayerARPG.MMO
                 BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, GameMessage.Type.NotFoundCharacter);
                 result.Invoke(AckResponseCode.Error, new ResponseDeclinePartyInvitationMessage()
                 {
-                    error = ResponseDeclinePartyInvitationMessage.Error.CharacterNotFound,
+                    error = ResponseDeclinePartyInvitationMessage.Error.NotLoggedIn,
                 });
                 return;
             }
@@ -135,7 +135,7 @@ namespace MultiplayerARPG.MMO
                 BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, GameMessage.Type.NotFoundCharacter);
                 result.Invoke(AckResponseCode.Error, new ResponseSendPartyInvitationMessage()
                 {
-                    error = ResponseSendPartyInvitationMessage.Error.CharacterNotFound,
+                    error = ResponseSendPartyInvitationMessage.Error.NotLoggedIn,
                 });
                 return;
             }
@@ -195,7 +195,7 @@ namespace MultiplayerARPG.MMO
                 BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, GameMessage.Type.NotFoundCharacter);
                 result.Invoke(AckResponseCode.Error, new ResponseCreatePartyMessage()
                 {
-                    error = ResponseCreatePartyMessage.Error.CharacterNotFound,
+                    error = ResponseCreatePartyMessage.Error.NotLoggedIn,
                 });
                 return;
             }
@@ -249,7 +249,7 @@ namespace MultiplayerARPG.MMO
             {
                 result.Invoke(AckResponseCode.Error, new ResponseChangePartyLeaderMessage()
                 {
-                    error = ResponseChangePartyLeaderMessage.Error.CharacterNotFound,
+                    error = ResponseChangePartyLeaderMessage.Error.NotLoggedIn,
                 });
                 return;
             }
@@ -304,7 +304,7 @@ namespace MultiplayerARPG.MMO
             {
                 result.Invoke(AckResponseCode.Error, new ResponseKickMemberFromPartyMessage()
                 {
-                    error = ResponseKickMemberFromPartyMessage.Error.CharacterNotFound,
+                    error = ResponseKickMemberFromPartyMessage.Error.NotLoggedIn,
                 });
                 return;
             }
@@ -366,7 +366,7 @@ namespace MultiplayerARPG.MMO
             {
                 result.Invoke(AckResponseCode.Error, new ResponseLeavePartyMessage()
                 {
-                    error = ResponseLeavePartyMessage.Error.CharacterNotFound,
+                    error = ResponseLeavePartyMessage.Error.NotLoggedIn,
                 });
                 return;
             }
@@ -449,7 +449,7 @@ namespace MultiplayerARPG.MMO
             {
                 result.Invoke(AckResponseCode.Error, new ResponseChangePartySettingMessage()
                 {
-                    error = ResponseChangePartySettingMessage.Error.CharacterNotFound,
+                    error = ResponseChangePartySettingMessage.Error.NotLoggedIn,
                 });
                 return;
             }

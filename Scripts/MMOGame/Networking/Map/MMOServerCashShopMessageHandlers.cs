@@ -27,7 +27,7 @@ namespace MultiplayerARPG.MMO
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 // Cannot find user
-                error = ResponseCashShopInfoMessage.Error.UserNotFound;
+                error = ResponseCashShopInfoMessage.Error.NotLoggedIn;
             }
             else
             {
@@ -66,7 +66,7 @@ namespace MultiplayerARPG.MMO
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 // Cannot find user
-                error = ResponseCashShopBuyMessage.Error.UserNotFound;
+                error = ResponseCashShopBuyMessage.Error.NotLoggedIn;
             }
             else
             {
@@ -139,7 +139,7 @@ namespace MultiplayerARPG.MMO
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 // Cannot find user
-                error = ResponseCashPackageInfoMessage.Error.UserNotFound;
+                error = ResponseCashPackageInfoMessage.Error.NotLoggedIn;
             }
             else
             {
@@ -179,7 +179,7 @@ namespace MultiplayerARPG.MMO
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 // Cannot find user
-                error = ResponseCashPackageBuyValidationMessage.Error.UserNotFound;
+                error = ResponseCashPackageBuyValidationMessage.Error.NotLoggedIn;
             }
             else
             {

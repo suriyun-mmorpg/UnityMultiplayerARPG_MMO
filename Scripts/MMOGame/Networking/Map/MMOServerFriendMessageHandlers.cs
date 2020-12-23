@@ -22,7 +22,7 @@ namespace MultiplayerARPG.MMO
                 BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, GameMessage.Type.NotFoundCharacter);
                 result.Invoke(AckResponseCode.Error, new ResponseGetFriendsMessage()
                 {
-                    error = ResponseGetFriendsMessage.Error.CharacterNotFound,
+                    error = ResponseGetFriendsMessage.Error.NotLoggedIn,
                 });
                 return;
             }
@@ -46,7 +46,7 @@ namespace MultiplayerARPG.MMO
                 BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, GameMessage.Type.NotFoundCharacter);
                 result.Invoke(AckResponseCode.Error, new ResponseFindCharactersMessage()
                 {
-                    error = ResponseFindCharactersMessage.Error.CharacterNotFound,
+                    error = ResponseFindCharactersMessage.Error.NotLoggedIn,
                 });
                 return;
             }
@@ -70,7 +70,7 @@ namespace MultiplayerARPG.MMO
                 BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, GameMessage.Type.NotFoundCharacter);
                 result.Invoke(AckResponseCode.Error, new ResponseAddFriendMessage()
                 {
-                    error = ResponseAddFriendMessage.Error.CharacterNotFound,
+                    error = ResponseAddFriendMessage.Error.NotLoggedIn,
                 });
                 return;
             }
@@ -93,7 +93,7 @@ namespace MultiplayerARPG.MMO
                 BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, GameMessage.Type.NotFoundCharacter);
                 result.Invoke(AckResponseCode.Error, new ResponseRemoveFriendMessage()
                 {
-                    error = ResponseRemoveFriendMessage.Error.CharacterNotFound,
+                    error = ResponseRemoveFriendMessage.Error.NotLoggedIn,
                 });
                 return;
             }
