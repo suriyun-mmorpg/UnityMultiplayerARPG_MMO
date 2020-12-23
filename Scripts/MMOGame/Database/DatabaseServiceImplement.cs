@@ -669,7 +669,6 @@ namespace MultiplayerARPG.MMO
             List<CharacterItem> storageItems;
             if (!cachedStorageItems.TryGetValue(storageId, out storageItems))
             {
-                LiteNetLibManager.Logging.LogError("read1 " + storageId.GetId());
                 // Doesn't cached yet, so get data from database
                 storageItems = await Database.ReadStorageItems(storageId.storageType, storageId.storageOwnerId);
                 // Cache data, it will be used to validate later
@@ -688,7 +687,6 @@ namespace MultiplayerARPG.MMO
             List<CharacterItem> storageItemList;
             if (!cachedStorageItems.TryGetValue(storageId, out storageItemList))
             {
-                LiteNetLibManager.Logging.LogError("not " + storageId.GetId());
                 // Cannot find storage
                 resp.Error = EStorageError.StorageErrorInvalidStorage;
                 return resp;
