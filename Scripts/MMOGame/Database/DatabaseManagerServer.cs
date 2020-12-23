@@ -19,7 +19,7 @@ namespace MultiplayerARPG.MMO
             Server = new Server
             {
                 Services = { DatabaseService.BindService(new DatabaseServiceImplement(database)) },
-                Ports = { new ServerPort("localhost", port, credentials) }
+                Ports = { new ServerPort("0.0.0.0", port, credentials) }
             };
         }
 
