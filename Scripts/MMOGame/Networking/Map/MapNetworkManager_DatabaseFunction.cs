@@ -83,7 +83,7 @@ namespace MultiplayerARPG.MMO
             {
                 int i = 0;
                 List<UniTask> tasks = new List<UniTask>();
-                foreach (BasePlayerCharacterEntity playerCharacter in ServerPlayerCharacterHandlers.GetPlayerCharacters())
+                foreach (BasePlayerCharacterEntity playerCharacter in ServerUserHandlers.GetPlayerCharacters())
                 {
                     if (playerCharacter == null) continue;
                     tasks.Add(SaveCharacterRoutine(playerCharacter.CloneTo(new PlayerCharacterData()), playerCharacter.UserId));

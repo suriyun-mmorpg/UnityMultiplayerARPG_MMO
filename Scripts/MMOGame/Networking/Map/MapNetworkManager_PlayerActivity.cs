@@ -72,7 +72,7 @@ namespace MultiplayerARPG.MMO
             CentralServerPeerInfo peerInfo;
             BaseMapInfo mapInfo;
             if (!string.IsNullOrEmpty(mapName) &&
-                ServerPlayerCharacterHandlers.TryGetPlayerCharacter(connectionId, out _) &&
+                ServerUserHandlers.TryGetPlayerCharacter(connectionId, out _) &&
                 mapServerConnectionIdsBySceneName.TryGetValue(mapName, out peerInfo) &&
                 GameInstance.MapInfos.TryGetValue(mapName, out mapInfo) &&
                 mapInfo.IsSceneSet())
@@ -166,7 +166,7 @@ namespace MultiplayerARPG.MMO
             CentralServerPeerInfo peerInfo;
             InstanceMapWarpingLocation warpingLocation;
             BaseMapInfo mapInfo;
-            if (ServerPlayerCharacterHandlers.TryGetPlayerCharacter(connectionId, out _) &&
+            if (ServerUserHandlers.TryGetPlayerCharacter(connectionId, out _) &&
                 instanceMapWarpingLocations.TryGetValue(instanceId, out warpingLocation) &&
                 instanceMapServerConnectionIdsByInstanceId.TryGetValue(instanceId, out peerInfo) &&
                 GameInstance.MapInfos.TryGetValue(warpingLocation.mapName, out mapInfo) &&

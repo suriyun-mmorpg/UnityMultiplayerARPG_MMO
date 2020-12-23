@@ -24,7 +24,7 @@ namespace MultiplayerARPG.MMO
             int cash = 0;
             List<int> cashShopItemIds = new List<int>();
             IPlayerCharacterData playerCharacter;
-            if (!GameInstance.ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 // Cannot find user
                 error = ResponseCashShopInfoMessage.Error.UserNotFound;
@@ -63,7 +63,7 @@ namespace MultiplayerARPG.MMO
             int dataId = request.dataId;
             int cash = 0;
             IPlayerCharacterData playerCharacter;
-            if (!GameInstance.ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 // Cannot find user
                 error = ResponseCashShopBuyMessage.Error.UserNotFound;
@@ -136,7 +136,7 @@ namespace MultiplayerARPG.MMO
             int cash = 0;
             List<int> cashPackageIds = new List<int>();
             IPlayerCharacterData playerCharacter;
-            if (!GameInstance.ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 // Cannot find user
                 error = ResponseCashPackageInfoMessage.Error.UserNotFound;
@@ -176,7 +176,7 @@ namespace MultiplayerARPG.MMO
             int dataId = request.dataId;
             int cash = 0;
             IPlayerCharacterData playerCharacter;
-            if (!GameInstance.ServerPlayerCharacterHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 // Cannot find user
                 error = ResponseCashPackageBuyValidationMessage.Error.UserNotFound;
