@@ -43,8 +43,8 @@ namespace MultiplayerARPG.MMO
             req.WeightLimit = storage.weightLimit;
             req.SlotLimit = storage.slotLimit;
             req.StorageItemIndex = request.storageItemIndex;
-            req.StorageItemAmount = request.amount;
-            req.InventoryItemIndex = request.inventoryIndex;
+            req.StorageItemAmount = request.storageItemAmount;
+            req.InventoryItemIndex = request.inventoryItemIndex;
             MoveItemFromStorageResp resp = await DbServiceClient.MoveItemFromStorageAsync(req);
             if (resp.Error != EStorageError.StorageErrorNone)
             {
@@ -105,8 +105,8 @@ namespace MultiplayerARPG.MMO
             req.CharacterId = request.characterId;
             req.WeightLimit = storage.weightLimit;
             req.SlotLimit = storage.slotLimit;
-            req.InventoryItemIndex = request.inventoryIndex;
-            req.InventoryItemAmount = request.amount;
+            req.InventoryItemIndex = request.inventoryItemIndex;
+            req.InventoryItemAmount = request.inventoryItemAmount;
             req.StorageItemIndex = request.storageItemIndex;
             MoveItemToStorageResp resp = await DbServiceClient.MoveItemToStorageAsync(req);
             if (resp.Error != EStorageError.StorageErrorNone)

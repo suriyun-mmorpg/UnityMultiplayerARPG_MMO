@@ -38,7 +38,7 @@ namespace MultiplayerARPG.MMO
             }
             if (playerCharacter.Gold - request.gold < 0)
             {
-                BaseGameNetworkManager.Singleton.SendServerGameMessage(playerCharacter.ConnectionId, GameMessage.Type.NotEnoughGoldToDeposit);
+                BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, GameMessage.Type.NotEnoughGoldToDeposit);
                 result.Invoke(AckResponseCode.Error, new ResponseDepositGuildGoldMessage()
                 {
                     error = ResponseDepositGuildGoldMessage.Error.GoldNotEnough,
@@ -74,7 +74,7 @@ namespace MultiplayerARPG.MMO
             }
             if (playerCharacter.Gold - request.gold < 0)
             {
-                BaseGameNetworkManager.Singleton.SendServerGameMessage(playerCharacter.ConnectionId, GameMessage.Type.NotEnoughGoldToDeposit);
+                BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, GameMessage.Type.NotEnoughGoldToDeposit);
                 result.Invoke(AckResponseCode.Error, new ResponseDepositUserGoldMessage()
                 {
                     error = ResponseDepositUserGoldMessage.Error.GoldNotEnough,
@@ -124,7 +124,7 @@ namespace MultiplayerARPG.MMO
             int gold = goldResp.GuildGold - request.gold;
             if (gold < 0)
             {
-                BaseGameNetworkManager.Singleton.SendServerGameMessage(playerCharacter.ConnectionId, GameMessage.Type.NotEnoughGoldToWithdraw);
+                BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, GameMessage.Type.NotEnoughGoldToWithdraw);
                 result.Invoke(AckResponseCode.Error, new ResponseWithdrawGuildGoldMessage()
                 {
                     error = ResponseWithdrawGuildGoldMessage.Error.GoldNotEnough,
@@ -166,7 +166,7 @@ namespace MultiplayerARPG.MMO
             int gold = goldResp.Gold - request.gold;
             if (gold < 0)
             {
-                BaseGameNetworkManager.Singleton.SendServerGameMessage(playerCharacter.ConnectionId, GameMessage.Type.NotEnoughGoldToWithdraw);
+                BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, GameMessage.Type.NotEnoughGoldToWithdraw);
                 result.Invoke(AckResponseCode.Error, new ResponseWithdrawUserGoldMessage()
                 {
                     error = ResponseWithdrawUserGoldMessage.Error.GoldNotEnough,

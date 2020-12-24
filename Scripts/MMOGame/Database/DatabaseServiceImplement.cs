@@ -797,6 +797,7 @@ namespace MultiplayerARPG.MMO
                 }
                 // Remove from storage
                 storageItemList.DecreaseItemsByIndex(request.StorageItemIndex, (short)request.StorageItemAmount, isLimitSlot);
+                storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
             }
             else
             {
@@ -808,7 +809,6 @@ namespace MultiplayerARPG.MMO
                 storageItemList[request.StorageItemIndex] = nonEquipItem;
                 character.NonEquipItems[request.InventoryItemIndex] = storageItem;
             }
-            storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
             character.FillEmptySlots();
             // Update storage list
             // TODO: May update later to reduce amount of processes
