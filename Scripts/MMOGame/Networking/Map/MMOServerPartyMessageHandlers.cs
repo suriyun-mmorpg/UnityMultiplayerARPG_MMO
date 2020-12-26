@@ -295,6 +295,59 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
+        public async UniTaskVoid HandleRequestChangePartySetting(RequestHandlerData requestHandler, RequestChangePartySettingMessage request, RequestProceedResultDelegate<ResponseChangePartySettingMessage> result)
+        {
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            await UniTask.Yield();
+            BasePlayerCharacterEntity playerCharacter;
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            {
+                result.Invoke(AckResponseCode.Error, new ResponseChangePartySettingMessage()
+                {
+                    error = ResponseChangePartySettingMessage.Error.NotLoggedIn,
+                });
+                return;
+            }
+            ValidatePartyRequestResult validateResult = GameInstance.ServerPartyHandlers.CanChangePartySetting(playerCharacter);
+            if (!validateResult.IsSuccess)
+            {
+                BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);
+                ResponseChangePartySettingMessage.Error error;
+                switch (validateResult.GameMessageType)
+                {
+                    case GameMessage.Type.NotJoinedParty:
+                        error = ResponseChangePartySettingMessage.Error.NotJoined;
+                        break;
+                    case GameMessage.Type.NotPartyLeader:
+                        error = ResponseChangePartySettingMessage.Error.NotAllowed;
+                        break;
+                    default:
+                        error = ResponseChangePartySettingMessage.Error.NotAvailable;
+                        break;
+                }
+                result.Invoke(AckResponseCode.Error, new ResponseChangePartySettingMessage()
+                {
+                    error = error,
+                });
+                return;
+            }
+            validateResult.Party.Setting(request.shareExp, request.shareItem);
+            GameInstance.ServerPartyHandlers.SetParty(validateResult.PartyId, validateResult.Party);
+            // Save to database
+            _ = DbServiceClient.UpdatePartyAsync(new UpdatePartyReq()
+            {
+                PartyId = validateResult.PartyId,
+                ShareExp = request.shareExp,
+                ShareItem = request.shareItem
+            });
+            // Broadcast via chat server
+            if (ChatNetworkManager.IsClientConnected)
+                ChatNetworkManager.SendPartySetting(null, MMOMessageTypes.UpdateParty, validateResult.PartyId, request.shareExp, request.shareItem);
+            BaseGameNetworkManager.Singleton.SendPartySettingToClients(validateResult.Party);
+            result.Invoke(AckResponseCode.Success, new ResponseChangePartySettingMessage());
+#endif
+        }
+
         public async UniTaskVoid HandleRequestKickMemberFromParty(RequestHandlerData requestHandler, RequestKickMemberFromPartyMessage request, RequestProceedResultDelegate<ResponseKickMemberFromPartyMessage> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
@@ -437,59 +490,6 @@ namespace MultiplayerARPG.MMO
                     ChatNetworkManager.SendRemoveSocialMember(null, MMOMessageTypes.UpdatePartyMember, validateResult.PartyId, playerCharacter.Id);
             }
             result.Invoke(AckResponseCode.Success, new ResponseLeavePartyMessage());
-#endif
-        }
-
-        public async UniTaskVoid HandleRequestChangePartySetting(RequestHandlerData requestHandler, RequestChangePartySettingMessage request, RequestProceedResultDelegate<ResponseChangePartySettingMessage> result)
-        {
-#if UNITY_STANDALONE && !CLIENT_BUILD
-            await UniTask.Yield();
-            BasePlayerCharacterEntity playerCharacter;
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
-            {
-                result.Invoke(AckResponseCode.Error, new ResponseChangePartySettingMessage()
-                {
-                    error = ResponseChangePartySettingMessage.Error.NotLoggedIn,
-                });
-                return;
-            }
-            ValidatePartyRequestResult validateResult = GameInstance.ServerPartyHandlers.CanChangePartySetting(playerCharacter);
-            if (!validateResult.IsSuccess)
-            {
-                BaseGameNetworkManager.Singleton.SendServerGameMessage(requestHandler.ConnectionId, validateResult.GameMessageType);
-                ResponseChangePartySettingMessage.Error error;
-                switch (validateResult.GameMessageType)
-                {
-                    case GameMessage.Type.NotJoinedParty:
-                        error = ResponseChangePartySettingMessage.Error.NotJoined;
-                        break;
-                    case GameMessage.Type.NotPartyLeader:
-                        error = ResponseChangePartySettingMessage.Error.NotAllowed;
-                        break;
-                    default:
-                        error = ResponseChangePartySettingMessage.Error.NotAvailable;
-                        break;
-                }
-                result.Invoke(AckResponseCode.Error, new ResponseChangePartySettingMessage()
-                {
-                    error = error,
-                });
-                return;
-            }
-            validateResult.Party.Setting(request.shareExp, request.shareItem);
-            GameInstance.ServerPartyHandlers.SetParty(validateResult.PartyId, validateResult.Party);
-            // Save to database
-            _ = DbServiceClient.UpdatePartyAsync(new UpdatePartyReq()
-            {
-                PartyId = validateResult.PartyId,
-                ShareExp = request.shareExp,
-                ShareItem = request.shareItem
-            });
-            // Broadcast via chat server
-            if (ChatNetworkManager.IsClientConnected)
-                ChatNetworkManager.SendPartySetting(null, MMOMessageTypes.UpdateParty, validateResult.PartyId, request.shareExp, request.shareItem);
-            BaseGameNetworkManager.Singleton.SendPartySettingToClients(validateResult.Party);
-            result.Invoke(AckResponseCode.Success, new ResponseChangePartySettingMessage());
 #endif
         }
     }

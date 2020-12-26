@@ -296,13 +296,21 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
+            byte swappingGuildRole = validateResult.Guild.GetMemberRole(request.memberId);
             validateResult.Guild.SetLeader(request.memberId);
+            validateResult.Guild.SetMemberRole(playerCharacter.Id, swappingGuildRole);
+            playerCharacter.GuildRole = swappingGuildRole;
             GameInstance.ServerGuildHandlers.SetGuild(validateResult.GuildId, validateResult.Guild);
             // Save to database
             _ = DbServiceClient.UpdateGuildLeaderAsync(new UpdateGuildLeaderReq()
             {
                 GuildId = validateResult.GuildId,
                 LeaderCharacterId = request.memberId
+            });
+            _ = DbServiceClient.UpdateGuildMemberRoleAsync(new UpdateGuildMemberRoleReq()
+            {
+                MemberCharacterId = request.memberId,
+                GuildRole = validateResult.Guild.GetMemberRole(request.memberId)
             });
             _ = DbServiceClient.UpdateGuildMemberRoleAsync(new UpdateGuildMemberRoleReq()
             {
@@ -445,10 +453,10 @@ namespace MultiplayerARPG.MMO
             else
             {
                 playerCharacter.ClearGuild();
-                BaseGameNetworkManager.Singleton.SendGuildTerminateToClient(playerCharacter.ConnectionId, validateResult.GuildId);
                 validateResult.Guild.RemoveMember(playerCharacter.Id);
                 GameInstance.ServerGuildHandlers.SetGuild(validateResult.GuildId, validateResult.Guild);
                 BaseGameNetworkManager.Singleton.SendRemoveGuildMemberToClients(validateResult.Guild, playerCharacter.Id);
+                BaseGameNetworkManager.Singleton.SendGuildTerminateToClient(playerCharacter.ConnectionId, validateResult.GuildId);
                 // Save to database
                 _ = DbServiceClient.ClearCharacterGuildAsync(new ClearCharacterGuildReq()
                 {
@@ -553,18 +561,13 @@ namespace MultiplayerARPG.MMO
             validateResult.Guild.SetRole(request.guildRole, request.name, request.canInvite, request.canKick, request.shareExpPercentage);
             GameInstance.ServerGuildHandlers.SetGuild(validateResult.GuildId, validateResult.Guild);
             // Change characters guild role
-            IPlayerCharacterData memberCharacter;
+            PlayerCharacterEntity memberCharacter;
             foreach (string memberId in validateResult.Guild.GetMemberIds())
             {
                 if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(memberId, out memberCharacter))
                 {
-                    memberCharacter.GuildRole = validateResult.Guild.GetMemberRole(memberCharacter.Id);
-                    // Save to database
-                    _ = DbServiceClient.UpdateGuildMemberRoleAsync(new UpdateGuildMemberRoleReq()
-                    {
-                        MemberCharacterId = memberId,
-                        GuildRole = request.guildRole,
-                    });
+                    if (validateResult.Guild.GetMemberRole(memberCharacter.Id) == request.guildRole)
+                        memberCharacter.SharedGuildExp = request.shareExpPercentage;
                 }
             }
             // Save to database
@@ -623,9 +626,12 @@ namespace MultiplayerARPG.MMO
             }
             validateResult.Guild.SetMemberRole(request.memberId, request.guildRole);
             GameInstance.ServerGuildHandlers.SetGuild(validateResult.GuildId, validateResult.Guild);
-            IPlayerCharacterData memberCharacter;
+            BasePlayerCharacterEntity memberCharacter;
             if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(request.memberId, out memberCharacter))
-                memberCharacter.GuildRole = validateResult.Guild.GetMemberRole(memberCharacter.Id);
+            {
+                memberCharacter.GuildRole = request.guildRole;
+                memberCharacter.SharedGuildExp = validateResult.Guild.GetRole(request.guildRole).shareExpPercentage;
+            }
             // Save to database
             _ = DbServiceClient.UpdateGuildMemberRoleAsync(new UpdateGuildMemberRoleReq()
             {
