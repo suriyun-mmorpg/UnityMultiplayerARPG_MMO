@@ -24,7 +24,7 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
             if (!CanAccessStorage(playerCharacter, playerCharacter.CurrentStorageId))
             {
-                BaseGameNetworkManager.Singleton.SendServerGameMessage(playerCharacter.ConnectionId, GameMessage.Type.CannotAccessStorage);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(playerCharacter.ConnectionId, GameMessage.Type.CannotAccessStorage);
                 return;
             }
             if (!usingStorageCharacters.ContainsKey(playerCharacter.CurrentStorageId))

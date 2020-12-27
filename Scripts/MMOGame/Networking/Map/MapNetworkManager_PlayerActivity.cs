@@ -215,7 +215,7 @@ namespace MultiplayerARPG.MMO
                         if (Assets.TryGetSpawnedObject(warpingCharacter, out playerCharacterEntity))
                         {
                             playerCharacterEntity.IsWarping = false;
-                            SendServerGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.ServiceNotAvailable);
+                            ServerGameMessageHandlers.SendGameMessage(playerCharacterEntity.ConnectionId, GameMessage.Type.ServiceNotAvailable);
                         }
                     }
                     instanceMapWarpingCharactersByInstanceId.TryRemove(instanceId, out _);
