@@ -13,7 +13,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-        public async UniTaskVoid HandleRequestGetFriends(RequestHandlerData requestHandler, RequestGetFriendsMessage request, RequestProceedResultDelegate<ResponseGetFriendsMessage> result)
+        public async UniTaskVoid HandleRequestGetFriends(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<ResponseGetFriendsMessage> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             BasePlayerCharacterEntity playerCharacter;
@@ -28,7 +28,7 @@ namespace MultiplayerARPG.MMO
             }
             ReadFriendsResp resp = await DbServiceClient.ReadFriendsAsync(new ReadFriendsReq()
             {
-                CharacterId = request.characterId
+                CharacterId = playerCharacter.Id,
             });
             result.Invoke(AckResponseCode.Success, new ResponseGetFriendsMessage()
             {

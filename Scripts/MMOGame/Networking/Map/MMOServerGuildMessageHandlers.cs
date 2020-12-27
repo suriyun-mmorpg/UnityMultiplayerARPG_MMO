@@ -387,7 +387,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid HandleRequestLeaveGuild(RequestHandlerData requestHandler, RequestLeaveGuildMessage request, RequestProceedResultDelegate<ResponseLeaveGuildMessage> result)
+        public async UniTaskVoid HandleRequestLeaveGuild(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<ResponseLeaveGuildMessage> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             await UniTask.Yield();

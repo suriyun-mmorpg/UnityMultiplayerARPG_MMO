@@ -39,7 +39,7 @@ namespace MultiplayerARPG.MMO
             MoveItemFromStorageReq req = new MoveItemFromStorageReq();
             req.StorageType = (EStorageType)request.storageType;
             req.StorageOwnerId = request.storageOwnerId;
-            req.CharacterId = request.characterId;
+            req.CharacterId = playerCharacter.Id;
             req.WeightLimit = storage.weightLimit;
             req.SlotLimit = storage.slotLimit;
             req.StorageItemIndex = request.storageItemIndex;
@@ -102,7 +102,7 @@ namespace MultiplayerARPG.MMO
             MoveItemToStorageReq req = new MoveItemToStorageReq();
             req.StorageType = (EStorageType)request.storageType;
             req.StorageOwnerId = request.storageOwnerId;
-            req.CharacterId = request.characterId;
+            req.CharacterId = playerCharacter.Id;
             req.WeightLimit = storage.weightLimit;
             req.SlotLimit = storage.slotLimit;
             req.InventoryItemIndex = request.inventoryItemIndex;
@@ -165,7 +165,7 @@ namespace MultiplayerARPG.MMO
             SwapOrMergeStorageItemReq req = new SwapOrMergeStorageItemReq();
             req.StorageType = (EStorageType)request.storageType;
             req.StorageOwnerId = request.storageOwnerId;
-            req.CharacterId = request.characterId;
+            req.CharacterId = playerCharacter.Id;
             req.WeightLimit = storage.weightLimit;
             req.SlotLimit = storage.slotLimit;
             req.FromIndex = request.fromIndex;
