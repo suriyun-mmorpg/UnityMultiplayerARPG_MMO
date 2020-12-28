@@ -134,6 +134,7 @@ namespace MultiplayerARPG.MMO
             // Server Handlers
             ServerUserHandlers = gameObject.GetOrAddComponent<IServerUserHandlers, DefaultServerUserHandlers>();
             ServerBuildingHandlers = gameObject.GetOrAddComponent<IServerBuildingHandlers, DefaultServerBuildingHandlers>();
+            ServerOnlineCharacterHandlers = gameObject.GetOrAddComponent<IServerOnlineCharacterHandlers, DefaultServerOnlineCharacterHandlers>();
             ServerGameMessageHandlers = gameObject.GetOrAddComponent<IServerGameMessageHandlers, DefaultServerGameMessageHandlers>();
             ServerStorageHandlers = gameObject.GetOrAddComponent<IServerStorageHandlers, MMOServerStorageHandlers>();
             ServerPartyHandlers = gameObject.GetOrAddComponent<IServerPartyHandlers, DefaultServerPartyHandlers>();
@@ -156,7 +157,7 @@ namespace MultiplayerARPG.MMO
             ClientGuildHandlers = gameObject.GetOrAddComponent<IClientGuildHandlers, DefaultClientGuildHandlers>();
             ClientFriendHandlers = gameObject.GetOrAddComponent<IClientFriendHandlers, DefaultClientFriendHandlers>();
             ClientBankHandlers = gameObject.GetOrAddComponent<IClientBankHandlers, DefaultClientBankHandlers>();
-            ClientUserHandlers = gameObject.GetOrAddComponent<IClientUserHandlers, DefaultClientUserHandlers>();
+            ClientOnlineCharacterHandlers = gameObject.GetOrAddComponent<IClientOnlineCharacterHandlers, DefaultClientOnlineCharacterHandlers>();
             ClientGameMessageHandlers = gameObject.GetOrAddComponent<IClientGameMessageHandlers, DefaultClientGameMessageHandlers>();
 #endif
         }
@@ -735,7 +736,7 @@ namespace MultiplayerARPG.MMO
                 case UpdateUserCharacterMessage.UpdateType.Online:
                     if (usersById.ContainsKey(message.data.id))
                     {
-                        NotifyOnlineCharacter(message.data.id);
+                        ServerOnlineCharacterHandlers.MarkOnlineCharacter(message.data.id);
                         socialId = message.data.partyId;
                         if (socialId > 0 && ServerPartyHandlers.TryGetParty(socialId, out party))
                         {
