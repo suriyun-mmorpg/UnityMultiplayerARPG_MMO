@@ -79,7 +79,7 @@ namespace MultiplayerARPG.MMO
                 Character1Id = playerCharacter.Id,
                 Character2Id = request.friendId,
             });
-            BaseGameNetworkManager.Singleton.SendUpdateFriendsToClient(requestHandler.ConnectionId, resp.List.MakeArrayFromRepeatedByteString<SocialCharacterData>());
+            GameInstance.ServerGameMessageHandlers.SendSetFriends(requestHandler.ConnectionId, resp.List.MakeArrayFromRepeatedByteString<SocialCharacterData>());
             result.Invoke(AckResponseCode.Success, new ResponseAddFriendMessage());
 #endif
         }
@@ -102,7 +102,7 @@ namespace MultiplayerARPG.MMO
                 Character1Id = playerCharacter.Id,
                 Character2Id = request.friendId
             });
-            BaseGameNetworkManager.Singleton.SendUpdateFriendsToClient(requestHandler.ConnectionId, resp.List.MakeArrayFromRepeatedByteString<SocialCharacterData>());
+            GameInstance.ServerGameMessageHandlers.SendSetFriends(requestHandler.ConnectionId, resp.List.MakeArrayFromRepeatedByteString<SocialCharacterData>());
             result.Invoke(AckResponseCode.Success, new ResponseRemoveFriendMessage());
 #endif
         }

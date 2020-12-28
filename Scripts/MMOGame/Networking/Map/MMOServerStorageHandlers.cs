@@ -40,8 +40,8 @@ namespace MultiplayerARPG.MMO
             // Notify storage items to client
             uint storageObjectId;
             Storage storage = GetStorage(playerCharacter.CurrentStorageId, out storageObjectId);
-            BaseGameNetworkManager.Singleton.SendNotifyStorageOpenedToClient(playerCharacter.ConnectionId, playerCharacter.CurrentStorageId.storageType, playerCharacter.CurrentStorageId.storageOwnerId, storageObjectId, storage.weightLimit, storage.slotLimit);
-            BaseGameNetworkManager.Singleton.SendNotifyStorageItemsUpdatedToClient(playerCharacter.ConnectionId, GetStorageItems(playerCharacter.CurrentStorageId));
+            GameInstance.ServerGameMessageHandlers.NotifyStorageOpened(playerCharacter.ConnectionId, playerCharacter.CurrentStorageId.storageType, playerCharacter.CurrentStorageId.storageOwnerId, storageObjectId, storage.weightLimit, storage.slotLimit);
+            GameInstance.ServerGameMessageHandlers.NotifyStorageItems(playerCharacter.ConnectionId, GetStorageItems(playerCharacter.CurrentStorageId));
 #endif
         }
 
@@ -220,7 +220,7 @@ namespace MultiplayerARPG.MMO
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             StorageId storageId = new StorageId(storageType, storageOwnerId);
-            BaseGameNetworkManager.Singleton.SendNotifyStorageItemsUpdatedToClients(usingStorageCharacters[storageId], GetStorageItems(storageId));
+            GameInstance.ServerGameMessageHandlers.NotifyStorageItemsToClients(usingStorageCharacters[storageId], GetStorageItems(storageId));
 #endif
         }
 

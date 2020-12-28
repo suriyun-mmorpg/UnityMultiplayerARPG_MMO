@@ -54,7 +54,7 @@ namespace MultiplayerARPG.MMO
             guild.gold = changeGoldResp.GuildGold;
             playerCharacter.Gold -= request.gold;
             GameInstance.ServerGuildHandlers.SetGuild(playerCharacter.GuildId, guild);
-            BaseGameNetworkManager.Singleton.SendSetGuildGoldToClients(guild);
+            GameInstance.ServerGameMessageHandlers.SendSetGuildGoldToMembers(guild);
             result.Invoke(AckResponseCode.Success, new ResponseDepositGuildGoldMessage());
 #endif
         }
@@ -140,7 +140,7 @@ namespace MultiplayerARPG.MMO
             guild.gold = changeGoldResp.GuildGold;
             playerCharacter.Gold = playerCharacter.Gold.Increase(request.gold);
             GameInstance.ServerGuildHandlers.SetGuild(playerCharacter.GuildId, guild);
-            BaseGameNetworkManager.Singleton.SendSetGuildGoldToClients(guild);
+            GameInstance.ServerGameMessageHandlers.SendSetGuildGoldToMembers(guild);
             result.Invoke(AckResponseCode.Success, new ResponseWithdrawGuildGoldMessage());
 #endif
         }

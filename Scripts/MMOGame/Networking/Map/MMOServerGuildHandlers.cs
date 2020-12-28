@@ -81,7 +81,7 @@ namespace MultiplayerARPG.MMO
             });
             GuildData guild = resp.GuildData.FromByteString<GuildData>();
             SetGuild(validateResult.GuildId, guild);
-            BaseGameNetworkManager.Singleton.SendGuildLevelExpSkillPointToClients(guild);
+            GameInstance.ServerGameMessageHandlers.SendSetGuildLevelExpSkillPointToMembers(guild);
 #endif
         }
 

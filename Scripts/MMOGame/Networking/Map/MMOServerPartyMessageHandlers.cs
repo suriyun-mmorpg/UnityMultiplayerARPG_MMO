@@ -75,9 +75,9 @@ namespace MultiplayerARPG.MMO
             if (ChatNetworkManager.IsClientConnected)
                 ChatNetworkManager.SendAddSocialMember(null, MMOMessageTypes.UpdatePartyMember, request.partyId, playerCharacter.Id, playerCharacter.CharacterName, playerCharacter.DataId, playerCharacter.Level);
             GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, GameMessage.Type.PartyInvitationAccepted);
-            BaseGameNetworkManager.Singleton.SendCreatePartyToClient(requestHandler.ConnectionId, validateResult.Party);
-            BaseGameNetworkManager.Singleton.SendAddPartyMembersToClient(requestHandler.ConnectionId, validateResult.Party);
-            BaseGameNetworkManager.Singleton.SendAddPartyMemberToClients(validateResult.Party, playerCharacter.Id, playerCharacter.CharacterName, playerCharacter.DataId, playerCharacter.Level);
+            GameInstance.ServerGameMessageHandlers.SendSetPartyData(requestHandler.ConnectionId, validateResult.Party);
+            GameInstance.ServerGameMessageHandlers.SendAddPartyMembersToOne(requestHandler.ConnectionId, validateResult.Party);
+            GameInstance.ServerGameMessageHandlers.SendAddPartyMembersToMembers(validateResult.Party, playerCharacter.Id, playerCharacter.CharacterName, playerCharacter.DataId, playerCharacter.Level);
             result.Invoke(AckResponseCode.Success, new ResponseAcceptPartyInvitationMessage());
 #endif
         }
@@ -172,7 +172,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             GameInstance.ServerPartyHandlers.AppendPartyInvitation(playerCharacter.PartyId, request.inviteeId);
-            BaseGameNetworkManager.Singleton.SendNotifyPartyInvitationToClient(inviteeCharacter.ConnectionId, new PartyInvitationData()
+            GameInstance.ServerGameMessageHandlers.SendNotifyPartyInvitation(inviteeCharacter.ConnectionId, new PartyInvitationData()
             {
                 InviterId = playerCharacter.Id,
                 InviterName = playerCharacter.CharacterName,
@@ -234,8 +234,8 @@ namespace MultiplayerARPG.MMO
                 ChatNetworkManager.SendCreateParty(null, MMOMessageTypes.UpdateParty, party.id, party.shareExp, party.shareItem, playerCharacter.Id);
                 ChatNetworkManager.SendAddSocialMember(null, MMOMessageTypes.UpdatePartyMember, party.id, playerCharacter.Id, playerCharacter.CharacterName, playerCharacter.DataId, playerCharacter.Level);
             }
-            BaseGameNetworkManager.Singleton.SendCreatePartyToClient(requestHandler.ConnectionId, party);
-            BaseGameNetworkManager.Singleton.SendAddPartyMembersToClient(requestHandler.ConnectionId, party);
+            GameInstance.ServerGameMessageHandlers.SendSetPartyData(requestHandler.ConnectionId, party);
+            GameInstance.ServerGameMessageHandlers.SendAddPartyMembersToOne(requestHandler.ConnectionId, party);
             result.Invoke(AckResponseCode.Success, new ResponseCreatePartyMessage());
 #endif
         }
@@ -290,7 +290,7 @@ namespace MultiplayerARPG.MMO
             // Broadcast via chat server
             if (ChatNetworkManager.IsClientConnected)
                 ChatNetworkManager.SendChangePartyLeader(null, MMOMessageTypes.UpdateParty, validateResult.PartyId, request.memberId);
-            BaseGameNetworkManager.Singleton.SendChangePartyLeaderToClients(validateResult.Party);
+            GameInstance.ServerGameMessageHandlers.SendSetPartyLeaderToMembers(validateResult.Party);
             result.Invoke(AckResponseCode.Success, new ResponseChangePartyLeaderMessage());
 #endif
         }
@@ -343,7 +343,7 @@ namespace MultiplayerARPG.MMO
             // Broadcast via chat server
             if (ChatNetworkManager.IsClientConnected)
                 ChatNetworkManager.SendPartySetting(null, MMOMessageTypes.UpdateParty, validateResult.PartyId, request.shareExp, request.shareItem);
-            BaseGameNetworkManager.Singleton.SendPartySettingToClients(validateResult.Party);
+            GameInstance.ServerGameMessageHandlers.SendSetPartySettingToMembers(validateResult.Party);
             result.Invoke(AckResponseCode.Success, new ResponseChangePartySettingMessage());
 #endif
         }
@@ -393,7 +393,7 @@ namespace MultiplayerARPG.MMO
             if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(request.memberId, out memberEntity))
             {
                 memberEntity.ClearParty();
-                BaseGameNetworkManager.Singleton.SendPartyTerminateToClient(memberEntity.ConnectionId, validateResult.PartyId);
+                GameInstance.ServerGameMessageHandlers.SendClearPartyData(memberEntity.ConnectionId, validateResult.PartyId);
             }
             validateResult.Party.RemoveMember(request.memberId);
             GameInstance.ServerPartyHandlers.SetParty(validateResult.PartyId, validateResult.Party);
@@ -405,7 +405,7 @@ namespace MultiplayerARPG.MMO
             // Broadcast via chat server
             if (ChatNetworkManager.IsClientConnected)
                 ChatNetworkManager.SendRemoveSocialMember(null, MMOMessageTypes.UpdatePartyMember, validateResult.PartyId, request.memberId);
-            BaseGameNetworkManager.Singleton.SendRemovePartyMemberToClients(validateResult.Party, request.memberId);
+            GameInstance.ServerGameMessageHandlers.SendRemovePartyMemberToMembers(validateResult.Party, request.memberId);
             result.Invoke(AckResponseCode.Success, new ResponseKickMemberFromPartyMessage());
 #endif
         }
@@ -452,7 +452,7 @@ namespace MultiplayerARPG.MMO
                     if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(memberId, out memberCharacter))
                     {
                         memberCharacter.ClearParty();
-                        BaseGameNetworkManager.Singleton.SendPartyTerminateToClient(memberCharacter.ConnectionId, validateResult.PartyId);
+                        GameInstance.ServerGameMessageHandlers.SendClearPartyData(memberCharacter.ConnectionId, validateResult.PartyId);
                     }
                     // Save to database
                     _ = DbServiceClient.ClearCharacterPartyAsync(new ClearCharacterPartyReq()
@@ -476,10 +476,10 @@ namespace MultiplayerARPG.MMO
             else
             {
                 playerCharacter.ClearParty();
-                BaseGameNetworkManager.Singleton.SendPartyTerminateToClient(playerCharacter.ConnectionId, validateResult.PartyId);
+                GameInstance.ServerGameMessageHandlers.SendClearPartyData(playerCharacter.ConnectionId, validateResult.PartyId);
                 validateResult.Party.RemoveMember(playerCharacter.Id);
                 GameInstance.ServerPartyHandlers.SetParty(validateResult.PartyId, validateResult.Party);
-                BaseGameNetworkManager.Singleton.SendRemovePartyMemberToClients(validateResult.Party, playerCharacter.Id);
+                GameInstance.ServerGameMessageHandlers.SendRemovePartyMemberToMembers(validateResult.Party, playerCharacter.Id);
                 // Save to database
                 _ = DbServiceClient.ClearCharacterPartyAsync(new ClearCharacterPartyReq()
                 {
