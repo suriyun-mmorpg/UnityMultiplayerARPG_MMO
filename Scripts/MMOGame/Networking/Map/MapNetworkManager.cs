@@ -157,6 +157,7 @@ namespace MultiplayerARPG.MMO
             ClientFriendHandlers = gameObject.GetOrAddComponent<IClientFriendHandlers, DefaultClientFriendHandlers>();
             ClientBankHandlers = gameObject.GetOrAddComponent<IClientBankHandlers, DefaultClientBankHandlers>();
             ClientUserHandlers = gameObject.GetOrAddComponent<IClientUserHandlers, DefaultClientUserHandlers>();
+            ClientGameMessageHandlers = gameObject.GetOrAddComponent<IClientGameMessageHandlers, DefaultClientGameMessageHandlers>();
 #endif
         }
 
@@ -758,7 +759,7 @@ namespace MultiplayerARPG.MMO
         {
             PartyData party;
             BasePlayerCharacterEntity playerCharacterEntity;
-            if (ServerPartyHandlers.TryGetParty(message.id, out party) && UpdateSocialGroupMember(party, message))
+            if (ServerPartyHandlers.TryGetParty(message.id, out party) && party.UpdateSocialGroupMember(message))
             {
                 switch (message.type)
                 {
@@ -820,7 +821,7 @@ namespace MultiplayerARPG.MMO
         {
             GuildData guild;
             BasePlayerCharacterEntity playerCharacterEntity;
-            if (ServerGuildHandlers.TryGetGuild(message.id, out guild) && UpdateSocialGroupMember(guild, message))
+            if (ServerGuildHandlers.TryGetGuild(message.id, out guild) && guild.UpdateSocialGroupMember(message))
             {
                 switch (message.type)
                 {
