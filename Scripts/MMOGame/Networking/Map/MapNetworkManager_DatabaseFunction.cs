@@ -122,7 +122,7 @@ namespace MultiplayerARPG.MMO
             {
                 int i = 0;
                 List<UniTask> tasks = new List<UniTask>();
-                foreach (BuildingEntity buildingEntity in BuildingEntities.Values)
+                foreach (BuildingEntity buildingEntity in ServerBuildingHandlers.GetBuildings())
                 {
                     if (buildingEntity == null) continue;
                     tasks.Add(SaveBuildingRoutine(buildingEntity.CloneTo(new BuildingSaveData())));

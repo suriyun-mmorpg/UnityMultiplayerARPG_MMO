@@ -133,6 +133,7 @@ namespace MultiplayerARPG.MMO
             ChatNetworkManager = gameObject.AddComponent<ChatNetworkManager>();
             // Server Handlers
             ServerUserHandlers = gameObject.GetOrAddComponent<IServerUserHandlers, DefaultServerUserHandlers>();
+            ServerBuildingHandlers = gameObject.GetOrAddComponent<IServerBuildingHandlers, DefaultServerBuildingHandlers>();
             ServerGameMessageHandlers = gameObject.GetOrAddComponent<IServerGameMessageHandlers, DefaultServerGameMessageHandlers>();
             ServerStorageHandlers = gameObject.GetOrAddComponent<IServerStorageHandlers, MMOServerStorageHandlers>();
             ServerPartyHandlers = gameObject.GetOrAddComponent<IServerPartyHandlers, DefaultServerPartyHandlers>();
@@ -257,7 +258,7 @@ namespace MultiplayerARPG.MMO
                     });
                 }
                 string mapName = CurrentMapInfo.Id;
-                foreach (BuildingEntity buildingEntity in BuildingEntities.Values)
+                foreach (BuildingEntity buildingEntity in ServerBuildingHandlers.GetBuildings())
                 {
                     if (buildingEntity == null) continue;
                     DbServiceClient.UpdateBuilding(new UpdateBuildingReq()
