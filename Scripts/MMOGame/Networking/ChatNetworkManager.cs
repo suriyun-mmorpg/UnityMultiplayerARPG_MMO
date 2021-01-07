@@ -5,6 +5,7 @@ using LiteNetLib;
 
 namespace MultiplayerARPG.MMO
 {
+    [DefaultExecutionOrder(-896)]
     public partial class ChatNetworkManager : LiteNetLibManager.LiteNetLibManager, IAppServer
     {
         [Header("Central Network Connection")]

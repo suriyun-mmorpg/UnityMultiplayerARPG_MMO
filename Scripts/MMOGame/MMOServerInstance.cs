@@ -10,6 +10,7 @@ using MiniJSON;
 namespace MultiplayerARPG.MMO
 {
     [RequireComponent(typeof(LogGUI))]
+    [DefaultExecutionOrder(-899)]
     public class MMOServerInstance : MonoBehaviour
     {
         public static MMOServerInstance Singleton { get; protected set; }

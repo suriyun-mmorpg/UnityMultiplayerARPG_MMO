@@ -9,6 +9,7 @@ using System.Collections.Concurrent;
 
 namespace MultiplayerARPG.MMO
 {
+    [DefaultExecutionOrder(-894)]
     public sealed partial class MapNetworkManager : BaseGameNetworkManager, IAppServer
     {
         public const float TERMINATE_INSTANCE_DELAY = 30f;  // Close instance when no clients connected within 30 seconds

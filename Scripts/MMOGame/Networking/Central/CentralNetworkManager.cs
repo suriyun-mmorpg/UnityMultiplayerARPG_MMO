@@ -5,6 +5,7 @@ using LiteNetLibManager;
 
 namespace MultiplayerARPG.MMO
 {
+    [DefaultExecutionOrder(-897)]
     public partial class CentralNetworkManager : LiteNetLibManager.LiteNetLibManager
     {
 #if UNITY_STANDALONE && !CLIENT_BUILD

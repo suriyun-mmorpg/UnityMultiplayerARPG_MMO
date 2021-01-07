@@ -4,6 +4,7 @@ using LiteNetLibManager;
 
 namespace MultiplayerARPG.MMO
 {
+    [DefaultExecutionOrder(-898)]
     public class DatabaseNetworkManager : MonoBehaviour
     {
         [SerializeField]

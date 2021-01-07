@@ -12,6 +12,7 @@ using LiteNetLib.Utils;
 
 namespace MultiplayerARPG.MMO
 {
+    [DefaultExecutionOrder(-895)]
     public partial class MapSpawnNetworkManager : LiteNetLibManager.LiteNetLibManager, IAppServer
     {
         [Header("Central Network Connection")]
