@@ -25,6 +25,8 @@ namespace MultiplayerARPG.MMO
         public const string ARG_CENTRAL_MAX_CONNECTIONS = "-" + CONFIG_CENTRAL_MAX_CONNECTIONS;
         public const string CONFIG_MACHINE_ADDRESS = "machineAddress";
         public const string ARG_MACHINE_ADDRESS = "-" + CONFIG_MACHINE_ADDRESS;
+        public const string CONFIG_USE_WEB_SOCKET = "useWebSocket";
+        public const string ARG_USE_WEB_SOCKET = "-" + CONFIG_USE_WEB_SOCKET;
         // Map spawn server
         public const string CONFIG_MAP_SPAWN_PORT = "mapSpawnPort";
         public const string ARG_MAP_SPAWN_PORT = "-" + CONFIG_MAP_SPAWN_PORT;
@@ -149,12 +151,6 @@ namespace MultiplayerARPG.MMO
             // Always accept SSL
             ServicePointManager.ServerCertificateValidationCallback += new RemoteCertificateValidationCallback((sender, certificate, chain, policyErrors) => { return true; });
 
-            // Active WebSockets
-            CentralNetworkManager.useWebSocket = UseWebSocket;
-            MapSpawnNetworkManager.useWebSocket = UseWebSocket;
-            MapNetworkManager.useWebSocket = UseWebSocket;
-            ChatNetworkManager.useWebSocket = UseWebSocket;
-
             CacheLogGUI.enabled = false;
 #if UNITY_STANDALONE && !CLIENT_BUILD
             GameInstance gameInstance = FindObjectOfType<GameInstance>();
@@ -187,6 +183,17 @@ namespace MultiplayerARPG.MMO
                 {
                     DatabaseNetworkManager.SetDatabaseByOptionIndex(dbOptionIndex);
                 }
+                
+                // Active WebSockets
+                bool useWebSocket = ConfigReader.IsArgsProvided(args, ARG_USE_WEB_SOCKET);
+                if (useWebSocket || ConfigReader.ReadConfigs(jsonConfig, CONFIG_USE_WEB_SOCKET, out useWebSocket))
+                {
+                    useWebSocket = useWebSocket;
+                }
+                CentralNetworkManager.useWebSocket = UseWebSocket;
+                MapSpawnNetworkManager.useWebSocket = UseWebSocket;
+                MapNetworkManager.useWebSocket = UseWebSocket;
+                ChatNetworkManager.useWebSocket = UseWebSocket;
 
                 // Central network address
                 string centralNetworkAddress;
@@ -421,6 +428,12 @@ namespace MultiplayerARPG.MMO
             {
                 DatabaseNetworkManager.SetDatabaseByOptionIndex(databaseOptionIndex);
 
+                // Active WebSockets
+                CentralNetworkManager.useWebSocket = UseWebSocket;
+                MapSpawnNetworkManager.useWebSocket = UseWebSocket;
+                MapNetworkManager.useWebSocket = UseWebSocket;
+                ChatNetworkManager.useWebSocket = UseWebSocket;
+
                 if (startDatabaseOnAwake)
                     startingDatabaseServer = true;
 
@@ -509,7 +522,7 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-#region Server functions
+        #region Server functions
         public void StartCentralServer()
         {
             centralNetworkManager.StartServer();
@@ -539,7 +552,7 @@ namespace MultiplayerARPG.MMO
         {
             DatabaseNetworkManager.StartClient();
         }
-#endregion
+        #endregion
 #endif
     }
 }
