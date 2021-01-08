@@ -188,7 +188,7 @@ namespace MultiplayerARPG.MMO
                 bool useWebSocket = ConfigReader.IsArgsProvided(args, ARG_USE_WEB_SOCKET);
                 if (useWebSocket || ConfigReader.ReadConfigs(jsonConfig, CONFIG_USE_WEB_SOCKET, out useWebSocket))
                 {
-                    useWebSocket = useWebSocket;
+                    this.useWebSocket = useWebSocket;
                 }
                 CentralNetworkManager.useWebSocket = UseWebSocket;
                 MapSpawnNetworkManager.useWebSocket = UseWebSocket;
