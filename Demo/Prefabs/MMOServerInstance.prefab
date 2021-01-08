@@ -93,10 +93,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentLogLevel: 2
   networkAddress: localhost
-  networkPort: 6000
+  networkPort: 7000
   useWebSocket: 0
   maxConnections: 1100
   transportFactory: {fileID: 0}
+  facebookLoginRequestType: 210
+  googlePlayLoginRequestType: 211
+  mapSpawnMillisecondsTimeout: 0
   minUsernameLength: 2
   maxUsernameLength: 24
   minPasswordLength: 2
@@ -275,7 +278,7 @@ MonoBehaviour:
   startCentralOnAwake: 0
   startMapSpawnOnAwake: 0
   startChatOnAwake: 0
-  startDatabaseManagerOnAwake: 0
+  startDatabaseOnAwake: 0
   startMapOnAwake: 0
   startingMap: {fileID: 11400000, guid: de8b0e4099f8d444692e88f92309e90d, type: 2}
   databaseOptionIndex: 0
