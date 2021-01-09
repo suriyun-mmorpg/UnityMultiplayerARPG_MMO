@@ -18,11 +18,11 @@ namespace MultiplayerARPG.MMO
             error = (Error)reader.GetByte();
 
             characters = new List<PlayerCharacterData>();
-            int count = reader.GetInt();
-            for (int i = 0; i < count; ++i)
+            byte count = reader.GetByte();
+            for (byte i = 0; i < count; ++i)
             {
                 PlayerCharacterData character = new PlayerCharacterData();
-                characters.Add(character.DeserializeCharacterData(reader));
+                characters.Add(character.DeserializeCharacterData(reader, true));
             }
         }
 
@@ -31,10 +31,10 @@ namespace MultiplayerARPG.MMO
             writer.Put((byte)error);
             if (characters == null)
                 characters = new List<PlayerCharacterData>();
-            writer.Put(characters.Count);
+            writer.Put((byte)characters.Count);
             foreach (PlayerCharacterData character in characters)
             {
-                character.SerializeCharacterData(writer);
+                character.SerializeCharacterData(writer, true);
             }
         }
     }
