@@ -30,11 +30,16 @@ namespace MultiplayerARPG.MMO
         {
             writer.Put((byte)error);
             if (characters == null)
-                characters = new List<PlayerCharacterData>();
-            writer.Put((byte)characters.Count);
-            foreach (PlayerCharacterData character in characters)
             {
-                character.SerializeCharacterData(writer, true);
+                writer.Put((byte)0);
+            }
+            else
+            {
+                writer.Put((byte)characters.Count);
+                foreach (PlayerCharacterData character in characters)
+                {
+                    character.SerializeCharacterData(writer, true);
+                }
             }
         }
     }
