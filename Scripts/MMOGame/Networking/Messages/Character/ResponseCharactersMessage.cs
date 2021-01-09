@@ -31,7 +31,7 @@ namespace MultiplayerARPG.MMO
             writer.Put((byte)error);
             if (characters == null)
             {
-                writer.Put((byte)0);
+                writer.Put(byte.MinValue);
             }
             else
             {
