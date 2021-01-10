@@ -67,10 +67,7 @@ namespace MultiplayerARPG.MMO
             IncreaseStorageItemsResp resp = await DbServiceClient.IncreaseStorageItemsAsync(req);
             if (resp.Error != EStorageError.StorageErrorNone)
             {
-                if (resp.Error == EStorageError.StorageErrorStorageWillOverwhelming)
-                {
-                    // TODO: May push error message
-                }
+                // Error ocurring, storage may overwhelming let's it drop items to ground
                 return false;
             }
             SetStorageItems(storageId, DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.StorageCharacterItems));
@@ -95,10 +92,7 @@ namespace MultiplayerARPG.MMO
             DecreaseStorageItemsResp resp = await DbServiceClient.DecreaseStorageItemsAsync(req);
             if (resp.Error != EStorageError.StorageErrorNone)
             {
-                if (resp.Error == EStorageError.StorageErrorStorageWillOverwhelming)
-                {
-                    // TODO: May push error message
-                }
+                // Error ocurring, storage may overwhelming let's it drop items to ground
                 return new DecreaseStorageItemsResult();
             }
             SetStorageItems(storageId, DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.StorageCharacterItems));
