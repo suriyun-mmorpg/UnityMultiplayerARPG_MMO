@@ -694,8 +694,7 @@ namespace MultiplayerARPG.MMO
             if (ChatNetworkManager.IsClientConnected)
             {
                 ChatNetworkManager.SendSetGuildSkillLevel(null, MMOMessageTypes.UpdateGuild, validateResult.GuildId, request.dataId, guild.GetSkillLevel(request.dataId));
-                ChatNetworkManager.SendSetGuildGold(null, MMOMessageTypes.UpdateGuild, validateResult.GuildId, guild.gold);
-                ChatNetworkManager.SendGuildLevelExpSkillPoint(null, MMOMessageTypes.UpdateGuild, validateResult.GuildId, guild.level, guild.exp, guild.skillPoint);
+                ChatNetworkManager.SendSetGuildLevelExpSkillPoint(null, MMOMessageTypes.UpdateGuild, validateResult.GuildId, guild.level, guild.exp, guild.skillPoint);
             }
             GameInstance.ServerGameMessageHandlers.SendSetGuildSkillLevelToMembers(guild, request.dataId);
             GameInstance.ServerGameMessageHandlers.SendSetGuildLevelExpSkillPointToMembers(guild);

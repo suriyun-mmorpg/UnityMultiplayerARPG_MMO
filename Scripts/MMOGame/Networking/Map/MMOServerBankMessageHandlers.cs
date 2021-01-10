@@ -6,6 +6,8 @@ namespace MultiplayerARPG.MMO
 {
     public class MMOServerBankMessageHandlers : MonoBehaviour, IServerBankMessageHandlers
     {
+        public ChatNetworkManager ChatNetworkManager { get; private set; }
+
 #if UNITY_STANDALONE && !CLIENT_BUILD
         public DatabaseService.DatabaseServiceClient DbServiceClient
         {
@@ -54,6 +56,11 @@ namespace MultiplayerARPG.MMO
             guild.gold = changeGoldResp.GuildGold;
             playerCharacter.Gold -= request.gold;
             GameInstance.ServerGuildHandlers.SetGuild(playerCharacter.GuildId, guild);
+            // Broadcast via chat server
+            if (ChatNetworkManager.IsClientConnected)
+            {
+                ChatNetworkManager.SendSetGuildGold(null, MMOMessageTypes.UpdateGuild, guild.id, guild.gold);
+            }
             GameInstance.ServerGameMessageHandlers.SendSetGuildGoldToMembers(guild);
             result.Invoke(AckResponseCode.Success, new ResponseDepositGuildGoldMessage());
 #endif
@@ -140,6 +147,11 @@ namespace MultiplayerARPG.MMO
             guild.gold = changeGoldResp.GuildGold;
             playerCharacter.Gold = playerCharacter.Gold.Increase(request.gold);
             GameInstance.ServerGuildHandlers.SetGuild(playerCharacter.GuildId, guild);
+            // Broadcast via chat server
+            if (ChatNetworkManager.IsClientConnected)
+            {
+                ChatNetworkManager.SendSetGuildGold(null, MMOMessageTypes.UpdateGuild, guild.id, guild.gold);
+            }
             GameInstance.ServerGameMessageHandlers.SendSetGuildGoldToMembers(guild);
             result.Invoke(AckResponseCode.Success, new ResponseWithdrawGuildGoldMessage());
 #endif

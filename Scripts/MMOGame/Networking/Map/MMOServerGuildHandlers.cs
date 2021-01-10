@@ -11,6 +11,7 @@ namespace MultiplayerARPG.MMO
         public static readonly ConcurrentDictionary<int, GuildData> Guilds = new ConcurrentDictionary<int, GuildData>();
         public static readonly ConcurrentDictionary<long, GuildData> UpdatingGuildMembers = new ConcurrentDictionary<long, GuildData>();
         public static readonly HashSet<string> GuildInvitations = new HashSet<string>();
+        public ChatNetworkManager ChatNetworkManager { get; private set; }
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
         public DatabaseService.DatabaseServiceClient DbServiceClient
@@ -20,6 +21,11 @@ namespace MultiplayerARPG.MMO
 #endif
 
         public int GuildsCount { get { return Guilds.Count; } }
+
+        private void Awake()
+        {
+            ChatNetworkManager = GetComponent<ChatNetworkManager>();
+        }
 
         public bool TryGetGuild(int guildId, out GuildData guildData)
         {
@@ -81,6 +87,11 @@ namespace MultiplayerARPG.MMO
             });
             GuildData guild = resp.GuildData.FromByteString<GuildData>();
             SetGuild(validateResult.GuildId, guild);
+            // Broadcast via chat server
+            if (ChatNetworkManager.IsClientConnected)
+            {
+                ChatNetworkManager.SendSetGuildLevelExpSkillPoint(null, MMOMessageTypes.UpdateGuild, guild.id, guild.level, guild.exp, guild.skillPoint);
+            }
             GameInstance.ServerGameMessageHandlers.SendSetGuildLevelExpSkillPointToMembers(guild);
 #endif
         }
