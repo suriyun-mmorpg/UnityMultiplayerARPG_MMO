@@ -925,9 +925,9 @@ namespace MultiplayerARPG.MMO
             await UniTask.SwitchToMainThread();
             bool isLimitSlot = request.SlotLimit > 0;
             short slotLimit = (short)request.SlotLimit;
-            // Increase item to storage
-            Dictionary<int, short> decreaseItems;
-            if (!storageItemList.DecreaseItems(request.DataId, (short)request.Amount, isLimitSlot, out decreaseItems))
+            // Decrease item from storage
+            Dictionary<int, short> decreasedItems;
+            if (!storageItemList.DecreaseItems(request.DataId, (short)request.Amount, isLimitSlot, out decreasedItems))
             {
                 resp.Error = EStorageError.StorageErrorDecreaseItemNotEnough;
                 return resp;
@@ -938,12 +938,12 @@ namespace MultiplayerARPG.MMO
             await Database.UpdateStorageItems((StorageType)request.StorageType, request.StorageOwnerId, storageItemList);
             resp.Error = EStorageError.StorageErrorNone;
             DatabaseServiceUtils.CopyToRepeatedByteString(storageItemList, resp.StorageCharacterItems);
-            foreach (int itemIndex in decreaseItems.Keys)
+            foreach (int itemIndex in decreasedItems.Keys)
             {
                 resp.DecreasedItems.Add(new ItemIndexAmountMap()
                 {
                     Index = itemIndex,
-                    Amount = decreaseItems[itemIndex]
+                    Amount = decreasedItems[itemIndex]
                 });
             }
             return resp;
