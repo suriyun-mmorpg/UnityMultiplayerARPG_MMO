@@ -156,7 +156,7 @@ MonoBehaviour:
   transportFactory: {fileID: 0}
   centralTransportFactory: {fileID: 0}
   centralNetworkAddress: 127.0.0.1
-  centralNetworkPort: 6000
+  centralNetworkPort: 7000
   machineAddress: 127.0.0.1
 --- !u!1 &1454126604845530
 GameObject:
@@ -333,7 +333,7 @@ MonoBehaviour:
   transportFactory: {fileID: 0}
   centralTransportFactory: {fileID: 0}
   centralNetworkAddress: 127.0.0.1
-  centralNetworkPort: 6000
+  centralNetworkPort: 7000
   machineAddress: 127.0.0.1
   exePath: ./Build.exe
   notSpawnInBatchMode: 0

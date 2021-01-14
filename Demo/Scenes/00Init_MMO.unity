@@ -539,10 +539,10 @@ MonoBehaviour:
   recoverMonstersWhenRoundEnd: 1
   centralTransportFactory: {fileID: 0}
   centralNetworkAddress: 127.0.0.1
-  centralNetworkPort: 6000
+  centralNetworkPort: 7000
   machineAddress: 127.0.0.1
   autoSaveDuration: 30
-  mapSpawnDuration: 0
+  mapSpawnMillisecondsTimeout: 0
 --- !u!114 &1127565839
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -898,6 +898,9 @@ MonoBehaviour:
   minCharacterNameLength: 2
   maxCharacterNameLength: 16
   maxCharacterSaves: 5
+  serverTargetFrameRate: 30
+  standaloneTargetFrameRate: 60
+  mobileTargetFrameRate: 30
   testInEditorMode: 0
   cashShopDatabase: {fileID: 11400000, guid: 677c37c598e6c1045b66de68f1f546f6, type: 2}
 --- !u!4 &1379718503
