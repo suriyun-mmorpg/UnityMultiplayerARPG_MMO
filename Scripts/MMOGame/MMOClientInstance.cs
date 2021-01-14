@@ -15,8 +15,8 @@ namespace MultiplayerARPG.MMO
         public static string SelectedCentralAddress { get; private set; }
         public static int SelectedCentralPort { get; private set; }
         public static string UserId { get; private set; }
-        public static string AccessToken { get; private set; }
-        public static string SelectCharacterId { get; private set; }
+        public static string UserToken { get; private set; }
+        public static string CharacterId { get; private set; }
 
         [Header("Client Components")]
         [SerializeField]
@@ -140,8 +140,8 @@ namespace MultiplayerARPG.MMO
             SelectedCentralAddress = string.Empty;
             SelectedCentralPort = 0;
             UserId = string.Empty;
-            AccessToken = string.Empty;
-            SelectCharacterId = string.Empty;
+            UserToken = string.Empty;
+            CharacterId = string.Empty;
         }
 
         public void RequestUserLogin(string username, string password, ResponseDelegate<ResponseUserLoginMessage> callback)
@@ -192,13 +192,13 @@ namespace MultiplayerARPG.MMO
                 callback.Invoke(responseHandler, responseCode, response);
 
             UserId = string.Empty;
-            AccessToken = string.Empty;
-            SelectCharacterId = string.Empty;
+            UserToken = string.Empty;
+            CharacterId = string.Empty;
             if (responseCode == AckResponseCode.Success)
             {
                 UserId = response.userId;
-                AccessToken = response.accessToken;
-                SelectCharacterId = string.Empty;
+                UserToken = response.accessToken;
+                CharacterId = string.Empty;
             }
         }
 
@@ -210,8 +210,8 @@ namespace MultiplayerARPG.MMO
                 callback.Invoke(responseHandler, responseCode, response);
 
             UserId = string.Empty;
-            AccessToken = string.Empty;
-            SelectCharacterId = string.Empty;
+            UserToken = string.Empty;
+            CharacterId = string.Empty;
         }
 
         private async UniTaskVoid OnRequestValidateAccessToken(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseValidateAccessTokenMessage response, ResponseDelegate<ResponseValidateAccessTokenMessage> callback)
@@ -222,11 +222,11 @@ namespace MultiplayerARPG.MMO
                 callback.Invoke(responseHandler, responseCode, response);
 
             UserId = string.Empty;
-            AccessToken = string.Empty;
+            UserToken = string.Empty;
             if (responseCode == AckResponseCode.Success)
             {
                 UserId = response.userId;
-                AccessToken = response.accessToken;
+                UserToken = response.accessToken;
             }
         }
 
@@ -237,10 +237,10 @@ namespace MultiplayerARPG.MMO
             if (callback != null)
                 callback.Invoke(responseHandler, responseCode, response);
 
-            SelectCharacterId = string.Empty;
+            CharacterId = string.Empty;
             if (responseCode == AckResponseCode.Success)
             {
-                SelectCharacterId = characterId;
+                CharacterId = characterId;
             }
         }
         #endregion

@@ -34,8 +34,8 @@ namespace MultiplayerARPG.MMO
         {
             ClearHistory();
             Next(uiLogin);
-            if (!string.IsNullOrEmpty(MMOClientInstance.UserId) && !string.IsNullOrEmpty(MMOClientInstance.AccessToken))
-                MMOClientInstance.Singleton.RequestValidateAccessToken(MMOClientInstance.UserId, MMOClientInstance.AccessToken, OnValidateAccessToken);
+            if (!string.IsNullOrEmpty(MMOClientInstance.UserId) && !string.IsNullOrEmpty(MMOClientInstance.UserToken))
+                MMOClientInstance.Singleton.RequestValidateAccessToken(MMOClientInstance.UserId, MMOClientInstance.UserToken, OnValidateAccessToken);
         }
 
         public void OnCentralServerDisconnected(DisconnectInfo disconnectInfo)
