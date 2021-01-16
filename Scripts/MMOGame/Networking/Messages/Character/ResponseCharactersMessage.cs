@@ -22,7 +22,7 @@ namespace MultiplayerARPG.MMO
             for (byte i = 0; i < count; ++i)
             {
                 PlayerCharacterData character = new PlayerCharacterData();
-                characters.Add(character.DeserializeCharacterData(reader, true));
+                characters.Add(character.DeserializeCharacterData(reader, withTransforms: false, withBuffs: false, withSkillUsages: false, withNonEquipItems: false, withSummons: false, withHotkeys: false, withQuests: false));
             }
         }
 
@@ -38,7 +38,7 @@ namespace MultiplayerARPG.MMO
                 writer.Put((byte)characters.Count);
                 foreach (PlayerCharacterData character in characters)
                 {
-                    character.SerializeCharacterData(writer, true);
+                    character.SerializeCharacterData(writer, withTransforms: false, withBuffs: false, withSkillUsages: false, withNonEquipItems: false, withSummons: false, withHotkeys: false, withQuests: false);
                 }
             }
         }
