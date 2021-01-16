@@ -14,9 +14,6 @@ namespace MultiplayerARPG.MMO
         // Client data, May keep these data in player prefs to do auto login system
         public static string SelectedCentralAddress { get; private set; }
         public static int SelectedCentralPort { get; private set; }
-        public static string UserId { get; private set; }
-        public static string UserToken { get; private set; }
-        public static string CharacterId { get; private set; }
 
         [Header("Client Components")]
         [SerializeField]
@@ -139,9 +136,9 @@ namespace MultiplayerARPG.MMO
         {
             SelectedCentralAddress = string.Empty;
             SelectedCentralPort = 0;
-            UserId = string.Empty;
-            UserToken = string.Empty;
-            CharacterId = string.Empty;
+            GameInstance.UserId = string.Empty;
+            GameInstance.UserToken = string.Empty;
+            GameInstance.CharacterId = string.Empty;
         }
 
         public void RequestUserLogin(string username, string password, ResponseDelegate<ResponseUserLoginMessage> callback)
@@ -191,14 +188,14 @@ namespace MultiplayerARPG.MMO
             if (callback != null)
                 callback.Invoke(responseHandler, responseCode, response);
 
-            UserId = string.Empty;
-            UserToken = string.Empty;
-            CharacterId = string.Empty;
+            GameInstance.UserId = string.Empty;
+            GameInstance.UserToken = string.Empty;
+            GameInstance.CharacterId = string.Empty;
             if (responseCode == AckResponseCode.Success)
             {
-                UserId = response.userId;
-                UserToken = response.accessToken;
-                CharacterId = string.Empty;
+                GameInstance.UserId = response.userId;
+                GameInstance.UserToken = response.accessToken;
+                GameInstance.CharacterId = string.Empty;
             }
         }
 
@@ -209,9 +206,9 @@ namespace MultiplayerARPG.MMO
             if (callback != null)
                 callback.Invoke(responseHandler, responseCode, response);
 
-            UserId = string.Empty;
-            UserToken = string.Empty;
-            CharacterId = string.Empty;
+            GameInstance.UserId = string.Empty;
+            GameInstance.UserToken = string.Empty;
+            GameInstance.CharacterId = string.Empty;
         }
 
         private async UniTaskVoid OnRequestValidateAccessToken(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseValidateAccessTokenMessage response, ResponseDelegate<ResponseValidateAccessTokenMessage> callback)
@@ -221,12 +218,12 @@ namespace MultiplayerARPG.MMO
             if (callback != null)
                 callback.Invoke(responseHandler, responseCode, response);
 
-            UserId = string.Empty;
-            UserToken = string.Empty;
+            GameInstance.UserId = string.Empty;
+            GameInstance.UserToken = string.Empty;
             if (responseCode == AckResponseCode.Success)
             {
-                UserId = response.userId;
-                UserToken = response.accessToken;
+                GameInstance.UserId = response.userId;
+                GameInstance.UserToken = response.accessToken;
             }
         }
 
@@ -237,10 +234,10 @@ namespace MultiplayerARPG.MMO
             if (callback != null)
                 callback.Invoke(responseHandler, responseCode, response);
 
-            CharacterId = string.Empty;
+            GameInstance.CharacterId = string.Empty;
             if (responseCode == AckResponseCode.Success)
             {
-                CharacterId = characterId;
+                GameInstance.CharacterId = characterId;
             }
         }
         #endregion

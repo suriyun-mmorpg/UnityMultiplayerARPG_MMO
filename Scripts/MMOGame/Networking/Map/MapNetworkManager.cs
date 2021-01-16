@@ -150,7 +150,6 @@ namespace MultiplayerARPG.MMO
             ServerFriendMessageHandlers = gameObject.GetOrAddComponent<IServerFriendMessageHandlers, MMOServerFriendMessageHandlers>();
             ServerBankMessageHandlers = gameObject.GetOrAddComponent<IServerBankMessageHandlers, MMOServerBankMessageHandlers>();
             // Client handlers
-            ClientUserHandlers = gameObject.GetOrAddComponent<IClientUserHandlers, DefaultClientUserHandlers>();
             ClientCashShopHandlers = gameObject.GetOrAddComponent<IClientCashShopHandlers, DefaultClientCashShopHandlers>();
             ClientMailHandlers = gameObject.GetOrAddComponent<IClientMailHandlers, DefaultClientMailHandlers>();
             ClientStorageHandlers = gameObject.GetOrAddComponent<IClientStorageHandlers, DefaultClientStorageHandlers>();
@@ -401,12 +400,9 @@ namespace MultiplayerARPG.MMO
         #region Character spawn function
         public override void SerializeClientReadyData(NetDataWriter writer)
         {
-            ClientUserHandlers.UserId = MMOClientInstance.UserId;
-            ClientUserHandlers.UserToken = MMOClientInstance.UserToken;
-            ClientUserHandlers.CharacterId = MMOClientInstance.CharacterId;
-            writer.Put(ClientUserHandlers.UserId);
-            writer.Put(ClientUserHandlers.UserToken);
-            writer.Put(ClientUserHandlers.CharacterId);
+            writer.Put(GameInstance.UserId);
+            writer.Put(GameInstance.UserToken);
+            writer.Put(GameInstance.CharacterId);
         }
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
