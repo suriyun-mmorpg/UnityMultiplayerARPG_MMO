@@ -138,7 +138,7 @@ namespace MultiplayerARPG.MMO
             SelectedCentralPort = 0;
             GameInstance.UserId = string.Empty;
             GameInstance.UserToken = string.Empty;
-            GameInstance.CharacterId = string.Empty;
+            GameInstance.SelectedCharacterId = string.Empty;
         }
 
         public void RequestUserLogin(string username, string password, ResponseDelegate<ResponseUserLoginMessage> callback)
@@ -190,12 +190,12 @@ namespace MultiplayerARPG.MMO
 
             GameInstance.UserId = string.Empty;
             GameInstance.UserToken = string.Empty;
-            GameInstance.CharacterId = string.Empty;
+            GameInstance.SelectedCharacterId = string.Empty;
             if (responseCode == AckResponseCode.Success)
             {
                 GameInstance.UserId = response.userId;
                 GameInstance.UserToken = response.accessToken;
-                GameInstance.CharacterId = string.Empty;
+                GameInstance.SelectedCharacterId = string.Empty;
             }
         }
 
@@ -208,7 +208,7 @@ namespace MultiplayerARPG.MMO
 
             GameInstance.UserId = string.Empty;
             GameInstance.UserToken = string.Empty;
-            GameInstance.CharacterId = string.Empty;
+            GameInstance.SelectedCharacterId = string.Empty;
         }
 
         private async UniTaskVoid OnRequestValidateAccessToken(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseValidateAccessTokenMessage response, ResponseDelegate<ResponseValidateAccessTokenMessage> callback)
@@ -234,10 +234,10 @@ namespace MultiplayerARPG.MMO
             if (callback != null)
                 callback.Invoke(responseHandler, responseCode, response);
 
-            GameInstance.CharacterId = string.Empty;
+            GameInstance.SelectedCharacterId = string.Empty;
             if (responseCode == AckResponseCode.Success)
             {
-                GameInstance.CharacterId = characterId;
+                GameInstance.SelectedCharacterId = characterId;
             }
         }
         #endregion

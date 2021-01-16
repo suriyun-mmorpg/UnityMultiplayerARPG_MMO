@@ -402,7 +402,7 @@ namespace MultiplayerARPG.MMO
         {
             writer.Put(GameInstance.UserId);
             writer.Put(GameInstance.UserToken);
-            writer.Put(GameInstance.CharacterId);
+            writer.Put(GameInstance.SelectedCharacterId);
         }
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
