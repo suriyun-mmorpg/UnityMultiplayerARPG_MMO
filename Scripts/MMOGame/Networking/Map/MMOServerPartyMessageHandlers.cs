@@ -189,7 +189,7 @@ namespace MultiplayerARPG.MMO
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             await UniTask.Yield();
-            BasePlayerCharacterEntity playerCharacter;
+            IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, GameMessage.Type.NotFoundCharacter);
@@ -244,7 +244,7 @@ namespace MultiplayerARPG.MMO
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             await UniTask.Yield();
-            BasePlayerCharacterEntity playerCharacter;
+            IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 result.Invoke(AckResponseCode.Error, new ResponseChangePartyLeaderMessage()
@@ -299,7 +299,7 @@ namespace MultiplayerARPG.MMO
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             await UniTask.Yield();
-            BasePlayerCharacterEntity playerCharacter;
+            IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 result.Invoke(AckResponseCode.Error, new ResponseChangePartySettingMessage()
@@ -352,7 +352,7 @@ namespace MultiplayerARPG.MMO
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             await UniTask.Yield();
-            BasePlayerCharacterEntity playerCharacter;
+            IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 result.Invoke(AckResponseCode.Error, new ResponseKickMemberFromPartyMessage()
@@ -389,11 +389,13 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            BasePlayerCharacterEntity memberEntity;
-            if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(request.memberId, out memberEntity))
+            IPlayerCharacterData memberCharacter;
+            long memberConnectionId;
+            if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(request.memberId, out memberCharacter) &&
+                GameInstance.ServerUserHandlers.TryGetConnectionId(request.memberId, out memberConnectionId))
             {
-                memberEntity.ClearParty();
-                GameInstance.ServerGameMessageHandlers.SendClearPartyData(memberEntity.ConnectionId, validateResult.PartyId);
+                memberCharacter.ClearParty();
+                GameInstance.ServerGameMessageHandlers.SendClearPartyData(memberConnectionId, validateResult.PartyId);
             }
             validateResult.Party.RemoveMember(request.memberId);
             GameInstance.ServerPartyHandlers.SetParty(validateResult.PartyId, validateResult.Party);
@@ -414,7 +416,7 @@ namespace MultiplayerARPG.MMO
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             await UniTask.Yield();
-            BasePlayerCharacterEntity playerCharacter;
+            IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 result.Invoke(AckResponseCode.Error, new ResponseLeavePartyMessage()
@@ -446,13 +448,15 @@ namespace MultiplayerARPG.MMO
             // If it is leader kick all members and terminate party
             if (validateResult.Party.IsLeader(playerCharacter.Id))
             {
-                BasePlayerCharacterEntity memberCharacter;
+                IPlayerCharacterData memberCharacter;
+                long memberConnectionId;
                 foreach (string memberId in validateResult.Party.GetMemberIds())
                 {
-                    if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(memberId, out memberCharacter))
+                    if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(memberId, out memberCharacter) &&
+                        GameInstance.ServerUserHandlers.TryGetConnectionId(memberId, out memberConnectionId))
                     {
                         memberCharacter.ClearParty();
-                        GameInstance.ServerGameMessageHandlers.SendClearPartyData(memberCharacter.ConnectionId, validateResult.PartyId);
+                        GameInstance.ServerGameMessageHandlers.SendClearPartyData(memberConnectionId, validateResult.PartyId);
                     }
                     // Save to database
                     _ = DbServiceClient.ClearCharacterPartyAsync(new ClearCharacterPartyReq()
@@ -476,10 +480,10 @@ namespace MultiplayerARPG.MMO
             else
             {
                 playerCharacter.ClearParty();
-                GameInstance.ServerGameMessageHandlers.SendClearPartyData(playerCharacter.ConnectionId, validateResult.PartyId);
                 validateResult.Party.RemoveMember(playerCharacter.Id);
                 GameInstance.ServerPartyHandlers.SetParty(validateResult.PartyId, validateResult.Party);
                 GameInstance.ServerGameMessageHandlers.SendRemovePartyMemberToMembers(validateResult.Party, playerCharacter.Id);
+                GameInstance.ServerGameMessageHandlers.SendClearPartyData(requestHandler.ConnectionId, validateResult.PartyId);
                 // Save to database
                 _ = DbServiceClient.ClearCharacterPartyAsync(new ClearCharacterPartyReq()
                 {
