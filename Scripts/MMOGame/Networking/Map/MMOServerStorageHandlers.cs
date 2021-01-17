@@ -9,7 +9,8 @@ namespace MultiplayerARPG.MMO
     {
 #if UNITY_STANDALONE && !CLIENT_BUILD
         private readonly ConcurrentDictionary<StorageId, List<CharacterItem>> storageItems = new ConcurrentDictionary<StorageId, List<CharacterItem>>();
-        private readonly ConcurrentDictionary<StorageId, HashSet<long>> usingStorageCharacters = new ConcurrentDictionary<StorageId, HashSet<long>>();
+        private readonly ConcurrentDictionary<StorageId, HashSet<long>> usingStorageClients = new ConcurrentDictionary<StorageId, HashSet<long>>();
+        private readonly ConcurrentDictionary<long, StorageId> usingStorageIds = new ConcurrentDictionary<long, StorageId>();
 #endif
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
@@ -19,37 +20,44 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-        public async UniTaskVoid OpenStorage(BasePlayerCharacterEntity playerCharacter)
+        public async UniTaskVoid OpenStorage(long connectionId, IPlayerCharacterData playerCharacter, StorageId storageId)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            if (!CanAccessStorage(playerCharacter, playerCharacter.CurrentStorageId))
+            if (!CanAccessStorage(playerCharacter, storageId))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(playerCharacter.ConnectionId, GameMessage.Type.CannotAccessStorage);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(connectionId, GameMessage.Type.CannotAccessStorage);
                 return;
             }
-            if (!usingStorageCharacters.ContainsKey(playerCharacter.CurrentStorageId))
-                usingStorageCharacters.TryAdd(playerCharacter.CurrentStorageId, new HashSet<long>());
-            usingStorageCharacters[playerCharacter.CurrentStorageId].Add(playerCharacter.ConnectionId);
+            // Store storage usage states
+            if (!usingStorageClients.ContainsKey(storageId))
+                usingStorageClients.TryAdd(storageId, new HashSet<long>());
+            usingStorageClients[storageId].Add(connectionId);
+            usingStorageIds.TryRemove(connectionId, out _);
+            usingStorageIds.TryAdd(connectionId, storageId);
             // Load storage items from database
             ReadStorageItemsReq req = new ReadStorageItemsReq();
-            req.StorageType = (EStorageType)playerCharacter.CurrentStorageId.storageType;
-            req.StorageOwnerId = playerCharacter.CurrentStorageId.storageOwnerId;
+            req.StorageType = (EStorageType)storageId.storageType;
+            req.StorageOwnerId = storageId.storageOwnerId;
             ReadStorageItemsResp resp = await DbServiceClient.ReadStorageItemsAsync(req);
             List<CharacterItem> storageItems = DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.StorageCharacterItems);
-            SetStorageItems(playerCharacter.CurrentStorageId, storageItems);
+            SetStorageItems(storageId, storageItems);
             // Notify storage items to client
             uint storageObjectId;
-            Storage storage = GetStorage(playerCharacter.CurrentStorageId, out storageObjectId);
-            GameInstance.ServerGameMessageHandlers.NotifyStorageOpened(playerCharacter.ConnectionId, playerCharacter.CurrentStorageId.storageType, playerCharacter.CurrentStorageId.storageOwnerId, storageObjectId, storage.weightLimit, storage.slotLimit);
-            GameInstance.ServerGameMessageHandlers.NotifyStorageItems(playerCharacter.ConnectionId, GetStorageItems(playerCharacter.CurrentStorageId));
+            Storage storage = GetStorage(storageId, out storageObjectId);
+            GameInstance.ServerGameMessageHandlers.NotifyStorageOpened(connectionId, storageId.storageType, storageId.storageOwnerId, storageObjectId, storage.weightLimit, storage.slotLimit);
+            GameInstance.ServerGameMessageHandlers.NotifyStorageItems(connectionId, GetStorageItems(storageId));
 #endif
         }
 
-        public async UniTaskVoid CloseStorage(BasePlayerCharacterEntity playerCharacter)
+        public async UniTaskVoid CloseStorage(long connectionId)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            if (usingStorageCharacters.ContainsKey(playerCharacter.CurrentStorageId))
-                usingStorageCharacters[playerCharacter.CurrentStorageId].Remove(playerCharacter.ConnectionId);
+            StorageId storageId;
+            if (usingStorageIds.TryGetValue(connectionId, out storageId) && usingStorageClients.ContainsKey(storageId))
+            {
+                usingStorageClients[storageId].Remove(connectionId);
+                usingStorageIds.TryRemove(connectionId, out _);
+            }
 #endif
             await UniTask.Yield();
         }
@@ -185,7 +193,7 @@ namespace MultiplayerARPG.MMO
             if (storageEntity == null)
                 return false;
             StorageId id = new StorageId(StorageType.Building, storageEntity.Id);
-            return usingStorageCharacters.ContainsKey(id) && usingStorageCharacters[id].Count > 0;
+            return usingStorageClients.ContainsKey(id) && usingStorageClients[id].Count > 0;
 #else
             return false;
 #endif
@@ -206,7 +214,8 @@ namespace MultiplayerARPG.MMO
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             storageItems.Clear();
-            usingStorageCharacters.Clear();
+            usingStorageClients.Clear();
+            usingStorageIds.Clear();
 #endif
         }
 
@@ -214,7 +223,7 @@ namespace MultiplayerARPG.MMO
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             StorageId storageId = new StorageId(storageType, storageOwnerId);
-            GameInstance.ServerGameMessageHandlers.NotifyStorageItemsToClients(usingStorageCharacters[storageId], GetStorageItems(storageId));
+            GameInstance.ServerGameMessageHandlers.NotifyStorageItemsToClients(usingStorageClients[storageId], GetStorageItems(storageId));
 #endif
         }
 
