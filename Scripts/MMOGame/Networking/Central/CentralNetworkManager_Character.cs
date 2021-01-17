@@ -9,7 +9,7 @@ namespace MultiplayerARPG.MMO
     {
         public bool RequestCharacters(ResponseDelegate<ResponseCharactersMessage> callback)
         {
-            return ClientSendRequest(MMORequestTypes.RequestCharacters, new EmptyMessage(), responseDelegate: callback);
+            return ClientSendRequest(MMORequestTypes.RequestCharacters, EmptyMessage.Value, responseDelegate: callback);
         }
 
         public bool RequestCreateCharacter(PlayerCharacterData characterData, ResponseDelegate<ResponseCreateCharacterMessage> callback)

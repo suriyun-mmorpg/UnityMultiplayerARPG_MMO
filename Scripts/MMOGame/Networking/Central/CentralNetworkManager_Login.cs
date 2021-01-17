@@ -27,7 +27,7 @@ namespace MultiplayerARPG.MMO
 
         public bool RequestUserLogout(ResponseDelegate callback)
         {
-            return ClientSendRequest(MMORequestTypes.RequestUserLogout, new EmptyMessage(), responseDelegate: callback);
+            return ClientSendRequest(MMORequestTypes.RequestUserLogout, EmptyMessage.Value, responseDelegate: callback);
         }
 
         public bool RequestValidateAccessToken(string userId, string accessToken, ResponseDelegate<ResponseValidateAccessTokenMessage> callback)
@@ -148,7 +148,7 @@ namespace MultiplayerARPG.MMO
                 });
             }
             // Response
-            result.Invoke(AckResponseCode.Success, new EmptyMessage());
+            result.Invoke(AckResponseCode.Success, EmptyMessage.Value);
         }
 #endif
 
