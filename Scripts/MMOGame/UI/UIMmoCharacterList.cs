@@ -30,17 +30,7 @@ namespace MultiplayerARPG.MMO
             PlayerCharacterDataById.Clear();
             // Proceed response
             List<PlayerCharacterData> selectableCharacters = new List<PlayerCharacterData>();
-            if (!responseCode.ShowUnhandledResponseMessageDialog(() =>
-            {
-                string errorMessage = string.Empty;
-                switch (response.error)
-                {
-                    case ResponseCharactersMessage.Error.NotLoggedin:
-                        errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_NOT_LOGGED_IN.ToString());
-                        break;
-                }
-                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), errorMessage);
-            }))
+            if (!responseCode.ShowUnhandledResponseMessageDialog(response.error))
             {
                 // Success, so set selectable characters by response's data
                 selectableCharacters = response.characters;
@@ -119,26 +109,7 @@ namespace MultiplayerARPG.MMO
         private async UniTaskVoid OnRequestedSelectCharacter(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseSelectCharacterMessage response)
         {
             await UniTask.Yield();
-            if (responseCode.ShowUnhandledResponseMessageDialog(() =>
-            {
-                string errorMessage = string.Empty;
-                switch (response.error)
-                {
-                    case ResponseSelectCharacterMessage.Error.NotLoggedin:
-                        errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_NOT_LOGGED_IN.ToString());
-                        break;
-                    case ResponseSelectCharacterMessage.Error.AlreadySelectCharacter:
-                        errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_ALREADY_SELECT_CHARACTER.ToString());
-                        break;
-                    case ResponseSelectCharacterMessage.Error.InvalidCharacterData:
-                        errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_INVALID_CHARACTER_DATA.ToString());
-                        break;
-                    case ResponseSelectCharacterMessage.Error.MapNotReady:
-                        errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_MAP_SERVER_NOT_READY.ToString());
-                        break;
-                }
-                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), errorMessage);
-            })) return;
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.error)) return;
             MMOClientInstance.Singleton.StartMapClient(response.sceneName, response.networkAddress, response.networkPort);
         }
 
@@ -159,17 +130,7 @@ namespace MultiplayerARPG.MMO
         private async UniTaskVoid OnRequestedDeleteCharacter(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseDeleteCharacterMessage response)
         {
             await UniTask.Yield();
-            if (responseCode.ShowUnhandledResponseMessageDialog(() =>
-            {
-                string errorMessage = string.Empty;
-                switch (response.error)
-                {
-                    case ResponseDeleteCharacterMessage.Error.NotLoggedin:
-                        errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_NOT_LOGGED_IN.ToString());
-                        break;
-                }
-                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), errorMessage);
-            })) return;
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.error)) return;
             // Reload characters
             LoadCharacters();
         }

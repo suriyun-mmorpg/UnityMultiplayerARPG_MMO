@@ -52,11 +52,11 @@ namespace MultiplayerARPG.MMO
             RequestProceedResultDelegate<ResponseCharactersMessage> result)
         {
             long connectionId = requestHandler.ConnectionId;
-            ResponseCharactersMessage.Error error = ResponseCharactersMessage.Error.None;
+            UITextKeys error = UITextKeys.NONE;
             List<PlayerCharacterData> characters = null;
             CentralUserPeerInfo userPeerInfo;
             if (!userPeers.TryGetValue(connectionId, out userPeerInfo))
-                error = ResponseCharactersMessage.Error.NotLoggedin;
+                error = UITextKeys.UI_ERROR_NOT_LOGGED_IN;
             else
             {
                 CharactersResp charactersResp = await DbServiceClient.ReadCharactersAsync(new ReadCharactersReq()
@@ -67,7 +67,7 @@ namespace MultiplayerARPG.MMO
             }
             // Response
             result.Invoke(
-                error == ResponseCharactersMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error,
+                error == UITextKeys.NONE ? AckResponseCode.Success : AckResponseCode.Error,
                 new ResponseCharactersMessage()
                 {
                     error = error,
@@ -84,7 +84,7 @@ namespace MultiplayerARPG.MMO
         {
             long connectionId = requestHandler.ConnectionId;
             NetDataReader reader = requestHandler.Reader;
-            ResponseCreateCharacterMessage.Error error = ResponseCreateCharacterMessage.Error.None;
+            UITextKeys error = UITextKeys.NONE;
             string characterName = request.characterName;
             int dataId = request.dataId;
             int entityId = request.entityId;
@@ -95,19 +95,19 @@ namespace MultiplayerARPG.MMO
                 CharacterName = characterName
             });
             if (findCharacterNameResp.FoundAmount > 0)
-                error = ResponseCreateCharacterMessage.Error.CharacterNameAlreadyExisted;
+                error = UITextKeys.UI_ERROR_CHARACTER_NAME_EXISTED;
             else if (!userPeers.TryGetValue(connectionId, out userPeerInfo))
-                error = ResponseCreateCharacterMessage.Error.NotLoggedin;
+                error = UITextKeys.UI_ERROR_NOT_LOGGED_IN;
             else if (string.IsNullOrEmpty(characterName) || characterName.Length < minCharacterNameLength)
-                error = ResponseCreateCharacterMessage.Error.TooShortCharacterName;
+                error = UITextKeys.UI_ERROR_CHARACTER_NAME_TOO_SHORT;
             else if (characterName.Length > maxCharacterNameLength)
-                error = ResponseCreateCharacterMessage.Error.TooLongCharacterName;
+                error = UITextKeys.UI_ERROR_CHARACTER_NAME_TOO_LONG;
             else if (!GameInstance.PlayerCharacters.ContainsKey(dataId) ||
                 !GameInstance.PlayerCharacterEntities.ContainsKey(entityId) ||
                 (GameInstance.Factions.Count > 0 && !GameInstance.Factions.ContainsKey(factionId)))
             {
                 // If there is factions, it must have faction with the id stored in faction dictionary
-                error = ResponseCreateCharacterMessage.Error.InvalidData;
+                error = UITextKeys.UI_ERROR_INVALID_DATA;
             }
             else
             {
@@ -125,7 +125,7 @@ namespace MultiplayerARPG.MMO
             }
             // Response
             result.Invoke(
-                error == ResponseCreateCharacterMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error,
+                error == UITextKeys.NONE ? AckResponseCode.Success : AckResponseCode.Error,
                 new ResponseCreateCharacterMessage()
                 {
                     error = error,
@@ -147,10 +147,10 @@ namespace MultiplayerARPG.MMO
             RequestProceedResultDelegate<ResponseDeleteCharacterMessage> result)
         {
             long connectionId = requestHandler.ConnectionId;
-            ResponseDeleteCharacterMessage.Error error = ResponseDeleteCharacterMessage.Error.None;
+            UITextKeys error = UITextKeys.NONE;
             CentralUserPeerInfo userPeerInfo;
             if (!userPeers.TryGetValue(connectionId, out userPeerInfo))
-                error = ResponseDeleteCharacterMessage.Error.NotLoggedin;
+                error = UITextKeys.UI_ERROR_NOT_LOGGED_IN;
             else
             {
                 await DbServiceClient.DeleteCharacterAsync(new DeleteCharacterReq()
@@ -161,7 +161,7 @@ namespace MultiplayerARPG.MMO
             }
             // Response
             result.Invoke(
-                error == ResponseDeleteCharacterMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error,
+                error == UITextKeys.NONE ? AckResponseCode.Success : AckResponseCode.Error,
                 new ResponseDeleteCharacterMessage()
                 {
                     error = error,
@@ -176,11 +176,11 @@ namespace MultiplayerARPG.MMO
             RequestProceedResultDelegate<ResponseSelectCharacterMessage> result)
         {
             long connectionId = requestHandler.ConnectionId;
-            ResponseSelectCharacterMessage.Error error = ResponseSelectCharacterMessage.Error.None;
+            UITextKeys error = UITextKeys.NONE;
             CentralServerPeerInfo mapServerPeerInfo = default;
             CentralUserPeerInfo userPeerInfo;
             if (!userPeers.TryGetValue(connectionId, out userPeerInfo))
-                error = ResponseSelectCharacterMessage.Error.NotLoggedin;
+                error = UITextKeys.UI_ERROR_NOT_LOGGED_IN;
             else
             {
                 CharacterResp characterResp = await DbServiceClient.ReadCharacterAsync(new ReadCharacterReq()
@@ -190,14 +190,14 @@ namespace MultiplayerARPG.MMO
                 });
                 PlayerCharacterData character = characterResp.CharacterData.FromByteString<PlayerCharacterData>();
                 if (character == null)
-                    error = ResponseSelectCharacterMessage.Error.InvalidCharacterData;
+                    error = UITextKeys.UI_ERROR_INVALID_CHARACTER_DATA;
                 else if (!mapServerPeersBySceneName.TryGetValue(character.CurrentMapName, out mapServerPeerInfo))
-                    error = ResponseSelectCharacterMessage.Error.MapNotReady;
+                    error = UITextKeys.UI_ERROR_MAP_SERVER_NOT_READY;
             }
-            AckResponseCode responseCode = error == ResponseSelectCharacterMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error;
+            AckResponseCode responseCode = error == UITextKeys.NONE ? AckResponseCode.Success : AckResponseCode.Error;
             ResponseSelectCharacterMessage response = new ResponseSelectCharacterMessage();
             response.error = error;
-            if (error != ResponseSelectCharacterMessage.Error.MapNotReady)
+            if (error != UITextKeys.UI_ERROR_MAP_SERVER_NOT_READY)
             {
                 response.sceneName = mapServerPeerInfo.extra;
                 response.networkAddress = mapServerPeerInfo.networkAddress;

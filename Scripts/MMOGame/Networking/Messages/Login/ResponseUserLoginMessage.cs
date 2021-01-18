@@ -4,26 +4,20 @@ namespace MultiplayerARPG.MMO
 {
     public class ResponseUserLoginMessage : INetSerializable
     {
-        public enum Error : byte
-        {
-            None,
-            InvalidUsernameOrPassword,
-            AlreadyLogin,
-        }
-        public Error error;
+        public UITextKeys error;
         public string userId;
         public string accessToken;
 
         public void Deserialize(NetDataReader reader)
         {
-            error = (Error)reader.GetByte();
+            error = (UITextKeys)reader.GetPackedUShort();
             userId = reader.GetString();
             accessToken = reader.GetString();
         }
 
         public void Serialize(NetDataWriter writer)
         {
-            writer.Put((byte)error);
+            writer.PutPackedUShort((ushort)error);
             writer.Put(userId);
             writer.Put(accessToken);
         }

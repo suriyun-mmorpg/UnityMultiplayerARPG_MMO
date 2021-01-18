@@ -13,40 +13,14 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-        public async UniTaskVoid HandleRequestGetFriends(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<ResponseGetFriendsMessage> result)
-        {
-#if UNITY_STANDALONE && !CLIENT_BUILD
-            BasePlayerCharacterEntity playerCharacter;
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
-            {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, GameMessage.Type.NotFoundCharacter);
-                result.Invoke(AckResponseCode.Error, new ResponseGetFriendsMessage()
-                {
-                    error = ResponseGetFriendsMessage.Error.NotLoggedIn,
-                });
-                return;
-            }
-            ReadFriendsResp resp = await DbServiceClient.ReadFriendsAsync(new ReadFriendsReq()
-            {
-                CharacterId = playerCharacter.Id,
-            });
-            result.Invoke(AckResponseCode.Success, new ResponseGetFriendsMessage()
-            {
-                friends = resp.List.MakeArrayFromRepeatedByteString<SocialCharacterData>(),
-            });
-#endif
-        }
-
         public async UniTaskVoid HandleRequestFindCharacters(RequestHandlerData requestHandler, RequestFindCharactersMessage request, RequestProceedResultDelegate<ResponseFindCharactersMessage> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            BasePlayerCharacterEntity playerCharacter;
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerUserHandlers.TryGetUserId(requestHandler.ConnectionId, out _))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, GameMessage.Type.NotFoundCharacter);
                 result.Invoke(AckResponseCode.Error, new ResponseFindCharactersMessage()
                 {
-                    error = ResponseFindCharactersMessage.Error.NotLoggedIn,
+                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
@@ -61,16 +35,38 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
+        public async UniTaskVoid HandleRequestGetFriends(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<ResponseGetFriendsMessage> result)
+        {
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            IPlayerCharacterData playerCharacter;
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            {
+                result.Invoke(AckResponseCode.Error, new ResponseGetFriendsMessage()
+                {
+                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                });
+                return;
+            }
+            ReadFriendsResp resp = await DbServiceClient.ReadFriendsAsync(new ReadFriendsReq()
+            {
+                CharacterId = playerCharacter.Id,
+            });
+            result.Invoke(AckResponseCode.Success, new ResponseGetFriendsMessage()
+            {
+                friends = resp.List.MakeArrayFromRepeatedByteString<SocialCharacterData>(),
+            });
+#endif
+        }
+
         public async UniTaskVoid HandleRequestAddFriend(RequestHandlerData requestHandler, RequestAddFriendMessage request, RequestProceedResultDelegate<ResponseAddFriendMessage> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            BasePlayerCharacterEntity playerCharacter;
+            IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, GameMessage.Type.NotFoundCharacter);
                 result.Invoke(AckResponseCode.Error, new ResponseAddFriendMessage()
                 {
-                    error = ResponseAddFriendMessage.Error.NotLoggedIn,
+                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
@@ -87,13 +83,12 @@ namespace MultiplayerARPG.MMO
         public async UniTaskVoid HandleRequestRemoveFriend(RequestHandlerData requestHandler, RequestRemoveFriendMessage request, RequestProceedResultDelegate<ResponseRemoveFriendMessage> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            BasePlayerCharacterEntity playerCharacter;
+            IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, GameMessage.Type.NotFoundCharacter);
                 result.Invoke(AckResponseCode.Error, new ResponseRemoveFriendMessage()
                 {
-                    error = ResponseRemoveFriendMessage.Error.NotLoggedIn,
+                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }

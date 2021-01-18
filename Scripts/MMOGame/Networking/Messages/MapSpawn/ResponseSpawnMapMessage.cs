@@ -4,29 +4,20 @@ namespace MultiplayerARPG.MMO
 {
     public class ResponseSpawnMapMessage : INetSerializable
     {
-        public enum Error : byte
-        {
-            None,
-            NotReady,
-            Unauthorized,
-            EmptySceneName,
-            CannotExecute,
-            Unknow,
-        }
-        public Error error;
+        public UITextKeys error;
         public string instanceId;
         public string requestId;
 
         public void Deserialize(NetDataReader reader)
         {
-            error = (Error)reader.GetByte();
+            error = (UITextKeys)reader.GetPackedUShort();
             instanceId = reader.GetString();
             requestId = reader.GetString();
         }
 
         public void Serialize(NetDataWriter writer)
         {
-            writer.Put((byte)error);
+            writer.PutPackedUShort((ushort)error);
             writer.Put(instanceId);
             writer.Put(requestId);
         }

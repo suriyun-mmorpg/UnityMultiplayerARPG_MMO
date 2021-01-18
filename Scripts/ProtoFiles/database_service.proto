@@ -77,44 +77,6 @@ enum EStorageType
     STORAGE_TYPE_GUILD = 2;
     STORAGE_TYPE_BUILDING = 3;
 }
-enum EStorageError
-{
-    STORAGE_ERROR_NONE = 0;
-    STORAGE_ERROR_INVALID_STORAGE = 1;
-    STORAGE_ERROR_INVALID_CHARACTER = 2;
-    STORAGE_ERROR_INVALID_STORAGE_INDEX = 3;
-    STORAGE_ERROR_INVALID_INVENTORY_INDEX = 4;
-    STORAGE_ERROR_STORAGE_WILL_OVERWHELMING = 5;
-    STORAGE_ERROR_INVENTORY_WILL_OVERWHELMING = 6;
-    STORAGE_ERROR_DECREASE_ITEM_NOT_ENOUGH = 7;
-}
-enum EUpdateReadMailStateError
-{
-    READ_MAIL_ERROR_NONE = 0;
-    READ_MAIL_ERROR_NOT_AVAILABLE = 1;
-    READ_MAIL_ERROR_NOT_ALLOWED = 2;
-}
-enum EUpdateClaimMailItemsStateError
-{
-    CLAIM_MAIL_ITEMS_ERROR_NONE = 0;
-    CLAIM_MAIL_ITEMS_ERROR_NOT_AVAILABLE = 1;
-    CLAIM_MAIL_ITEMS_ERROR_NOT_ALLOWED = 2;
-    CLAIM_MAIL_ITEMS_ERROR_ALREADY_CLAIMED = 3;
-    CLAIM_MAIL_ITEMS_ERROR_CANNOT_CARRY = 4;
-}
-enum EUpdateDeleteMailStateError
-{
-    DELETE_MAIL_ERROR_NONE = 0;
-    DELETE_MAIL_ERROR_NOT_AVAILABLE = 1;
-    DELETE_MAIL_ERROR_NOT_ALLOWED = 2;
-}
-enum ESendMailError
-{
-    SEND_MAIL_ERROR_NONE = 0;
-    SEND_MAIL_ERROR_NOT_AVAILABLE = 1;
-    SEND_MAIL_ERROR_NOT_ALLOWED = 2;
-    SEND_MAIL_ERROR_NO_RECEIVER = 3;
-}
 // Map
 message ItemIndexAmountMap {
     int32 index = 1;
@@ -427,7 +389,7 @@ message MoveItemToStorageReq {
     int32 storage_item_index = 8;
 }
 message MoveItemToStorageResp {
-    EStorageError error = 1;
+    uint32 error = 1;
     repeated bytes inventory_item_items = 2;
     repeated bytes storage_character_items = 3;
 }
@@ -443,7 +405,7 @@ message MoveItemFromStorageReq {
     int32 inventory_item_index = 8;
 }
 message MoveItemFromStorageResp {
-    EStorageError error = 1;
+    uint32 error = 1;
     repeated bytes inventory_item_items = 2;
     repeated bytes storage_character_items = 3;
 }
@@ -458,7 +420,7 @@ message SwapOrMergeStorageItemReq {
     int32 to_index = 7;
 }
 message SwapOrMergeStorageItemResp {
-    EStorageError error = 1;
+    uint32 error = 1;
     repeated bytes storage_character_items = 2;
 }
 // Increase storage items
@@ -470,7 +432,7 @@ message IncreaseStorageItemsReq {
     bytes item = 5;
 }
 message IncreaseStorageItemsResp {
-    EStorageError error = 1;
+    uint32 error = 1;
     repeated bytes storage_character_items = 2;
 }
 // Decrease storage items
@@ -483,7 +445,7 @@ message DecreaseStorageItemsReq {
     int32 amount = 6;
 }
 message DecreaseStorageItemsResp {
-    EStorageError error = 1;
+    uint32 error = 1;
     repeated bytes storage_character_items = 2;
     repeated ItemIndexAmountMap decreased_items = 3;
 }
@@ -500,7 +462,7 @@ message UpdateReadMailStateReq {
     string user_id = 2;
 }
 message UpdateReadMailStateResp {
-    EUpdateReadMailStateError error = 1;
+    uint32 error = 1;
     bytes mail = 2;
 }
 message UpdateClaimMailItemsStateReq {
@@ -508,7 +470,7 @@ message UpdateClaimMailItemsStateReq {
     string user_id = 2;
 }
 message UpdateClaimMailItemsStateResp {
-    EUpdateClaimMailItemsStateError error = 1;
+    uint32 error = 1;
     bytes mail = 2;
 }
 message UpdateDeleteMailStateReq {
@@ -516,13 +478,13 @@ message UpdateDeleteMailStateReq {
     string user_id = 2;
 }
 message UpdateDeleteMailStateResp {
-    EUpdateDeleteMailStateError error = 1;
+    uint32 error = 1;
 }
 message SendMailReq {
     bytes mail = 1;
 }
 message SendMailResp {
-    ESendMailError error = 1;
+    uint32 error = 1;
 }
 message GetMailReq {
     string mail_id = 1;

@@ -688,21 +688,21 @@ namespace MultiplayerARPG.MMO
             if (!cachedStorageItems.TryGetValue(storageId, out storageItemList))
             {
                 // Cannot find storage
-                resp.Error = EStorageError.StorageErrorInvalidStorage;
+                resp.Error = (ushort)UITextKeys.UI_ERROR_STORAGE_NOT_FOUND;
                 return resp;
             }
             PlayerCharacterData character;
             if (!cachedUserCharacter.TryGetValue(request.CharacterId, out character))
             {
                 // Cannot find character
-                resp.Error = EStorageError.StorageErrorInvalidCharacter;
+                resp.Error = (ushort)UITextKeys.UI_ERROR_CHARACTER_NOT_FOUND;
                 return resp;
             }
             if (request.InventoryItemIndex < 0 ||
                 request.InventoryItemIndex >= character.NonEquipItems.Count)
             {
                 // Invalid inventory index
-                resp.Error = EStorageError.StorageErrorInvalidInventoryIndex;
+                resp.Error = (ushort)UITextKeys.UI_ERROR_INVALID_ITEM_INDEX;
                 return resp;
             }
             await UniTask.SwitchToMainThread();
@@ -725,7 +725,7 @@ namespace MultiplayerARPG.MMO
                 if (isOverwhelming || !storageItemList.IncreaseItems(movingItem))
                 {
                     // Storage will overwhelming
-                    resp.Error = EStorageError.StorageErrorStorageWillOverwhelming;
+                    resp.Error = (ushort)UITextKeys.UI_ERROR_STORAGE_WILL_OVERWHELMING;
                     return resp;
                 }
                 // Remove from inventory
@@ -746,7 +746,7 @@ namespace MultiplayerARPG.MMO
             // Update storage list
             // TODO: May update later to reduce amount of processes
             await Database.UpdateStorageItems((StorageType)request.StorageType, request.StorageOwnerId, storageItemList);
-            resp.Error = EStorageError.StorageErrorNone;
+            resp.Error = 0;
             DatabaseServiceUtils.CopyToRepeatedByteString(character.NonEquipItems, resp.InventoryItemItems);
             DatabaseServiceUtils.CopyToRepeatedByteString(storageItemList, resp.StorageCharacterItems);
             return resp;
@@ -760,21 +760,21 @@ namespace MultiplayerARPG.MMO
             if (!cachedStorageItems.TryGetValue(storageId, out storageItemList))
             {
                 // Cannot find storage
-                resp.Error = EStorageError.StorageErrorInvalidStorage;
+                resp.Error = (ushort)UITextKeys.UI_ERROR_STORAGE_NOT_FOUND;
                 return resp;
             }
             PlayerCharacterData character;
             if (!cachedUserCharacter.TryGetValue(request.CharacterId, out character))
             {
                 // Cannot find character
-                resp.Error = EStorageError.StorageErrorInvalidCharacter;
+                resp.Error = (ushort)UITextKeys.UI_ERROR_CHARACTER_NOT_FOUND;
                 return resp;
             }
             if (request.StorageItemIndex < 0 ||
                 request.StorageItemIndex >= storageItemList.Count)
             {
                 // Invalid storage index
-                resp.Error = EStorageError.StorageErrorInvalidStorageIndex;
+                resp.Error = (ushort)UITextKeys.UI_ERROR_INVALID_ITEM_INDEX;
                 return resp;
             }
             await UniTask.SwitchToMainThread();
@@ -792,7 +792,7 @@ namespace MultiplayerARPG.MMO
                 if (isOverwhelming || !character.IncreaseItems(movingItem))
                 {
                     // inventory will overwhelming
-                    resp.Error = EStorageError.StorageErrorInventoryWillOverwhelming;
+                    resp.Error = (ushort)UITextKeys.UI_ERROR_STORAGE_WILL_OVERWHELMING;
                     return resp;
                 }
                 // Remove from storage
@@ -813,7 +813,7 @@ namespace MultiplayerARPG.MMO
             // Update storage list
             // TODO: May update later to reduce amount of processes
             await Database.UpdateStorageItems((StorageType)request.StorageType, request.StorageOwnerId, storageItemList);
-            resp.Error = EStorageError.StorageErrorNone;
+            resp.Error = 0;
             DatabaseServiceUtils.CopyToRepeatedByteString(character.NonEquipItems, resp.InventoryItemItems);
             DatabaseServiceUtils.CopyToRepeatedByteString(storageItemList, resp.StorageCharacterItems);
             return resp;
@@ -828,7 +828,7 @@ namespace MultiplayerARPG.MMO
             if (!cachedStorageItems.TryGetValue(storageId, out storageItemList))
             {
                 // Cannot find storage
-                resp.Error = EStorageError.StorageErrorInvalidStorage;
+                resp.Error = (ushort)UITextKeys.UI_ERROR_STORAGE_NOT_FOUND;
                 return resp;
             }
             await UniTask.SwitchToMainThread();
@@ -868,7 +868,7 @@ namespace MultiplayerARPG.MMO
             // Update storage list
             // TODO: May update later to reduce amount of processes
             await Database.UpdateStorageItems((StorageType)request.StorageType, request.StorageOwnerId, storageItemList);
-            resp.Error = EStorageError.StorageErrorNone;
+            resp.Error = 0;
             DatabaseServiceUtils.CopyToRepeatedByteString(storageItemList, resp.StorageCharacterItems);
             return resp;
         }
@@ -882,7 +882,7 @@ namespace MultiplayerARPG.MMO
             if (!cachedStorageItems.TryGetValue(storageId, out storageItemList))
             {
                 // Cannot find storage
-                resp.Error = EStorageError.StorageErrorInvalidStorage;
+                resp.Error = (ushort)UITextKeys.UI_ERROR_STORAGE_NOT_FOUND;
                 return resp;
             }
             await UniTask.SwitchToMainThread();
@@ -898,14 +898,14 @@ namespace MultiplayerARPG.MMO
             if (isOverwhelming || !storageItemList.IncreaseItems(addingItem))
             {
                 // Storage will overwhelming
-                resp.Error = EStorageError.StorageErrorStorageWillOverwhelming;
+                resp.Error = (ushort)UITextKeys.UI_ERROR_STORAGE_WILL_OVERWHELMING;
                 return resp;
             }
             storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
             // Update storage list
             // TODO: May update later to reduce amount of processes
             await Database.UpdateStorageItems((StorageType)request.StorageType, request.StorageOwnerId, storageItemList);
-            resp.Error = EStorageError.StorageErrorNone;
+            resp.Error = 0;
             DatabaseServiceUtils.CopyToRepeatedByteString(storageItemList, resp.StorageCharacterItems);
             return resp;
         }
@@ -919,7 +919,7 @@ namespace MultiplayerARPG.MMO
             if (!cachedStorageItems.TryGetValue(storageId, out storageItemList))
             {
                 // Cannot find storage
-                resp.Error = EStorageError.StorageErrorInvalidStorage;
+                resp.Error = (ushort)UITextKeys.UI_ERROR_STORAGE_NOT_FOUND;
                 return resp;
             }
             await UniTask.SwitchToMainThread();
@@ -929,14 +929,14 @@ namespace MultiplayerARPG.MMO
             Dictionary<int, short> decreasedItems;
             if (!storageItemList.DecreaseItems(request.DataId, (short)request.Amount, isLimitSlot, out decreasedItems))
             {
-                resp.Error = EStorageError.StorageErrorDecreaseItemNotEnough;
+                resp.Error = (ushort)UITextKeys.UI_ERROR_NOT_ENOUGH_ITEMS;
                 return resp;
             }
             storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
             // Update storage list
             // TODO: May update later to reduce amount of processes
             await Database.UpdateStorageItems((StorageType)request.StorageType, request.StorageOwnerId, storageItemList);
-            resp.Error = EStorageError.StorageErrorNone;
+            resp.Error = 0;
             DatabaseServiceUtils.CopyToRepeatedByteString(storageItemList, resp.StorageCharacterItems);
             foreach (int itemIndex in decreasedItems.Keys)
             {
@@ -964,7 +964,7 @@ namespace MultiplayerARPG.MMO
             if (updated > 0)
                 resp.Mail = DatabaseServiceUtils.ToByteString(await Database.GetMail(request.MailId, request.UserId));
             else
-                resp.Error = EUpdateReadMailStateError.ReadMailErrorNotAllowed;
+                resp.Error = (ushort)UITextKeys.UI_ERROR_MAIL_READ_NOT_ALLOWED;
             return resp;
         }
 
@@ -975,7 +975,7 @@ namespace MultiplayerARPG.MMO
             if (updated > 0)
                 resp.Mail = DatabaseServiceUtils.ToByteString(await Database.GetMail(request.MailId, request.UserId));
             else
-                resp.Error = EUpdateClaimMailItemsStateError.ClaimMailItemsErrorNotAllowed;
+                resp.Error = (ushort)UITextKeys.UI_ERROR_MAIL_CLAIM_NOT_ALLOWED;
             return resp;
         }
 
@@ -984,7 +984,7 @@ namespace MultiplayerARPG.MMO
             UpdateDeleteMailStateResp resp = new UpdateDeleteMailStateResp();
             long updated = await Database.UpdateDeleteMailState(request.MailId, request.UserId);
             if (updated <= 0)
-                resp.Error = EUpdateDeleteMailStateError.DeleteMailErrorNotAllowed;
+                resp.Error = (ushort)UITextKeys.UI_ERROR_MAIL_DELETE_NOT_ALLOWED;
             return resp;
         }
 
@@ -995,7 +995,7 @@ namespace MultiplayerARPG.MMO
             {
                 return new SendMailResp()
                 {
-                    Error = ESendMailError.SendMailErrorNoReceiver,
+                    Error = (ushort)UITextKeys.UI_ERROR_MAIL_SEND_NO_RECEIVER,
                 };
             }
             await Database.CreateMail(mail);

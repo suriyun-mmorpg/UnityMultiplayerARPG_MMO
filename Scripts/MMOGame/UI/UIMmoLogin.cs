@@ -99,20 +99,7 @@ namespace MultiplayerARPG.MMO
             LoggingIn = false;
             string storingUsername = string.Empty;
             string storingPassword = string.Empty;
-            if (responseCode.ShowUnhandledResponseMessageDialog(() =>
-            {
-                string errorMessage = string.Empty;
-                switch (response.error)
-                {
-                    case ResponseUserLoginMessage.Error.AlreadyLogin:
-                        errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_ALREADY_LOGGED_IN.ToString());
-                        break;
-                    case ResponseUserLoginMessage.Error.InvalidUsernameOrPassword:
-                        errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_INVALID_USERNAME_OR_PASSWORD.ToString());
-                        break;
-                }
-                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), errorMessage);
-            }))
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.error))
             {
                 if (onLoginFail != null)
                     onLoginFail.Invoke();
@@ -121,6 +108,7 @@ namespace MultiplayerARPG.MMO
             if (toggleAutoLogin != null && toggleAutoLogin.isOn)
             {
                 // Store password
+                PlayerPrefs.SetString(keyUsername, storingUsername);
                 PlayerPrefs.SetString(keyPassword, storingPassword);
                 PlayerPrefs.Save();
             }

@@ -46,7 +46,7 @@ namespace MultiplayerARPG.MMO
             RequestProceedResultDelegate<ResponseUserLoginMessage> result)
         {
             long connectionId = requestHandler.ConnectionId;
-            ResponseUserLoginMessage.Error error = ResponseUserLoginMessage.Error.None;
+            UITextKeys error = UITextKeys.NONE;
             ValidateUserLoginResp validateUserLoginResp = await DbServiceClient.ValidateUserLoginAsync(new ValidateUserLoginReq()
             {
                 Username = request.username,
@@ -56,12 +56,12 @@ namespace MultiplayerARPG.MMO
             string accessToken = string.Empty;
             if (string.IsNullOrEmpty(userId))
             {
-                error = ResponseUserLoginMessage.Error.InvalidUsernameOrPassword;
+                error = UITextKeys.UI_ERROR_INVALID_USERNAME_OR_PASSWORD;
                 userId = string.Empty;
             }
             else if (userPeersByUserId.ContainsKey(userId) || MapContainsUser(userId))
             {
-                error = ResponseUserLoginMessage.Error.AlreadyLogin;
+                error = UITextKeys.UI_ERROR_ALREADY_LOGGED_IN;
                 userId = string.Empty;
             }
             else
@@ -80,7 +80,7 @@ namespace MultiplayerARPG.MMO
             }
             // Response
             result.Invoke(
-                error == ResponseUserLoginMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error,
+                error == UITextKeys.NONE ? AckResponseCode.Success : AckResponseCode.Error,
                 new ResponseUserLoginMessage()
                 {
                     error = error,
@@ -96,7 +96,7 @@ namespace MultiplayerARPG.MMO
             RequestUserRegisterMessage request,
             RequestProceedResultDelegate<ResponseUserRegisterMessage> result)
         {
-            ResponseUserRegisterMessage.Error error = ResponseUserRegisterMessage.Error.None;
+            UITextKeys error = UITextKeys.NONE;
             string username = request.username;
             string password = request.password;
             FindUsernameResp findUsernameResp = await DbServiceClient.FindUsernameAsync(new FindUsernameReq()
@@ -104,13 +104,13 @@ namespace MultiplayerARPG.MMO
                 Username = username
             });
             if (findUsernameResp.FoundAmount > 0)
-                error = ResponseUserRegisterMessage.Error.UsernameAlreadyExisted;
+                error = UITextKeys.UI_ERROR_USERNAME_EXISTED;
             else if (string.IsNullOrEmpty(username) || username.Length < minUsernameLength)
-                error = ResponseUserRegisterMessage.Error.TooShortUsername;
+                error = UITextKeys.UI_ERROR_USERNAME_TOO_SHORT;
             else if (username.Length > maxUsernameLength)
-                error = ResponseUserRegisterMessage.Error.TooLongUsername;
+                error = UITextKeys.UI_ERROR_USERNAME_TOO_LONG;
             else if (string.IsNullOrEmpty(password) || password.Length < minPasswordLength)
-                error = ResponseUserRegisterMessage.Error.TooShortPassword;
+                error = UITextKeys.UI_ERROR_PASSWORD_TOO_SHORT;
             else
             {
                 await DbServiceClient.CreateUserLoginAsync(new CreateUserLoginReq()
@@ -121,7 +121,7 @@ namespace MultiplayerARPG.MMO
             }
             // Response
             result.Invoke(
-                error == ResponseUserRegisterMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error,
+                error == UITextKeys.NONE ? AckResponseCode.Success : AckResponseCode.Error,
                 new ResponseUserRegisterMessage()
                 {
                     error = error,
@@ -159,7 +159,7 @@ namespace MultiplayerARPG.MMO
             RequestProceedResultDelegate<ResponseValidateAccessTokenMessage> result)
         {
             long connectionId = requestHandler.ConnectionId;
-            ResponseValidateAccessTokenMessage.Error error = ResponseValidateAccessTokenMessage.Error.None;
+            UITextKeys error = UITextKeys.NONE;
             string userId = request.userId;
             string accessToken = request.accessToken;
             ValidateAccessTokenResp validateAccessTokenResp = await DbServiceClient.ValidateAccessTokenAsync(new ValidateAccessTokenReq()
@@ -169,7 +169,7 @@ namespace MultiplayerARPG.MMO
             });
             if (!validateAccessTokenResp.IsPass)
             {
-                error = ResponseValidateAccessTokenMessage.Error.InvalidAccessToken;
+                error = UITextKeys.UI_ERROR_INVALID_USER_TOKEN;
                 userId = string.Empty;
                 accessToken = string.Empty;
             }
@@ -195,7 +195,7 @@ namespace MultiplayerARPG.MMO
             }
             // Response
             result.Invoke(
-                error == ResponseValidateAccessTokenMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error,
+                error == UITextKeys.NONE ? AckResponseCode.Success : AckResponseCode.Error,
                 new ResponseValidateAccessTokenMessage()
                 {
                     error = error,

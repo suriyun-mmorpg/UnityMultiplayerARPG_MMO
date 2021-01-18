@@ -25,7 +25,7 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
             if (!CanAccessStorage(playerCharacter, storageId))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(connectionId, GameMessage.Type.CannotAccessStorage);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(connectionId, UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE);
                 return;
             }
             // Store storage usage states
@@ -73,7 +73,7 @@ namespace MultiplayerARPG.MMO
             req.SlotLimit = storge.slotLimit;
             req.Item = DatabaseServiceUtils.ToByteString(addingItem);
             IncreaseStorageItemsResp resp = await DbServiceClient.IncreaseStorageItemsAsync(req);
-            if (resp.Error != EStorageError.StorageErrorNone)
+            if (UITextKeys.NONE != (UITextKeys)resp.Error)
             {
                 // Error ocurring, storage may overwhelming let's it drop items to ground
                 return false;
@@ -98,7 +98,7 @@ namespace MultiplayerARPG.MMO
             req.DataId = dataId;
             req.Amount = amount;
             DecreaseStorageItemsResp resp = await DbServiceClient.DecreaseStorageItemsAsync(req);
-            if (resp.Error != EStorageError.StorageErrorNone)
+            if (UITextKeys.NONE != (UITextKeys)resp.Error)
             {
                 // Error ocurring, storage may overwhelming let's it drop items to ground
                 return new DecreaseStorageItemsResult();

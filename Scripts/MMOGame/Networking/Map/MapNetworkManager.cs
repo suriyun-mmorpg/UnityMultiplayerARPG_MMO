@@ -142,8 +142,10 @@ namespace MultiplayerARPG.MMO
             // Server Message Handlers
             ServerCashShopMessageHandlers = gameObject.GetOrAddComponent<IServerCashShopMessageHandlers, MMOServerCashShopMessageHandlers>();
             ServerMailMessageHandlers = gameObject.GetOrAddComponent<IServerMailMessageHandlers, MMOServerMailMessageHandlers>();
-            ServerInventoryMessageHandlers = gameObject.GetOrAddComponent<IServerInventoryMessageHandlers, DefaultServerInventoryMessageHandlers>();
             ServerStorageMessageHandlers = gameObject.GetOrAddComponent<IServerStorageMessageHandlers, MMOServerStorageMessageHandlers>();
+            ServerCharacterAttributeMessageHandlers = gameObject.GetOrAddComponent<IServerCharacterAttributeMessageHandlers, DefaultServerCharacterAttributeMessageHandlers>();
+            ServerCharacterSkillMessageHandlers = gameObject.GetOrAddComponent<IServerCharacterSkillMessageHandlers, DefaultServerCharacterSkillMessageHandlers>();
+            ServerInventoryMessageHandlers = gameObject.GetOrAddComponent<IServerInventoryMessageHandlers, DefaultServerInventoryMessageHandlers>();
             ServerPartyMessageHandlers = gameObject.GetOrAddComponent<IServerPartyMessageHandlers, MMOServerPartyMessageHandlers>();
             ServerGuildMessageHandlers = gameObject.GetOrAddComponent<IServerGuildMessageHandlers, MMOServerGuildMessageHandlers>();
             ServerFriendMessageHandlers = gameObject.GetOrAddComponent<IServerFriendMessageHandlers, MMOServerFriendMessageHandlers>();
@@ -152,6 +154,8 @@ namespace MultiplayerARPG.MMO
             ClientCashShopHandlers = gameObject.GetOrAddComponent<IClientCashShopHandlers, DefaultClientCashShopHandlers>();
             ClientMailHandlers = gameObject.GetOrAddComponent<IClientMailHandlers, DefaultClientMailHandlers>();
             ClientStorageHandlers = gameObject.GetOrAddComponent<IClientStorageHandlers, DefaultClientStorageHandlers>();
+            ClientCharacterAttributeHandlers = gameObject.GetOrAddComponent<IClientCharacterAttributeHandlers, DefaultClientCharacterAttributeHandlers>();
+            ClientCharacterSkillHandlers = gameObject.GetOrAddComponent<IClientCharacterSkillHandlers, DefaultClientCharacterSkillHandlers>();
             ClientInventoryHandlers = gameObject.GetOrAddComponent<IClientInventoryHandlers, DefaultClientInventoryHandlers>();
             ClientPartyHandlers = gameObject.GetOrAddComponent<IClientPartyHandlers, DefaultClientPartyHandlers>();
             ClientGuildHandlers = gameObject.GetOrAddComponent<IClientGuildHandlers, DefaultClientGuildHandlers>();

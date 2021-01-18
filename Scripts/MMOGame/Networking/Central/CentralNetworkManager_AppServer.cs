@@ -37,7 +37,7 @@ namespace MultiplayerARPG.MMO
             RequestProceedResultDelegate<ResponseAppServerRegisterMessage> result)
         {
             long connectionId = requestHandler.ConnectionId;
-            ResponseAppServerRegisterMessage.Error error = ResponseAppServerRegisterMessage.Error.None;
+            UITextKeys error = UITextKeys.NONE;
             if (request.ValidateHash())
             {
                 ResponseAppServerAddressMessage responseAppServerAddressMessage;
@@ -64,7 +64,7 @@ namespace MultiplayerARPG.MMO
                         }
                         else
                         {
-                            error = ResponseAppServerRegisterMessage.Error.MapAlreadyExisted;
+                            error = UITextKeys.UI_ERROR_MAP_EXISTED;
                             if (LogInfo)
                                 Logging.Log(LogTag, "Register Map Server Failed: [" + connectionId + "] [" + sceneName + "] [" + error + "]");
                         }
@@ -83,7 +83,7 @@ namespace MultiplayerARPG.MMO
                         }
                         else
                         {
-                            error = ResponseAppServerRegisterMessage.Error.EventAlreadyExisted;
+                            error = UITextKeys.UI_ERROR_EVENT_EXISTED;
                             if (LogInfo)
                                 Logging.Log(LogTag, "Register Instance Map Server Failed: [" + connectionId + "] [" + instanceId + "] [" + error + "]");
                         }
@@ -93,7 +93,7 @@ namespace MultiplayerARPG.MMO
                         // Send chat peer info to map servers
                         responseAppServerAddressMessage = new ResponseAppServerAddressMessage()
                         {
-                            error = ResponseAppServerAddressMessage.Error.None,
+                            error = UITextKeys.NONE,
                             peerInfo = peerInfo,
                         };
                         foreach (CentralServerPeerInfo mapServerPeer in mapServerPeers.Values)
@@ -107,13 +107,13 @@ namespace MultiplayerARPG.MMO
             }
             else
             {
-                error = ResponseAppServerRegisterMessage.Error.InvalidHash;
+                error = UITextKeys.UI_ERROR_INVALID_SERVER_HASH;
                 if (LogInfo)
                     Logging.Log(LogTag, "Register Server Failed: [" + connectionId + "] [" + error + "]");
             }
             // Response
             result.Invoke(
-                error == ResponseAppServerRegisterMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error,
+                error == UITextKeys.NONE ? AckResponseCode.Success : AckResponseCode.Error,
                 new ResponseAppServerRegisterMessage()
                 {
                     error = error,
@@ -136,13 +136,13 @@ namespace MultiplayerARPG.MMO
                 // Send other info to current peer
                 ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MMOMessageTypes.AppServerAddress, new ResponseAppServerAddressMessage()
                 {
-                    error = ResponseAppServerAddressMessage.Error.None,
+                    error = UITextKeys.NONE,
                     peerInfo = mapPeerInfo,
                 });
                 // Send current info to other peer
                 ServerSendPacket(mapPeerInfo.connectionId, DeliveryMethod.ReliableOrdered, MMOMessageTypes.AppServerAddress, new ResponseAppServerAddressMessage()
                 {
-                    error = ResponseAppServerAddressMessage.Error.None,
+                    error = UITextKeys.NONE,
                     peerInfo = broadcastPeerInfo,
                 });
             }
@@ -152,7 +152,7 @@ namespace MultiplayerARPG.MMO
                 CentralServerPeerInfo chatPeerInfo = chatServerPeers.Values.First();
                 ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MMOMessageTypes.AppServerAddress, new ResponseAppServerAddressMessage()
                 {
-                    error = ResponseAppServerAddressMessage.Error.None,
+                    error = UITextKeys.NONE,
                     peerInfo = chatPeerInfo,
                 });
             }
@@ -166,7 +166,7 @@ namespace MultiplayerARPG.MMO
             RequestProceedResultDelegate<ResponseAppServerAddressMessage> result)
         {
             long connectionId = requestHandler.ConnectionId;
-            ResponseAppServerAddressMessage.Error error = ResponseAppServerAddressMessage.Error.None;
+            UITextKeys error = UITextKeys.NONE;
             CentralServerPeerInfo peerInfo = new CentralServerPeerInfo();
             switch (request.peerType)
             {
@@ -180,7 +180,7 @@ namespace MultiplayerARPG.MMO
                     }
                     else
                     {
-                        error = ResponseAppServerAddressMessage.Error.ServerNotFound;
+                        error = UITextKeys.UI_ERROR_SERVER_NOT_FOUND;
                         if (LogInfo)
                             Logging.Log(LogTag, "Request Map Spawn Address: [" + connectionId + "] [" + error + "]");
                     }
@@ -189,7 +189,7 @@ namespace MultiplayerARPG.MMO
                     string mapName = request.extra;
                     if (!mapServerPeersBySceneName.TryGetValue(mapName, out peerInfo))
                     {
-                        error = ResponseAppServerAddressMessage.Error.ServerNotFound;
+                        error = UITextKeys.UI_ERROR_SERVER_NOT_FOUND;
                         if (LogInfo)
                             Logging.Log(LogTag, "Request Map Address: [" + connectionId + "] [" + mapName + "] [" + error + "]");
                     }
@@ -203,7 +203,7 @@ namespace MultiplayerARPG.MMO
                     }
                     else
                     {
-                        error = ResponseAppServerAddressMessage.Error.ServerNotFound;
+                        error = UITextKeys.UI_ERROR_SERVER_NOT_FOUND;
                         if (LogInfo)
                             Logging.Log(LogTag, "Request Chat Address: [" + connectionId + "] [" + error + "]");
                     }
@@ -211,7 +211,7 @@ namespace MultiplayerARPG.MMO
             }
             // Response
             result.Invoke(
-                error == ResponseAppServerAddressMessage.Error.None ? AckResponseCode.Success : AckResponseCode.Error,
+                error == UITextKeys.NONE ? AckResponseCode.Success : AckResponseCode.Error,
                 new ResponseAppServerAddressMessage()
                 {
                     error = error,

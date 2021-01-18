@@ -4,22 +4,14 @@ namespace MultiplayerARPG.MMO
 {
     public class ResponseSelectCharacterMessage : INetSerializable
     {
-        public enum Error : byte
-        {
-            None,
-            NotLoggedin,
-            AlreadySelectCharacter,
-            InvalidCharacterData,
-            MapNotReady,
-        }
-        public Error error;
+        public UITextKeys error;
         public string sceneName;
         public string networkAddress;
         public int networkPort;
 
         public void Deserialize(NetDataReader reader)
         {
-            error = (Error)reader.GetByte();
+            error = (UITextKeys)reader.GetPackedUShort();
             sceneName = reader.GetString();
             networkAddress = reader.GetString();
             networkPort = reader.GetInt();
@@ -27,7 +19,7 @@ namespace MultiplayerARPG.MMO
 
         public void Serialize(NetDataWriter writer)
         {
-            writer.Put((byte)error);
+            writer.PutPackedUShort((ushort)error);
             writer.Put(sceneName);
             writer.Put(networkAddress);
             writer.Put(networkPort);

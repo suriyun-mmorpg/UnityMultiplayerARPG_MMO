@@ -76,26 +76,7 @@ namespace MultiplayerARPG.MMO
         {
             await UniTask.Yield();
             Registering = false;
-            if (responseCode.ShowUnhandledResponseMessageDialog(() =>
-            {
-                string errorMessage = string.Empty;
-                switch (response.error)
-                {
-                    case ResponseUserRegisterMessage.Error.TooShortUsername:
-                        errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_USERNAME_TOO_SHORT.ToString());
-                        break;
-                    case ResponseUserRegisterMessage.Error.TooLongUsername:
-                        errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_USERNAME_TOO_LONG.ToString());
-                        break;
-                    case ResponseUserRegisterMessage.Error.TooShortPassword:
-                        errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_PASSWORD_TOO_SHORT.ToString());
-                        break;
-                    case ResponseUserRegisterMessage.Error.UsernameAlreadyExisted:
-                        errorMessage = LanguageManager.GetText(UITextKeys.UI_ERROR_USERNAME_EXISTED.ToString());
-                        break;
-                }
-                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), errorMessage);
-            }))
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.error))
             {
                 if (onRegisterFail != null)
                     onRegisterFail.Invoke();
