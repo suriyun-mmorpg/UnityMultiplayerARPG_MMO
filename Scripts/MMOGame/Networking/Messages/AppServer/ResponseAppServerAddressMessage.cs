@@ -4,19 +4,19 @@ namespace MultiplayerARPG.MMO
 {
     public class ResponseAppServerAddressMessage : INetSerializable
     {
-        public UITextKeys error;
+        public UITextKeys message;
         public CentralServerPeerInfo peerInfo;
 
         public void Deserialize(NetDataReader reader)
         {
-            error = (UITextKeys)reader.GetPackedUShort();
+            message = (UITextKeys)reader.GetPackedUShort();
             peerInfo = new CentralServerPeerInfo();
             peerInfo.Deserialize(reader);
         }
 
         public void Serialize(NetDataWriter writer)
         {
-            writer.PutPackedUShort((ushort)error);
+            writer.PutPackedUShort((ushort)message);
             peerInfo.Serialize(writer);
         }
     }

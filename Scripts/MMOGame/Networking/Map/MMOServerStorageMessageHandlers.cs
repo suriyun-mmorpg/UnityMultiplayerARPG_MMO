@@ -21,7 +21,7 @@ namespace MultiplayerARPG.MMO
             {
                 result.Invoke(AckResponseCode.Error, new ResponseOpenStorageMessage()
                 {
-                    error = UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE,
+                    message = UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE,
                 });
                 return;
             }
@@ -30,7 +30,7 @@ namespace MultiplayerARPG.MMO
             {
                 result.Invoke(AckResponseCode.Error, new ResponseOpenStorageMessage()
                 {
-                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
@@ -39,7 +39,7 @@ namespace MultiplayerARPG.MMO
             {
                 result.Invoke(AckResponseCode.Error, new ResponseOpenStorageMessage()
                 {
-                    error = UITextKeys.UI_ERROR_STORAGE_NOT_FOUND,
+                    message = UITextKeys.UI_ERROR_STORAGE_NOT_FOUND,
                 });
                 return;
             }
@@ -56,7 +56,7 @@ namespace MultiplayerARPG.MMO
             {
                 result.Invoke(AckResponseCode.Error, new ResponseCloseStorageMessage()
                 {
-                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
@@ -74,7 +74,7 @@ namespace MultiplayerARPG.MMO
             {
                 result.Invoke(AckResponseCode.Error, new ResponseMoveItemFromStorageMessage()
                 {
-                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
@@ -83,7 +83,7 @@ namespace MultiplayerARPG.MMO
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE);
                 result.Invoke(AckResponseCode.Error, new ResponseMoveItemFromStorageMessage()
                 {
-                    error = UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE,
+                    message = UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE,
                 });
                 return;
             }
@@ -98,13 +98,13 @@ namespace MultiplayerARPG.MMO
             req.StorageItemAmount = request.storageItemAmount;
             req.InventoryItemIndex = request.inventoryItemIndex;
             MoveItemFromStorageResp resp = await DbServiceClient.MoveItemFromStorageAsync(req);
-            UITextKeys error = (UITextKeys)resp.Error;
-            if (error != UITextKeys.NONE)
+            UITextKeys message = (UITextKeys)resp.Error;
+            if (message != UITextKeys.NONE)
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, error);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, message);
                 result.Invoke(AckResponseCode.Error, new ResponseMoveItemFromStorageMessage()
                 {
-                    error = error,
+                    message = message,
                 });
                 return;
             }
@@ -125,7 +125,7 @@ namespace MultiplayerARPG.MMO
             {
                 result.Invoke(AckResponseCode.Error, new ResponseMoveItemToStorageMessage()
                 {
-                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
@@ -134,7 +134,7 @@ namespace MultiplayerARPG.MMO
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE);
                 result.Invoke(AckResponseCode.Error, new ResponseMoveItemToStorageMessage()
                 {
-                    error = UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE,
+                    message = UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE,
                 });
                 return;
             }
@@ -149,13 +149,13 @@ namespace MultiplayerARPG.MMO
             req.InventoryItemAmount = request.inventoryItemAmount;
             req.StorageItemIndex = request.storageItemIndex;
             MoveItemToStorageResp resp = await DbServiceClient.MoveItemToStorageAsync(req);
-            UITextKeys error = (UITextKeys)resp.Error;
-            if (error != UITextKeys.NONE)
+            UITextKeys message = (UITextKeys)resp.Error;
+            if (message != UITextKeys.NONE)
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, error);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, message);
                 result.Invoke(AckResponseCode.Error, new ResponseMoveItemToStorageMessage()
                 {
-                    error = error,
+                    message = message,
                 });
                 return;
             }
@@ -176,7 +176,7 @@ namespace MultiplayerARPG.MMO
             {
                 result.Invoke(AckResponseCode.Error, new ResponseSwapOrMergeStorageItemMessage()
                 {
-                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
@@ -185,7 +185,7 @@ namespace MultiplayerARPG.MMO
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE);
                 result.Invoke(AckResponseCode.Error, new ResponseSwapOrMergeStorageItemMessage()
                 {
-                    error = UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE,
+                    message = UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE,
                 });
                 return;
             }
@@ -199,13 +199,13 @@ namespace MultiplayerARPG.MMO
             req.FromIndex = request.fromIndex;
             req.ToIndex = request.toIndex;
             SwapOrMergeStorageItemResp resp = await DbServiceClient.SwapOrMergeStorageItemAsync(req);
-            UITextKeys error = (UITextKeys)resp.Error;
-            if (error != UITextKeys.NONE)
+            UITextKeys message = (UITextKeys)resp.Error;
+            if (message != UITextKeys.NONE)
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, error);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, message);
                 result.Invoke(AckResponseCode.Error, new ResponseSwapOrMergeStorageItemMessage()
                 {
-                    error = error,
+                    message = message,
                 });
                 return;
             }

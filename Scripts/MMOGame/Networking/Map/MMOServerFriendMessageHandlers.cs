@@ -20,7 +20,7 @@ namespace MultiplayerARPG.MMO
             {
                 result.Invoke(AckResponseCode.Error, new ResponseFindCharactersMessage()
                 {
-                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
@@ -43,7 +43,7 @@ namespace MultiplayerARPG.MMO
             {
                 result.Invoke(AckResponseCode.Error, new ResponseGetFriendsMessage()
                 {
-                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
@@ -66,7 +66,7 @@ namespace MultiplayerARPG.MMO
             {
                 result.Invoke(AckResponseCode.Error, new ResponseAddFriendMessage()
                 {
-                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
@@ -88,7 +88,7 @@ namespace MultiplayerARPG.MMO
             {
                 result.Invoke(AckResponseCode.Error, new ResponseRemoveFriendMessage()
                 {
-                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }

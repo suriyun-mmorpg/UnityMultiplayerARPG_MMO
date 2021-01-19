@@ -76,7 +76,7 @@ namespace MultiplayerARPG.MMO
         {
             await UniTask.Yield();
             Registering = false;
-            if (responseCode.ShowUnhandledResponseMessageDialog(response.error))
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.message))
             {
                 if (onRegisterFail != null)
                     onRegisterFail.Invoke();

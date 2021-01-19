@@ -30,7 +30,7 @@ namespace MultiplayerARPG.MMO
             PlayerCharacterDataById.Clear();
             // Proceed response
             List<PlayerCharacterData> selectableCharacters = new List<PlayerCharacterData>();
-            if (!responseCode.ShowUnhandledResponseMessageDialog(response.error))
+            if (!responseCode.ShowUnhandledResponseMessageDialog(response.message))
             {
                 // Success, so set selectable characters by response's data
                 selectableCharacters = response.characters;
@@ -109,7 +109,7 @@ namespace MultiplayerARPG.MMO
         private async UniTaskVoid OnRequestedSelectCharacter(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseSelectCharacterMessage response)
         {
             await UniTask.Yield();
-            if (responseCode.ShowUnhandledResponseMessageDialog(response.error)) return;
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
             MMOClientInstance.Singleton.StartMapClient(response.sceneName, response.networkAddress, response.networkPort);
         }
 
@@ -130,7 +130,7 @@ namespace MultiplayerARPG.MMO
         private async UniTaskVoid OnRequestedDeleteCharacter(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseDeleteCharacterMessage response)
         {
             await UniTask.Yield();
-            if (responseCode.ShowUnhandledResponseMessageDialog(response.error)) return;
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
             // Reload characters
             LoadCharacters();
         }

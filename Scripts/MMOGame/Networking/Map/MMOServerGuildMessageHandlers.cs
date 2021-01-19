@@ -29,7 +29,7 @@ namespace MultiplayerARPG.MMO
             {
                 result.Invoke(AckResponseCode.Error, new ResponseAcceptGuildInvitationMessage()
                 {
-                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
@@ -39,7 +39,7 @@ namespace MultiplayerARPG.MMO
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessage);
                 result.Invoke(AckResponseCode.Error, new ResponseAcceptGuildInvitationMessage()
                 {
-                    error = validateResult.GameMessage,
+                    message = validateResult.GameMessage,
                 });
                 return;
             }
@@ -74,7 +74,7 @@ namespace MultiplayerARPG.MMO
             {
                 result.Invoke(AckResponseCode.Error, new ResponseDeclineGuildInvitationMessage()
                 {
-                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
@@ -84,7 +84,7 @@ namespace MultiplayerARPG.MMO
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessage);
                 result.Invoke(AckResponseCode.Error, new ResponseDeclineGuildInvitationMessage()
                 {
-                    error = validateResult.GameMessage,
+                    message = validateResult.GameMessage,
                 });
                 return;
             }
@@ -103,7 +103,7 @@ namespace MultiplayerARPG.MMO
             {
                 result.Invoke(AckResponseCode.Error, new ResponseSendGuildInvitationMessage()
                 {
-                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
@@ -113,7 +113,7 @@ namespace MultiplayerARPG.MMO
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, UITextKeys.UI_ERROR_CHARACTER_NOT_FOUND);
                 result.Invoke(AckResponseCode.Error, new ResponseSendGuildInvitationMessage()
                 {
-                    error = UITextKeys.UI_ERROR_CHARACTER_NOT_FOUND,
+                    message = UITextKeys.UI_ERROR_CHARACTER_NOT_FOUND,
                 });
                 return;
             }
@@ -123,7 +123,7 @@ namespace MultiplayerARPG.MMO
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessage);
                 result.Invoke(AckResponseCode.Error, new ResponseSendGuildInvitationMessage()
                 {
-                    error = validateResult.GameMessage,
+                    message = validateResult.GameMessage,
                 });
                 return;
             }
@@ -150,7 +150,7 @@ namespace MultiplayerARPG.MMO
             {
                 result.Invoke(AckResponseCode.Error, new ResponseCreateGuildMessage()
                 {
-                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
@@ -160,7 +160,7 @@ namespace MultiplayerARPG.MMO
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessage);
                 result.Invoke(AckResponseCode.Error, new ResponseCreateGuildMessage()
                 {
-                    error = validateResult.GameMessage,
+                    message = validateResult.GameMessage,
                 });
                 return;
             }
@@ -173,7 +173,7 @@ namespace MultiplayerARPG.MMO
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, UITextKeys.UI_ERROR_GUILD_NAME_EXISTED);
                 result.Invoke(AckResponseCode.Error, new ResponseCreateGuildMessage()
                 {
-                    error = UITextKeys.UI_ERROR_GUILD_NAME_EXISTED,
+                    message = UITextKeys.UI_ERROR_GUILD_NAME_EXISTED,
                 });
                 return;
             }
@@ -214,7 +214,7 @@ namespace MultiplayerARPG.MMO
             {
                 result.Invoke(AckResponseCode.Error, new ResponseChangeGuildLeaderMessage()
                 {
-                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
@@ -224,7 +224,7 @@ namespace MultiplayerARPG.MMO
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessage);
                 result.Invoke(AckResponseCode.Error, new ResponseChangeGuildLeaderMessage()
                 {
-                    error = validateResult.GameMessage,
+                    message = validateResult.GameMessage,
                 });
                 return;
             }
@@ -267,7 +267,7 @@ namespace MultiplayerARPG.MMO
             {
                 result.Invoke(AckResponseCode.Error, new ResponseKickMemberFromGuildMessage()
                 {
-                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
@@ -277,7 +277,7 @@ namespace MultiplayerARPG.MMO
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessage);
                 result.Invoke(AckResponseCode.Error, new ResponseKickMemberFromGuildMessage()
                 {
-                    error = validateResult.GameMessage,
+                    message = validateResult.GameMessage,
                 });
                 return;
             }
@@ -313,7 +313,7 @@ namespace MultiplayerARPG.MMO
             {
                 result.Invoke(AckResponseCode.Error, new ResponseLeaveGuildMessage()
                 {
-                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
@@ -323,7 +323,7 @@ namespace MultiplayerARPG.MMO
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessage);
                 result.Invoke(AckResponseCode.Error, new ResponseLeaveGuildMessage()
                 {
-                    error = validateResult.GameMessage,
+                    message = validateResult.GameMessage,
                 });
                 return;
             }
@@ -387,7 +387,7 @@ namespace MultiplayerARPG.MMO
             {
                 result.Invoke(AckResponseCode.Error, new ResponseChangeGuildMessageMessage()
                 {
-                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
@@ -397,7 +397,7 @@ namespace MultiplayerARPG.MMO
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessage);
                 result.Invoke(AckResponseCode.Error, new ResponseChangeGuildMessageMessage()
                 {
-                    error = validateResult.GameMessage,
+                    message = validateResult.GameMessage,
                 });
                 return;
             }
@@ -426,7 +426,7 @@ namespace MultiplayerARPG.MMO
             {
                 result.Invoke(AckResponseCode.Error, new ResponseChangeGuildRoleMessage()
                 {
-                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
@@ -436,7 +436,7 @@ namespace MultiplayerARPG.MMO
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessage);
                 result.Invoke(AckResponseCode.Error, new ResponseChangeGuildRoleMessage()
                 {
-                    error = validateResult.GameMessage,
+                    message = validateResult.GameMessage,
                 });
                 return;
             }
@@ -479,7 +479,7 @@ namespace MultiplayerARPG.MMO
             {
                 result.Invoke(AckResponseCode.Error, new ResponseChangeMemberGuildRoleMessage()
                 {
-                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
@@ -489,7 +489,7 @@ namespace MultiplayerARPG.MMO
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessage);
                 result.Invoke(AckResponseCode.Error, new ResponseChangeMemberGuildRoleMessage()
                 {
-                    error = validateResult.GameMessage,
+                    message = validateResult.GameMessage,
                 });
                 return;
             }
@@ -524,7 +524,7 @@ namespace MultiplayerARPG.MMO
             {
                 result.Invoke(AckResponseCode.Error, new ResponseIncreaseGuildSkillLevelMessage()
                 {
-                    error = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
@@ -534,7 +534,7 @@ namespace MultiplayerARPG.MMO
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, validateResult.GameMessage);
                 result.Invoke(AckResponseCode.Error, new ResponseIncreaseGuildSkillLevelMessage()
                 {
-                    error = validateResult.GameMessage,
+                    message = validateResult.GameMessage,
                 });
                 return;
             }

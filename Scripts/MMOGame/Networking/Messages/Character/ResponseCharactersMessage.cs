@@ -5,12 +5,12 @@ namespace MultiplayerARPG.MMO
 {
     public class ResponseCharactersMessage : INetSerializable
     {
-        public UITextKeys error;
+        public UITextKeys message;
         public List<PlayerCharacterData> characters;
 
         public void Deserialize(NetDataReader reader)
         {
-            error = (UITextKeys)reader.GetPackedUShort();
+            message = (UITextKeys)reader.GetPackedUShort();
 
             characters = new List<PlayerCharacterData>();
             byte count = reader.GetByte();
@@ -23,7 +23,7 @@ namespace MultiplayerARPG.MMO
 
         public void Serialize(NetDataWriter writer)
         {
-            writer.PutPackedUShort((ushort)error);
+            writer.PutPackedUShort((ushort)message);
             if (characters == null)
             {
                 writer.Put(byte.MinValue);

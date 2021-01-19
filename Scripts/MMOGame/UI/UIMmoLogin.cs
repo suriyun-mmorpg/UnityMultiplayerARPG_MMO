@@ -99,7 +99,7 @@ namespace MultiplayerARPG.MMO
             LoggingIn = false;
             string storingUsername = string.Empty;
             string storingPassword = string.Empty;
-            if (responseCode.ShowUnhandledResponseMessageDialog(response.error))
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.message))
             {
                 if (onLoginFail != null)
                     onLoginFail.Invoke();

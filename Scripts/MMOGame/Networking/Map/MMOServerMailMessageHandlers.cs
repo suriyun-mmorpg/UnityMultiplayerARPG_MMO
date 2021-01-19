@@ -47,12 +47,12 @@ namespace MultiplayerARPG.MMO
                     MailId = request.id,
                     UserId = playerCharacter.UserId,
                 });
-                UITextKeys error = (UITextKeys)resp.Error;
+                UITextKeys message = (UITextKeys)resp.Error;
                 result.Invoke(
-                    error == UITextKeys.NONE ? AckResponseCode.Success : AckResponseCode.Error,
+                    message == UITextKeys.NONE ? AckResponseCode.Success : AckResponseCode.Error,
                     new ResponseReadMailMessage()
                     {
-                        error = error,
+                        message = message,
                         mail = resp.Mail.FromByteString<Mail>(),
                     });
             }
@@ -60,7 +60,7 @@ namespace MultiplayerARPG.MMO
             {
                 result.Invoke(AckResponseCode.Error, new ResponseReadMailMessage()
                 {
-                    error = UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE,
+                    message = UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE,
                 });
             }
 #endif
@@ -72,7 +72,7 @@ namespace MultiplayerARPG.MMO
             IPlayerCharacterData playerCharacter;
             if (GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                UITextKeys error = UITextKeys.NONE;
+                UITextKeys message = UITextKeys.NONE;
                 GetMailResp mailResp = await DbServiceClient.GetMailAsync(new GetMailReq()
                 {
                     MailId = request.id,
@@ -81,11 +81,11 @@ namespace MultiplayerARPG.MMO
                 Mail mail = mailResp.Mail.FromByteString<Mail>();
                 if (mail.IsClaim)
                 {
-                    error = UITextKeys.UI_ERROR_MAIL_CLAIM_ALREADY_CLAIMED;
+                    message = UITextKeys.UI_ERROR_MAIL_CLAIM_ALREADY_CLAIMED;
                 }
                 else if (mail.IsDelete)
                 {
-                    error = UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE;
+                    message = UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE;
                 }
                 else
                 {
@@ -97,11 +97,11 @@ namespace MultiplayerARPG.MMO
                             increasingItems.Add(CharacterItem.Create(mailItem.Key, amount: mailItem.Value));
                         }
                         if (playerCharacter.IncreasingItemsWillOverwhelming(increasingItems))
-                            error = UITextKeys.UI_ERROR_WILL_OVERWHELMING;
+                            message = UITextKeys.UI_ERROR_WILL_OVERWHELMING;
                         else
                             playerCharacter.IncreaseItems(increasingItems);
                     }
-                    if (error == UITextKeys.NONE && mail.Currencies.Count > 0)
+                    if (message == UITextKeys.NONE && mail.Currencies.Count > 0)
                     {
                         List<CharacterCurrency> increasingCurrencies = new List<CharacterCurrency>();
                         foreach (KeyValuePair<int, int> mailCurrency in mail.Currencies)
@@ -110,16 +110,16 @@ namespace MultiplayerARPG.MMO
                         }
                         playerCharacter.IncreaseCurrencies(increasingCurrencies);
                     }
-                    if (error == UITextKeys.NONE && mail.Gold > 0)
+                    if (message == UITextKeys.NONE && mail.Gold > 0)
                     {
                         playerCharacter.Gold = playerCharacter.Gold.Increase(mail.Gold);
                     }
                 }
-                if (error != UITextKeys.NONE)
+                if (message != UITextKeys.NONE)
                 {
                     result.Invoke(AckResponseCode.Error, new ResponseClaimMailItemsMessage()
                     {
-                        error = error,
+                        message = message,
                     });
                     return;
                 }
@@ -128,12 +128,12 @@ namespace MultiplayerARPG.MMO
                     MailId = request.id,
                     UserId = playerCharacter.UserId,
                 });
-                error = (UITextKeys)resp.Error;
+                message = (UITextKeys)resp.Error;
                 result.Invoke(
-                    error == UITextKeys.NONE ? AckResponseCode.Success : AckResponseCode.Error,
+                    message == UITextKeys.NONE ? AckResponseCode.Success : AckResponseCode.Error,
                     new ResponseClaimMailItemsMessage()
                     {
-                        error = error,
+                        message = message,
                         mail = resp.Mail.FromByteString<Mail>(),
                     });
             }
@@ -141,7 +141,7 @@ namespace MultiplayerARPG.MMO
             {
                 result.Invoke(AckResponseCode.Error, new ResponseClaimMailItemsMessage()
                 {
-                    error = UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE,
+                    message = UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE,
                 });
             }
 #endif
@@ -158,19 +158,19 @@ namespace MultiplayerARPG.MMO
                     MailId = request.id,
                     UserId = playerCharacter.UserId,
                 });
-                UITextKeys error = (UITextKeys)resp.Error;
+                UITextKeys message = (UITextKeys)resp.Error;
                 result.Invoke(
-                    error == UITextKeys.NONE ? AckResponseCode.Success : AckResponseCode.Error,
+                    message == UITextKeys.NONE ? AckResponseCode.Success : AckResponseCode.Error,
                     new ResponseDeleteMailMessage()
                     {
-                        error = error,
+                        message = message,
                     });
             }
             else
             {
                 result.Invoke(AckResponseCode.Error, new ResponseDeleteMailMessage()
                 {
-                    error = UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE,
+                    message = UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE,
                 });
             }
 #endif
@@ -193,7 +193,7 @@ namespace MultiplayerARPG.MMO
                 {
                     result.Invoke(AckResponseCode.Error, new ResponseSendMailMessage()
                     {
-                        error = UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD,
+                        message = UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD,
                     });
                     return;
                 }
@@ -207,7 +207,7 @@ namespace MultiplayerARPG.MMO
                 {
                     result.Invoke(AckResponseCode.Error, new ResponseSendMailMessage()
                     {
-                        error = UITextKeys.UI_ERROR_MAIL_SEND_NO_RECEIVER,
+                        message = UITextKeys.UI_ERROR_MAIL_SEND_NO_RECEIVER,
                     });
                     return;
                 }
@@ -224,19 +224,19 @@ namespace MultiplayerARPG.MMO
                 {
                     Mail = DatabaseServiceUtils.ToByteString(mail),
                 });
-                UITextKeys error = (UITextKeys)resp.Error;
+                UITextKeys message = (UITextKeys)resp.Error;
                 result.Invoke(
-                    error == UITextKeys.NONE ? AckResponseCode.Success : AckResponseCode.Error,
+                    message == UITextKeys.NONE ? AckResponseCode.Success : AckResponseCode.Error,
                     new ResponseSendMailMessage()
                     {
-                        error = error,
+                        message = message,
                     });
             }
             else
             {
                 result.Invoke(AckResponseCode.Error, new ResponseSendMailMessage()
                 {
-                    error = UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE,
+                    message = UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE,
                 });
             }
 #endif

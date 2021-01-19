@@ -18,7 +18,7 @@ namespace MultiplayerARPG.MMO
         private async UniTaskVoid OnRequestedCreateCharacter(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseCreateCharacterMessage response)
         {
             await UniTask.Yield();
-            if (responseCode.ShowUnhandledResponseMessageDialog(response.error)) return;
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
             if (eventOnCreateCharacter != null)
                 eventOnCreateCharacter.Invoke();
         }

@@ -204,17 +204,17 @@ namespace MultiplayerARPG.MMO
             RequestSpawnMapMessage request,
             RequestProceedResultDelegate<ResponseSpawnMapMessage> result)
         {
-            UITextKeys error = UITextKeys.NONE;
+            UITextKeys message = UITextKeys.NONE;
             if (!CentralAppServerRegister.IsRegisteredToCentralServer)
-                error = UITextKeys.UI_ERROR_APP_NOT_READY;
+                message = UITextKeys.UI_ERROR_APP_NOT_READY;
             else if (string.IsNullOrEmpty(request.mapId))
-                error = UITextKeys.UI_ERROR_EMPTY_SCENE_NAME;
+                message = UITextKeys.UI_ERROR_EMPTY_SCENE_NAME;
 
-            if (error != UITextKeys.NONE)
+            if (message != UITextKeys.NONE)
             {
                 result.Invoke(AckResponseCode.Error, new ResponseSpawnMapMessage()
                 {
-                    error = error
+                    message = message
                 });
             }
             else
@@ -339,7 +339,7 @@ namespace MultiplayerARPG.MMO
                                 {
                                     result.Invoke(AckResponseCode.Success, new ResponseSpawnMapMessage()
                                     {
-                                        error = UITextKeys.NONE,
+                                        message = UITextKeys.NONE,
                                         instanceId = request.instanceId,
                                         requestId = request.requestId,
                                     });
@@ -365,7 +365,7 @@ namespace MultiplayerARPG.MMO
                                 {
                                     result.Invoke(AckResponseCode.Error, new ResponseSpawnMapMessage()
                                     {
-                                        error = UITextKeys.UI_ERROR_CANNOT_EXCUTE_MAP_SERVER,
+                                        message = UITextKeys.UI_ERROR_CANNOT_EXCUTE_MAP_SERVER,
                                         instanceId = request.instanceId,
                                         requestId = request.requestId,
                                     });
@@ -400,7 +400,7 @@ namespace MultiplayerARPG.MMO
                 {
                     result.Invoke(AckResponseCode.Error, new ResponseSpawnMapMessage()
                     {
-                        error = UITextKeys.UI_ERROR_UNKNOW,
+                        message = UITextKeys.UI_ERROR_UNKNOW,
                         instanceId = request.instanceId,
                         requestId = request.requestId,
                     });
