@@ -30,7 +30,6 @@ namespace MultiplayerARPG.MMO
             GuildData guild;
             if (!GameInstance.ServerGuildHandlers.TryGetGuild(playerCharacter.GuildId, out guild))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, UITextKeys.UI_ERROR_NOT_JOINED_GUILD);
                 result.Invoke(AckResponseCode.Error, new ResponseDepositGuildGoldMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_JOINED_GUILD,
@@ -39,7 +38,6 @@ namespace MultiplayerARPG.MMO
             }
             if (playerCharacter.Gold - request.gold < 0)
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD_TO_DEPOSIT);
                 result.Invoke(AckResponseCode.Error, new ResponseDepositGuildGoldMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD_TO_DEPOSIT,
@@ -79,7 +77,6 @@ namespace MultiplayerARPG.MMO
             }
             if (playerCharacter.Gold - request.gold < 0)
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD_TO_DEPOSIT);
                 result.Invoke(AckResponseCode.Error, new ResponseDepositUserGoldMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD_TO_DEPOSIT,
@@ -113,7 +110,6 @@ namespace MultiplayerARPG.MMO
             GuildData guild;
             if (!GameInstance.ServerGuildHandlers.TryGetGuild(playerCharacter.GuildId, out guild))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, UITextKeys.UI_ERROR_NOT_JOINED_GUILD);
                 result.Invoke(AckResponseCode.Error, new ResponseWithdrawGuildGoldMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_JOINED_GUILD,
@@ -128,7 +124,6 @@ namespace MultiplayerARPG.MMO
             int gold = goldResp.GuildGold - request.gold;
             if (gold < 0)
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD_TO_WITHDRAW);
                 result.Invoke(AckResponseCode.Error, new ResponseWithdrawGuildGoldMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD_TO_WITHDRAW,
@@ -174,7 +169,6 @@ namespace MultiplayerARPG.MMO
             int gold = goldResp.Gold - request.gold;
             if (gold < 0)
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD_TO_WITHDRAW);
                 result.Invoke(AckResponseCode.Error, new ResponseWithdrawUserGoldMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD_TO_WITHDRAW,

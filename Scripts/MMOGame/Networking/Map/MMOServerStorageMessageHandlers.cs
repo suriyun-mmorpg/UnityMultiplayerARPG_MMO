@@ -80,7 +80,6 @@ namespace MultiplayerARPG.MMO
             }
             if (!GameInstance.ServerStorageHandlers.CanAccessStorage(playerCharacter, storageId))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE);
                 result.Invoke(AckResponseCode.Error, new ResponseMoveItemFromStorageMessage()
                 {
                     message = UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE,
@@ -101,7 +100,6 @@ namespace MultiplayerARPG.MMO
             UITextKeys message = (UITextKeys)resp.Error;
             if (message != UITextKeys.NONE)
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, message);
                 result.Invoke(AckResponseCode.Error, new ResponseMoveItemFromStorageMessage()
                 {
                     message = message,
@@ -131,7 +129,6 @@ namespace MultiplayerARPG.MMO
             }
             if (!GameInstance.ServerStorageHandlers.CanAccessStorage(playerCharacter, storageId))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE);
                 result.Invoke(AckResponseCode.Error, new ResponseMoveItemToStorageMessage()
                 {
                     message = UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE,
@@ -152,7 +149,6 @@ namespace MultiplayerARPG.MMO
             UITextKeys message = (UITextKeys)resp.Error;
             if (message != UITextKeys.NONE)
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, message);
                 result.Invoke(AckResponseCode.Error, new ResponseMoveItemToStorageMessage()
                 {
                     message = message,
@@ -182,7 +178,6 @@ namespace MultiplayerARPG.MMO
             }
             if (!GameInstance.ServerStorageHandlers.CanAccessStorage(playerCharacter, storageId))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE);
                 result.Invoke(AckResponseCode.Error, new ResponseSwapOrMergeStorageItemMessage()
                 {
                     message = UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE,
@@ -202,7 +197,6 @@ namespace MultiplayerARPG.MMO
             UITextKeys message = (UITextKeys)resp.Error;
             if (message != UITextKeys.NONE)
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(requestHandler.ConnectionId, message);
                 result.Invoke(AckResponseCode.Error, new ResponseSwapOrMergeStorageItemMessage()
                 {
                     message = message,
