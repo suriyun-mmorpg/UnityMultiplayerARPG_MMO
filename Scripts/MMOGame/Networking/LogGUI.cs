@@ -59,6 +59,8 @@ public class LogGUI : MonoBehaviour
 
     private void LateUpdate()
     {
+        if (string.IsNullOrEmpty(logSavePath))
+            return;
         using (StreamWriter writer = new StreamWriter(logSavePath, true, Encoding.UTF8))
         {
             string logText;
