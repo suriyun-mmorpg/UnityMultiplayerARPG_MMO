@@ -3,6 +3,7 @@ using System.IO;
 using System.Text;
 using UnityEngine;
 using LiteNetLibManager;
+using System.Collections.Concurrent;
 
 public class LogGUI : MonoBehaviour
 {
@@ -23,7 +24,8 @@ public class LogGUI : MonoBehaviour
 
     private Vector2 scrollPosition;
     private string logSavePath;
-    private List<LogData> logList = new List<LogData>();
+    private readonly ConcurrentQueue<LogData> PrintingLogs = new ConcurrentQueue<LogData>();
+    private readonly ConcurrentQueue<string> WritingLogs = new ConcurrentQueue<string>();
     private bool shouldScrollToBottom;
 
     private void Start()
@@ -55,14 +57,22 @@ public class LogGUI : MonoBehaviour
         Application.logMessageReceivedThreaded -= HandleLog;
     }
 
+    private void LateUpdate()
+    {
+        using (StreamWriter writer = new StreamWriter(logSavePath, true, Encoding.UTF8))
+        {
+            string logText;
+            while (WritingLogs.TryDequeue(out logText))
+            {
+                writer.WriteLine(logText);
+            }
+        }
+    }
+
     private void HandleLog(LogType type, string tag, string logString)
     {
         if (string.IsNullOrEmpty(logSavePath))
             return;
-        using (StreamWriter writer = new StreamWriter(logSavePath, true, Encoding.UTF8))
-        {
-            writer.WriteLine($"({type})[{tag}] {logString}\n");
-        }
         Color color = Color.white;
         switch (type)
         {
@@ -76,13 +86,14 @@ public class LogGUI : MonoBehaviour
                 color = Color.magenta;
                 break;
         }
-        logList.Add(new LogData()
+        PrintingLogs.Enqueue(new LogData()
         {
             logText = $"[{tag}] {logString}",
             logColor = color,
         });
-        if (logList.Count > showLogSize)
-            logList.RemoveAt(0);
+        if (PrintingLogs.Count > showLogSize)
+            PrintingLogs.TryDequeue(out _);
+        WritingLogs.Enqueue($"({type})[{tag}] {logString}\n");
         shouldScrollToBottom = true;
     }
 
@@ -90,10 +101,6 @@ public class LogGUI : MonoBehaviour
     {
         if (string.IsNullOrEmpty(logSavePath))
             return;
-        using (StreamWriter writer = new StreamWriter(logSavePath, true, Encoding.UTF8))
-        {
-            writer.WriteLine($"({type})[UnityEngine.Debug] {condition}\n");
-        }
         Color color = Color.white;
         switch (type)
         {
@@ -107,13 +114,14 @@ public class LogGUI : MonoBehaviour
                 color = Color.magenta;
                 break;
         }
-        logList.Add(new LogData()
+        PrintingLogs.Enqueue(new LogData()
         {
             logText = $"[UnityEngine.Debug] {condition}",
             logColor = color,
         });
-        if (logList.Count > showLogSize)
-            logList.RemoveAt(0);
+        if (PrintingLogs.Count > showLogSize)
+            PrintingLogs.TryDequeue(out _);
+        WritingLogs.Enqueue($"({type})[UnityEngine.Debug] {condition}\n");
         shouldScrollToBottom = true;
     }
 
@@ -125,9 +133,8 @@ public class LogGUI : MonoBehaviour
             shouldScrollToBottom = false;
         }
         scrollPosition = GUILayout.BeginScrollView(scrollPosition, GUILayout.Width(Screen.width), GUILayout.Height(logAreaHeight));
-        for (int i = 0; i < logList.Count; ++i)
+        foreach (LogData logData in PrintingLogs)
         {
-            LogData logData = logList[i];
             GUI.color = logData.logColor;
             GUILayout.Label(logData.logText);
         }
