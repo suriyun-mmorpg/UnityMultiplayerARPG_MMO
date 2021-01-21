@@ -113,7 +113,6 @@ namespace MultiplayerARPG.MMO
 
         protected override void Awake()
         {
-            base.Awake();
             if (useWebSocket)
             {
                 if (centralTransportFactory == null || !centralTransportFactory.CanUseWithWebGL)
@@ -162,6 +161,7 @@ namespace MultiplayerARPG.MMO
             ClientOnlineCharacterHandlers = gameObject.GetOrAddComponent<IClientOnlineCharacterHandlers, DefaultClientOnlineCharacterHandlers>();
             ClientGameMessageHandlers = gameObject.GetOrAddComponent<IClientGameMessageHandlers, DefaultClientGameMessageHandlers>();
 #endif
+            base.Awake();
         }
 
         protected override void LateUpdate()
