@@ -23,7 +23,7 @@ namespace MultiplayerARPG.MMO
         protected readonly Dictionary<string, CentralUserPeerInfo> userPeersByUserId = new Dictionary<string, CentralUserPeerInfo>();
         // Map users, users whom connected to map server / instance map server will be kept in this list
         protected readonly Dictionary<long, HashSet<string>> mapUserIds = new Dictionary<long, HashSet<string>>();
-        // <Ack Id, <Map-Server Transport Handler, Map-Server Ack Id> dictionary
+        // <Request Id, Response Handler> dictionary
         protected readonly Dictionary<string, RequestProceedResultDelegate<ResponseSpawnMapMessage>> requestSpawnMapHandlers = new Dictionary<string, RequestProceedResultDelegate<ResponseSpawnMapMessage>>();
 #endif
 
@@ -67,7 +67,7 @@ namespace MultiplayerARPG.MMO
             RegisterRequestToServer<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.RequestSpawnMap, HandleRequestSpawnMap);
             RegisterRequestToServer<RequestValidateAccessTokenMessage, ResponseValidateAccessTokenMessage>(MMORequestTypes.RequestValidateAccessToken, HandleRequestValidateAccessToken);
             // Register this response for map-spawn requests
-            RegisterRequestToClient<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.RequestSpawnMap, null, HandleResponseSpawnMap);
+            Server.RegisterResponseHandler<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.RequestSpawnMap, HandleResponseSpawnMap);
             // Keeping `RegisterClientMessages` and `RegisterServerMessages` for backward compatibility, can use any of below dev extension methods
             this.InvokeInstanceDevExtMethods("RegisterClientMessages");
             this.InvokeInstanceDevExtMethods("RegisterServerMessages");
