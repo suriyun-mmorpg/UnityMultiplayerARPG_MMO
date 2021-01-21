@@ -127,8 +127,8 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
             CentralAppServerRegister = new CentralAppServerRegister(CentralTransportFactory.Build(), this);
             CentralAppServerRegister.onAppServerRegistered = OnAppServerRegistered;
-            CentralAppServerRegister.RegisterMessage(MMOMessageTypes.AppServerAddress, HandleResponseAppServerAddress);
-            CentralAppServerRegister.RegisterResponse<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.RequestSpawnMap);
+            CentralAppServerRegister.RegisterMessageHandler(MMOMessageTypes.AppServerAddress, HandleResponseAppServerAddress);
+            CentralAppServerRegister.RegisterResponseHandler<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.RequestSpawnMap);
             this.InvokeInstanceDevExtMethods("OnInitCentralAppServerRegister");
             ChatNetworkManager = gameObject.AddComponent<ChatNetworkManager>();
             // Server Handlers

@@ -50,29 +50,25 @@ namespace MultiplayerARPG.MMO
             this.InvokeInstanceDevExtMethods("OnInitCentralAppServerRegister");
         }
 
-        protected override void RegisterClientMessages()
+        protected override void RegisterMessages()
         {
-            this.InvokeInstanceDevExtMethods("RegisterClientMessages");
-            base.RegisterClientMessages();
-            EnableServerRequestResponse(MMOMessageTypes.Request, MMOMessageTypes.Response);
+            base.RegisterMessages();
             RegisterClientMessage(MMOMessageTypes.Chat, HandleChatAtClient);
             RegisterClientMessage(MMOMessageTypes.UpdateMapUser, HandleUpdateMapUserAtClient);
             RegisterClientMessage(MMOMessageTypes.UpdatePartyMember, HandleUpdatePartyMemberAtClient);
             RegisterClientMessage(MMOMessageTypes.UpdateParty, HandleUpdatePartyAtClient);
             RegisterClientMessage(MMOMessageTypes.UpdateGuildMember, HandleUpdateGuildMemberAtClient);
             RegisterClientMessage(MMOMessageTypes.UpdateGuild, HandleUpdateGuildAtClient);
-        }
-
-        protected override void RegisterServerMessages()
-        {
-            this.InvokeInstanceDevExtMethods("RegisterServerMessages");
-            base.RegisterServerMessages();
             RegisterServerMessage(MMOMessageTypes.Chat, HandleChatAtServer);
             RegisterServerMessage(MMOMessageTypes.UpdateMapUser, HandleUpdateMapUserAtServer);
             RegisterServerMessage(MMOMessageTypes.UpdatePartyMember, HandleUpdatePartyMemberAtServer);
             RegisterServerMessage(MMOMessageTypes.UpdateParty, HandleUpdatePartyAtServer);
             RegisterServerMessage(MMOMessageTypes.UpdateGuildMember, HandleUpdateGuildMemberAtServer);
             RegisterServerMessage(MMOMessageTypes.UpdateGuild, HandleUpdateGuildAtServer);
+            // Keeping `RegisterClientMessages` and `RegisterServerMessages` for backward compatibility, can use any of below dev extension methods
+            this.InvokeInstanceDevExtMethods("RegisterClientMessages");
+            this.InvokeInstanceDevExtMethods("RegisterServerMessages");
+            this.InvokeInstanceDevExtMethods("RegisterMessages");
         }
 
         protected virtual void Clean()

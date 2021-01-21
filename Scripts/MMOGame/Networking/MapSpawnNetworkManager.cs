@@ -102,7 +102,7 @@ namespace MultiplayerARPG.MMO
             }
             CentralAppServerRegister = new CentralAppServerRegister(CentralTransportFactory.Build(), this);
             CentralAppServerRegister.onAppServerRegistered = OnAppServerRegistered;
-            CentralAppServerRegister.RegisterRequest<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.RequestSpawnMap, HandleRequestSpawnMap);
+            CentralAppServerRegister.RegisterRequestHandler<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.RequestSpawnMap, HandleRequestSpawnMap);
             this.InvokeInstanceDevExtMethods("OnInitCentralAppServerRegister");
         }
 
