@@ -118,7 +118,7 @@ namespace MultiplayerARPG.MMO
             PartyData party;
             if (ServerPartyHandlers.TryGetParty(playerCharacterEntity.PartyId, out party))
             {
-                // If character is party member, will bring party member to join instance
+                // If character is party leader, will bring party member to join instance
                 if (party.IsLeader(playerCharacterEntity.Id))
                 {
                     List<BasePlayerCharacterEntity> aliveAllies = playerCharacterEntity.FindAliveCharacters<BasePlayerCharacterEntity>(CurrentGameInstance.joinInstanceMapDistance, true, false, false);
@@ -131,6 +131,11 @@ namespace MultiplayerARPG.MMO
                     }
                     instanceMapWarpingCharacters.Add(playerCharacterEntity.ObjectId);
                     playerCharacterEntity.IsWarping = true;
+                }
+                else
+                {
+                    ServerGameMessageHandlers.SendGameMessage(playerCharacterEntity.ConnectionId, UITextKeys.UI_ERROR_PARTY_MEMBER_CANNOT_ENTER_INSTANCE);
+                    return;
                 }
             }
             else
