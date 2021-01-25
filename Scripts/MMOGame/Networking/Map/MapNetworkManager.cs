@@ -591,17 +591,6 @@ namespace MultiplayerARPG.MMO
 
                     // Register player character entity to the server
                     RegisterPlayerCharacter(connectionId, playerCharacterEntity);
-
-                    // Setup subscribers
-                    LiteNetLibPlayer player = GetPlayer(connectionId);
-                    foreach (LiteNetLibIdentity spawnedObject in Assets.GetSpawnedObjects())
-                    {
-                        if (spawnedObject.ConnectionId == player.ConnectionId)
-                            continue;
-
-                        if (spawnedObject.ShouldAddSubscriber(player))
-                            spawnedObject.AddSubscriber(player);
-                    }
                 }
             }
         }
