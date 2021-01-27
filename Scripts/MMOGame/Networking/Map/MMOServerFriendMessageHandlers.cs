@@ -16,7 +16,7 @@ namespace MultiplayerARPG.MMO
         public async UniTaskVoid HandleRequestFindCharacters(RequestHandlerData requestHandler, RequestFindCharactersMessage request, RequestProceedResultDelegate<ResponseFindCharactersMessage> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            if (!GameInstance.ServerUserHandlers.TryGetUserId(requestHandler.ConnectionId, out _))
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out _))
             {
                 result.Invoke(AckResponseCode.Error, new ResponseFindCharactersMessage()
                 {
@@ -76,7 +76,10 @@ namespace MultiplayerARPG.MMO
                 Character2Id = request.friendId,
             });
             GameInstance.ServerGameMessageHandlers.SendSetFriends(requestHandler.ConnectionId, resp.List.MakeArrayFromRepeatedByteString<SocialCharacterData>());
-            result.Invoke(AckResponseCode.Success, new ResponseAddFriendMessage());
+            result.Invoke(AckResponseCode.Success, new ResponseAddFriendMessage()
+            {
+                message = UITextKeys.UI_FRIEND_ADDED,
+            });
 #endif
         }
 
@@ -98,7 +101,10 @@ namespace MultiplayerARPG.MMO
                 Character2Id = request.friendId
             });
             GameInstance.ServerGameMessageHandlers.SendSetFriends(requestHandler.ConnectionId, resp.List.MakeArrayFromRepeatedByteString<SocialCharacterData>());
-            result.Invoke(AckResponseCode.Success, new ResponseRemoveFriendMessage());
+            result.Invoke(AckResponseCode.Success, new ResponseRemoveFriendMessage()
+            {
+                message = UITextKeys.UI_FRIEND_REMOVED,
+            });
 #endif
         }
     }
