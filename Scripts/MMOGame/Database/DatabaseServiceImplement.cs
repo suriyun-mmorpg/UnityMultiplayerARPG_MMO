@@ -260,6 +260,14 @@ namespace MultiplayerARPG.MMO
         {
             List<SocialCharacterData> friends = await ReadFriends(request.Character1Id);
             // Update to cache
+            for (int i = 0; i < friends.Count; ++i)
+            {
+                if (friends[i].id.Equals(request.Character2Id))
+                {
+                    friends.RemoveAt(i);
+                    break;
+                }
+            }
             SocialCharacterData character = await ReadSocialCharacter(request.Character2Id);
             friends.Add(character);
             cachedFriend[request.Character1Id] = friends;
@@ -282,6 +290,7 @@ namespace MultiplayerARPG.MMO
                     break;
                 }
             }
+            cachedFriend[request.Character1Id] = friends;
             // Update to database
             await Database.DeleteFriend(request.Character1Id, request.Character2Id);
             ReadFriendsResp resp = new ReadFriendsResp();
