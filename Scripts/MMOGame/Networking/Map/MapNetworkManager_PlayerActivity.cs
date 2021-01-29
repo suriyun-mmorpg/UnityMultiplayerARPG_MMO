@@ -47,7 +47,7 @@ namespace MultiplayerARPG.MMO
             {
                 if (overrideRotation)
                     playerCharacterEntity.CurrentRotation = rotation;
-                playerCharacterEntity.Teleport(position);
+                playerCharacterEntity.Teleport(position, Quaternion.Euler(playerCharacterEntity.CurrentRotation));
                 return;
             }
 
