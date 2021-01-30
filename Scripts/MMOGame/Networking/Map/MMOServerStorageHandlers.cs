@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG.MMO
 {
-    public class MMOServerStorageHandlers : MonoBehaviour, IServerStorageHandlers
+    public partial class MMOServerStorageHandlers : MonoBehaviour, IServerStorageHandlers
     {
 #if UNITY_STANDALONE && !CLIENT_BUILD
         private readonly ConcurrentDictionary<StorageId, List<CharacterItem>> storageItems = new ConcurrentDictionary<StorageId, List<CharacterItem>>();

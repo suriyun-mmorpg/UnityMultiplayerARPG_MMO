@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG.MMO
 {
-    public class MMOServerMailMessageHandlers : MonoBehaviour, IServerMailMessageHandlers
+    public partial class MMOServerMailMessageHandlers : MonoBehaviour, IServerMailMessageHandlers
     {
 #if UNITY_STANDALONE && !CLIENT_BUILD
         public DatabaseService.DatabaseServiceClient DbServiceClient

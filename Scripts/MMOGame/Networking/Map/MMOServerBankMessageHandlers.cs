@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG.MMO
 {
-    public class MMOServerBankMessageHandlers : MonoBehaviour, IServerBankMessageHandlers
+    public partial class MMOServerBankMessageHandlers : MonoBehaviour, IServerBankMessageHandlers
     {
         public ChatNetworkManager ChatNetworkManager { get; private set; }
 

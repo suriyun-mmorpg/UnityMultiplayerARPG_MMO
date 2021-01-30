@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG.MMO
 {
-    public class MMOServerFriendMessageHandlers : MonoBehaviour, IServerFriendMessageHandlers
+    public partial class MMOServerFriendMessageHandlers : MonoBehaviour, IServerFriendMessageHandlers
     {
 #if UNITY_STANDALONE && !CLIENT_BUILD
         public DatabaseService.DatabaseServiceClient DbServiceClient
