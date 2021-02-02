@@ -164,17 +164,17 @@ namespace MultiplayerARPG.MMO
             base.Awake();
         }
 
-        protected override void LateUpdate()
+        protected override void FixedUpdate()
         {
-            base.LateUpdate();
+            base.FixedUpdate();
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            float tempUnscaledTime = Time.unscaledTime;
+            float tempTime = Time.fixedTime;
             if (IsServer)
             {
                 CentralAppServerRegister.Update();
-                if (tempUnscaledTime - lastSaveTime > autoSaveDuration)
+                if (tempTime - lastSaveTime > autoSaveDuration)
                 {
-                    lastSaveTime = tempUnscaledTime;
+                    lastSaveTime = tempTime;
                     SaveCharactersRoutine().Forget();
                     if (!IsInstanceMap())
                     {
@@ -186,8 +186,8 @@ namespace MultiplayerARPG.MMO
                 {
                     // Quitting application when no players
                     if (Players.Count > 0)
-                        terminatingTime = tempUnscaledTime;
-                    else if (tempUnscaledTime - terminatingTime >= TERMINATE_INSTANCE_DELAY)
+                        terminatingTime = tempTime;
+                    else if (tempTime - terminatingTime >= TERMINATE_INSTANCE_DELAY)
                         Application.Quit();
                 }
 
