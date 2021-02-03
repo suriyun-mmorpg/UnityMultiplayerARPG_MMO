@@ -107,5 +107,29 @@ namespace MultiplayerARPG.MMO
             });
 #endif
         }
+
+        public async UniTaskVoid HandleRequestSendFriendRequest(RequestHandlerData requestHandler, RequestSendFriendRequestMessage request, RequestProceedResultDelegate<ResponseSendFriendRequestMessage> result)
+        {
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            result.Invoke(AckResponseCode.Unimplemented, new ResponseSendFriendRequestMessage());
+            await UniTask.Yield();
+#endif
+        }
+
+        public async UniTaskVoid HandleRequestAcceptFriendRequest(RequestHandlerData requestHandler, RequestAcceptFriendRequestMessage request, RequestProceedResultDelegate<ResponseAcceptFriendRequestMessage> result)
+        {
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            result.Invoke(AckResponseCode.Unimplemented, new ResponseAcceptFriendRequestMessage());
+            await UniTask.Yield();
+#endif
+        }
+
+        public async UniTaskVoid HandleRequestDeclineFriendRequest(RequestHandlerData requestHandler, RequestDeclineFriendRequestMessage request, RequestProceedResultDelegate<ResponseDeclineFriendRequestMessage> result)
+        {
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            result.Invoke(AckResponseCode.Unimplemented, new ResponseDeclineFriendRequestMessage());
+            await UniTask.Yield();
+#endif
+        }
     }
 }
