@@ -148,6 +148,48 @@ namespace MultiplayerARPG.MMO
                 await InsertMigrationId(migrationId);
                 Logging.Log("Migrated to 1.61b");
             }
+            migrationId = "1.62e";
+            if (!await HasMigrationId(migrationId))
+            {
+                Logging.Log("Migrating up to 1.62e");
+                await ExecuteNonQuery("ALTER TABLE `characterattribute` ADD INDEX(`idx`);");
+                await ExecuteNonQuery("ALTER TABLE `characterattribute` ADD INDEX(`characterId`);");
+                await ExecuteNonQuery("ALTER TABLE `characterbuff` ADD INDEX(`characterId`);");
+                await ExecuteNonQuery("ALTER TABLE `charactercurrency` ADD INDEX(`idx`);");
+                await ExecuteNonQuery("ALTER TABLE `charactercurrency` ADD INDEX(`characterId`);");
+                await ExecuteNonQuery("ALTER TABLE `characterhotkey` ADD INDEX(`characterId`);");
+                await ExecuteNonQuery("ALTER TABLE `characterhotkey` ADD INDEX(`hotkeyId`);");
+                await ExecuteNonQuery("ALTER TABLE `characteritem` ADD INDEX(`idx`);");
+                await ExecuteNonQuery("ALTER TABLE `characteritem` ADD INDEX(`inventoryType`);");
+                await ExecuteNonQuery("ALTER TABLE `characteritem` ADD INDEX(`characterId`);");
+                await ExecuteNonQuery("ALTER TABLE `characterquest` ADD INDEX(`idx`);");
+                await ExecuteNonQuery("ALTER TABLE `characterquest` ADD INDEX(`characterId`);");
+                await ExecuteNonQuery("ALTER TABLE `characters` ADD INDEX(`userId`);");
+                await ExecuteNonQuery("ALTER TABLE `characters` ADD INDEX(`factionId`);");
+                await ExecuteNonQuery("ALTER TABLE `characters` ADD INDEX(`partyId`);");
+                await ExecuteNonQuery("ALTER TABLE `characters` ADD INDEX(`guildId`);");
+                await ExecuteNonQuery("ALTER TABLE `characterskill` ADD INDEX(`idx`);");
+                await ExecuteNonQuery("ALTER TABLE `characterskill` ADD INDEX(`characterId`);");
+                await ExecuteNonQuery("ALTER TABLE `characterskillusage` ADD INDEX(`characterId`);");
+                await ExecuteNonQuery("ALTER TABLE `charactersummon` ADD INDEX(`characterId`);");
+                await ExecuteNonQuery("ALTER TABLE `friend` ADD INDEX(`characterId1`);");
+                await ExecuteNonQuery("ALTER TABLE `friend` ADD INDEX(`characterId2`);");
+                await ExecuteNonQuery("ALTER TABLE `guild` ADD INDEX(`leaderId`);");
+                await ExecuteNonQuery("ALTER TABLE `mail` ADD INDEX(`eventId`);");
+                await ExecuteNonQuery("ALTER TABLE `mail` ADD INDEX(`senderId`);");
+                await ExecuteNonQuery("ALTER TABLE `mail` ADD INDEX(`senderName`);");
+                await ExecuteNonQuery("ALTER TABLE `mail` ADD INDEX(`receiverId`);");
+                await ExecuteNonQuery("ALTER TABLE `mail` ADD INDEX(`isRead`);");
+                await ExecuteNonQuery("ALTER TABLE `mail` ADD INDEX(`isClaim`);");
+                await ExecuteNonQuery("ALTER TABLE `mail` ADD INDEX(`isDelete`);");
+                await ExecuteNonQuery("ALTER TABLE `party` ADD INDEX(`leaderId`);");
+                await ExecuteNonQuery("ALTER TABLE `storageitem` ADD INDEX(`idx`);");
+                await ExecuteNonQuery("ALTER TABLE `storageitem` ADD INDEX(`storageType`);");
+                await ExecuteNonQuery("ALTER TABLE `storageitem` ADD INDEX(`storageOwnerId`);");
+                // Insert migrate history
+                await InsertMigrationId(migrationId);
+                Logging.Log("Migrated to 1.62e");
+            }
         }
 
         private async UniTask<bool> HasMigrationId(string migrationId)
