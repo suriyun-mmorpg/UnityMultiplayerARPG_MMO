@@ -25,7 +25,7 @@ namespace MultiplayerARPG.MMO
             }, responseDelegate: callback);
         }
 
-        public bool RequestUserLogout(ResponseDelegate callback)
+        public bool RequestUserLogout(ResponseDelegate<INetSerializable> callback)
         {
             return ClientSendRequest(MMORequestTypes.RequestUserLogout, EmptyMessage.Value, responseDelegate: callback);
         }

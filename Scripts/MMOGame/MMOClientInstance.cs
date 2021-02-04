@@ -151,7 +151,7 @@ namespace MultiplayerARPG.MMO
             centralNetworkManager.RequestUserRegister(username, password, callback);
         }
 
-        public void RequestUserLogout(ResponseDelegate callback)
+        public void RequestUserLogout(ResponseDelegate<INetSerializable> callback)
         {
             centralNetworkManager.RequestUserLogout((responseHandler, responseCode, response) => OnRequestUserLogout(responseHandler, responseCode, response, callback));
         }
@@ -199,7 +199,7 @@ namespace MultiplayerARPG.MMO
             }
         }
 
-        private async UniTaskVoid OnRequestUserLogout(ResponseHandlerData responseHandler, AckResponseCode responseCode, INetSerializable response, ResponseDelegate callback)
+        private async UniTaskVoid OnRequestUserLogout(ResponseHandlerData responseHandler, AckResponseCode responseCode, INetSerializable response, ResponseDelegate<INetSerializable> callback)
         {
             await UniTask.Yield();
 
