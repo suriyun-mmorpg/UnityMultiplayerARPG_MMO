@@ -1,12 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using UnityEngine;
 using LiteNetLib;
 using LiteNetLibManager;
-using LiteNetLib.Utils;
 using Cysharp.Threading.Tasks;
 
 namespace MultiplayerARPG.MMO
@@ -30,12 +27,12 @@ namespace MultiplayerARPG.MMO
             });
         }
 
-#if UNITY_STANDALONE && !CLIENT_BUILD
         protected UniTaskVoid HandleRequestAppServerRegister(
             RequestHandlerData requestHandler,
             RequestAppServerRegisterMessage request,
             RequestProceedResultDelegate<ResponseAppServerRegisterMessage> result)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             long connectionId = requestHandler.ConnectionId;
             UITextKeys message = UITextKeys.NONE;
             if (request.ValidateHash())
@@ -118,11 +115,10 @@ namespace MultiplayerARPG.MMO
                 {
                     message = message,
                 });
+#endif
             return default;
         }
-#endif
 
-#if UNITY_STANDALONE && !CLIENT_BUILD
         /// <summary>
         /// This function will be used to send connection information to connected map servers and chat servers
         /// </summary>
@@ -130,6 +126,7 @@ namespace MultiplayerARPG.MMO
         /// <param name="broadcastPeerInfo"></param>
         protected void BroadcastAppServers(long connectionId, CentralServerPeerInfo broadcastPeerInfo)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             // Send map peer info to other map server
             foreach (CentralServerPeerInfo mapPeerInfo in mapServerPeers.Values)
             {
@@ -156,15 +153,15 @@ namespace MultiplayerARPG.MMO
                     peerInfo = chatPeerInfo,
                 });
             }
-        }
 #endif
+        }
 
-#if UNITY_STANDALONE && !CLIENT_BUILD
         protected UniTaskVoid HandleRequestAppServerAddress(
             RequestHandlerData requestHandler,
             RequestAppServerAddressMessage request,
             RequestProceedResultDelegate<ResponseAppServerAddressMessage> result)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             long connectionId = requestHandler.ConnectionId;
             UITextKeys message = UITextKeys.NONE;
             CentralServerPeerInfo peerInfo = new CentralServerPeerInfo();
@@ -217,13 +214,13 @@ namespace MultiplayerARPG.MMO
                     message = message,
                     peerInfo = peerInfo,
                 });
+#endif
             return default;
         }
-#endif
 
-#if UNITY_STANDALONE && !CLIENT_BUILD
         protected void HandleUpdateMapUser(MessageHandlerData messageHandler)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             long connectionId = messageHandler.ConnectionId;
             UpdateUserCharacterMessage message = messageHandler.ReadMessage<UpdateUserCharacterMessage>();
             if (mapUserIds.ContainsKey(connectionId))
@@ -245,8 +242,8 @@ namespace MultiplayerARPG.MMO
                         break;
                 }
             }
-        }
 #endif
+        }
 
         public static string GetAppServerRegisterHash(CentralServerPeerType peerType, int time)
         {

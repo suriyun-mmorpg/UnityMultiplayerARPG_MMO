@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using LiteNetLib.Utils;
 using LiteNetLibManager;
 using UnityEngine;
 
@@ -25,7 +24,6 @@ namespace MultiplayerARPG.MMO
             return ServerSendRequest(connectionId, MMORequestTypes.RequestSpawnMap, message, millisecondsTimeout: mapSpawnMillisecondsTimeout);
         }
 
-#if UNITY_STANDALONE && !CLIENT_BUILD
         /// <summary>
         /// This is function which read request from map server to spawn another map servers
         /// Then it will response back when requested map server is ready
@@ -36,6 +34,7 @@ namespace MultiplayerARPG.MMO
             RequestSpawnMapMessage request,
             RequestProceedResultDelegate<ResponseSpawnMapMessage> result)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             string requestId = GenericUtils.GetUniqueId();
             request.requestId = requestId;
             List<long> connectionIds = new List<long>(mapSpawnServerPeers.Keys);
@@ -44,22 +43,22 @@ namespace MultiplayerARPG.MMO
             // Add ack Id / transport handler to dictionary which will be used in OnRequestSpawnMap() function 
             // To send map spawn response to map-server
             requestSpawnMapHandlers.Add(requestId, result);
+#endif
             return default;
         }
-#endif
 
-#if UNITY_STANDALONE && !CLIENT_BUILD
         protected UniTaskVoid HandleResponseSpawnMap(
             ResponseHandlerData requestHandler,
             AckResponseCode responseCode,
             ResponseSpawnMapMessage response)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             // Forward responses to map server transport handler
             RequestProceedResultDelegate<ResponseSpawnMapMessage> result;
             if (requestSpawnMapHandlers.TryGetValue(response.requestId, out result))
                 result.Invoke(responseCode, response);
+#endif
             return default;
         }
-#endif
     }
 }

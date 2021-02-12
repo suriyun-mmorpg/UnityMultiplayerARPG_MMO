@@ -47,7 +47,6 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if UNITY_STANDALONE && !CLIENT_BUILD
         protected override void RegisterMessages()
         {
             base.RegisterMessages();
@@ -73,7 +72,6 @@ namespace MultiplayerARPG.MMO
             this.InvokeInstanceDevExtMethods("RegisterServerMessages");
             this.InvokeInstanceDevExtMethods("RegisterMessages");
         }
-#endif
 
         protected virtual void Clean()
         {
@@ -121,10 +119,10 @@ namespace MultiplayerARPG.MMO
             base.OnStopClient();
         }
 
-#if UNITY_STANDALONE && !CLIENT_BUILD
         public override void OnPeerDisconnected(long connectionId, DisconnectInfo disconnectInfo)
         {
             base.OnPeerDisconnected(connectionId, disconnectInfo);
+#if UNITY_STANDALONE && !CLIENT_BUILD
             // Remove disconnect map spawn server
             mapSpawnServerPeers.Remove(connectionId);
             // Remove disconnect map server
@@ -152,8 +150,8 @@ namespace MultiplayerARPG.MMO
                 userPeersByUserId.Remove(userPeerInfo.userId);
                 userPeers.Remove(connectionId);
             }
-        }
 #endif
+        }
 
         public override void OnClientConnected()
         {
@@ -169,16 +167,16 @@ namespace MultiplayerARPG.MMO
                 onClientDisconnected.Invoke(disconnectInfo);
         }
 
-#if UNITY_STANDALONE && !CLIENT_BUILD
         public bool MapContainsUser(string userId)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             foreach (HashSet<string> mapUser in mapUserIds.Values)
             {
                 if (mapUser.Contains(userId))
                     return true;
             }
+#endif
             return false;
         }
-#endif
     }
 }

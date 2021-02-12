@@ -39,12 +39,12 @@ namespace MultiplayerARPG.MMO
             }, responseDelegate: callback);
         }
 
-#if UNITY_STANDALONE && !CLIENT_BUILD
         protected async UniTaskVoid HandleRequestUserLogin(
             RequestHandlerData requestHandler,
             RequestUserLoginMessage request,
             RequestProceedResultDelegate<ResponseUserLoginMessage> result)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             long connectionId = requestHandler.ConnectionId;
             UITextKeys message = UITextKeys.NONE;
             ValidateUserLoginResp validateUserLoginResp = await DbServiceClient.ValidateUserLoginAsync(new ValidateUserLoginReq()
@@ -87,15 +87,15 @@ namespace MultiplayerARPG.MMO
                     userId = userId,
                     accessToken = accessToken,
                 });
-        }
 #endif
+        }
 
-#if UNITY_STANDALONE && !CLIENT_BUILD
         protected async UniTaskVoid HandleRequestUserRegister(
             RequestHandlerData requestHandler,
             RequestUserRegisterMessage request,
             RequestProceedResultDelegate<ResponseUserRegisterMessage> result)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             UITextKeys message = UITextKeys.NONE;
             string username = request.username;
             string password = request.password;
@@ -126,15 +126,15 @@ namespace MultiplayerARPG.MMO
                 {
                     message = message,
                 });
-        }
 #endif
+        }
 
-#if UNITY_STANDALONE && !CLIENT_BUILD
         protected async UniTaskVoid HandleRequestUserLogout(
             RequestHandlerData requestHandler,
             EmptyMessage request,
             RequestProceedResultDelegate<EmptyMessage> result)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             long connectionId = requestHandler.ConnectionId;
             CentralUserPeerInfo userPeerInfo;
             if (userPeers.TryGetValue(connectionId, out userPeerInfo))
@@ -149,15 +149,15 @@ namespace MultiplayerARPG.MMO
             }
             // Response
             result.Invoke(AckResponseCode.Success, EmptyMessage.Value);
-        }
 #endif
+        }
 
-#if UNITY_STANDALONE && !CLIENT_BUILD
         protected async UniTaskVoid HandleRequestValidateAccessToken(
             RequestHandlerData requestHandler,
             RequestValidateAccessTokenMessage request,
             RequestProceedResultDelegate<ResponseValidateAccessTokenMessage> result)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             long connectionId = requestHandler.ConnectionId;
             UITextKeys message = UITextKeys.NONE;
             string userId = request.userId;
@@ -202,7 +202,7 @@ namespace MultiplayerARPG.MMO
                     userId = userId,
                     accessToken = accessToken,
                 });
-        }
 #endif
+        }
     }
 }

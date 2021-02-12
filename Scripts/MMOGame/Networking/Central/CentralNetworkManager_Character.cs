@@ -45,12 +45,12 @@ namespace MultiplayerARPG.MMO
             }, responseDelegate: callback);
         }
 
-#if UNITY_STANDALONE && !CLIENT_BUILD
         protected async UniTaskVoid HandleRequestCharacters(
             RequestHandlerData requestHandler,
             EmptyMessage request,
             RequestProceedResultDelegate<ResponseCharactersMessage> result)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             long connectionId = requestHandler.ConnectionId;
             UITextKeys message = UITextKeys.NONE;
             List<PlayerCharacterData> characters = null;
@@ -73,15 +73,15 @@ namespace MultiplayerARPG.MMO
                     message = message,
                     characters = characters,
                 });
-        }
 #endif
+        }
 
-#if UNITY_STANDALONE && !CLIENT_BUILD
         protected async UniTaskVoid HandleRequestCreateCharacter(
             RequestHandlerData requestHandler,
             RequestCreateCharacterMessage request,
             RequestProceedResultDelegate<ResponseCreateCharacterMessage> result)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             long connectionId = requestHandler.ConnectionId;
             NetDataReader reader = requestHandler.Reader;
             UITextKeys message = UITextKeys.NONE;
@@ -130,22 +130,22 @@ namespace MultiplayerARPG.MMO
                 {
                     message = message,
                 });
-        }
 #endif
+        }
 
-#if UNITY_STANDALONE && !CLIENT_BUILD
         private void DeserializeCreateCharacterExtra(PlayerCharacterData characterData, NetDataReader reader)
         {
-            this.InvokeInstanceDevExtMethods("DeserializeCreateCharacterExtra", characterData, reader);
-        }
-#endif
-
 #if UNITY_STANDALONE && !CLIENT_BUILD
+            this.InvokeInstanceDevExtMethods("DeserializeCreateCharacterExtra", characterData, reader);
+#endif
+        }
+
         protected async UniTaskVoid HandleRequestDeleteCharacter(
             RequestHandlerData requestHandler,
             RequestDeleteCharacterMessage request,
             RequestProceedResultDelegate<ResponseDeleteCharacterMessage> result)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             long connectionId = requestHandler.ConnectionId;
             UITextKeys message = UITextKeys.NONE;
             CentralUserPeerInfo userPeerInfo;
@@ -166,15 +166,15 @@ namespace MultiplayerARPG.MMO
                 {
                     message = message,
                 });
-        }
 #endif
+        }
 
-#if UNITY_STANDALONE && !CLIENT_BUILD
         protected async UniTaskVoid HandleRequestSelectCharacter(
             RequestHandlerData requestHandler,
             RequestSelectCharacterMessage request,
             RequestProceedResultDelegate<ResponseSelectCharacterMessage> result)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             long connectionId = requestHandler.ConnectionId;
             UITextKeys message = UITextKeys.NONE;
             CentralServerPeerInfo mapServerPeerInfo = default;
@@ -205,7 +205,7 @@ namespace MultiplayerARPG.MMO
             }
             // Response
             result.Invoke(responseCode, response);
-        }
 #endif
+        }
     }
 }
