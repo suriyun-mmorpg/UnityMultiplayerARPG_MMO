@@ -60,9 +60,8 @@ namespace MultiplayerARPG.MMO
             Application.Quit();
         }
 
-        private async UniTaskVoid OnUserLogout(ResponseHandlerData responseHandler, AckResponseCode responseCode, INetSerializable response)
+        private void OnUserLogout(ResponseHandlerData responseHandler, AckResponseCode responseCode, INetSerializable response)
         {
-            await UniTask.Yield();
             if (responseCode == AckResponseCode.Success)
             {
                 ClearHistory();
@@ -70,9 +69,8 @@ namespace MultiplayerARPG.MMO
             }
         }
 
-        private async UniTaskVoid OnValidateAccessToken(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseValidateAccessTokenMessage response)
+        private void OnValidateAccessToken(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseValidateAccessTokenMessage response)
         {
-            await UniTask.Yield();
             if (responseCode == AckResponseCode.Success)
             {
                 if (onValidateAccessTokenSuccess != null)

@@ -93,9 +93,8 @@ namespace MultiplayerARPG.MMO
             MMOClientInstance.Singleton.RequestUserLogin(Username, Password, OnLogin);
         }
 
-        public async UniTaskVoid OnLogin(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseUserLoginMessage response)
+        public void OnLogin(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseUserLoginMessage response)
         {
-            await UniTask.Yield();
             LoggingIn = false;
             string storingUsername = string.Empty;
             string storingPassword = string.Empty;

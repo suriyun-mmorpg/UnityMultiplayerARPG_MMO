@@ -47,7 +47,7 @@ namespace MultiplayerARPG.MMO
             return default;
         }
 
-        protected UniTaskVoid HandleResponseSpawnMap(
+        protected void HandleResponseSpawnMap(
             ResponseHandlerData requestHandler,
             AckResponseCode responseCode,
             ResponseSpawnMapMessage response)
@@ -58,7 +58,6 @@ namespace MultiplayerARPG.MMO
             if (requestSpawnMapHandlers.TryGetValue(response.requestId, out result))
                 result.Invoke(responseCode, response);
 #endif
-            return default;
         }
     }
 }

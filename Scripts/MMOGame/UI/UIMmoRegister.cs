@@ -72,9 +72,8 @@ namespace MultiplayerARPG.MMO
             MMOClientInstance.Singleton.RequestUserRegister(Username, Password, OnRegister);
         }
 
-        public async UniTaskVoid OnRegister(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseUserRegisterMessage response)
+        public void OnRegister(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseUserRegisterMessage response)
         {
-            await UniTask.Yield();
             Registering = false;
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message))
             {

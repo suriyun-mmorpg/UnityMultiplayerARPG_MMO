@@ -98,7 +98,7 @@ namespace MultiplayerARPG.MMO
             ConnectToCentralServer();
         }
 
-        public UniTaskVoid OnAppServerRegistered(
+        public void OnAppServerRegistered(
             ResponseHandlerData responseHandler,
             AckResponseCode responseCode,
             ResponseAppServerRegisterMessage response)
@@ -107,7 +107,6 @@ namespace MultiplayerARPG.MMO
                 IsRegisteredToCentralServer = true;
             if (onAppServerRegistered != null)
                 onAppServerRegistered.Invoke(responseCode);
-            return default;
         }
     }
 }
