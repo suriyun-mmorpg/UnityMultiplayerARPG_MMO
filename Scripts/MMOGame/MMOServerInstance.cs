@@ -515,7 +515,7 @@ namespace MultiplayerARPG.MMO
             {
                 // Start database manager client, it will connect to database manager server
                 // To request database functions
-                gameInstance.DoNotLoadHomeScene = true;
+                gameInstance.DoNotLoadHomeScene = !Application.isEditor;
                 StartDatabaseManagerClient();
             }
         }
