@@ -123,12 +123,14 @@ namespace MultiplayerARPG.MMO
                 if (centralTransportFactory == null)
                     centralTransportFactory = gameObject.AddComponent<LiteNetLibTransportFactory>();
             }
+#if UNITY_STANDALONE && !CLIENT_BUILD
             CentralAppServerRegister = new CentralAppServerRegister(CentralTransportFactory.Build(), this);
             CentralAppServerRegister.onAppServerRegistered = OnAppServerRegistered;
             CentralAppServerRegister.RegisterMessageHandler(MMOMessageTypes.AppServerAddress, HandleResponseAppServerAddress);
             CentralAppServerRegister.RegisterResponseHandler<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.RequestSpawnMap);
             this.InvokeInstanceDevExtMethods("OnInitCentralAppServerRegister");
             ChatNetworkManager = gameObject.AddComponent<ChatNetworkManager>();
+#endif
             // Server Handlers
             ServerUserHandlers = gameObject.GetOrAddComponent<IServerUserHandlers, DefaultServerUserHandlers>();
             ServerBuildingHandlers = gameObject.GetOrAddComponent<IServerBuildingHandlers, DefaultServerBuildingHandlers>();
@@ -396,7 +398,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-        #region Character spawn function
+#region Character spawn function
         public override void SerializeClientReadyData(NetDataWriter writer)
         {
             writer.Put(GameInstance.UserId);
@@ -593,9 +595,9 @@ namespace MultiplayerARPG.MMO
             }
         }
 #endif
-        #endregion
+#endregion
 
-        #region Network message handlers
+#region Network message handlers
         protected override void HandleWarpAtClient(MessageHandlerData messageHandler)
         {
             MMOWarpMessage message = messageHandler.ReadMessage<MMOWarpMessage>();
@@ -688,9 +690,9 @@ namespace MultiplayerARPG.MMO
                 UpdateMapUsers(CentralAppServerRegister, UpdateUserCharacterMessage.UpdateType.Add);
         }
 #endif
-        #endregion
+#endregion
 
-        #region Connect to chat server
+#region Connect to chat server
         public void OnChatServerConnected()
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
@@ -906,9 +908,9 @@ namespace MultiplayerARPG.MMO
                 }
             }
         }
-        #endregion
+#endregion
 
-        #region Update map user functions
+#region Update map user functions
         private void UpdateMapUsers(LiteNetLibClient transportHandler, UpdateUserCharacterMessage.UpdateType updateType)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
@@ -928,6 +930,6 @@ namespace MultiplayerARPG.MMO
             transportHandler.SendPacket(DeliveryMethod.ReliableOrdered, MMOMessageTypes.UpdateMapUser, updateMapUserMessage.Serialize);
 #endif
         }
-        #endregion
+#endregion
     }
 }
