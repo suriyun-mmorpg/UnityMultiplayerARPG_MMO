@@ -63,6 +63,16 @@ namespace MultiplayerARPG.MMO
             await UniTask.Yield();
         }
 
+        public bool TryGetOpenedStorageId(long connectionId, out StorageId storageId)
+        {
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            return usingStorageIds.TryGetValue(connectionId, out storageId);
+#else
+            storageId = default;
+            return false;
+#endif
+        }
+
         public async UniTask<bool> IncreaseStorageItems(StorageId storageId, CharacterItem addingItem)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
