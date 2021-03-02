@@ -204,9 +204,8 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        private async UniTaskVoid OnRequestSpawnMap(ResponseHandlerData requestHandler, AckResponseCode responseCode, INetSerializable response, string instanceId)
+        private void OnRequestSpawnMap(ResponseHandlerData requestHandler, AckResponseCode responseCode, INetSerializable response, string instanceId)
         {
-            await UniTask.Yield();
             if (responseCode == AckResponseCode.Error ||
                 responseCode == AckResponseCode.Timeout)
             {
