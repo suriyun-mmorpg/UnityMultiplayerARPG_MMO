@@ -103,10 +103,17 @@ namespace MultiplayerARPG.MMO
                     }
                     if (message == UITextKeys.NONE && mail.Currencies.Count > 0)
                     {
-                        List<CharacterCurrency> increasingCurrencies = new List<CharacterCurrency>();
+                        List<CurrencyAmount> increasingCurrencies = new List<CurrencyAmount>();
+                        Currency tempCurrency;
                         foreach (KeyValuePair<int, int> mailCurrency in mail.Currencies)
                         {
-                            increasingCurrencies.Add(CharacterCurrency.Create(mailCurrency.Key, amount: mailCurrency.Value));
+                            if (!GameInstance.Currencies.TryGetValue(mailCurrency.Key, out tempCurrency))
+                                continue;
+                            increasingCurrencies.Add(new CurrencyAmount()
+                            {
+                                currency = tempCurrency,
+                                amount = mailCurrency.Value
+                            });
                         }
                         playerCharacter.IncreaseCurrencies(increasingCurrencies);
                     }
