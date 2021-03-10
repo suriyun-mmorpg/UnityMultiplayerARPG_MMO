@@ -45,7 +45,8 @@ namespace MultiplayerARPG.MMO
             uint storageObjectId;
             Storage storage = GetStorage(storageId, out storageObjectId);
             GameInstance.ServerGameMessageHandlers.NotifyStorageOpened(connectionId, storageId.storageType, storageId.storageOwnerId, storageObjectId, storage.weightLimit, storage.slotLimit);
-            GameInstance.ServerGameMessageHandlers.NotifyStorageItems(connectionId, GetStorageItems(storageId));
+            storageItems.FillEmptySlots(storage.slotLimit > 0, storage.slotLimit);
+            GameInstance.ServerGameMessageHandlers.NotifyStorageItems(connectionId, storageItems);
 #endif
         }
 
