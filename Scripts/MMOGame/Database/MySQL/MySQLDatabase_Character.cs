@@ -494,7 +494,7 @@ namespace MultiplayerARPG.MMO
                 "respawnPositionX=@respawnPositionX, " +
                 "respawnPositionY=@respawnPositionY, " +
                 "respawnPositionZ=@respawnPositionZ, " +
-                "mountDataId=@mountDataId " +
+                "mountDataId=@mountDataId, " +
                 "lastDeadTime=@lastDeadTime " +
                 "WHERE id=@id",
                 new MySqlParameter("@dataId", character.DataId),
