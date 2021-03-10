@@ -36,7 +36,7 @@ namespace MultiplayerARPG.MMO
             return !string.IsNullOrEmpty(MapInstanceId);
         }
 
-        protected override void WarpCharacter(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position, bool overrideRotation, Vector3 rotation)
+        public override void WarpCharacter(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position, bool overrideRotation, Vector3 rotation)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             if (!CanWarpCharacter(playerCharacterEntity))
@@ -106,7 +106,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-        protected override void WarpCharacterToInstance(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position, bool overrideRotation, Vector3 rotation)
+        public override void WarpCharacterToInstance(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position, bool overrideRotation, Vector3 rotation)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             if (!CanWarpCharacter(playerCharacterEntity))

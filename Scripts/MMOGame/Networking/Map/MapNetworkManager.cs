@@ -134,7 +134,7 @@ namespace MultiplayerARPG.MMO
             // Server Handlers
             ServerUserHandlers = gameObject.GetOrAddComponent<IServerUserHandlers, DefaultServerUserHandlers>();
             ServerBuildingHandlers = gameObject.GetOrAddComponent<IServerBuildingHandlers, DefaultServerBuildingHandlers>();
-            ServerOnlineCharacterHandlers = gameObject.GetOrAddComponent<IServerOnlineCharacterHandlers, DefaultServerOnlineCharacterHandlers>();
+            ServerCharacterHandlers = gameObject.GetOrAddComponent<IServerCharacterHandlers, DefaultServerCharacterHandlers>();
             ServerGameMessageHandlers = gameObject.GetOrAddComponent<IServerGameMessageHandlers, DefaultServerGameMessageHandlers>();
             ServerStorageHandlers = gameObject.GetOrAddComponent<IServerStorageHandlers, MMOServerStorageHandlers>();
             ServerPartyHandlers = gameObject.GetOrAddComponent<IServerPartyHandlers, DefaultServerPartyHandlers>();
@@ -727,7 +727,7 @@ namespace MultiplayerARPG.MMO
                 case UpdateUserCharacterMessage.UpdateType.Online:
                     if (usersById.ContainsKey(message.data.id))
                     {
-                        ServerOnlineCharacterHandlers.MarkOnlineCharacter(message.data.id);
+                        ServerCharacterHandlers.MarkOnlineCharacter(message.data.id);
                         socialId = message.data.partyId;
                         if (socialId > 0 && ServerPartyHandlers.TryGetParty(socialId, out party))
                         {
