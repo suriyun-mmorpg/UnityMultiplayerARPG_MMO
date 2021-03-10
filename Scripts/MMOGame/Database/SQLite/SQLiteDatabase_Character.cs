@@ -161,7 +161,8 @@ namespace MultiplayerARPG.MMO
                     reader.GetFloat(29),
                     reader.GetFloat(30));
                 result.MountDataId = reader.GetInt32(31);
-                result.LastUpdate = (int)((System.DateTimeOffset)reader.GetDateTime(32)).ToUnixTimeSeconds();
+                result.LastDeadTime = reader.GetInt32(32);
+                result.LastUpdate = (int)((System.DateTimeOffset)reader.GetDateTime(33)).ToUnixTimeSeconds();
                 return true;
             }
             result = null;
@@ -193,7 +194,7 @@ namespace MultiplayerARPG.MMO
                 "equipWeaponSet, statPoint, skillPoint, gold, partyId, guildId, guildRole, sharedGuildExp, " +
                 "currentMapName, currentPositionX, currentPositionY, currentPositionZ, currentRotationX, currentRotationY, currentRotationZ," +
                 "respawnMapName, respawnPositionX, respawnPositionY, respawnPositionZ," +
-                "mountDataId, updateAt FROM characters WHERE id=@id LIMIT 1",
+                "mountDataId, lastDeadTime, updateAt FROM characters WHERE id=@id LIMIT 1",
                 new SqliteParameter("@id", id));
             // Found character, then read its relates data
             if (result != null)
@@ -287,6 +288,7 @@ namespace MultiplayerARPG.MMO
                 "respawnPositionY=@respawnPositionY, " +
                 "respawnPositionZ=@respawnPositionZ, " +
                 "mountDataId=@mountDataId " +
+                "lastDeadTime=@lastDeadTime " +
                 "WHERE id=@id",
                 new SqliteParameter("@dataId", character.DataId),
                 new SqliteParameter("@entityId", character.EntityId),
@@ -315,6 +317,7 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@respawnPositionY", character.RespawnPosition.y),
                 new SqliteParameter("@respawnPositionZ", character.RespawnPosition.z),
                 new SqliteParameter("@mountDataId", character.MountDataId),
+                new SqliteParameter("@lastDeadTime", character.LastDeadTime),
                 new SqliteParameter("@id", character.Id));
             FillCharacterRelatesData(character);
             this.InvokeInstanceDevExtMethods("UpdateCharacter", character);

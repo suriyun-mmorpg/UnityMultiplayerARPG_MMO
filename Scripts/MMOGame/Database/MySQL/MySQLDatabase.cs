@@ -190,6 +190,15 @@ namespace MultiplayerARPG.MMO
                 await InsertMigrationId(migrationId);
                 Logging.Log("Migrated to 1.62e");
             }
+            migrationId = "1.63b";
+            if (!await HasMigrationId(migrationId))
+            {
+                Logging.Log("Migrating up to 1.63b");
+                await ExecuteNonQuery("ALTER TABLE `characters` ADD `lastDeadTime` INT NOT NULL DEFAULT '0' AFTER `mountDataId`;");
+                // Insert migrate history
+                await InsertMigrationId(migrationId);
+                Logging.Log("Migrated to 1.63b");
+            }
         }
 
         private async UniTask<bool> HasMigrationId(string migrationId)

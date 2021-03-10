@@ -402,6 +402,9 @@ namespace MultiplayerARPG.MMO
             if (!IsColumnExist("characters", "currentRotationZ"))
                 ExecuteNonQuery("ALTER TABLE characters ADD currentRotationZ REAL NOT NULL DEFAULT 0;");
 
+            if (!IsColumnExist("characters", "lastDeadTime"))
+                ExecuteNonQuery("ALTER TABLE characters ADD lastDeadTime INTEGER NOT NULL DEFAULT 0;");
+
             if (!IsColumnExist("guild", "gold"))
                 ExecuteNonQuery("ALTER TABLE guild ADD gold INTEGER NOT NULL DEFAULT 0;");
 
