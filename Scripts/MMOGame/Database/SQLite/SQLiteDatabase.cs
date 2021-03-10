@@ -173,6 +173,7 @@ namespace MultiplayerARPG.MMO
               respawnPositionY REAL NOT NULL DEFAULT 0,
               respawnPositionZ REAL NOT NULL DEFAULT 0,
               mountDataId INTEGER NOT NULL DEFAULT 0,
+              lastDeadTime INTEGER NOT NULL DEFAULT 0,
               createAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
               updateAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
