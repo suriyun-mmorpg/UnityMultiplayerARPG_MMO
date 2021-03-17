@@ -101,7 +101,7 @@ namespace MultiplayerARPG.MMO
                 MMOWarpMessage message = new MMOWarpMessage();
                 message.networkAddress = peerInfo.networkAddress;
                 message.networkPort = peerInfo.networkPort;
-                ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Warp, message);
+                ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Warp, message);
             }
         }
 #endif
@@ -198,7 +198,7 @@ namespace MultiplayerARPG.MMO
                 MMOWarpMessage message = new MMOWarpMessage();
                 message.networkAddress = peerInfo.networkAddress;
                 message.networkPort = peerInfo.networkPort;
-                ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Warp, message);
+                ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Warp, message);
             }
         }
 #endif

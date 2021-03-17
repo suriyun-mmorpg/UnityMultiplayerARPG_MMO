@@ -95,7 +95,7 @@ namespace MultiplayerARPG.MMO
                         };
                         foreach (CentralServerPeerInfo mapServerPeer in mapServerPeers.Values)
                         {
-                            ServerSendPacket(mapServerPeer.connectionId, DeliveryMethod.ReliableOrdered, MMOMessageTypes.AppServerAddress, responseAppServerAddressMessage);
+                            ServerSendPacket(mapServerPeer.connectionId, 0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.AppServerAddress, responseAppServerAddressMessage);
                         }
                         if (LogInfo)
                             Logging.Log(LogTag, "Register Chat Server: [" + connectionId + "]");
@@ -131,13 +131,13 @@ namespace MultiplayerARPG.MMO
             foreach (CentralServerPeerInfo mapPeerInfo in mapServerPeers.Values)
             {
                 // Send other info to current peer
-                ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MMOMessageTypes.AppServerAddress, new ResponseAppServerAddressMessage()
+                ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.AppServerAddress, new ResponseAppServerAddressMessage()
                 {
                     message = UITextKeys.NONE,
                     peerInfo = mapPeerInfo,
                 });
                 // Send current info to other peer
-                ServerSendPacket(mapPeerInfo.connectionId, DeliveryMethod.ReliableOrdered, MMOMessageTypes.AppServerAddress, new ResponseAppServerAddressMessage()
+                ServerSendPacket(mapPeerInfo.connectionId, 0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.AppServerAddress, new ResponseAppServerAddressMessage()
                 {
                     message = UITextKeys.NONE,
                     peerInfo = broadcastPeerInfo,
@@ -147,7 +147,7 @@ namespace MultiplayerARPG.MMO
             if (chatServerPeers.Count > 0)
             {
                 CentralServerPeerInfo chatPeerInfo = chatServerPeers.Values.First();
-                ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MMOMessageTypes.AppServerAddress, new ResponseAppServerAddressMessage()
+                ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.AppServerAddress, new ResponseAppServerAddressMessage()
                 {
                     message = UITextKeys.NONE,
                     peerInfo = chatPeerInfo,

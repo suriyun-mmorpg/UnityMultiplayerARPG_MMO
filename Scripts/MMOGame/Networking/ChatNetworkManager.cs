@@ -215,12 +215,12 @@ namespace MultiplayerARPG.MMO
             {
                 case ChatChannel.Global:
                 case ChatChannel.System:
-                    ServerSendPacketToAllConnections(DeliveryMethod.ReliableOrdered, MMOMessageTypes.Chat, message);
+                    ServerSendPacketToAllConnections(0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.Chat, message);
                     break;
                 case ChatChannel.Party:
                 case ChatChannel.Guild:
                     // Send message to all map servers, let's map servers filter messages
-                    ServerSendPacketToAllConnections(DeliveryMethod.ReliableOrdered, MMOMessageTypes.Chat, message);
+                    ServerSendPacketToAllConnections(0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.Chat, message);
                     break;
                 case ChatChannel.Whisper:
                     long senderConnectionId = 0;
@@ -228,11 +228,11 @@ namespace MultiplayerARPG.MMO
                     // Send message to map server which have the character
                     if (!string.IsNullOrEmpty(message.sender) &&
                         connectionIdsByCharacterName.TryGetValue(message.sender, out senderConnectionId))
-                        ServerSendPacket(senderConnectionId, DeliveryMethod.ReliableOrdered, MMOMessageTypes.Chat, message);
+                        ServerSendPacket(senderConnectionId, 0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.Chat, message);
                     if (!string.IsNullOrEmpty(message.receiver) &&
                         connectionIdsByCharacterName.TryGetValue(message.receiver, out receiverConnectionId) &&
                         (receiverConnectionId != senderConnectionId))
-                        ServerSendPacket(receiverConnectionId, DeliveryMethod.ReliableOrdered, MMOMessageTypes.Chat, message);
+                        ServerSendPacket(receiverConnectionId, 0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.Chat, message);
                     break;
             }
         }
@@ -284,7 +284,7 @@ namespace MultiplayerARPG.MMO
                 foreach (long mapServerConnectionId in mapServerConnectionIds)
                 {
                     if (mapServerConnectionId != connectionId)
-                        ServerSendPacket(mapServerConnectionId, DeliveryMethod.ReliableOrdered, MMOMessageTypes.UpdatePartyMember, message);
+                        ServerSendPacket(mapServerConnectionId, 0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.UpdatePartyMember, message);
                 }
             }
         }
@@ -298,7 +298,7 @@ namespace MultiplayerARPG.MMO
                 foreach (long mapServerConnectionId in mapServerConnectionIds)
                 {
                     if (mapServerConnectionId != connectionId)
-                        ServerSendPacket(mapServerConnectionId, DeliveryMethod.ReliableOrdered, MMOMessageTypes.UpdateParty, message);
+                        ServerSendPacket(mapServerConnectionId, 0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.UpdateParty, message);
                 }
             }
         }
@@ -312,7 +312,7 @@ namespace MultiplayerARPG.MMO
                 foreach (long mapServerConnectionId in mapServerConnectionIds)
                 {
                     if (mapServerConnectionId != connectionId)
-                        ServerSendPacket(mapServerConnectionId, DeliveryMethod.ReliableOrdered, MMOMessageTypes.UpdateGuildMember, message);
+                        ServerSendPacket(mapServerConnectionId, 0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.UpdateGuildMember, message);
                 }
             }
         }
@@ -326,7 +326,7 @@ namespace MultiplayerARPG.MMO
                 foreach (long mapServerConnectionId in mapServerConnectionIds)
                 {
                     if (mapServerConnectionId != connectionId)
-                        ServerSendPacket(mapServerConnectionId, DeliveryMethod.ReliableOrdered, MMOMessageTypes.UpdateGuild, message);
+                        ServerSendPacket(mapServerConnectionId, 0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.UpdateGuild, message);
                 }
             }
         }
@@ -347,7 +347,7 @@ namespace MultiplayerARPG.MMO
             UpdateUserCharacterMessage updateMapUserMessage = new UpdateUserCharacterMessage();
             updateMapUserMessage.type = updateType;
             updateMapUserMessage.data = userData;
-            ServerSendPacket(connectionId, DeliveryMethod.ReliableOrdered, MMOMessageTypes.UpdateMapUser, updateMapUserMessage);
+            ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.UpdateMapUser, updateMapUserMessage);
         }
     }
 }
