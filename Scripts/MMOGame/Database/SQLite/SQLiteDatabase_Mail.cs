@@ -87,7 +87,7 @@ namespace MultiplayerARPG.MMO
             if (count > 0)
             {
                 await UniTask.Yield();
-                ExecuteNonQuery("UPDATE mail SET isRead=1, readTimestamp=datetime('now') WHERE id=@id AND receiverId LIKE @receiverId AND isRead=0",
+                ExecuteNonQuery("UPDATE mail SET isRead=1, readTimestamp=datetime('now', 'localtime') WHERE id=@id AND receiverId LIKE @receiverId AND isRead=0",
                     new SqliteParameter("@id", mailId),
                     new SqliteParameter("@receiverId", userId));
             }
@@ -103,7 +103,7 @@ namespace MultiplayerARPG.MMO
             if (count > 0)
             {
                 await UniTask.Yield();
-                ExecuteNonQuery("UPDATE mail SET isClaim=1, claimTimestamp=datetime('now') WHERE id=@id AND receiverId LIKE @receiverId AND isClaim=0",
+                ExecuteNonQuery("UPDATE mail SET isClaim=1, claimTimestamp=datetime('now', 'localtime') WHERE id=@id AND receiverId LIKE @receiverId AND isClaim=0",
                     new SqliteParameter("@id", mailId),
                     new SqliteParameter("@receiverId", userId));
             }
@@ -119,7 +119,7 @@ namespace MultiplayerARPG.MMO
             if (count > 0)
             {
                 await UniTask.Yield();
-                ExecuteNonQuery("UPDATE mail SET isDelete=1, deleteTimestamp=datetime('now') WHERE id=@id AND receiverId LIKE @receiverId AND isDelete=0",
+                ExecuteNonQuery("UPDATE mail SET isDelete=1, deleteTimestamp=datetime('now', 'localtime') WHERE id=@id AND receiverId LIKE @receiverId AND isDelete=0",
                     new SqliteParameter("@id", mailId),
                     new SqliteParameter("@receiverId", userId));
             }
@@ -129,8 +129,8 @@ namespace MultiplayerARPG.MMO
         public override async UniTask<int> CreateMail(Mail mail)
         {
             await UniTask.Yield();
-            return ExecuteNonQuery("INSERT INTO mail (eventId, senderId, senderName, receiverId, title, content, gold, currencies, items) " +
-                "VALUES (@eventId, @senderId, @senderName, @receiverId, @title, @content, @gold, @currencies, @items)",
+            return ExecuteNonQuery("INSERT INTO mail (eventId, senderId, senderName, receiverId, title, content, gold, currencies, items, sentTimestamp) " +
+                "VALUES (@eventId, @senderId, @senderName, @receiverId, @title, @content, @gold, @currencies, @items, datetime('now', 'localtime'))",
                     new SqliteParameter("@eventId", mail.EventId),
                     new SqliteParameter("@senderId", mail.SenderId),
                     new SqliteParameter("@senderName", mail.SenderName),
