@@ -44,6 +44,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             GameInstance.ServerStorageHandlers.OpenStorage(requestHandler.ConnectionId, playerCharacter, storageId);
+            result.Invoke(AckResponseCode.Success, new ResponseOpenStorageMessage());
             await UniTask.Yield();
 #endif
         }
@@ -61,6 +62,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             GameInstance.ServerStorageHandlers.CloseStorage(requestHandler.ConnectionId);
+            result.Invoke(AckResponseCode.Success, new ResponseCloseStorageMessage());
             await UniTask.Yield();
 #endif
         }
