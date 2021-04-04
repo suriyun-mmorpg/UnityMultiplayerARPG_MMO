@@ -42,10 +42,10 @@ namespace MultiplayerARPG.MMO
             }
             if (!isPass)
             {
-                result.Invoke(AckResponseCode.Error, new EmptyMessage());
+                result.Invoke(AckResponseCode.Error, EmptyMessage.Value);
                 return;
             }
-            result.Invoke(AckResponseCode.Success, new EmptyMessage());
+            result.Invoke(AckResponseCode.Success, EmptyMessage.Value);
 #endif
         }
 
@@ -118,7 +118,7 @@ namespace MultiplayerARPG.MMO
             cachedUserAccessToken[request.UserId] = request.AccessToken;
             // Update data to database
             await Database.UpdateAccessToken(request.UserId, request.AccessToken);
-            result.Invoke(AckResponseCode.Success, new EmptyMessage());
+            result.Invoke(AckResponseCode.Success, EmptyMessage.Value);
 #endif
         }
 
@@ -129,7 +129,7 @@ namespace MultiplayerARPG.MMO
             cachedUsernames.Add(request.Username);
             // Insert new user login to database
             await Database.CreateUserLogin(request.Username, request.Password);
-            result.Invoke(AckResponseCode.Success, new EmptyMessage());
+            result.Invoke(AckResponseCode.Success, EmptyMessage.Value);
 #endif
         }
 
@@ -227,7 +227,7 @@ namespace MultiplayerARPG.MMO
             }
             // Delete data from database
             await Database.DeleteCharacter(request.UserId, request.CharacterId);
-            result.Invoke(AckResponseCode.Success, new EmptyMessage());
+            result.Invoke(AckResponseCode.Success, EmptyMessage.Value);
 #endif
         }
 
@@ -373,7 +373,7 @@ namespace MultiplayerARPG.MMO
                 cachedBuilding[request.MapName].TryRemove(request.BuildingId, out _);
             // Remove from database
             await Database.DeleteBuilding(request.MapName, request.BuildingId);
-            result.Invoke(AckResponseCode.Success, new EmptyMessage());
+            result.Invoke(AckResponseCode.Success, EmptyMessage.Value);
 #endif
         }
 
@@ -453,7 +453,7 @@ namespace MultiplayerARPG.MMO
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             await Database.DeleteParty(request.PartyId);
-            result.Invoke(AckResponseCode.Success, new EmptyMessage());
+            result.Invoke(AckResponseCode.Success, EmptyMessage.Value);
 #endif
         }
 
@@ -490,7 +490,7 @@ namespace MultiplayerARPG.MMO
                 cachedUserCharacter[request.CharacterId].PartyId = 0;
             // Update to database
             await Database.UpdateCharacterParty(request.CharacterId, 0);
-            result.Invoke(AckResponseCode.Success, new EmptyMessage());
+            result.Invoke(AckResponseCode.Success, EmptyMessage.Value);
 #endif
         }
 
@@ -595,7 +595,7 @@ namespace MultiplayerARPG.MMO
             }
             // Remove data from database
             await Database.DeleteGuild(request.GuildId);
-            result.Invoke(AckResponseCode.Success, new EmptyMessage());
+            result.Invoke(AckResponseCode.Success, EmptyMessage.Value);
 #endif
         }
 
@@ -635,7 +635,7 @@ namespace MultiplayerARPG.MMO
             }
             // Update to database
             await Database.UpdateCharacterGuild(request.CharacterId, 0, 0);
-            result.Invoke(AckResponseCode.Success, new EmptyMessage());
+            result.Invoke(AckResponseCode.Success, EmptyMessage.Value);
 #endif
         }
 
