@@ -13,7 +13,7 @@ namespace MultiplayerARPG.MMO
             string userId = await Database.ValidateUserLogin(request.Username, request.Password);
             if (string.IsNullOrEmpty(userId))
             {
-                result.Invoke(AckResponseCode.Error, new ValidateUserLoginResp());
+                result.Invoke(AckResponseCode.Success, new ValidateUserLoginResp());
                 return;
             }
             result.Invoke(AckResponseCode.Success, new ValidateUserLoginResp()
@@ -42,7 +42,7 @@ namespace MultiplayerARPG.MMO
             }
             if (!isPass)
             {
-                result.Invoke(AckResponseCode.Error, EmptyMessage.Value);
+                result.Invoke(AckResponseCode.Success, EmptyMessage.Value);
                 return;
             }
             result.Invoke(AckResponseCode.Success, EmptyMessage.Value);
@@ -769,7 +769,7 @@ namespace MultiplayerARPG.MMO
             if (!cachedStorageItems.TryGetValue(storageId, out storageItemList))
             {
                 // Cannot find storage
-                result.Invoke(AckResponseCode.Error, new MoveItemToStorageResp()
+                result.Invoke(AckResponseCode.Success, new MoveItemToStorageResp()
                 {
                     Error = UITextKeys.UI_ERROR_STORAGE_NOT_FOUND
                 });
@@ -779,7 +779,7 @@ namespace MultiplayerARPG.MMO
             if (!cachedUserCharacter.TryGetValue(request.CharacterId, out character))
             {
                 // Cannot find character
-                result.Invoke(AckResponseCode.Error, new MoveItemToStorageResp()
+                result.Invoke(AckResponseCode.Success, new MoveItemToStorageResp()
                 {
                     Error = UITextKeys.UI_ERROR_CHARACTER_NOT_FOUND
                 });
@@ -789,7 +789,7 @@ namespace MultiplayerARPG.MMO
                 request.InventoryItemIndex >= character.NonEquipItems.Count)
             {
                 // Invalid inventory index
-                result.Invoke(AckResponseCode.Error, new MoveItemToStorageResp()
+                result.Invoke(AckResponseCode.Success, new MoveItemToStorageResp()
                 {
                     Error = UITextKeys.UI_ERROR_INVALID_ITEM_INDEX
                 });
@@ -815,7 +815,7 @@ namespace MultiplayerARPG.MMO
                 if (isOverwhelming || !storageItemList.IncreaseItems(movingItem))
                 {
                     // Storage will overwhelming
-                    result.Invoke(AckResponseCode.Error, new MoveItemToStorageResp()
+                    result.Invoke(AckResponseCode.Success, new MoveItemToStorageResp()
                     {
                         Error = UITextKeys.UI_ERROR_STORAGE_WILL_OVERWHELMING
                     });
@@ -856,7 +856,7 @@ namespace MultiplayerARPG.MMO
             if (!cachedStorageItems.TryGetValue(storageId, out storageItemList))
             {
                 // Cannot find storage
-                result.Invoke(AckResponseCode.Error, new MoveItemFromStorageResp()
+                result.Invoke(AckResponseCode.Success, new MoveItemFromStorageResp()
                 {
                     Error = UITextKeys.UI_ERROR_STORAGE_NOT_FOUND
                 });
@@ -866,7 +866,7 @@ namespace MultiplayerARPG.MMO
             if (!cachedUserCharacter.TryGetValue(request.CharacterId, out character))
             {
                 // Cannot find character
-                result.Invoke(AckResponseCode.Error, new MoveItemFromStorageResp()
+                result.Invoke(AckResponseCode.Success, new MoveItemFromStorageResp()
                 {
                     Error = UITextKeys.UI_ERROR_CHARACTER_NOT_FOUND
                 });
@@ -876,7 +876,7 @@ namespace MultiplayerARPG.MMO
                 request.StorageItemIndex >= storageItemList.Count)
             {
                 // Invalid storage index
-                result.Invoke(AckResponseCode.Error, new MoveItemFromStorageResp()
+                result.Invoke(AckResponseCode.Success, new MoveItemFromStorageResp()
                 {
                     Error = UITextKeys.UI_ERROR_INVALID_ITEM_INDEX
                 });
@@ -897,7 +897,7 @@ namespace MultiplayerARPG.MMO
                 if (isOverwhelming || !character.IncreaseItems(movingItem))
                 {
                     // inventory will overwhelming
-                    result.Invoke(AckResponseCode.Error, new MoveItemFromStorageResp()
+                    result.Invoke(AckResponseCode.Success, new MoveItemFromStorageResp()
                     {
                         Error = UITextKeys.UI_ERROR_STORAGE_WILL_OVERWHELMING
                     });
@@ -939,7 +939,7 @@ namespace MultiplayerARPG.MMO
             if (!cachedStorageItems.TryGetValue(storageId, out storageItemList))
             {
                 // Cannot find storage
-                result.Invoke(AckResponseCode.Error, new SwapOrMergeStorageItemResp()
+                result.Invoke(AckResponseCode.Success, new SwapOrMergeStorageItemResp()
                 {
                     Error = UITextKeys.UI_ERROR_STORAGE_NOT_FOUND
                 });
@@ -999,7 +999,7 @@ namespace MultiplayerARPG.MMO
             if (!cachedStorageItems.TryGetValue(storageId, out storageItemList))
             {
                 // Cannot find storage
-                result.Invoke(AckResponseCode.Error, new IncreaseStorageItemsResp()
+                result.Invoke(AckResponseCode.Success, new IncreaseStorageItemsResp()
                 {
                     Error = UITextKeys.UI_ERROR_STORAGE_NOT_FOUND
                 });
@@ -1018,7 +1018,7 @@ namespace MultiplayerARPG.MMO
             if (isOverwhelming || !storageItemList.IncreaseItems(addingItem))
             {
                 // Storage will overwhelming
-                result.Invoke(AckResponseCode.Error, new IncreaseStorageItemsResp()
+                result.Invoke(AckResponseCode.Success, new IncreaseStorageItemsResp()
                 {
                     Error = UITextKeys.UI_ERROR_STORAGE_WILL_OVERWHELMING
                 });
@@ -1045,7 +1045,7 @@ namespace MultiplayerARPG.MMO
             if (!cachedStorageItems.TryGetValue(storageId, out storageItemList))
             {
                 // Cannot find storage
-                result.Invoke(AckResponseCode.Error, new DecreaseStorageItemsResp()
+                result.Invoke(AckResponseCode.Success, new DecreaseStorageItemsResp()
                 {
                     Error = UITextKeys.UI_ERROR_STORAGE_NOT_FOUND,
                 });
@@ -1058,7 +1058,7 @@ namespace MultiplayerARPG.MMO
             Dictionary<int, short> decreasedItems;
             if (!storageItemList.DecreaseItems(request.DataId, request.Amount, isLimitSlot, out decreasedItems))
             {
-                result.Invoke(AckResponseCode.Error, new DecreaseStorageItemsResp()
+                result.Invoke(AckResponseCode.Success, new DecreaseStorageItemsResp()
                 {
                     Error = UITextKeys.UI_ERROR_NOT_ENOUGH_ITEMS,
                 });
@@ -1101,7 +1101,7 @@ namespace MultiplayerARPG.MMO
             long updated = await Database.UpdateReadMailState(request.MailId, request.UserId);
             if (updated <= 0)
             {
-                result.Invoke(AckResponseCode.Error, new UpdateReadMailStateResp()
+                result.Invoke(AckResponseCode.Success, new UpdateReadMailStateResp()
                 {
                     Error = UITextKeys.UI_ERROR_MAIL_READ_NOT_ALLOWED
                 });
@@ -1120,7 +1120,7 @@ namespace MultiplayerARPG.MMO
             long updated = await Database.UpdateClaimMailItemsState(request.MailId, request.UserId);
             if (updated <= 0)
             {
-                result.Invoke(AckResponseCode.Error, new UpdateClaimMailItemsStateResp()
+                result.Invoke(AckResponseCode.Success, new UpdateClaimMailItemsStateResp()
                 {
                     Error = UITextKeys.UI_ERROR_MAIL_READ_NOT_ALLOWED
                 });
@@ -1139,7 +1139,7 @@ namespace MultiplayerARPG.MMO
             long updated = await Database.UpdateDeleteMailState(request.MailId, request.UserId);
             if (updated <= 0)
             {
-                result.Invoke(AckResponseCode.Error, new UpdateDeleteMailStateResp()
+                result.Invoke(AckResponseCode.Success, new UpdateDeleteMailStateResp()
                 {
                     Error = UITextKeys.UI_ERROR_MAIL_READ_NOT_ALLOWED
                 });
@@ -1155,7 +1155,7 @@ namespace MultiplayerARPG.MMO
             Mail mail = request.Mail;
             if (string.IsNullOrEmpty(mail.ReceiverId))
             {
-                result.Invoke(AckResponseCode.Error, new SendMailResp()
+                result.Invoke(AckResponseCode.Success, new SendMailResp()
                 {
                     Error = UITextKeys.UI_ERROR_MAIL_SEND_NO_RECEIVER
                 });
@@ -1164,7 +1164,7 @@ namespace MultiplayerARPG.MMO
             long created = await Database.CreateMail(mail);
             if (created <= 0)
             {
-                result.Invoke(AckResponseCode.Error, new SendMailResp()
+                result.Invoke(AckResponseCode.Success, new SendMailResp()
                 {
                     Error = UITextKeys.UI_ERROR_MAIL_SEND_NOT_ALLOWED
                 });

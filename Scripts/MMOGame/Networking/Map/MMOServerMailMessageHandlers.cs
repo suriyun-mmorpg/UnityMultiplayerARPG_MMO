@@ -8,9 +8,9 @@ namespace MultiplayerARPG.MMO
     public partial class MMOServerMailMessageHandlers : MonoBehaviour, IServerMailMessageHandlers
     {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        public DatabaseService.DatabaseServiceClient DbServiceClient
+        public DatabaseNetworkManager DbServiceClient
         {
-            get { return MMOServerInstance.Singleton.DatabaseNetworkManager.ServiceClient; }
+            get { return MMOServerInstance.Singleton.DatabaseNetworkManager; }
         }
 #endif
 
@@ -26,7 +26,7 @@ namespace MultiplayerARPG.MMO
                     UserId = playerCharacter.UserId,
                     OnlyNewMails = request.onlyNewMails,
                 });
-                mails.AddRange(resp.List.MakeListFromRepeatedByteString<MailListEntry>());
+                mails.AddRange(resp.List);
             }
             result.Invoke(AckResponseCode.Success, new ResponseMailListMessage()
             {
@@ -47,13 +47,13 @@ namespace MultiplayerARPG.MMO
                     MailId = request.id,
                     UserId = playerCharacter.UserId,
                 });
-                UITextKeys message = (UITextKeys)resp.Error;
+                UITextKeys message = resp.Error;
                 result.Invoke(
                     message == UITextKeys.NONE ? AckResponseCode.Success : AckResponseCode.Error,
                     new ResponseReadMailMessage()
                     {
                         message = message,
-                        mail = resp.Mail.FromByteString<Mail>(),
+                        mail = resp.Mail,
                     });
             }
             else
@@ -78,7 +78,7 @@ namespace MultiplayerARPG.MMO
                     MailId = request.id,
                     UserId = playerCharacter.UserId,
                 });
-                Mail mail = mailResp.Mail.FromByteString<Mail>();
+                Mail mail = mailResp.Mail;
                 if (mail.IsClaim)
                 {
                     message = UITextKeys.UI_ERROR_MAIL_CLAIM_ALREADY_CLAIMED;
@@ -135,13 +135,13 @@ namespace MultiplayerARPG.MMO
                     MailId = request.id,
                     UserId = playerCharacter.UserId,
                 });
-                message = (UITextKeys)resp.Error;
+                message = resp.Error;
                 result.Invoke(
                     message == UITextKeys.NONE ? AckResponseCode.Success : AckResponseCode.Error,
                     new ResponseClaimMailItemsMessage()
                     {
                         message = message,
-                        mail = resp.Mail.FromByteString<Mail>(),
+                        mail = resp.Mail,
                     });
             }
             else
@@ -165,7 +165,7 @@ namespace MultiplayerARPG.MMO
                     MailId = request.id,
                     UserId = playerCharacter.UserId,
                 });
-                UITextKeys message = (UITextKeys)resp.Error;
+                UITextKeys message = resp.Error;
                 result.Invoke(
                     message == UITextKeys.NONE ? AckResponseCode.Success : AckResponseCode.Error,
                     new ResponseDeleteMailMessage()
@@ -229,9 +229,9 @@ namespace MultiplayerARPG.MMO
                 };
                 SendMailResp resp = await DbServiceClient.SendMailAsync(new SendMailReq()
                 {
-                    Mail = DatabaseServiceUtils.ToByteString(mail),
+                    Mail = mail,
                 });
-                UITextKeys message = (UITextKeys)resp.Error;
+                UITextKeys message = resp.Error;
                 result.Invoke(
                     message == UITextKeys.NONE ? AckResponseCode.Success : AckResponseCode.Error,
                     new ResponseSendMailMessage()

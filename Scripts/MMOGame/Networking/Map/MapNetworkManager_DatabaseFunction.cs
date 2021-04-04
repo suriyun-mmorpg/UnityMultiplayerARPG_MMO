@@ -3,7 +3,6 @@ using LiteNetLib;
 using LiteNetLibManager;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace MultiplayerARPG.MMO
 {
@@ -17,10 +16,10 @@ namespace MultiplayerARPG.MMO
                 loadingStorageIds.Add(storageId);
                 ReadStorageItemsResp readStorageItemsResp = await DbServiceClient.ReadStorageItemsAsync(new ReadStorageItemsReq()
                 {
-                    StorageType = (EStorageType)storageId.storageType,
-                    StorageOwnerId = storageId.storageOwnerId
+                    StorageType = storageId.storageType,
+                    StorageOwnerId = storageId.storageOwnerId,
                 });
-                ServerStorageHandlers.SetStorageItems(storageId, readStorageItemsResp.StorageCharacterItems.MakeListFromRepeatedByteString<CharacterItem>());
+                ServerStorageHandlers.SetStorageItems(storageId, readStorageItemsResp.StorageCharacterItems);
                 loadingStorageIds.Remove(storageId);
             }
         }
@@ -34,9 +33,9 @@ namespace MultiplayerARPG.MMO
                 loadingPartyIds.Add(id);
                 PartyResp resp = await DbServiceClient.ReadPartyAsync(new ReadPartyReq()
                 {
-                    PartyId = id
+                    PartyId = id,
                 });
-                ServerPartyHandlers.SetParty(id, resp.PartyData.FromByteString<PartyData>());
+                ServerPartyHandlers.SetParty(id, resp.PartyData);
                 loadingPartyIds.Remove(id);
             }
         }
@@ -50,9 +49,9 @@ namespace MultiplayerARPG.MMO
                 loadingGuildIds.Add(id);
                 GuildResp resp = await DbServiceClient.ReadGuildAsync(new ReadGuildReq()
                 {
-                    GuildId = id
+                    GuildId = id,
                 });
-                ServerGuildHandlers.SetGuild(id, resp.GuildData.FromByteString<GuildData>());
+                ServerGuildHandlers.SetGuild(id, resp.GuildData);
                 loadingGuildIds.Remove(id);
             }
         }
@@ -67,7 +66,7 @@ namespace MultiplayerARPG.MMO
                 // Update character
                 await DbServiceClient.UpdateCharacterAsync(new UpdateCharacterReq()
                 {
-                    CharacterData = playerCharacterData.ToByteString()
+                    CharacterData = playerCharacterData,
                 });
                 savingCharacters.Remove(playerCharacterData.Id);
                 if (LogInfo)
@@ -106,7 +105,7 @@ namespace MultiplayerARPG.MMO
                 await DbServiceClient.UpdateBuildingAsync(new UpdateBuildingReq()
                 {
                     MapName = Assets.onlineScene.SceneName,
-                    BuildingData = buildingSaveData.ToByteString()
+                    BuildingData = buildingSaveData,
                 });
                 savingBuildings.Remove(buildingSaveData.Id);
                 if (LogInfo)
@@ -149,7 +148,7 @@ namespace MultiplayerARPG.MMO
                 await DbServiceClient.CreateBuildingAsync(new CreateBuildingReq()
                 {
                     MapName = Assets.onlineScene.SceneName,
-                    BuildingData = saveData.ToByteString()
+                    BuildingData = saveData,
                 });
             }
         }

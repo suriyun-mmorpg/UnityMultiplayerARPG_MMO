@@ -14,9 +14,9 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        public DatabaseService.DatabaseServiceClient DbServiceClient
+        public DatabaseNetworkManager DbServiceClient
         {
-            get { return MMOServerInstance.Singleton.DatabaseNetworkManager.ServiceClient; }
+            get { return MMOServerInstance.Singleton.DatabaseNetworkManager; }
         }
 #endif
 
@@ -36,10 +36,10 @@ namespace MultiplayerARPG.MMO
             usingStorageIds.TryAdd(connectionId, storageId);
             // Load storage items from database
             ReadStorageItemsReq req = new ReadStorageItemsReq();
-            req.StorageType = (EStorageType)storageId.storageType;
+            req.StorageType = storageId.storageType;
             req.StorageOwnerId = storageId.storageOwnerId;
             ReadStorageItemsResp resp = await DbServiceClient.ReadStorageItemsAsync(req);
-            List<CharacterItem> storageItems = DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.StorageCharacterItems);
+            List<CharacterItem> storageItems = resp.StorageCharacterItems;
             SetStorageItems(storageId, storageItems);
             // Notify storage items to client
             uint storageObjectId;
@@ -79,18 +79,18 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
             Storage storge = GetStorage(storageId, out _);
             IncreaseStorageItemsReq req = new IncreaseStorageItemsReq();
-            req.StorageType = (EStorageType)storageId.storageType;
+            req.StorageType = storageId.storageType;
             req.StorageOwnerId = storageId.storageOwnerId;
             req.WeightLimit = storge.weightLimit;
             req.SlotLimit = storge.slotLimit;
-            req.Item = DatabaseServiceUtils.ToByteString(addingItem);
+            req.Item = addingItem;
             IncreaseStorageItemsResp resp = await DbServiceClient.IncreaseStorageItemsAsync(req);
             if (UITextKeys.NONE != (UITextKeys)resp.Error)
             {
                 // Error ocurring, storage may overwhelming let's it drop items to ground
                 return false;
             }
-            SetStorageItems(storageId, DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.StorageCharacterItems));
+            SetStorageItems(storageId, resp.StorageCharacterItems);
             NotifyStorageItemsUpdated(storageId.storageType, storageId.storageOwnerId);
             return true;
 #else
@@ -103,7 +103,7 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
             Storage storge = GetStorage(storageId, out _);
             DecreaseStorageItemsReq req = new DecreaseStorageItemsReq();
-            req.StorageType = (EStorageType)storageId.storageType;
+            req.StorageType = storageId.storageType;
             req.StorageOwnerId = storageId.storageOwnerId;
             req.WeightLimit = storge.weightLimit;
             req.SlotLimit = storge.slotLimit;
@@ -115,7 +115,7 @@ namespace MultiplayerARPG.MMO
                 // Error ocurring, storage may overwhelming let's it drop items to ground
                 return new DecreaseStorageItemsResult();
             }
-            SetStorageItems(storageId, DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.StorageCharacterItems));
+            SetStorageItems(storageId, resp.StorageCharacterItems);
             NotifyStorageItemsUpdated(storageId.storageType, storageId.storageOwnerId);
             Dictionary<int, short> decreasedItems = new Dictionary<int, short>();
             foreach (ItemIndexAmountMap entry in resp.DecreasedItems)

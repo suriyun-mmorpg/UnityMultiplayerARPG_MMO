@@ -9,9 +9,9 @@ namespace MultiplayerARPG.MMO
         public ChatNetworkManager ChatNetworkManager { get; private set; }
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        public DatabaseService.DatabaseServiceClient DbServiceClient
+        public DatabaseNetworkManager DbServiceClient
         {
-            get { return MMOServerInstance.Singleton.DatabaseNetworkManager.ServiceClient; }
+            get { return MMOServerInstance.Singleton.DatabaseNetworkManager; }
         }
 #endif
 

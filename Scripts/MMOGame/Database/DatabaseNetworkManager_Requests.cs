@@ -5,299 +5,476 @@ namespace MultiplayerARPG.MMO
 {
     public partial class DatabaseNetworkManager
     {
-        public async UniTask<AsyncResponseData<ValidateUserLoginResp>> RequestValidateUserLogin(ValidateUserLoginReq request)
+        public async UniTask<ValidateUserLoginResp> ValidateUserLoginAsync(ValidateUserLoginReq request)
         {
-            return await Client.SendRequestAsync<ValidateUserLoginReq, ValidateUserLoginResp>(DatabaseRequestTypes.RequestValidateUserLogin, request);
+            var result = await Client.SendRequestAsync<ValidateUserLoginReq, ValidateUserLoginResp>(DatabaseRequestTypes.RequestValidateUserLogin, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new ValidateUserLoginResp();
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<EmptyMessage>> RequestValidateAccessToken(ValidateAccessTokenReq request)
+        public async UniTask<ValidateAccessTokenResp> ValidateAccessTokenAsync(ValidateAccessTokenReq request)
         {
-            return await Client.SendRequestAsync<ValidateAccessTokenReq, EmptyMessage>(DatabaseRequestTypes.RequestValidateAccessToken, request);
+            var result = await Client.SendRequestAsync<ValidateAccessTokenReq, ValidateAccessTokenResp>(DatabaseRequestTypes.RequestValidateAccessToken, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new ValidateAccessTokenResp();
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<GetUserLevelResp>> RequestGetUserLevel(GetUserLevelReq request)
+        public async UniTask<GetUserLevelResp> GetUserLevelAsync(GetUserLevelReq request)
         {
-            return await Client.SendRequestAsync<GetUserLevelReq, GetUserLevelResp>(DatabaseRequestTypes.RequestGetUserLevel, request);
+            var result = await Client.SendRequestAsync<GetUserLevelReq, GetUserLevelResp>(DatabaseRequestTypes.RequestGetUserLevel, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new GetUserLevelResp();
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<GoldResp>> RequestGetGold(GetGoldReq request)
+        public async UniTask<GoldResp> GetGoldAsync(GetGoldReq request)
         {
-            return await Client.SendRequestAsync<GetGoldReq, GoldResp>(DatabaseRequestTypes.RequestGetGold, request);
+            var result = await Client.SendRequestAsync<GetGoldReq, GoldResp>(DatabaseRequestTypes.RequestGetGold, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new GoldResp();
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<GoldResp>> RequestChangeGold(ChangeGoldReq request)
+        public async UniTask<GoldResp> ChangeGoldAsync(ChangeGoldReq request)
         {
-            return await Client.SendRequestAsync<ChangeGoldReq, GoldResp>(DatabaseRequestTypes.RequestChangeGold, request);
+            var result = await Client.SendRequestAsync<ChangeGoldReq, GoldResp>(DatabaseRequestTypes.RequestChangeGold, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new GoldResp();
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<CashResp>> RequestGetCash(GetCashReq request)
+        public async UniTask<CashResp> GetCashAsync(GetCashReq request)
         {
-            return await Client.SendRequestAsync<GetCashReq, CashResp>(DatabaseRequestTypes.RequestGetCash, request);
+            var result = await Client.SendRequestAsync<GetCashReq, CashResp>(DatabaseRequestTypes.RequestGetCash, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new CashResp();
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<CashResp>> RequestChangeCash(ChangeCashReq request)
+        public async UniTask<CashResp> ChangeCashAsync(ChangeCashReq request)
         {
-            return await Client.SendRequestAsync<ChangeCashReq, CashResp>(DatabaseRequestTypes.RequestChangeCash, request);
+            var result = await Client.SendRequestAsync<ChangeCashReq, CashResp>(DatabaseRequestTypes.RequestChangeCash, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new CashResp();
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<EmptyMessage>> RequestUpdateAccessToken(UpdateAccessTokenReq request)
+        public async UniTask<EmptyMessage> UpdateAccessTokenAsync(UpdateAccessTokenReq request)
         {
-            return await Client.SendRequestAsync<UpdateAccessTokenReq, EmptyMessage>(DatabaseRequestTypes.RequestUpdateAccessToken, request);
+            var result = await Client.SendRequestAsync<UpdateAccessTokenReq, EmptyMessage>(DatabaseRequestTypes.RequestUpdateAccessToken, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return EmptyMessage.Value;
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<EmptyMessage>> RequestCreateUserLogin(CreateUserLoginReq request)
+        public async UniTask<EmptyMessage> CreateUserLoginAsync(CreateUserLoginReq request)
         {
-            return await Client.SendRequestAsync<CreateUserLoginReq, EmptyMessage>(DatabaseRequestTypes.RequestCreateUserLogin, request);
+            var result = await Client.SendRequestAsync<CreateUserLoginReq, EmptyMessage>(DatabaseRequestTypes.RequestCreateUserLogin, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return EmptyMessage.Value;
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<FindUsernameResp>> RequestFindUsername(FindUsernameReq request)
+        public async UniTask<FindUsernameResp> FindUsernameAsync(FindUsernameReq request)
         {
-            return await Client.SendRequestAsync<FindUsernameReq, FindUsernameResp>(DatabaseRequestTypes.RequestFindUsername, request);
+            var result = await Client.SendRequestAsync<FindUsernameReq, FindUsernameResp>(DatabaseRequestTypes.RequestFindUsername, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new FindUsernameResp();
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<CharacterResp>> RequestCreateCharacter(CreateCharacterReq request)
+        public async UniTask<CharacterResp> CreateCharacterAsync(CreateCharacterReq request)
         {
-            return await Client.SendRequestAsync<CreateCharacterReq, CharacterResp>(DatabaseRequestTypes.RequestCreateCharacter, request);
+            var result = await Client.SendRequestAsync<CreateCharacterReq, CharacterResp>(DatabaseRequestTypes.RequestCreateCharacter, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new CharacterResp();
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<CharacterResp>> RequestReadCharacter(ReadCharacterReq request)
+        public async UniTask<CharacterResp> ReadCharacterAsync(ReadCharacterReq request)
         {
-            return await Client.SendRequestAsync<ReadCharacterReq, CharacterResp>(DatabaseRequestTypes.RequestReadCharacter, request);
+            var result = await Client.SendRequestAsync<ReadCharacterReq, CharacterResp>(DatabaseRequestTypes.RequestReadCharacter, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new CharacterResp();
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<CharactersResp>> RequestReadCharacters(ReadCharactersReq request)
+        public async UniTask<CharactersResp> ReadCharactersAsync(ReadCharactersReq request)
         {
-            return await Client.SendRequestAsync<ReadCharactersReq, CharactersResp>(DatabaseRequestTypes.RequestReadCharacters, request);
+            var result = await Client.SendRequestAsync<ReadCharactersReq, CharactersResp>(DatabaseRequestTypes.RequestReadCharacters, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new CharactersResp();
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<CharacterResp>> RequestUpdateCharacter(UpdateCharacterReq request)
+        public async UniTask<CharacterResp> UpdateCharacterAsync(UpdateCharacterReq request)
         {
-            return await Client.SendRequestAsync<UpdateCharacterReq, CharacterResp>(DatabaseRequestTypes.RequestUpdateCharacter, request);
+            var result = await Client.SendRequestAsync<UpdateCharacterReq, CharacterResp>(DatabaseRequestTypes.RequestUpdateCharacter, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new CharacterResp();
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<EmptyMessage>> RequestDeleteCharacter(DeleteCharacterReq request)
+        public async UniTask<EmptyMessage> DeleteCharacterAsync(DeleteCharacterReq request)
         {
-            return await Client.SendRequestAsync<DeleteCharacterReq, EmptyMessage>(DatabaseRequestTypes.RequestDeleteCharacter, request);
+            var result = await Client.SendRequestAsync<DeleteCharacterReq, EmptyMessage>(DatabaseRequestTypes.RequestDeleteCharacter, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return EmptyMessage.Value;
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<FindCharacterNameResp>> RequestFindCharacterName(FindCharacterNameReq request)
+        public async UniTask<FindCharacterNameResp> FindCharacterNameAsync(FindCharacterNameReq request)
         {
-            return await Client.SendRequestAsync<FindCharacterNameReq, FindCharacterNameResp>(DatabaseRequestTypes.RequestFindCharacterName, request);
+            var result = await Client.SendRequestAsync<FindCharacterNameReq, FindCharacterNameResp>(DatabaseRequestTypes.RequestFindCharacterName, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new FindCharacterNameResp();
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<SocialCharactersResp>> RequestFindCharacters(FindCharacterNameReq request)
+        public async UniTask<SocialCharactersResp> FindCharactersAsync(FindCharacterNameReq request)
         {
-            return await Client.SendRequestAsync<FindCharacterNameReq, SocialCharactersResp>(DatabaseRequestTypes.RequestFindCharacters, request);
+            var result = await Client.SendRequestAsync<FindCharacterNameReq, SocialCharactersResp>(DatabaseRequestTypes.RequestFindCharacters, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new SocialCharactersResp();
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<SocialCharactersResp>> RequestCreateFriend(CreateFriendReq request)
+        public async UniTask<SocialCharactersResp> CreateFriendAsync(CreateFriendReq request)
         {
-            return await Client.SendRequestAsync<CreateFriendReq, SocialCharactersResp>(DatabaseRequestTypes.RequestCreateFriend, request);
+            var result = await Client.SendRequestAsync<CreateFriendReq, SocialCharactersResp>(DatabaseRequestTypes.RequestCreateFriend, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new SocialCharactersResp();
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<SocialCharactersResp>> RequestDeleteFriend(DeleteFriendReq request)
+        public async UniTask<SocialCharactersResp> DeleteFriendAsync(DeleteFriendReq request)
         {
-            return await Client.SendRequestAsync<DeleteFriendReq, SocialCharactersResp>(DatabaseRequestTypes.RequestDeleteFriend, request);
+            var result = await Client.SendRequestAsync<DeleteFriendReq, SocialCharactersResp>(DatabaseRequestTypes.RequestDeleteFriend, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new SocialCharactersResp();
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<SocialCharactersResp>> RequestReadFriends(ReadFriendsReq request)
+        public async UniTask<SocialCharactersResp> ReadFriendsAsync(ReadFriendsReq request)
         {
-            return await Client.SendRequestAsync<ReadFriendsReq, SocialCharactersResp>(DatabaseRequestTypes.RequestReadFriends, request);
+            var result = await Client.SendRequestAsync<ReadFriendsReq, SocialCharactersResp>(DatabaseRequestTypes.RequestReadFriends, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new SocialCharactersResp();
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<BuildingResp>> RequestCreateBuilding(CreateBuildingReq request)
+        public async UniTask<BuildingResp> CreateBuildingAsync(CreateBuildingReq request)
         {
-            return await Client.SendRequestAsync<CreateBuildingReq, BuildingResp>(DatabaseRequestTypes.RequestCreateBuilding, request);
+            var result = await Client.SendRequestAsync<CreateBuildingReq, BuildingResp>(DatabaseRequestTypes.RequestCreateBuilding, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new BuildingResp();
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<BuildingResp>> RequestUpdateBuilding(UpdateBuildingReq request)
+        public async UniTask<BuildingResp> UpdateBuildingAsync(UpdateBuildingReq request)
         {
-            return await Client.SendRequestAsync<UpdateBuildingReq, BuildingResp>(DatabaseRequestTypes.RequestUpdateBuilding, request);
+            var result = await Client.SendRequestAsync<UpdateBuildingReq, BuildingResp>(DatabaseRequestTypes.RequestUpdateBuilding, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new BuildingResp();
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<EmptyMessage>> RequestDeleteBuilding(DeleteBuildingReq request)
+        public async UniTask<EmptyMessage> DeleteBuildingAsync(DeleteBuildingReq request)
         {
-            return await Client.SendRequestAsync<DeleteBuildingReq, EmptyMessage>(DatabaseRequestTypes.RequestDeleteBuilding, request);
+            var result = await Client.SendRequestAsync<DeleteBuildingReq, EmptyMessage>(DatabaseRequestTypes.RequestDeleteBuilding, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return EmptyMessage.Value;
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<BuildingsResp>> RequestReadBuildings(ReadBuildingsReq request)
+        public async UniTask<BuildingsResp> ReadBuildingsAsync(ReadBuildingsReq request)
         {
-            return await Client.SendRequestAsync<ReadBuildingsReq, BuildingsResp>(DatabaseRequestTypes.RequestReadBuildings, request);
+            var result = await Client.SendRequestAsync<ReadBuildingsReq, BuildingsResp>(DatabaseRequestTypes.RequestReadBuildings, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new BuildingsResp();
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<PartyResp>> RequestCreateParty(CreatePartyReq request)
+        public async UniTask<PartyResp> CreatePartyAsync(CreatePartyReq request)
         {
-            return await Client.SendRequestAsync<CreatePartyReq, PartyResp>(DatabaseRequestTypes.RequestCreateParty, request);
+            var result = await Client.SendRequestAsync<CreatePartyReq, PartyResp>(DatabaseRequestTypes.RequestCreateParty, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new PartyResp();
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<PartyResp>> RequestUpdateParty(UpdatePartyReq request)
+        public async UniTask<PartyResp> UpdatePartyAsync(UpdatePartyReq request)
         {
-            return await Client.SendRequestAsync<UpdatePartyReq, PartyResp>(DatabaseRequestTypes.RequestUpdateParty, request);
+            var result = await Client.SendRequestAsync<UpdatePartyReq, PartyResp>(DatabaseRequestTypes.RequestUpdateParty, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new PartyResp();
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<PartyResp>> RequestUpdatePartyLeader(UpdatePartyLeaderReq request)
+        public async UniTask<PartyResp> UpdatePartyLeaderAsync(UpdatePartyLeaderReq request)
         {
-            return await Client.SendRequestAsync<UpdatePartyLeaderReq, PartyResp>(DatabaseRequestTypes.RequestUpdatePartyLeader, request);
+            var result = await Client.SendRequestAsync<UpdatePartyLeaderReq, PartyResp>(DatabaseRequestTypes.RequestUpdatePartyLeader, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new PartyResp();
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<EmptyMessage>> RequestDeleteParty(DeletePartyReq request)
+        public async UniTask<EmptyMessage> DeletePartyAsync(DeletePartyReq request)
         {
-            return await Client.SendRequestAsync<DeletePartyReq, EmptyMessage>(DatabaseRequestTypes.RequestDeleteParty, request);
+            var result = await Client.SendRequestAsync<DeletePartyReq, EmptyMessage>(DatabaseRequestTypes.RequestDeleteParty, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return EmptyMessage.Value;
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<PartyResp>> RequestUpdateCharacterParty(UpdateCharacterPartyReq request)
+        public async UniTask<PartyResp> UpdateCharacterPartyAsync(UpdateCharacterPartyReq request)
         {
-            return await Client.SendRequestAsync<UpdateCharacterPartyReq, PartyResp>(DatabaseRequestTypes.RequestUpdateCharacterParty, request);
+            var result = await Client.SendRequestAsync<UpdateCharacterPartyReq, PartyResp>(DatabaseRequestTypes.RequestUpdateCharacterParty, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new PartyResp();
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<EmptyMessage>> RequestClearCharacterParty(ClearCharacterPartyReq request)
+        public async UniTask<EmptyMessage> ClearCharacterPartyAsync(ClearCharacterPartyReq request)
         {
-            return await Client.SendRequestAsync<ClearCharacterPartyReq, EmptyMessage>(DatabaseRequestTypes.RequestClearCharacterParty, request);
+            var result = await Client.SendRequestAsync<ClearCharacterPartyReq, EmptyMessage>(DatabaseRequestTypes.RequestClearCharacterParty, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return EmptyMessage.Value;
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<PartyResp>> RequestReadParty(ReadPartyReq request)
+        public async UniTask<PartyResp> ReadPartyAsync(ReadPartyReq request)
         {
-            return await Client.SendRequestAsync<ReadPartyReq, PartyResp>(DatabaseRequestTypes.RequestReadParty, request);
+            var result = await Client.SendRequestAsync<ReadPartyReq, PartyResp>(DatabaseRequestTypes.RequestReadParty, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new PartyResp();
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<GuildResp>> RequestCreateGuild(CreateGuildReq request)
+        public async UniTask<GuildResp> CreateGuildAsync(CreateGuildReq request)
         {
-            return await Client.SendRequestAsync<CreateGuildReq, GuildResp>(DatabaseRequestTypes.RequestCreateGuild, request);
+            var result = await Client.SendRequestAsync<CreateGuildReq, GuildResp>(DatabaseRequestTypes.RequestCreateGuild, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new GuildResp();
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<GuildResp>> RequestUpdateGuildLeader(UpdateGuildLeaderReq request)
+        public async UniTask<GuildResp> UpdateGuildLeaderAsync(UpdateGuildLeaderReq request)
         {
-            return await Client.SendRequestAsync<UpdateGuildLeaderReq, GuildResp>(DatabaseRequestTypes.RequestUpdateGuildLeader, request);
+            var result = await Client.SendRequestAsync<UpdateGuildLeaderReq, GuildResp>(DatabaseRequestTypes.RequestUpdateGuildLeader, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new GuildResp();
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<GuildResp>> RequestUpdateGuildMessage(UpdateGuildMessageReq request)
+        public async UniTask<GuildResp> UpdateGuildMessageAsync(UpdateGuildMessageReq request)
         {
-            return await Client.SendRequestAsync<UpdateGuildMessageReq, GuildResp>(DatabaseRequestTypes.RequestUpdateGuildMessage, request);
+            var result = await Client.SendRequestAsync<UpdateGuildMessageReq, GuildResp>(DatabaseRequestTypes.RequestUpdateGuildMessage, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new GuildResp();
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<GuildResp>> RequestUpdateGuildRole(UpdateGuildRoleReq request)
+        public async UniTask<GuildResp> UpdateGuildRoleAsync(UpdateGuildRoleReq request)
         {
-            return await Client.SendRequestAsync<UpdateGuildRoleReq, GuildResp>(DatabaseRequestTypes.RequestUpdateGuildRole, request);
+            var result = await Client.SendRequestAsync<UpdateGuildRoleReq, GuildResp>(DatabaseRequestTypes.RequestUpdateGuildRole, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new GuildResp();
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<GuildResp>> RequestUpdateGuildMemberRole(UpdateGuildMemberRoleReq request)
+        public async UniTask<GuildResp> UpdateGuildMemberRoleAsync(UpdateGuildMemberRoleReq request)
         {
-            return await Client.SendRequestAsync<UpdateGuildMemberRoleReq, GuildResp>(DatabaseRequestTypes.RequestUpdateGuildMemberRole, request);
+            var result = await Client.SendRequestAsync<UpdateGuildMemberRoleReq, GuildResp>(DatabaseRequestTypes.RequestUpdateGuildMemberRole, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new GuildResp();
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<EmptyMessage>> RequestDeleteGuild(DeleteGuildReq request)
+        public async UniTask<EmptyMessage> DeleteGuildAsync(DeleteGuildReq request)
         {
-            return await Client.SendRequestAsync<DeleteGuildReq, EmptyMessage>(DatabaseRequestTypes.RequestDeleteGuild, request);
+            var result = await Client.SendRequestAsync<DeleteGuildReq, EmptyMessage>(DatabaseRequestTypes.RequestDeleteGuild, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return EmptyMessage.Value;
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<GuildResp>> RequestUpdateCharacterGuild(UpdateCharacterGuildReq request)
+        public async UniTask<GuildResp> UpdateCharacterGuildAsync(UpdateCharacterGuildReq request)
         {
-            return await Client.SendRequestAsync<UpdateCharacterGuildReq, GuildResp>(DatabaseRequestTypes.RequestUpdateCharacterGuild, request);
+            var result = await Client.SendRequestAsync<UpdateCharacterGuildReq, GuildResp>(DatabaseRequestTypes.RequestUpdateCharacterGuild, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new GuildResp();
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<EmptyMessage>> RequestClearCharacterGuild(ClearCharacterGuildReq request)
+        public async UniTask<EmptyMessage> ClearCharacterGuildAsync(ClearCharacterGuildReq request)
         {
-            return await Client.SendRequestAsync<ClearCharacterGuildReq, EmptyMessage>(DatabaseRequestTypes.RequestClearCharacterGuild, request);
+            var result = await Client.SendRequestAsync<ClearCharacterGuildReq, EmptyMessage>(DatabaseRequestTypes.RequestClearCharacterGuild, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return EmptyMessage.Value;
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<FindGuildNameResp>> RequestFindGuildName(FindGuildNameReq request)
+        public async UniTask<FindGuildNameResp> FindGuildNameAsync(FindGuildNameReq request)
         {
-            return await Client.SendRequestAsync<FindGuildNameReq, FindGuildNameResp>(DatabaseRequestTypes.RequestFindGuildName, request);
+            var result = await Client.SendRequestAsync<FindGuildNameReq, FindGuildNameResp>(DatabaseRequestTypes.RequestFindGuildName, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new FindGuildNameResp();
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<GuildResp>> RequestReadGuild(ReadGuildReq request)
+        public async UniTask<GuildResp> ReadGuildAsync(ReadGuildReq request)
         {
-            return await Client.SendRequestAsync<ReadGuildReq, GuildResp>(DatabaseRequestTypes.RequestReadGuild, request);
+            var result = await Client.SendRequestAsync<ReadGuildReq, GuildResp>(DatabaseRequestTypes.RequestReadGuild, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new GuildResp();
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<GuildResp>> RequestIncreaseGuildExp(IncreaseGuildExpReq request)
+        public async UniTask<GuildResp> IncreaseGuildExpAsync(IncreaseGuildExpReq request)
         {
-            return await Client.SendRequestAsync<IncreaseGuildExpReq, GuildResp>(DatabaseRequestTypes.RequestIncreaseGuildExp, request);
+            var result = await Client.SendRequestAsync<IncreaseGuildExpReq, GuildResp>(DatabaseRequestTypes.RequestIncreaseGuildExp, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new GuildResp();
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<GuildResp>> RequestAddGuildSkill(AddGuildSkillReq request)
+        public async UniTask<GuildResp> AddGuildSkillAsync(AddGuildSkillReq request)
         {
-            return await Client.SendRequestAsync<AddGuildSkillReq, GuildResp>(DatabaseRequestTypes.RequestAddGuildSkill, request);
+            var result = await Client.SendRequestAsync<AddGuildSkillReq, GuildResp>(DatabaseRequestTypes.RequestAddGuildSkill, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new GuildResp();
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<GuildGoldResp>> RequestGetGuildGold(GetGuildGoldReq request)
+        public async UniTask<GuildGoldResp> GetGuildGoldAsync(GetGuildGoldReq request)
         {
-            return await Client.SendRequestAsync<GetGuildGoldReq, GuildGoldResp>(DatabaseRequestTypes.RequestGetGuildGold, request);
+            var result = await Client.SendRequestAsync<GetGuildGoldReq, GuildGoldResp>(DatabaseRequestTypes.RequestGetGuildGold, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new GuildGoldResp();
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<GuildGoldResp>> RequestChangeGuildGold(ChangeGuildGoldReq request)
+        public async UniTask<GuildGoldResp> ChangeGuildGoldAsync(ChangeGuildGoldReq request)
         {
-            return await Client.SendRequestAsync<ChangeGuildGoldReq, GuildGoldResp>(DatabaseRequestTypes.RequestChangeGuildGold, request);
+            var result = await Client.SendRequestAsync<ChangeGuildGoldReq, GuildGoldResp>(DatabaseRequestTypes.RequestChangeGuildGold, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new GuildGoldResp();
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<ReadStorageItemsResp>> RequestReadStorageItems(ReadStorageItemsReq request)
+        public async UniTask<ReadStorageItemsResp> ReadStorageItemsAsync(ReadStorageItemsReq request)
         {
-            return await Client.SendRequestAsync<ReadStorageItemsReq, ReadStorageItemsResp>(DatabaseRequestTypes.RequestReadStorageItems, request);
+            var result = await Client.SendRequestAsync<ReadStorageItemsReq, ReadStorageItemsResp>(DatabaseRequestTypes.RequestReadStorageItems, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new ReadStorageItemsResp();
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<MoveItemToStorageResp>> RequestMoveItemToStorage(MoveItemToStorageReq request)
+        public async UniTask<MoveItemToStorageResp> MoveItemToStorageAsync(MoveItemToStorageReq request)
         {
-            return await Client.SendRequestAsync<MoveItemToStorageReq, MoveItemToStorageResp>(DatabaseRequestTypes.RequestMoveItemToStorage, request);
+            var result = await Client.SendRequestAsync<MoveItemToStorageReq, MoveItemToStorageResp>(DatabaseRequestTypes.RequestMoveItemToStorage, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new MoveItemToStorageResp();
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<MoveItemFromStorageResp>> RequestMoveItemFromStorage(MoveItemFromStorageReq request)
+        public async UniTask<MoveItemFromStorageResp> MoveItemFromStorageAsync(MoveItemFromStorageReq request)
         {
-            return await Client.SendRequestAsync<MoveItemFromStorageReq, MoveItemFromStorageResp>(DatabaseRequestTypes.RequestMoveItemFromStorage, request);
+            var result = await Client.SendRequestAsync<MoveItemFromStorageReq, MoveItemFromStorageResp>(DatabaseRequestTypes.RequestMoveItemFromStorage, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new MoveItemFromStorageResp();
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<SwapOrMergeStorageItemResp>> RequestSwapOrMergeStorageItem(SwapOrMergeStorageItemReq request)
+        public async UniTask<SwapOrMergeStorageItemResp> SwapOrMergeStorageItemAsync(SwapOrMergeStorageItemReq request)
         {
-            return await Client.SendRequestAsync<SwapOrMergeStorageItemReq, SwapOrMergeStorageItemResp>(DatabaseRequestTypes.RequestSwapOrMergeStorageItem, request);
+            var result = await Client.SendRequestAsync<SwapOrMergeStorageItemReq, SwapOrMergeStorageItemResp>(DatabaseRequestTypes.RequestSwapOrMergeStorageItem, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new SwapOrMergeStorageItemResp();
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<IncreaseStorageItemsResp>> RequestIncreaseStorageItems(IncreaseStorageItemsReq request)
+        public async UniTask<IncreaseStorageItemsResp> IncreaseStorageItemsAsync(IncreaseStorageItemsReq request)
         {
-            return await Client.SendRequestAsync<IncreaseStorageItemsReq, IncreaseStorageItemsResp>(DatabaseRequestTypes.RequestIncreaseStorageItems, request);
+            var result = await Client.SendRequestAsync<IncreaseStorageItemsReq, IncreaseStorageItemsResp>(DatabaseRequestTypes.RequestIncreaseStorageItems, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new IncreaseStorageItemsResp();
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<DecreaseStorageItemsResp>> RequestDecreaseStorageItems(DecreaseStorageItemsReq request)
+        public async UniTask<DecreaseStorageItemsResp> DecreaseStorageItemsAsync(DecreaseStorageItemsReq request)
         {
-            return await Client.SendRequestAsync<DecreaseStorageItemsReq, DecreaseStorageItemsResp>(DatabaseRequestTypes.RequestDecreaseStorageItems, request);
+            var result = await Client.SendRequestAsync<DecreaseStorageItemsReq, DecreaseStorageItemsResp>(DatabaseRequestTypes.RequestDecreaseStorageItems, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new DecreaseStorageItemsResp();
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<MailListResp>> RequestMailList(MailListReq request)
+        public async UniTask<MailListResp> MailListAsync(MailListReq request)
         {
-            return await Client.SendRequestAsync<MailListReq, MailListResp>(DatabaseRequestTypes.RequestMailList, request);
+            var result = await Client.SendRequestAsync<MailListReq, MailListResp>(DatabaseRequestTypes.RequestMailList, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new MailListResp();
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<UpdateReadMailStateResp>> RequestUpdateReadMailState(UpdateReadMailStateReq request)
+        public async UniTask<UpdateReadMailStateResp> UpdateReadMailStateAsync(UpdateReadMailStateReq request)
         {
-            return await Client.SendRequestAsync<UpdateReadMailStateReq, UpdateReadMailStateResp>(DatabaseRequestTypes.RequestUpdateReadMailState, request);
+            var result = await Client.SendRequestAsync<UpdateReadMailStateReq, UpdateReadMailStateResp>(DatabaseRequestTypes.RequestUpdateReadMailState, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new UpdateReadMailStateResp();
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<UpdateClaimMailItemsStateResp>> RequestUpdateClaimMailItemsState(UpdateClaimMailItemsStateReq request)
+        public async UniTask<UpdateClaimMailItemsStateResp> UpdateClaimMailItemsStateAsync(UpdateClaimMailItemsStateReq request)
         {
-            return await Client.SendRequestAsync<UpdateClaimMailItemsStateReq, UpdateClaimMailItemsStateResp>(DatabaseRequestTypes.RequestUpdateClaimMailItemsState, request);
+            var result = await Client.SendRequestAsync<UpdateClaimMailItemsStateReq, UpdateClaimMailItemsStateResp>(DatabaseRequestTypes.RequestUpdateClaimMailItemsState, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new UpdateClaimMailItemsStateResp();
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<UpdateDeleteMailStateResp>> RequestUpdateDeleteMailState(UpdateDeleteMailStateReq request)
+        public async UniTask<UpdateDeleteMailStateResp> UpdateDeleteMailStateAsync(UpdateDeleteMailStateReq request)
         {
-            return await Client.SendRequestAsync<UpdateDeleteMailStateReq, UpdateDeleteMailStateResp>(DatabaseRequestTypes.RequestUpdateDeleteMailState, request);
+            var result = await Client.SendRequestAsync<UpdateDeleteMailStateReq, UpdateDeleteMailStateResp>(DatabaseRequestTypes.RequestUpdateDeleteMailState, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new UpdateDeleteMailStateResp();
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<SendMailResp>> RequestSendMail(SendMailReq request)
+        public async UniTask<SendMailResp> SendMailAsync(SendMailReq request)
         {
-            return await Client.SendRequestAsync<SendMailReq, SendMailResp>(DatabaseRequestTypes.RequestSendMail, request);
+            var result = await Client.SendRequestAsync<SendMailReq, SendMailResp>(DatabaseRequestTypes.RequestSendMail, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new SendMailResp();
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<GetMailResp>> RequestGetMail(GetMailReq request)
+        public async UniTask<GetMailResp> GetMailAsync(GetMailReq request)
         {
-            return await Client.SendRequestAsync<GetMailReq, GetMailResp>(DatabaseRequestTypes.RequestGetMail, request);
+            var result = await Client.SendRequestAsync<GetMailReq, GetMailResp>(DatabaseRequestTypes.RequestGetMail, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new GetMailResp();
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<GetIdByCharacterNameResp>> RequestGetIdByCharacterName(GetIdByCharacterNameReq request)
+        public async UniTask<GetIdByCharacterNameResp> GetIdByCharacterNameAsync(GetIdByCharacterNameReq request)
         {
-            return await Client.SendRequestAsync<GetIdByCharacterNameReq, GetIdByCharacterNameResp>(DatabaseRequestTypes.RequestGetIdByCharacterName, request);
+            var result = await Client.SendRequestAsync<GetIdByCharacterNameReq, GetIdByCharacterNameResp>(DatabaseRequestTypes.RequestGetIdByCharacterName, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new GetIdByCharacterNameResp();
+            return result.Response;
         }
 
-        public async UniTask<AsyncResponseData<GetUserIdByCharacterNameResp>> RequestGetUserIdByCharacterName(GetUserIdByCharacterNameReq request)
+        public async UniTask<GetUserIdByCharacterNameResp> GetUserIdByCharacterNameAsync(GetUserIdByCharacterNameReq request)
         {
-            return await Client.SendRequestAsync<GetUserIdByCharacterNameReq, GetUserIdByCharacterNameResp>(DatabaseRequestTypes.RequestGetUserIdByCharacterName, request);
+            var result = await Client.SendRequestAsync<GetUserIdByCharacterNameReq, GetUserIdByCharacterNameResp>(DatabaseRequestTypes.RequestGetUserIdByCharacterName, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new GetUserIdByCharacterNameResp();
+            return result.Response;
         }
     }
 }

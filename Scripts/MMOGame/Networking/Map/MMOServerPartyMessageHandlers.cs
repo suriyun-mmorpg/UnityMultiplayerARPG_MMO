@@ -10,9 +10,9 @@ namespace MultiplayerARPG.MMO
         public ChatNetworkManager ChatNetworkManager { get; private set; }
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        public DatabaseService.DatabaseServiceClient DbServiceClient
+        public DatabaseNetworkManager DbServiceClient
         {
-            get { return MMOServerInstance.Singleton.DatabaseNetworkManager.ServiceClient; }
+            get { return MMOServerInstance.Singleton.DatabaseNetworkManager; }
         }
 #endif
 
@@ -50,7 +50,7 @@ namespace MultiplayerARPG.MMO
             // Save to database
             _ = DbServiceClient.UpdateCharacterPartyAsync(new UpdateCharacterPartyReq()
             {
-                SocialCharacterData = DatabaseServiceUtils.ToByteString(SocialCharacterData.Create(playerCharacter)),
+                SocialCharacterData = SocialCharacterData.Create(playerCharacter),
                 PartyId = request.partyId
             });
             // Broadcast via chat server
@@ -169,7 +169,7 @@ namespace MultiplayerARPG.MMO
                 ShareExp = request.shareExp,
                 ShareItem = request.shareItem
             });
-            PartyData party = DatabaseServiceUtils.FromByteString<PartyData>(createPartyResp.PartyData);
+            PartyData party = createPartyResp.PartyData;
             GameInstance.ServerPartyHandlers.SetParty(party.id, party);
             playerCharacter.PartyId = party.id;
             // Broadcast via chat server

@@ -9,9 +9,9 @@ namespace MultiplayerARPG.MMO
         public ChatNetworkManager ChatNetworkManager { get; private set; }
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        public DatabaseService.DatabaseServiceClient DbServiceClient
+        public DatabaseNetworkManager DbServiceClient
         {
-            get { return MMOServerInstance.Singleton.DatabaseNetworkManager.ServiceClient; }
+            get { return MMOServerInstance.Singleton.DatabaseNetworkManager; }
         }
 #endif
 
@@ -49,7 +49,7 @@ namespace MultiplayerARPG.MMO
             // Save to database
             _ = DbServiceClient.UpdateCharacterGuildAsync(new UpdateCharacterGuildReq()
             {
-                SocialCharacterData = DatabaseServiceUtils.ToByteString(SocialCharacterData.Create(playerCharacter)),
+                SocialCharacterData = SocialCharacterData.Create(playerCharacter),
                 GuildId = request.guildId,
                 GuildRole = validateResult.Guild.GetMemberRole(playerCharacter.Id)
             });
@@ -180,7 +180,7 @@ namespace MultiplayerARPG.MMO
                 LeaderCharacterId = playerCharacter.Id,
                 GuildName = request.guildName,
             });
-            GuildData guild = DatabaseServiceUtils.FromByteString<GuildData>(createGuildResp.GuildData);
+            GuildData guild = createGuildResp.GuildData;
             GameInstance.Singleton.SocialSystemSetting.DecreaseCreateGuildResource(playerCharacter);
             GameInstance.ServerGuildHandlers.SetGuild(guild.id, guild);
             playerCharacter.GuildId = guild.id;
@@ -535,7 +535,7 @@ namespace MultiplayerARPG.MMO
                 GuildId = validateResult.GuildId,
                 SkillId = request.dataId,
             });
-            GuildData guild = resp.GuildData.FromByteString<GuildData>();
+            GuildData guild = resp.GuildData;
             GameInstance.ServerGuildHandlers.SetGuild(validateResult.GuildId, guild);
             // Broadcast via chat server
             if (ChatNetworkManager.IsClientConnected)

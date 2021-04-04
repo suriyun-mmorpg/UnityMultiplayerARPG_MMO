@@ -7,9 +7,9 @@ namespace MultiplayerARPG.MMO
     public partial class MMOServerStorageMessageHandlers : MonoBehaviour, IServerStorageMessageHandlers
     {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        public DatabaseService.DatabaseServiceClient DbServiceClient
+        public DatabaseNetworkManager DbServiceClient
         {
-            get { return MMOServerInstance.Singleton.DatabaseNetworkManager.ServiceClient; }
+            get { return MMOServerInstance.Singleton.DatabaseNetworkManager; }
         }
 #endif
 
@@ -90,7 +90,7 @@ namespace MultiplayerARPG.MMO
             }
             Storage storage = GameInstance.ServerStorageHandlers.GetStorage(storageId, out _);
             MoveItemFromStorageReq req = new MoveItemFromStorageReq();
-            req.StorageType = (EStorageType)request.storageType;
+            req.StorageType = request.storageType;
             req.StorageOwnerId = request.storageOwnerId;
             req.CharacterId = playerCharacter.Id;
             req.WeightLimit = storage.weightLimit;
@@ -108,8 +108,8 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            playerCharacter.NonEquipItems = DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.InventoryItemItems);
-            GameInstance.ServerStorageHandlers.SetStorageItems(storageId, DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.StorageCharacterItems));
+            playerCharacter.NonEquipItems = resp.InventoryItemItems;
+            GameInstance.ServerStorageHandlers.SetStorageItems(storageId, resp.StorageCharacterItems);
             GameInstance.ServerStorageHandlers.NotifyStorageItemsUpdated(request.storageType, request.storageOwnerId);
             // Success
             result.Invoke(AckResponseCode.Success, new ResponseMoveItemFromStorageMessage());
@@ -139,7 +139,7 @@ namespace MultiplayerARPG.MMO
             }
             Storage storage = GameInstance.ServerStorageHandlers.GetStorage(storageId, out _);
             MoveItemToStorageReq req = new MoveItemToStorageReq();
-            req.StorageType = (EStorageType)request.storageType;
+            req.StorageType = request.storageType;
             req.StorageOwnerId = request.storageOwnerId;
             req.CharacterId = playerCharacter.Id;
             req.WeightLimit = storage.weightLimit;
@@ -157,8 +157,8 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            playerCharacter.NonEquipItems = DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.InventoryItemItems);
-            GameInstance.ServerStorageHandlers.SetStorageItems(storageId, DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.StorageCharacterItems));
+            playerCharacter.NonEquipItems = resp.InventoryItemItems;
+            GameInstance.ServerStorageHandlers.SetStorageItems(storageId, resp.StorageCharacterItems);
             GameInstance.ServerStorageHandlers.NotifyStorageItemsUpdated(request.storageType, request.storageOwnerId);
             // Success
             result.Invoke(AckResponseCode.Success, new ResponseMoveItemToStorageMessage());
@@ -188,7 +188,7 @@ namespace MultiplayerARPG.MMO
             }
             Storage storage = GameInstance.ServerStorageHandlers.GetStorage(storageId, out _);
             SwapOrMergeStorageItemReq req = new SwapOrMergeStorageItemReq();
-            req.StorageType = (EStorageType)request.storageType;
+            req.StorageType = request.storageType;
             req.StorageOwnerId = request.storageOwnerId;
             req.CharacterId = playerCharacter.Id;
             req.WeightLimit = storage.weightLimit;
@@ -205,7 +205,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            GameInstance.ServerStorageHandlers.SetStorageItems(storageId, DatabaseServiceUtils.MakeListFromRepeatedByteString<CharacterItem>(resp.StorageCharacterItems));
+            GameInstance.ServerStorageHandlers.SetStorageItems(storageId, resp.StorageCharacterItems);
             GameInstance.ServerStorageHandlers.NotifyStorageItemsUpdated(request.storageType, request.storageOwnerId);
             // Success
             result.Invoke(AckResponseCode.Success, new ResponseSwapOrMergeStorageItemMessage());

@@ -63,7 +63,7 @@ namespace MultiplayerARPG.MMO
                 {
                     UserId = userPeerInfo.userId
                 });
-                characters = DatabaseServiceUtils.MakeListFromRepeatedByteString<PlayerCharacterData>(charactersResp.List);
+                characters = charactersResp.List;
             }
             // Response
             result.Invoke(
@@ -120,7 +120,7 @@ namespace MultiplayerARPG.MMO
                 await DbServiceClient.CreateCharacterAsync(new CreateCharacterReq()
                 {
                     UserId = userPeerInfo.userId,
-                    CharacterData = characterData.ToByteString()
+                    CharacterData = characterData,
                 });
             }
             // Response
@@ -188,7 +188,7 @@ namespace MultiplayerARPG.MMO
                     UserId = userPeerInfo.userId,
                     CharacterId = request.characterId
                 });
-                PlayerCharacterData character = characterResp.CharacterData.FromByteString<PlayerCharacterData>();
+                PlayerCharacterData character = characterResp.CharacterData;
                 if (character == null)
                     message = UITextKeys.UI_ERROR_INVALID_CHARACTER_DATA;
                 else if (!mapServerPeersBySceneName.TryGetValue(character.CurrentMapName, out mapServerPeerInfo))

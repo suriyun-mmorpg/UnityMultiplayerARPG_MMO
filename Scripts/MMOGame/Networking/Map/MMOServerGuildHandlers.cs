@@ -1,4 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
+using LiteNetLibManager;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using UnityEngine;
@@ -14,9 +15,9 @@ namespace MultiplayerARPG.MMO
         public ChatNetworkManager ChatNetworkManager { get; private set; }
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        public DatabaseService.DatabaseServiceClient DbServiceClient
+        public DatabaseNetworkManager DbServiceClient
         {
-            get { return MMOServerInstance.Singleton.DatabaseNetworkManager.ServiceClient; }
+            get { return MMOServerInstance.Singleton.DatabaseNetworkManager; }
         }
 #endif
 
@@ -85,7 +86,7 @@ namespace MultiplayerARPG.MMO
                 GuildId = validateResult.GuildId,
                 Exp = exp,
             });
-            GuildData guild = resp.GuildData.FromByteString<GuildData>();
+            GuildData guild = resp.GuildData;
             SetGuild(validateResult.GuildId, guild);
             // Broadcast via chat server
             if (ChatNetworkManager.IsClientConnected)

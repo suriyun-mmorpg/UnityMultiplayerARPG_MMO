@@ -6,9 +6,9 @@ namespace MultiplayerARPG.MMO
     public partial class MMOServerMailHandlers : MonoBehaviour, IServerMailHandlers
     {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        public DatabaseService.DatabaseServiceClient DbServiceClient
+        public DatabaseNetworkManager DbServiceClient
         {
-            get { return MMOServerInstance.Singleton.DatabaseNetworkManager.ServiceClient; }
+            get { return MMOServerInstance.Singleton.DatabaseNetworkManager; }
         }
 #endif
 
@@ -17,7 +17,7 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
             SendMailResp resp = await DbServiceClient.SendMailAsync(new SendMailReq()
             {
-                Mail = DatabaseServiceUtils.ToByteString(mail),
+                Mail = mail,
             });
             if (resp.Error == 0)
                 return true;

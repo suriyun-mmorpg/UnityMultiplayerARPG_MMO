@@ -65,9 +65,9 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        public DatabaseService.DatabaseServiceClient DbServiceClient
+        public DatabaseNetworkManager DbServiceClient
         {
-            get { return MMOServerInstance.Singleton.DatabaseNetworkManager.ServiceClient; }
+            get { return MMOServerInstance.Singleton.DatabaseNetworkManager; }
         }
 #endif
 
@@ -248,7 +248,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        protected override void OnDestroy()
+        protected async override void OnDestroy()
         {
             // Save immediately
 #if UNITY_STANDALONE && !CLIENT_BUILD
@@ -257,19 +257,19 @@ namespace MultiplayerARPG.MMO
                 foreach (BasePlayerCharacterEntity playerCharacter in ServerUserHandlers.GetPlayerCharacters())
                 {
                     if (playerCharacter == null) continue;
-                    DbServiceClient.UpdateCharacter(new UpdateCharacterReq()
+                    await DbServiceClient.UpdateCharacterAsync(new UpdateCharacterReq()
                     {
-                        CharacterData = playerCharacter.CloneTo(new PlayerCharacterData()).ToByteString()
+                        CharacterData = playerCharacter.CloneTo(new PlayerCharacterData())
                     });
                 }
                 string mapName = CurrentMapInfo.Id;
                 foreach (BuildingEntity buildingEntity in ServerBuildingHandlers.GetBuildings())
                 {
                     if (buildingEntity == null) continue;
-                    DbServiceClient.UpdateBuilding(new UpdateBuildingReq()
+                    await DbServiceClient.UpdateBuildingAsync(new UpdateBuildingReq()
                     {
                         MapName = mapName,
-                        BuildingData = buildingEntity.CloneTo(new BuildingSaveData()).ToByteString()
+                        BuildingData = buildingEntity.CloneTo(new BuildingSaveData())
                     });
                 }
             }
@@ -371,7 +371,7 @@ namespace MultiplayerARPG.MMO
                     MapName = CurrentMapInfo.Id,
                 });
                 HashSet<StorageId> storageIds = new HashSet<StorageId>();
-                List<BuildingSaveData> buildings = resp.List.MakeListFromRepeatedByteString<BuildingSaveData>();
+                List<BuildingSaveData> buildings = resp.List;
                 BuildingEntity buildingEntity;
                 foreach (BuildingSaveData building in buildings)
                 {
@@ -462,7 +462,7 @@ namespace MultiplayerARPG.MMO
                 UserId = userId,
                 CharacterId = selectCharacterId
             });
-            PlayerCharacterData playerCharacterData = characterResp.CharacterData.FromByteString<PlayerCharacterData>();
+            PlayerCharacterData playerCharacterData = characterResp.CharacterData;
             // If data is empty / cannot find character, disconnect user
             if (playerCharacterData == null)
             {
