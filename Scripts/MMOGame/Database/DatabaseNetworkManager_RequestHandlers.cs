@@ -23,7 +23,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        protected async UniTaskVoid ValidateAccessToken(RequestHandlerData requestHandler, ValidateAccessTokenReq request, RequestProceedResultDelegate<EmptyMessage> result)
+        protected async UniTaskVoid ValidateAccessToken(RequestHandlerData requestHandler, ValidateAccessTokenReq request, RequestProceedResultDelegate<ValidateAccessTokenResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             bool isPass;
@@ -40,12 +40,10 @@ namespace MultiplayerARPG.MMO
                 if (isPass)
                     cachedUserAccessToken[request.UserId] = request.AccessToken;
             }
-            if (!isPass)
+            result.Invoke(AckResponseCode.Success, new ValidateAccessTokenResp()
             {
-                result.Invoke(AckResponseCode.Success, EmptyMessage.Value);
-                return;
-            }
-            result.Invoke(AckResponseCode.Success, EmptyMessage.Value);
+                IsPass = isPass
+            });
 #endif
         }
 

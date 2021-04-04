@@ -63,7 +63,7 @@ namespace MultiplayerARPG.MMO
             base.RegisterMessages();
             EnableRequestResponse(MMOMessageTypes.Request, MMOMessageTypes.Response);
             RegisterRequestToServer<ValidateUserLoginReq, ValidateUserLoginResp>(DatabaseRequestTypes.RequestValidateUserLogin, ValidateUserLogin);
-            RegisterRequestToServer<ValidateAccessTokenReq, EmptyMessage>(DatabaseRequestTypes.RequestValidateAccessToken, ValidateAccessToken);
+            RegisterRequestToServer<ValidateAccessTokenReq, ValidateAccessTokenResp>(DatabaseRequestTypes.RequestValidateAccessToken, ValidateAccessToken);
             RegisterRequestToServer<GetUserLevelReq, GetUserLevelResp>(DatabaseRequestTypes.RequestGetUserLevel, GetUserLevel);
             RegisterRequestToServer<GetGoldReq, GoldResp>(DatabaseRequestTypes.RequestGetGold, GetGold);
             RegisterRequestToServer<ChangeGoldReq, GoldResp>(DatabaseRequestTypes.RequestChangeGold, ChangeGold);
