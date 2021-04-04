@@ -30,6 +30,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         // TODO: I'm going to make in-memory database without Redis for now
         // In the future it may implements Redis
         // It's going to get some data from all tables but not every records
@@ -48,6 +49,7 @@ namespace MultiplayerARPG.MMO
         private ConcurrentDictionary<int, PartyData> cachedParty = new ConcurrentDictionary<int, PartyData>();
         private ConcurrentDictionary<int, GuildData> cachedGuild = new ConcurrentDictionary<int, GuildData>();
         private ConcurrentDictionary<StorageId, List<CharacterItem>> cachedStorageItems = new ConcurrentDictionary<StorageId, List<CharacterItem>>();
+#endif
 
         public async UniTaskVoid ValidateUserLogin(RequestHandlerData requestHandler, ValidateUserLoginReq request, RequestProceedResultDelegate<ValidateUserLoginResp> result)
         {
@@ -1246,6 +1248,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         public async UniTask<int> ReadGold(string userId)
         {
             int gold;
@@ -1360,5 +1363,6 @@ namespace MultiplayerARPG.MMO
                 cachedSocialCharacter[socialCharacter.id] = socialCharacter;
             }
         }
+#endif
     }
 }
