@@ -248,5 +248,13 @@ namespace MultiplayerARPG.MMO
             }
 #endif
         }
+
+        public async UniTaskVoid HandleRequestMailNotification(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<ResponseMailNotificationMessage> result)
+        {
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            result.Invoke(AckResponseCode.Unimplemented, new ResponseMailNotificationMessage());
+            await UniTask.Yield();
+#endif
+        }
     }
 }

@@ -145,8 +145,6 @@ namespace MultiplayerARPG.MMO
                 {
                     message = message,
                     dataId = dataId,
-                    userCash = userCash,
-                    userGold = userGold,
                 });
 #endif
             await UniTask.Yield();

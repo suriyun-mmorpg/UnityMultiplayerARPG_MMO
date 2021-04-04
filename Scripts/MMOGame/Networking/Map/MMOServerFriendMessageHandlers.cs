@@ -13,12 +13,12 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-        public async UniTaskVoid HandleRequestFindCharacters(RequestHandlerData requestHandler, RequestFindCharactersMessage request, RequestProceedResultDelegate<ResponseFindCharactersMessage> result)
+        public async UniTaskVoid HandleRequestFindCharacters(RequestHandlerData requestHandler, RequestFindCharactersMessage request, RequestProceedResultDelegate<ResponseSocialCharacterListMessage> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out _))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseFindCharactersMessage()
+                result.Invoke(AckResponseCode.Error, new ResponseSocialCharacterListMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -28,7 +28,7 @@ namespace MultiplayerARPG.MMO
             {
                 CharacterName = request.characterName
             });
-            result.Invoke(AckResponseCode.Success, new ResponseFindCharactersMessage()
+            result.Invoke(AckResponseCode.Success, new ResponseSocialCharacterListMessage()
             {
                 characters = resp.List.MakeArrayFromRepeatedByteString<SocialCharacterData>(),
             });
@@ -128,6 +128,14 @@ namespace MultiplayerARPG.MMO
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             result.Invoke(AckResponseCode.Unimplemented, new ResponseDeclineFriendRequestMessage());
+            await UniTask.Yield();
+#endif
+        }
+
+        public async UniTaskVoid HandleRequestGetFriendRequests(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<ResponseGetFriendRequestsMessage> result)
+        {
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            result.Invoke(AckResponseCode.Unimplemented, new ResponseGetFriendRequestsMessage());
             await UniTask.Yield();
 #endif
         }

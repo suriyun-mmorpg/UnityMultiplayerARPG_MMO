@@ -476,7 +476,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanChangeGuildMemberRole(playerCharacter);
+            ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanChangeGuildMemberRole(playerCharacter, request.memberId);
             if (!validateResult.IsSuccess)
             {
                 result.Invoke(AckResponseCode.Error, new ResponseChangeMemberGuildRoleMessage()
@@ -569,6 +569,22 @@ namespace MultiplayerARPG.MMO
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             result.Invoke(AckResponseCode.Unimplemented, new ResponseDeclineGuildRequestMessage());
+            await UniTask.Yield();
+#endif
+        }
+
+        public async UniTaskVoid HandleRequestGetGuildRequests(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<ResponseGetGuildRequestsMessage> result)
+        {
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            result.Invoke(AckResponseCode.Unimplemented, new ResponseGetGuildRequestsMessage());
+            await UniTask.Yield();
+#endif
+        }
+
+        public async UniTaskVoid HandleRequestFindGuilds(RequestHandlerData requestHandler, RequestFindGuildsMessage request, RequestProceedResultDelegate<ResponseFindGuildsMessage> result)
+        {
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            result.Invoke(AckResponseCode.Unimplemented, new ResponseFindGuildsMessage());
             await UniTask.Yield();
 #endif
         }
