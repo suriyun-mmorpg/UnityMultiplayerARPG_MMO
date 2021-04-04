@@ -528,7 +528,7 @@ namespace MultiplayerARPG.MMO
                     {
                         UserId = userId
                     });
-                    playerCharacterEntity.UserLevel = (byte)getUserLevelResp.UserLevel;
+                    playerCharacterEntity.UserLevel = getUserLevelResp.UserLevel;
 
                     // Load party data, if this map-server does not have party data
                     if (playerCharacterEntity.PartyId > 0)
