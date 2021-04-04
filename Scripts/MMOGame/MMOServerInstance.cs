@@ -73,6 +73,8 @@ namespace MultiplayerARPG.MMO
         public const string ARG_DATABASE_ADDRESS = "-" + CONFIG_DATABASE_ADDRESS;
         public const string CONFIG_DATABASE_PORT = "databaseManagerPort";
         public const string ARG_DATABASE_PORT = "-" + CONFIG_DATABASE_PORT;
+        public const string CONFIG_DATABASE_MAX_CONNECTIONS = "databaseMaxConnections";
+        public const string ARG_DATABASE_MAX_CONNECTIONS = "-" + CONFIG_DATABASE_MAX_CONNECTIONS;
         // Start servers
         public const string CONFIG_START_CENTRAL_SERVER = "startCentralServer";
         public const string ARG_START_CENTRAL_SERVER = "-" + CONFIG_START_CENTRAL_SERVER;
@@ -362,6 +364,14 @@ namespace MultiplayerARPG.MMO
                     ConfigReader.ReadConfigs(jsonConfig, CONFIG_DATABASE_PORT, out databaseNetworkPort, 6100))
                 {
                     databaseNetworkManager.networkPort = databaseNetworkPort;
+                }
+
+                // Database max connections
+                int databaseNetworkMaxConnections;
+                if (ConfigReader.ReadArgs(args, ARG_DATABASE_PORT, out databaseNetworkMaxConnections, 1000) ||
+                    ConfigReader.ReadConfigs(jsonConfig, CONFIG_DATABASE_PORT, out databaseNetworkMaxConnections, 1000))
+                {
+                    databaseNetworkManager.maxConnections = databaseNetworkMaxConnections;
                 }
 
                 string logFileName = "Log";
