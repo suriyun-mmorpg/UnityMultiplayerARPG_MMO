@@ -7,8 +7,7 @@ namespace MultiplayerARPG.MMO
 {
     public partial class DatabaseNetworkManager
     {
-
-        public async UniTaskVoid ValidateUserLogin(RequestHandlerData requestHandler, ValidateUserLoginReq request, RequestProceedResultDelegate<ValidateUserLoginResp> result)
+        protected async UniTaskVoid ValidateUserLogin(RequestHandlerData requestHandler, ValidateUserLoginReq request, RequestProceedResultDelegate<ValidateUserLoginResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             string userId = await Database.ValidateUserLogin(request.Username, request.Password);
@@ -24,7 +23,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid ValidateAccessToken(RequestHandlerData requestHandler, ValidateAccessTokenReq request, RequestProceedResultDelegate<EmptyMessage> result)
+        protected async UniTaskVoid ValidateAccessToken(RequestHandlerData requestHandler, ValidateAccessTokenReq request, RequestProceedResultDelegate<EmptyMessage> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             bool isPass;
@@ -50,7 +49,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid GetUserLevel(RequestHandlerData requestHandler, GetUserLevelReq request, RequestProceedResultDelegate<GetUserLevelResp> result)
+        protected async UniTaskVoid GetUserLevel(RequestHandlerData requestHandler, GetUserLevelReq request, RequestProceedResultDelegate<GetUserLevelResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             result.Invoke(AckResponseCode.Success, new GetUserLevelResp()
@@ -60,7 +59,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid GetGold(RequestHandlerData requestHandler, GetGoldReq request, RequestProceedResultDelegate<GoldResp> result)
+        protected async UniTaskVoid GetGold(RequestHandlerData requestHandler, GetGoldReq request, RequestProceedResultDelegate<GoldResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             result.Invoke(AckResponseCode.Success, new GoldResp()
@@ -70,7 +69,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid ChangeGold(RequestHandlerData requestHandler, ChangeGoldReq request, RequestProceedResultDelegate<GoldResp> result)
+        protected async UniTaskVoid ChangeGold(RequestHandlerData requestHandler, ChangeGoldReq request, RequestProceedResultDelegate<GoldResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             int gold = await ReadGold(request.UserId);
@@ -86,7 +85,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid GetCash(RequestHandlerData requestHandler, GetCashReq request, RequestProceedResultDelegate<CashResp> result)
+        protected async UniTaskVoid GetCash(RequestHandlerData requestHandler, GetCashReq request, RequestProceedResultDelegate<CashResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             result.Invoke(AckResponseCode.Success, new CashResp()
@@ -96,7 +95,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid ChangeCash(RequestHandlerData requestHandler, ChangeCashReq request, RequestProceedResultDelegate<CashResp> result)
+        protected async UniTaskVoid ChangeCash(RequestHandlerData requestHandler, ChangeCashReq request, RequestProceedResultDelegate<CashResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             int cash = await ReadCash(request.UserId);
@@ -112,7 +111,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid UpdateAccessToken(RequestHandlerData requestHandler, UpdateAccessTokenReq request, RequestProceedResultDelegate<EmptyMessage> result)
+        protected async UniTaskVoid UpdateAccessToken(RequestHandlerData requestHandler, UpdateAccessTokenReq request, RequestProceedResultDelegate<EmptyMessage> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             // Store access token to the dictionary, it will be used to validate later
@@ -123,7 +122,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid CreateUserLogin(RequestHandlerData requestHandler, CreateUserLoginReq request, RequestProceedResultDelegate<EmptyMessage> result)
+        protected async UniTaskVoid CreateUserLogin(RequestHandlerData requestHandler, CreateUserLoginReq request, RequestProceedResultDelegate<EmptyMessage> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             // Cache username, it will be used to validate later
@@ -134,7 +133,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid FindUsername(RequestHandlerData requestHandler, FindUsernameReq request, RequestProceedResultDelegate<FindUsernameResp> result)
+        protected async UniTaskVoid FindUsername(RequestHandlerData requestHandler, FindUsernameReq request, RequestProceedResultDelegate<FindUsernameResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             long foundAmount;
@@ -158,7 +157,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid CreateCharacter(RequestHandlerData requestHandler, CreateCharacterReq request, RequestProceedResultDelegate<CharacterResp> result)
+        protected async UniTaskVoid CreateCharacter(RequestHandlerData requestHandler, CreateCharacterReq request, RequestProceedResultDelegate<CharacterResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             PlayerCharacterData character = request.CharacterData;
@@ -174,7 +173,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid ReadCharacter(RequestHandlerData requestHandler, ReadCharacterReq request, RequestProceedResultDelegate<CharacterResp> result)
+        protected async UniTaskVoid ReadCharacter(RequestHandlerData requestHandler, ReadCharacterReq request, RequestProceedResultDelegate<CharacterResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             result.Invoke(AckResponseCode.Success, new CharacterResp()
@@ -184,7 +183,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid ReadCharacters(RequestHandlerData requestHandler, ReadCharactersReq request, RequestProceedResultDelegate<CharactersResp> result)
+        protected async UniTaskVoid ReadCharacters(RequestHandlerData requestHandler, ReadCharactersReq request, RequestProceedResultDelegate<CharactersResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             result.Invoke(AckResponseCode.Success, new CharactersResp()
@@ -194,7 +193,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid UpdateCharacter(RequestHandlerData requestHandler, UpdateCharacterReq request, RequestProceedResultDelegate<CharacterResp> result)
+        protected async UniTaskVoid UpdateCharacter(RequestHandlerData requestHandler, UpdateCharacterReq request, RequestProceedResultDelegate<CharacterResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             PlayerCharacterData character = request.CharacterData;
@@ -216,7 +215,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid DeleteCharacter(RequestHandlerData requestHandler, DeleteCharacterReq request, RequestProceedResultDelegate<EmptyMessage> result)
+        protected async UniTaskVoid DeleteCharacter(RequestHandlerData requestHandler, DeleteCharacterReq request, RequestProceedResultDelegate<EmptyMessage> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             // Remove data from cache
@@ -232,7 +231,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid FindCharacterName(RequestHandlerData requestHandler, FindCharacterNameReq request, RequestProceedResultDelegate<FindCharacterNameResp> result)
+        protected async UniTaskVoid FindCharacterName(RequestHandlerData requestHandler, FindCharacterNameReq request, RequestProceedResultDelegate<FindCharacterNameResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             long foundAmount;
@@ -256,7 +255,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid FindCharacters(RequestHandlerData requestHandler, FindCharacterNameReq request, RequestProceedResultDelegate<SocialCharactersResp> result)
+        protected async UniTaskVoid FindCharacters(RequestHandlerData requestHandler, FindCharacterNameReq request, RequestProceedResultDelegate<SocialCharactersResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             result.Invoke(AckResponseCode.Success, new SocialCharactersResp()
@@ -266,7 +265,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid CreateFriend(RequestHandlerData requestHandler, CreateFriendReq request, RequestProceedResultDelegate<SocialCharactersResp> result)
+        protected async UniTaskVoid CreateFriend(RequestHandlerData requestHandler, CreateFriendReq request, RequestProceedResultDelegate<SocialCharactersResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             List<SocialCharacterData> friends = await ReadFriends(request.Character1Id);
@@ -291,7 +290,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid DeleteFriend(RequestHandlerData requestHandler, DeleteFriendReq request, RequestProceedResultDelegate<SocialCharactersResp> result)
+        protected async UniTaskVoid DeleteFriend(RequestHandlerData requestHandler, DeleteFriendReq request, RequestProceedResultDelegate<SocialCharactersResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             List<SocialCharacterData> friends = await ReadFriends(request.Character1Id);
@@ -314,7 +313,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid ReadFriends(RequestHandlerData requestHandler, ReadFriendsReq request, RequestProceedResultDelegate<SocialCharactersResp> result)
+        protected async UniTaskVoid ReadFriends(RequestHandlerData requestHandler, ReadFriendsReq request, RequestProceedResultDelegate<SocialCharactersResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             result.Invoke(AckResponseCode.Success, new SocialCharactersResp()
@@ -324,7 +323,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid CreateBuilding(RequestHandlerData requestHandler, CreateBuildingReq request, RequestProceedResultDelegate<BuildingResp> result)
+        protected async UniTaskVoid CreateBuilding(RequestHandlerData requestHandler, CreateBuildingReq request, RequestProceedResultDelegate<BuildingResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             BuildingSaveData building = request.BuildingData;
@@ -345,7 +344,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid UpdateBuilding(RequestHandlerData requestHandler, UpdateBuildingReq request, RequestProceedResultDelegate<BuildingResp> result)
+        protected async UniTaskVoid UpdateBuilding(RequestHandlerData requestHandler, UpdateBuildingReq request, RequestProceedResultDelegate<BuildingResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             BuildingSaveData building = request.BuildingData;
@@ -366,7 +365,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid DeleteBuilding(RequestHandlerData requestHandler, DeleteBuildingReq request, RequestProceedResultDelegate<EmptyMessage> result)
+        protected async UniTaskVoid DeleteBuilding(RequestHandlerData requestHandler, DeleteBuildingReq request, RequestProceedResultDelegate<EmptyMessage> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             // Remove from cache
@@ -378,7 +377,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid ReadBuildings(RequestHandlerData requestHandler, ReadBuildingsReq request, RequestProceedResultDelegate<BuildingsResp> result)
+        protected async UniTaskVoid ReadBuildings(RequestHandlerData requestHandler, ReadBuildingsReq request, RequestProceedResultDelegate<BuildingsResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             List<BuildingSaveData> buildings = new List<BuildingSaveData>();
@@ -403,7 +402,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid CreateParty(RequestHandlerData requestHandler, CreatePartyReq request, RequestProceedResultDelegate<PartyResp> result)
+        protected async UniTaskVoid CreateParty(RequestHandlerData requestHandler, CreatePartyReq request, RequestProceedResultDelegate<PartyResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             // Insert to database
@@ -418,7 +417,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid UpdateParty(RequestHandlerData requestHandler, UpdatePartyReq request, RequestProceedResultDelegate<PartyResp> result)
+        protected async UniTaskVoid UpdateParty(RequestHandlerData requestHandler, UpdatePartyReq request, RequestProceedResultDelegate<PartyResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             PartyData party = await ReadParty(request.PartyId);
@@ -434,7 +433,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid UpdatePartyLeader(RequestHandlerData requestHandler, UpdatePartyLeaderReq request, RequestProceedResultDelegate<PartyResp> result)
+        protected async UniTaskVoid UpdatePartyLeader(RequestHandlerData requestHandler, UpdatePartyLeaderReq request, RequestProceedResultDelegate<PartyResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             PartyData party = await ReadParty(request.PartyId);
@@ -450,7 +449,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid DeleteParty(RequestHandlerData requestHandler, DeletePartyReq request, RequestProceedResultDelegate<EmptyMessage> result)
+        protected async UniTaskVoid DeleteParty(RequestHandlerData requestHandler, DeletePartyReq request, RequestProceedResultDelegate<EmptyMessage> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             await Database.DeleteParty(request.PartyId);
@@ -458,7 +457,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid UpdateCharacterParty(RequestHandlerData requestHandler, UpdateCharacterPartyReq request, RequestProceedResultDelegate<PartyResp> result)
+        protected async UniTaskVoid UpdateCharacterParty(RequestHandlerData requestHandler, UpdateCharacterPartyReq request, RequestProceedResultDelegate<PartyResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             PartyData party = await ReadParty(request.PartyId);
@@ -478,7 +477,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid ClearCharacterParty(RequestHandlerData requestHandler, ClearCharacterPartyReq request, RequestProceedResultDelegate<EmptyMessage> result)
+        protected async UniTaskVoid ClearCharacterParty(RequestHandlerData requestHandler, ClearCharacterPartyReq request, RequestProceedResultDelegate<EmptyMessage> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             PlayerCharacterData character = await ReadCharacter(request.CharacterId);
@@ -495,7 +494,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid ReadParty(RequestHandlerData requestHandler, ReadPartyReq request, RequestProceedResultDelegate<PartyResp> result)
+        protected async UniTaskVoid ReadParty(RequestHandlerData requestHandler, ReadPartyReq request, RequestProceedResultDelegate<PartyResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             result.Invoke(AckResponseCode.Success, new PartyResp()
@@ -505,7 +504,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid CreateGuild(RequestHandlerData requestHandler, CreateGuildReq request, RequestProceedResultDelegate<GuildResp> result)
+        protected async UniTaskVoid CreateGuild(RequestHandlerData requestHandler, CreateGuildReq request, RequestProceedResultDelegate<GuildResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             // Insert to database
@@ -520,7 +519,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid UpdateGuildLeader(RequestHandlerData requestHandler, UpdateGuildLeaderReq request, RequestProceedResultDelegate<GuildResp> result)
+        protected async UniTaskVoid UpdateGuildLeader(RequestHandlerData requestHandler, UpdateGuildLeaderReq request, RequestProceedResultDelegate<GuildResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             GuildData guild = await ReadGuild(request.GuildId);
@@ -536,7 +535,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid UpdateGuildMessage(RequestHandlerData requestHandler, UpdateGuildMessageReq request, RequestProceedResultDelegate<GuildResp> result)
+        protected async UniTaskVoid UpdateGuildMessage(RequestHandlerData requestHandler, UpdateGuildMessageReq request, RequestProceedResultDelegate<GuildResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             GuildData guild = await ReadGuild(request.GuildId);
@@ -552,7 +551,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid UpdateGuildRole(RequestHandlerData requestHandler, UpdateGuildRoleReq request, RequestProceedResultDelegate<GuildResp> result)
+        protected async UniTaskVoid UpdateGuildRole(RequestHandlerData requestHandler, UpdateGuildRoleReq request, RequestProceedResultDelegate<GuildResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             GuildData guild = await ReadGuild(request.GuildId);
@@ -568,7 +567,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid UpdateGuildMemberRole(RequestHandlerData requestHandler, UpdateGuildMemberRoleReq request, RequestProceedResultDelegate<GuildResp> result)
+        protected async UniTaskVoid UpdateGuildMemberRole(RequestHandlerData requestHandler, UpdateGuildMemberRoleReq request, RequestProceedResultDelegate<GuildResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             GuildData guild = await ReadGuild(request.GuildId);
@@ -584,7 +583,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid DeleteGuild(RequestHandlerData requestHandler, DeleteGuildReq request, RequestProceedResultDelegate<EmptyMessage> result)
+        protected async UniTaskVoid DeleteGuild(RequestHandlerData requestHandler, DeleteGuildReq request, RequestProceedResultDelegate<EmptyMessage> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             // Remove data from cache
@@ -600,7 +599,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid UpdateCharacterGuild(RequestHandlerData requestHandler, UpdateCharacterGuildReq request, RequestProceedResultDelegate<GuildResp> result)
+        protected async UniTaskVoid UpdateCharacterGuild(RequestHandlerData requestHandler, UpdateCharacterGuildReq request, RequestProceedResultDelegate<GuildResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             GuildData guild = await ReadGuild(request.GuildId);
@@ -620,7 +619,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid ClearCharacterGuild(RequestHandlerData requestHandler, ClearCharacterGuildReq request, RequestProceedResultDelegate<EmptyMessage> result)
+        protected async UniTaskVoid ClearCharacterGuild(RequestHandlerData requestHandler, ClearCharacterGuildReq request, RequestProceedResultDelegate<EmptyMessage> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             PlayerCharacterData character = await ReadCharacter(request.CharacterId);
@@ -640,7 +639,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid FindGuildName(RequestHandlerData requestHandler, FindGuildNameReq request, RequestProceedResultDelegate<FindGuildNameResp> result)
+        protected async UniTaskVoid FindGuildName(RequestHandlerData requestHandler, FindGuildNameReq request, RequestProceedResultDelegate<FindGuildNameResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             long foundAmount;
@@ -664,7 +663,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid ReadGuild(RequestHandlerData requestHandler, ReadGuildReq request, RequestProceedResultDelegate<GuildResp> result)
+        protected async UniTaskVoid ReadGuild(RequestHandlerData requestHandler, ReadGuildReq request, RequestProceedResultDelegate<GuildResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             result.Invoke(AckResponseCode.Success, new GuildResp()
@@ -674,7 +673,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid IncreaseGuildExp(RequestHandlerData requestHandler, IncreaseGuildExpReq request, RequestProceedResultDelegate<GuildResp> result)
+        protected async UniTaskVoid IncreaseGuildExp(RequestHandlerData requestHandler, IncreaseGuildExpReq request, RequestProceedResultDelegate<GuildResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             // TODO: May validate guild by character
@@ -692,7 +691,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid AddGuildSkill(RequestHandlerData requestHandler, AddGuildSkillReq request, RequestProceedResultDelegate<GuildResp> result)
+        protected async UniTaskVoid AddGuildSkill(RequestHandlerData requestHandler, AddGuildSkillReq request, RequestProceedResultDelegate<GuildResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             // TODO: May validate guild by character
@@ -713,7 +712,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid GetGuildGold(RequestHandlerData requestHandler, GetGuildGoldReq request, RequestProceedResultDelegate<GuildGoldResp> result)
+        protected async UniTaskVoid GetGuildGold(RequestHandlerData requestHandler, GetGuildGoldReq request, RequestProceedResultDelegate<GuildGoldResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             GuildData guild = await ReadGuild(request.GuildId);
@@ -724,7 +723,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid ChangeGuildGold(RequestHandlerData requestHandler, ChangeGuildGoldReq request, RequestProceedResultDelegate<GuildGoldResp> result)
+        protected async UniTaskVoid ChangeGuildGold(RequestHandlerData requestHandler, ChangeGuildGoldReq request, RequestProceedResultDelegate<GuildGoldResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             GuildData guild = await ReadGuild(request.GuildId);
@@ -740,7 +739,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid ReadStorageItems(RequestHandlerData requestHandler, ReadStorageItemsReq request, RequestProceedResultDelegate<ReadStorageItemsResp> result)
+        protected async UniTaskVoid ReadStorageItems(RequestHandlerData requestHandler, ReadStorageItemsReq request, RequestProceedResultDelegate<ReadStorageItemsResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             // Prepare storage data
@@ -761,7 +760,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid MoveItemToStorage(RequestHandlerData requestHandler, MoveItemToStorageReq request, RequestProceedResultDelegate<MoveItemToStorageResp> result)
+        protected async UniTaskVoid MoveItemToStorage(RequestHandlerData requestHandler, MoveItemToStorageReq request, RequestProceedResultDelegate<MoveItemToStorageResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             // Prepare storage data
@@ -849,7 +848,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid MoveItemFromStorage(RequestHandlerData requestHandler, MoveItemFromStorageReq request, RequestProceedResultDelegate<MoveItemFromStorageResp> result)
+        protected async UniTaskVoid MoveItemFromStorage(RequestHandlerData requestHandler, MoveItemFromStorageReq request, RequestProceedResultDelegate<MoveItemFromStorageResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             StorageId storageId = new StorageId(request.StorageType, request.StorageOwnerId);
@@ -931,7 +930,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid SwapOrMergeStorageItem(RequestHandlerData requestHandler, SwapOrMergeStorageItemReq request, RequestProceedResultDelegate<SwapOrMergeStorageItemResp> result)
+        protected async UniTaskVoid SwapOrMergeStorageItem(RequestHandlerData requestHandler, SwapOrMergeStorageItemReq request, RequestProceedResultDelegate<SwapOrMergeStorageItemResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             // Prepare storage data
@@ -991,7 +990,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid IncreaseStorageItems(RequestHandlerData requestHandler, IncreaseStorageItemsReq request, RequestProceedResultDelegate<IncreaseStorageItemsResp> result)
+        protected async UniTaskVoid IncreaseStorageItems(RequestHandlerData requestHandler, IncreaseStorageItemsReq request, RequestProceedResultDelegate<IncreaseStorageItemsResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             // Prepare storage data
@@ -1037,7 +1036,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid DecreaseStorageItems(RequestHandlerData requestHandler, DecreaseStorageItemsReq request, RequestProceedResultDelegate<DecreaseStorageItemsResp> result)
+        protected async UniTaskVoid DecreaseStorageItems(RequestHandlerData requestHandler, DecreaseStorageItemsReq request, RequestProceedResultDelegate<DecreaseStorageItemsResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             // Prepare storage data
@@ -1086,7 +1085,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid MailList(RequestHandlerData requestHandler, MailListReq request, RequestProceedResultDelegate<MailListResp> result)
+        protected async UniTaskVoid MailList(RequestHandlerData requestHandler, MailListReq request, RequestProceedResultDelegate<MailListResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             result.Invoke(AckResponseCode.Success, new MailListResp()
@@ -1096,7 +1095,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid UpdateReadMailState(RequestHandlerData requestHandler, UpdateReadMailStateReq request, RequestProceedResultDelegate<UpdateReadMailStateResp> result)
+        protected async UniTaskVoid UpdateReadMailState(RequestHandlerData requestHandler, UpdateReadMailStateReq request, RequestProceedResultDelegate<UpdateReadMailStateResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             long updated = await Database.UpdateReadMailState(request.MailId, request.UserId);
@@ -1115,7 +1114,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid UpdateClaimMailItemsState(RequestHandlerData requestHandler, UpdateClaimMailItemsStateReq request, RequestProceedResultDelegate<UpdateClaimMailItemsStateResp> result)
+        protected async UniTaskVoid UpdateClaimMailItemsState(RequestHandlerData requestHandler, UpdateClaimMailItemsStateReq request, RequestProceedResultDelegate<UpdateClaimMailItemsStateResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             long updated = await Database.UpdateClaimMailItemsState(request.MailId, request.UserId);
@@ -1134,7 +1133,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid UpdateDeleteMailState(RequestHandlerData requestHandler, UpdateDeleteMailStateReq request, RequestProceedResultDelegate<UpdateDeleteMailStateResp> result)
+        protected async UniTaskVoid UpdateDeleteMailState(RequestHandlerData requestHandler, UpdateDeleteMailStateReq request, RequestProceedResultDelegate<UpdateDeleteMailStateResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             long updated = await Database.UpdateDeleteMailState(request.MailId, request.UserId);
@@ -1150,7 +1149,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid SendMail(RequestHandlerData requestHandler, SendMailReq request, RequestProceedResultDelegate<SendMailResp> result)
+        protected async UniTaskVoid SendMail(RequestHandlerData requestHandler, SendMailReq request, RequestProceedResultDelegate<SendMailResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             Mail mail = request.Mail;
@@ -1175,7 +1174,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid GetMail(RequestHandlerData requestHandler, GetMailReq request, RequestProceedResultDelegate<GetMailResp> result)
+        protected async UniTaskVoid GetMail(RequestHandlerData requestHandler, GetMailReq request, RequestProceedResultDelegate<GetMailResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             result.Invoke(AckResponseCode.Success, new GetMailResp()
@@ -1185,7 +1184,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid GetIdByCharacterName(RequestHandlerData requestHandler, GetIdByCharacterNameReq request, RequestProceedResultDelegate<GetIdByCharacterNameResp> result)
+        protected async UniTaskVoid GetIdByCharacterName(RequestHandlerData requestHandler, GetIdByCharacterNameReq request, RequestProceedResultDelegate<GetIdByCharacterNameResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             result.Invoke(AckResponseCode.Success, new GetIdByCharacterNameResp()
@@ -1195,7 +1194,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid GetUserIdByCharacterName(RequestHandlerData requestHandler, GetUserIdByCharacterNameReq request, RequestProceedResultDelegate<GetUserIdByCharacterNameResp> result)
+        protected async UniTaskVoid GetUserIdByCharacterName(RequestHandlerData requestHandler, GetUserIdByCharacterNameReq request, RequestProceedResultDelegate<GetUserIdByCharacterNameResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             result.Invoke(AckResponseCode.Success, new GetUserIdByCharacterNameResp()
@@ -1206,7 +1205,7 @@ namespace MultiplayerARPG.MMO
         }
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        public async UniTask<int> ReadGold(string userId)
+        protected async UniTask<int> ReadGold(string userId)
         {
             int gold;
             if (!cachedUserGold.TryGetValue(userId, out gold))
@@ -1218,7 +1217,7 @@ namespace MultiplayerARPG.MMO
             return gold;
         }
 
-        public async UniTask<int> ReadCash(string userId)
+        protected async UniTask<int> ReadCash(string userId)
         {
             int cash;
             if (!cachedUserCash.TryGetValue(userId, out cash))
@@ -1230,7 +1229,7 @@ namespace MultiplayerARPG.MMO
             return cash;
         }
 
-        public async UniTask<PlayerCharacterData> ReadCharacter(string id)
+        protected async UniTask<PlayerCharacterData> ReadCharacter(string id)
         {
             PlayerCharacterData character;
             if (!cachedUserCharacter.TryGetValue(id, out character))
@@ -1247,7 +1246,7 @@ namespace MultiplayerARPG.MMO
             return character;
         }
 
-        public async UniTask<SocialCharacterData> ReadSocialCharacter(string id)
+        protected async UniTask<SocialCharacterData> ReadSocialCharacter(string id)
         {
             //cachedSocialCharacter
             SocialCharacterData character;
@@ -1261,7 +1260,7 @@ namespace MultiplayerARPG.MMO
             return character;
         }
 
-        public async UniTask<List<SocialCharacterData>> ReadFriends(string id)
+        protected async UniTask<List<SocialCharacterData>> ReadFriends(string id)
         {
             List<SocialCharacterData> friends;
             if (!cachedFriend.TryGetValue(id, out friends))
@@ -1278,7 +1277,7 @@ namespace MultiplayerARPG.MMO
             return friends;
         }
 
-        public async UniTask<PartyData> ReadParty(int id)
+        protected async UniTask<PartyData> ReadParty(int id)
         {
             PartyData party;
             if (!cachedParty.TryGetValue(id, out party))
@@ -1295,7 +1294,7 @@ namespace MultiplayerARPG.MMO
             return party;
         }
 
-        public async UniTask<GuildData> ReadGuild(int id)
+        protected async UniTask<GuildData> ReadGuild(int id)
         {
             GuildData guild;
             if (!cachedGuild.TryGetValue(id, out guild))
