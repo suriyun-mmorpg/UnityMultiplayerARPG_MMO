@@ -19,8 +19,8 @@ namespace MultiplayerARPG.MMO
         public void Serialize(NetDataWriter writer)
         {
             writer.Put((byte)Error);
-            writer.PutValue(InventoryItemItems);
-            writer.PutValue(StorageCharacterItems);
+            writer.PutList(InventoryItemItems);
+            writer.PutList(StorageCharacterItems);
         }
     }
 }
