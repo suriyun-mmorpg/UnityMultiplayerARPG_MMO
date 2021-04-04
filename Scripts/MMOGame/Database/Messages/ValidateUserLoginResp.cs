@@ -13,7 +13,7 @@ namespace MultiplayerARPG.MMO
 
         public void Serialize(NetDataWriter writer)
         {
-            throw new System.NotImplementedException();
+            writer.Put(UserId);
         }
     }
 }
