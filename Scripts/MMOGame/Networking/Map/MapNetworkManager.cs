@@ -433,6 +433,7 @@ namespace MultiplayerARPG.MMO
                 if (LogError)
                     Logging.LogError(LogTag, "Invalid access token for user: " + userId);
                 Transport.ServerDisconnect(connectionId);
+                return false;
             }
 
             if (!IsReadyToInstantiateObjects())
