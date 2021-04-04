@@ -50,6 +50,14 @@ namespace MultiplayerARPG.MMO
         private ConcurrentDictionary<StorageId, List<CharacterItem>> cachedStorageItems = new ConcurrentDictionary<StorageId, List<CharacterItem>>();
 #endif
 
+        public override void OnStartServer()
+        {
+            base.OnStartServer();
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            Database.Initialize();
+#endif
+        }
+
         protected override void RegisterMessages()
         {
             base.RegisterMessages();
