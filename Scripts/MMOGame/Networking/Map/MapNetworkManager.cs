@@ -764,7 +764,7 @@ namespace MultiplayerARPG.MMO
                             ServerGameMessageHandlers.SendSetPartyData(playerCharacterEntity.ConnectionId, party);
                             ServerGameMessageHandlers.SendAddPartyMembersToOne(playerCharacterEntity.ConnectionId, party);
                         }
-                        ServerGameMessageHandlers.SendAddPartyMembersToMembers(party, message.data.id, message.data.characterName, message.data.dataId, message.data.level);
+                        ServerGameMessageHandlers.SendAddPartyMemberToMembers(party, message.data.id, message.data.characterName, message.data.dataId, message.data.level);
                         break;
                     case UpdateSocialMemberMessage.UpdateType.Remove:
                         if (ServerUserHandlers.TryGetPlayerCharacterById(message.data.id, out playerCharacterEntity))
@@ -828,7 +828,7 @@ namespace MultiplayerARPG.MMO
                             ServerGameMessageHandlers.SendSetGuildData(playerCharacterEntity.ConnectionId, guild);
                             ServerGameMessageHandlers.SendAddGuildMembersToOne(playerCharacterEntity.ConnectionId, guild);
                         }
-                        ServerGameMessageHandlers.SendAddGuildMembersToMembers(guild, message.data.id, message.data.characterName, message.data.dataId, message.data.level);
+                        ServerGameMessageHandlers.SendAddGuildMemberToMembers(guild, message.data.id, message.data.characterName, message.data.dataId, message.data.level);
                         break;
                     case UpdateSocialMemberMessage.UpdateType.Remove:
                         if (ServerUserHandlers.TryGetPlayerCharacterById(message.data.id, out playerCharacterEntity))

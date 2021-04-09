@@ -58,7 +58,7 @@ namespace MultiplayerARPG.MMO
                 ChatNetworkManager.SendAddSocialMember(null, MMOMessageTypes.UpdatePartyMember, request.partyId, playerCharacter.Id, playerCharacter.CharacterName, playerCharacter.DataId, playerCharacter.Level);
             GameInstance.ServerGameMessageHandlers.SendSetPartyData(requestHandler.ConnectionId, validateResult.Party);
             GameInstance.ServerGameMessageHandlers.SendAddPartyMembersToOne(requestHandler.ConnectionId, validateResult.Party);
-            GameInstance.ServerGameMessageHandlers.SendAddPartyMembersToMembers(validateResult.Party, playerCharacter.Id, playerCharacter.CharacterName, playerCharacter.DataId, playerCharacter.Level);
+            GameInstance.ServerGameMessageHandlers.SendAddPartyMemberToMembers(validateResult.Party, playerCharacter.Id, playerCharacter.CharacterName, playerCharacter.DataId, playerCharacter.Level);
             result.Invoke(AckResponseCode.Success, new ResponseAcceptPartyInvitationMessage()
             {
                 message = UITextKeys.UI_PARTY_INVITATION_ACCEPTED,

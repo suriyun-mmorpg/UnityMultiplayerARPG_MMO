@@ -58,7 +58,7 @@ namespace MultiplayerARPG.MMO
                 ChatNetworkManager.SendAddSocialMember(null, MMOMessageTypes.UpdateGuildMember, request.guildId, playerCharacter.Id, playerCharacter.CharacterName, playerCharacter.DataId, playerCharacter.Level);
             GameInstance.ServerGameMessageHandlers.SendSetGuildData(requestHandler.ConnectionId, validateResult.Guild);
             GameInstance.ServerGameMessageHandlers.SendAddGuildMembersToOne(requestHandler.ConnectionId, validateResult.Guild);
-            GameInstance.ServerGameMessageHandlers.SendAddGuildMembersToMembers(validateResult.Guild, playerCharacter.Id, playerCharacter.CharacterName, playerCharacter.DataId, playerCharacter.Level);
+            GameInstance.ServerGameMessageHandlers.SendAddGuildMemberToMembers(validateResult.Guild, playerCharacter.Id, playerCharacter.CharacterName, playerCharacter.DataId, playerCharacter.Level);
             result.Invoke(AckResponseCode.Success, new ResponseAcceptGuildInvitationMessage()
             {
                 message = UITextKeys.UI_GUILD_INVITATION_ACCEPTED,
