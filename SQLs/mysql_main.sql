@@ -180,6 +180,7 @@ CREATE TABLE `characters` (
   `respawnPositionY` float NOT NULL DEFAULT '0',
   `respawnPositionZ` float NOT NULL DEFAULT '0',
   `mountDataId` int NOT NULL DEFAULT '0',
+  `lastDeadTime` int NOT NULL DEFAULT '0',
   `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -397,7 +398,8 @@ INSERT INTO `__migrations` (`migrationId`) VALUES
 ('1.60c'),
 ('1.61'),
 ('1.61b'),
-('1.62e');
+('1.62e'),
+('1.63b');
 
 --
 -- Indexes for dumped tables
