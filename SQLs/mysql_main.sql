@@ -161,8 +161,8 @@ CREATE TABLE `characters` (
   `currentFood` int NOT NULL DEFAULT '0',
   `currentWater` int NOT NULL DEFAULT '0',
   `equipWeaponSet` tinyint UNSIGNED NOT NULL DEFAULT '0',
-  `statPoint` int NOT NULL DEFAULT '0',
-  `skillPoint` int NOT NULL DEFAULT '0',
+  `statPoint` float NOT NULL DEFAULT '0',
+  `skillPoint` float NOT NULL DEFAULT '0',
   `gold` int NOT NULL DEFAULT '0',
   `partyId` int NOT NULL DEFAULT '0',
   `guildId` int NOT NULL DEFAULT '0',
@@ -399,7 +399,8 @@ INSERT INTO `__migrations` (`migrationId`) VALUES
 ('1.61'),
 ('1.61b'),
 ('1.62e'),
-('1.63b');
+('1.63b'),
+('1.65d');
 
 --
 -- Indexes for dumped tables
