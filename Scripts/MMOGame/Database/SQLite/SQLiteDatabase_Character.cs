@@ -139,8 +139,8 @@ namespace MultiplayerARPG.MMO
                 result.CurrentFood = reader.GetInt32(10);
                 result.CurrentWater = reader.GetInt32(11);
                 result.EquipWeaponSet = reader.GetByte(12);
-                result.StatPoint = reader.GetInt16(13);
-                result.SkillPoint = reader.GetInt16(14);
+                result.StatPoint = reader.GetFloat(13);
+                result.SkillPoint = reader.GetFloat(14);
                 result.Gold = reader.GetInt32(15);
                 result.PartyId = reader.GetInt32(16);
                 result.GuildId = reader.GetInt32(17);

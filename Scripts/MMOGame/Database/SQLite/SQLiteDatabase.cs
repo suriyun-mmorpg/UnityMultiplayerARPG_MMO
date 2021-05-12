@@ -154,8 +154,8 @@ namespace MultiplayerARPG.MMO
               currentFood INTEGER NOT NULL,
               currentWater INTEGER NOT NULL,
               equipWeaponSet INTEGER NOT NULL DEFAULT 0,
-              statPoint INTEGER NOT NULL,
-              skillPoint INTEGER NOT NULL,
+              statPoint REAL NOT NULL,
+              skillPoint REAL NOT NULL,
               gold INTEGER NOT NULL,
               partyId INTEGER NOT NULL DEFAULT 0,
               guildId INTEGER NOT NULL DEFAULT 0,
@@ -415,13 +415,76 @@ namespace MultiplayerARPG.MMO
             if (!IsColumnExist("mail", "claimTimestamp"))
                 ExecuteNonQuery("ALTER TABLE mail ADD claimTimestamp TIMESTAMP NULL DEFAULT NULL;");
 
-            if (!IsColumnType("mail", "gold", "integer"))
+            if (!IsColumnType("mail", "gold", "INTEGER"))
             {
-                ExecuteNonQuery("CREATE TABLE mail_backup AS SELECT id, eventId, senderId, senderName, receiverId, title, content, currencies, items, isRead, readTimestamp, isClaim, claimTimestamp, isDelete, deleteTimestamp, sentTimestamp FROM mail;" +
-                    "\nDROP TABLE mail;" +
-                    "\nALTER TABLE mail_backup RENAME TO mail;" +
-                    "\nALTER TABLE mail ADD gold INTEGER NOT NULL DEFAULT 0;");
+                ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS mail (
+                  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+                  eventId TEXT NULL DEFAULT NULL,
+                  senderId TEXT NULL DEFAULT NULL,
+                  senderName TEXT NULL DEFAULT NULL,
+                  receiverId TEXT NOT NULL,
+                  title TEXT NOT NULL,
+                  content TEXT NOT NULL,
+                  gold INTEGER NOT NULL DEFAULT 0,
+                  currencies TEXT NOT NULL,
+                  items TEXT NOT NULL,
+                  isRead INTEGER NOT NULL DEFAULT 0,
+                  readTimestamp TIMESTAMP NULL DEFAULT NULL,
+                  isClaim INTEGER NOT NULL DEFAULT 0,
+                  claimTimestamp TIMESTAMP NULL DEFAULT NULL,
+                  isDelete INTEGER NOT NULL DEFAULT 0,
+                  deleteTimestamp TIMESTAMP NULL DEFAULT NULL,
+                  sentTimestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+                );" +
+                "\nINSERT INTO mail_backup SELECT * FROM mail;" +
+                "\nDROP TABLE mail;" +
+                "\nALTER TABLE mail_backup RENAME TO mail;");
+            }
 
+            if (!IsColumnType("characters", "statPoint", "REAL") ||
+                !IsColumnType("characters", "skillPoint", "REAL"))
+            {
+                ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characters_backup (
+                  id TEXT NOT NULL PRIMARY KEY,
+                  userId TEXT NOT NULL,
+                  dataId INGETER NOT NULL DEFAULT 0,
+                  entityId INGETER NOT NULL DEFAULT 0,
+                  factionId INGETER NOT NULL DEFAULT 0,
+                  characterName TEXT NOT NULL UNIQUE,
+                  level INTEGER NOT NULL,
+                  exp INTEGER NOT NULL,
+                  currentHp INTEGER NOT NULL,
+                  currentMp INTEGER NOT NULL,
+                  currentStamina INTEGER NOT NULL,
+                  currentFood INTEGER NOT NULL,
+                  currentWater INTEGER NOT NULL,
+                  equipWeaponSet INTEGER NOT NULL DEFAULT 0,
+                  statPoint REAL NOT NULL,
+                  skillPoint REAL NOT NULL,
+                  gold INTEGER NOT NULL,
+                  partyId INTEGER NOT NULL DEFAULT 0,
+                  guildId INTEGER NOT NULL DEFAULT 0,
+                  guildRole INTEGER NOT NULL DEFAULT 0,
+                  sharedGuildExp INTEGER NOT NULL DEFAULT 0,
+                  currentMapName TEXT NOT NULL,
+                  currentPositionX REAL NOT NULL DEFAULT 0,
+                  currentPositionY REAL NOT NULL DEFAULT 0,
+                  currentPositionZ REAL NOT NULL DEFAULT 0,
+                  currentRotationX REAL NOT NULL DEFAULT 0,
+                  currentRotationY REAL NOT NULL DEFAULT 0,
+                  currentRotationZ REAL NOT NULL DEFAULT 0,
+                  respawnMapName TEXT NOT NULL,
+                  respawnPositionX REAL NOT NULL DEFAULT 0,
+                  respawnPositionY REAL NOT NULL DEFAULT 0,
+                  respawnPositionZ REAL NOT NULL DEFAULT 0,
+                  mountDataId INTEGER NOT NULL DEFAULT 0,
+                  lastDeadTime INTEGER NOT NULL DEFAULT 0,
+                  createAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                  updateAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+                );" +
+                "\nINSERT INTO characters_backup SELECT * FROM characters;" +
+                "\nDROP TABLE characters;" +
+                "\nALTER TABLE characters_backup RENAME TO characters;");
             }
 
             this.InvokeInstanceDevExtMethods("Init");

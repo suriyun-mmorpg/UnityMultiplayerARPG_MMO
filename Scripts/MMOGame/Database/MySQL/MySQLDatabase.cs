@@ -199,6 +199,15 @@ namespace MultiplayerARPG.MMO
                 await InsertMigrationId(migrationId);
                 Logging.Log("Migrated to 1.63b");
             }
+            migrationId = "1.65d";
+            if (!await HasMigrationId(migrationId))
+            {
+                Logging.Log("Migrating up to 1.65d");
+                await ExecuteNonQuery("ALTER TABLE `characters` CHANGE `statPoint` `statPoint` FLOAT NOT NULL DEFAULT '0', CHANGE `skillPoint` `skillPoint` FLOAT NOT NULL DEFAULT '0';");
+                // Insert migrate history
+                await InsertMigrationId(migrationId);
+                Logging.Log("Migrated to 1.65d");
+            }
         }
 
         private async UniTask<bool> HasMigrationId(string migrationId)
