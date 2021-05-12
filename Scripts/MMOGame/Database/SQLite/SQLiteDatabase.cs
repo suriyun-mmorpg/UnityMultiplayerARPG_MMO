@@ -154,8 +154,8 @@ namespace MultiplayerARPG.MMO
               currentFood INTEGER NOT NULL,
               currentWater INTEGER NOT NULL,
               equipWeaponSet INTEGER NOT NULL DEFAULT 0,
-              statPoint REAL NOT NULL,
-              skillPoint REAL NOT NULL,
+              statPoint REAL NOT NULL DEFAULT 0,
+              skillPoint REAL NOT NULL DEFAULT 0,
               gold INTEGER NOT NULL,
               partyId INTEGER NOT NULL DEFAULT 0,
               guildId INTEGER NOT NULL DEFAULT 0,
@@ -417,7 +417,7 @@ namespace MultiplayerARPG.MMO
 
             if (!IsColumnType("mail", "gold", "INTEGER"))
             {
-                ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS mail (
+                ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS mail_modifying (
                   id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
                   eventId TEXT NULL DEFAULT NULL,
                   senderId TEXT NULL DEFAULT NULL,
@@ -435,16 +435,17 @@ namespace MultiplayerARPG.MMO
                   isDelete INTEGER NOT NULL DEFAULT 0,
                   deleteTimestamp TIMESTAMP NULL DEFAULT NULL,
                   sentTimestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-                );" +
-                "\nINSERT INTO mail_backup SELECT * FROM mail;" +
-                "\nDROP TABLE mail;" +
-                "\nALTER TABLE mail_backup RENAME TO mail;");
+                );");
+                ExecuteNonQuery("INSERT INTO mail_modifying SELECT * FROM mail;");
+                ExecuteNonQuery("ALTER TABLE mail RENAME TO mail_delete;");
+                ExecuteNonQuery("ALTER TABLE mail_modifying RENAME TO mail;");
+                ExecuteNonQuery("DROP TABLE mail_delete;");
             }
 
             if (!IsColumnType("characters", "statPoint", "REAL") ||
                 !IsColumnType("characters", "skillPoint", "REAL"))
             {
-                ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characters_backup (
+                ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characters_modifying (
                   id TEXT NOT NULL PRIMARY KEY,
                   userId TEXT NOT NULL,
                   dataId INGETER NOT NULL DEFAULT 0,
@@ -459,8 +460,8 @@ namespace MultiplayerARPG.MMO
                   currentFood INTEGER NOT NULL,
                   currentWater INTEGER NOT NULL,
                   equipWeaponSet INTEGER NOT NULL DEFAULT 0,
-                  statPoint REAL NOT NULL,
-                  skillPoint REAL NOT NULL,
+                  statPoint REAL NOT NULL DEFAULT 0,
+                  skillPoint REAL NOT NULL DEFAULT 0,
                   gold INTEGER NOT NULL,
                   partyId INTEGER NOT NULL DEFAULT 0,
                   guildId INTEGER NOT NULL DEFAULT 0,
@@ -481,10 +482,11 @@ namespace MultiplayerARPG.MMO
                   lastDeadTime INTEGER NOT NULL DEFAULT 0,
                   createAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                   updateAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-                );" +
-                "\nINSERT INTO characters_backup SELECT * FROM characters;" +
-                "\nDROP TABLE characters;" +
-                "\nALTER TABLE characters_backup RENAME TO characters;");
+                );");
+                ExecuteNonQuery("INSERT INTO characters_modifying SELECT * FROM characters;");
+                ExecuteNonQuery("ALTER TABLE characters RENAME TO characters_delete;");
+                ExecuteNonQuery("DROP TABLE characters_delete;");
+                ExecuteNonQuery("ALTER TABLE characters_modifying RENAME TO characters;");
             }
 
             this.InvokeInstanceDevExtMethods("Init");
