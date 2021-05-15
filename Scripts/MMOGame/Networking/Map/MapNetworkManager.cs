@@ -611,16 +611,16 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
         protected override void HandleChatAtServer(MessageHandlerData messageHandler)
         {
-            ChatMessage message = FillChatChannelId(messageHandler.ReadMessage<ChatMessage>());
+            ChatMessage message = messageHandler.ReadMessage<ChatMessage>().FillChannelId();
             // Local chat will processes immediately, not have to be sent to chat server
             if (message.channel == ChatChannel.Local)
             {
-                ReadChatMessage(message);
+                ServerChatHandlers.OnChatMessage(message);
                 return;
             }
             if (message.channel == ChatChannel.System)
             {
-                if (CanSendSystemAnnounce(message.sender))
+                if (ServerChatHandlers.CanSendSystemAnnounce(message.sender))
                 {
                     // Send chat message to chat server, for MMO mode chat message handling by chat server
                     if (ChatNetworkManager.IsClientConnected)
@@ -707,7 +707,7 @@ namespace MultiplayerARPG.MMO
         public void OnChatMessageReceive(ChatMessage message)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            ReadChatMessage(message);
+            ServerChatHandlers.OnChatMessage(message);
 #endif
         }
 
