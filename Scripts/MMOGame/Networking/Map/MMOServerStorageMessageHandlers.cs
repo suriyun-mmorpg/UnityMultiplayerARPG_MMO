@@ -99,7 +99,7 @@ namespace MultiplayerARPG.MMO
             req.StorageItemAmount = request.storageItemAmount;
             req.InventoryItemIndex = request.inventoryItemIndex;
             MoveItemFromStorageResp resp = await DbServiceClient.MoveItemFromStorageAsync(req);
-            UITextKeys message = (UITextKeys)resp.Error;
+            UITextKeys message = resp.Error;
             if (message != UITextKeys.NONE)
             {
                 result.Invoke(AckResponseCode.Error, new ResponseMoveItemFromStorageMessage()
@@ -148,7 +148,7 @@ namespace MultiplayerARPG.MMO
             req.InventoryItemAmount = request.inventoryItemAmount;
             req.StorageItemIndex = request.storageItemIndex;
             MoveItemToStorageResp resp = await DbServiceClient.MoveItemToStorageAsync(req);
-            UITextKeys message = (UITextKeys)resp.Error;
+            UITextKeys message = resp.Error;
             if (message != UITextKeys.NONE)
             {
                 result.Invoke(AckResponseCode.Error, new ResponseMoveItemToStorageMessage()
@@ -196,7 +196,7 @@ namespace MultiplayerARPG.MMO
             req.FromIndex = request.fromIndex;
             req.ToIndex = request.toIndex;
             SwapOrMergeStorageItemResp resp = await DbServiceClient.SwapOrMergeStorageItemAsync(req);
-            UITextKeys message = (UITextKeys)resp.Error;
+            UITextKeys message = resp.Error;
             if (message != UITextKeys.NONE)
             {
                 result.Invoke(AckResponseCode.Error, new ResponseSwapOrMergeStorageItemMessage()
