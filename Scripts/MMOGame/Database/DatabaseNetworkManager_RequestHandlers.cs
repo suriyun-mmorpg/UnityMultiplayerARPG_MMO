@@ -825,13 +825,38 @@ namespace MultiplayerARPG.MMO
             }
             else
             {
-                // Swapping
                 CharacterItem storageItem = storageItemList[request.StorageItemIndex];
                 CharacterItem nonEquipItem = character.NonEquipItems[request.InventoryItemIndex];
-                storageItem.id = GenericUtils.GetUniqueId();
-                nonEquipItem.id = GenericUtils.GetUniqueId();
-                storageItemList[request.StorageItemIndex] = nonEquipItem;
-                character.NonEquipItems[request.InventoryItemIndex] = storageItem;
+                if (storageItem.IsEmptySlot())
+                {
+                    // Add to storage or merge
+                    bool isOverwhelming = storageItemList.IncreasingItemsWillOverwhelming(
+                        movingItem.dataId, movingItem.amount, isLimitWeight, weightLimit,
+                        storageItemList.GetTotalItemWeight(), isLimitSlot, slotLimit);
+                    if (isOverwhelming)
+                    {
+                        // Storage will overwhelming
+                        result.Invoke(AckResponseCode.Success, new MoveItemToStorageResp()
+                        {
+                            Error = UITextKeys.UI_ERROR_STORAGE_WILL_OVERWHELMING
+                        });
+                        return;
+                    }
+                    // Increase to storage
+                    movingItem.id = GenericUtils.GetUniqueId();
+                    storageItemList[request.StorageItemIndex] = movingItem;
+                    // Remove from inventory
+                    character.DecreaseItemsByIndex(request.InventoryItemIndex, request.InventoryItemAmount);
+                    character.FillEmptySlots();
+                }
+                else
+                {
+                    // Swapping
+                    storageItem.id = GenericUtils.GetUniqueId();
+                    nonEquipItem.id = GenericUtils.GetUniqueId();
+                    storageItemList[request.StorageItemIndex] = nonEquipItem;
+                    character.NonEquipItems[request.InventoryItemIndex] = storageItem;
+                }
             }
             storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
             // Update storage list
@@ -907,13 +932,36 @@ namespace MultiplayerARPG.MMO
             }
             else
             {
-                // Swapping
                 CharacterItem storageItem = storageItemList[request.StorageItemIndex];
                 CharacterItem nonEquipItem = character.NonEquipItems[request.InventoryItemIndex];
-                storageItem.id = GenericUtils.GetUniqueId();
-                nonEquipItem.id = GenericUtils.GetUniqueId();
-                storageItemList[request.StorageItemIndex] = nonEquipItem;
-                character.NonEquipItems[request.InventoryItemIndex] = storageItem;
+                if (nonEquipItem.IsEmptySlot())
+                {
+                    // Add to inventory or merge
+                    bool isOverwhelming = character.IncreasingItemsWillOverwhelming(movingItem.dataId, movingItem.amount);
+                    if (isOverwhelming)
+                    {
+                        // inventory will overwhelming
+                        result.Invoke(AckResponseCode.Success, new MoveItemFromStorageResp()
+                        {
+                            Error = UITextKeys.UI_ERROR_STORAGE_WILL_OVERWHELMING
+                        });
+                        return;
+                    }
+                    // Increase to inventory
+                    movingItem.id = GenericUtils.GetUniqueId();
+                    character.NonEquipItems[request.InventoryItemIndex] = movingItem;
+                    // Remove from storage
+                    storageItemList.DecreaseItemsByIndex(request.StorageItemIndex, request.StorageItemAmount, isLimitSlot);
+                    storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
+                }
+                else
+                {
+                    // Swapping
+                    storageItem.id = GenericUtils.GetUniqueId();
+                    nonEquipItem.id = GenericUtils.GetUniqueId();
+                    storageItemList[request.StorageItemIndex] = nonEquipItem;
+                    character.NonEquipItems[request.InventoryItemIndex] = storageItem;
+                }
             }
             character.FillEmptySlots();
             // Update storage list
