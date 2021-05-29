@@ -17,7 +17,6 @@ namespace MultiplayerARPG.MMO
             StorageOwnerId = reader.GetString();
             WeightLimit = reader.GetShort();
             SlotLimit = reader.GetShort();
-            WeightLimit = reader.GetShort();
             DataId = reader.GetInt();
             Amount = reader.GetShort();
         }
