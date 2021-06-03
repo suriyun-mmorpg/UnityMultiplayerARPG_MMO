@@ -258,8 +258,8 @@ namespace MultiplayerARPG.MMO
         public override async UniTask CreateCharacter(string userId, IPlayerCharacterData characterData)
         {
             await ExecuteNonQuery("INSERT INTO characters " +
-                "(id, userId, dataId, entityId, factionId, characterName, level, exp, currentHp, currentMp, currentStamina, currentFood, currentWater, equipWeaponSet, statPoint, skillPoint, gold, currentMapName, currentPositionX, currentPositionY, currentPositionZ, currentRotationX, currentRotationY, currentRotationZ, respawnMapName, respawnPositionX, respawnPositionY, respawnPositionZ, mountDataId) VALUES " +
-                "(@id, @userId, @dataId, @entityId, @factionId, @characterName, @level, @exp, @currentHp, @currentMp, @currentStamina, @currentFood, @currentWater, @equipWeaponSet, @statPoint, @skillPoint, @gold, @currentMapName, @currentPositionX, @currentPositionY, @currentPositionZ, @currentRotationX, @currentRotationY, @currentRotationZ, @respawnMapName, @respawnPositionX, @respawnPositionY, @respawnPositionZ, @mountDataId)",
+                "(id, userId, dataId, entityId, factionId, characterName, level, exp, currentHp, currentMp, currentStamina, currentFood, currentWater, equipWeaponSet, statPoint, skillPoint, gold, currentMapName, currentPositionX, currentPositionY, currentPositionZ, currentRotationX, currentRotationY, currentRotationZ, respawnMapName, respawnPositionX, respawnPositionY, respawnPositionZ, mountDataId, companionDataId) VALUES " +
+                "(@id, @userId, @dataId, @entityId, @factionId, @characterName, @level, @exp, @currentHp, @currentMp, @currentStamina, @currentFood, @currentWater, @equipWeaponSet, @statPoint, @skillPoint, @gold, @currentMapName, @currentPositionX, @currentPositionY, @currentPositionZ, @currentRotationX, @currentRotationY, @currentRotationZ, @respawnMapName, @respawnPositionX, @respawnPositionY, @respawnPositionZ, @mountDataId, @companionDataId)",
                 new MySqlParameter("@id", characterData.Id),
                 new MySqlParameter("@userId", userId),
                 new MySqlParameter("@dataId", characterData.DataId),
@@ -288,7 +288,8 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@respawnPositionX", characterData.RespawnPosition.x),
                 new MySqlParameter("@respawnPositionY", characterData.RespawnPosition.y),
                 new MySqlParameter("@respawnPositionZ", characterData.RespawnPosition.z),
-                new MySqlParameter("@mountDataId", characterData.MountDataId));
+                new MySqlParameter("@mountDataId", characterData.MountDataId),
+                new MySqlParameter("@companionDataId", characterData.CompanionDataId));
             await FillCharacterRelatesData(characterData);
             this.InvokeInstanceDevExtMethods("CreateCharacter", userId, characterData);
         }
@@ -333,8 +334,9 @@ namespace MultiplayerARPG.MMO
                     reader.GetFloat(29),
                     reader.GetFloat(30));
                 result.MountDataId = reader.GetInt32(31);
-                result.LastDeadTime = reader.GetInt32(32);
-                result.LastUpdate = (int)((System.DateTimeOffset)reader.GetDateTime(33)).ToUnixTimeSeconds();
+                result.CompanionDataId = reader.GetInt32(32);
+                result.LastDeadTime = reader.GetInt32(33);
+                result.LastUpdate = (int)((System.DateTimeOffset)reader.GetDateTime(34)).ToUnixTimeSeconds();
                 return true;
             }
             result = null;
@@ -365,7 +367,7 @@ namespace MultiplayerARPG.MMO
                 "equipWeaponSet, statPoint, skillPoint, gold, partyId, guildId, guildRole, sharedGuildExp, " +
                 "currentMapName, currentPositionX, currentPositionY, currentPositionZ, currentRotationX, currentRotationY, currentRotationZ," +
                 "respawnMapName, respawnPositionX, respawnPositionY, respawnPositionZ," +
-                "mountDataId, lastDeadTime, updateAt FROM characters WHERE id=@id LIMIT 1",
+                "mountDataId, companionDataId, lastDeadTime, updateAt FROM characters WHERE id=@id LIMIT 1",
                 new MySqlParameter("@id", id));
             // Found character, then read its relates data
             if (result != null)
@@ -495,6 +497,7 @@ namespace MultiplayerARPG.MMO
                 "respawnPositionY=@respawnPositionY, " +
                 "respawnPositionZ=@respawnPositionZ, " +
                 "mountDataId=@mountDataId, " +
+                "companionDataId=@companionDataId, " +
                 "lastDeadTime=@lastDeadTime " +
                 "WHERE id=@id",
                 new MySqlParameter("@dataId", character.DataId),
@@ -524,6 +527,7 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@respawnPositionY", character.RespawnPosition.y),
                 new MySqlParameter("@respawnPositionZ", character.RespawnPosition.z),
                 new MySqlParameter("@mountDataId", character.MountDataId),
+                new MySqlParameter("@companionDataId", character.CompanionDataId),
                 new MySqlParameter("@lastDeadTime", character.LastDeadTime),
                 new MySqlParameter("@id", character.Id));
             await FillCharacterRelatesData(character);
