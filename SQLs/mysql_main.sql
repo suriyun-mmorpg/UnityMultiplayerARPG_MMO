@@ -180,7 +180,6 @@ CREATE TABLE `characters` (
   `respawnPositionY` float NOT NULL DEFAULT '0',
   `respawnPositionZ` float NOT NULL DEFAULT '0',
   `mountDataId` int NOT NULL DEFAULT '0',
-  `companionDataId` int NOT NULL DEFAULT '0',
   `lastDeadTime` int NOT NULL DEFAULT '0',
   `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -401,8 +400,7 @@ INSERT INTO `__migrations` (`migrationId`) VALUES
 ('1.61b'),
 ('1.62e'),
 ('1.63b'),
-('1.65d'),
-('1.66');
+('1.65d');
 
 --
 -- Indexes for dumped tables
