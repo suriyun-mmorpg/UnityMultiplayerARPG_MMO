@@ -69,21 +69,6 @@ CREATE TABLE `characterbuff` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `charactercompanion`
---
-
-CREATE TABLE `charactercompanion` (
-  `userId` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `dataId` int NOT NULL DEFAULT '0',
-  `name` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
-  `level` int NOT NULL DEFAULT '1',
-  `exp` int NOT NULL DEFAULT '0',
-  `nameChangeCount` int NOT NULL DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `charactercurrency`
 --
 
@@ -444,12 +429,6 @@ ALTER TABLE `characterattribute`
 ALTER TABLE `characterbuff`
   ADD PRIMARY KEY (`id`),
   ADD KEY `characterId` (`characterId`);
-
---
--- Indexes for table `charactercompanion`
---
-ALTER TABLE `charactercompanion`
-  ADD PRIMARY KEY (`characterId`, `dataId`);
 
 --
 -- Indexes for table `charactercurrency`

@@ -82,15 +82,6 @@ namespace MultiplayerARPG.MMO
               updateAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
 
-            ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS charactercompanion (
-              characterId TEXT NOT NULL,
-              dataId INTEGER NOT NULL,
-              name TEXT NULL DEFAULT NULL,
-              level INTEGER NOT NULL DEFAULT '1',
-              exp INTEGER NOT NULL DEFAULT '0',
-              nameChangeCount INTEGER NOT NULL DEFAULT '0',
-            )");
-
             ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characterhotkey (
               id TEXT NOT NULL PRIMARY KEY,
               characterId TEXT NOT NULL,
