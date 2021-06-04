@@ -174,6 +174,7 @@ namespace MultiplayerARPG.MMO
               respawnPositionZ REAL NOT NULL DEFAULT 0,
               mountDataId INTEGER NOT NULL DEFAULT 0,
               companionDataId INTEGER NOT NULL DEFAULT 0,
+              companionLockRemainsDuration REAL NOT NULL DEFAULT 0,
               lastDeadTime INTEGER NOT NULL DEFAULT 0,
               createAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
               updateAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -406,6 +407,9 @@ namespace MultiplayerARPG.MMO
 
             if (!IsColumnExist("characters", "companionDataId"))
                 ExecuteNonQuery("ALTER TABLE characters ADD companionDataId INTEGER NOT NULL DEFAULT 0;");
+
+            if (!IsColumnExist("characters", "companionLockRemainsDuration"))
+                ExecuteNonQuery("ALTER TABLE characters ADD companionLockRemainsDuration REAL NOT NULL DEFAULT 0;");
 
             if (!IsColumnExist("characters", "lastDeadTime"))
                 ExecuteNonQuery("ALTER TABLE characters ADD lastDeadTime INTEGER NOT NULL DEFAULT 0;");

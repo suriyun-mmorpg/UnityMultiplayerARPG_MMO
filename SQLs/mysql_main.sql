@@ -181,6 +181,7 @@ CREATE TABLE `characters` (
   `respawnPositionZ` float NOT NULL DEFAULT '0',
   `mountDataId` int NOT NULL DEFAULT '0',
   `companionDataId` int NOT NULL DEFAULT '0',
+  `companionLockRemainsDuration` float NOT NULL DEFAULT '0',
   `lastDeadTime` int NOT NULL DEFAULT '0',
   `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
