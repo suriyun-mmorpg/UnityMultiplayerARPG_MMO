@@ -214,6 +214,15 @@ namespace MultiplayerARPG.MMO
                 Logging.Log("Migrating up to 1.66");
                 await ExecuteNonQuery("ALTER TABLE `characters` ADD `companionDataId` INT NOT NULL DEFAULT '0' AFTER `mountDataId`;");
                 await ExecuteNonQuery("ALTER TABLE `characters` ADD `companionLockRemainsDuration` FLOAT NOT NULL DEFAULT '0' AFTER `companionDataId`;");
+                await ExecuteNonQuery("CREATE TABLE `charactercompanion` ("
+                    + "`characterId` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,"
+                    + "`dataId` int NOT NULL DEFAULT '0',"
+                    + "`name` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,"
+                    + "`level` int NOT NULL DEFAULT '1',"
+                    + "`exp` int NOT NULL DEFAULT '0',"
+                    + "`nameChangeCount` int NOT NULL DEFAULT '0'"
+                    + ") ENGINE = InnoDB DEFAULT CHARSET = utf8 COLLATE = utf8_unicode_ci;");
+                await ExecuteNonQuery("ALTER TABLE `charactercompanion` ADD PRIMARY KEY(`characterId`, `dataId`);");
                 // Insert migrate history
                 await InsertMigrationId(migrationId);
                 Logging.Log("Migrated to 1.66");
