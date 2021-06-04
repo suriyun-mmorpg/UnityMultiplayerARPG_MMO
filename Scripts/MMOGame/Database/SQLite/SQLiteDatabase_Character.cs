@@ -86,8 +86,8 @@ namespace MultiplayerARPG.MMO
         {
             await UniTask.Yield();
             ExecuteNonQuery("INSERT INTO characters " +
-                "(id, userId, dataId, entityId, factionId, characterName, level, exp, currentHp, currentMp, currentStamina, currentFood, currentWater, equipWeaponSet, statPoint, skillPoint, gold, currentMapName, currentPositionX, currentPositionY, currentPositionZ, currentRotationX, currentRotationY, currentRotationZ, respawnMapName, respawnPositionX, respawnPositionY, respawnPositionZ, mountDataId, companionDataId, companionLockRemainsDuration) VALUES " +
-                "(@id, @userId, @dataId, @entityId, @factionId, @characterName, @level, @exp, @currentHp, @currentMp, @currentStamina, @currentFood, @currentWater, @equipWeaponSet, @statPoint, @skillPoint, @gold, @currentMapName, @currentPositionX, @currentPositionY, @currentPositionZ, @currentRotationX, @currentRotationY, @currentRotationZ, @respawnMapName, @respawnPositionX, @respawnPositionY, @respawnPositionZ, @mountDataId, @companionDataId, @companionLockRemainsDuration)",
+                "(id, userId, dataId, entityId, factionId, characterName, level, exp, currentHp, currentMp, currentStamina, currentFood, currentWater, equipWeaponSet, statPoint, skillPoint, gold, currentMapName, currentPositionX, currentPositionY, currentPositionZ, currentRotationX, currentRotationY, currentRotationZ, respawnMapName, respawnPositionX, respawnPositionY, respawnPositionZ, mountDataId, companionDataId) VALUES " +
+                "(@id, @userId, @dataId, @entityId, @factionId, @characterName, @level, @exp, @currentHp, @currentMp, @currentStamina, @currentFood, @currentWater, @equipWeaponSet, @statPoint, @skillPoint, @gold, @currentMapName, @currentPositionX, @currentPositionY, @currentPositionZ, @currentRotationX, @currentRotationY, @currentRotationZ, @respawnMapName, @respawnPositionX, @respawnPositionY, @respawnPositionZ, @mountDataId, @companionDataId)",
                 new SqliteParameter("@id", characterData.Id),
                 new SqliteParameter("@userId", userId),
                 new SqliteParameter("@dataId", characterData.DataId),
@@ -117,8 +117,7 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@respawnPositionY", characterData.RespawnPosition.y),
                 new SqliteParameter("@respawnPositionZ", characterData.RespawnPosition.z),
                 new SqliteParameter("@mountDataId", characterData.MountDataId),
-                new SqliteParameter("@companionDataId", characterData.CompanionDataId),
-                new SqliteParameter("@companionLockRemainsDuration", characterData.CompanionLockRemainsDuration));
+                new SqliteParameter("@companionDataId", characterData.CompanionDataId));
             FillCharacterRelatesData(characterData);
             this.InvokeInstanceDevExtMethods("CreateCharacter", userId, characterData);
         }
@@ -164,9 +163,8 @@ namespace MultiplayerARPG.MMO
                     reader.GetFloat(30));
                 result.MountDataId = reader.GetInt32(31);
                 result.CompanionDataId = reader.GetInt32(32);
-                result.CompanionLockRemainsDuration = reader.GetInt32(33);
-                result.LastDeadTime = reader.GetInt32(34);
-                result.LastUpdate = (int)((System.DateTimeOffset)reader.GetDateTime(35)).ToUnixTimeSeconds();
+                result.LastDeadTime = reader.GetInt32(33);
+                result.LastUpdate = (int)((System.DateTimeOffset)reader.GetDateTime(34)).ToUnixTimeSeconds();
                 return true;
             }
             result = null;
@@ -198,7 +196,7 @@ namespace MultiplayerARPG.MMO
                 "equipWeaponSet, statPoint, skillPoint, gold, partyId, guildId, guildRole, sharedGuildExp, " +
                 "currentMapName, currentPositionX, currentPositionY, currentPositionZ, currentRotationX, currentRotationY, currentRotationZ," +
                 "respawnMapName, respawnPositionX, respawnPositionY, respawnPositionZ," +
-                "mountDataId, companionDataId, companionLockRemainsDuration, lastDeadTime, updateAt FROM characters WHERE id=@id LIMIT 1",
+                "mountDataId, companionDataId, lastDeadTime, updateAt FROM characters WHERE id=@id LIMIT 1",
                 new SqliteParameter("@id", id));
             // Found character, then read its relates data
             if (result != null)
@@ -293,7 +291,6 @@ namespace MultiplayerARPG.MMO
                 "respawnPositionZ=@respawnPositionZ, " +
                 "mountDataId=@mountDataId, " +
                 "companionDataId=@companionDataId, " +
-                "companionLockRemainsDuration=@companionLockRemainsDuration, " +
                 "lastDeadTime=@lastDeadTime " +
                 "WHERE id=@id",
                 new SqliteParameter("@dataId", character.DataId),
@@ -324,7 +321,6 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@respawnPositionZ", character.RespawnPosition.z),
                 new SqliteParameter("@mountDataId", character.MountDataId),
                 new SqliteParameter("@companionDataId", character.CompanionDataId),
-                new SqliteParameter("@companionLockRemainsDuration", character.CompanionLockRemainsDuration),
                 new SqliteParameter("@lastDeadTime", character.LastDeadTime),
                 new SqliteParameter("@id", character.Id));
             FillCharacterRelatesData(character);

@@ -213,7 +213,6 @@ namespace MultiplayerARPG.MMO
             {
                 Logging.Log("Migrating up to 1.66");
                 await ExecuteNonQuery("ALTER TABLE `characters` ADD `companionDataId` INT NOT NULL DEFAULT '0' AFTER `mountDataId`;");
-                await ExecuteNonQuery("ALTER TABLE `characters` ADD `companionLockRemainsDuration` FLOAT NOT NULL DEFAULT '0' AFTER `companionDataId`;");
                 // Insert migrate history
                 await InsertMigrationId(migrationId);
                 Logging.Log("Migrated to 1.66");
