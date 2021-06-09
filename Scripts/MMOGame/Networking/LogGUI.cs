@@ -58,15 +58,19 @@ public class LogGUI : MonoBehaviour
 
     private void OnEnable()
     {
+#if !UNITY_SERVER
         Application.logMessageReceivedThreaded += HandleLog;
+#endif
     }
 
     private void OnDisable()
     {
+#if !UNITY_SERVER
         Application.logMessageReceivedThreaded -= HandleLog;
+#endif
     }
 
-    public void HandleLog(LogType type, string logString)
+    private void HandleLog(LogType type, string logString)
     {
 #if !UNITY_SERVER
         if (!setup)
