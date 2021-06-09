@@ -253,9 +253,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5e08d8ccbfded44bb2400909f8f4376, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  logFileName: log
   logAreaHeight: 100
-  openLogDir: 1
   showLogSize: 20
 --- !u!114 &114946005600446132
 MonoBehaviour:
@@ -385,9 +383,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea8a47e377855194bab2c977e67ba885, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  currentLogLevel: 2
+  networkAddress: 127.0.0.1
+  networkPort: 6100
+  useWebSocket: 0
+  maxConnections: 200
+  transportFactory: {fileID: 0}
   database: {fileID: 114414512406587944}
   databaseOptions:
   - {fileID: 114715813743394434}
   - {fileID: 114414512406587944}
-  networkAddress: 127.0.0.1
-  networkPort: 6100

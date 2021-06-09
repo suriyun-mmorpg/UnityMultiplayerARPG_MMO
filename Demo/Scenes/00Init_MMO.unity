@@ -486,6 +486,49 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+--- !u!1 &755619695
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 755619697}
+  - component: {fileID: 755619696}
+  m_Layer: 0
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &755619696
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 755619695}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13c094c5623217447af4bab7b76b302f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &755619697
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 755619695}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -131.58049, y: -101.83295, z: -89.96415}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 8
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1127565837
 GameObject:
   m_ObjectHideFlags: 0
@@ -526,6 +569,9 @@ MonoBehaviour:
   pingDuration: 1
   doNotEnterGameOnConnect: 0
   doNotDestroyOnSceneChanges: 0
+  hitToSomeoneNotifyMessageId: 2001
+  hitFromSomeoneNotifyMessageId: 2002
+  killNotifyMessageId: 2000
   onSpawnEntitiesStart:
     m_PersistentCalls:
       m_Calls: []
@@ -537,6 +583,8 @@ MonoBehaviour:
       m_Calls: []
   guildWarStatusMsgType: 200
   recoverMonstersWhenRoundEnd: 1
+  guildWarMailSenderId: GUILDWAR
+  guildWarMailSenderName: Guild War Manager
   centralTransportFactory: {fileID: 0}
   centralNetworkAddress: 127.0.0.1
   centralNetworkPort: 7000
@@ -555,10 +603,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5a2f797d92f5524593c6d991dec562f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  defaultVisibleRange: 80
   generateGridMode: 0
   axisMode: 0
   includeInactiveComponents: 1
   cellSize: 100
+  updateInterval: 1
 --- !u!4 &1127565840
 Transform:
   m_ObjectHideFlags: 0
@@ -771,6 +821,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca66ed5b09dc41447ad7cf901faa5e46, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  turnOnKillDrop: 0
+  killDropEquipItems: 1
+  killDropNonEquipItems: 1
+  corpsePrefab: {fileID: 0}
   dimensionType: 0
   saveSystem: {fileID: 0}
   gameplayRule: {fileID: 11400000, guid: 3bfe680a81b27ce4ba9642ddff7baa17, type: 2}
@@ -1018,16 +1072,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   masterVolumeSetting:
     id: MASTER
-    maxVolumeRate: 1
+    volumeScale: 1
   bgmVolumeSetting:
     id: BGM
-    maxVolumeRate: 1
+    volumeScale: 1
   sfxVolumeSetting:
     id: SFX
-    maxVolumeRate: 1
+    volumeScale: 1
   ambientVolumeSetting:
     id: AMBIENT
-    maxVolumeRate: 1
+    volumeScale: 1
   otherVolumeSettings: []
 --- !u!114 &1379718508
 MonoBehaviour:
@@ -2082,6 +2136,11 @@ MonoBehaviour:
       value: Mount {0}
   newLanguageKey: ENG
   addNewLanguage: 0
+  migrateOldGameMessage: 0
+  setMessageLanguageKey: 
+  setMessageKey: 
+  setMessageValue: 
+  setMessage: 0
 --- !u!114 &1650493581 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 114462229916829746, guid: 16b2c0544b2d04c4c94eb1e5d854b997,
