@@ -430,7 +430,7 @@ namespace MultiplayerARPG.MMO
 
                 if (startLog)
                 {
-                    CacheLogGUI.logFileName = logFileName;
+                    CacheLogGUI.SetupLogger(logFileName);
                     CacheLogGUI.enabled = true;
                 }
             }
@@ -462,6 +462,8 @@ namespace MultiplayerARPG.MMO
                     startingMapId = startingMap.Id;
                     startingMapServer = true;
                 }
+                    CacheLogGUI.SetupLogger("TEST");
+                    CacheLogGUI.enabled = true;
             }
 #endif
         }
