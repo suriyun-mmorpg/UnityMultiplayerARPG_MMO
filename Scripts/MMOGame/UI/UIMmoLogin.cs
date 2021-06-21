@@ -96,8 +96,6 @@ namespace MultiplayerARPG.MMO
         public void OnLogin(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseUserLoginMessage response)
         {
             LoggingIn = false;
-            string storingUsername = string.Empty;
-            string storingPassword = string.Empty;
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message))
             {
                 if (onLoginFail != null)
@@ -107,8 +105,8 @@ namespace MultiplayerARPG.MMO
             if (toggleAutoLogin != null && toggleAutoLogin.isOn)
             {
                 // Store password
-                PlayerPrefs.SetString(keyUsername, storingUsername);
-                PlayerPrefs.SetString(keyPassword, storingPassword);
+                PlayerPrefs.SetString(keyUsername, Username);
+                PlayerPrefs.SetString(keyPassword, Password);
                 PlayerPrefs.Save();
             }
             if (onLoginSuccess != null)
