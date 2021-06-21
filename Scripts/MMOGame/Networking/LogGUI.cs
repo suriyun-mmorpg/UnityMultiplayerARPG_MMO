@@ -32,7 +32,7 @@ public class LogGUI : MonoBehaviour
     private bool shouldScrollToBottom;
     private bool setup = false;
 
-    public void SetupLogger(string prefix)
+    public void SetupLogger(string logName)
     {
         LogManager.LoggerFactory = UnityLoggerFactory.Create(builder =>
         {
@@ -42,13 +42,7 @@ public class LogGUI : MonoBehaviour
             builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<ILoggerProvider, LogGUIProvider>(x => new LogGUIProvider(this, x.GetService<IOptions<ZLoggerOptions>>())));
             LoggerProviderOptions.RegisterProviderOptions<ZLoggerOptions, LogGUIProvider>(builder.Services);
 #endif
-            builder.AddZLoggerRollingFile((openFileTime, sequence) =>
-            {
-                return $"{logFolder}/{prefix} {openFileTime.ToLocalTime():yyyy-MM-dd_HH-mm}_{sequence:000}.{logExtension}";
-            }, (writeLogTime) =>
-            {
-                return writeLogTime.ToLocalTime();
-            }, 1024, options =>
+            builder.AddZLoggerFile($"{logFolder}/{logName}.{logExtension}", options =>
             {
                 options.PrefixFormatter = LogManager.PrefixFormatterConfigure;
             });
