@@ -462,8 +462,6 @@ namespace MultiplayerARPG.MMO
                     startingMapId = startingMap.Id;
                     startingMapServer = true;
                 }
-                    CacheLogGUI.SetupLogger("TEST");
-                    CacheLogGUI.enabled = true;
             }
 #endif
         }
@@ -527,7 +525,7 @@ namespace MultiplayerARPG.MMO
             {
                 // Start database manager client, it will connect to database manager server
                 // To request database functions
-                gameInstance.DoNotLoadHomeScene = !Application.isEditor;
+                gameInstance.DoNotLoadHomeScene = !Application.isEditor || startingMapServer;
                 StartDatabaseManagerClient();
             }
         }
