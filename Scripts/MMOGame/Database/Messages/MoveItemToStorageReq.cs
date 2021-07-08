@@ -1,4 +1,5 @@
 ﻿using LiteNetLib.Utils;
+using System.Collections.Generic;
 
 namespace MultiplayerARPG.MMO
 {
@@ -12,6 +13,7 @@ namespace MultiplayerARPG.MMO
         public int StorageItemIndex { get; set; }
         public short WeightLimit { get; set; }
         public short SlotLimit { get; set; }
+        public List<CharacterItem> Inventory { get; set; }
 
         public void Deserialize(NetDataReader reader)
         {
@@ -23,6 +25,7 @@ namespace MultiplayerARPG.MMO
             StorageItemIndex = reader.GetInt();
             WeightLimit = reader.GetShort();
             SlotLimit = reader.GetShort();
+            Inventory = reader.GetList<CharacterItem>();
         }
 
         public void Serialize(NetDataWriter writer)
@@ -35,6 +38,7 @@ namespace MultiplayerARPG.MMO
             writer.Put(StorageItemIndex);
             writer.Put(WeightLimit);
             writer.Put(SlotLimit);
+            writer.PutList(Inventory);
         }
     }
 }

@@ -784,7 +784,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             if (request.InventoryItemIndex < 0 ||
-                request.InventoryItemIndex >= character.NonEquipItems.Count)
+                request.InventoryItemIndex >= request.Inventory.Count)
             {
                 // Invalid inventory index
                 result.Invoke(AckResponseCode.Success, new MoveItemToStorageResp()
@@ -793,6 +793,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
+            character.NonEquipItems = request.Inventory;
             await UniTask.SwitchToMainThread();
             bool isLimitWeight = request.WeightLimit > 0;
             bool isLimitSlot = request.SlotLimit > 0;
@@ -905,6 +906,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
+            character.NonEquipItems = request.Inventory;
             await UniTask.SwitchToMainThread();
             bool isLimitSlot = request.SlotLimit > 0;
             short slotLimit = request.SlotLimit;

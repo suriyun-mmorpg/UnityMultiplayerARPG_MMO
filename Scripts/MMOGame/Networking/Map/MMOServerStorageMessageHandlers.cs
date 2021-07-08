@@ -1,6 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
 using LiteNetLibManager;
 using UnityEngine;
+using System.Collections.Generic;
 
 namespace MultiplayerARPG.MMO
 {
@@ -98,6 +99,7 @@ namespace MultiplayerARPG.MMO
             req.StorageItemIndex = request.storageItemIndex;
             req.StorageItemAmount = request.storageItemAmount;
             req.InventoryItemIndex = request.inventoryItemIndex;
+            req.Inventory = new List<CharacterItem>(playerCharacter.NonEquipItems);
             MoveItemFromStorageResp resp = await DbServiceClient.MoveItemFromStorageAsync(req);
             UITextKeys message = resp.Error;
             if (message != UITextKeys.NONE)
@@ -147,6 +149,7 @@ namespace MultiplayerARPG.MMO
             req.InventoryItemIndex = request.inventoryItemIndex;
             req.InventoryItemAmount = request.inventoryItemAmount;
             req.StorageItemIndex = request.storageItemIndex;
+            req.Inventory = new List<CharacterItem>(playerCharacter.NonEquipItems);
             MoveItemToStorageResp resp = await DbServiceClient.MoveItemToStorageAsync(req);
             UITextKeys message = resp.Error;
             if (message != UITextKeys.NONE)
