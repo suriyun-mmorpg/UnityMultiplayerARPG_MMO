@@ -208,6 +208,24 @@ namespace MultiplayerARPG.MMO
                 await InsertMigrationId(migrationId);
                 Logging.Log("Migrated to 1.65d");
             }
+            migrationId = "1.67";
+            if (!await HasMigrationId(migrationId))
+            {
+                Logging.Log("Migrating up to 1.67");
+                await ExecuteNonQuery("ALTER TABLE `guild` ADD `score` INT(11) NOT NULL DEFAULT '0' AFTER `gold`;");
+                await ExecuteNonQuery("ALTER TABLE `guild` ADD `optionId1` INT(11) NOT NULL DEFAULT '0' AFTER `score`;");
+                await ExecuteNonQuery("ALTER TABLE `guild` ADD `optionId2` INT(11) NOT NULL DEFAULT '0' AFTER `optionId1`;");
+                await ExecuteNonQuery("ALTER TABLE `guild` ADD `optionId3` INT(11) NOT NULL DEFAULT '0' AFTER `optionId2`;");
+                await ExecuteNonQuery("ALTER TABLE `guild` ADD `optionId4` INT(11) NOT NULL DEFAULT '0' AFTER `optionId3`;");
+                await ExecuteNonQuery("ALTER TABLE `guild` ADD `optionId5` INT(11) NOT NULL DEFAULT '0' AFTER `optionId4`;");
+                await ExecuteNonQuery("ALTER TABLE `guild` ADD `autoAcceptRequests` TINYINT(1) NOT NULL DEFAULT '0' AFTER `optionId5`;");
+                await ExecuteNonQuery("ALTER TABLE `guild` ADD `rank` INT(11) NOT NULL DEFAULT '0' AFTER `autoAcceptRequests`;");
+                await ExecuteNonQuery("ALTER TABLE `guild` ADD `currentMembers` INT(11) NOT NULL DEFAULT '0' AFTER `rank`;");
+                await ExecuteNonQuery("ALTER TABLE `guild` ADD `maxMembers` INT(11) NOT NULL DEFAULT '0' AFTER `currentMembers`;");
+                // Insert migrate history
+                await InsertMigrationId(migrationId);
+                Logging.Log("Migrated to 1.67");
+            }
         }
 
         private async UniTask<bool> HasMigrationId(string migrationId)

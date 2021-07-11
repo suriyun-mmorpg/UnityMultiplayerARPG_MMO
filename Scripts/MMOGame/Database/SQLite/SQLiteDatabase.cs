@@ -264,7 +264,17 @@ namespace MultiplayerARPG.MMO
               exp INTEGER NOT NULL DEFAULT 0,
               skillPoint INTEGER NOT NULL DEFAULT 0,
               guildMessage TEXT NOT NULL DEFAULT '',
-              gold INTEGER NOT NULL DEFAULT 0
+              gold INTEGER NOT NULL DEFAULT 0,
+              score INTEGER NOT NULL DEFAULT 0,
+              optionId1 INTEGER NOT NULL DEFAULT 0,
+              optionId2 INTEGER NOT NULL DEFAULT 0,
+              optionId3 INTEGER NOT NULL DEFAULT 0,
+              optionId4 INTEGER NOT NULL DEFAULT 0,
+              optionId5 INTEGER NOT NULL DEFAULT 0,
+              autoAcceptRequests INTEGER NOT NULL DEFAULT 0,
+              rank INTEGER NOT NULL DEFAULT 0,
+              currentMembers INTEGER NOT NULL DEFAULT 0,
+              maxMembers INTEGER NOT NULL DEFAULT 0
             )");
 
             ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS guildrole (
@@ -408,6 +418,36 @@ namespace MultiplayerARPG.MMO
 
             if (!IsColumnExist("guild", "gold"))
                 ExecuteNonQuery("ALTER TABLE guild ADD gold INTEGER NOT NULL DEFAULT 0;");
+
+            if (!IsColumnExist("guild", "score"))
+                ExecuteNonQuery("ALTER TABLE guild ADD score INTEGER NOT NULL DEFAULT 0;");
+
+            if (!IsColumnExist("guild", "optionId1"))
+                ExecuteNonQuery("ALTER TABLE guild ADD optionId1 INTEGER NOT NULL DEFAULT 0;");
+
+            if (!IsColumnExist("guild", "optionId2"))
+                ExecuteNonQuery("ALTER TABLE guild ADD optionId2 INTEGER NOT NULL DEFAULT 0;");
+
+            if (!IsColumnExist("guild", "optionId3"))
+                ExecuteNonQuery("ALTER TABLE guild ADD optionId3 INTEGER NOT NULL DEFAULT 0;");
+
+            if (!IsColumnExist("guild", "optionId4"))
+                ExecuteNonQuery("ALTER TABLE guild ADD optionId4 INTEGER NOT NULL DEFAULT 0;");
+
+            if (!IsColumnExist("guild", "optionId5"))
+                ExecuteNonQuery("ALTER TABLE guild ADD optionId5 INTEGER NOT NULL DEFAULT 0;");
+
+            if (!IsColumnExist("guild", "autoAcceptRequests"))
+                ExecuteNonQuery("ALTER TABLE guild ADD autoAcceptRequests INTEGER NOT NULL DEFAULT 0;");
+
+            if (!IsColumnExist("guild", "rank"))
+                ExecuteNonQuery("ALTER TABLE guild ADD rank INTEGER NOT NULL DEFAULT 0;");
+
+            if (!IsColumnExist("guild", "currentMembers"))
+                ExecuteNonQuery("ALTER TABLE guild ADD currentMembers INTEGER NOT NULL DEFAULT 0;");
+
+            if (!IsColumnExist("guild", "maxMembers"))
+                ExecuteNonQuery("ALTER TABLE guild ADD maxMembers INTEGER NOT NULL DEFAULT 0;");
 
             if (!IsColumnExist("mail", "isClaim"))
                 ExecuteNonQuery("ALTER TABLE mail ADD isClaim INTEGER NOT NULL DEFAULT 0;");

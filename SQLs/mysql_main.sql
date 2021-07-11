@@ -266,7 +266,17 @@ CREATE TABLE `guild` (
   `exp` int NOT NULL DEFAULT '0',
   `skillPoint` int NOT NULL DEFAULT '0',
   `guildMessage` varchar(160) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `gold` int NOT NULL DEFAULT '0'
+  `gold` int NOT NULL DEFAULT '0',
+  `score` int NOT NULL DEFAULT '0',
+  `optionId1` int NOT NULL DEFAULT '0',
+  `optionId2` int NOT NULL DEFAULT '0',
+  `optionId3` int NOT NULL DEFAULT '0',
+  `optionId4` int NOT NULL DEFAULT '0',
+  `optionId5` int NOT NULL DEFAULT '0',
+  `autoAcceptRequests` tinyint(1) NOT NULL DEFAULT '0',
+  `rank` int NOT NULL DEFAULT '0',
+  `currentMembers` int NOT NULL DEFAULT '0',
+  `maxMembers` int NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
