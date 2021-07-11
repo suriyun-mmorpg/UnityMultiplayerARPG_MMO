@@ -411,6 +411,272 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
+        public async UniTaskVoid HandleRequestChangeGuildMessage2(RequestHandlerData requestHandler, RequestChangeGuildMessageMessage request, RequestProceedResultDelegate<ResponseChangeGuildMessageMessage> result)
+        {
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            await UniTask.Yield();
+            IPlayerCharacterData playerCharacter;
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            {
+                result.Invoke(AckResponseCode.Error, new ResponseChangeGuildMessageMessage()
+                {
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                });
+                return;
+            }
+            ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanChangeGuildMessage2(playerCharacter, request.message);
+            if (!validateResult.IsSuccess)
+            {
+                result.Invoke(AckResponseCode.Error, new ResponseChangeGuildMessageMessage()
+                {
+                    message = validateResult.GameMessage,
+                });
+                return;
+            }
+            validateResult.Guild.guildMessage2 = request.message;
+            GameInstance.ServerGuildHandlers.SetGuild(validateResult.GuildId, validateResult.Guild);
+            // Save to database
+            _ = DbServiceClient.UpdateGuildMessage2Async(new UpdateGuildMessageReq()
+            {
+                GuildId = validateResult.GuildId,
+                GuildMessage = request.message
+            });
+            // Broadcast via chat server
+            if (ChatNetworkManager.IsClientConnected)
+                ChatNetworkManager.SendSetGuildMessage(null, MMOMessageTypes.UpdateGuild, validateResult.GuildId, request.message);
+            GameInstance.ServerGameMessageHandlers.SendSetGuildMessageToMembers(validateResult.Guild);
+            result.Invoke(AckResponseCode.Success, new ResponseChangeGuildMessageMessage());
+#endif
+        }
+
+        public async UniTaskVoid HandleRequestChangeGuildOptionId1(RequestHandlerData requestHandler, RequestChangeGuildOptionIdMessage request, RequestProceedResultDelegate<ResponseChangeGuildOptionIdMessage> result)
+        {
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            await UniTask.Yield();
+            IPlayerCharacterData playerCharacter;
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            {
+                result.Invoke(AckResponseCode.Error, new ResponseChangeGuildOptionIdMessage()
+                {
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                });
+                return;
+            }
+            ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanChangeGuildOptions(playerCharacter);
+            if (!validateResult.IsSuccess)
+            {
+                result.Invoke(AckResponseCode.Error, new ResponseChangeGuildOptionIdMessage()
+                {
+                    message = validateResult.GameMessage,
+                });
+                return;
+            }
+            validateResult.Guild.optionId1 = request.optionId;
+            GameInstance.ServerGuildHandlers.SetGuild(validateResult.GuildId, validateResult.Guild);
+            // Save to database
+            _ = DbServiceClient.UpdateGuildOptionId1Async(new UpdateGuildOptionIdReq()
+            {
+                GuildId = validateResult.GuildId,
+                OptionId = request.optionId
+            });
+            // Broadcast via chat server
+            if (ChatNetworkManager.IsClientConnected)
+                ChatNetworkManager.SendSetGuildOptionId1(null, MMOMessageTypes.UpdateGuild, validateResult.GuildId, request.optionId);
+            GameInstance.ServerGameMessageHandlers.SendSetGuildOptionId1ToMembers(validateResult.Guild);
+            result.Invoke(AckResponseCode.Success, new ResponseChangeGuildOptionIdMessage());
+#endif
+        }
+
+        public async UniTaskVoid HandleRequestChangeGuildOptionId2(RequestHandlerData requestHandler, RequestChangeGuildOptionIdMessage request, RequestProceedResultDelegate<ResponseChangeGuildOptionIdMessage> result)
+        {
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            await UniTask.Yield();
+            IPlayerCharacterData playerCharacter;
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            {
+                result.Invoke(AckResponseCode.Error, new ResponseChangeGuildOptionIdMessage()
+                {
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                });
+                return;
+            }
+            ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanChangeGuildOptions(playerCharacter);
+            if (!validateResult.IsSuccess)
+            {
+                result.Invoke(AckResponseCode.Error, new ResponseChangeGuildOptionIdMessage()
+                {
+                    message = validateResult.GameMessage,
+                });
+                return;
+            }
+            validateResult.Guild.optionId2 = request.optionId;
+            GameInstance.ServerGuildHandlers.SetGuild(validateResult.GuildId, validateResult.Guild);
+            // Save to database
+            _ = DbServiceClient.UpdateGuildOptionId2Async(new UpdateGuildOptionIdReq()
+            {
+                GuildId = validateResult.GuildId,
+                OptionId = request.optionId
+            });
+            // Broadcast via chat server
+            if (ChatNetworkManager.IsClientConnected)
+                ChatNetworkManager.SendSetGuildOptionId2(null, MMOMessageTypes.UpdateGuild, validateResult.GuildId, request.optionId);
+            GameInstance.ServerGameMessageHandlers.SendSetGuildOptionId2ToMembers(validateResult.Guild);
+            result.Invoke(AckResponseCode.Success, new ResponseChangeGuildOptionIdMessage());
+#endif
+        }
+
+        public async UniTaskVoid HandleRequestChangeGuildOptionId3(RequestHandlerData requestHandler, RequestChangeGuildOptionIdMessage request, RequestProceedResultDelegate<ResponseChangeGuildOptionIdMessage> result)
+        {
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            await UniTask.Yield();
+            IPlayerCharacterData playerCharacter;
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            {
+                result.Invoke(AckResponseCode.Error, new ResponseChangeGuildOptionIdMessage()
+                {
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                });
+                return;
+            }
+            ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanChangeGuildOptions(playerCharacter);
+            if (!validateResult.IsSuccess)
+            {
+                result.Invoke(AckResponseCode.Error, new ResponseChangeGuildOptionIdMessage()
+                {
+                    message = validateResult.GameMessage,
+                });
+                return;
+            }
+            validateResult.Guild.optionId3 = request.optionId;
+            GameInstance.ServerGuildHandlers.SetGuild(validateResult.GuildId, validateResult.Guild);
+            // Save to database
+            _ = DbServiceClient.UpdateGuildOptionId3Async(new UpdateGuildOptionIdReq()
+            {
+                GuildId = validateResult.GuildId,
+                OptionId = request.optionId
+            });
+            // Broadcast via chat server
+            if (ChatNetworkManager.IsClientConnected)
+                ChatNetworkManager.SendSetGuildOptionId3(null, MMOMessageTypes.UpdateGuild, validateResult.GuildId, request.optionId);
+            GameInstance.ServerGameMessageHandlers.SendSetGuildOptionId3ToMembers(validateResult.Guild);
+            result.Invoke(AckResponseCode.Success, new ResponseChangeGuildOptionIdMessage());
+#endif
+        }
+
+        public async UniTaskVoid HandleRequestChangeGuildOptionId4(RequestHandlerData requestHandler, RequestChangeGuildOptionIdMessage request, RequestProceedResultDelegate<ResponseChangeGuildOptionIdMessage> result)
+        {
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            await UniTask.Yield();
+            IPlayerCharacterData playerCharacter;
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            {
+                result.Invoke(AckResponseCode.Error, new ResponseChangeGuildOptionIdMessage()
+                {
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                });
+                return;
+            }
+            ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanChangeGuildOptions(playerCharacter);
+            if (!validateResult.IsSuccess)
+            {
+                result.Invoke(AckResponseCode.Error, new ResponseChangeGuildOptionIdMessage()
+                {
+                    message = validateResult.GameMessage,
+                });
+                return;
+            }
+            validateResult.Guild.optionId4 = request.optionId;
+            GameInstance.ServerGuildHandlers.SetGuild(validateResult.GuildId, validateResult.Guild);
+            // Save to database
+            _ = DbServiceClient.UpdateGuildOptionId4Async(new UpdateGuildOptionIdReq()
+            {
+                GuildId = validateResult.GuildId,
+                OptionId = request.optionId
+            });
+            // Broadcast via chat server
+            if (ChatNetworkManager.IsClientConnected)
+                ChatNetworkManager.SendSetGuildOptionId4(null, MMOMessageTypes.UpdateGuild, validateResult.GuildId, request.optionId);
+            GameInstance.ServerGameMessageHandlers.SendSetGuildOptionId4ToMembers(validateResult.Guild);
+            result.Invoke(AckResponseCode.Success, new ResponseChangeGuildOptionIdMessage());
+#endif
+        }
+
+        public async UniTaskVoid HandleRequestChangeGuildOptionId5(RequestHandlerData requestHandler, RequestChangeGuildOptionIdMessage request, RequestProceedResultDelegate<ResponseChangeGuildOptionIdMessage> result)
+        {
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            await UniTask.Yield();
+            IPlayerCharacterData playerCharacter;
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            {
+                result.Invoke(AckResponseCode.Error, new ResponseChangeGuildOptionIdMessage()
+                {
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                });
+                return;
+            }
+            ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanChangeGuildOptions(playerCharacter);
+            if (!validateResult.IsSuccess)
+            {
+                result.Invoke(AckResponseCode.Error, new ResponseChangeGuildOptionIdMessage()
+                {
+                    message = validateResult.GameMessage,
+                });
+                return;
+            }
+            validateResult.Guild.optionId5 = request.optionId;
+            GameInstance.ServerGuildHandlers.SetGuild(validateResult.GuildId, validateResult.Guild);
+            // Save to database
+            _ = DbServiceClient.UpdateGuildOptionId5Async(new UpdateGuildOptionIdReq()
+            {
+                GuildId = validateResult.GuildId,
+                OptionId = request.optionId
+            });
+            // Broadcast via chat server
+            if (ChatNetworkManager.IsClientConnected)
+                ChatNetworkManager.SendSetGuildOptionId5(null, MMOMessageTypes.UpdateGuild, validateResult.GuildId, request.optionId);
+            GameInstance.ServerGameMessageHandlers.SendSetGuildOptionId5ToMembers(validateResult.Guild);
+            result.Invoke(AckResponseCode.Success, new ResponseChangeGuildOptionIdMessage());
+#endif
+        }
+
+        public async UniTaskVoid HandleRequestChangeGuildAutoAcceptRequests(RequestHandlerData requestHandler, RequestChangeGuildAutoAcceptRequestsMessage request, RequestProceedResultDelegate<ResponseChangeGuildAutoAcceptRequestsMessage> result)
+        {
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            await UniTask.Yield();
+            IPlayerCharacterData playerCharacter;
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            {
+                result.Invoke(AckResponseCode.Error, new ResponseChangeGuildAutoAcceptRequestsMessage()
+                {
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                });
+                return;
+            }
+            ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanChangeGuildOptions(playerCharacter);
+            if (!validateResult.IsSuccess)
+            {
+                result.Invoke(AckResponseCode.Error, new ResponseChangeGuildAutoAcceptRequestsMessage()
+                {
+                    message = validateResult.GameMessage,
+                });
+                return;
+            }
+            validateResult.Guild.autoAcceptRequests = request.autoAcceptRequests;
+            GameInstance.ServerGuildHandlers.SetGuild(validateResult.GuildId, validateResult.Guild);
+            // Save to database
+            _ = DbServiceClient.UpdateGuildAutoAcceptRequestsAsync(new UpdateGuildAutoAcceptRequestsReq()
+            {
+                GuildId = validateResult.GuildId,
+                AutoAcceptRequests = request.autoAcceptRequests
+            });
+            // Broadcast via chat server
+            if (ChatNetworkManager.IsClientConnected)
+                ChatNetworkManager.SendSetGuildAutoAcceptRequests(null, MMOMessageTypes.UpdateGuild, validateResult.GuildId, request.autoAcceptRequests);
+            GameInstance.ServerGameMessageHandlers.SendSetGuildAutoAcceptRequestsToMembers(validateResult.Guild);
+            result.Invoke(AckResponseCode.Success, new ResponseChangeGuildAutoAcceptRequestsMessage());
+#endif
+        }
+
         public async UniTaskVoid HandleRequestChangeGuildRole(RequestHandlerData requestHandler, RequestChangeGuildRoleMessage request, RequestProceedResultDelegate<ResponseChangeGuildRoleMessage> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD

@@ -41,9 +41,18 @@ namespace MultiplayerARPG.MMO
                     result.exp = reader.GetInt32(3);
                     result.skillPoint = reader.GetInt16(4);
                     result.guildMessage = reader.GetString(5);
-                    result.gold = reader.GetInt32(6);
+                    result.guildMessage2 = reader.GetString(6);
+                    result.gold = reader.GetInt32(7);
+                    result.score = reader.GetInt32(8);
+                    result.optionId1 = reader.GetInt32(9);
+                    result.optionId2 = reader.GetInt32(10);
+                    result.optionId3 = reader.GetInt32(11);
+                    result.optionId4 = reader.GetInt32(12);
+                    result.optionId5 = reader.GetInt32(13);
+                    result.autoAcceptRequests = reader.GetBoolean(14);
+                    result.rank = reader.GetInt32(15);
                 }
-            }, "SELECT guildName, leaderId, level, exp, skillPoint, guildMessage, gold FROM guild WHERE id=@id LIMIT 1",
+            }, "SELECT guildName, leaderId, level, exp, skillPoint, guildMessage, guildMessage2, gold, score, optionId1, optionId2, optionId3, optionId4, optionId5, autoAcceptRequests, rank FROM guild WHERE id=@id LIMIT 1",
                 new SqliteParameter("@id", id));
             if (result != null)
             {
@@ -116,6 +125,86 @@ namespace MultiplayerARPG.MMO
             await UniTask.Yield();
             ExecuteNonQuery("UPDATE guild SET guildMessage=@guildMessage WHERE id=@id",
                 new SqliteParameter("@guildMessage", guildMessage),
+                new SqliteParameter("@id", id));
+        }
+
+        public override async UniTask UpdateGuildMessage2(int id, string guildMessage)
+        {
+            await UniTask.Yield();
+            ExecuteNonQuery("UPDATE guild SET guildMessage2=@guildMessage WHERE id=@id",
+                new SqliteParameter("@guildMessage", guildMessage),
+                new SqliteParameter("@id", id));
+        }
+
+        public override async UniTask UpdateGuildScore(int id, int score)
+        {
+
+            await UniTask.Yield();
+            ExecuteNonQuery("UPDATE guild SET score=@score WHERE id=@id",
+                new SqliteParameter("@score", score),
+                new SqliteParameter("@id", id));
+        }
+
+        public override async UniTask UpdateGuildOptionId1(int id, int optionId)
+        {
+
+            await UniTask.Yield();
+            ExecuteNonQuery("UPDATE guild SET optionId1=@optionId WHERE id=@id",
+                new SqliteParameter("@optionId", optionId),
+                new SqliteParameter("@id", id));
+        }
+
+        public override async UniTask UpdateGuildOptionId2(int id, int optionId)
+        {
+
+            await UniTask.Yield();
+            ExecuteNonQuery("UPDATE guild SET optionId2=@optionId WHERE id=@id",
+                new SqliteParameter("@optionId", optionId),
+                new SqliteParameter("@id", id));
+        }
+
+        public override async UniTask UpdateGuildOptionId3(int id, int optionId)
+        {
+
+            await UniTask.Yield();
+            ExecuteNonQuery("UPDATE guild SET optionId3=@optionId WHERE id=@id",
+                new SqliteParameter("@optionId", optionId),
+                new SqliteParameter("@id", id));
+        }
+
+        public override async UniTask UpdateGuildOptionId4(int id, int optionId)
+        {
+
+            await UniTask.Yield();
+            ExecuteNonQuery("UPDATE guild SET optionId4=@optionId WHERE id=@id",
+                new SqliteParameter("@optionId", optionId),
+                new SqliteParameter("@id", id));
+        }
+
+        public override async UniTask UpdateGuildOptionId5(int id, int optionId)
+        {
+
+            await UniTask.Yield();
+            ExecuteNonQuery("UPDATE guild SET optionId5=@optionId WHERE id=@id",
+                new SqliteParameter("@optionId", optionId),
+                new SqliteParameter("@id", id));
+        }
+
+        public override async UniTask UpdateGuildAutoAcceptRequests(int id, bool autoAcceptRequests)
+        {
+
+            await UniTask.Yield();
+            ExecuteNonQuery("UPDATE guild SET autoAcceptRequests=@autoAcceptRequests WHERE id=@id",
+                new SqliteParameter("@autoAcceptRequests", autoAcceptRequests),
+                new SqliteParameter("@id", id));
+        }
+
+        public override async UniTask UpdateGuildRank(int id, int rank)
+        {
+
+            await UniTask.Yield();
+            ExecuteNonQuery("UPDATE guild SET rank=@rank WHERE id=@id",
+                new SqliteParameter("@rank", rank),
                 new SqliteParameter("@id", id));
         }
 

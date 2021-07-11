@@ -96,6 +96,15 @@ namespace MultiplayerARPG.MMO
             RegisterRequestToServer<CreateGuildReq, GuildResp>(DatabaseRequestTypes.RequestCreateGuild, CreateGuild);
             RegisterRequestToServer<UpdateGuildLeaderReq, GuildResp>(DatabaseRequestTypes.RequestUpdateGuildLeader, UpdateGuildLeader);
             RegisterRequestToServer<UpdateGuildMessageReq, GuildResp>(DatabaseRequestTypes.RequestUpdateGuildMessage, UpdateGuildMessage);
+            RegisterRequestToServer<UpdateGuildMessageReq, GuildResp>(DatabaseRequestTypes.RequestUpdateGuildMessage2, UpdateGuildMessage2);
+            RegisterRequestToServer<UpdateGuildScoreReq, GuildResp>(DatabaseRequestTypes.RequestUpdateGuildScore, UpdateGuildScore);
+            RegisterRequestToServer<UpdateGuildOptionIdReq, GuildResp>(DatabaseRequestTypes.RequestUpdateGuildOptionId1, UpdateGuildOptionId1);
+            RegisterRequestToServer<UpdateGuildOptionIdReq, GuildResp>(DatabaseRequestTypes.RequestUpdateGuildOptionId2, UpdateGuildOptionId2);
+            RegisterRequestToServer<UpdateGuildOptionIdReq, GuildResp>(DatabaseRequestTypes.RequestUpdateGuildOptionId3, UpdateGuildOptionId3);
+            RegisterRequestToServer<UpdateGuildOptionIdReq, GuildResp>(DatabaseRequestTypes.RequestUpdateGuildOptionId4, UpdateGuildOptionId4);
+            RegisterRequestToServer<UpdateGuildOptionIdReq, GuildResp>(DatabaseRequestTypes.RequestUpdateGuildOptionId5, UpdateGuildOptionId5);
+            RegisterRequestToServer<UpdateGuildAutoAcceptRequestsReq, GuildResp>(DatabaseRequestTypes.RequestUpdateGuildAutoAcceptRequests, UpdateGuildAutoAcceptRequests);
+            RegisterRequestToServer<UpdateGuildRankReq, GuildResp>(DatabaseRequestTypes.RequestUpdateGuildRank, UpdateGuildRank);
             RegisterRequestToServer<UpdateGuildRoleReq, GuildResp>(DatabaseRequestTypes.RequestUpdateGuildRole, UpdateGuildRole);
             RegisterRequestToServer<UpdateGuildMemberRoleReq, GuildResp>(DatabaseRequestTypes.RequestUpdateGuildMemberRole, UpdateGuildMemberRole);
             RegisterRequestToServer<DeleteGuildReq, EmptyMessage>(DatabaseRequestTypes.RequestDeleteGuild, DeleteGuild);

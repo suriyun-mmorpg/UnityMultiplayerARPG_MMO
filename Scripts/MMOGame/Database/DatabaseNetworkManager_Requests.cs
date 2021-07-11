@@ -277,6 +277,62 @@ namespace MultiplayerARPG.MMO
             return result.Response;
         }
 
+        public async UniTask<GuildResp> UpdateGuildMessage2Async(UpdateGuildMessageReq request)
+        {
+            var result = await Client.SendRequestAsync<UpdateGuildMessageReq, GuildResp>(DatabaseRequestTypes.RequestUpdateGuildMessage2, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new GuildResp();
+            return result.Response;
+        }
+
+        public async UniTask<GuildResp> UpdateGuildOptionId1Async(UpdateGuildOptionIdReq request)
+        {
+            var result = await Client.SendRequestAsync<UpdateGuildOptionIdReq, GuildResp>(DatabaseRequestTypes.RequestUpdateGuildOptionId1, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new GuildResp();
+            return result.Response;
+        }
+
+        public async UniTask<GuildResp> UpdateGuildOptionId2Async(UpdateGuildOptionIdReq request)
+        {
+            var result = await Client.SendRequestAsync<UpdateGuildOptionIdReq, GuildResp>(DatabaseRequestTypes.RequestUpdateGuildOptionId2, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new GuildResp();
+            return result.Response;
+        }
+
+        public async UniTask<GuildResp> UpdateGuildOptionId3Async(UpdateGuildOptionIdReq request)
+        {
+            var result = await Client.SendRequestAsync<UpdateGuildOptionIdReq, GuildResp>(DatabaseRequestTypes.RequestUpdateGuildOptionId3, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new GuildResp();
+            return result.Response;
+        }
+
+        public async UniTask<GuildResp> UpdateGuildOptionId4Async(UpdateGuildOptionIdReq request)
+        {
+            var result = await Client.SendRequestAsync<UpdateGuildOptionIdReq, GuildResp>(DatabaseRequestTypes.RequestUpdateGuildOptionId4, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new GuildResp();
+            return result.Response;
+        }
+
+        public async UniTask<GuildResp> UpdateGuildOptionId5Async(UpdateGuildOptionIdReq request)
+        {
+            var result = await Client.SendRequestAsync<UpdateGuildOptionIdReq, GuildResp>(DatabaseRequestTypes.RequestUpdateGuildOptionId5, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new GuildResp();
+            return result.Response;
+        }
+
+        public async UniTask<GuildResp> UpdateGuildAutoAcceptRequestsAsync(UpdateGuildAutoAcceptRequestsReq request)
+        {
+            var result = await Client.SendRequestAsync<UpdateGuildAutoAcceptRequestsReq, GuildResp>(DatabaseRequestTypes.RequestUpdateGuildAutoAcceptRequests, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new GuildResp();
+            return result.Response;
+        }
+
         public async UniTask<GuildResp> UpdateGuildRoleAsync(UpdateGuildRoleReq request)
         {
             var result = await Client.SendRequestAsync<UpdateGuildRoleReq, GuildResp>(DatabaseRequestTypes.RequestUpdateGuildRole, request);

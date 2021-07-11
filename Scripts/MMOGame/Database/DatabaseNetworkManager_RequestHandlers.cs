@@ -549,6 +549,150 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
+        protected async UniTaskVoid UpdateGuildMessage2(RequestHandlerData requestHandler, UpdateGuildMessageReq request, RequestProceedResultDelegate<GuildResp> result)
+        {
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            GuildData guild = await ReadGuild(request.GuildId);
+            // Update to cache
+            guild.guildMessage2 = request.GuildMessage;
+            cachedGuild[request.GuildId] = guild;
+            // Update to database
+            await Database.UpdateGuildMessage2(request.GuildId, request.GuildMessage);
+            result.Invoke(AckResponseCode.Success, new GuildResp()
+            {
+                GuildData = guild
+            });
+#endif
+        }
+
+        protected async UniTaskVoid UpdateGuildScore(RequestHandlerData requestHandler, UpdateGuildScoreReq request, RequestProceedResultDelegate<GuildResp> result)
+        {
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            GuildData guild = await ReadGuild(request.GuildId);
+            // Update to cache
+            guild.score = request.Score;
+            cachedGuild[request.GuildId] = guild;
+            // Update to database
+            await Database.UpdateGuildScore(request.GuildId, request.Score);
+            result.Invoke(AckResponseCode.Success, new GuildResp()
+            {
+                GuildData = guild
+            });
+#endif
+        }
+
+        protected async UniTaskVoid UpdateGuildOptionId1(RequestHandlerData requestHandler, UpdateGuildOptionIdReq request, RequestProceedResultDelegate<GuildResp> result)
+        {
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            GuildData guild = await ReadGuild(request.GuildId);
+            // Update to cache
+            guild.optionId1 = request.OptionId;
+            cachedGuild[request.GuildId] = guild;
+            // Update to database
+            await Database.UpdateGuildOptionId1(request.GuildId, request.OptionId);
+            result.Invoke(AckResponseCode.Success, new GuildResp()
+            {
+                GuildData = guild
+            });
+#endif
+        }
+
+        protected async UniTaskVoid UpdateGuildOptionId2(RequestHandlerData requestHandler, UpdateGuildOptionIdReq request, RequestProceedResultDelegate<GuildResp> result)
+        {
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            GuildData guild = await ReadGuild(request.GuildId);
+            // Update to cache
+            guild.optionId2 = request.OptionId;
+            cachedGuild[request.GuildId] = guild;
+            // Update to database
+            await Database.UpdateGuildOptionId2(request.GuildId, request.OptionId);
+            result.Invoke(AckResponseCode.Success, new GuildResp()
+            {
+                GuildData = guild
+            });
+#endif
+        }
+
+        protected async UniTaskVoid UpdateGuildOptionId3(RequestHandlerData requestHandler, UpdateGuildOptionIdReq request, RequestProceedResultDelegate<GuildResp> result)
+        {
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            GuildData guild = await ReadGuild(request.GuildId);
+            // Update to cache
+            guild.optionId3 = request.OptionId;
+            cachedGuild[request.GuildId] = guild;
+            // Update to database
+            await Database.UpdateGuildOptionId3(request.GuildId, request.OptionId);
+            result.Invoke(AckResponseCode.Success, new GuildResp()
+            {
+                GuildData = guild
+            });
+#endif
+        }
+
+        protected async UniTaskVoid UpdateGuildOptionId4(RequestHandlerData requestHandler, UpdateGuildOptionIdReq request, RequestProceedResultDelegate<GuildResp> result)
+        {
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            GuildData guild = await ReadGuild(request.GuildId);
+            // Update to cache
+            guild.optionId4 = request.OptionId;
+            cachedGuild[request.GuildId] = guild;
+            // Update to database
+            await Database.UpdateGuildOptionId4(request.GuildId, request.OptionId);
+            result.Invoke(AckResponseCode.Success, new GuildResp()
+            {
+                GuildData = guild
+            });
+#endif
+        }
+
+        protected async UniTaskVoid UpdateGuildOptionId5(RequestHandlerData requestHandler, UpdateGuildOptionIdReq request, RequestProceedResultDelegate<GuildResp> result)
+        {
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            GuildData guild = await ReadGuild(request.GuildId);
+            // Update to cache
+            guild.optionId5 = request.OptionId;
+            cachedGuild[request.GuildId] = guild;
+            // Update to database
+            await Database.UpdateGuildOptionId5(request.GuildId, request.OptionId);
+            result.Invoke(AckResponseCode.Success, new GuildResp()
+            {
+                GuildData = guild
+            });
+#endif
+        }
+
+        protected async UniTaskVoid UpdateGuildAutoAcceptRequests(RequestHandlerData requestHandler, UpdateGuildAutoAcceptRequestsReq request, RequestProceedResultDelegate<GuildResp> result)
+        {
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            GuildData guild = await ReadGuild(request.GuildId);
+            // Update to cache
+            guild.autoAcceptRequests = request.AutoAcceptRequests;
+            cachedGuild[request.GuildId] = guild;
+            // Update to database
+            await Database.UpdateGuildAutoAcceptRequests(request.GuildId, request.AutoAcceptRequests);
+            result.Invoke(AckResponseCode.Success, new GuildResp()
+            {
+                GuildData = guild
+            });
+#endif
+        }
+
+        protected async UniTaskVoid UpdateGuildRank(RequestHandlerData requestHandler, UpdateGuildRankReq request, RequestProceedResultDelegate<GuildResp> result)
+        {
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            GuildData guild = await ReadGuild(request.GuildId);
+            // Update to cache
+            guild.score = request.Rank;
+            cachedGuild[request.GuildId] = guild;
+            // Update to database
+            await Database.UpdateGuildRank(request.GuildId, request.Rank);
+            result.Invoke(AckResponseCode.Success, new GuildResp()
+            {
+                GuildData = guild
+            });
+#endif
+        }
+
         protected async UniTaskVoid UpdateGuildRole(RequestHandlerData requestHandler, UpdateGuildRoleReq request, RequestProceedResultDelegate<GuildResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD

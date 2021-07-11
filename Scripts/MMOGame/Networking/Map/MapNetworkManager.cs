@@ -864,6 +864,11 @@ namespace MultiplayerARPG.MMO
                         ServerGuildHandlers.SetGuild(message.id, guild);
                         ServerGameMessageHandlers.SendSetGuildMessageToMembers(guild);
                         break;
+                    case UpdateGuildMessage.UpdateType.SetGuildMessage2:
+                        guild.guildMessage2 = message.guildMessage;
+                        ServerGuildHandlers.SetGuild(message.id, guild);
+                        ServerGameMessageHandlers.SendSetGuildMessageToMembers(guild);
+                        break;
                     case UpdateGuildMessage.UpdateType.SetGuildRole:
                         guild.SetRole(message.guildRole, message.roleName, message.canInvite, message.canKick, message.shareExpPercentage);
                         ServerGuildHandlers.SetGuild(message.id, guild);
@@ -890,6 +895,46 @@ namespace MultiplayerARPG.MMO
                         guild.gold = message.gold;
                         ServerGuildHandlers.SetGuild(message.id, guild);
                         ServerGameMessageHandlers.SendSetGuildGoldToMembers(guild);
+                        break;
+                    case UpdateGuildMessage.UpdateType.SetScore:
+                        guild.score = message.score;
+                        ServerGuildHandlers.SetGuild(message.id, guild);
+                        ServerGameMessageHandlers.SendSetGuildScoreToMembers(guild);
+                        break;
+                    case UpdateGuildMessage.UpdateType.SetOptionId1:
+                        guild.optionId1 = message.optionId;
+                        ServerGuildHandlers.SetGuild(message.id, guild);
+                        ServerGameMessageHandlers.SendSetGuildOptionId1ToMembers(guild);
+                        break;
+                    case UpdateGuildMessage.UpdateType.SetOptionId2:
+                        guild.optionId2 = message.optionId;
+                        ServerGuildHandlers.SetGuild(message.id, guild);
+                        ServerGameMessageHandlers.SendSetGuildOptionId2ToMembers(guild);
+                        break;
+                    case UpdateGuildMessage.UpdateType.SetOptionId3:
+                        guild.optionId3 = message.optionId;
+                        ServerGuildHandlers.SetGuild(message.id, guild);
+                        ServerGameMessageHandlers.SendSetGuildOptionId3ToMembers(guild);
+                        break;
+                    case UpdateGuildMessage.UpdateType.SetOptionId4:
+                        guild.optionId4 = message.optionId;
+                        ServerGuildHandlers.SetGuild(message.id, guild);
+                        ServerGameMessageHandlers.SendSetGuildOptionId4ToMembers(guild);
+                        break;
+                    case UpdateGuildMessage.UpdateType.SetOptionId5:
+                        guild.optionId5 = message.optionId;
+                        ServerGuildHandlers.SetGuild(message.id, guild);
+                        ServerGameMessageHandlers.SendSetGuildOptionId5ToMembers(guild);
+                        break;
+                    case UpdateGuildMessage.UpdateType.SetAutoAcceptRequests:
+                        guild.autoAcceptRequests = message.autoAcceptRequests;
+                        ServerGuildHandlers.SetGuild(message.id, guild);
+                        ServerGameMessageHandlers.SendSetGuildAutoAcceptRequestsToMembers(guild);
+                        break;
+                    case UpdateGuildMessage.UpdateType.SetRank:
+                        guild.rank = message.rank;
+                        ServerGuildHandlers.SetGuild(message.id, guild);
+                        ServerGameMessageHandlers.SendSetGuildRankToMembers(guild);
                         break;
                     case UpdateGuildMessage.UpdateType.LevelExpSkillPoint:
                         guild.level = message.level;

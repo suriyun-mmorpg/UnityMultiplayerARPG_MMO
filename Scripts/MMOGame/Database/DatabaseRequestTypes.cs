@@ -61,5 +61,14 @@
         public const ushort RequestGetMail = 57;
         public const ushort RequestGetIdByCharacterName = 58;
         public const ushort RequestGetUserIdByCharacterName = 59;
+        public const ushort RequestUpdateGuildMessage2 = 60;
+        public const ushort RequestUpdateGuildScore = 61;
+        public const ushort RequestUpdateGuildOptionId1 = 62;
+        public const ushort RequestUpdateGuildOptionId2 = 63;
+        public const ushort RequestUpdateGuildOptionId3 = 64;
+        public const ushort RequestUpdateGuildOptionId4 = 65;
+        public const ushort RequestUpdateGuildOptionId5 = 66;
+        public const ushort RequestUpdateGuildAutoAcceptRequests = 67;
+        public const ushort RequestUpdateGuildRank = 68;
     }
 }
