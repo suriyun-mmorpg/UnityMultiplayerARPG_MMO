@@ -1376,6 +1376,16 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
+        protected async UniTaskVoid GetMailNotificationCount(RequestHandlerData requestHandler, GetMailNotificationCountReq request, RequestProceedResultDelegate<GetMailNotificationCountResp> result)
+        {
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            result.Invoke(AckResponseCode.Success, new GetMailNotificationCountResp()
+            {
+                NotificationCount = await Database.GetMailNotificationCount(request.UserId),
+            });
+#endif
+        }
+
         protected async UniTaskVoid GetIdByCharacterName(RequestHandlerData requestHandler, GetIdByCharacterNameReq request, RequestProceedResultDelegate<GetIdByCharacterNameResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD

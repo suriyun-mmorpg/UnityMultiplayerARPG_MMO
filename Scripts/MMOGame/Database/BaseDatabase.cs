@@ -94,6 +94,7 @@ namespace MultiplayerARPG.MMO
         public abstract UniTask<long> UpdateClaimMailItemsState(string mailId, string userId);
         public abstract UniTask<long> UpdateDeleteMailState(string mailId, string userId);
         public abstract UniTask<int> CreateMail(Mail mail);
+        public abstract UniTask<int> GetMailNotificationCount(string userId);
 #endif
     }
 }

@@ -532,5 +532,13 @@ namespace MultiplayerARPG.MMO
                 return new GetUserIdByCharacterNameResp();
             return result.Response;
         }
+
+        public async UniTask<GetMailNotificationCountResp> GetMailsCountAsync(GetMailNotificationCountReq request)
+        {
+            var result = await Client.SendRequestAsync<GetMailNotificationCountReq, GetMailNotificationCountResp>(DatabaseRequestTypes.RequestGetMailNotificationCount, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new GetMailNotificationCountResp();
+            return result.Response;
+        }
     }
 }

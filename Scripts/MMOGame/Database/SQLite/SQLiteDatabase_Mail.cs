@@ -141,6 +141,29 @@ namespace MultiplayerARPG.MMO
                     new SqliteParameter("@currencies", mail.WriteCurrencies()),
                     new SqliteParameter("@items", mail.WriteItems()));
         }
+
+        public override async UniTask<int> GetMailNotificationCount(string userId)
+        {
+            await UniTask.Yield();
+            int count = 0;
+            ExecuteReader((reader) =>
+            {
+                while (reader.Read())
+                {
+                    int gold = reader.GetInt32(0);
+                    string currencies = reader.GetString(1);
+                    string items = reader.GetString(2);
+                    bool isRead = reader.GetBoolean(3);
+                    bool isClaim = reader.GetBoolean(4);
+                    if (!isClaim && (gold != 0 || !string.IsNullOrEmpty(currencies) || !string.IsNullOrEmpty(items)))
+                        count++;
+                    else if (!isRead)
+                        count++;
+                }
+            }, "SELECT gold, currencies, items, isRead, isClaim FROM mail WHERE receiverId=@receiverId AND isDelete=0",
+                new SqliteParameter("@receiverId", userId));
+            return count;
+        }
     }
 }
 #endif

@@ -252,8 +252,25 @@ namespace MultiplayerARPG.MMO
         public async UniTaskVoid HandleRequestMailNotification(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<ResponseMailNotificationMessage> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            result.Invoke(AckResponseCode.Unimplemented, new ResponseMailNotificationMessage());
-            await UniTask.Yield();
+            string userId;
+            if (GameInstance.ServerUserHandlers.TryGetUserId(requestHandler.ConnectionId, out userId))
+            {
+                GetMailNotificationCountResp resp = await DbServiceClient.GetMailsCountAsync(new GetMailNotificationCountReq()
+                {
+                    UserId = userId,
+                });
+                result.Invoke(AckResponseCode.Success, new ResponseMailNotificationMessage()
+                {
+                    notificationCount = resp.NotificationCount
+                });
+            }
+            else
+            {
+                result.Invoke(AckResponseCode.Error, new ResponseMailNotificationMessage()
+                {
+                    message = UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE,
+                });
+            }
 #endif
         }
     }

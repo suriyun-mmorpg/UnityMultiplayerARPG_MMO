@@ -70,5 +70,6 @@
         public const ushort RequestUpdateGuildOptionId5 = 66;
         public const ushort RequestUpdateGuildAutoAcceptRequests = 67;
         public const ushort RequestUpdateGuildRank = 68;
+        public const ushort RequestGetMailNotificationCount = 69;
     }
 }

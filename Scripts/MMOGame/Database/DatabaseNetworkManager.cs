@@ -128,6 +128,7 @@ namespace MultiplayerARPG.MMO
             RegisterRequestToServer<UpdateDeleteMailStateReq, UpdateDeleteMailStateResp>(DatabaseRequestTypes.RequestUpdateDeleteMailState, UpdateDeleteMailState);
             RegisterRequestToServer<SendMailReq, SendMailResp>(DatabaseRequestTypes.RequestSendMail, SendMail);
             RegisterRequestToServer<GetMailReq, GetMailResp>(DatabaseRequestTypes.RequestGetMail, GetMail);
+            RegisterRequestToServer<GetMailNotificationCountReq, GetMailNotificationCountResp>(DatabaseRequestTypes.RequestGetMailNotificationCount, GetMailNotificationCount);
             RegisterRequestToServer<GetIdByCharacterNameReq, GetIdByCharacterNameResp>(DatabaseRequestTypes.RequestGetIdByCharacterName, GetIdByCharacterName);
             RegisterRequestToServer<GetUserIdByCharacterNameReq, GetUserIdByCharacterNameResp>(DatabaseRequestTypes.RequestGetUserIdByCharacterName, GetUserIdByCharacterName);
             this.InvokeInstanceDevExtMethods("RegisterMessages");
