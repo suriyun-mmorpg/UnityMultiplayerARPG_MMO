@@ -252,12 +252,12 @@ namespace MultiplayerARPG.MMO
         public async UniTaskVoid HandleRequestMailNotification(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<ResponseMailNotificationMessage> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            string userId;
-            if (GameInstance.ServerUserHandlers.TryGetUserId(requestHandler.ConnectionId, out userId))
+            IPlayerCharacterData playerCharacter;
+            if (GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 GetMailNotificationCountResp resp = await DbServiceClient.GetMailsCountAsync(new GetMailNotificationCountReq()
                 {
-                    UserId = userId,
+                    UserId = playerCharacter.UserId,
                 });
                 result.Invoke(AckResponseCode.Success, new ResponseMailNotificationMessage()
                 {
