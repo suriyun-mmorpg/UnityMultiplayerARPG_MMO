@@ -346,6 +346,7 @@ namespace MultiplayerARPG.MMO
                 await SaveCharacterRoutine(saveCharacterData, playerCharacterEntity.UserId);
             }
             UnregisterPlayerCharacter(connectionId);
+            UnregisterUserId(connectionId);
             base.OnPeerDisconnected(connectionId, disconnectInfo);
         }
 #endif
@@ -452,6 +453,7 @@ namespace MultiplayerARPG.MMO
                 return false;
             }
 
+            RegisterUserId(connectionId, userId);
             SetPlayerReadyRoutine(connectionId, userId, selectCharacterId).Forget();
             return true;
         }
