@@ -264,6 +264,7 @@ namespace MultiplayerARPG.MMO
               exp INTEGER NOT NULL DEFAULT 0,
               skillPoint INTEGER NOT NULL DEFAULT 0,
               guildMessage TEXT NOT NULL DEFAULT '',
+              guildMessage2 TEXT NOT NULL DEFAULT '',
               gold INTEGER NOT NULL DEFAULT 0,
               score INTEGER NOT NULL DEFAULT 0,
               optionId1 INTEGER NOT NULL DEFAULT 0,
@@ -415,6 +416,9 @@ namespace MultiplayerARPG.MMO
 
             if (!IsColumnExist("characters", "lastDeadTime"))
                 ExecuteNonQuery("ALTER TABLE characters ADD lastDeadTime INTEGER NOT NULL DEFAULT 0;");
+
+            if (!IsColumnExist("guild", "guildMessage2"))
+                ExecuteNonQuery("ALTER TABLE guild ADD guildMessage2 TEXT NOT NULL DEFAULT '';");
 
             if (!IsColumnExist("guild", "gold"))
                 ExecuteNonQuery("ALTER TABLE guild ADD gold INTEGER NOT NULL DEFAULT 0;");
