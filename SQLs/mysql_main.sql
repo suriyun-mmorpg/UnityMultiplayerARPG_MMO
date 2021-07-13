@@ -266,6 +266,7 @@ CREATE TABLE `guild` (
   `exp` int NOT NULL DEFAULT '0',
   `skillPoint` int NOT NULL DEFAULT '0',
   `guildMessage` varchar(160) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  `guildMessage2` varchar(160) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
   `gold` int NOT NULL DEFAULT '0',
   `score` int NOT NULL DEFAULT '0',
   `optionId1` int NOT NULL DEFAULT '0',
