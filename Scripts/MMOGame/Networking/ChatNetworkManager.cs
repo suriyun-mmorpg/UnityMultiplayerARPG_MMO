@@ -247,16 +247,16 @@ namespace MultiplayerARPG.MMO
                 switch (message.type)
                 {
                     case UpdateUserCharacterMessage.UpdateType.Add:
-                        if (!mapUsersById.ContainsKey(message.data.id))
+                        if (!mapUsersById.ContainsKey(message.character.id))
                         {
-                            mapUsersById[message.data.id] = message.data;
-                            connectionIdsByCharacterId[message.data.id] = connectionId;
-                            connectionIdsByCharacterName[message.data.characterName] = connectionId;
-                            UpdateMapUser(UpdateUserCharacterMessage.UpdateType.Add, message.data, connectionId);
+                            mapUsersById[message.character.id] = message.character;
+                            connectionIdsByCharacterId[message.character.id] = connectionId;
+                            connectionIdsByCharacterName[message.character.characterName] = connectionId;
+                            UpdateMapUser(UpdateUserCharacterMessage.UpdateType.Add, message.character, connectionId);
                         }
                         break;
                     case UpdateUserCharacterMessage.UpdateType.Remove:
-                        if (mapUsersById.TryGetValue(message.data.id, out userData))
+                        if (mapUsersById.TryGetValue(message.character.id, out userData))
                         {
                             mapUsersById.Remove(userData.id);
                             connectionIdsByCharacterId.Remove(userData.id);
@@ -265,10 +265,10 @@ namespace MultiplayerARPG.MMO
                         }
                         break;
                     case UpdateUserCharacterMessage.UpdateType.Online:
-                        if (mapUsersById.ContainsKey(message.data.id))
+                        if (mapUsersById.ContainsKey(message.character.id))
                         {
-                            mapUsersById[message.data.id] = message.data;
-                            UpdateMapUser(UpdateUserCharacterMessage.UpdateType.Online, message.data, connectionId);
+                            mapUsersById[message.character.id] = message.character;
+                            UpdateMapUser(UpdateUserCharacterMessage.UpdateType.Online, message.character, connectionId);
                         }
                         break;
                 }
@@ -346,7 +346,7 @@ namespace MultiplayerARPG.MMO
         {
             UpdateUserCharacterMessage updateMapUserMessage = new UpdateUserCharacterMessage();
             updateMapUserMessage.type = updateType;
-            updateMapUserMessage.data = userData;
+            updateMapUserMessage.character = userData;
             ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.UpdateMapUser, updateMapUserMessage);
         }
     }
