@@ -52,7 +52,7 @@ namespace MultiplayerARPG.MMO
                     result.autoAcceptRequests = reader.GetBoolean(14);
                     result.rank = reader.GetInt32(15);
                 }
-            }, "SELECT guildName, leaderId, level, exp, skillPoint, guildMessage, guildMessage2, gold, score, optionId1, optionId2, optionId3, optionId4, optionId5, autoAcceptRequests, rank FROM guild WHERE id=@id LIMIT 1",
+            }, "SELECT `guildName`, `leaderId`, `level`, `exp`, `skillPoint`, `guildMessage`, `guildMessage2`, `gold`, `score`, `optionId1`, `optionId2`, `optionId3`, `optionId4`, `optionId5`, `autoAcceptRequests`, `rank` FROM guild WHERE id=@id LIMIT 1",
                 new SqliteParameter("@id", id));
             if (result != null)
             {
