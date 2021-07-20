@@ -320,7 +320,7 @@ namespace MultiplayerARPG.MMO
             MailListResp resp = await DbServiceClient.MailListAsync(new MailListReq()
             {
                 UserId = userId,
-                OnlyNewMails = true,
+                OnlyNewMails = false,
             });
             List<UniTask<UITextKeys>> tasks = new List<UniTask<UITextKeys>>();
             foreach (MailListEntry entry in resp.List)
