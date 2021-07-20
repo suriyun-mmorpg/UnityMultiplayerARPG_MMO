@@ -18,12 +18,12 @@ namespace MultiplayerARPG.MMO
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             List<MailListEntry> mails = new List<MailListEntry>();
-            IPlayerCharacterData playerCharacter;
-            if (GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            string userId;
+            if (GameInstance.ServerUserHandlers.TryGetUserId(requestHandler.ConnectionId, out userId))
             {
                 MailListResp resp = await DbServiceClient.MailListAsync(new MailListReq()
                 {
-                    UserId = playerCharacter.UserId,
+                    UserId = userId,
                     OnlyNewMails = request.onlyNewMails,
                 });
                 mails.AddRange(resp.List);
@@ -39,13 +39,13 @@ namespace MultiplayerARPG.MMO
         public async UniTaskVoid HandleRequestReadMail(RequestHandlerData requestHandler, RequestReadMailMessage request, RequestProceedResultDelegate<ResponseReadMailMessage> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            IPlayerCharacterData playerCharacter;
-            if (GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            string userId;
+            if (GameInstance.ServerUserHandlers.TryGetUserId(requestHandler.ConnectionId, out userId))
             {
                 UpdateReadMailStateResp resp = await DbServiceClient.UpdateReadMailStateAsync(new UpdateReadMailStateReq()
                 {
                     MailId = request.id,
-                    UserId = playerCharacter.UserId,
+                    UserId = userId,
                 });
                 UITextKeys message = resp.Error;
                 result.Invoke(
@@ -66,120 +66,130 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
+        private async UniTask<UITextKeys> ClaimMailItems(string mailId, IPlayerCharacterData playerCharacter)
+        {
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            GetMailResp mailResp = await DbServiceClient.GetMailAsync(new GetMailReq()
+            {
+                MailId = mailId,
+                UserId = playerCharacter.UserId,
+            });
+            Mail mail = mailResp.Mail;
+            if (mail.IsClaim)
+            {
+                return UITextKeys.UI_ERROR_MAIL_CLAIM_ALREADY_CLAIMED;
+            }
+            else if (mail.IsDelete)
+            {
+                return UITextKeys.UI_ERROR_MAIL_CLAIM_NOT_ALLOWED;
+            }
+            else
+            {
+                if (mail.Items.Count > 0)
+                {
+                    List<CharacterItem> increasingItems = new List<CharacterItem>();
+                    foreach (KeyValuePair<int, short> mailItem in mail.Items)
+                    {
+                        increasingItems.Add(CharacterItem.Create(mailItem.Key, amount: mailItem.Value));
+                    }
+                    if (playerCharacter.IncreasingItemsWillOverwhelming(increasingItems))
+                        return UITextKeys.UI_ERROR_WILL_OVERWHELMING;
+                    else
+                        playerCharacter.IncreaseItems(increasingItems);
+                }
+                if (mail.Currencies.Count > 0)
+                {
+                    List<CurrencyAmount> increasingCurrencies = new List<CurrencyAmount>();
+                    Currency tempCurrency;
+                    foreach (KeyValuePair<int, int> mailCurrency in mail.Currencies)
+                    {
+                        if (!GameInstance.Currencies.TryGetValue(mailCurrency.Key, out tempCurrency))
+                            continue;
+                        increasingCurrencies.Add(new CurrencyAmount()
+                        {
+                            currency = tempCurrency,
+                            amount = mailCurrency.Value
+                        });
+                    }
+                    playerCharacter.IncreaseCurrencies(increasingCurrencies);
+                }
+                if (mail.Gold > 0)
+                {
+                    playerCharacter.Gold = playerCharacter.Gold.Increase(mail.Gold);
+                }
+            }
+            UpdateClaimMailItemsStateResp resp = await DbServiceClient.UpdateClaimMailItemsStateAsync(new UpdateClaimMailItemsStateReq()
+            {
+                MailId = mailId,
+                UserId = playerCharacter.UserId,
+            });
+            return UITextKeys.NONE;
+#else
+            return UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE;
+#endif
+        }
+
         public async UniTaskVoid HandleRequestClaimMailItems(RequestHandlerData requestHandler, RequestClaimMailItemsMessage request, RequestProceedResultDelegate<ResponseClaimMailItemsMessage> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             IPlayerCharacterData playerCharacter;
-            if (GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
-            {
-                UITextKeys message = UITextKeys.NONE;
-                GetMailResp mailResp = await DbServiceClient.GetMailAsync(new GetMailReq()
-                {
-                    MailId = request.id,
-                    UserId = playerCharacter.UserId,
-                });
-                Mail mail = mailResp.Mail;
-                if (mail.IsClaim)
-                {
-                    message = UITextKeys.UI_ERROR_MAIL_CLAIM_ALREADY_CLAIMED;
-                }
-                else if (mail.IsDelete)
-                {
-                    message = UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE;
-                }
-                else
-                {
-                    if (mail.Items.Count > 0)
-                    {
-                        List<CharacterItem> increasingItems = new List<CharacterItem>();
-                        foreach (KeyValuePair<int, short> mailItem in mail.Items)
-                        {
-                            increasingItems.Add(CharacterItem.Create(mailItem.Key, amount: mailItem.Value));
-                        }
-                        if (playerCharacter.IncreasingItemsWillOverwhelming(increasingItems))
-                            message = UITextKeys.UI_ERROR_WILL_OVERWHELMING;
-                        else
-                            playerCharacter.IncreaseItems(increasingItems);
-                    }
-                    if (message == UITextKeys.NONE && mail.Currencies.Count > 0)
-                    {
-                        List<CurrencyAmount> increasingCurrencies = new List<CurrencyAmount>();
-                        Currency tempCurrency;
-                        foreach (KeyValuePair<int, int> mailCurrency in mail.Currencies)
-                        {
-                            if (!GameInstance.Currencies.TryGetValue(mailCurrency.Key, out tempCurrency))
-                                continue;
-                            increasingCurrencies.Add(new CurrencyAmount()
-                            {
-                                currency = tempCurrency,
-                                amount = mailCurrency.Value
-                            });
-                        }
-                        playerCharacter.IncreaseCurrencies(increasingCurrencies);
-                    }
-                    if (message == UITextKeys.NONE && mail.Gold > 0)
-                    {
-                        playerCharacter.Gold = playerCharacter.Gold.Increase(mail.Gold);
-                    }
-                }
-                if (message != UITextKeys.NONE)
-                {
-                    result.Invoke(AckResponseCode.Error, new ResponseClaimMailItemsMessage()
-                    {
-                        message = message,
-                    });
-                    return;
-                }
-                UpdateClaimMailItemsStateResp resp = await DbServiceClient.UpdateClaimMailItemsStateAsync(new UpdateClaimMailItemsStateReq()
-                {
-                    MailId = request.id,
-                    UserId = playerCharacter.UserId,
-                });
-                message = resp.Error;
-                result.Invoke(
-                    message == UITextKeys.NONE ? AckResponseCode.Success : AckResponseCode.Error,
-                    new ResponseClaimMailItemsMessage()
-                    {
-                        message = message,
-                        mail = resp.Mail,
-                    });
-            }
-            else
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 result.Invoke(AckResponseCode.Error, new ResponseClaimMailItemsMessage()
                 {
-                    message = UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE,
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
+                return;
             }
+            UITextKeys message = await ClaimMailItems(request.id, playerCharacter);
+            if (message != UITextKeys.NONE)
+            {
+                result.Invoke(AckResponseCode.Error, new ResponseClaimMailItemsMessage()
+                {
+                    message = message,
+                });
+                return;
+            }
+            result.Invoke(AckResponseCode.Success, new ResponseClaimMailItemsMessage());
+#endif
+        }
+
+        private async UniTask<UITextKeys> DeleteMail(string mailId, string userId)
+        {
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            UpdateDeleteMailStateResp resp = await DbServiceClient.UpdateDeleteMailStateAsync(new UpdateDeleteMailStateReq()
+            {
+                MailId = mailId,
+                UserId = userId,
+            });
+            return resp.Error;
+#else
+            return UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE;
 #endif
         }
 
         public async UniTaskVoid HandleRequestDeleteMail(RequestHandlerData requestHandler, RequestDeleteMailMessage request, RequestProceedResultDelegate<ResponseDeleteMailMessage> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            IPlayerCharacterData playerCharacter;
-            if (GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
-            {
-                UpdateDeleteMailStateResp resp = await DbServiceClient.UpdateDeleteMailStateAsync(new UpdateDeleteMailStateReq()
-                {
-                    MailId = request.id,
-                    UserId = playerCharacter.UserId,
-                });
-                UITextKeys message = resp.Error;
-                result.Invoke(
-                    message == UITextKeys.NONE ? AckResponseCode.Success : AckResponseCode.Error,
-                    new ResponseDeleteMailMessage()
-                    {
-                        message = message,
-                    });
-            }
-            else
+            string userId;
+            if (!GameInstance.ServerUserHandlers.TryGetUserId(requestHandler.ConnectionId, out userId))
             {
                 result.Invoke(AckResponseCode.Error, new ResponseDeleteMailMessage()
                 {
-                    message = UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE,
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
+                return;
             }
+            UITextKeys message = await DeleteMail(request.id, userId);
+            if (message != UITextKeys.NONE)
+            {
+                result.Invoke(AckResponseCode.Error, new ResponseDeleteMailMessage()
+                {
+                    message = message,
+                });
+                return;
+            }
+            result.Invoke(AckResponseCode.Success, new ResponseDeleteMailMessage());
 #endif
         }
 
@@ -252,6 +262,7 @@ namespace MultiplayerARPG.MMO
         public async UniTaskVoid HandleRequestMailNotification(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<ResponseMailNotificationMessage> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
+            int notificationCount = 0;
             string userId;
             if (GameInstance.ServerUserHandlers.TryGetUserId(requestHandler.ConnectionId, out userId))
             {
@@ -259,18 +270,65 @@ namespace MultiplayerARPG.MMO
                 {
                     UserId = userId,
                 });
-                result.Invoke(AckResponseCode.Success, new ResponseMailNotificationMessage()
-                {
-                    notificationCount = resp.NotificationCount
-                });
+                notificationCount = resp.NotificationCount;
             }
-            else
+            result.Invoke(AckResponseCode.Success, new ResponseMailNotificationMessage()
             {
-                result.Invoke(AckResponseCode.Error, new ResponseMailNotificationMessage()
+                notificationCount = notificationCount,
+            });
+#endif
+        }
+
+        public async UniTaskVoid HandleRequestClaimAllMailsItems(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<ResponseClaimAllMailsItemsMessage> result)
+        {
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            IPlayerCharacterData playerCharacter;
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            {
+                result.Invoke(AckResponseCode.Error, new ResponseClaimAllMailsItemsMessage()
                 {
-                    message = UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE,
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                });
+                return;
+            }
+            MailListResp resp = await DbServiceClient.MailListAsync(new MailListReq()
+            {
+                UserId = playerCharacter.UserId,
+                OnlyNewMails = true,
+            });
+            List<UniTask<UITextKeys>> tasks = new List<UniTask<UITextKeys>>();
+            foreach (MailListEntry entry in resp.List)
+            {
+                tasks.Add(ClaimMailItems(entry.Id, playerCharacter));
+            }
+            await UniTask.WhenAll(tasks);
+            result.Invoke(AckResponseCode.Success, new ResponseClaimAllMailsItemsMessage());
+#endif
+        }
+
+        public async UniTaskVoid HandleRequestDeleteAllMails(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<ResponseDeleteAllMailsMessage> result)
+        {
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            string userId;
+            if (!GameInstance.ServerUserHandlers.TryGetUserId(requestHandler.ConnectionId, out userId))
+            {
+                result.Invoke(AckResponseCode.Error, new ResponseDeleteAllMailsMessage()
+                {
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
             }
+            MailListResp resp = await DbServiceClient.MailListAsync(new MailListReq()
+            {
+                UserId = userId,
+                OnlyNewMails = true,
+            });
+            List<UniTask<UITextKeys>> tasks = new List<UniTask<UITextKeys>>();
+            foreach (MailListEntry entry in resp.List)
+            {
+                tasks.Add(DeleteMail(entry.Id, userId));
+            }
+            await UniTask.WhenAll(tasks);
+            result.Invoke(AckResponseCode.Success, new ResponseDeleteAllMailsMessage());
 #endif
         }
     }
