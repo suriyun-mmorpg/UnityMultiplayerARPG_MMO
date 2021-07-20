@@ -411,7 +411,8 @@ INSERT INTO `__migrations` (`migrationId`) VALUES
 ('1.61b'),
 ('1.62e'),
 ('1.63b'),
-('1.65d');
+('1.65d'),
+('1.67');
 
 --
 -- Indexes for dumped tables
