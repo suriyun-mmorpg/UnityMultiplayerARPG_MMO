@@ -309,6 +309,7 @@ namespace MultiplayerARPG.MMO
               title TEXT NOT NULL,
               content TEXT NOT NULL,
               gold INTEGER NOT NULL DEFAULT 0,
+              cash INTEGER NOT NULL DEFAULT 0,
               currencies TEXT NOT NULL,
               items TEXT NOT NULL,
               isRead INTEGER NOT NULL DEFAULT 0,
@@ -452,6 +453,9 @@ namespace MultiplayerARPG.MMO
 
             if (!IsColumnExist("guild", "maxMembers"))
                 ExecuteNonQuery("ALTER TABLE guild ADD maxMembers INTEGER NOT NULL DEFAULT 0;");
+
+            if (!IsColumnExist("mail", "cash"))
+                ExecuteNonQuery("ALTER TABLE mail ADD cash INTEGER NOT NULL DEFAULT 0;");
 
             if (!IsColumnExist("mail", "isClaim"))
                 ExecuteNonQuery("ALTER TABLE mail ADD isClaim INTEGER NOT NULL DEFAULT 0;");

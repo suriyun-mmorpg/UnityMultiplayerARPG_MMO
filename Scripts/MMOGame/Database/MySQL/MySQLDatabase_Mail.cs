@@ -17,20 +17,21 @@ namespace MultiplayerARPG.MMO
                 while (reader.Read())
                 {
                     int gold = reader.GetInt32(3);
-                    string currencies = reader.GetString(4);
-                    string items = reader.GetString(5);
+                    int cash = reader.GetInt32(4);
+                    string currencies = reader.GetString(5);
+                    string items = reader.GetString(6);
                     tempMail = new MailListEntry()
                     {
                         Id = reader.GetInt64(0).ToString(),
                         SenderName = reader.GetString(1),
                         Title = reader.GetString(2),
-                        IsRead = reader.GetBoolean(6),
-                        IsClaim = reader.GetBoolean(7),
-                        SentTimestamp = (int)((DateTimeOffset)reader.GetDateTime(8)).ToUnixTimeSeconds(),
+                        IsRead = reader.GetBoolean(7),
+                        IsClaim = reader.GetBoolean(8),
+                        SentTimestamp = (int)((DateTimeOffset)reader.GetDateTime(9)).ToUnixTimeSeconds(),
                     };
                     if (onlyNewMails)
                     {
-                        if (!tempMail.IsClaim && (gold != 0 || !string.IsNullOrEmpty(currencies) || !string.IsNullOrEmpty(items)))
+                        if (!tempMail.IsClaim && (gold != 0 || cash != 0 || !string.IsNullOrEmpty(currencies) || !string.IsNullOrEmpty(items)))
                             result.Add(tempMail);
                         else if (!tempMail.IsRead)
                             result.Add(tempMail);
@@ -40,7 +41,7 @@ namespace MultiplayerARPG.MMO
                         result.Add(tempMail);
                     }
                 }
-            }, "SELECT id, senderName, title, gold, currencies, items, isRead, isClaim, sentTimestamp FROM mail WHERE receiverId=@receiverId AND isDelete=0 ORDER BY isRead ASC, sentTimestamp DESC",
+            }, "SELECT id, senderName, title, gold, cash, currencies, items, isRead, isClaim, sentTimestamp FROM mail WHERE receiverId=@receiverId AND isDelete=0 ORDER BY isRead ASC, sentTimestamp DESC",
                 new MySqlParameter("@receiverId", userId));
             return result;
         }
@@ -52,7 +53,7 @@ namespace MultiplayerARPG.MMO
             {
                 if (reader.Read())
                 {
-                    result.Id = reader.GetInt64(0).ToString();
+                    result.Id = reader.GetInt32(0).ToString();
                     result.EventId = reader.GetString(1);
                     result.SenderId = reader.GetString(2);
                     result.SenderName = reader.GetString(3);
@@ -60,17 +61,18 @@ namespace MultiplayerARPG.MMO
                     result.Title = reader.GetString(5);
                     result.Content = reader.GetString(6);
                     result.Gold = reader.GetInt32(7);
-                    result.ReadCurrencies(reader.GetString(8));
-                    result.ReadItems(reader.GetString(9));
-                    result.IsRead = reader.GetBoolean(10);
-                    if (reader[11] != DBNull.Value)
-                        result.ReadTimestamp = (int)((DateTimeOffset)reader.GetDateTime(11)).ToUnixTimeSeconds();
-                    result.IsClaim = reader.GetBoolean(12);
-                    if (reader[13] != DBNull.Value)
-                        result.ClaimTimestamp = (int)((DateTimeOffset)reader.GetDateTime(13)).ToUnixTimeSeconds();
-                    result.SentTimestamp = (int)((DateTimeOffset)reader.GetDateTime(14)).ToUnixTimeSeconds();
+                    result.Cash = reader.GetInt32(8);
+                    result.ReadCurrencies(reader.GetString(9));
+                    result.ReadItems(reader.GetString(10));
+                    result.IsRead = reader.GetBoolean(11);
+                    if (reader[12] != DBNull.Value)
+                        result.ReadTimestamp = (int)((DateTimeOffset)reader.GetDateTime(12)).ToUnixTimeSeconds();
+                    result.IsClaim = reader.GetBoolean(13);
+                    if (reader[14] != DBNull.Value)
+                        result.ClaimTimestamp = (int)((DateTimeOffset)reader.GetDateTime(14)).ToUnixTimeSeconds();
+                    result.SentTimestamp = (int)((DateTimeOffset)reader.GetDateTime(15)).ToUnixTimeSeconds();
                 }
-            }, "SELECT id, eventId, senderId, senderName, receiverId, title, content, gold, currencies, items, isRead, readTimestamp, isClaim, claimTimestamp, sentTimestamp FROM mail WHERE id=@id AND receiverId=@receiverId AND isDelete=0",
+            }, "SELECT id, eventId, senderId, senderName, receiverId, title, content, gold, cash, currencies, items, isRead, readTimestamp, isClaim, claimTimestamp, sentTimestamp FROM mail WHERE id=@id AND receiverId=@receiverId AND isDelete=0",
                 new MySqlParameter("@id", mailId),
                 new MySqlParameter("@receiverId", userId));
             return result;
@@ -123,8 +125,8 @@ namespace MultiplayerARPG.MMO
 
         public override async UniTask<int> CreateMail(Mail mail)
         {
-            return await ExecuteNonQuery("INSERT INTO mail (eventId, senderId, senderName, receiverId, title, content, gold, currencies, items) " +
-                "VALUES (@eventId, @senderId, @senderName, @receiverId, @title, @content, @gold, @currencies, @items)",
+            return await ExecuteNonQuery("INSERT INTO mail (eventId, senderId, senderName, receiverId, title, content, gold, cash, currencies, items) " +
+                "VALUES (@eventId, @senderId, @senderName, @receiverId, @title, @content, @gold, @cash, @currencies, @items)",
                     new MySqlParameter("@eventId", mail.EventId),
                     new MySqlParameter("@senderId", mail.SenderId),
                     new MySqlParameter("@senderName", mail.SenderName),
@@ -132,6 +134,7 @@ namespace MultiplayerARPG.MMO
                     new MySqlParameter("@title", mail.Title),
                     new MySqlParameter("@content", mail.Content),
                     new MySqlParameter("@gold", mail.Gold),
+                    new MySqlParameter("@cash", mail.Cash),
                     new MySqlParameter("@currencies", mail.WriteCurrencies()),
                     new MySqlParameter("@items", mail.WriteItems()));
         }
@@ -144,16 +147,17 @@ namespace MultiplayerARPG.MMO
                 while (reader.Read())
                 {
                     int gold = reader.GetInt32(0);
-                    string currencies = reader.GetString(1);
-                    string items = reader.GetString(2);
-                    bool isRead = reader.GetBoolean(3);
-                    bool isClaim = reader.GetBoolean(4);
+                    int cash = reader.GetInt32(1);
+                    string currencies = reader.GetString(2);
+                    string items = reader.GetString(3);
+                    bool isRead = reader.GetBoolean(4);
+                    bool isClaim = reader.GetBoolean(5);
                     if (!isClaim && (gold != 0 || !string.IsNullOrEmpty(currencies) || !string.IsNullOrEmpty(items)))
                         count++;
                     else if (!isRead)
                         count++;
                 }
-            }, "SELECT gold, currencies, items, isRead, isClaim FROM mail WHERE receiverId=@receiverId AND isDelete=0",
+            }, "SELECT gold, cash, currencies, items, isRead, isClaim FROM mail WHERE receiverId=@receiverId AND isDelete=0",
                 new MySqlParameter("@receiverId", userId));
             return count;
         }

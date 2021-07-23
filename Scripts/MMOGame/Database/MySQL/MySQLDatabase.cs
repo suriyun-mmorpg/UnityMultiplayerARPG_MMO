@@ -227,6 +227,16 @@ namespace MultiplayerARPG.MMO
                 await InsertMigrationId(migrationId);
                 Logging.Log("Migrated to 1.67");
             }
+            migrationId = "1.67b";
+            if (!await HasMigrationId(migrationId))
+            {
+                Logging.Log("Migrating up to 1.67b");
+                await ExecuteNonQuery("ALTER TABLE `mail` CHANGE `gold` `gold` INT(11) NOT NULL DEFAULT '0';");
+                await ExecuteNonQuery("ALTER TABLE `mail` ADD `cash` INT(11) NOT NULL DEFAULT '0' AFTER `gold`;");
+                // Insert migrate history
+                await InsertMigrationId(migrationId);
+                Logging.Log("Migrated to 1.67b");
+            }
         }
 
         private async UniTask<bool> HasMigrationId(string migrationId)

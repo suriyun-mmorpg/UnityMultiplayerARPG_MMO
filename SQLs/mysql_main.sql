@@ -321,7 +321,8 @@ CREATE TABLE `mail` (
   `receiverId` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   `title` varchar(160) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   `content` text CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `gold` int NOT NULL,
+  `gold` int NOT NULL DEFAULT '0',
+  `cash` int NOT NULL DEFAULT '0',
   `currencies` text CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   `items` text CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   `isRead` tinyint(1) NOT NULL DEFAULT '0',
@@ -412,7 +413,8 @@ INSERT INTO `__migrations` (`migrationId`) VALUES
 ('1.62e'),
 ('1.63b'),
 ('1.65d'),
-('1.67');
+('1.67'),
+('1.67b');
 
 --
 -- Indexes for dumped tables
