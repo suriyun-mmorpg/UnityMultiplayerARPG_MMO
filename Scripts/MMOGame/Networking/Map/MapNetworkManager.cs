@@ -903,30 +903,10 @@ namespace MultiplayerARPG.MMO
                         ServerGuildHandlers.SetGuild(message.id, guild);
                         ServerGameMessageHandlers.SendSetGuildScoreToMembers(guild);
                         break;
-                    case UpdateGuildMessage.UpdateType.SetOptionId1:
-                        guild.optionId1 = message.optionId;
+                    case UpdateGuildMessage.UpdateType.SetOptions:
+                        guild.options = message.options;
                         ServerGuildHandlers.SetGuild(message.id, guild);
-                        ServerGameMessageHandlers.SendSetGuildOptionId1ToMembers(guild);
-                        break;
-                    case UpdateGuildMessage.UpdateType.SetOptionId2:
-                        guild.optionId2 = message.optionId;
-                        ServerGuildHandlers.SetGuild(message.id, guild);
-                        ServerGameMessageHandlers.SendSetGuildOptionId2ToMembers(guild);
-                        break;
-                    case UpdateGuildMessage.UpdateType.SetOptionId3:
-                        guild.optionId3 = message.optionId;
-                        ServerGuildHandlers.SetGuild(message.id, guild);
-                        ServerGameMessageHandlers.SendSetGuildOptionId3ToMembers(guild);
-                        break;
-                    case UpdateGuildMessage.UpdateType.SetOptionId4:
-                        guild.optionId4 = message.optionId;
-                        ServerGuildHandlers.SetGuild(message.id, guild);
-                        ServerGameMessageHandlers.SendSetGuildOptionId4ToMembers(guild);
-                        break;
-                    case UpdateGuildMessage.UpdateType.SetOptionId5:
-                        guild.optionId5 = message.optionId;
-                        ServerGuildHandlers.SetGuild(message.id, guild);
-                        ServerGameMessageHandlers.SendSetGuildOptionId5ToMembers(guild);
+                        ServerGameMessageHandlers.SendSetGuildOptionsToMembers(guild);
                         break;
                     case UpdateGuildMessage.UpdateType.SetAutoAcceptRequests:
                         guild.autoAcceptRequests = message.autoAcceptRequests;

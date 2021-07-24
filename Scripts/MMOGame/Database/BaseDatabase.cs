@@ -69,11 +69,7 @@ namespace MultiplayerARPG.MMO
         public abstract UniTask UpdateGuildMessage(int id, string guildMessage);
         public abstract UniTask UpdateGuildMessage2(int id, string guildMessage);
         public abstract UniTask UpdateGuildScore(int id, int score);
-        public abstract UniTask UpdateGuildOptionId1(int id, int optionId);
-        public abstract UniTask UpdateGuildOptionId2(int id, int optionId);
-        public abstract UniTask UpdateGuildOptionId3(int id, int optionId);
-        public abstract UniTask UpdateGuildOptionId4(int id, int optionId);
-        public abstract UniTask UpdateGuildOptionId5(int id, int optionId);
+        public abstract UniTask UpdateGuildOptions(int id, string options);
         public abstract UniTask UpdateGuildAutoAcceptRequests(int id, bool autoAcceptRequests);
         public abstract UniTask UpdateGuildRank(int id, int rank);
         public abstract UniTask UpdateGuildRole(int id, byte guildRole, string name, bool canInvite, bool canKick, byte shareExpPercentage);

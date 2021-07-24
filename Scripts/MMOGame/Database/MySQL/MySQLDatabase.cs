@@ -233,6 +233,8 @@ namespace MultiplayerARPG.MMO
                 Logging.Log("Migrating up to 1.67b");
                 await ExecuteNonQuery("ALTER TABLE `mail` CHANGE `gold` `gold` INT(11) NOT NULL DEFAULT '0';");
                 await ExecuteNonQuery("ALTER TABLE `mail` ADD `cash` INT(11) NOT NULL DEFAULT '0' AFTER `gold`;");
+                await ExecuteNonQuery("ALTER TABLE `guild` DROP `optionId1`, DROP `optionId2`, DROP `optionId3`, DROP `optionId4`, DROP `optionId5`;");
+                await ExecuteNonQuery("ALTER TABLE `guild` ADD `options` TEXT CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL AFTER `score`;");
                 // Insert migrate history
                 await InsertMigrationId(migrationId);
                 Logging.Log("Migrated to 1.67b");

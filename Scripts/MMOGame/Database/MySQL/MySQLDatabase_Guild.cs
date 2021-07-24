@@ -42,15 +42,11 @@ namespace MultiplayerARPG.MMO
                     result.guildMessage2 = reader.GetString(6);
                     result.gold = reader.GetInt32(7);
                     result.score = reader.GetInt32(8);
-                    result.optionId1 = reader.GetInt32(9);
-                    result.optionId2 = reader.GetInt32(10);
-                    result.optionId3 = reader.GetInt32(11);
-                    result.optionId4 = reader.GetInt32(12);
-                    result.optionId5 = reader.GetInt32(13);
-                    result.autoAcceptRequests = reader.GetBoolean(14);
-                    result.rank = reader.GetInt32(15);
+                    result.options = reader.GetString(9);
+                    result.autoAcceptRequests = reader.GetBoolean(10);
+                    result.rank = reader.GetInt32(11);
                 }
-            }, "SELECT `guildName`, `leaderId`, `level`, `exp`, `skillPoint`, `guildMessage`, `guildMessage2`, `gold`, `score`, `optionId1`, `optionId2`, `optionId3`, `optionId4`, `optionId5`, `autoAcceptRequests`, `rank` FROM guild WHERE id=@id LIMIT 1",
+            }, "SELECT `guildName`, `leaderId`, `level`, `exp`, `skillPoint`, `guildMessage`, `guildMessage2`, `gold`, `score`, `options`, `autoAcceptRequests`, `rank` FROM guild WHERE id=@id LIMIT 1",
                 new MySqlParameter("@id", id));
             // Read relates data if guild exists
             if (result != null)
@@ -138,38 +134,10 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@id", id));
         }
 
-        public override async UniTask UpdateGuildOptionId1(int id, int optionId)
+        public override async UniTask UpdateGuildOptions(int id, string options)
         {
-            await ExecuteNonQuery("UPDATE guild SET optionId1=@optionId WHERE id=@id",
-                new MySqlParameter("@optionId", optionId),
-                new MySqlParameter("@id", id));
-        }
-
-        public override async UniTask UpdateGuildOptionId2(int id, int optionId)
-        {
-            await ExecuteNonQuery("UPDATE guild SET optionId2=@optionId WHERE id=@id",
-                new MySqlParameter("@optionId", optionId),
-                new MySqlParameter("@id", id));
-        }
-
-        public override async UniTask UpdateGuildOptionId3(int id, int optionId)
-        {
-            await ExecuteNonQuery("UPDATE guild SET optionId3=@optionId WHERE id=@id",
-                new MySqlParameter("@optionId", optionId),
-                new MySqlParameter("@id", id));
-        }
-
-        public override async UniTask UpdateGuildOptionId4(int id, int optionId)
-        {
-            await ExecuteNonQuery("UPDATE guild SET optionId4=@optionId WHERE id=@id",
-                new MySqlParameter("@optionId", optionId),
-                new MySqlParameter("@id", id));
-        }
-
-        public override async UniTask UpdateGuildOptionId5(int id, int optionId)
-        {
-            await ExecuteNonQuery("UPDATE guild SET optionId5=@optionId WHERE id=@id",
-                new MySqlParameter("@optionId", optionId),
+            await ExecuteNonQuery("UPDATE guild SET options=@options WHERE id=@id",
+                new MySqlParameter("@options", options),
                 new MySqlParameter("@id", id));
         }
 
