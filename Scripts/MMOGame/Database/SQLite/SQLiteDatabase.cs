@@ -267,11 +267,7 @@ namespace MultiplayerARPG.MMO
               guildMessage2 TEXT NOT NULL DEFAULT '',
               gold INTEGER NOT NULL DEFAULT 0,
               score INTEGER NOT NULL DEFAULT 0,
-              optionId1 INTEGER NOT NULL DEFAULT 0,
-              optionId2 INTEGER NOT NULL DEFAULT 0,
-              optionId3 INTEGER NOT NULL DEFAULT 0,
-              optionId4 INTEGER NOT NULL DEFAULT 0,
-              optionId5 INTEGER NOT NULL DEFAULT 0,
+              options TEXT NOT NULL DEFAULT '',
               autoAcceptRequests INTEGER NOT NULL DEFAULT 0,
               rank INTEGER NOT NULL DEFAULT 0,
               currentMembers INTEGER NOT NULL DEFAULT 0,
@@ -427,20 +423,8 @@ namespace MultiplayerARPG.MMO
             if (!IsColumnExist("guild", "score"))
                 ExecuteNonQuery("ALTER TABLE guild ADD score INTEGER NOT NULL DEFAULT 0;");
 
-            if (!IsColumnExist("guild", "optionId1"))
-                ExecuteNonQuery("ALTER TABLE guild ADD optionId1 INTEGER NOT NULL DEFAULT 0;");
-
-            if (!IsColumnExist("guild", "optionId2"))
-                ExecuteNonQuery("ALTER TABLE guild ADD optionId2 INTEGER NOT NULL DEFAULT 0;");
-
-            if (!IsColumnExist("guild", "optionId3"))
-                ExecuteNonQuery("ALTER TABLE guild ADD optionId3 INTEGER NOT NULL DEFAULT 0;");
-
-            if (!IsColumnExist("guild", "optionId4"))
-                ExecuteNonQuery("ALTER TABLE guild ADD optionId4 INTEGER NOT NULL DEFAULT 0;");
-
-            if (!IsColumnExist("guild", "optionId5"))
-                ExecuteNonQuery("ALTER TABLE guild ADD optionId5 INTEGER NOT NULL DEFAULT 0;");
+            if (!IsColumnExist("guild", "options"))
+                ExecuteNonQuery("ALTER TABLE guild ADD options TEXT NOT NULL DEFAULT '';");
 
             if (!IsColumnExist("guild", "autoAcceptRequests"))
                 ExecuteNonQuery("ALTER TABLE guild ADD autoAcceptRequests INTEGER NOT NULL DEFAULT 0;");
