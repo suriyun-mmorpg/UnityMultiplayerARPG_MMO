@@ -169,7 +169,7 @@ namespace MultiplayerARPG.MMO
                     if (GameInstance.ServerBuildingHandlers.TryGetBuilding(storageId.storageOwnerId, out buildingEntity))
                     {
                         objectId = buildingEntity.ObjectId;
-                        storage = buildingEntity.storage;
+                        storage = buildingEntity.Storage;
                     }
                     break;
             }
@@ -192,7 +192,7 @@ namespace MultiplayerARPG.MMO
                 case StorageType.Building:
                     StorageEntity buildingEntity;
                     if (!GameInstance.ServerBuildingHandlers.TryGetBuilding(storageId.storageOwnerId, out buildingEntity) ||
-                        !(buildingEntity.IsCreator(playerCharacter.Id) || buildingEntity.canUseByEveryone))
+                        !(buildingEntity.IsCreator(playerCharacter.Id) || buildingEntity.CanUseByEveryone))
                         return false;
                     break;
             }
