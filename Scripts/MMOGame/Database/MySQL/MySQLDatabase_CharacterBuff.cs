@@ -12,6 +12,7 @@ namespace MultiplayerARPG.MMO
             if (reader.Read())
             {
                 result = new CharacterBuff();
+                result.id = GenericUtils.GetUniqueId();
                 result.type = (BuffType)reader.GetByte(0);
                 result.dataId = reader.GetInt32(1);
                 result.level = reader.GetInt16(2);
