@@ -12,9 +12,9 @@ namespace MultiplayerARPG.MMO
     public partial class DatabaseNetworkManager : LiteNetLibManager.LiteNetLibManager
     {
         [SerializeField]
-        private BaseDatabase database;
+        private BaseDatabase database = null;
         [SerializeField]
-        private BaseDatabase[] databaseOptions;
+        private BaseDatabase[] databaseOptions = new BaseDatabase[0];
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
         public BaseDatabase Database { get { return database == null ? databaseOptions.FirstOrDefault() : database; } }

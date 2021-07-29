@@ -89,15 +89,15 @@ namespace MultiplayerARPG.MMO
 
         [Header("Server Components")]
         [SerializeField]
-        private CentralNetworkManager centralNetworkManager;
+        private CentralNetworkManager centralNetworkManager = null;
         [SerializeField]
-        private MapSpawnNetworkManager mapSpawnNetworkManager;
+        private MapSpawnNetworkManager mapSpawnNetworkManager = null;
         [SerializeField]
-        private MapNetworkManager mapNetworkManager;
+        private MapNetworkManager mapNetworkManager = null;
         [SerializeField]
-        private ChatNetworkManager chatNetworkManager;
+        private ChatNetworkManager chatNetworkManager = null;
         [SerializeField]
-        private DatabaseNetworkManager databaseNetworkManager;
+        private DatabaseNetworkManager databaseNetworkManager = null;
 
         [Header("Settings")]
         [SerializeField]

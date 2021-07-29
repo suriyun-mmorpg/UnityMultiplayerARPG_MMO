@@ -17,15 +17,15 @@ namespace MultiplayerARPG.MMO
 
         [Header("Client Components")]
         [SerializeField]
-        private CentralNetworkManager centralNetworkManager;
+        private CentralNetworkManager centralNetworkManager = null;
         [SerializeField]
-        private MapNetworkManager mapNetworkManager;
+        private MapNetworkManager mapNetworkManager = null;
 
         [Header("Settings")]
         [SerializeField]
         private bool useWebSocket = false;
         [SerializeField]
-        private MmoNetworkSetting[] networkSettings;
+        private MmoNetworkSetting[] networkSettings = new MmoNetworkSetting[0];
 
         public CentralNetworkManager CentralNetworkManager { get { return centralNetworkManager; } }
         public MapNetworkManager MapNetworkManager { get { return mapNetworkManager; } }
@@ -143,7 +143,7 @@ namespace MultiplayerARPG.MMO
 
         public void RequestUserLogin(string username, string password, ResponseDelegate<ResponseUserLoginMessage> callback)
         {
-            centralNetworkManager.RequestUserLogin(username, password, (responseHandler, responseCode, response) => OnRequestUserLogin(responseHandler, responseCode, response, callback));
+            centralNetworkManager.RequestUserLogin(username, password, (responseHandler, responseCode, response) => OnRequestUserLogin(responseHandler, responseCode, response, callback).Forget());
         }
 
         public void RequestUserRegister(string username, string password, ResponseDelegate<ResponseUserRegisterMessage> callback)
@@ -153,12 +153,12 @@ namespace MultiplayerARPG.MMO
 
         public void RequestUserLogout(ResponseDelegate<INetSerializable> callback)
         {
-            centralNetworkManager.RequestUserLogout((responseHandler, responseCode, response) => OnRequestUserLogout(responseHandler, responseCode, response, callback));
+            centralNetworkManager.RequestUserLogout((responseHandler, responseCode, response) => OnRequestUserLogout(responseHandler, responseCode, response, callback).Forget());
         }
 
         public void RequestValidateAccessToken(string userId, string accessToken, ResponseDelegate<ResponseValidateAccessTokenMessage> callback)
         {
-            centralNetworkManager.RequestValidateAccessToken(userId, accessToken, (responseHandler, responseCode, response) => OnRequestValidateAccessToken(responseHandler, responseCode, response, callback));
+            centralNetworkManager.RequestValidateAccessToken(userId, accessToken, (responseHandler, responseCode, response) => OnRequestValidateAccessToken(responseHandler, responseCode, response, callback).Forget());
         }
 
         public void RequestCharacters(ResponseDelegate<ResponseCharactersMessage> callback)
@@ -178,7 +178,7 @@ namespace MultiplayerARPG.MMO
 
         public void RequestSelectCharacter(string characterId, ResponseDelegate<ResponseSelectCharacterMessage> callback)
         {
-            centralNetworkManager.RequestSelectCharacter(characterId, (responseHandler, responseCode, response) => OnRequestSelectCharacter(responseHandler, responseCode, response, characterId, callback));
+            centralNetworkManager.RequestSelectCharacter(characterId, (responseHandler, responseCode, response) => OnRequestSelectCharacter(responseHandler, responseCode, response, characterId, callback).Forget());
         }
 
         private async UniTaskVoid OnRequestUserLogin(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseUserLoginMessage response, ResponseDelegate<ResponseUserLoginMessage> callback)
