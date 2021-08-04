@@ -19,8 +19,8 @@ namespace MultiplayerARPG.MMO
                 {
                     int gold = reader.GetInt32(3);
                     int cash = reader.GetInt32(4);
-                    string currencies = reader.GetString(4);
-                    string items = reader.GetString(5);
+                    string currencies = reader.GetString(5);
+                    string items = reader.GetString(6);
                     tempMail = new MailListEntry()
                     {
                         Id = reader.GetInt32(0).ToString(),
