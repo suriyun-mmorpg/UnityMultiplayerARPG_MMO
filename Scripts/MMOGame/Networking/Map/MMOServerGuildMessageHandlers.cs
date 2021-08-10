@@ -443,8 +443,8 @@ namespace MultiplayerARPG.MMO
             });
             // Broadcast via chat server
             if (ChatNetworkManager.IsClientConnected)
-                ChatNetworkManager.SendSetGuildMessage(null, MMOMessageTypes.UpdateGuild, validateResult.GuildId, request.message);
-            GameInstance.ServerGameMessageHandlers.SendSetGuildMessageToMembers(validateResult.Guild);
+                ChatNetworkManager.SendSetGuildMessage2(null, MMOMessageTypes.UpdateGuild, validateResult.GuildId, request.message);
+            GameInstance.ServerGameMessageHandlers.SendSetGuildMessage2ToMembers(validateResult.Guild);
             result.Invoke(AckResponseCode.Success, new ResponseChangeGuildMessageMessage());
 #endif
         }
