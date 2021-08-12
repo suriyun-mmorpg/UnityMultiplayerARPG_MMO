@@ -563,6 +563,10 @@ namespace MultiplayerARPG.MMO
                             ServerGameMessageHandlers.SendSetGuildData(playerCharacterEntity.ConnectionId, guild);
                             ServerGameMessageHandlers.SendAddGuildMembersToOne(playerCharacterEntity.ConnectionId, guild);
                             ServerGameMessageHandlers.SendSetGuildMessage(playerCharacterEntity.ConnectionId, guild);
+                            ServerGameMessageHandlers.SendSetGuildMessage2(playerCharacterEntity.ConnectionId, guild);
+                            ServerGameMessageHandlers.SendSetGuildRank(playerCharacterEntity.ConnectionId, guild);
+                            ServerGameMessageHandlers.SendSetGuildScore(playerCharacterEntity.ConnectionId, guild);
+                            ServerGameMessageHandlers.SendSetGuildOptions(playerCharacterEntity.ConnectionId, guild);
                             ServerGameMessageHandlers.SendSetGuildRolesToOne(playerCharacterEntity.ConnectionId, guild);
                             ServerGameMessageHandlers.SendSetGuildMemberRolesToOne(playerCharacterEntity.ConnectionId, guild);
                             ServerGameMessageHandlers.SendSetGuildSkillLevelsToOne(playerCharacterEntity.ConnectionId, guild);
