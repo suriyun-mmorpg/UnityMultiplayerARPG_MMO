@@ -14,8 +14,9 @@ namespace MultiplayerARPG.MMO
                 result = new CharacterQuest();
                 result.dataId = reader.GetInt32(0);
                 result.isComplete = reader.GetBoolean(1);
-                result.ReadKilledMonsters(reader.GetString(2));
-                result.ReadCompletedTasks(reader.GetString(3));
+                result.isTracking = reader.GetBoolean(2);
+                result.ReadKilledMonsters(reader.GetString(3));
+                result.ReadCompletedTasks(reader.GetString(4));
                 return true;
             }
             result = CharacterQuest.Empty;
@@ -24,12 +25,13 @@ namespace MultiplayerARPG.MMO
 
         public async UniTask CreateCharacterQuest(MySqlConnection connection, MySqlTransaction transaction, int idx, string characterId, CharacterQuest characterQuest)
         {
-            await ExecuteNonQuery(connection, transaction, "INSERT INTO characterquest (id, idx, characterId, dataId, isComplete, killedMonsters, completedTasks) VALUES (@id, @idx, @characterId, @dataId, @isComplete, @killedMonsters, @completedTasks)",
+            await ExecuteNonQuery(connection, transaction, "INSERT INTO characterquest (id, idx, characterId, dataId, isComplete, isTracking, killedMonsters, completedTasks) VALUES (@id, @idx, @characterId, @dataId, @isComplete, @isTracking, @killedMonsters, @completedTasks)",
                 new MySqlParameter("@id", characterId + "_" + idx),
                 new MySqlParameter("@idx", idx),
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@dataId", characterQuest.dataId),
                 new MySqlParameter("@isComplete", characterQuest.isComplete),
+                new MySqlParameter("@isTracking", characterQuest.isTracking),
                 new MySqlParameter("@killedMonsters", characterQuest.WriteKilledMonsters()),
                 new MySqlParameter("@completedTasks", characterQuest.WriteCompletedTasks()));
         }
@@ -45,7 +47,7 @@ namespace MultiplayerARPG.MMO
                 {
                     result.Add(tempQuest);
                 }
-            }, "SELECT dataId, isComplete, killedMonsters, completedTasks FROM characterquest WHERE characterId=@characterId ORDER BY idx ASC",
+            }, "SELECT dataId, isComplete, isTracking, killedMonsters, completedTasks FROM characterquest WHERE characterId=@characterId ORDER BY idx ASC",
                 new MySqlParameter("@characterId", characterId));
             return result;
         }

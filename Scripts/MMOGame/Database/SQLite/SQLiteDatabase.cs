@@ -133,6 +133,7 @@ namespace MultiplayerARPG.MMO
               characterId TEXT NOT NULL,
               dataId INTEGER NOT NULL,
               isComplete INTEGER NOT NULL DEFAULT 0,
+              isTracking INTEGER NOT NULL DEFAULT 0,
               killedMonsters TEXT NOT NULL DEFAULT '',
               completedTasks TEXT NOT NULL DEFAULT '',
               createAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -353,6 +354,9 @@ namespace MultiplayerARPG.MMO
 
             if (!IsColumnExist("characteritem", "sockets"))
                 ExecuteNonQuery("ALTER TABLE characteritem ADD sockets TEXT NOT NULL DEFAULT '';");
+
+            if (!IsColumnExist("characterquest", "isTracking"))
+                ExecuteNonQuery("ALTER TABLE characterquest ADD isTracking INTEGER NOT NULL DEFAULT 0;");
 
             if (!IsColumnExist("characterquest", "completedTasks"))
                 ExecuteNonQuery("ALTER TABLE characterquest ADD completedTasks TEXT NOT NULL DEFAULT '';");

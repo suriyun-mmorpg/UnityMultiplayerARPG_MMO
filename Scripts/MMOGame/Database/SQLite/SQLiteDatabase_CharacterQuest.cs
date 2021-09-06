@@ -13,8 +13,9 @@ namespace MultiplayerARPG.MMO
                 result = new CharacterQuest();
                 result.dataId = reader.GetInt32(0);
                 result.isComplete = reader.GetBoolean(1);
-                result.ReadKilledMonsters(reader.GetString(2));
-                result.ReadCompletedTasks(reader.GetString(3));
+                result.isTracking = reader.GetBoolean(2);
+                result.ReadKilledMonsters(reader.GetString(3));
+                result.ReadCompletedTasks(reader.GetString(4));
                 return true;
             }
             result = CharacterQuest.Empty;
@@ -23,12 +24,13 @@ namespace MultiplayerARPG.MMO
 
         public void CreateCharacterQuest(SqliteTransaction transaction, int idx, string characterId, CharacterQuest characterQuest)
         {
-            ExecuteNonQuery(transaction, "INSERT INTO characterquest (id, idx, characterId, dataId, isComplete, killedMonsters, completedTasks) VALUES (@id, @idx, @characterId, @dataId, @isComplete, @killedMonsters, @completedTasks)",
+            ExecuteNonQuery(transaction, "INSERT INTO characterquest (id, idx, characterId, dataId, isComplete, isTracking, killedMonsters, completedTasks) VALUES (@id, @idx, @characterId, @dataId, @isComplete, @isTracking, @killedMonsters, @completedTasks)",
                 new SqliteParameter("@id", characterId + "_" + idx),
                 new SqliteParameter("@idx", idx),
                 new SqliteParameter("@characterId", characterId),
                 new SqliteParameter("@dataId", characterQuest.dataId),
                 new SqliteParameter("@isComplete", characterQuest.isComplete),
+                new SqliteParameter("@isTracking", characterQuest.isTracking),
                 new SqliteParameter("@killedMonsters", characterQuest.WriteKilledMonsters()),
                 new SqliteParameter("@completedTasks", characterQuest.WriteCompletedTasks()));
         }
@@ -43,7 +45,7 @@ namespace MultiplayerARPG.MMO
                 {
                     result.Add(tempQuest);
                 }
-            }, "SELECT dataId, isComplete, killedMonsters, completedTasks FROM characterquest WHERE characterId=@characterId ORDER BY idx ASC",
+            }, "SELECT dataId, isComplete, isTracking, killedMonsters, completedTasks FROM characterquest WHERE characterId=@characterId ORDER BY idx ASC",
                 new SqliteParameter("@characterId", characterId));
             return result;
         }

@@ -134,6 +134,7 @@ CREATE TABLE `characterquest` (
   `characterId` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   `dataId` int NOT NULL DEFAULT '0',
   `isComplete` tinyint(1) NOT NULL DEFAULT '0',
+  `isTracking` tinyint(1) NOT NULL DEFAULT '0',
   `killedMonsters` text CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   `completedTasks` text CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
