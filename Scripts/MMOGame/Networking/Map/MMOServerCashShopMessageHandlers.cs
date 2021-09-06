@@ -89,17 +89,17 @@ namespace MultiplayerARPG.MMO
                     // Cannot find item
                     message = UITextKeys.UI_ERROR_ITEM_NOT_FOUND;
                 }
-                else if (userCash < cashShopItem.sellPriceCash)
+                else if (userCash < cashShopItem.SellPriceCash)
                 {
                     // Not enough cash
                     message = UITextKeys.UI_ERROR_NOT_ENOUGH_CASH;
                 }
-                else if (userGold < cashShopItem.sellPriceGold)
+                else if (userGold < cashShopItem.SellPriceGold)
                 {
                     // Not enough cash
                     message = UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD;
                 }
-                else if (playerCharacter.IncreasingItemsWillOverwhelming(cashShopItem.receiveItems))
+                else if (playerCharacter.IncreasingItemsWillOverwhelming(cashShopItem.ReceiveItems))
                 {
                     // Cannot carry all rewards
                     message = UITextKeys.UI_ERROR_WILL_OVERWHELMING;
@@ -110,7 +110,7 @@ namespace MultiplayerARPG.MMO
                     CashResp changeCashResp = await DbServiceClient.ChangeCashAsync(new ChangeCashReq()
                     {
                         UserId = playerCharacter.UserId,
-                        ChangeAmount = -cashShopItem.sellPriceCash
+                        ChangeAmount = -cashShopItem.SellPriceCash
                     });
                     userCash = changeCashResp.Cash;
                     playerCharacter.UserCash = userCash;
@@ -118,18 +118,18 @@ namespace MultiplayerARPG.MMO
                     GoldResp changeGoldResp = await DbServiceClient.ChangeGoldAsync(new ChangeGoldReq()
                     {
                         UserId = playerCharacter.UserId,
-                        ChangeAmount = -cashShopItem.sellPriceGold
+                        ChangeAmount = -cashShopItem.SellPriceGold
                     });
                     userGold = changeGoldResp.Gold;
                     playerCharacter.UserGold = userGold;
                     // Increase character gold
-                    playerCharacter.Gold = playerCharacter.Gold.Increase(cashShopItem.receiveGold);
+                    playerCharacter.Gold = playerCharacter.Gold.Increase(cashShopItem.ReceiveGold);
                     // Increase currencies
-                    playerCharacter.IncreaseCurrencies(cashShopItem.receiveCurrencies);
+                    playerCharacter.IncreaseCurrencies(cashShopItem.ReceiveCurrencies);
                     // Increase character item
-                    if (cashShopItem.receiveItems != null && cashShopItem.receiveItems.Length > 0)
+                    if (cashShopItem.ReceiveItems != null && cashShopItem.ReceiveItems.Length > 0)
                     {
-                        foreach (ItemAmount receiveItem in cashShopItem.receiveItems)
+                        foreach (ItemAmount receiveItem in cashShopItem.ReceiveItems)
                         {
                             if (receiveItem.item == null || receiveItem.amount <= 0) continue;
                             playerCharacter.AddOrSetNonEquipItems(CharacterItem.Create(receiveItem.item, 1, receiveItem.amount));
@@ -225,7 +225,7 @@ namespace MultiplayerARPG.MMO
                     CashResp changeCashResp = await DbServiceClient.ChangeCashAsync(new ChangeCashReq()
                     {
                         UserId = playerCharacter.UserId,
-                        ChangeAmount = cashPackage.cashAmount
+                        ChangeAmount = cashPackage.CashAmount
                     });
                     cash = changeCashResp.Cash;
                     playerCharacter.UserCash = cash;
