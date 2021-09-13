@@ -29,8 +29,8 @@ public class LogGUI : MonoBehaviour
 
     private Vector2 scrollPosition;
     private readonly ConcurrentQueue<LogData> PrintingLogs = new ConcurrentQueue<LogData>();
-    private bool shouldScrollToBottom;
-    private bool setup = false;
+    private bool logScrollingToBottom;
+    private bool loggingEnabled = false;
 
     public void SetupLogger(string logName)
     {
@@ -47,7 +47,7 @@ public class LogGUI : MonoBehaviour
                 options.PrefixFormatter = LogManager.PrefixFormatterConfigure;
             });
         });
-        setup = true;
+        loggingEnabled = true;
     }
 
     private void OnEnable()
@@ -67,7 +67,7 @@ public class LogGUI : MonoBehaviour
     private void HandleLog(LogType type, string logString)
     {
 #if !UNITY_SERVER
-        if (!setup)
+        if (!loggingEnabled)
             return;
         Color color = Color.white;
         switch (type)
@@ -89,7 +89,7 @@ public class LogGUI : MonoBehaviour
         });
         if (PrintingLogs.Count > showLogSize)
             PrintingLogs.TryDequeue(out _);
-        shouldScrollToBottom = true;
+        logScrollingToBottom = true;
 #endif
     }
 
@@ -101,10 +101,10 @@ public class LogGUI : MonoBehaviour
 #if !UNITY_SERVER
     void OnGUI()
     {
-        if (shouldScrollToBottom)
+        if (logScrollingToBottom)
         {
             scrollPosition.y = Mathf.Infinity;
-            shouldScrollToBottom = false;
+            logScrollingToBottom = false;
         }
         scrollPosition = GUILayout.BeginScrollView(scrollPosition, GUILayout.Width(Screen.width), GUILayout.Height(logAreaHeight));
         foreach (LogData logData in PrintingLogs)
