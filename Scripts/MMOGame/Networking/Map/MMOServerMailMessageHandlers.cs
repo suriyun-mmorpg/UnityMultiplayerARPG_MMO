@@ -117,6 +117,15 @@ namespace MultiplayerARPG.MMO
                 {
                     playerCharacter.Gold = playerCharacter.Gold.Increase(mail.Gold);
                 }
+                if (mail.Cash > 0)
+                {
+                    CashResp changeCashResp = await DbServiceClient.ChangeCashAsync(new ChangeCashReq()
+                    {
+                        UserId = playerCharacter.UserId,
+                        ChangeAmount = -mail.Cash
+                    });
+                    playerCharacter.UserCash = changeCashResp.Cash;
+                }
             }
             UpdateClaimMailItemsStateResp resp = await DbServiceClient.UpdateClaimMailItemsStateAsync(new UpdateClaimMailItemsStateReq()
             {
@@ -296,12 +305,10 @@ namespace MultiplayerARPG.MMO
                 UserId = playerCharacter.UserId,
                 OnlyNewMails = true,
             });
-            List<UniTask<UITextKeys>> tasks = new List<UniTask<UITextKeys>>();
             foreach (MailListEntry entry in resp.List)
             {
-                tasks.Add(ClaimMailItems(entry.Id, playerCharacter));
+                await ClaimMailItems(entry.Id, playerCharacter);
             }
-            await UniTask.WhenAll(tasks);
             result.Invoke(AckResponseCode.Success, new ResponseClaimAllMailsItemsMessage());
 #endif
         }
@@ -322,12 +329,10 @@ namespace MultiplayerARPG.MMO
                 UserId = userId,
                 OnlyNewMails = false,
             });
-            List<UniTask<UITextKeys>> tasks = new List<UniTask<UITextKeys>>();
             foreach (MailListEntry entry in resp.List)
             {
-                tasks.Add(DeleteMail(entry.Id, userId));
+                await DeleteMail(entry.Id, userId);
             }
-            await UniTask.WhenAll(tasks);
             result.Invoke(AckResponseCode.Success, new ResponseDeleteAllMailsMessage());
 #endif
         }
