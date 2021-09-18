@@ -432,7 +432,6 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-
         public override void SerializeClientReadyData(NetDataWriter writer)
         {
             writer.Put(GameInstance.UserId);
@@ -448,6 +447,7 @@ namespace MultiplayerARPG.MMO
             string selectCharacterId = reader.GetString();
             if (!await ValidatePlayerConnection(connectionId, userId, accessToken, selectCharacterId))
             {
+                Transport.ServerDisconnect(connectionId);
                 return false;
             }
 
