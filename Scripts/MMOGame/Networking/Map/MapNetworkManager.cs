@@ -437,7 +437,7 @@ namespace MultiplayerARPG.MMO
             base.HandleEnterGameResponse(responseHandler, responseCode, response);
             if (responseCode == AckResponseCode.Success)
             {
-                // Disconnect from central server when connected to map server
+                // Disconnect from central server when accepted by map server
                 MMOClientInstance.Singleton.StopCentralClient();
             }
         }
