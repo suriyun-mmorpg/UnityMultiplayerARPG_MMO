@@ -338,12 +338,11 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
         private async UniTaskVoid OnPeerDisconnectedRoutine(long connectionId, DisconnectInfo disconnectInfo)
         {
-            if (disconnectInfo.Reason != DisconnectReason.DisconnectPeerCalled)
-                await UniTask.Delay(playerCharacterDespawnMillisecondsDelay);
             // Save player character data
             BasePlayerCharacterEntity playerCharacterEntity;
             if (ServerUserHandlers.TryGetPlayerCharacter(connectionId, out playerCharacterEntity))
             {
+                await UniTask.Delay(playerCharacterDespawnMillisecondsDelay);
                 PlayerCharacterData saveCharacterData = playerCharacterEntity.CloneTo(new PlayerCharacterData());
                 while (savingCharacters.Contains(saveCharacterData.Id))
                 {
