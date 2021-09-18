@@ -2,15 +2,23 @@
 using UnityEngine.UI;
 using LiteNetLibManager;
 using UnityEngine;
-using LiteNetLib.Utils;
-using Cysharp.Threading.Tasks;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace MultiplayerARPG.MMO
 {
     public class UIMmoLogin : UIBase
     {
+        [System.Obsolete("Deprecated, use `uiTextUsername` instead.")]
+        [HideInInspector]
         public InputField textUsername;
+        [System.Obsolete("Deprecated, use `uiTextPassword` instead.")]
+        [HideInInspector]
         public InputField textPassword;
+
+        public InputFieldWrapper uiTextUsername;
+        public InputFieldWrapper uiTextPassword;
         [Tooltip("If this is turned on, it will store both username to player prefs")]
         public Toggle toggleRememberUsername;
         [Tooltip("If this is turned on, it will store both username and password to player prefs. And login automatically when start game")]
@@ -27,22 +35,61 @@ namespace MultiplayerARPG.MMO
             set
             {
                 logginIn = value;
-                if (textUsername != null)
-                    textUsername.interactable = !logginIn;
-                if (textPassword != null)
-                    textPassword.interactable = !logginIn;
+                if (uiTextUsername != null)
+                    uiTextUsername.interactable = !logginIn;
+                if (uiTextPassword != null)
+                    uiTextPassword.interactable = !logginIn;
             }
         }
 
         public string Username
         {
-            get { return textUsername == null ? string.Empty : textUsername.text; }
-            set { if (textUsername != null) textUsername.text = value; }
+            get { return uiTextUsername == null ? string.Empty : uiTextUsername.text; }
+            set { if (uiTextUsername != null) uiTextUsername.text = value; }
         }
         public string Password
         {
-            get { return textPassword == null ? string.Empty : textPassword.text; }
-            set { if (textPassword != null) textPassword.text = value; }
+            get { return uiTextPassword == null ? string.Empty : uiTextPassword.text; }
+            set { if (uiTextPassword != null) uiTextPassword.text = value; }
+        }
+
+        protected override void Awake()
+        {
+            base.Awake();
+            MigrateInputComponent();
+        }
+
+#if UNITY_EDITOR
+        private void OnValidate()
+        {
+            if (MigrateInputComponent())
+                EditorUtility.SetDirty(this);
+        }
+#endif
+
+        public bool MigrateInputComponent()
+        {
+            bool hasChanges = false;
+            InputFieldWrapper wrapper;
+#pragma warning disable CS0618 // Type or member is obsolete
+            if (textUsername != null)
+            {
+                hasChanges = true;
+                wrapper = textUsername.gameObject.GetOrAddComponent<InputFieldWrapper>();
+                wrapper.unityInputField = textUsername;
+                uiTextUsername = wrapper;
+                textUsername = null;
+            }
+            if (textPassword != null)
+            {
+                hasChanges = true;
+                wrapper = textPassword.gameObject.GetOrAddComponent<InputFieldWrapper>();
+                wrapper.unityInputField = textPassword;
+                uiTextPassword = wrapper;
+                textPassword = null;
+            }
+#pragma warning restore CS0618 // Type or member is obsolete
+            return hasChanges;
         }
 
         private void Start()

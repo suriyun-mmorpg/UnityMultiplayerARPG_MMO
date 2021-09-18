@@ -1,16 +1,29 @@
-﻿using UnityEngine.Events;
+﻿using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 using LiteNetLibManager;
-using LiteNetLib.Utils;
-using Cysharp.Threading.Tasks;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace MultiplayerARPG.MMO
 {
     public class UIMmoRegister : UIBase
     {
+        [System.Obsolete("Deprecated, use `uiTextUsername` instead.")]
+        [HideInInspector]
         public InputField textUsername;
+        [System.Obsolete("Deprecated, use `uiTextPassword` instead.")]
+        [HideInInspector]
         public InputField textPassword;
+        [System.Obsolete("Deprecated, use `textConfirmPassword` instead.")]
+        [HideInInspector]
         public InputField textConfirmPassword;
+
+        public InputFieldWrapper uiTextUsername;
+        public InputFieldWrapper uiTextPassword;
+        public InputFieldWrapper uiTextConfirmPassword;
+
         public UnityEvent onRegisterSuccess;
         public UnityEvent onRegisterFail;
 
@@ -21,24 +34,83 @@ namespace MultiplayerARPG.MMO
             set
             {
                 registering = value;
-                if (textUsername != null)
-                    textUsername.interactable = !registering;
-                if (textPassword != null)
-                    textPassword.interactable = !registering;
-                if (textConfirmPassword != null)
-                    textConfirmPassword.interactable = !registering;
+                if (uiTextUsername != null)
+                    uiTextUsername.interactable = !registering;
+                if (uiTextPassword != null)
+                    uiTextPassword.interactable = !registering;
+                if (uiTextConfirmPassword != null)
+                    uiTextConfirmPassword.interactable = !registering;
             }
         }
 
-        public string Username { get { return textUsername == null ? string.Empty : textUsername.text; } }
-        public string Password { get { return textPassword == null ? string.Empty : textPassword.text; } }
-        public string ConfirmPassword { get { return textConfirmPassword == null ? string.Empty : textConfirmPassword.text; } }
+        public string Username
+        {
+            get { return uiTextUsername == null ? string.Empty : uiTextUsername.text; }
+            set { if (uiTextUsername != null) uiTextUsername.text = value; }
+        }
+        public string Password
+        {
+            get { return uiTextPassword == null ? string.Empty : uiTextPassword.text; }
+            set { if (uiTextPassword != null) uiTextPassword.text = value; }
+        }
+        public string ConfirmPassword
+        {
+            get { return uiTextConfirmPassword == null ? string.Empty : uiTextConfirmPassword.text; }
+            set { if (uiTextConfirmPassword != null) uiTextConfirmPassword.text = value; }
+        }
+
+        protected override void Awake()
+        {
+            base.Awake();
+            MigrateInputComponent();
+        }
+
+#if UNITY_EDITOR
+        private void OnValidate()
+        {
+            if (MigrateInputComponent())
+                EditorUtility.SetDirty(this);
+        }
+#endif
+
+        public bool MigrateInputComponent()
+        {
+            bool hasChanges = false;
+            InputFieldWrapper wrapper;
+#pragma warning disable CS0618 // Type or member is obsolete
+            if (textUsername != null)
+            {
+                hasChanges = true;
+                wrapper = textUsername.gameObject.GetOrAddComponent<InputFieldWrapper>();
+                wrapper.unityInputField = textUsername;
+                uiTextUsername = wrapper;
+                textUsername = null;
+            }
+            if (textPassword != null)
+            {
+                hasChanges = true;
+                wrapper = textPassword.gameObject.GetOrAddComponent<InputFieldWrapper>();
+                wrapper.unityInputField = textPassword;
+                uiTextPassword = wrapper;
+                textPassword = null;
+            }
+            if (textConfirmPassword != null)
+            {
+                hasChanges = true;
+                wrapper = textConfirmPassword.gameObject.GetOrAddComponent<InputFieldWrapper>();
+                wrapper.unityInputField = textConfirmPassword;
+                uiTextConfirmPassword = wrapper;
+                textConfirmPassword = null;
+            }
+#pragma warning restore CS0618 // Type or member is obsolete
+            return hasChanges;
+        }
 
         public bool ValidatePassword()
         {
             if (string.IsNullOrEmpty(Password))
                 return false;
-            if (textConfirmPassword != null && !Password.Equals(ConfirmPassword))
+            if (uiTextConfirmPassword != null && !Password.Equals(ConfirmPassword))
                 return false;
             return true;
         }
