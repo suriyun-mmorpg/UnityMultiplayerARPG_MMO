@@ -338,7 +338,8 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
         private async UniTaskVoid OnPeerDisconnectedRoutine(long connectionId, DisconnectInfo disconnectInfo)
         {
-            await UniTask.Delay(playerCharacterDespawnMillisecondsDelay);
+            if (disconnectInfo.Reason != DisconnectReason.DisconnectPeerCalled)
+                await UniTask.Delay(playerCharacterDespawnMillisecondsDelay);
             // Save player character data
             BasePlayerCharacterEntity playerCharacterEntity;
             if (ServerUserHandlers.TryGetPlayerCharacter(connectionId, out playerCharacterEntity))
@@ -349,6 +350,8 @@ namespace MultiplayerARPG.MMO
                     await UniTask.Yield();
                 }
                 await SaveCharacterRoutine(saveCharacterData, playerCharacterEntity.UserId);
+                // Destroy character from server
+                playerCharacterEntity.NetworkDestroy();
             }
             // Unregister user to allow user to login
             UnregisterPlayerCharacter(connectionId);
