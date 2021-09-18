@@ -5,7 +5,6 @@ using UnityEngine.Events;
 using LiteNetLib;
 using LiteNetLibManager;
 using LiteNetLib.Utils;
-using Cysharp.Threading.Tasks;
 
 namespace MultiplayerARPG.MMO
 {
