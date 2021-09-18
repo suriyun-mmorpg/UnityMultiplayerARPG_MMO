@@ -88,8 +88,6 @@ namespace MultiplayerARPG.MMO
         {
             if (onMapClientConnected != null)
                 onMapClientConnected.Invoke();
-            // Disconnect from central server when connected to map server
-            StopCentralClient();
         }
 
         public void OnMapServerDisconnected(DisconnectInfo disconnectInfo)

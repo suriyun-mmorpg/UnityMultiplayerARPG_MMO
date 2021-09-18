@@ -432,6 +432,16 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
+        protected override void HandleEnterGameResponse(ResponseHandlerData responseHandler, AckResponseCode responseCode, EnterGameResponseMessage response)
+        {
+            base.HandleEnterGameResponse(responseHandler, responseCode, response);
+            if (responseCode == AckResponseCode.Success)
+            {
+                // Disconnect from central server when connected to map server
+                MMOClientInstance.Singleton.StopCentralClient();
+            }
+        }
+
         public override void SerializeClientReadyData(NetDataWriter writer)
         {
             writer.Put(GameInstance.UserId);
