@@ -50,7 +50,7 @@ namespace MultiplayerARPG.MMO
         public int mapSpawnMillisecondsTimeout = 0;
 
         [Header("Player Disconnection")]
-        public int playerCharacterDespawnMillisecondsDelay = 10000;
+        public int playerCharacterDespawnMillisecondsDelay = 0;
 
         private float terminatingTime;
 
