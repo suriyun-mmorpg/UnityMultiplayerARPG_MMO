@@ -14,10 +14,11 @@ namespace MultiplayerARPG.MMO
             {
                 if (reader.Read())
                     id = (int)reader.GetInt64(0);
-            }, "INSERT INTO guild (guildName, leaderId) VALUES (@guildName, @leaderId);" +
+            }, "INSERT INTO guild (guildName, leaderId, options) VALUES (@guildName, @leaderId, @options);" +
                 "SELECT LAST_INSERT_ROWID();",
                 new SqliteParameter("@guildName", guildName),
-                new SqliteParameter("@leaderId", leaderId));
+                new SqliteParameter("@leaderId", leaderId),
+                new SqliteParameter("@options", "{}"));
             if (id > 0)
                 ExecuteNonQuery("UPDATE characters SET guildId=@id WHERE id=@leaderId",
                     new SqliteParameter("@id", id),
