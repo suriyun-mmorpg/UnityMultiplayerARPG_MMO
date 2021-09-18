@@ -97,6 +97,8 @@ namespace MultiplayerARPG.MMO
                 playerCharacterEntity.IsWarping = false;
                 // Destroy character from server
                 playerCharacterEntity.NetworkDestroy();
+                // Unregister character to tell central server that the user is disconnecting from this server
+                UnregisterPlayerCharacter(connectionId);
                 // Send message to client to warp
                 MMOWarpMessage message = new MMOWarpMessage();
                 message.networkAddress = peerInfo.networkAddress;
@@ -194,6 +196,8 @@ namespace MultiplayerARPG.MMO
                 playerCharacterEntity.IsWarping = false;
                 // Destroy character from server
                 playerCharacterEntity.NetworkDestroy();
+                // Unregister character to tell central server that the user is disconnecting from this server
+                UnregisterPlayerCharacter(connectionId);
                 // Send message to client to warp
                 MMOWarpMessage message = new MMOWarpMessage();
                 message.networkAddress = peerInfo.networkAddress;

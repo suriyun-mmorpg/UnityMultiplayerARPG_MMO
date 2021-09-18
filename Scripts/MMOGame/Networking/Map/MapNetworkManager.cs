@@ -49,6 +49,9 @@ namespace MultiplayerARPG.MMO
         [Header("Map Spawn")]
         public int mapSpawnMillisecondsTimeout = 0;
 
+        [Header("Player Disconnection")]
+        public int playerCharacterDespawnMillisecondsDelay = 10000;
+
         private float terminatingTime;
 
         public BaseTransportFactory CentralTransportFactory
@@ -327,6 +330,7 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
         public override void OnPeerDisconnected(long connectionId, DisconnectInfo disconnectInfo)
         {
+            base.OnPeerDisconnected(connectionId, disconnectInfo);
             OnPeerDisconnectedRoutine(connectionId, disconnectInfo).Forget();
         }
 #endif
@@ -334,6 +338,7 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
         private async UniTaskVoid OnPeerDisconnectedRoutine(long connectionId, DisconnectInfo disconnectInfo)
         {
+            await UniTask.Delay(playerCharacterDespawnMillisecondsDelay);
             // Save player character data
             BasePlayerCharacterEntity playerCharacterEntity;
             if (ServerUserHandlers.TryGetPlayerCharacter(connectionId, out playerCharacterEntity))
@@ -345,9 +350,9 @@ namespace MultiplayerARPG.MMO
                 }
                 await SaveCharacterRoutine(saveCharacterData, playerCharacterEntity.UserId);
             }
+            // Unregister user to allow user to login
             UnregisterPlayerCharacter(connectionId);
             UnregisterUserId(connectionId);
-            base.OnPeerDisconnected(connectionId, disconnectInfo);
         }
 #endif
 
@@ -601,6 +606,9 @@ namespace MultiplayerARPG.MMO
 
                     // Register player character entity to the server
                     RegisterPlayerCharacter(connectionId, playerCharacterEntity);
+
+                    // Don't destroy player character entity when disconnect
+                    playerCharacterEntity.Identity.DoNotDestroyWhenDisconnect = true;
                 }
             }
         }
