@@ -409,7 +409,30 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#region Character spawn function
+        #region Character spawn function
+        public override void SerializeEnterGameData(NetDataWriter writer)
+        {
+            writer.Put(GameInstance.UserId);
+            writer.Put(GameInstance.UserToken);
+            writer.Put(GameInstance.SelectedCharacterId);
+        }
+
+#if UNITY_STANDALONE && !CLIENT_BUILD
+        public override async UniTask<bool> DeserializeEnterGameData(long connectionId, NetDataReader reader)
+        {
+            string userId = reader.GetString();
+            string accessToken = reader.GetString();
+            string selectCharacterId = reader.GetString();
+            if (!await ValidatePlayerConnection(connectionId, userId, accessToken, selectCharacterId))
+            {
+                return false;
+            }
+
+            return true;
+        }
+#endif
+
+
         public override void SerializeClientReadyData(NetDataWriter writer)
         {
             writer.Put(GameInstance.UserId);
@@ -423,26 +446,8 @@ namespace MultiplayerARPG.MMO
             string userId = reader.GetString();
             string accessToken = reader.GetString();
             string selectCharacterId = reader.GetString();
-
-            if (ServerUserHandlers.TryGetPlayerCharacter(connectionId, out _))
+            if (!await ValidatePlayerConnection(connectionId, userId, accessToken, selectCharacterId))
             {
-                if (LogError)
-                    Logging.LogError(LogTag, "User trying to hack: " + userId);
-                Transport.ServerDisconnect(connectionId);
-                return false;
-            }
-
-            ValidateAccessTokenResp validateAccessTokenResp = await DbServiceClient.ValidateAccessTokenAsync(new ValidateAccessTokenReq()
-            {
-                UserId = userId,
-                AccessToken = accessToken
-            });
-
-            if (!validateAccessTokenResp.IsPass)
-            {
-                if (LogError)
-                    Logging.LogError(LogTag, "Invalid access token for user: " + userId);
-                Transport.ServerDisconnect(connectionId);
                 return false;
             }
 
@@ -462,6 +467,40 @@ namespace MultiplayerARPG.MMO
 
             RegisterUserId(connectionId, userId);
             SetPlayerReadyRoutine(connectionId, userId, selectCharacterId).Forget();
+            return true;
+        }
+#endif
+
+#if UNITY_STANDALONE && !CLIENT_BUILD
+        private async UniTask<bool> ValidatePlayerConnection(long connectionId, string userId, string accessToken, string selectCharacterId)
+        {
+            if (ServerUserHandlers.TryGetPlayerCharacter(connectionId, out _))
+            {
+                if (LogError)
+                    Logging.LogError(LogTag, "User trying to hack: " + userId);
+                return false;
+            }
+
+            ValidateAccessTokenResp validateAccessTokenResp = await DbServiceClient.ValidateAccessTokenAsync(new ValidateAccessTokenReq()
+            {
+                UserId = userId,
+                AccessToken = accessToken
+            });
+
+            if (!validateAccessTokenResp.IsPass)
+            {
+                if (LogError)
+                    Logging.LogError(LogTag, "Invalid access token for user: " + userId);
+                return false;
+            }
+
+            if (ServerUserHandlers.TryGetPlayerCharacterById(selectCharacterId, out _))
+            {
+                if (LogError)
+                    Logging.LogError(LogTag, "Character: " + selectCharacterId + " rejected by server, it wasn't despawned");
+                return false;
+            }
+
             return true;
         }
 #endif
@@ -615,9 +654,9 @@ namespace MultiplayerARPG.MMO
             }
         }
 #endif
-#endregion
+        #endregion
 
-#region Network message handlers
+        #region Network message handlers
         protected override void HandleWarpAtClient(MessageHandlerData messageHandler)
         {
             MMOWarpMessage message = messageHandler.ReadMessage<MMOWarpMessage>();
@@ -710,9 +749,9 @@ namespace MultiplayerARPG.MMO
                 UpdateMapUsers(CentralAppServerRegister, UpdateUserCharacterMessage.UpdateType.Add);
         }
 #endif
-#endregion
+        #endregion
 
-#region Connect to chat server
+        #region Connect to chat server
         public void OnChatServerConnected()
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
@@ -953,9 +992,9 @@ namespace MultiplayerARPG.MMO
                 }
             }
         }
-#endregion
+        #endregion
 
-#region Update map user functions
+        #region Update map user functions
         private void UpdateMapUsers(LiteNetLibClient transportHandler, UpdateUserCharacterMessage.UpdateType updateType)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
@@ -975,6 +1014,6 @@ namespace MultiplayerARPG.MMO
             transportHandler.SendPacket(0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.UpdateMapUser, updateMapUserMessage.Serialize);
 #endif
         }
-#endregion
+        #endregion
     }
 }
