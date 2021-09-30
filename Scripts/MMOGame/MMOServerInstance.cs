@@ -185,7 +185,7 @@ namespace MultiplayerARPG.MMO
                 {
                     DatabaseNetworkManager.SetDatabaseByOptionIndex(dbOptionIndex);
                 }
-                
+
                 // Active WebSockets
                 bool useWebSocket = ConfigReader.IsArgsProvided(args, ARG_USE_WEB_SOCKET);
                 if (useWebSocket || ConfigReader.ReadConfigs(jsonConfig, CONFIG_USE_WEB_SOCKET, out useWebSocket))
@@ -516,7 +516,7 @@ namespace MultiplayerARPG.MMO
             }
 
             GameInstance gameInstance = FindObjectOfType<GameInstance>();
-            gameInstance.DoNotLoadHomeScene = false;
+            gameInstance.LoadHomeScenePreventions[nameof(MMOServerInstance)] = false;
 
             if (startingCentralServer ||
                 startingMapSpawnServer ||
@@ -525,7 +525,7 @@ namespace MultiplayerARPG.MMO
             {
                 // Start database manager client, it will connect to database manager server
                 // To request database functions
-                gameInstance.DoNotLoadHomeScene = !Application.isEditor || startingMapServer;
+                gameInstance.LoadHomeScenePreventions[nameof(MMOServerInstance)] = !Application.isEditor || startingMapServer;
                 StartDatabaseManagerClient();
             }
         }
