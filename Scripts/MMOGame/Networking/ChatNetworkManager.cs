@@ -213,10 +213,9 @@ namespace MultiplayerARPG.MMO
                 Logging.Log(LogTag, "Handle chat: " + message.channel + " sender: " + message.sender + " receiver: " + message.receiver + " message: " + message.message);
             switch (message.channel)
             {
+                case ChatChannel.Local:
                 case ChatChannel.Global:
                 case ChatChannel.System:
-                    ServerSendPacketToAllConnections(0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.Chat, message);
-                    break;
                 case ChatChannel.Party:
                 case ChatChannel.Guild:
                     // Send message to all map servers, let's map servers filter messages

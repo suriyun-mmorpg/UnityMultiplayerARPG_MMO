@@ -722,7 +722,27 @@ namespace MultiplayerARPG.MMO
             // Local chat will processes immediately, not have to be sent to chat server
             if (message.channel == ChatChannel.Local)
             {
-                ServerChatHandlers.OnChatMessage(message);
+                bool sentGmCommand = false;
+                IPlayerCharacterData playerCharacter;
+                if (!string.IsNullOrEmpty(message.sender) && GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(message.sender, out playerCharacter))
+                {
+                    BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
+                    string gmCommand;
+                    if (playerCharacterEntity != null &&
+                        GameInstance.Singleton.GMCommands.IsGMCommand(message.message, out gmCommand) &&
+                        GameInstance.Singleton.GMCommands.CanUseGMCommand(playerCharacterEntity, gmCommand))
+                    {
+                        // If it's GM command and sender's user level > 0, handle gm commands
+                        // Send GM command to chat server to broadcast to other servers later
+                        if (ChatNetworkManager.IsClientConnected)
+                        {
+                            ChatNetworkManager.SendEnterChat(null, MMOMessageTypes.Chat, message.channel, message.message, message.sender, message.receiver, message.channelId);
+                        }
+                        sentGmCommand = true;
+                    }
+                }
+                if (!sentGmCommand)
+                    ServerChatHandlers.OnChatMessage(message);
                 return;
             }
             if (message.channel == ChatChannel.System)
@@ -814,7 +834,17 @@ namespace MultiplayerARPG.MMO
         public void OnChatMessageReceive(ChatMessage message)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            ServerChatHandlers.OnChatMessage(message);
+            if (message.channel == ChatChannel.Local)
+            {
+                // Handle GM command here, only GM command will be broadcasted as local channel
+                BasePlayerCharacterEntity playerCharacterEntity;
+                GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(message.sender, out playerCharacterEntity);
+                GameInstance.Singleton.GMCommands.HandleGMCommand(playerCharacterEntity, message.message);
+            }
+            else
+            {
+                ServerChatHandlers.OnChatMessage(message);
+            }
 #endif
         }
 
