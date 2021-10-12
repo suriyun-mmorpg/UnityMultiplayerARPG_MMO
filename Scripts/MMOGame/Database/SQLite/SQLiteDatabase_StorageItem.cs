@@ -10,7 +10,7 @@ namespace MultiplayerARPG.MMO
     {
         private void CreateStorageItem(SqliteTransaction transaction, int idx, StorageType storageType, string storageOwnerId, CharacterItem characterItem)
         {
-            ExecuteNonQuery(transaction, "INSERT INTO storageitem (id, idx, storageType, storageOwnerId, dataId, level, amount, durability, exp, lockRemainsDuration, ammo, sockets) VALUES (@id, @idx, @storageType, @storageOwnerId, @dataId, @level, @amount, @durability, @exp, @lockRemainsDuration, @ammo, @sockets)",
+            ExecuteNonQuery(transaction, "INSERT INTO storageitem (id, idx, storageType, storageOwnerId, dataId, level, amount, durability, exp, lockRemainsDuration, expireTime, randomSeed, ammo, sockets) VALUES (@id, @idx, @storageType, @storageOwnerId, @dataId, @level, @amount, @durability, @exp, @lockRemainsDuration, @expireTime, @randomSeed, @ammo, @sockets)",
                 new SqliteParameter("@id", new StorageItemId(storageType, storageOwnerId, idx).GetId()),
                 new SqliteParameter("@idx", idx),
                 new SqliteParameter("@storageType", (byte)storageType),
@@ -21,6 +21,8 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@durability", characterItem.durability),
                 new SqliteParameter("@exp", characterItem.exp),
                 new SqliteParameter("@lockRemainsDuration", characterItem.lockRemainsDuration),
+                new SqliteParameter("@expireTime", characterItem.expireTime),
+                new SqliteParameter("@randomSeed", characterItem.randomSeed),
                 new SqliteParameter("@ammo", characterItem.ammo),
                 new SqliteParameter("@sockets", characterItem.WriteSockets()));
         }
@@ -36,8 +38,10 @@ namespace MultiplayerARPG.MMO
                 result.durability = reader.GetFloat(3);
                 result.exp = reader.GetInt32(4);
                 result.lockRemainsDuration = reader.GetFloat(5);
-                result.ammo = reader.GetInt16(6);
-                result.ReadSockets(reader.GetString(7));
+                result.expireTime = reader.GetInt64(6);
+                result.randomSeed = reader.GetByte(7);
+                result.ammo = reader.GetInt16(8);
+                result.ReadSockets(reader.GetString(9));
                 return true;
             }
             result = CharacterItem.Empty;
@@ -55,7 +59,7 @@ namespace MultiplayerARPG.MMO
                 {
                     result.Add(tempInventory);
                 }
-            }, "SELECT dataId, level, amount, durability, exp, lockRemainsDuration, ammo, sockets FROM storageitem WHERE storageType=@storageType AND storageOwnerId=@storageOwnerId ORDER BY idx ASC",
+            }, "SELECT dataId, level, amount, durability, exp, lockRemainsDuration, expireTime, randomSeed, ammo, sockets FROM storageitem WHERE storageType=@storageType AND storageOwnerId=@storageOwnerId ORDER BY idx ASC",
                 new SqliteParameter("@storageType", (byte)storageType),
                 new SqliteParameter("@storageOwnerId", storageOwnerId));
             return result;

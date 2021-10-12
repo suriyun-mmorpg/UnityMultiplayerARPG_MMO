@@ -363,6 +363,8 @@ CREATE TABLE `storageitem` (
   `durability` float NOT NULL DEFAULT '0',
   `exp` int NOT NULL DEFAULT '0',
   `lockRemainsDuration` float NOT NULL DEFAULT '0',
+  `expireTime` bigint NOT NULL DEFAULT '0',
+  `randomSeed` tinyint UNSIGNED NOT NULL DEFAULT '0',
   `ammo` int NOT NULL DEFAULT '0',
   `sockets` text CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,

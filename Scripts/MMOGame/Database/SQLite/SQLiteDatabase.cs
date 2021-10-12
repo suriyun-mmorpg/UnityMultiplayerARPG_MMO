@@ -104,6 +104,8 @@ namespace MultiplayerARPG.MMO
               durability REAL NOT NULL DEFAULT 0,
               exp INTEGER NOT NULL DEFAULT 0,
               lockRemainsDuration REAL NOT NULL DEFAULT 0,
+              expireTime INTEGER NOT NULL DEFAULT 0,
+              randomSeed INTEGER NOT NULL DEFAULT 0,
               ammo INTEGER NOT NULL DEFAULT 0,
               sockets TEXT NOT NULL DEFAULT '',
               createAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -121,6 +123,8 @@ namespace MultiplayerARPG.MMO
               durability REAL NOT NULL DEFAULT 0,
               exp INTEGER NOT NULL DEFAULT 0,
               lockRemainsDuration REAL NOT NULL DEFAULT 0,
+              expireTime INTEGER NOT NULL DEFAULT 0,
+              randomSeed INTEGER NOT NULL DEFAULT 0,
               ammo INTEGER NOT NULL DEFAULT 0,
               sockets TEXT NOT NULL DEFAULT '',
               createAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -361,14 +365,32 @@ namespace MultiplayerARPG.MMO
             if (!IsColumnExist("characteritem", "sockets"))
                 ExecuteNonQuery("ALTER TABLE characteritem ADD sockets TEXT NOT NULL DEFAULT '';");
 
+            if (!IsColumnExist("storageitem", "durability"))
+                ExecuteNonQuery("ALTER TABLE storageitem ADD durability REAL NOT NULL DEFAULT 0;");
+
+            if (!IsColumnExist("storageitem", "exp"))
+                ExecuteNonQuery("ALTER TABLE storageitem ADD exp INTEGER NOT NULL DEFAULT 0;");
+
+            if (!IsColumnExist("storageitem", "lockRemainsDuration"))
+                ExecuteNonQuery("ALTER TABLE storageitem ADD lockRemainsDuration REAL NOT NULL DEFAULT 0;");
+
+            if (!IsColumnExist("storageitem", "expireTime"))
+                ExecuteNonQuery("ALTER TABLE storageitem ADD expireTime INTEGER NOT NULL DEFAULT 0;");
+
+            if (!IsColumnExist("storageitem", "randomSeed"))
+                ExecuteNonQuery("ALTER TABLE storageitem ADD randomSeed INTEGER NOT NULL DEFAULT 0;");
+
+            if (!IsColumnExist("storageitem", "ammo"))
+                ExecuteNonQuery("ALTER TABLE storageitem ADD ammo INTEGER NOT NULL DEFAULT 0;");
+
+            if (!IsColumnExist("storageitem", "sockets"))
+                ExecuteNonQuery("ALTER TABLE storageitem ADD sockets TEXT NOT NULL DEFAULT '';");
+
             if (!IsColumnExist("characterquest", "isTracking"))
                 ExecuteNonQuery("ALTER TABLE characterquest ADD isTracking INTEGER NOT NULL DEFAULT 0;");
 
             if (!IsColumnExist("characterquest", "completedTasks"))
                 ExecuteNonQuery("ALTER TABLE characterquest ADD completedTasks TEXT NOT NULL DEFAULT '';");
-
-            if (!IsColumnExist("storageitem", "sockets"))
-                ExecuteNonQuery("ALTER TABLE storageitem ADD sockets TEXT NOT NULL DEFAULT '';");
 
             if (!IsColumnExist("userlogin", "gold"))
                 ExecuteNonQuery("ALTER TABLE userlogin ADD gold INTEGER NOT NULL DEFAULT 0;");
