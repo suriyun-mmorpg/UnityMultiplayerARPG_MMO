@@ -184,6 +184,7 @@ CREATE TABLE `characters` (
   `respawnPositionZ` float NOT NULL DEFAULT '0',
   `mountDataId` int NOT NULL DEFAULT '0',
   `lastDeadTime` bigint NOT NULL DEFAULT '0',
+  `unmuteTime` bigint NOT NULL DEFAULT '0',
   `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -387,6 +388,7 @@ CREATE TABLE `userlogin` (
   `authType` tinyint UNSIGNED NOT NULL DEFAULT '1',
   `accessToken` varchar(36) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
   `userLevel` tinyint UNSIGNED NOT NULL DEFAULT '0',
+  `unbanTime` bigint NOT NULL DEFAULT '0',
   `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;

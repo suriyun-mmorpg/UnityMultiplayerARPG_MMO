@@ -179,6 +179,7 @@ namespace MultiplayerARPG.MMO
               respawnPositionZ REAL NOT NULL DEFAULT 0,
               mountDataId INTEGER NOT NULL DEFAULT 0,
               lastDeadTime INTEGER NOT NULL DEFAULT 0,
+              unmuteTime INTEGER NOT NULL DEFAULT 0,
               createAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
               updateAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
@@ -233,6 +234,7 @@ namespace MultiplayerARPG.MMO
               gold INTEGER NOT NULL DEFAULT 0,
               cash INTEGER NOT NULL DEFAULT 0,
               userLevel INTEGER NOT NULL DEFAULT 0,
+              unbanTime INTEGER NOT NULL DEFAULT 0,
               email TEXT NOT NULL,
               authType INTEGER NOT NULL,
               accessToken TEXT,
@@ -401,6 +403,9 @@ namespace MultiplayerARPG.MMO
             if (!IsColumnExist("userlogin", "userLevel"))
                 ExecuteNonQuery("ALTER TABLE userlogin ADD userLevel INTEGER NOT NULL DEFAULT 0;");
 
+            if (!IsColumnExist("userlogin", "unbanTime"))
+                ExecuteNonQuery("ALTER TABLE userlogin ADD unbanTime INTEGER NOT NULL DEFAULT 0;");
+
             if (!IsColumnExist("buildings", "remainsLifeTime"))
                 ExecuteNonQuery("ALTER TABLE buildings ADD remainsLifeTime REAL NOT NULL DEFAULT 0;");
 
@@ -445,6 +450,9 @@ namespace MultiplayerARPG.MMO
 
             if (!IsColumnExist("characters", "lastDeadTime"))
                 ExecuteNonQuery("ALTER TABLE characters ADD lastDeadTime INTEGER NOT NULL DEFAULT 0;");
+
+            if (!IsColumnExist("characters", "unmuteTime"))
+                ExecuteNonQuery("ALTER TABLE characters ADD unmuteTime INTEGER NOT NULL DEFAULT 0;");
 
             if (!IsColumnExist("guild", "guildMessage2"))
                 ExecuteNonQuery("ALTER TABLE guild ADD guildMessage2 TEXT NOT NULL DEFAULT '';");
@@ -544,6 +552,7 @@ namespace MultiplayerARPG.MMO
                   respawnPositionZ REAL NOT NULL DEFAULT 0,
                   mountDataId INTEGER NOT NULL DEFAULT 0,
                   lastDeadTime INTEGER NOT NULL DEFAULT 0,
+                  unmuteTime INTEGER NOT NULL DEFAULT 0,
                   createAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                   updateAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
                 );");

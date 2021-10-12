@@ -253,10 +253,12 @@ namespace MultiplayerARPG.MMO
             {
                 Logging.Log("Migrating up to 1.70");
                 await ExecuteNonQuery("ALTER TABLE `characters` CHANGE `lastDeadTime` `lastDeadTime` BIGINT NOT NULL DEFAULT '0';");
+                await ExecuteNonQuery("ALTER TABLE `characters` ADD `unmuteTime` BIGINT NOT NULL DEFAULT '0' AFTER `lastDeadTime`;");
                 await ExecuteNonQuery("ALTER TABLE `characteritem` ADD `expireTime` BIGINT NOT NULL DEFAULT '0' AFTER `lockRemainsDuration`;");
                 await ExecuteNonQuery("ALTER TABLE `characteritem` ADD `randomSeed` TINYINT UNSIGNED NOT NULL DEFAULT '0' AFTER `expireTime`;");
                 await ExecuteNonQuery("ALTER TABLE `storageitem` ADD `expireTime` BIGINT NOT NULL DEFAULT '0' AFTER `lockRemainsDuration`;");
                 await ExecuteNonQuery("ALTER TABLE `storageitem` ADD `randomSeed` TINYINT UNSIGNED NOT NULL DEFAULT '0' AFTER `expireTime`;");
+                await ExecuteNonQuery("ALTER TABLE `userlogin` ADD `unbanTime` BIGINT NOT NULL DEFAULT '0' AFTER `userLevel`;");
                 // Insert migrate history
                 await InsertMigrationId(migrationId);
                 Logging.Log("Migrated to 1.70");
