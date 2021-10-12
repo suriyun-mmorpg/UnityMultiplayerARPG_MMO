@@ -28,7 +28,7 @@ namespace MultiplayerARPG.MMO
                         Title = reader.GetString(2),
                         IsRead = reader.GetBoolean(7),
                         IsClaim = reader.GetBoolean(8),
-                        SentTimestamp = (int)((DateTimeOffset)reader.GetDateTime(9)).ToUnixTimeSeconds(),
+                        SentTimestamp = ((DateTimeOffset)reader.GetDateTime(9)).ToUnixTimeSeconds(),
                     };
                     if (onlyNewMails)
                     {
@@ -68,11 +68,11 @@ namespace MultiplayerARPG.MMO
                     result.ReadItems(reader.GetString(10));
                     result.IsRead = reader.GetBoolean(11);
                     if (reader[12] != DBNull.Value)
-                        result.ReadTimestamp = (int)((DateTimeOffset)reader.GetDateTime(12)).ToUnixTimeSeconds();
+                        result.ReadTimestamp = ((DateTimeOffset)reader.GetDateTime(12)).ToUnixTimeSeconds();
                     result.IsClaim = reader.GetBoolean(13);
                     if (reader[14] != DBNull.Value)
-                        result.ClaimTimestamp = (int)((DateTimeOffset)reader.GetDateTime(14)).ToUnixTimeSeconds();
-                    result.SentTimestamp = (int)((DateTimeOffset)reader.GetDateTime(15)).ToUnixTimeSeconds();
+                        result.ClaimTimestamp = ((DateTimeOffset)reader.GetDateTime(14)).ToUnixTimeSeconds();
+                    result.SentTimestamp = ((DateTimeOffset)reader.GetDateTime(15)).ToUnixTimeSeconds();
                 }
             }, "SELECT id, eventId, senderId, senderName, receiverId, title, content, gold, cash, currencies, items, isRead, readTimestamp, isClaim, claimTimestamp, sentTimestamp FROM mail WHERE id=@id AND receiverId LIKE @receiverId AND isDelete=0",
                 new SqliteParameter("@id", mailId),

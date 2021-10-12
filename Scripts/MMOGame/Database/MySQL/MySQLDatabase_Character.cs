@@ -333,8 +333,8 @@ namespace MultiplayerARPG.MMO
                     reader.GetFloat(29),
                     reader.GetFloat(30));
                 result.MountDataId = reader.GetInt32(31);
-                result.LastDeadTime = reader.GetInt32(32);
-                result.LastUpdate = (int)((System.DateTimeOffset)reader.GetDateTime(33)).ToUnixTimeSeconds();
+                result.LastDeadTime = reader.GetInt64(32);
+                result.LastUpdate = ((System.DateTimeOffset)reader.GetDateTime(33)).ToUnixTimeSeconds();
                 return true;
             }
             result = null;
