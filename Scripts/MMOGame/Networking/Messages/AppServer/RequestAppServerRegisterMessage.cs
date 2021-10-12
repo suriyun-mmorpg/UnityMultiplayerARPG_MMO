@@ -5,22 +5,22 @@ namespace MultiplayerARPG.MMO
     public class RequestAppServerRegisterMessage : INetSerializable
     {
         public CentralServerPeerInfo peerInfo;
-        public int time { get; private set; }
+        public long time { get; private set; }
         public string hash { get; private set; }
 
         public void Deserialize(NetDataReader reader)
         {
             peerInfo.Deserialize(reader);
-            time = reader.GetInt();
+            time = reader.GetPackedLong();
             hash = reader.GetString();
         }
 
         public void Serialize(NetDataWriter writer)
         {
-            time = (int)System.DateTimeOffset.Now.ToUnixTimeSeconds();
+            time = System.DateTimeOffset.Now.ToUnixTimeSeconds();
             hash = CentralNetworkManager.GetAppServerRegisterHash(peerInfo.peerType, time);
             peerInfo.Serialize(writer);
-            writer.Put(time);
+            writer.PutPackedLong(time);
             writer.Put(hash);
         }
 

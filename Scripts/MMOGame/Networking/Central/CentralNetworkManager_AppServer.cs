@@ -245,7 +245,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public static string GetAppServerRegisterHash(CentralServerPeerType peerType, int time)
+        public static string GetAppServerRegisterHash(CentralServerPeerType peerType, long time)
         {
             MD5 algorithm = MD5.Create();  // or use SHA256.Create();
             return Encoding.UTF8.GetString(algorithm.ComputeHash(Encoding.UTF8.GetBytes(peerType.ToString() + time.ToString())));
