@@ -659,10 +659,12 @@ namespace MultiplayerARPG.MMO
                 if (reader.Read())
                 {
                     id = reader.GetString(0);
+                    string hashedPassword = reader.GetString(1);
+                    if (!password.PasswordVerify(hashedPassword))
+                        id = string.Empty;
                 }
-            }, "SELECT id FROM userlogin WHERE username=@username AND password=@password AND authType=@authType LIMIT 1",
+            }, "SELECT id, password FROM userlogin WHERE username=@username AND authType=@authType LIMIT 1",
                 new MySqlParameter("@username", username),
-                new MySqlParameter("@password", password.GetMD5()),
                 new MySqlParameter("@authType", AUTH_TYPE_NORMAL));
 
             return id;
@@ -738,7 +740,7 @@ namespace MultiplayerARPG.MMO
             await ExecuteNonQuery("INSERT INTO userlogin (id, username, password, email, authType) VALUES (@id, @username, @password, @email, @authType)",
                 new MySqlParameter("@id", GenericUtils.GetUniqueId()),
                 new MySqlParameter("@username", username),
-                new MySqlParameter("@password", password.GetMD5()),
+                new MySqlParameter("@password", password.PasswordHash()),
                 new MySqlParameter("@email", ""),
                 new MySqlParameter("@authType", AUTH_TYPE_NORMAL));
         }

@@ -703,10 +703,14 @@ namespace MultiplayerARPG.MMO
             ExecuteReader((reader) =>
             {
                 if (reader.Read())
+                {
                     id = reader.GetString(0);
-            }, "SELECT id FROM userlogin WHERE username=@username AND password=@password AND authType=@authType LIMIT 1",
+                    string hashedPassword = reader.GetString(1);
+                    if (!password.PasswordVerify(hashedPassword))
+                        id = string.Empty;
+                }
+            }, "SELECT id, password FROM userlogin WHERE username=@username AND authType=@authType LIMIT 1",
                 new SqliteParameter("@username", username),
-                new SqliteParameter("@password", GenericUtils.GetMD5(password)),
                 new SqliteParameter("@authType", AUTH_TYPE_NORMAL));
 
             return id;
@@ -790,7 +794,7 @@ namespace MultiplayerARPG.MMO
             ExecuteNonQuery("INSERT INTO userlogin (id, username, password, email, authType) VALUES (@id, @username, @password, @email, @authType)",
                 new SqliteParameter("@id", GenericUtils.GetUniqueId()),
                 new SqliteParameter("@username", username),
-                new SqliteParameter("@password", GenericUtils.GetMD5(password)),
+                new SqliteParameter("@password", password.PasswordHash()),
                 new SqliteParameter("@email", ""),
                 new SqliteParameter("@authType", AUTH_TYPE_NORMAL));
         }
