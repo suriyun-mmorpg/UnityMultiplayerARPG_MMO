@@ -11,7 +11,7 @@ namespace MultiplayerARPG.MMO
             if (string.IsNullOrEmpty(characterItem.id))
                 return;
 
-            ExecuteNonQuery(transaction, "INSERT INTO characteritem (id, idx, inventoryType, characterId, dataId, level, amount, equipSlotIndex, durability, exp, lockRemainsDuration, ammo, sockets) VALUES (@id, @idx, @inventoryType, @characterId, @dataId, @level, @amount, @equipSlotIndex, @durability, @exp, @lockRemainsDuration, @ammo, @sockets)",
+            ExecuteNonQuery(transaction, "INSERT INTO characteritem (id, idx, inventoryType, characterId, dataId, level, amount, equipSlotIndex, durability, exp, lockRemainsDuration, expireTime, randomSeed, ammo, sockets) VALUES (@id, @idx, @inventoryType, @characterId, @dataId, @level, @amount, @equipSlotIndex, @durability, @exp, @lockRemainsDuration, @expireTime, @randomSeed, @ammo, @sockets)",
                 new SqliteParameter("@id", characterItem.id),
                 new SqliteParameter("@idx", idx),
                 new SqliteParameter("@inventoryType", (byte)inventoryType),
@@ -23,6 +23,8 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@durability", characterItem.durability),
                 new SqliteParameter("@exp", characterItem.exp),
                 new SqliteParameter("@lockRemainsDuration", characterItem.lockRemainsDuration),
+                new SqliteParameter("@expireTime", characterItem.expireTime),
+                new SqliteParameter("@randomSeed", characterItem.randomSeed),
                 new SqliteParameter("@ammo", characterItem.ammo),
                 new SqliteParameter("@sockets", characterItem.WriteSockets()));
         }
@@ -40,8 +42,10 @@ namespace MultiplayerARPG.MMO
                 result.durability = reader.GetFloat(5);
                 result.exp = reader.GetInt32(6);
                 result.lockRemainsDuration = reader.GetFloat(7);
-                result.ammo = reader.GetInt16(8);
-                result.ReadSockets(reader.GetString(9));
+                result.expireTime = reader.GetInt64(8);
+                result.randomSeed = reader.GetByte(9);
+                result.ammo = reader.GetInt16(10);
+                result.ReadSockets(reader.GetString(11));
                 return true;
             }
             result = CharacterItem.Empty;
@@ -58,7 +62,7 @@ namespace MultiplayerARPG.MMO
                 {
                     result.Add(tempInventory);
                 }
-            }, "SELECT id, dataId, level, amount, equipSlotIndex, durability, exp, lockRemainsDuration, ammo, sockets FROM characteritem WHERE characterId=@characterId AND inventoryType=@inventoryType ORDER BY idx ASC",
+            }, "SELECT id, dataId, level, amount, equipSlotIndex, durability, exp, lockRemainsDuration, expireTime, randomSeed, ammo, sockets FROM characteritem WHERE characterId=@characterId AND inventoryType=@inventoryType ORDER BY idx ASC",
                 new SqliteParameter("@characterId", characterId),
                 new SqliteParameter("@inventoryType", (byte)inventoryType));
             return result;
@@ -85,7 +89,7 @@ namespace MultiplayerARPG.MMO
                     if (inventoryType == InventoryType.EquipWeaponLeft)
                         result[equipWeaponSet].leftHand = tempInventory;
                 }
-            }, "SELECT id, dataId, level, amount, equipSlotIndex, durability, exp, lockRemainsDuration, ammo, sockets, idx, inventoryType FROM characteritem WHERE characterId=@characterId AND (inventoryType=@inventoryType1 OR inventoryType=@inventoryType2) ORDER BY idx ASC",
+            }, "SELECT id, dataId, level, amount, equipSlotIndex, durability, exp, lockRemainsDuration, expireTime, randomSeed, ammo, sockets, idx, inventoryType FROM characteritem WHERE characterId=@characterId AND (inventoryType=@inventoryType1 OR inventoryType=@inventoryType2) ORDER BY idx ASC",
                 new SqliteParameter("@characterId", characterId),
                 new SqliteParameter("@inventoryType1", (byte)InventoryType.EquipWeaponRight),
                 new SqliteParameter("@inventoryType2", (byte)InventoryType.EquipWeaponLeft));
