@@ -349,6 +349,12 @@ namespace MultiplayerARPG.MMO
             if (!IsColumnExist("characteritem", "lockRemainsDuration"))
                 ExecuteNonQuery("ALTER TABLE characteritem ADD lockRemainsDuration REAL NOT NULL DEFAULT 0;");
 
+            if (!IsColumnExist("characteritem", "expireTime"))
+                ExecuteNonQuery("ALTER TABLE characteritem ADD expireTime INTEGER NOT NULL DEFAULT 0;");
+
+            if (!IsColumnExist("characteritem", "randomSeed"))
+                ExecuteNonQuery("ALTER TABLE characteritem ADD randomSeed INTEGER NOT NULL DEFAULT 0;");
+
             if (!IsColumnExist("characteritem", "ammo"))
                 ExecuteNonQuery("ALTER TABLE characteritem ADD ammo INTEGER NOT NULL DEFAULT 0;");
 

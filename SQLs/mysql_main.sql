@@ -116,6 +116,8 @@ CREATE TABLE `characteritem` (
   `durability` float NOT NULL DEFAULT '0',
   `exp` int NOT NULL DEFAULT '0',
   `lockRemainsDuration` float NOT NULL DEFAULT '0',
+  `expireTime` bigint NOT NULL DEFAULT '0',
+  `randomSeed` tinyint UNSIGNED NOT NULL DEFAULT '0',
   `ammo` int NOT NULL DEFAULT '0',
   `sockets` text CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -181,7 +183,7 @@ CREATE TABLE `characters` (
   `respawnPositionY` float NOT NULL DEFAULT '0',
   `respawnPositionZ` float NOT NULL DEFAULT '0',
   `mountDataId` int NOT NULL DEFAULT '0',
-  `lastDeadTime` int NOT NULL DEFAULT '0',
+  `lastDeadTime` bigint NOT NULL DEFAULT '0',
   `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
