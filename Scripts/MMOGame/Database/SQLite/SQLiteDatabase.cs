@@ -816,19 +816,46 @@ namespace MultiplayerARPG.MMO
             return result != null ? (long)result : 0;
         }
 
-        public override UniTask<long> GetUserUnbanTime(string userId)
+        public override async UniTask<long> GetUserUnbanTime(string userId)
         {
-            throw new NotImplementedException();
+            await UniTask.Yield();
+            long unbanTime = 0;
+            ExecuteReader((reader) =>
+            {
+                if (reader.Read())
+                {
+                    unbanTime = reader.GetInt64(0);
+                }
+            }, "SELECT unbanTime FROM userlogin WHERE id=@id LIMIT 1",
+                new SqliteParameter("@id", userId));
+            return unbanTime;
         }
 
-        public override UniTask SetUserUnbanTimeByCharacterName(string characterName, long unbanTime)
+        public override async UniTask SetUserUnbanTimeByCharacterName(string characterName, long unbanTime)
         {
-            throw new NotImplementedException();
+            await UniTask.Yield();
+            string userId = string.Empty;
+            ExecuteReader((reader) =>
+            {
+                if (reader.Read())
+                {
+                    userId = reader.GetString(0);
+                }
+            }, "SELECT userId FROM characters WHERE characterName LIKE @characterName LIMIT 1",
+                new SqliteParameter("@characterName", characterName));
+            if (string.IsNullOrEmpty(userId))
+                return;
+            ExecuteNonQuery("UPDATE userlogin SET unbanTime=@unbanTime WHERE id=@id LIMIT 1",
+                new SqliteParameter("@id", userId),
+                new SqliteParameter("@unbanTime", unbanTime));
         }
 
-        public override UniTask SetCharacterUnmuteTimeByCharacterName(string characterName, long unmuteTime)
+        public override async UniTask SetCharacterUnmuteTimeByCharacterName(string characterName, long unmuteTime)
         {
-            throw new NotImplementedException();
+            await UniTask.Yield();
+            ExecuteNonQuery("UPDATE characters SET unmuteTime=@unmuteTime WHERE characterName LIKE @characterName",
+                new SqliteParameter("@characterName", characterName),
+                new SqliteParameter("@unmuteTime", unmuteTime));
         }
 #endif
     }

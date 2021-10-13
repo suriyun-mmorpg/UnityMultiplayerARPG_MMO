@@ -754,19 +754,43 @@ namespace MultiplayerARPG.MMO
             return result != null ? (long)result : 0;
         }
 
-        public override UniTask<long> GetUserUnbanTime(string userId)
+        public override async UniTask<long> GetUserUnbanTime(string userId)
         {
-            throw new NotImplementedException();
+            long unbanTime = 0;
+            await ExecuteReader((reader) =>
+            {
+                if (reader.Read())
+                {
+                    unbanTime = reader.GetInt64(0);
+                }
+            }, "SELECT unbanTime FROM userlogin WHERE id=@id LIMIT 1",
+                new MySqlParameter("@id", userId));
+            return unbanTime;
         }
 
-        public override UniTask SetUserUnbanTimeByCharacterName(string characterName, long unbanTime)
+        public override async UniTask SetUserUnbanTimeByCharacterName(string characterName, long unbanTime)
         {
-            throw new NotImplementedException();
+            string userId = string.Empty;
+            await ExecuteReader((reader) =>
+            {
+                if (reader.Read())
+                {
+                    userId = reader.GetString(0);
+                }
+            }, "SELECT userId FROM characters WHERE characterName LIKE @characterName LIMIT 1",
+                new MySqlParameter("@characterName", characterName));
+            if (string.IsNullOrEmpty(userId))
+                return;
+            await ExecuteNonQuery("UPDATE userlogin SET unbanTime=@unbanTime WHERE id=@id LIMIT 1",
+                new MySqlParameter("@id", userId),
+                new MySqlParameter("@unbanTime", unbanTime));
         }
 
-        public override UniTask SetCharacterUnmuteTimeByCharacterName(string characterName, long unmuteTime)
+        public override async UniTask SetCharacterUnmuteTimeByCharacterName(string characterName, long unmuteTime)
         {
-            throw new NotImplementedException();
+            await ExecuteNonQuery("UPDATE characters SET unmuteTime=@unmuteTime WHERE characterName LIKE @characterName LIMIT 1",
+                new MySqlParameter("@characterName", characterName),
+                new MySqlParameter("@unmuteTime", unmuteTime));
         }
 #endif
     }
