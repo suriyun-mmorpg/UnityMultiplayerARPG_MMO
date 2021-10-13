@@ -850,7 +850,7 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@unbanTime", unbanTime));
         }
 
-        public override async UniTask SetCharacterUnmuteTimeByCharacterName(string characterName, long unmuteTime)
+        public override async UniTask SetCharacterUnmuteTimeByName(string characterName, long unmuteTime)
         {
             await UniTask.Yield();
             ExecuteNonQuery("UPDATE characters SET unmuteTime=@unmuteTime WHERE characterName LIKE @characterName",

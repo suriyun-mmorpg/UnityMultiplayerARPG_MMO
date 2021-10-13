@@ -786,7 +786,7 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@unbanTime", unbanTime));
         }
 
-        public override async UniTask SetCharacterUnmuteTimeByCharacterName(string characterName, long unmuteTime)
+        public override async UniTask SetCharacterUnmuteTimeByName(string characterName, long unmuteTime)
         {
             await ExecuteNonQuery("UPDATE characters SET unmuteTime=@unmuteTime WHERE characterName LIKE @characterName LIMIT 1",
                 new MySqlParameter("@characterName", characterName),

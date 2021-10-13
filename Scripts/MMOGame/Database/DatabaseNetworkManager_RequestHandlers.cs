@@ -1342,6 +1342,33 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
+        protected async UniTaskVoid GetUserUnbanTime(RequestHandlerData requestHandler, GetUserUnbanTimeReq request, RequestProceedResultDelegate<GetUserUnbanTimeResp> result)
+        {
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            long unbanTime = await Database.GetUserUnbanTime(request.UserId);
+            result.Invoke(AckResponseCode.Success, new GetUserUnbanTimeResp()
+            {
+                UnbanTime = unbanTime,
+            });
+#endif
+        }
+
+        protected async UniTaskVoid SetUserUnbanTimeByCharacterName(RequestHandlerData requestHandler, SetUserUnbanTimeByCharacterNameReq request, RequestProceedResultDelegate<EmptyMessage> result)
+        {
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            await Database.SetUserUnbanTimeByCharacterName(request.CharacterName, request.UnbanTime);
+            result.Invoke(AckResponseCode.Success, new EmptyMessage());
+#endif
+        }
+
+        protected async UniTaskVoid SetCharacterUnmuteTimeByName(RequestHandlerData requestHandler, SetCharacterUnmuteTimeByNameReq request, RequestProceedResultDelegate<EmptyMessage> result)
+        {
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            await Database.SetCharacterUnmuteTimeByName(request.CharacterName, request.UnmuteTime);
+            result.Invoke(AckResponseCode.Success, new EmptyMessage());
+#endif
+        }
+
 #if UNITY_STANDALONE && !CLIENT_BUILD
         protected async UniTask<int> ReadGold(string userId)
         {
@@ -1386,7 +1413,6 @@ namespace MultiplayerARPG.MMO
 
         protected async UniTask<SocialCharacterData> ReadSocialCharacter(string id)
         {
-            //cachedSocialCharacter
             SocialCharacterData character;
             if (!cachedSocialCharacter.TryGetValue(id, out character))
             {
