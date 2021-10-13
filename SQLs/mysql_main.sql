@@ -381,7 +381,7 @@ CREATE TABLE `storageitem` (
 CREATE TABLE `userlogin` (
   `id` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   `username` varchar(32) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `password` varchar(32) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+  `password` varchar(72) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   `gold` int NOT NULL DEFAULT '0',
   `cash` int NOT NULL DEFAULT '0',
   `email` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
