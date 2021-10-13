@@ -24,6 +24,9 @@ namespace MultiplayerARPG.MMO
         public abstract UniTask UpdateAccessToken(string userId, string accessToken);
         public abstract UniTask CreateUserLogin(string username, string password);
         public abstract UniTask<long> FindUsername(string username);
+        public abstract UniTask<long> GetUserUnbanTime(string userId);
+        public abstract UniTask SetUserUnbanTimeByCharacterName(string characterName, long unbanTime);
+        public abstract UniTask SetCharacterUnmuteTimeByCharacterName(string characterName, long unmuteTime);
 
         public abstract UniTask CreateCharacter(string userId, IPlayerCharacterData characterData);
         public abstract UniTask<PlayerCharacterData> ReadCharacter(

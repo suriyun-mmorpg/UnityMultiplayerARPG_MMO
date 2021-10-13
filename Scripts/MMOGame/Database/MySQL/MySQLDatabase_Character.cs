@@ -334,7 +334,8 @@ namespace MultiplayerARPG.MMO
                     reader.GetFloat(30));
                 result.MountDataId = reader.GetInt32(31);
                 result.LastDeadTime = reader.GetInt64(32);
-                result.LastUpdate = ((System.DateTimeOffset)reader.GetDateTime(33)).ToUnixTimeSeconds();
+                result.UnmuteTime = reader.GetInt64(33);
+                result.LastUpdate = ((System.DateTimeOffset)reader.GetDateTime(34)).ToUnixTimeSeconds();
                 return true;
             }
             result = null;
@@ -365,7 +366,7 @@ namespace MultiplayerARPG.MMO
                 "equipWeaponSet, statPoint, skillPoint, gold, partyId, guildId, guildRole, sharedGuildExp, " +
                 "currentMapName, currentPositionX, currentPositionY, currentPositionZ, currentRotationX, currentRotationY, currentRotationZ," +
                 "respawnMapName, respawnPositionX, respawnPositionY, respawnPositionZ," +
-                "mountDataId, lastDeadTime, updateAt FROM characters WHERE id=@id LIMIT 1",
+                "mountDataId, lastDeadTime, unmuteTime, updateAt FROM characters WHERE id=@id LIMIT 1",
                 new MySqlParameter("@id", id));
             // Found character, then read its relates data
             if (result != null)
@@ -496,6 +497,7 @@ namespace MultiplayerARPG.MMO
                 "respawnPositionZ=@respawnPositionZ, " +
                 "mountDataId=@mountDataId, " +
                 "lastDeadTime=@lastDeadTime " +
+                "unmuteTime=@unmuteTime " +
                 "WHERE id=@id",
                 new MySqlParameter("@dataId", character.DataId),
                 new MySqlParameter("@entityId", character.EntityId),
@@ -525,6 +527,7 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@respawnPositionZ", character.RespawnPosition.z),
                 new MySqlParameter("@mountDataId", character.MountDataId),
                 new MySqlParameter("@lastDeadTime", character.LastDeadTime),
+                new MySqlParameter("@unmuteTime", character.UnmuteTime),
                 new MySqlParameter("@id", character.Id));
             await FillCharacterRelatesData(character);
             this.InvokeInstanceDevExtMethods("UpdateCharacter", character);

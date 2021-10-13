@@ -61,20 +61,14 @@ namespace MultiplayerARPG.MMO
             return result.Response;
         }
 
-        public async UniTask<EmptyMessage> UpdateAccessTokenAsync(UpdateAccessTokenReq request)
+        public async UniTask UpdateAccessTokenAsync(UpdateAccessTokenReq request)
         {
-            var result = await Client.SendRequestAsync<UpdateAccessTokenReq, EmptyMessage>(DatabaseRequestTypes.RequestUpdateAccessToken, request);
-            if (result.ResponseCode != AckResponseCode.Success)
-                return EmptyMessage.Value;
-            return result.Response;
+            await Client.SendRequestAsync<UpdateAccessTokenReq, EmptyMessage>(DatabaseRequestTypes.RequestUpdateAccessToken, request);
         }
 
-        public async UniTask<EmptyMessage> CreateUserLoginAsync(CreateUserLoginReq request)
+        public async UniTask CreateUserLoginAsync(CreateUserLoginReq request)
         {
-            var result = await Client.SendRequestAsync<CreateUserLoginReq, EmptyMessage>(DatabaseRequestTypes.RequestCreateUserLogin, request);
-            if (result.ResponseCode != AckResponseCode.Success)
-                return EmptyMessage.Value;
-            return result.Response;
+            await Client.SendRequestAsync<CreateUserLoginReq, EmptyMessage>(DatabaseRequestTypes.RequestCreateUserLogin, request);
         }
 
         public async UniTask<FindUsernameResp> FindUsernameAsync(FindUsernameReq request)
@@ -117,12 +111,9 @@ namespace MultiplayerARPG.MMO
             return result.Response;
         }
 
-        public async UniTask<EmptyMessage> DeleteCharacterAsync(DeleteCharacterReq request)
+        public async UniTask DeleteCharacterAsync(DeleteCharacterReq request)
         {
-            var result = await Client.SendRequestAsync<DeleteCharacterReq, EmptyMessage>(DatabaseRequestTypes.RequestDeleteCharacter, request);
-            if (result.ResponseCode != AckResponseCode.Success)
-                return EmptyMessage.Value;
-            return result.Response;
+            await Client.SendRequestAsync<DeleteCharacterReq, EmptyMessage>(DatabaseRequestTypes.RequestDeleteCharacter, request);
         }
 
         public async UniTask<FindCharacterNameResp> FindCharacterNameAsync(FindCharacterNameReq request)
@@ -181,12 +172,9 @@ namespace MultiplayerARPG.MMO
             return result.Response;
         }
 
-        public async UniTask<EmptyMessage> DeleteBuildingAsync(DeleteBuildingReq request)
+        public async UniTask DeleteBuildingAsync(DeleteBuildingReq request)
         {
-            var result = await Client.SendRequestAsync<DeleteBuildingReq, EmptyMessage>(DatabaseRequestTypes.RequestDeleteBuilding, request);
-            if (result.ResponseCode != AckResponseCode.Success)
-                return EmptyMessage.Value;
-            return result.Response;
+            await Client.SendRequestAsync<DeleteBuildingReq, EmptyMessage>(DatabaseRequestTypes.RequestDeleteBuilding, request);
         }
 
         public async UniTask<BuildingsResp> ReadBuildingsAsync(ReadBuildingsReq request)
@@ -221,12 +209,9 @@ namespace MultiplayerARPG.MMO
             return result.Response;
         }
 
-        public async UniTask<EmptyMessage> DeletePartyAsync(DeletePartyReq request)
+        public async UniTask DeletePartyAsync(DeletePartyReq request)
         {
-            var result = await Client.SendRequestAsync<DeletePartyReq, EmptyMessage>(DatabaseRequestTypes.RequestDeleteParty, request);
-            if (result.ResponseCode != AckResponseCode.Success)
-                return EmptyMessage.Value;
-            return result.Response;
+            await Client.SendRequestAsync<DeletePartyReq, EmptyMessage>(DatabaseRequestTypes.RequestDeleteParty, request);
         }
 
         public async UniTask<PartyResp> UpdateCharacterPartyAsync(UpdateCharacterPartyReq request)
@@ -237,12 +222,9 @@ namespace MultiplayerARPG.MMO
             return result.Response;
         }
 
-        public async UniTask<EmptyMessage> ClearCharacterPartyAsync(ClearCharacterPartyReq request)
+        public async UniTask ClearCharacterPartyAsync(ClearCharacterPartyReq request)
         {
-            var result = await Client.SendRequestAsync<ClearCharacterPartyReq, EmptyMessage>(DatabaseRequestTypes.RequestClearCharacterParty, request);
-            if (result.ResponseCode != AckResponseCode.Success)
-                return EmptyMessage.Value;
-            return result.Response;
+            await Client.SendRequestAsync<ClearCharacterPartyReq, EmptyMessage>(DatabaseRequestTypes.RequestClearCharacterParty, request);
         }
 
         public async UniTask<PartyResp> ReadPartyAsync(ReadPartyReq request)
@@ -317,12 +299,9 @@ namespace MultiplayerARPG.MMO
             return result.Response;
         }
 
-        public async UniTask<EmptyMessage> DeleteGuildAsync(DeleteGuildReq request)
+        public async UniTask DeleteGuildAsync(DeleteGuildReq request)
         {
-            var result = await Client.SendRequestAsync<DeleteGuildReq, EmptyMessage>(DatabaseRequestTypes.RequestDeleteGuild, request);
-            if (result.ResponseCode != AckResponseCode.Success)
-                return EmptyMessage.Value;
-            return result.Response;
+            await Client.SendRequestAsync<DeleteGuildReq, EmptyMessage>(DatabaseRequestTypes.RequestDeleteGuild, request);
         }
 
         public async UniTask<GuildResp> UpdateCharacterGuildAsync(UpdateCharacterGuildReq request)
@@ -333,12 +312,9 @@ namespace MultiplayerARPG.MMO
             return result.Response;
         }
 
-        public async UniTask<EmptyMessage> ClearCharacterGuildAsync(ClearCharacterGuildReq request)
+        public async UniTask ClearCharacterGuildAsync(ClearCharacterGuildReq request)
         {
-            var result = await Client.SendRequestAsync<ClearCharacterGuildReq, EmptyMessage>(DatabaseRequestTypes.RequestClearCharacterGuild, request);
-            if (result.ResponseCode != AckResponseCode.Success)
-                return EmptyMessage.Value;
-            return result.Response;
+            await Client.SendRequestAsync<ClearCharacterGuildReq, EmptyMessage>(DatabaseRequestTypes.RequestClearCharacterGuild, request);
         }
 
         public async UniTask<FindGuildNameResp> FindGuildNameAsync(FindGuildNameReq request)
@@ -507,6 +483,24 @@ namespace MultiplayerARPG.MMO
             if (result.ResponseCode != AckResponseCode.Success)
                 return new GetMailNotificationCountResp();
             return result.Response;
+        }
+
+        public async UniTask<GetUserUnbanTimeResp> GetUserUnbanTimeAsync(GetUserUnbanTimeReq request)
+        {
+            var result = await Client.SendRequestAsync<GetUserUnbanTimeReq, GetUserUnbanTimeResp>(DatabaseRequestTypes.RequestGetUserUnbanTime, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new GetUserUnbanTimeResp();
+            return result.Response;
+        }
+
+        public async UniTask SetUserUnbanTimeByCharacterNameAsync(SetUserUnbanTimeByCharacterNameReq request)
+        {
+            await Client.SendRequestAsync<SetUserUnbanTimeByCharacterNameReq, EmptyMessage>(DatabaseRequestTypes.RequestSetUserUnbanTimeByCharacterName, request);
+        }
+
+        public async UniTask SetCharacterUnmuteTimeByNameAsync(SetCharacterUnmuteTimeByNameReq request)
+        {
+            await Client.SendRequestAsync<SetCharacterUnmuteTimeByNameReq, EmptyMessage>(DatabaseRequestTypes.RequestSetCharacterUnmuteTimeByName, request);
         }
     }
 }

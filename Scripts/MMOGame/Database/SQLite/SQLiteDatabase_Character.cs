@@ -162,7 +162,8 @@ namespace MultiplayerARPG.MMO
                     reader.GetFloat(30));
                 result.MountDataId = reader.GetInt32(31);
                 result.LastDeadTime = reader.GetInt64(32);
-                result.LastUpdate = ((System.DateTimeOffset)reader.GetDateTime(33)).ToUnixTimeSeconds();
+                result.UnmuteTime = reader.GetInt64(33);
+                result.LastUpdate = ((System.DateTimeOffset)reader.GetDateTime(34)).ToUnixTimeSeconds();
                 return true;
             }
             result = null;
@@ -194,7 +195,7 @@ namespace MultiplayerARPG.MMO
                 "equipWeaponSet, statPoint, skillPoint, gold, partyId, guildId, guildRole, sharedGuildExp, " +
                 "currentMapName, currentPositionX, currentPositionY, currentPositionZ, currentRotationX, currentRotationY, currentRotationZ," +
                 "respawnMapName, respawnPositionX, respawnPositionY, respawnPositionZ," +
-                "mountDataId, lastDeadTime, updateAt FROM characters WHERE id=@id LIMIT 1",
+                "mountDataId, lastDeadTime, unmuteTime, updateAt FROM characters WHERE id=@id LIMIT 1",
                 new SqliteParameter("@id", id));
             // Found character, then read its relates data
             if (result != null)
@@ -289,6 +290,7 @@ namespace MultiplayerARPG.MMO
                 "respawnPositionZ=@respawnPositionZ, " +
                 "mountDataId=@mountDataId, " +
                 "lastDeadTime=@lastDeadTime " +
+                "unmuteTime=@unmuteTime " +
                 "WHERE id=@id",
                 new SqliteParameter("@dataId", character.DataId),
                 new SqliteParameter("@entityId", character.EntityId),
@@ -318,6 +320,7 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@respawnPositionZ", character.RespawnPosition.z),
                 new SqliteParameter("@mountDataId", character.MountDataId),
                 new SqliteParameter("@lastDeadTime", character.LastDeadTime),
+                new SqliteParameter("@unmuteTime", character.UnmuteTime),
                 new SqliteParameter("@id", character.Id));
             FillCharacterRelatesData(character);
             this.InvokeInstanceDevExtMethods("UpdateCharacter", character);

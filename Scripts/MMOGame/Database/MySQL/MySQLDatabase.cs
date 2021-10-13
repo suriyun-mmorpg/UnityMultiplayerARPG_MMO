@@ -753,6 +753,21 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@username", username));
             return result != null ? (long)result : 0;
         }
+
+        public override UniTask<long> GetUserUnbanTime(string userId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override UniTask SetUserUnbanTimeByCharacterName(string characterName, long unbanTime)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override UniTask SetCharacterUnmuteTimeByCharacterName(string characterName, long unmuteTime)
+        {
+            throw new NotImplementedException();
+        }
 #endif
     }
 }
