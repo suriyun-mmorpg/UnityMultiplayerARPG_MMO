@@ -177,6 +177,7 @@ namespace MultiplayerARPG.MMO
             UITextKeys message = UITextKeys.NONE;
             string userId = request.userId;
             string accessToken = request.accessToken;
+            long unbanTime = 0;
             ValidateAccessTokenResp validateAccessTokenResp = await DbServiceClient.ValidateAccessTokenAsync(new ValidateAccessTokenReq()
             {
                 UserId = userId,
@@ -190,23 +191,37 @@ namespace MultiplayerARPG.MMO
             }
             else
             {
-                CentralUserPeerInfo userPeerInfo;
-                if (userPeersByUserId.TryGetValue(userId, out userPeerInfo))
+                GetUserUnbanTimeResp resp = await DbServiceClient.GetUserUnbanTimeAsync(new GetUserUnbanTimeReq()
                 {
-                    userPeersByUserId.Remove(userPeerInfo.userId);
-                    userPeers.Remove(userPeerInfo.connectionId);
-                }
-                userPeerInfo = new CentralUserPeerInfo();
-                userPeerInfo.connectionId = connectionId;
-                userPeerInfo.userId = userId;
-                userPeerInfo.accessToken = accessToken = Regex.Replace(System.Convert.ToBase64String(System.Guid.NewGuid().ToByteArray()), "[/+=]", "");
-                userPeersByUserId[userId] = userPeerInfo;
-                userPeers[connectionId] = userPeerInfo;
-                await DbServiceClient.UpdateAccessTokenAsync(new UpdateAccessTokenReq()
-                {
-                    UserId = userPeerInfo.userId,
-                    AccessToken = accessToken
+                    UserId = userId
                 });
+                unbanTime = resp.UnbanTime;
+                if (unbanTime > System.DateTimeOffset.UtcNow.ToUnixTimeSeconds())
+                {
+                    message = UITextKeys.UI_ERROR_USER_BANNED;
+                    userId = string.Empty;
+                    accessToken = string.Empty;
+                }
+                else
+                {
+                    CentralUserPeerInfo userPeerInfo;
+                    if (userPeersByUserId.TryGetValue(userId, out userPeerInfo))
+                    {
+                        userPeersByUserId.Remove(userPeerInfo.userId);
+                        userPeers.Remove(userPeerInfo.connectionId);
+                    }
+                    userPeerInfo = new CentralUserPeerInfo();
+                    userPeerInfo.connectionId = connectionId;
+                    userPeerInfo.userId = userId;
+                    userPeerInfo.accessToken = accessToken = Regex.Replace(System.Convert.ToBase64String(System.Guid.NewGuid().ToByteArray()), "[/+=]", "");
+                    userPeersByUserId[userId] = userPeerInfo;
+                    userPeers[connectionId] = userPeerInfo;
+                    await DbServiceClient.UpdateAccessTokenAsync(new UpdateAccessTokenReq()
+                    {
+                        UserId = userPeerInfo.userId,
+                        AccessToken = accessToken
+                    });
+                }
             }
             // Response
             result.Invoke(
