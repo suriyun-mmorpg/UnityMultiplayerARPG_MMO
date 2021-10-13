@@ -289,7 +289,7 @@ namespace MultiplayerARPG.MMO
                 "respawnPositionY=@respawnPositionY, " +
                 "respawnPositionZ=@respawnPositionZ, " +
                 "mountDataId=@mountDataId, " +
-                "lastDeadTime=@lastDeadTime " +
+                "lastDeadTime=@lastDeadTime, " +
                 "unmuteTime=@unmuteTime " +
                 "WHERE id=@id",
                 new SqliteParameter("@dataId", character.DataId),
