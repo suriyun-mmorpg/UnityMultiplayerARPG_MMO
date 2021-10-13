@@ -719,12 +719,26 @@ namespace MultiplayerARPG.MMO
         protected override void HandleChatAtServer(MessageHandlerData messageHandler)
         {
             ChatMessage message = messageHandler.ReadMessage<ChatMessage>().FillChannelId();
+            // Check muting character
+            IPlayerCharacterData playerCharacter = null;
+            if (!string.IsNullOrEmpty(message.sender) && GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(message.sender, out playerCharacter) && playerCharacter.IsMuting())
+            {
+                long connectionId;
+                if (GameInstance.ServerUserHandlers.TryGetConnectionId(playerCharacter.Id, out connectionId))
+                {
+                    ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, new ChatMessage()
+                    {
+                        channel = ChatChannel.System,
+                        message = "You have been muted.",
+                    });
+                }
+                return;
+            }
             // Local chat will processes immediately, not have to be sent to chat server
             if (message.channel == ChatChannel.Local)
             {
                 bool sentGmCommand = false;
-                IPlayerCharacterData playerCharacter;
-                if (!string.IsNullOrEmpty(message.sender) && GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(message.sender, out playerCharacter))
+                if (playerCharacter != null)
                 {
                     BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
                     string gmCommand;
