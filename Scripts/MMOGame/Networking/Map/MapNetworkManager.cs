@@ -138,7 +138,7 @@ namespace MultiplayerARPG.MMO
 #endif
             // Server Handlers
             ServerMailHandlers = gameObject.GetOrAddComponent<IServerMailHandlers, MMOServerMailHandlers>();
-            ServerUserHandlers = gameObject.GetOrAddComponent<IServerUserHandlers, DefaultServerUserHandlers>();
+            ServerUserHandlers = gameObject.GetOrAddComponent<IServerUserHandlers, MMOServerUserHandlers>();
             ServerBuildingHandlers = gameObject.GetOrAddComponent<IServerBuildingHandlers, DefaultServerBuildingHandlers>();
             ServerCharacterHandlers = gameObject.GetOrAddComponent<IServerCharacterHandlers, DefaultServerCharacterHandlers>();
             ServerGameMessageHandlers = gameObject.GetOrAddComponent<IServerGameMessageHandlers, DefaultServerGameMessageHandlers>();
@@ -851,9 +851,17 @@ namespace MultiplayerARPG.MMO
             if (message.channel == ChatChannel.Local)
             {
                 // Handle GM command here, only GM command will be broadcasted as local channel
-                BasePlayerCharacterEntity playerCharacterEntity;
+                BasePlayerCharacterEntity playerCharacterEntity = null;
                 GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(message.sender, out playerCharacterEntity);
-                GameInstance.Singleton.GMCommands.HandleGMCommand(playerCharacterEntity, message.message);
+                string response = GameInstance.Singleton.GMCommands.HandleGMCommand(playerCharacterEntity, message.message);
+                if (playerCharacterEntity != null && !string.IsNullOrEmpty(response))
+                {
+                    ServerSendPacket(playerCharacterEntity.ConnectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, new ChatMessage()
+                    {
+                        channel = ChatChannel.System,
+                        message = response,
+                    });
+                }
             }
             else
             {
