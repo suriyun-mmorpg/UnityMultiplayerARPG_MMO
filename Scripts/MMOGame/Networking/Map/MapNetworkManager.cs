@@ -856,7 +856,7 @@ namespace MultiplayerARPG.MMO
                 // Handle GM command here, only GM command will be broadcasted as local channel
                 BasePlayerCharacterEntity playerCharacterEntity = null;
                 GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(message.sender, out playerCharacterEntity);
-                string response = GameInstance.Singleton.GMCommands.HandleGMCommand(playerCharacterEntity, message.message);
+                string response = GameInstance.Singleton.GMCommands.HandleGMCommand(message.sender, playerCharacterEntity, message.message);
                 if (playerCharacterEntity != null && !string.IsNullOrEmpty(response))
                 {
                     ServerSendPacket(playerCharacterEntity.ConnectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, new ChatMessage()
