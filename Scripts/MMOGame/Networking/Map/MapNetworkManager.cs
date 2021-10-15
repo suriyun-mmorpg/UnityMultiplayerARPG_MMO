@@ -724,7 +724,9 @@ namespace MultiplayerARPG.MMO
             ChatMessage message = messageHandler.ReadMessage<ChatMessage>().FillChannelId();
             // Check muting character
             IPlayerCharacterData playerCharacter = null;
-            if (!message.sendByServer && !string.IsNullOrEmpty(message.sender) && GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(message.sender, out playerCharacter) && playerCharacter.IsMuting())
+            if (!string.IsNullOrEmpty(message.sender))
+                GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(message.sender, out playerCharacter);
+            if (!message.sendByServer && playerCharacter != null && playerCharacter.IsMuting())
             {
                 long connectionId;
                 if (GameInstance.ServerUserHandlers.TryGetConnectionId(playerCharacter.Id, out connectionId))
@@ -743,7 +745,7 @@ namespace MultiplayerARPG.MMO
                 bool sentGmCommand = false;
                 if (message.sendByServer || playerCharacter != null)
                 {
-                    BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
+                    BasePlayerCharacterEntity playerCharacterEntity = playerCharacter == null ? null : playerCharacter as BasePlayerCharacterEntity;
                     string gmCommand;
                     if (message.sendByServer || (playerCharacterEntity != null &&
                         GameInstance.Singleton.GMCommands.IsGMCommand(message.message, out gmCommand) &&
