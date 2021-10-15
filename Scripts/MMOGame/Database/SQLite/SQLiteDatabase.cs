@@ -845,7 +845,7 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@characterName", characterName));
             if (string.IsNullOrEmpty(userId))
                 return;
-            ExecuteNonQuery("UPDATE userlogin SET unbanTime=@unbanTime WHERE id=@id LIMIT 1",
+            ExecuteNonQuery("UPDATE userlogin SET unbanTime=@unbanTime WHERE id=@id",
                 new SqliteParameter("@id", userId),
                 new SqliteParameter("@unbanTime", unbanTime));
         }
