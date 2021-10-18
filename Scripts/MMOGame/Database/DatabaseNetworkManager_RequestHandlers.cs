@@ -184,9 +184,15 @@ namespace MultiplayerARPG.MMO
         protected async UniTaskVoid ReadCharacters(RequestHandlerData requestHandler, ReadCharactersReq request, RequestProceedResultDelegate<CharactersResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
+            List<PlayerCharacterData> characters = await Database.ReadCharacters(request.UserId);
+            // Read and cache character (or load from cache)
+            for (int i = 0; i < characters.Count; ++i)
+            {
+                characters[i] = await ReadCharacter(characters[i].Id);
+            }
             result.Invoke(AckResponseCode.Success, new CharactersResp()
             {
-                List = await Database.ReadCharacters(request.UserId)
+                List = characters
             });
 #endif
         }
