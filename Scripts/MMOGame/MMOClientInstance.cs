@@ -8,7 +8,7 @@ using Cysharp.Threading.Tasks;
 
 namespace MultiplayerARPG.MMO
 {
-    [DefaultExecutionOrder(-899)]
+    [DefaultExecutionOrder(-898)]
     public partial class MMOClientInstance : MonoBehaviour
     {
         public static MMOClientInstance Singleton { get; protected set; }
@@ -26,11 +26,14 @@ namespace MultiplayerARPG.MMO
         [SerializeField]
         private bool useWebSocket = false;
         [SerializeField]
+        private bool webSocketSecure = false;
+        [SerializeField]
         private MmoNetworkSetting[] networkSettings = new MmoNetworkSetting[0];
 
         public CentralNetworkManager CentralNetworkManager { get { return centralNetworkManager; } }
         public MapNetworkManager MapNetworkManager { get { return mapNetworkManager; } }
         public bool UseWebSocket { get { return useWebSocket; } }
+        public bool WebSocketSecure { get { return webSocketSecure; } }
         public MmoNetworkSetting[] NetworkSettings { get { return networkSettings; } }
 
         public System.Action onCentralClientConnected;
@@ -54,7 +57,9 @@ namespace MultiplayerARPG.MMO
 
             // Active WebSockets
             CentralNetworkManager.useWebSocket = UseWebSocket;
+            CentralNetworkManager.webSocketSecure = WebSocketSecure;
             MapNetworkManager.useWebSocket = UseWebSocket;
+            MapNetworkManager.webSocketSecure = WebSocketSecure;
         }
 
         private void OnEnable()

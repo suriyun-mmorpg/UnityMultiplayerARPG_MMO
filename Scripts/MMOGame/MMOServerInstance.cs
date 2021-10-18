@@ -27,6 +27,12 @@ namespace MultiplayerARPG.MMO
         public const string ARG_MACHINE_ADDRESS = "-" + CONFIG_MACHINE_ADDRESS;
         public const string CONFIG_USE_WEB_SOCKET = "useWebSocket";
         public const string ARG_USE_WEB_SOCKET = "-" + CONFIG_USE_WEB_SOCKET;
+        public const string CONFIG_WEB_SOCKET_SECURE = "webSocketSecure";
+        public const string ARG_WEB_SOCKET_SECURE = "-" + CONFIG_WEB_SOCKET_SECURE;
+        public const string CONFIG_WEB_SOCKET_CERT_PATH = "webSocketCertPath";
+        public const string ARG_WEB_SOCKET_CERT_PATH = "-" + CONFIG_WEB_SOCKET_CERT_PATH;
+        public const string CONFIG_WEB_SOCKET_CERT_PASSWORD = "webSocketCertPassword";
+        public const string ARG_WEB_SOCKET_CERT_PASSWORD = "-" + CONFIG_WEB_SOCKET_CERT_PASSWORD;
         // Map spawn server
         public const string CONFIG_MAP_SPAWN_PORT = "mapSpawnPort";
         public const string ARG_MAP_SPAWN_PORT = "-" + CONFIG_MAP_SPAWN_PORT;
@@ -102,6 +108,12 @@ namespace MultiplayerARPG.MMO
         [Header("Settings")]
         [SerializeField]
         private bool useWebSocket = false;
+        [SerializeField]
+        private bool webSocketSecure = false;
+        [SerializeField]
+        private string webSocketCertPath = string.Empty;
+        [SerializeField]
+        private string webSocketCertPassword = string.Empty;
 
         public CentralNetworkManager CentralNetworkManager { get { return centralNetworkManager; } }
         public MapSpawnNetworkManager MapSpawnNetworkManager { get { return mapSpawnNetworkManager; } }
@@ -109,6 +121,9 @@ namespace MultiplayerARPG.MMO
         public ChatNetworkManager ChatNetworkManager { get { return chatNetworkManager; } }
         public DatabaseNetworkManager DatabaseNetworkManager { get { return databaseNetworkManager; } }
         public bool UseWebSocket { get { return useWebSocket; } }
+        public bool WebSocketSecure { get { return webSocketSecure; } }
+        public string WebScoketCertificateFilePath { get { return webSocketCertPath; } }
+        public string WebScoketCertificatePassword { get { return webSocketCertPassword; } }
 
         private LogGUI cacheLogGUI;
         public LogGUI CacheLogGUI
@@ -192,10 +207,44 @@ namespace MultiplayerARPG.MMO
                 {
                     this.useWebSocket = useWebSocket;
                 }
+                bool webSocketSecure = ConfigReader.IsArgsProvided(args, ARG_WEB_SOCKET_SECURE);
+                if (webSocketSecure || ConfigReader.ReadConfigs(jsonConfig, CONFIG_WEB_SOCKET_SECURE, out webSocketSecure))
+                {
+                    this.webSocketSecure = webSocketSecure;
+                }
+                string webSocketCertPath;
+                if (ConfigReader.ReadArgs(args, ARG_WEB_SOCKET_CERT_PATH, out webSocketCertPath, string.Empty) ||
+                    ConfigReader.ReadConfigs(jsonConfig, CONFIG_WEB_SOCKET_CERT_PATH, out webSocketCertPath, string.Empty))
+                {
+                    this.webSocketCertPath = webSocketCertPath;
+                }
+                string webSocketCertPassword;
+                if (ConfigReader.ReadArgs(args, ARG_WEB_SOCKET_CERT_PASSWORD, out webSocketCertPassword, string.Empty) ||
+                    ConfigReader.ReadConfigs(jsonConfig, CONFIG_WEB_SOCKET_CERT_PASSWORD, out webSocketCertPassword, string.Empty))
+                {
+                    this.webSocketCertPassword = webSocketCertPassword;
+                }
+
+                // Active WebSockets
                 CentralNetworkManager.useWebSocket = UseWebSocket;
+                CentralNetworkManager.webSocketSecure = WebSocketSecure;
+                CentralNetworkManager.webSocketCertificateFilePath = WebScoketCertificateFilePath;
+                CentralNetworkManager.webSocketCertificatePassword = WebScoketCertificatePassword;
+
                 MapSpawnNetworkManager.useWebSocket = UseWebSocket;
+                MapSpawnNetworkManager.webSocketSecure = WebSocketSecure;
+                MapSpawnNetworkManager.webSocketCertificateFilePath = WebScoketCertificateFilePath;
+                MapSpawnNetworkManager.webSocketCertificatePassword = WebScoketCertificatePassword;
+
                 MapNetworkManager.useWebSocket = UseWebSocket;
+                MapNetworkManager.webSocketSecure = WebSocketSecure;
+                MapNetworkManager.webSocketCertificateFilePath = WebScoketCertificateFilePath;
+                MapNetworkManager.webSocketCertificatePassword = WebScoketCertificatePassword;
+
                 ChatNetworkManager.useWebSocket = UseWebSocket;
+                ChatNetworkManager.webSocketSecure = WebSocketSecure;
+                ChatNetworkManager.webSocketCertificateFilePath = WebScoketCertificateFilePath;
+                ChatNetworkManager.webSocketCertificatePassword = WebScoketCertificatePassword;
 
                 // Central network address
                 string centralNetworkAddress;
@@ -440,9 +489,24 @@ namespace MultiplayerARPG.MMO
 
                 // Active WebSockets
                 CentralNetworkManager.useWebSocket = UseWebSocket;
+                CentralNetworkManager.webSocketSecure = WebSocketSecure;
+                CentralNetworkManager.webSocketCertificateFilePath = WebScoketCertificateFilePath;
+                CentralNetworkManager.webSocketCertificatePassword = WebScoketCertificatePassword;
+
                 MapSpawnNetworkManager.useWebSocket = UseWebSocket;
+                MapSpawnNetworkManager.webSocketSecure = WebSocketSecure;
+                MapSpawnNetworkManager.webSocketCertificateFilePath = WebScoketCertificateFilePath;
+                MapSpawnNetworkManager.webSocketCertificatePassword = WebScoketCertificatePassword;
+
                 MapNetworkManager.useWebSocket = UseWebSocket;
+                MapNetworkManager.webSocketSecure = WebSocketSecure;
+                MapNetworkManager.webSocketCertificateFilePath = WebScoketCertificateFilePath;
+                MapNetworkManager.webSocketCertificatePassword = WebScoketCertificatePassword;
+
                 ChatNetworkManager.useWebSocket = UseWebSocket;
+                ChatNetworkManager.webSocketSecure = WebSocketSecure;
+                ChatNetworkManager.webSocketCertificateFilePath = WebScoketCertificateFilePath;
+                ChatNetworkManager.webSocketCertificatePassword = WebScoketCertificatePassword;
 
                 if (startDatabaseOnAwake)
                     startingDatabaseServer = true;
