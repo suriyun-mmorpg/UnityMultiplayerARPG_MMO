@@ -120,8 +120,14 @@ namespace MultiplayerARPG.MMO
         {
             if (useWebSocket)
             {
-                if (centralTransportFactory == null || !centralTransportFactory.CanUseWithWebGL)
-                    centralTransportFactory = gameObject.AddComponent<WebSocketTransportFactory>();
+                if (centralTransportFactory == null || !(centralTransportFactory is IWebSocketTransportFactory))
+                {
+                    WebSocketTransportFactory webSocketTransportFactory = gameObject.AddComponent<WebSocketTransportFactory>();
+                    webSocketTransportFactory.Secure = webSocketSecure;
+                    webSocketTransportFactory.CertificateFilePath = webSocketCertificateFilePath;
+                    webSocketTransportFactory.CertificatePassword = webSocketCertificatePassword;
+                    centralTransportFactory = webSocketTransportFactory;
+                }
             }
             else
             {
