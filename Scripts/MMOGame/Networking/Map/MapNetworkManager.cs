@@ -346,12 +346,19 @@ namespace MultiplayerARPG.MMO
             {
                 string id = playerCharacterEntity.Id;
                 string userId = playerCharacterEntity.UserId;
+                // Save character immediately when player disconnect
+                while (savingCharacters.Contains(id))
+                {
+                    await UniTask.Yield();
+                }
+                await SaveCharacterRoutine(playerCharacterEntity.CloneTo(new PlayerCharacterData()), userId);
                 // Store despawning player character id, it will be used later if player not connect and continue playing the character
                 CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
                 try
                 {
                     if (despawningPlayerCharacterCancellations.TryAdd(id, cancellationTokenSource))
                         await UniTask.Delay(playerCharacterDespawnMillisecondsDelay, true, PlayerLoopTiming.Update, cancellationTokenSource.Token);
+                    // Save character again before despawned (it may attacked by other characters)
                     while (savingCharacters.Contains(id))
                     {
                         await UniTask.Yield(cancellationTokenSource.Token);
