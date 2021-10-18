@@ -8,6 +8,7 @@ using Cysharp.Threading.Tasks;
 
 namespace MultiplayerARPG.MMO
 {
+    [DefaultExecutionOrder(-899)]
     public partial class MMOClientInstance : MonoBehaviour
     {
         public static MMOClientInstance Singleton { get; protected set; }
