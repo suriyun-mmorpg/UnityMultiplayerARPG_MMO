@@ -78,7 +78,7 @@ namespace MultiplayerARPG.MMO
                 InventoryType inventoryType;
                 while (ReadCharacterItem(reader, out tempInventory))
                 {
-                    equipWeaponSet = reader.GetByte(10);
+                    equipWeaponSet = reader.GetByte(12);
                     inventoryType = (InventoryType)reader.GetByte(13);
                     // Fill weapon sets if needed
                     while (result.Count <= equipWeaponSet)
