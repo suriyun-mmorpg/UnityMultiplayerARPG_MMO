@@ -22,8 +22,9 @@ namespace MultiplayerARPG.MMO
                 result.LockPassword = reader.GetString(6);
                 result.CreatorId = reader.GetString(7);
                 result.CreatorName = reader.GetString(8);
-                result.Position = new Vector3(reader.GetFloat(9), reader.GetFloat(10), reader.GetFloat(11));
-                result.Rotation = Quaternion.Euler(reader.GetFloat(12), reader.GetFloat(13), reader.GetFloat(14));
+                result.ExtraData = reader.GetString(9);
+                result.Position = new Vector3(reader.GetFloat(10), reader.GetFloat(11), reader.GetFloat(12));
+                result.Rotation = Quaternion.Euler(reader.GetFloat(13), reader.GetFloat(14), reader.GetFloat(15));
                 return true;
             }
             result = new BuildingSaveData();
@@ -34,7 +35,7 @@ namespace MultiplayerARPG.MMO
         {
             MySqlConnection connection = NewConnection();
             await OpenConnection(connection);
-            await ExecuteNonQuery(connection, null, "INSERT INTO buildings (id, parentId, entityId, currentHp, remainsLifeTime, mapName, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, creatorId, creatorName) VALUES (@id, @parentId, @entityId, @currentHp, @remainsLifeTime, @mapName, @positionX, @positionY, @positionZ, @rotationX, @rotationY, @rotationZ, @creatorId, @creatorName)",
+            await ExecuteNonQuery(connection, null, "INSERT INTO buildings (id, parentId, entityId, currentHp, remainsLifeTime, mapName, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, creatorId, creatorName, extraData) VALUES (@id, @parentId, @entityId, @currentHp, @remainsLifeTime, @mapName, @positionX, @positionY, @positionZ, @rotationX, @rotationY, @rotationZ, @creatorId, @creatorName, @extraData)",
                 new MySqlParameter("@id", saveData.Id),
                 new MySqlParameter("@parentId", saveData.ParentId),
                 new MySqlParameter("@entityId", saveData.EntityId),
@@ -48,7 +49,8 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@rotationY", saveData.Rotation.eulerAngles.y),
                 new MySqlParameter("@rotationZ", saveData.Rotation.eulerAngles.z),
                 new MySqlParameter("@creatorId", saveData.CreatorId),
-                new MySqlParameter("@creatorName", saveData.CreatorName));
+                new MySqlParameter("@creatorName", saveData.CreatorName),
+                new MySqlParameter("@extraData", saveData.ExtraData));
             await connection.CloseAsync();
         }
 
@@ -62,7 +64,7 @@ namespace MultiplayerARPG.MMO
                 {
                     result.Add(tempBuilding);
                 }
-            }, "SELECT id, parentId, entityId, currentHp, remainsLifeTime, isLocked, lockPassword, creatorId, creatorName, positionX, positionY, positionZ, rotationX, rotationY, rotationZ FROM buildings WHERE mapName=@mapName", new MySqlParameter("@mapName", mapName));
+            }, "SELECT id, parentId, entityId, currentHp, remainsLifeTime, isLocked, lockPassword, creatorId, creatorName, extraData, positionX, positionY, positionZ, rotationX, rotationY, rotationZ FROM buildings WHERE mapName=@mapName", new MySqlParameter("@mapName", mapName));
             return result;
         }
 
@@ -79,6 +81,7 @@ namespace MultiplayerARPG.MMO
                 "lockPassword=@lockPassword, " +
                 "creatorId=@creatorId, " +
                 "creatorName=@creatorName, " +
+                "extraData=@extraData, " +
                 "positionX=@positionX, " +
                 "positionY=@positionY, " +
                 "positionZ=@positionZ, " +
@@ -96,6 +99,7 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@lockPassword", building.LockPassword),
                 new MySqlParameter("@creatorId", building.CreatorId),
                 new MySqlParameter("@creatorName", building.CreatorName),
+                new MySqlParameter("@extraData", building.ExtraData),
                 new MySqlParameter("@positionX", building.Position.x),
                 new MySqlParameter("@positionY", building.Position.y),
                 new MySqlParameter("@positionZ", building.Position.z),

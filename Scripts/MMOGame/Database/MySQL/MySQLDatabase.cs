@@ -53,7 +53,7 @@ namespace MultiplayerARPG.MMO
             string migrationId = "1.57b";
             if (!await HasMigrationId(migrationId))
             {
-                Logging.Log("Migrating up to 1.57b");
+                Logging.Log($"Migrating up to {migrationId}");
                 // Migrate data
                 try
                 {
@@ -75,12 +75,12 @@ namespace MultiplayerARPG.MMO
                 catch { }
                 // Insert migrate history
                 await InsertMigrationId(migrationId);
-                Logging.Log("Migrated to 1.57b");
+                Logging.Log($"Migrated to {migrationId}");
             }
             migrationId = "1.58";
             if (!await HasMigrationId(migrationId))
             {
-                Logging.Log("Migrating up to 1.58");
+                Logging.Log($"Migrating up to {migrationId}");
                 await ExecuteNonQuery("ALTER TABLE `characterbuff` CHANGE `type` `type` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0';");
                 await ExecuteNonQuery("ALTER TABLE `characterhotkey` CHANGE `type` `type` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0';");
                 await ExecuteNonQuery("ALTER TABLE `characteritem` CHANGE `inventoryType` `inventoryType` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0';");
@@ -94,21 +94,21 @@ namespace MultiplayerARPG.MMO
                 await ExecuteNonQuery("ALTER TABLE `characters` ADD `currentRotationZ` FLOAT NOT NULL DEFAULT '0' AFTER `currentRotationY`;");
                 // Insert migrate history
                 await InsertMigrationId(migrationId);
-                Logging.Log("Migrated to 1.58");
+                Logging.Log($"Migrated to {migrationId}");
             }
             migrationId = "1.60c";
             if (!await HasMigrationId(migrationId))
             {
-                Logging.Log("Migrating up to 1.60c");
+                Logging.Log($"Migrating up to {migrationId}");
                 await ExecuteNonQuery("ALTER TABLE `characterquest` ADD `completedTasks` TEXT NOT NULL AFTER `killedMonsters`;");
                 // Insert migrate history
                 await InsertMigrationId(migrationId);
-                Logging.Log("Migrated to 1.60c");
+                Logging.Log($"Migrated to {migrationId}");
             }
             migrationId = "1.61";
             if (!await HasMigrationId(migrationId))
             {
-                Logging.Log("Migrating up to 1.61");
+                Logging.Log($"Migrating up to {migrationId}");
                 await ExecuteNonQuery("CREATE TABLE `charactercurrency` ("
                     + "`id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,"
                     + "`idx` int(11) NOT NULL,"
@@ -137,21 +137,21 @@ namespace MultiplayerARPG.MMO
                     + "PRIMARY KEY(`id`)) ENGINE = InnoDB DEFAULT CHARSET = utf8 COLLATE utf8_unicode_ci;");
                 // Insert migrate history
                 await InsertMigrationId(migrationId);
-                Logging.Log("Migrated to 1.61");
+                Logging.Log($"Migrated to {migrationId}");
             }
             migrationId = "1.61b";
             if (!await HasMigrationId(migrationId))
             {
-                Logging.Log("Migrating up to 1.61b");
+                Logging.Log($"Migrating up to {migrationId}");
                 await ExecuteNonQuery("ALTER TABLE `mail` ADD `isClaim` tinyint(1) NOT NULL DEFAULT 0 AFTER `readTimestamp`, ADD `claimTimestamp` timestamp NULL DEFAULT NULL AFTER `isClaim`;");
                 // Insert migrate history
                 await InsertMigrationId(migrationId);
-                Logging.Log("Migrated to 1.61b");
+                Logging.Log($"Migrated to {migrationId}");
             }
             migrationId = "1.62e";
             if (!await HasMigrationId(migrationId))
             {
-                Logging.Log("Migrating up to 1.62e");
+                Logging.Log($"Migrating up to {migrationId}");
                 await ExecuteNonQuery("ALTER TABLE `characterattribute` ADD INDEX(`idx`);");
                 await ExecuteNonQuery("ALTER TABLE `characterattribute` ADD INDEX(`characterId`);");
                 await ExecuteNonQuery("ALTER TABLE `characterbuff` ADD INDEX(`characterId`);");
@@ -188,30 +188,30 @@ namespace MultiplayerARPG.MMO
                 await ExecuteNonQuery("ALTER TABLE `storageitem` ADD INDEX(`storageOwnerId`);");
                 // Insert migrate history
                 await InsertMigrationId(migrationId);
-                Logging.Log("Migrated to 1.62e");
+                Logging.Log($"Migrated to {migrationId}");
             }
             migrationId = "1.63b";
             if (!await HasMigrationId(migrationId))
             {
-                Logging.Log("Migrating up to 1.63b");
+                Logging.Log($"Migrating up to {migrationId}");
                 await ExecuteNonQuery("ALTER TABLE `characters` ADD `lastDeadTime` INT NOT NULL DEFAULT '0' AFTER `mountDataId`;");
                 // Insert migrate history
                 await InsertMigrationId(migrationId);
-                Logging.Log("Migrated to 1.63b");
+                Logging.Log($"Migrated to {migrationId}");
             }
             migrationId = "1.65d";
             if (!await HasMigrationId(migrationId))
             {
-                Logging.Log("Migrating up to 1.65d");
+                Logging.Log($"Migrating up to {migrationId}");
                 await ExecuteNonQuery("ALTER TABLE `characters` CHANGE `statPoint` `statPoint` FLOAT NOT NULL DEFAULT '0', CHANGE `skillPoint` `skillPoint` FLOAT NOT NULL DEFAULT '0';");
                 // Insert migrate history
                 await InsertMigrationId(migrationId);
-                Logging.Log("Migrated to 1.65d");
+                Logging.Log($"Migrated to {migrationId}");
             }
             migrationId = "1.67";
             if (!await HasMigrationId(migrationId))
             {
-                Logging.Log("Migrating up to 1.67");
+                Logging.Log($"Migrating up to {migrationId}");
                 await ExecuteNonQuery("ALTER TABLE `guild` ADD `guildMessage2` VARCHAR(160) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL AFTER `guildMessage`;");
                 await ExecuteNonQuery("ALTER TABLE `guild` ADD `score` INT(11) NOT NULL DEFAULT '0' AFTER `gold`;");
                 await ExecuteNonQuery("ALTER TABLE `guild` ADD `optionId1` INT(11) NOT NULL DEFAULT '0' AFTER `score`;");
@@ -225,33 +225,33 @@ namespace MultiplayerARPG.MMO
                 await ExecuteNonQuery("ALTER TABLE `guild` ADD `maxMembers` INT(11) NOT NULL DEFAULT '0' AFTER `currentMembers`;");
                 // Insert migrate history
                 await InsertMigrationId(migrationId);
-                Logging.Log("Migrated to 1.67");
+                Logging.Log($"Migrated to {migrationId}");
             }
             migrationId = "1.67b";
             if (!await HasMigrationId(migrationId))
             {
-                Logging.Log("Migrating up to 1.67b");
+                Logging.Log($"Migrating up to {migrationId}");
                 await ExecuteNonQuery("ALTER TABLE `mail` CHANGE `gold` `gold` INT(11) NOT NULL DEFAULT '0';");
                 await ExecuteNonQuery("ALTER TABLE `mail` ADD `cash` INT(11) NOT NULL DEFAULT '0' AFTER `gold`;");
                 await ExecuteNonQuery("ALTER TABLE `guild` DROP `optionId1`, DROP `optionId2`, DROP `optionId3`, DROP `optionId4`, DROP `optionId5`;");
                 await ExecuteNonQuery("ALTER TABLE `guild` ADD `options` TEXT CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL AFTER `score`;");
                 // Insert migrate history
                 await InsertMigrationId(migrationId);
-                Logging.Log("Migrated to 1.67b");
+                Logging.Log($"Migrated to {migrationId}");
             }
             migrationId = "1.69";
             if (!await HasMigrationId(migrationId))
             {
-                Logging.Log("Migrating up to 1.69");
+                Logging.Log($"Migrating up to {migrationId}");
                 await ExecuteNonQuery("ALTER TABLE `characterquest` ADD `isTracking` TINYINT(1) NOT NULL DEFAULT '0' AFTER `isComplete`;");
                 // Insert migrate history
                 await InsertMigrationId(migrationId);
-                Logging.Log("Migrated to 1.69");
+                Logging.Log($"Migrated to {migrationId}");
             }
             migrationId = "1.70";
             if (!await HasMigrationId(migrationId))
             {
-                Logging.Log("Migrating up to 1.70");
+                Logging.Log($"Migrating up to {migrationId}");
                 await ExecuteNonQuery("ALTER TABLE `characters` CHANGE `lastDeadTime` `lastDeadTime` BIGINT NOT NULL DEFAULT '0';");
                 await ExecuteNonQuery("ALTER TABLE `characters` ADD `unmuteTime` BIGINT NOT NULL DEFAULT '0' AFTER `lastDeadTime`;");
                 await ExecuteNonQuery("ALTER TABLE `characteritem` ADD `expireTime` BIGINT NOT NULL DEFAULT '0' AFTER `lockRemainsDuration`;");
@@ -259,10 +259,19 @@ namespace MultiplayerARPG.MMO
                 await ExecuteNonQuery("ALTER TABLE `storageitem` ADD `expireTime` BIGINT NOT NULL DEFAULT '0' AFTER `lockRemainsDuration`;");
                 await ExecuteNonQuery("ALTER TABLE `storageitem` ADD `randomSeed` TINYINT UNSIGNED NOT NULL DEFAULT '0' AFTER `expireTime`;");
                 await ExecuteNonQuery("ALTER TABLE `userlogin` ADD `unbanTime` BIGINT NOT NULL DEFAULT '0' AFTER `userLevel`;");
-                await ExecuteNonQuery("ALTER TABLE `userlogin` CHANGE `password` `password` VARCHAR(72) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL");
+                await ExecuteNonQuery("ALTER TABLE `userlogin` CHANGE `password` `password` VARCHAR(72) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL;");
                 // Insert migrate history
                 await InsertMigrationId(migrationId);
-                Logging.Log("Migrated to 1.70");
+                Logging.Log($"Migrated to {migrationId}");
+            }
+            migrationId = "1.71";
+            if (!await HasMigrationId(migrationId))
+            {
+                Logging.Log($"Migrating up to {migrationId}");
+                await ExecuteNonQuery("ALTER TABLE `buildings` ADD `extraData` TEXT CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL AFTER `creatorName`;");
+                // Insert migrate history
+                await InsertMigrationId(migrationId);
+                Logging.Log($"Migrated to {migrationId}");
             }
         }
 

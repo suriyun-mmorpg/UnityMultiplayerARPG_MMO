@@ -29,6 +29,7 @@ CREATE TABLE `buildings` (
   `lockPassword` varchar(6) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
   `creatorId` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
   `creatorName` varchar(32) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  `extraData` text CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -417,7 +418,8 @@ INSERT INTO `__migrations` (`migrationId`) VALUES
 ('1.63b'),
 ('1.65d'),
 ('1.67'),
-('1.67b');
+('1.67b'),
+('1.71');
 
 --
 -- Indexes for dumped tables

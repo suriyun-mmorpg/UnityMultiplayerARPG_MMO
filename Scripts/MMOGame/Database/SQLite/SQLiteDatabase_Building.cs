@@ -22,8 +22,9 @@ namespace MultiplayerARPG.MMO
                 result.LockPassword = reader.GetString(6);
                 result.CreatorId = reader.GetString(7);
                 result.CreatorName = reader.GetString(8);
-                result.Position = new Vector3(reader.GetFloat(9), reader.GetFloat(10), reader.GetFloat(11));
-                result.Rotation = Quaternion.Euler(reader.GetFloat(12), reader.GetFloat(13), reader.GetFloat(14));
+                result.ExtraData = reader.GetString(9);
+                result.Position = new Vector3(reader.GetFloat(10), reader.GetFloat(11), reader.GetFloat(12));
+                result.Rotation = Quaternion.Euler(reader.GetFloat(13), reader.GetFloat(14), reader.GetFloat(15));
                 return true;
             }
             result = new BuildingSaveData();
@@ -33,7 +34,7 @@ namespace MultiplayerARPG.MMO
         public override async UniTask CreateBuilding(string mapName, IBuildingSaveData saveData)
         {
             await UniTask.Yield();
-            ExecuteNonQuery("INSERT INTO buildings (id, parentId, entityId, currentHp, remainsLifeTime, mapName, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, creatorId, creatorName) VALUES (@id, @parentId, @entityId, @currentHp, @remainsLifeTime, @mapName, @positionX, @positionY, @positionZ, @rotationX, @rotationY, @rotationZ, @creatorId, @creatorName)",
+            ExecuteNonQuery("INSERT INTO buildings (id, parentId, entityId, currentHp, remainsLifeTime, mapName, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, creatorId, creatorName, extraData) VALUES (@id, @parentId, @entityId, @currentHp, @remainsLifeTime, @mapName, @positionX, @positionY, @positionZ, @rotationX, @rotationY, @rotationZ, @creatorId, @creatorName, @extraData)",
                 new SqliteParameter("@id", saveData.Id),
                 new SqliteParameter("@parentId", saveData.ParentId),
                 new SqliteParameter("@entityId", saveData.EntityId),
@@ -47,7 +48,8 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@rotationY", saveData.Rotation.eulerAngles.y),
                 new SqliteParameter("@rotationZ", saveData.Rotation.eulerAngles.z),
                 new SqliteParameter("@creatorId", saveData.CreatorId),
-                new SqliteParameter("@creatorName", saveData.CreatorName));
+                new SqliteParameter("@creatorName", saveData.CreatorName),
+                new SqliteParameter("@extraData", saveData.ExtraData));
         }
 
         public override async UniTask<List<BuildingSaveData>> ReadBuildings(string mapName)
@@ -61,7 +63,7 @@ namespace MultiplayerARPG.MMO
                 {
                     result.Add(tempBuilding);
                 }
-            }, "SELECT id, parentId, entityId, currentHp, remainsLifeTime, isLocked, lockPassword, creatorId, creatorName, positionX, positionY, positionZ, rotationX, rotationY, rotationZ FROM buildings WHERE mapName=@mapName", new SqliteParameter("@mapName", mapName));
+            }, "SELECT id, parentId, entityId, currentHp, remainsLifeTime, isLocked, lockPassword, creatorId, creatorName, extraData, positionX, positionY, positionZ, rotationX, rotationY, rotationZ FROM buildings WHERE mapName=@mapName", new SqliteParameter("@mapName", mapName));
             return result;
         }
 
@@ -77,6 +79,7 @@ namespace MultiplayerARPG.MMO
                 "lockPassword=@lockPassword, " +
                 "creatorId=@creatorId, " +
                 "creatorName=@creatorName, " +
+                "extraData=@extraData, " +
                 "positionX=@positionX, " +
                 "positionY=@positionY, " +
                 "positionZ=@positionZ, " +
@@ -93,6 +96,7 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@lockPassword", building.LockPassword),
                 new SqliteParameter("@creatorId", building.CreatorId),
                 new SqliteParameter("@creatorName", building.CreatorName),
+                new SqliteParameter("@extraData", building.ExtraData),
                 new SqliteParameter("@positionX", building.Position.x),
                 new SqliteParameter("@positionY", building.Position.y),
                 new SqliteParameter("@positionZ", building.Position.z),

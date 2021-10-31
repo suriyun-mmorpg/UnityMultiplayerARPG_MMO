@@ -259,6 +259,7 @@ namespace MultiplayerARPG.MMO
               lockPassword TEXT NOT NULL DEFAULT '',
               creatorId TEXT NOT NULL,
               creatorName TEXT NOT NULL,
+              extraData TEXT NOT NULL DEFAULT '',
               createAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
               updateAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
@@ -414,6 +415,9 @@ namespace MultiplayerARPG.MMO
 
             if (!IsColumnExist("buildings", "lockPassword"))
                 ExecuteNonQuery("ALTER TABLE buildings ADD lockPassword TEXT NOT NULL DEFAULT '';");
+
+            if (!IsColumnExist("buildings", "extraData"))
+                ExecuteNonQuery("ALTER TABLE buildings ADD extraData TEXT NOT NULL DEFAULT '';");
 
             if (!IsColumnExist("characters", "partyId"))
                 ExecuteNonQuery("ALTER TABLE characters ADD partyId INTEGER NOT NULL DEFAULT 0;");
