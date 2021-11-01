@@ -351,13 +351,12 @@ namespace MultiplayerARPG.MMO
             if (ServerUserHandlers.TryGetPlayerCharacter(connectionId, out playerCharacterEntity))
             {
                 string id = playerCharacterEntity.Id;
-                string userId = playerCharacterEntity.UserId;
                 // Save character immediately when player disconnect
                 while (savingCharacters.Contains(id))
                 {
                     await UniTask.Yield();
                 }
-                await SaveCharacterRoutine(playerCharacterEntity.CloneTo(new PlayerCharacterData()), userId);
+                await SaveCharacter(playerCharacterEntity);
                 // Store despawning player character id, it will be used later if player not connect and continue playing the character
                 CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
                 try
@@ -371,7 +370,7 @@ namespace MultiplayerARPG.MMO
                     }
                     if (!cancellationTokenSource.IsCancellationRequested)
                     {
-                        await SaveCharacterRoutine(playerCharacterEntity.CloneTo(new PlayerCharacterData()), userId);
+                        await SaveCharacter(playerCharacterEntity);
                         playerCharacterEntity.NetworkDestroy();
                     }
                 }
@@ -469,7 +468,6 @@ namespace MultiplayerARPG.MMO
             {
                 return false;
             }
-
             return true;
         }
 #endif
@@ -532,7 +530,7 @@ namespace MultiplayerARPG.MMO
                 {
                     await UniTask.Yield();
                 }
-                await SaveCharacterRoutine(playerCharacterEntity.CloneTo(new PlayerCharacterData()), userId);
+                await SaveCharacter(playerCharacterEntity);
                 // Despawn the character
                 playerCharacterEntity.NetworkDestroy();
             }
@@ -690,10 +688,24 @@ namespace MultiplayerARPG.MMO
                     }
 
                     // Summon saved summons
+                    GetSummonBuffsResp summonBuffsResp = await DbServiceClient.GetSummonBuffsAsync(new GetSummonBuffsReq()
+                    {
+                        CharacterId = playerCharacterEntity.Id,
+                    });
+                    List<CharacterBuff> summonBuffs = summonBuffsResp.SummonBuffs;
                     for (int i = 0; i < playerCharacterEntity.Summons.Count; ++i)
                     {
                         CharacterSummon summon = playerCharacterEntity.Summons[i];
                         summon.Summon(playerCharacterEntity, summon.Level, summon.summonRemainsDuration, summon.Exp, summon.CurrentHp, summon.CurrentMp);
+                        for (int j = 0; j < summonBuffs.Count; ++j)
+                        {
+                            if (summonBuffs[j].id.StartsWith(i.ToString()))
+                            {
+                                summon.CacheEntity.Buffs.Add(summonBuffs[j]);
+                                summonBuffs.RemoveAt(j);
+                                j--;
+                            }
+                        }
                         playerCharacterEntity.Summons[i] = summon;
                     }
 

@@ -502,5 +502,18 @@ namespace MultiplayerARPG.MMO
         {
             await Client.SendRequestAsync<SetCharacterUnmuteTimeByNameReq, EmptyMessage>(DatabaseRequestTypes.RequestSetCharacterUnmuteTimeByName, request);
         }
+
+        public async UniTask<GetSummonBuffsResp> GetSummonBuffsAsync(GetSummonBuffsReq request)
+        {
+            var result = await Client.SendRequestAsync<GetSummonBuffsReq, GetSummonBuffsResp>(DatabaseRequestTypes.RequestGetSummonBuffs, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new GetSummonBuffsResp();
+            return result.Response;
+        }
+
+        public async UniTask SetSummonBuffsAsync(SetSummonBuffsReq request)
+        {
+            await Client.SendRequestAsync<SetSummonBuffsReq, EmptyMessage>(DatabaseRequestTypes.RequestSetSummonBuffs, request);
+        }
     }
 }

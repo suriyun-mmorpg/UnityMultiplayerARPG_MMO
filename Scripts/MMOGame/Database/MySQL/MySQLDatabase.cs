@@ -269,6 +269,20 @@ namespace MultiplayerARPG.MMO
             {
                 Logging.Log($"Migrating up to {migrationId}");
                 await ExecuteNonQuery("ALTER TABLE `buildings` ADD `extraData` TEXT CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL AFTER `creatorName`;");
+                await ExecuteNonQuery("CREATE TABLE `summonbuffs` (" +
+                    "`id` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL," +
+                    "`characterId` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL," +
+                    "`buffId` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL," +
+                    "`type` tinyint UNSIGNED NOT NULL DEFAULT '0'," +
+                    "`dataId` int NOT NULL DEFAULT '0'," +
+                    "`level` int NOT NULL DEFAULT '1'," +
+                    "`buffRemainsDuration` float NOT NULL DEFAULT '0'," +
+                    "`createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP," +
+                    "`updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP" +
+                    ") ENGINE = InnoDB DEFAULT CHARSET = utf8 COLLATE = utf8_unicode_ci;");
+                await ExecuteNonQuery("ALTER TABLE `summonbuffs` ADD PRIMARY KEY (`id`);");
+                await ExecuteNonQuery("ALTER TABLE `summonbuffs` ADD KEY (`characterId`);");
+                await ExecuteNonQuery("ALTER TABLE `summonbuffs` ADD KEY (`buffId`);");
                 // Insert migrate history
                 await InsertMigrationId(migrationId);
                 Logging.Log($"Migrated to {migrationId}");

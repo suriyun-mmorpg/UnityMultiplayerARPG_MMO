@@ -1363,7 +1363,7 @@ namespace MultiplayerARPG.MMO
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             await Database.SetUserUnbanTimeByCharacterName(request.CharacterName, request.UnbanTime);
-            result.Invoke(AckResponseCode.Success, new EmptyMessage());
+            result.Invoke(AckResponseCode.Success, EmptyMessage.Value);
 #endif
         }
 
@@ -1371,7 +1371,25 @@ namespace MultiplayerARPG.MMO
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             await Database.SetCharacterUnmuteTimeByName(request.CharacterName, request.UnmuteTime);
-            result.Invoke(AckResponseCode.Success, new EmptyMessage());
+            result.Invoke(AckResponseCode.Success, EmptyMessage.Value);
+#endif
+        }
+
+        protected async UniTaskVoid GetSummonBuffs(RequestHandlerData requestHandler, GetSummonBuffsReq request, RequestProceedResultDelegate<GetSummonBuffsResp> result)
+        {
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            result.Invoke(AckResponseCode.Success, new GetSummonBuffsResp()
+            {
+                SummonBuffs = await Database.GetSummonBuffs(request.CharacterId),
+            });
+#endif
+        }
+
+        protected async UniTaskVoid SetSummonBuffs(RequestHandlerData requestHandler, SetSummonBuffsReq request, RequestProceedResultDelegate<EmptyMessage> result)
+        {
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            await Database.SetSummonBuffs(request.CharacterId, request.SummonBuffs);
+            result.Invoke(AckResponseCode.Success, EmptyMessage.Value);
 #endif
         }
 

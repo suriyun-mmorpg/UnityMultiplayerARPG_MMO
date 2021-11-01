@@ -70,5 +70,7 @@
         public const ushort RequestGetUserUnbanTime = 70;
         public const ushort RequestSetUserUnbanTimeByCharacterName = 71;
         public const ushort RequestSetCharacterUnmuteTimeByName = 72;
+        public const ushort RequestGetSummonBuffs = 73;
+        public const ushort RequestSetSummonBuffs = 74;
     }
 }

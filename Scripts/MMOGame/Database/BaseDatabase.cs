@@ -45,6 +45,8 @@ namespace MultiplayerARPG.MMO
         public abstract UniTask<List<PlayerCharacterData>> ReadCharacters(string userId);
         public abstract UniTask UpdateCharacter(IPlayerCharacterData character);
         public abstract UniTask DeleteCharacter(string userId, string id);
+        public abstract UniTask<List<CharacterBuff>> GetSummonBuffs(string characterId);
+        public abstract UniTask SetSummonBuffs(string characterId, List<CharacterBuff> summonBuffs);
         public abstract UniTask<long> FindCharacterName(string characterName);
         public abstract UniTask<List<SocialCharacterData>> FindCharacters(string characterName);
         public abstract UniTask CreateFriend(string id1, string id2);

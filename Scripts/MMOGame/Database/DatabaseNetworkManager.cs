@@ -130,6 +130,8 @@ namespace MultiplayerARPG.MMO
             RegisterRequestToServer<GetUserUnbanTimeReq, GetUserUnbanTimeResp>(DatabaseRequestTypes.RequestGetUserUnbanTime, GetUserUnbanTime);
             RegisterRequestToServer<SetUserUnbanTimeByCharacterNameReq, EmptyMessage>(DatabaseRequestTypes.RequestSetUserUnbanTimeByCharacterName, SetUserUnbanTimeByCharacterName);
             RegisterRequestToServer<SetCharacterUnmuteTimeByNameReq, EmptyMessage>(DatabaseRequestTypes.RequestSetCharacterUnmuteTimeByName, SetCharacterUnmuteTimeByName);
+            RegisterRequestToServer<GetSummonBuffsReq, GetSummonBuffsResp>(DatabaseRequestTypes.RequestGetSummonBuffs, GetSummonBuffs);
+            RegisterRequestToServer<SetSummonBuffsReq, EmptyMessage>(DatabaseRequestTypes.RequestSetSummonBuffs, SetSummonBuffs);
             this.InvokeInstanceDevExtMethods("RegisterMessages");
         }
     }

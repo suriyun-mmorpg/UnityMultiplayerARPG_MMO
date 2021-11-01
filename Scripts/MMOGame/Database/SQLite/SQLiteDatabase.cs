@@ -219,6 +219,18 @@ namespace MultiplayerARPG.MMO
               updateAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
 
+            ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS summonbuffs (
+              id TEXT NOT NULL PRIMARY KEY,
+              characterId TEXT NOT NULL,
+              buffId TEXT NOT NULL,
+              type INTEGER NOT NULL,
+              dataId INTEGER NOT NULL,
+              level INTEGER NOT NULL,
+              buffRemainsDuration REAL NOT NULL,
+              createAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+              updateAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+            )");
+
             ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS friend (
               id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
               characterId1 TEXT NOT NULL,

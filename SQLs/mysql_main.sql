@@ -376,6 +376,24 @@ CREATE TABLE `storageitem` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `summonbuffs`
+--
+
+CREATE TABLE `summonbuffs` (
+  `id` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+  `characterId` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+  `buffId` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+  `type` tinyint UNSIGNED NOT NULL DEFAULT '0',
+  `dataId` int NOT NULL DEFAULT '0',
+  `level` int NOT NULL DEFAULT '1',
+  `buffRemainsDuration` float NOT NULL DEFAULT '0',
+  `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `userlogin`
 --
 
@@ -419,6 +437,8 @@ INSERT INTO `__migrations` (`migrationId`) VALUES
 ('1.65d'),
 ('1.67'),
 ('1.67b'),
+('1.69'),
+('1.70'),
 ('1.71');
 
 --
@@ -566,6 +586,14 @@ ALTER TABLE `storageitem`
   ADD KEY `idx` (`idx`),
   ADD KEY `storageType` (`storageType`),
   ADD KEY `storageOwnerId` (`storageOwnerId`);
+
+--
+-- Indexes for table `summonbuffs`
+--
+ALTER TABLE `summonbuffs`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `characterId` (`characterId`),
+  ADD KEY `buffId` (`buffId`);
 
 --
 -- Indexes for table `userlogin`

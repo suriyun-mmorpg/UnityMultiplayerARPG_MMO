@@ -82,17 +82,11 @@ namespace MultiplayerARPG.MMO
                 // Unregister player character
                 UnregisterPlayerCharacter(connectionId);
                 // Clone character data to save
-                PlayerCharacterData savingCharacterData = new PlayerCharacterData();
-                playerCharacterEntity.CloneTo(savingCharacterData);
-                savingCharacterData.CurrentMapName = mapName;
-                savingCharacterData.CurrentPosition = position;
-                if (overrideRotation)
-                    savingCharacterData.CurrentRotation = rotation;
-                while (savingCharacters.Contains(savingCharacterData.Id))
+                while (savingCharacters.Contains(playerCharacterEntity.Id))
                 {
                     await UniTask.Yield();
                 }
-                await SaveCharacterRoutine(savingCharacterData, playerCharacterEntity.UserId);
+                await SaveCharacter(playerCharacterEntity, true, mapName, position, overrideRotation, rotation);
                 // Remove this character from warping list
                 playerCharacterEntity.IsWarping = false;
                 // Destroy character from server
@@ -183,15 +177,12 @@ namespace MultiplayerARPG.MMO
                 playerCharacterEntity.IsWarping = true;
                 // Unregister player character
                 UnregisterPlayerCharacter(connectionId);
-                // Clone character data to save
-                PlayerCharacterData savingCharacterData = new PlayerCharacterData();
-                playerCharacterEntity.CloneTo(savingCharacterData);
                 // Wait to save character before move to instance map
-                while (savingCharacters.Contains(savingCharacterData.Id))
+                while (savingCharacters.Contains(playerCharacterEntity.Id))
                 {
                     await UniTask.Yield();
                 }
-                await SaveCharacterRoutine(savingCharacterData, playerCharacterEntity.UserId);
+                await SaveCharacter(playerCharacterEntity);
                 // Remove this character from warping list
                 playerCharacterEntity.IsWarping = false;
                 // Destroy character from server

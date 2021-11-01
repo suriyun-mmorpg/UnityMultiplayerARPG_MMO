@@ -1,8 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
-using LiteNetLib;
 using LiteNetLibManager;
-using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace MultiplayerARPG.MMO
 {
@@ -58,7 +57,44 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        private async UniTask SaveCharacterRoutine(PlayerCharacterData playerCharacterData, string userId)
+        private async UniTask SaveCharacter(BasePlayerCharacterEntity playerCharacterEntity, 
+            bool changeMap = false, string mapName = "", 
+            Vector3 position = new Vector3(), bool overrideRotation = false, Vector3 rotation = new Vector3())
+        {
+            PlayerCharacterData savingCharacterData = playerCharacterEntity.CloneTo(new PlayerCharacterData());
+            if (changeMap)
+            {
+                savingCharacterData.CurrentMapName = mapName;
+                savingCharacterData.CurrentPosition = position;
+                if (overrideRotation)
+                    savingCharacterData.CurrentRotation = rotation;
+            }
+            List<CharacterBuff> summonBuffs = new List<CharacterBuff>();
+            CharacterSummon tempSummon;
+            CharacterBuff tempBuff;
+            for (int i = 0; i < playerCharacterEntity.Summons.Count; ++i)
+            {
+                tempSummon = playerCharacterEntity.Summons[i];
+                if (tempSummon == null || tempSummon.CacheEntity == null || tempSummon.CacheEntity.Buffs == null || tempSummon.CacheEntity.Buffs.Count == 0) continue;
+                for (int j = 0; j < tempSummon.CacheEntity.Buffs.Count; ++j)
+                {
+                    tempBuff = tempSummon.CacheEntity.Buffs[j];
+                    summonBuffs.Add(new CharacterBuff()
+                    {
+                        id = i + "_" + j,
+                        type = tempBuff.type,
+                        dataId = tempBuff.dataId,
+                        level = tempBuff.level,
+                        buffRemainsDuration = tempBuff.buffRemainsDuration,
+                    });
+                }
+            }
+            await SaveCharacterRoutine(savingCharacterData, summonBuffs);
+        }
+#endif
+
+#if UNITY_STANDALONE && !CLIENT_BUILD
+        private async UniTask SaveCharacterRoutine(PlayerCharacterData playerCharacterData, List<CharacterBuff> summonBuffs)
         {
             if (playerCharacterData != null && !savingCharacters.Contains(playerCharacterData.Id))
             {
@@ -67,6 +103,11 @@ namespace MultiplayerARPG.MMO
                 await DbServiceClient.UpdateCharacterAsync(new UpdateCharacterReq()
                 {
                     CharacterData = playerCharacterData,
+                });
+                await DbServiceClient.SetSummonBuffsAsync(new SetSummonBuffsReq()
+                {
+                    CharacterId = playerCharacterData.Id,
+                    SummonBuffs = summonBuffs,
                 });
                 savingCharacters.Remove(playerCharacterData.Id);
                 if (LogInfo)
@@ -82,10 +123,10 @@ namespace MultiplayerARPG.MMO
             {
                 int i = 0;
                 List<UniTask> tasks = new List<UniTask>();
-                foreach (BasePlayerCharacterEntity playerCharacter in ServerUserHandlers.GetPlayerCharacters())
+                foreach (BasePlayerCharacterEntity playerCharacterEntity in ServerUserHandlers.GetPlayerCharacters())
                 {
-                    if (playerCharacter == null) continue;
-                    tasks.Add(SaveCharacterRoutine(playerCharacter.CloneTo(new PlayerCharacterData()), playerCharacter.UserId));
+                    if (playerCharacterEntity == null) continue;
+                    tasks.Add(SaveCharacter(playerCharacterEntity));
                     ++i;
                 }
                 await UniTask.WhenAll(tasks);
