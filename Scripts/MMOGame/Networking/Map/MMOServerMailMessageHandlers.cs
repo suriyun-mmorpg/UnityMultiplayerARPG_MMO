@@ -87,15 +87,10 @@ namespace MultiplayerARPG.MMO
             {
                 if (mail.Items.Count > 0)
                 {
-                    List<CharacterItem> increasingItems = new List<CharacterItem>();
-                    foreach (KeyValuePair<int, short> mailItem in mail.Items)
-                    {
-                        increasingItems.Add(CharacterItem.Create(mailItem.Key, amount: mailItem.Value));
-                    }
-                    if (playerCharacter.IncreasingItemsWillOverwhelming(increasingItems))
+                    if (playerCharacter.IncreasingItemsWillOverwhelming(mail.Items))
                         return UITextKeys.UI_ERROR_WILL_OVERWHELMING;
                     else
-                        playerCharacter.IncreaseItems(increasingItems);
+                        playerCharacter.IncreaseItems(mail.Items);
                 }
                 if (mail.Currencies.Count > 0)
                 {
