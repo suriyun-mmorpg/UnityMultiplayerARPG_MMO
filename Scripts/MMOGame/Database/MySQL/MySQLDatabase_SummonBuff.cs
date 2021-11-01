@@ -57,8 +57,8 @@ namespace MultiplayerARPG.MMO
                         new MySqlParameter("@dataId", summonBuff.dataId),
                         new MySqlParameter("@level", summonBuff.level),
                         new MySqlParameter("@buffRemainsDuration", summonBuff.buffRemainsDuration));
-                    await transaction.CommitAsync();
                 }
+                await transaction.CommitAsync();
             }
             catch (System.Exception ex)
             {

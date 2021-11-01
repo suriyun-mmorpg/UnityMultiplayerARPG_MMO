@@ -56,8 +56,8 @@ namespace MultiplayerARPG.MMO
                         new SqliteParameter("@dataId", summonBuff.dataId),
                         new SqliteParameter("@level", summonBuff.level),
                         new SqliteParameter("@buffRemainsDuration", summonBuff.buffRemainsDuration));
-                    transaction.Commit();
                 }
+                transaction.Commit();
             }
             catch (System.Exception ex)
             {
