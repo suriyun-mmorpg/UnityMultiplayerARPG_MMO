@@ -515,5 +515,21 @@ namespace MultiplayerARPG.MMO
         {
             await Client.SendRequestAsync<SetSummonBuffsReq, EmptyMessage>(DatabaseRequestTypes.RequestSetSummonBuffs, request);
         }
+
+        public async UniTask<ValidateEmailVerificationResp> ValidateEmailVerificationAsync(ValidateEmailVerificationReq request)
+        {
+            var result = await Client.SendRequestAsync<ValidateEmailVerificationReq, ValidateEmailVerificationResp>(DatabaseRequestTypes.RequestValidateEmailVerification, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new ValidateEmailVerificationResp();
+            return result.Response;
+        }
+
+        public async UniTask<FindEmailResp> FindEmailAsync(FindEmailReq request)
+        {
+            var result = await Client.SendRequestAsync<FindEmailReq, FindEmailResp>(DatabaseRequestTypes.RequestFindEmail, request);
+            if (result.ResponseCode != AckResponseCode.Success)
+                return new FindEmailResp();
+            return result.Response;
+        }
     }
 }

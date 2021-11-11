@@ -287,6 +287,15 @@ namespace MultiplayerARPG.MMO
                 await InsertMigrationId(migrationId);
                 Logging.Log($"Migrated to {migrationId}");
             }
+            migrationId = "1.71b";
+            if (!await HasMigrationId(migrationId))
+            {
+                Logging.Log($"Migrating up to {migrationId}");
+                await ExecuteNonQuery("ALTER TABLE `userlogin` ADD `isEmailVerified` tinyint(1) NOT NULL DEFAULT '0' AFTER `email`;");
+                // Insert migrate history
+                await InsertMigrationId(migrationId);
+                Logging.Log($"Migrated to {migrationId}");
+            }
         }
 
         private async UniTask<bool> HasMigrationId(string migrationId)
@@ -761,13 +770,13 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@accessToken", accessToken));
         }
 
-        public override async UniTask CreateUserLogin(string username, string password)
+        public override async UniTask CreateUserLogin(string username, string password, string email)
         {
             await ExecuteNonQuery("INSERT INTO userlogin (id, username, password, email, authType) VALUES (@id, @username, @password, @email, @authType)",
                 new MySqlParameter("@id", GenericUtils.GetUniqueId()),
                 new MySqlParameter("@username", username),
                 new MySqlParameter("@password", password.PasswordHash()),
-                new MySqlParameter("@email", ""),
+                new MySqlParameter("@email", email),
                 new MySqlParameter("@authType", AUTH_TYPE_NORMAL));
         }
 
@@ -815,6 +824,20 @@ namespace MultiplayerARPG.MMO
             await ExecuteNonQuery("UPDATE characters SET unmuteTime=@unmuteTime WHERE characterName LIKE @characterName LIMIT 1",
                 new MySqlParameter("@characterName", characterName),
                 new MySqlParameter("@unmuteTime", unmuteTime));
+        }
+
+        public override async UniTask<bool> ValidateEmailVerification(string userId)
+        {
+            object result = await ExecuteScalar("SELECT COUNT(*) FROM userlogin WHERE userId=@userId AND isEmailVerified=1",
+                new MySqlParameter("@userId", userId));
+            return (result != null ? (long)result : 0) > 0;
+        }
+
+        public override async UniTask<long> FindEmail(string email)
+        {
+            object result = await ExecuteScalar("SELECT COUNT(*) FROM userlogin WHERE email LIKE @email",
+                new MySqlParameter("@email", email));
+            return result != null ? (long)result : 0;
         }
 #endif
     }

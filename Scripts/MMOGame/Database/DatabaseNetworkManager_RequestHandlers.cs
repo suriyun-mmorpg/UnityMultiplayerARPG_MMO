@@ -126,7 +126,7 @@ namespace MultiplayerARPG.MMO
             // Cache username, it will be used to validate later
             cachedUsernames.Add(request.Username);
             // Insert new user login to database
-            await Database.CreateUserLogin(request.Username, request.Password);
+            await Database.CreateUserLogin(request.Username, request.Password, request.Email);
             result.Invoke(AckResponseCode.Success, EmptyMessage.Value);
 #endif
         }
@@ -1390,6 +1390,41 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
             await Database.SetSummonBuffs(request.CharacterId, request.SummonBuffs);
             result.Invoke(AckResponseCode.Success, EmptyMessage.Value);
+#endif
+        }
+
+        protected async UniTaskVoid FindEmail(RequestHandlerData requestHandler, FindEmailReq request, RequestProceedResultDelegate<FindEmailResp> result)
+        {
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            long foundAmount;
+            if (cachedEmails.Contains(request.Email))
+            {
+                // Already cached username, so validate username from cache
+                foundAmount = 1;
+            }
+            else
+            {
+                // Doesn't cached yet, so try validate from database
+                foundAmount = await Database.FindEmail(request.Email);
+                // Cache username, it will be used to validate later
+                if (foundAmount > 0)
+                    cachedEmails.Add(request.Email);
+            }
+            result.Invoke(AckResponseCode.Success, new FindEmailResp()
+            {
+                FoundAmount = foundAmount
+            });
+#endif
+        }
+
+        protected async UniTaskVoid ValidateEmailVerification(RequestHandlerData requestHandler, ValidateEmailVerificationReq request, RequestProceedResultDelegate<ValidateEmailVerificationResp> result)
+        {
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            bool isPass = await Database.ValidateEmailVerification(request.UserId);
+            result.Invoke(AckResponseCode.Success, new ValidateEmailVerificationResp()
+            {
+                IsPass = isPass
+            });
 #endif
         }
 

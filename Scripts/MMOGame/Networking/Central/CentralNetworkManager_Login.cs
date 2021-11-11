@@ -45,6 +45,16 @@ namespace MultiplayerARPG.MMO
             RequestProceedResultDelegate<ResponseUserLoginMessage> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
+            if (disableDefaultLogin)
+            {
+                result.Invoke(AckResponseCode.Error,
+                    new ResponseUserLoginMessage()
+                    {
+                        message = UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE
+                    });
+                return;
+            }
+
             long connectionId = requestHandler.ConnectionId;
             UITextKeys message = UITextKeys.NONE;
             ValidateUserLoginResp validateUserLoginResp = await DbServiceClient.ValidateUserLoginAsync(new ValidateUserLoginReq()
@@ -67,6 +77,15 @@ namespace MultiplayerARPG.MMO
             }
             else
             {
+                bool emailVerified = true;
+                if (requireEmailValiation)
+                {
+                    ValidateEmailVerificationResp validateEmailVerificationResp = await DbServiceClient.ValidateEmailVerificationAsync(new ValidateEmailVerificationReq()
+                    {
+                        UserId = userId
+                    });
+                    emailVerified = validateEmailVerificationResp.IsPass;
+                }
                 GetUserUnbanTimeResp resp = await DbServiceClient.GetUserUnbanTimeAsync(new GetUserUnbanTimeReq()
                 {
                     UserId = userId
@@ -75,6 +94,11 @@ namespace MultiplayerARPG.MMO
                 if (unbanTime > System.DateTimeOffset.UtcNow.ToUnixTimeSeconds())
                 {
                     message = UITextKeys.UI_ERROR_USER_BANNED;
+                    userId = string.Empty;
+                }
+                else if (!emailVerified)
+                {
+                    message = UITextKeys.UI_ERROR_EMAIL_NOT_VERIFIED;
                     userId = string.Empty;
                 }
                 else
@@ -111,28 +135,62 @@ namespace MultiplayerARPG.MMO
             RequestProceedResultDelegate<ResponseUserRegisterMessage> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
+            if (disableDefaultLogin)
+            {
+                result.Invoke(AckResponseCode.Error,
+                    new ResponseUserRegisterMessage()
+                    {
+                        message = UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE
+                    });
+                return;
+            }
+
             UITextKeys message = UITextKeys.NONE;
             string username = request.username;
             string password = request.password;
+            string email = request.email.Trim();
             FindUsernameResp findUsernameResp = await DbServiceClient.FindUsernameAsync(new FindUsernameReq()
             {
                 Username = username
             });
-            if (findUsernameResp.FoundAmount > 0)
-                message = UITextKeys.UI_ERROR_USERNAME_EXISTED;
-            else if (string.IsNullOrEmpty(username) || username.Length < minUsernameLength)
-                message = UITextKeys.UI_ERROR_USERNAME_TOO_SHORT;
-            else if (username.Length > maxUsernameLength)
-                message = UITextKeys.UI_ERROR_USERNAME_TOO_LONG;
-            else if (string.IsNullOrEmpty(password) || password.Length < minPasswordLength)
-                message = UITextKeys.UI_ERROR_PASSWORD_TOO_SHORT;
-            else
+            bool emailVerified = true;
+            if (requireEmail)
             {
-                await DbServiceClient.CreateUserLoginAsync(new CreateUserLoginReq()
+                if (string.IsNullOrEmpty(email) || !Email.IsValid(email))
                 {
-                    Username = username,
-                    Password = password
-                });
+                    message = UITextKeys.UI_ERROR_INVALID_EMAIL;
+                    emailVerified = false;
+                }
+                else
+                {
+                    FindEmailResp findEmailResp = await DbServiceClient.FindEmailAsync(new FindEmailReq()
+                    {
+                        Email = email
+                    });
+                    emailVerified = findEmailResp.FoundAmount <= 0;
+                    if (!emailVerified)
+                        message = UITextKeys.UI_ERROR_EMAIL_ALREADY_IN_USE;
+                }
+            }
+            if (emailVerified)
+            {
+                if (findUsernameResp.FoundAmount > 0)
+                    message = UITextKeys.UI_ERROR_USERNAME_EXISTED;
+                else if (string.IsNullOrEmpty(username) || username.Length < minUsernameLength)
+                    message = UITextKeys.UI_ERROR_USERNAME_TOO_SHORT;
+                else if (username.Length > maxUsernameLength)
+                    message = UITextKeys.UI_ERROR_USERNAME_TOO_LONG;
+                else if (string.IsNullOrEmpty(password) || password.Length < minPasswordLength)
+                    message = UITextKeys.UI_ERROR_PASSWORD_TOO_SHORT;
+                else
+                {
+                    await DbServiceClient.CreateUserLoginAsync(new CreateUserLoginReq()
+                    {
+                        Username = username,
+                        Password = password,
+                        Email = email,
+                    });
+                }
             }
             // Response
             result.Invoke(

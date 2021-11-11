@@ -248,6 +248,7 @@ namespace MultiplayerARPG.MMO
               userLevel INTEGER NOT NULL DEFAULT 0,
               unbanTime INTEGER NOT NULL DEFAULT 0,
               email TEXT NOT NULL,
+              isEmailVerified INTEGER NOT NULL DEFAULT 0,
               authType INTEGER NOT NULL,
               accessToken TEXT,
               createAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -418,6 +419,9 @@ namespace MultiplayerARPG.MMO
 
             if (!IsColumnExist("userlogin", "unbanTime"))
                 ExecuteNonQuery("ALTER TABLE userlogin ADD unbanTime INTEGER NOT NULL DEFAULT 0;");
+
+            if (!IsColumnExist("userlogin", "isEmailVerified"))
+                ExecuteNonQuery("ALTER TABLE userlogin ADD isEmailVerified INTEGER NOT NULL DEFAULT 0;");
 
             if (!IsColumnExist("buildings", "remainsLifeTime"))
                 ExecuteNonQuery("ALTER TABLE buildings ADD remainsLifeTime REAL NOT NULL DEFAULT 0;");
@@ -813,14 +817,14 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@accessToken", accessToken));
         }
 
-        public override async UniTask CreateUserLogin(string username, string password)
+        public override async UniTask CreateUserLogin(string username, string password, string email)
         {
             await UniTask.Yield();
             ExecuteNonQuery("INSERT INTO userlogin (id, username, password, email, authType) VALUES (@id, @username, @password, @email, @authType)",
                 new SqliteParameter("@id", GenericUtils.GetUniqueId()),
                 new SqliteParameter("@username", username),
                 new SqliteParameter("@password", password.PasswordHash()),
-                new SqliteParameter("@email", ""),
+                new SqliteParameter("@email", email),
                 new SqliteParameter("@authType", AUTH_TYPE_NORMAL));
         }
 
@@ -872,6 +876,22 @@ namespace MultiplayerARPG.MMO
             ExecuteNonQuery("UPDATE characters SET unmuteTime=@unmuteTime WHERE characterName LIKE @characterName",
                 new SqliteParameter("@characterName", characterName),
                 new SqliteParameter("@unmuteTime", unmuteTime));
+        }
+
+        public override async UniTask<bool> ValidateEmailVerification(string userId)
+        {
+            await UniTask.Yield();
+            object result = ExecuteScalar("SELECT COUNT(*) FROM userlogin WHERE userId=@userId AND isEmailVerified=1",
+                new SqliteParameter("@userId", userId));
+            return (result != null ? (long)result : 0) > 0;
+        }
+
+        public override async UniTask<long> FindEmail(string email)
+        {
+            await UniTask.Yield();
+            object result = ExecuteScalar("SELECT COUNT(*) FROM userlogin WHERE email LIKE @email",
+                new SqliteParameter("@email", email));
+            return result != null ? (long)result : 0;
         }
 #endif
     }

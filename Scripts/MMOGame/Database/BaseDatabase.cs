@@ -16,13 +16,15 @@ namespace MultiplayerARPG.MMO
 
         public abstract UniTask<string> ValidateUserLogin(string username, string password);
         public abstract UniTask<bool> ValidateAccessToken(string userId, string accessToken);
+        public abstract UniTask<bool> ValidateEmailVerification(string userId);
+        public abstract UniTask<long> FindEmail(string email);
         public abstract UniTask<byte> GetUserLevel(string userId);
         public abstract UniTask<int> GetGold(string userId);
         public abstract UniTask UpdateGold(string userId, int amount);
         public abstract UniTask<int> GetCash(string userId);
         public abstract UniTask UpdateCash(string userId, int amount);
         public abstract UniTask UpdateAccessToken(string userId, string accessToken);
-        public abstract UniTask CreateUserLogin(string username, string password);
+        public abstract UniTask CreateUserLogin(string username, string password, string email);
         public abstract UniTask<long> FindUsername(string username);
         public abstract UniTask<long> GetUserUnbanTime(string userId);
         public abstract UniTask SetUserUnbanTimeByCharacterName(string characterName, long unbanTime);

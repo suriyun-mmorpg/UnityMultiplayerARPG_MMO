@@ -404,6 +404,7 @@ CREATE TABLE `userlogin` (
   `gold` int NOT NULL DEFAULT '0',
   `cash` int NOT NULL DEFAULT '0',
   `email` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  `isEmailVerified` tinyint(1) NOT NULL DEFAULT '0',
   `authType` tinyint UNSIGNED NOT NULL DEFAULT '1',
   `accessToken` varchar(36) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
   `userLevel` tinyint UNSIGNED NOT NULL DEFAULT '0',

@@ -72,5 +72,7 @@
         public const ushort RequestSetCharacterUnmuteTimeByName = 72;
         public const ushort RequestGetSummonBuffs = 73;
         public const ushort RequestSetSummonBuffs = 74;
+        public const ushort RequestValidateEmailVerification = 75;
+        public const ushort RequestFindEmail = 76;
     }
 }

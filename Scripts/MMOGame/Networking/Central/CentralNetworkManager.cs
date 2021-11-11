@@ -31,11 +31,14 @@ namespace MultiplayerARPG.MMO
         public int mapSpawnMillisecondsTimeout = 0;
 
         [Header("User Account")]
+        public bool disableDefaultLogin = false;
         public int minUsernameLength = 2;
         public int maxUsernameLength = 24;
         public int minPasswordLength = 2;
         public int minCharacterNameLength = 2;
         public int maxCharacterNameLength = 16;
+        public bool requireEmail = false;
+        public bool requireEmailValiation = false;
 
         public System.Action onClientConnected;
         public System.Action<DisconnectInfo> onClientDisconnected;
