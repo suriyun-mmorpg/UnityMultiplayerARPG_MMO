@@ -357,6 +357,9 @@ namespace MultiplayerARPG.MMO
                     await UniTask.Yield();
                 }
                 await SaveCharacter(playerCharacterEntity);
+                // Saved, so can unregister character and user
+                UnregisterPlayerCharacter(connectionId);
+                UnregisterUserId(connectionId);
                 // Store despawning player character id, it will be used later if player not connect and continue playing the character
                 CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
                 try
@@ -387,8 +390,6 @@ namespace MultiplayerARPG.MMO
                 {
                     despawningPlayerCharacterCancellations.TryRemove(id, out cancellationTokenSource);
                     cancellationTokenSource.Dispose();
-                    UnregisterPlayerCharacter(connectionId);
-                    UnregisterUserId(connectionId);
                 }
             }
             else
