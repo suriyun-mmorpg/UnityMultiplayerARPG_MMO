@@ -569,6 +569,13 @@ MonoBehaviour:
   pingDuration: 1
   doNotEnterGameOnConnect: 0
   doNotDestroyOnSceneChanges: 0
+  auctionHouseMessageTypes:
+    createAuctionMsgType: 1300
+    bidMsgType: 1301
+    buyoutMsgType: 1302
+    getAccessTokenMsgType: 1303
+  auctionHouseServiceUrl: http://localhost:9800/auction-house
+  auctionHouseSecretKey: secret
   hitToSomeoneNotifyMessageId: 2001
   hitFromSomeoneNotifyMessageId: 2002
   killNotifyMessageId: 2000
@@ -825,10 +832,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca66ed5b09dc41447ad7cf901faa5e46, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  turnOnKillDrop: 0
-  killDropEquipItems: 1
-  killDropNonEquipItems: 1
-  corpsePrefab: {fileID: 0}
   dimensionType: 0
   saveSystem: {fileID: 0}
   gameplayRule: {fileID: 11400000, guid: 3bfe680a81b27ce4ba9642ddff7baa17, type: 2}
@@ -838,6 +841,10 @@ MonoBehaviour:
   itemDropEntityPrefab: {fileID: 114247390284341630, guid: 611b907cf80c87a4eb9e0d5d4a8688f5,
     type: 3}
   warpPortalEntityPrefab: {fileID: 114731892942428866, guid: 5773ff22c96e3ab4bb12d8202ec86244,
+    type: 3}
+  playerCorpsePrefab: {fileID: 9036829038788336466, guid: d98696903f1afa34fba36b435c7fb329,
+    type: 3}
+  monsterCorpsePrefab: {fileID: 9036829038788336466, guid: d98696903f1afa34fba36b435c7fb329,
     type: 3}
   uiSceneGameplayPrefab: {fileID: 114088817493988554, guid: 4af36d4bdf0cf07409f4412130b793ec,
     type: 3}
@@ -914,6 +921,9 @@ MonoBehaviour:
   combatTextDistance: 20
   maxEquipWeaponSet: 2
   currentPositionSaveMode: 0
+  playerDropItemMode: 0
+  playerDeadDropItemMode: 0
+  monsterDeadDropItemMode: 0
   dismantleFilter:
     includeJunk: 0
     includeArmor: 1
