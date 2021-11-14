@@ -150,9 +150,9 @@ namespace MultiplayerARPG.MMO
             centralNetworkManager.RequestUserLogin(username, password, (responseHandler, responseCode, response) => OnRequestUserLogin(responseHandler, responseCode, response, callback).Forget());
         }
 
-        public void RequestUserRegister(string username, string password, ResponseDelegate<ResponseUserRegisterMessage> callback)
+        public void RequestUserRegister(string username, string password, string email, ResponseDelegate<ResponseUserRegisterMessage> callback)
         {
-            centralNetworkManager.RequestUserRegister(username, password, callback);
+            centralNetworkManager.RequestUserRegister(username, password, email, callback);
         }
 
         public void RequestUserLogout(ResponseDelegate<INetSerializable> callback)

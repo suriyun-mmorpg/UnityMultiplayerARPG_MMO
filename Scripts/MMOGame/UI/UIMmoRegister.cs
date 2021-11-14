@@ -23,6 +23,7 @@ namespace MultiplayerARPG.MMO
         public InputFieldWrapper uiTextUsername;
         public InputFieldWrapper uiTextPassword;
         public InputFieldWrapper uiTextConfirmPassword;
+        public InputFieldWrapper uiTextEmail;
 
         public UnityEvent onRegisterSuccess;
         public UnityEvent onRegisterFail;
@@ -40,6 +41,8 @@ namespace MultiplayerARPG.MMO
                     uiTextPassword.interactable = !registering;
                 if (uiTextConfirmPassword != null)
                     uiTextConfirmPassword.interactable = !registering;
+                if (uiTextEmail != null)
+                    uiTextEmail.interactable = !registering;
             }
         }
 
@@ -57,6 +60,11 @@ namespace MultiplayerARPG.MMO
         {
             get { return uiTextConfirmPassword == null ? string.Empty : uiTextConfirmPassword.text; }
             set { if (uiTextConfirmPassword != null) uiTextConfirmPassword.text = value; }
+        }
+        public string Email
+        {
+            get { return uiTextEmail == null ? string.Empty : uiTextEmail.text; }
+            set { if (uiTextEmail != null) uiTextEmail.text = value; }
         }
 
         protected override void Awake()
@@ -141,7 +149,7 @@ namespace MultiplayerARPG.MMO
             }
 
             Registering = true;
-            MMOClientInstance.Singleton.RequestUserRegister(Username, Password, OnRegister);
+            MMOClientInstance.Singleton.RequestUserRegister(Username, Password, Email, OnRegister);
         }
 
         public void OnRegister(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseUserRegisterMessage response)

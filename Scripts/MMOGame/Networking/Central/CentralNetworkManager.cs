@@ -38,7 +38,7 @@ namespace MultiplayerARPG.MMO
         public int minCharacterNameLength = 2;
         public int maxCharacterNameLength = 16;
         public bool requireEmail = false;
-        public bool requireEmailValiation = false;
+        public bool requireEmailVerification = false;
 
         public System.Action onClientConnected;
         public System.Action<DisconnectInfo> onClientDisconnected;

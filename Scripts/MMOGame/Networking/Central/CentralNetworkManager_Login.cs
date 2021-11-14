@@ -16,12 +16,13 @@ namespace MultiplayerARPG.MMO
             }, responseDelegate: callback);
         }
 
-        public bool RequestUserRegister(string username, string password, ResponseDelegate<ResponseUserRegisterMessage> callback)
+        public bool RequestUserRegister(string username, string password, string email, ResponseDelegate<ResponseUserRegisterMessage> callback)
         {
             return ClientSendRequest(MMORequestTypes.RequestUserRegister, new RequestUserRegisterMessage()
             {
                 username = username,
                 password = password,
+                email = email,
             }, responseDelegate: callback);
         }
 
@@ -78,7 +79,7 @@ namespace MultiplayerARPG.MMO
             else
             {
                 bool emailVerified = true;
-                if (requireEmailValiation)
+                if (requireEmailVerification)
                 {
                     ValidateEmailVerificationResp validateEmailVerificationResp = await DbServiceClient.ValidateEmailVerificationAsync(new ValidateEmailVerificationReq()
                     {
