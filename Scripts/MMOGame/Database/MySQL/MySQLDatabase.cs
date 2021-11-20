@@ -828,7 +828,7 @@ namespace MultiplayerARPG.MMO
 
         public override async UniTask<bool> ValidateEmailVerification(string userId)
         {
-            object result = await ExecuteScalar("SELECT COUNT(*) FROM userlogin WHERE userId=@userId AND isEmailVerified=1",
+            object result = await ExecuteScalar("SELECT COUNT(*) FROM userlogin WHERE id=@userId AND isEmailVerified=1",
                 new MySqlParameter("@userId", userId));
             return (result != null ? (long)result : 0) > 0;
         }
