@@ -88,6 +88,8 @@ namespace MultiplayerARPG.MMO
         {
             if (onCentralClientDisconnected != null)
                 onCentralClientDisconnected.Invoke(disconnectInfo);
+            GameInstance.UserId = string.Empty;
+            GameInstance.UserToken = string.Empty;
         }
 
         public void OnMapServerConnected()
