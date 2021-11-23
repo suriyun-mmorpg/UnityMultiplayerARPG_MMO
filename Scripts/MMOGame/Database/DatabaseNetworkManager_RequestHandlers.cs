@@ -1010,7 +1010,7 @@ namespace MultiplayerARPG.MMO
                     // inventory will overwhelming
                     result.Invoke(AckResponseCode.Success, new MoveItemFromStorageResp()
                     {
-                        Error = UITextKeys.UI_ERROR_STORAGE_WILL_OVERWHELMING
+                        Error = UITextKeys.UI_ERROR_WILL_OVERWHELMING
                     });
                     return;
                 }
@@ -1031,7 +1031,7 @@ namespace MultiplayerARPG.MMO
                         // inventory will overwhelming
                         result.Invoke(AckResponseCode.Success, new MoveItemFromStorageResp()
                         {
-                            Error = UITextKeys.UI_ERROR_STORAGE_WILL_OVERWHELMING
+                            Error = UITextKeys.UI_ERROR_WILL_OVERWHELMING
                         });
                         return;
                     }
