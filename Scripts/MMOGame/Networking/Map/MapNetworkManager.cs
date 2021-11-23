@@ -751,11 +751,11 @@ namespace MultiplayerARPG.MMO
             // Check muting character
             IPlayerCharacterData playerCharacter = null;
             if (!string.IsNullOrEmpty(message.sender))
-                GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(message.sender, out playerCharacter);
+                ServerUserHandlers.TryGetPlayerCharacterByName(message.sender, out playerCharacter);
             if (!message.sendByServer && playerCharacter != null && playerCharacter.IsMuting())
             {
                 long connectionId;
-                if (GameInstance.ServerUserHandlers.TryGetConnectionId(playerCharacter.Id, out connectionId))
+                if (ServerUserHandlers.TryGetConnectionId(playerCharacter.Id, out connectionId))
                 {
                     ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, new ChatMessage()
                     {
@@ -774,8 +774,8 @@ namespace MultiplayerARPG.MMO
                     BasePlayerCharacterEntity playerCharacterEntity = playerCharacter == null ? null : playerCharacter as BasePlayerCharacterEntity;
                     string gmCommand;
                     if (message.sendByServer || (playerCharacterEntity != null &&
-                        GameInstance.Singleton.GMCommands.IsGMCommand(message.message, out gmCommand) &&
-                        GameInstance.Singleton.GMCommands.CanUseGMCommand(playerCharacterEntity, gmCommand)))
+                        CurrentGameInstance.GMCommands.IsGMCommand(message.message, out gmCommand) &&
+                        CurrentGameInstance.GMCommands.CanUseGMCommand(playerCharacterEntity, gmCommand)))
                     {
                         // If it's GM command and sender's user level > 0, handle gm commands
                         // Send GM command to chat server to broadcast to other servers later
@@ -883,8 +883,8 @@ namespace MultiplayerARPG.MMO
             {
                 // Handle GM command here, only GM command will be broadcasted as local channel
                 BasePlayerCharacterEntity playerCharacterEntity;
-                GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(message.sender, out playerCharacterEntity);
-                string response = GameInstance.Singleton.GMCommands.HandleGMCommand(message.sender, playerCharacterEntity, message.message);
+                ServerUserHandlers.TryGetPlayerCharacterByName(message.sender, out playerCharacterEntity);
+                string response = CurrentGameInstance.GMCommands.HandleGMCommand(message.sender, playerCharacterEntity, message.message);
                 if (playerCharacterEntity != null && !string.IsNullOrEmpty(response))
                 {
                     ServerSendPacket(playerCharacterEntity.ConnectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, new ChatMessage()
