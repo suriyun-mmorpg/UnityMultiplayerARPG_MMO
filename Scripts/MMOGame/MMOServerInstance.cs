@@ -112,7 +112,7 @@ namespace MultiplayerARPG.MMO
         [SerializeField]
         private bool webSocketSecure = false;
         [SerializeField]
-        private SslProtocols webSocketSslProtocols = SslProtocols.None;
+        private SslProtocols webSocketSslProtocols = SslProtocols.Tls12;
         [SerializeField]
         private string webSocketCertPath = string.Empty;
         [SerializeField]
@@ -221,7 +221,7 @@ namespace MultiplayerARPG.MMO
                     ConfigReader.ReadConfigs(jsonConfig, CONFIG_WEB_SOCKET_CERT_PATH, out sslProtocols, string.Empty))
                 {
                     if (!Enum.TryParse(sslProtocols, out webSocketSslProtocols))
-                        webSocketSslProtocols = SslProtocols.None;
+                        webSocketSslProtocols = SslProtocols.Tls12;
                 }
                 string webSocketCertPath;
                 if (ConfigReader.ReadArgs(args, ARG_WEB_SOCKET_CERT_PATH, out webSocketCertPath, string.Empty) ||
