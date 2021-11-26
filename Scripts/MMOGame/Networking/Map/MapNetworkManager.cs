@@ -124,7 +124,6 @@ namespace MultiplayerARPG.MMO
                 {
                     WebSocketTransportFactory webSocketTransportFactory = gameObject.AddComponent<WebSocketTransportFactory>();
                     webSocketTransportFactory.Secure = webSocketSecure;
-                    webSocketTransportFactory.SslProtocols = webSocketSslProtocols;
                     webSocketTransportFactory.CertificateFilePath = webSocketCertificateFilePath;
                     webSocketTransportFactory.CertificatePassword = webSocketCertificatePassword;
                     centralTransportFactory = webSocketTransportFactory;
