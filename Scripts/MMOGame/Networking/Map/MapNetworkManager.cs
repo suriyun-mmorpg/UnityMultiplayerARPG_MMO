@@ -193,7 +193,6 @@ namespace MultiplayerARPG.MMO
             float tempTime = Time.fixedTime;
             if (IsServer)
             {
-                AppRegisterClient.Update();
                 if (tempTime - lastSaveTime > autoSaveDuration)
                 {
                     lastSaveTime = tempTime;
@@ -204,6 +203,7 @@ namespace MultiplayerARPG.MMO
                         SaveBuildingsRoutine().Forget();
                     }
                 }
+
                 if (IsInstanceMap())
                 {
                     // Quitting application when no players
