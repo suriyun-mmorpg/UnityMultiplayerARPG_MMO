@@ -77,7 +77,7 @@ namespace MultiplayerARPG.MMO
             get { return centralTransportFactory; }
         }
 
-        public CentralAppServerRegister CentralAppServerRegister { get; private set; }
+        public AppRegisterClient CentralAppServerRegister { get; private set; }
 
         public string CentralNetworkAddress { get { return centralNetworkAddress; } }
         public int CentralNetworkPort { get { return centralNetworkPort; } }
@@ -144,7 +144,7 @@ namespace MultiplayerARPG.MMO
         public override void OnStartServer()
         {
             this.InvokeInstanceDevExtMethods("OnStartServer");
-            CentralAppServerRegister.OnStartServer();
+            CentralAppServerRegister.OnAppStart();
             spawningPort = startPort;
             portCounter = startPort;
             base.OnStartServer();
@@ -152,7 +152,7 @@ namespace MultiplayerARPG.MMO
 
         public override void OnStopServer()
         {
-            CentralAppServerRegister.OnStopServer();
+            CentralAppServerRegister.OnAppStop();
             Clean();
             base.OnStopServer();
         }

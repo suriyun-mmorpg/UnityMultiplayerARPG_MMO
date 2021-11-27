@@ -59,7 +59,7 @@ namespace MultiplayerARPG.MMO
         private float terminatingTime;
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        public CentralAppServerRegister CentralAppServerRegister { get; private set; }
+        public AppRegisterClient CentralAppServerRegister { get; private set; }
 #endif
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
@@ -429,7 +429,7 @@ namespace MultiplayerARPG.MMO
         public override void OnStopServer()
         {
             base.OnStopServer();
-            CentralAppServerRegister.OnStopServer();
+            CentralAppServerRegister.OnAppStop();
             if (ChatNetworkManager.IsClientConnected)
                 ChatNetworkManager.StopClient();
         }
@@ -472,7 +472,7 @@ namespace MultiplayerARPG.MMO
         protected override async UniTask PostSpawnEntities()
         {
             await UniTask.Yield();
-            CentralAppServerRegister.OnStartServer();
+            CentralAppServerRegister.OnAppStart();
         }
 #endif
 
@@ -892,7 +892,7 @@ namespace MultiplayerARPG.MMO
         #endregion
 
         #region Connect to chat server
-        public void OnChatServerConnected()
+        public void OnClusterServerConnected()
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             if (LogInfo)

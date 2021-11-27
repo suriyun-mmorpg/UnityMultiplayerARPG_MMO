@@ -4,20 +4,20 @@ using Cysharp.Threading.Tasks;
 
 namespace MultiplayerARPG.MMO
 {
-    public class CentralAppServerRegister : LiteNetLibClient
+    public class AppRegisterClient : LiteNetLibClient
     {
-        private IAppServer appServer;
-
-        public bool IsRegisteredToCentralServer { get; private set; }
-
-        // Events
         public System.Action<AckResponseCode> onAppServerRegistered;
 
-        public CentralAppServerRegister(ITransport transport, IAppServer appServer) : base(transport)
+        public bool IsRegisteredToCentralServer { get; private set; }
+        public override string LogTag { get { return nameof(AppRegisterClient) + ":" + appServer.PeerType; } }
+
+        private IAppServer appServer;
+
+        public AppRegisterClient(IAppServer appServer) : base(new TcpTransport())
         {
             this.appServer = appServer;
             EnableRequestResponse(MMOMessageTypes.Request, MMOMessageTypes.Response);
-            RegisterResponseHandler<RequestAppServerRegisterMessage, ResponseAppServerRegisterMessage>(MMORequestTypes.RequestAppServerRegister, OnAppServerRegistered);
+            RegisterResponseHandler<RequestAppServerRegisterMessage, ResponseAppServerRegisterMessage>(MMORequestTypes.RequestAppServerRegister, OnAppRegistered);
         }
 
         public override void OnClientReceive(TransportEventData eventData)
@@ -32,23 +32,23 @@ namespace MultiplayerARPG.MMO
                     ReadPacket(eventData.connectionId, eventData.reader);
                     break;
                 case ENetworkEvent.DisconnectEvent:
-                    Logging.Log(LogTag, "OnPeerDisconnected. disconnectInfo.Reason: " + eventData.disconnectInfo.Reason);
+                    Logging.Log(LogTag, "OnClientDisconnected. disconnectInfo.Reason: " + eventData.disconnectInfo.Reason);
                     StopClient();
                     OnCentralServerDisconnected(eventData.disconnectInfo).Forget();
                     break;
                 case ENetworkEvent.ErrorEvent:
-                    Logging.LogError(LogTag, "OnNetworkError endPoint: " + eventData.endPoint + " socketErrorCode " + eventData.socketError);
+                    Logging.LogError(LogTag, "OnClientNetworkError endPoint: " + eventData.endPoint + " socketErrorCode " + eventData.socketError);
                     break;
             }
         }
 
-        public void OnStartServer()
+        public void OnAppStart()
         {
             Logging.Log(LogTag, "[" + appServer.PeerType + "] Starting server");
             ConnectToCentralServer();
         }
 
-        public void OnStopServer()
+        public void OnAppStop()
         {
             Logging.Log(LogTag, "[" + appServer.PeerType + "] Stopping server");
             DisconnectFromCentralServer();
@@ -69,15 +69,16 @@ namespace MultiplayerARPG.MMO
         public void OnCentralServerConnected()
         {
             Logging.Log(LogTag, "[" + appServer.PeerType + "] Connected to Central Server");
-            CentralServerPeerInfo peerInfo = new CentralServerPeerInfo();
-            peerInfo.peerType = appServer.PeerType;
-            peerInfo.networkAddress = appServer.AppAddress;
-            peerInfo.networkPort = appServer.AppPort;
-            peerInfo.extra = appServer.AppExtra;
             // Send Request
             SendRequest(MMORequestTypes.RequestAppServerRegister, new RequestAppServerRegisterMessage()
             {
-                peerInfo = peerInfo,
+                peerInfo = new CentralServerPeerInfo()
+                {
+                    peerType = appServer.PeerType,
+                    networkAddress = appServer.AppAddress,
+                    networkPort = appServer.AppPort,
+                    extra = appServer.AppExtra,
+                },
             });
         }
 
@@ -98,7 +99,7 @@ namespace MultiplayerARPG.MMO
             ConnectToCentralServer();
         }
 
-        public void OnAppServerRegistered(
+        public void OnAppRegistered(
             ResponseHandlerData responseHandler,
             AckResponseCode responseCode,
             ResponseAppServerRegisterMessage response)
