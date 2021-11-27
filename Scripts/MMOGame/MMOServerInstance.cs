@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using LiteNetLibManager;
-using UnityEngine;
 using System.Net;
 using System.Net.Security;
 using System.IO;
-using MiniJSON;
 using System.Security.Authentication;
+using LiteNetLibManager;
+using UnityEngine;
+using MiniJSON;
 
 namespace MultiplayerARPG.MMO
 {

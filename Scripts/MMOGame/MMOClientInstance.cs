@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Security;
+using System.Security.Authentication;
 using UnityEngine;
 using LiteNetLib;
 using LiteNetLibManager;
@@ -28,12 +29,15 @@ namespace MultiplayerARPG.MMO
         [SerializeField]
         private bool webSocketSecure = false;
         [SerializeField]
+        private SslProtocols webSocketSslProtocols = SslProtocols.Tls12;
+        [SerializeField]
         private MmoNetworkSetting[] networkSettings = new MmoNetworkSetting[0];
 
         public CentralNetworkManager CentralNetworkManager { get { return centralNetworkManager; } }
         public MapNetworkManager MapNetworkManager { get { return mapNetworkManager; } }
         public bool UseWebSocket { get { return useWebSocket; } }
         public bool WebSocketSecure { get { return webSocketSecure; } }
+        public SslProtocols WebSocketSslProtocols { get { return webSocketSslProtocols; } }
         public MmoNetworkSetting[] NetworkSettings { get { return networkSettings; } }
 
         public System.Action onCentralClientConnected;
@@ -58,8 +62,11 @@ namespace MultiplayerARPG.MMO
             // Active WebSockets
             CentralNetworkManager.useWebSocket = UseWebSocket;
             CentralNetworkManager.webSocketSecure = WebSocketSecure;
+            CentralNetworkManager.webSocketSslProtocols = WebSocketSslProtocols;
+
             MapNetworkManager.useWebSocket = UseWebSocket;
             MapNetworkManager.webSocketSecure = WebSocketSecure;
+            MapNetworkManager.webSocketSslProtocols = WebSocketSslProtocols;
         }
 
         private void OnEnable()
