@@ -85,7 +85,7 @@ namespace MultiplayerARPG.MMO
                                 Logging.Log(LogTag, "Register Instance Map Server Failed: [" + connectionId + "] [" + instanceId + "] [" + message + "]");
                         }
                         break;
-                    case CentralServerPeerType.Chat:
+                    case CentralServerPeerType.ClusterServer:
                         chatServerPeers[connectionId] = peerInfo;
                         // Send chat peer info to map servers
                         responseAppServerAddressMessage = new ResponseAppServerAddressMessage()
@@ -191,7 +191,7 @@ namespace MultiplayerARPG.MMO
                             Logging.Log(LogTag, "Request Map Address: [" + connectionId + "] [" + mapName + "] [" + message + "]");
                     }
                     break;
-                case CentralServerPeerType.Chat:
+                case CentralServerPeerType.ClusterServer:
                     if (chatServerPeers.Count > 0)
                     {
                         peerInfo = chatServerPeers.Values.First();

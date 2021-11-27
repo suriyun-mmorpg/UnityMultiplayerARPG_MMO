@@ -5,6 +5,6 @@
         MapSpawnServer,
         MapServer,
         InstanceMapServer,
-        Chat,
+        ClusterServer,
     }
 }
