@@ -25,11 +25,11 @@ namespace MultiplayerARPG.MMO
             switch (eventData.type)
             {
                 case ENetworkEvent.ConnectEvent:
-                    Logging.Log(LogTag, "OnPeerConnected.");
+                    Logging.Log(LogTag, "OnClientConnected");
                     OnCentralServerConnected();
                     break;
                 case ENetworkEvent.DataEvent:
-                    ReadPacket(eventData.connectionId, eventData.reader);
+                    ReadPacket(-1, eventData.reader);
                     break;
                 case ENetworkEvent.DisconnectEvent:
                     Logging.Log(LogTag, "OnClientDisconnected. disconnectInfo.Reason: " + eventData.disconnectInfo.Reason);
@@ -37,38 +37,38 @@ namespace MultiplayerARPG.MMO
                     OnCentralServerDisconnected(eventData.disconnectInfo).Forget();
                     break;
                 case ENetworkEvent.ErrorEvent:
-                    Logging.LogError(LogTag, "OnClientNetworkError endPoint: " + eventData.endPoint + " socketErrorCode " + eventData.socketError);
+                    Logging.LogError(LogTag, "OnClientNetworkError endPoint: " + eventData.endPoint + " socketErrorCode " + eventData.socketError + " errorMessage " + eventData.errorMessage);
                     break;
             }
         }
 
         public void OnAppStart()
         {
-            Logging.Log(LogTag, "[" + appServer.PeerType + "] Starting server");
+            Logging.Log(LogTag, "Starting server");
             ConnectToCentralServer();
         }
 
         public void OnAppStop()
         {
-            Logging.Log(LogTag, "[" + appServer.PeerType + "] Stopping server");
+            Logging.Log(LogTag, "Stopping server");
             DisconnectFromCentralServer();
         }
 
         public void ConnectToCentralServer()
         {
-            Logging.Log(LogTag, "[" + appServer.PeerType + "] Connecting to Central Server: " + appServer.CentralNetworkAddress + ":" + appServer.CentralNetworkPort);
+            Logging.Log(LogTag, "Connecting to Central Server: " + appServer.CentralNetworkAddress + ":" + appServer.CentralNetworkPort);
             StartClient(appServer.CentralNetworkAddress, appServer.CentralNetworkPort);
         }
 
         public void DisconnectFromCentralServer()
         {
-            Logging.Log(LogTag, "[" + appServer.PeerType + "] Disconnecting from Central Server");
+            Logging.Log(LogTag, "Disconnecting from Central Server");
             StopClient();
         }
 
         public void OnCentralServerConnected()
         {
-            Logging.Log(LogTag, "[" + appServer.PeerType + "] Connected to Central Server");
+            Logging.Log(LogTag, "Connected to Central Server");
             // Send Request
             SendRequest(MMORequestTypes.RequestAppServerRegister, new RequestAppServerRegisterMessage()
             {
@@ -84,17 +84,17 @@ namespace MultiplayerARPG.MMO
 
         public async UniTaskVoid OnCentralServerDisconnected(DisconnectInfo disconnectInfo)
         {
-            Logging.Log(LogTag, "[" + appServer.PeerType + "] Disconnected from Central Server");
+            Logging.Log(LogTag, "Disconnected from Central Server");
             IsRegisteredToCentralServer = false;
-            Logging.Log(LogTag, "[" + appServer.PeerType + "] Reconnect to central in 5 seconds...");
+            Logging.Log(LogTag, "Reconnect to central in 5 seconds...");
             await UniTask.Delay(1000, true);
-            Logging.Log(LogTag, "[" + appServer.PeerType + "] Reconnect to central in 4 seconds...");
+            Logging.Log(LogTag, "Reconnect to central in 4 seconds...");
             await UniTask.Delay(1000, true);
-            Logging.Log(LogTag, "[" + appServer.PeerType + "] Reconnect to central in 3 seconds...");
+            Logging.Log(LogTag, "Reconnect to central in 3 seconds...");
             await UniTask.Delay(1000, true);
-            Logging.Log(LogTag, "[" + appServer.PeerType + "] Reconnect to central in 2 seconds...");
+            Logging.Log(LogTag, "Reconnect to central in 2 seconds...");
             await UniTask.Delay(1000, true);
-            Logging.Log(LogTag, "[" + appServer.PeerType + "] Reconnect to central in 1 seconds...");
+            Logging.Log(LogTag, "Reconnect to central in 1 seconds...");
             await UniTask.Delay(1000, true);
             ConnectToCentralServer();
         }
