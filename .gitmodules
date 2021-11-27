@@ -1,0 +1,3 @@
+[submodule "TCPTransport"]
+	path = TCPTransport
+	url = https://github.com/insthync/LiteNetLibManager_TCP.git
