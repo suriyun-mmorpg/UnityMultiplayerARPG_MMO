@@ -10,7 +10,7 @@ namespace MultiplayerARPG.MMO
         public string CentralNetworkAddress { get; set; }
         public int CentralNetworkPort { get; set; }
         public string AppAddress { get; set; }
-        public int AppPort { get { return ServerPort; } }
+        public int AppPort { get { return ServerPort; } set { ServerPort = value; } }
         public string AppExtra { get { return string.Empty; } }
         public CentralServerPeerType PeerType { get { return CentralServerPeerType.ClusterServer; } }
 
@@ -31,6 +31,11 @@ namespace MultiplayerARPG.MMO
             RegisterMessageHandler(MMOMessageTypes.UpdateParty, HandleUpdatePartyAtServer);
             RegisterMessageHandler(MMOMessageTypes.UpdateGuildMember, HandleUpdateGuildMemberAtServer);
             RegisterMessageHandler(MMOMessageTypes.UpdateGuild, HandleUpdateGuildAtServer);
+        }
+
+        public bool StartServer()
+        {
+            return StartServer(AppPort, int.MaxValue);
         }
 
         protected override void OnStartServer()

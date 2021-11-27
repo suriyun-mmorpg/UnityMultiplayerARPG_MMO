@@ -31,11 +31,11 @@ namespace MultiplayerARPG.MMO
                     ReadPacket(-1, eventData.reader);
                     break;
                 case ENetworkEvent.DisconnectEvent:
-                    Logging.Log(LogTag, "OnPeerDisconnected peer. disconnectInfo.Reason: " + eventData.disconnectInfo.Reason);
+                    Logging.Log(LogTag, "OnClientDisconnected peer. disconnectInfo.Reason: " + eventData.disconnectInfo.Reason);
                     StopClient();
                     break;
                 case ENetworkEvent.ErrorEvent:
-                    Logging.LogError(LogTag, "OnNetworkError endPoint: " + eventData.endPoint + " socketErrorCode " + eventData.socketError + " errorMessage " + eventData.errorMessage);
+                    Logging.LogError(LogTag, "OnClientNetworkError endPoint: " + eventData.endPoint + " socketErrorCode " + eventData.socketError + " errorMessage " + eventData.errorMessage);
                     break;
             }
         }
