@@ -44,6 +44,9 @@ namespace MultiplayerARPG.MMO
         public int centralNetworkPort = 6000;
         public string machineAddress = "127.0.0.1";
 
+        [Header("Chat Network Connection")]
+        public BaseTransportFactory chatTransportFactory;
+
         [Header("Database")]
         public float autoSaveDuration = 2f;
 
@@ -54,11 +57,6 @@ namespace MultiplayerARPG.MMO
         public int playerCharacterDespawnMillisecondsDelay = 5000;
 
         private float terminatingTime;
-
-        public BaseTransportFactory CentralTransportFactory
-        {
-            get { return centralTransportFactory; }
-        }
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
         public CentralAppServerRegister CentralAppServerRegister { get; private set; }
@@ -118,31 +116,6 @@ namespace MultiplayerARPG.MMO
 
         protected override void Awake()
         {
-            if (useWebSocket)
-            {
-                if (centralTransportFactory == null || !(centralTransportFactory is IWebSocketTransportFactory))
-                {
-                    WebSocketTransportFactory webSocketTransportFactory = gameObject.AddComponent<WebSocketTransportFactory>();
-                    webSocketTransportFactory.Secure = webSocketSecure;
-                    webSocketTransportFactory.SslProtocols = webSocketSslProtocols;
-                    webSocketTransportFactory.CertificateFilePath = webSocketCertificateFilePath;
-                    webSocketTransportFactory.CertificatePassword = webSocketCertificatePassword;
-                    centralTransportFactory = webSocketTransportFactory;
-                }
-            }
-            else
-            {
-                if (centralTransportFactory == null)
-                    centralTransportFactory = gameObject.AddComponent<LiteNetLibTransportFactory>();
-            }
-#if UNITY_STANDALONE && !CLIENT_BUILD
-            CentralAppServerRegister = new CentralAppServerRegister(CentralTransportFactory.Build(), this);
-            CentralAppServerRegister.onAppServerRegistered = OnAppServerRegistered;
-            CentralAppServerRegister.RegisterMessageHandler(MMOMessageTypes.AppServerAddress, HandleResponseAppServerAddress);
-            CentralAppServerRegister.RegisterResponseHandler<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.RequestSpawnMap);
-            this.InvokeInstanceDevExtMethods("OnInitCentralAppServerRegister");
-            ChatNetworkManager = gameObject.AddComponent<ChatNetworkManager>();
-#endif
             // Server Handlers
             ServerMailHandlers = gameObject.GetOrAddComponent<IServerMailHandlers, MMOServerMailHandlers>();
             ServerUserHandlers = gameObject.GetOrAddComponent<IServerUserHandlers, MMOServerUserHandlers>();
@@ -177,6 +150,57 @@ namespace MultiplayerARPG.MMO
             ClientChatHandlers = gameObject.GetOrAddComponent<IClientChatHandlers, DefaultClientChatHandlers>();
             ClientGameMessageHandlers = gameObject.GetOrAddComponent<IClientGameMessageHandlers, DefaultClientGameMessageHandlers>();
             base.Awake();
+        }
+
+        protected override void Start()
+        {
+            base.Start();
+            // App client which will be used by map server to connect to central server
+            if (useWebSocket)
+            {
+                if (centralTransportFactory == null || !(centralTransportFactory is IWebSocketTransportFactory))
+                {
+                    WebSocketTransportFactory webSocketTransportFactory = gameObject.AddComponent<WebSocketTransportFactory>();
+                    webSocketTransportFactory.Secure = webSocketSecure;
+                    webSocketTransportFactory.SslProtocols = webSocketSslProtocols;
+                    webSocketTransportFactory.CertificateFilePath = webSocketCertificateFilePath;
+                    webSocketTransportFactory.CertificatePassword = webSocketCertificatePassword;
+                    centralTransportFactory = webSocketTransportFactory;
+                }
+            }
+            else
+            {
+                if (centralTransportFactory == null)
+                    centralTransportFactory = gameObject.AddComponent<LiteNetLibTransportFactory>();
+            }
+
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            CentralAppServerRegister = new CentralAppServerRegister(centralTransportFactory.Build(), this);
+            CentralAppServerRegister.onAppServerRegistered = OnAppServerRegistered;
+            CentralAppServerRegister.RegisterMessageHandler(MMOMessageTypes.AppServerAddress, HandleResponseAppServerAddress);
+            CentralAppServerRegister.RegisterResponseHandler<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.RequestSpawnMap);
+            this.InvokeInstanceDevExtMethods("OnInitCentralAppServerRegister");
+
+            // Chat client which will be used by map server to connect to chat server
+            ChatNetworkManager = gameObject.AddComponent<ChatNetworkManager>();
+            if (useWebSocket)
+            {
+                if (chatTransportFactory == null || !(chatTransportFactory is IWebSocketTransportFactory))
+                {
+                    WebSocketTransportFactory webSocketTransportFactory = ChatNetworkManager.gameObject.AddComponent<WebSocketTransportFactory>();
+                    webSocketTransportFactory.Secure = webSocketSecure;
+                    webSocketTransportFactory.SslProtocols = webSocketSslProtocols;
+                    webSocketTransportFactory.CertificateFilePath = webSocketCertificateFilePath;
+                    webSocketTransportFactory.CertificatePassword = webSocketCertificatePassword;
+                    chatTransportFactory = webSocketTransportFactory;
+                }
+            }
+            else
+            {
+                if (chatTransportFactory == null)
+                    chatTransportFactory = ChatNetworkManager.gameObject.AddComponent<LiteNetLibTransportFactory>();
+            }
+#endif
         }
 
         protected override void FixedUpdate()
