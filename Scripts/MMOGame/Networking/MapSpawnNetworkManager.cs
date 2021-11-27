@@ -86,9 +86,9 @@ namespace MultiplayerARPG.MMO
         public string AppExtra { get { return string.Empty; } }
         public CentralServerPeerType PeerType { get { return CentralServerPeerType.MapSpawnServer; } }
 
-        protected override void Awake()
+        protected override void Start()
         {
-            base.Awake();
+            base.Start();
             if (useWebSocket)
             {
                 if (centralTransportFactory == null || !(centralTransportFactory is IWebSocketTransportFactory))

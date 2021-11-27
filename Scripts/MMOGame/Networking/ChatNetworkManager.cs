@@ -33,9 +33,9 @@ namespace MultiplayerARPG.MMO
         private readonly Dictionary<string, long> connectionIdsByCharacterId = new Dictionary<string, long>();
         private readonly Dictionary<string, long> connectionIdsByCharacterName = new Dictionary<string, long>();
 
-        protected override void Awake()
+        protected override void Start()
         {
-            base.Awake();
+            base.Start();
             if (useWebSocket)
             {
                 if (centralTransportFactory == null || !(centralTransportFactory is IWebSocketTransportFactory))
