@@ -229,12 +229,6 @@ namespace MultiplayerARPG.MMO
                 CentralNetworkManager.webSocketCertificateFilePath = WebScoketCertificateFilePath;
                 CentralNetworkManager.webSocketCertificatePassword = WebScoketCertificatePassword;
 
-                MapSpawnNetworkManager.useWebSocket = UseWebSocket;
-                MapSpawnNetworkManager.webSocketSecure = WebSocketSecure;
-                MapSpawnNetworkManager.webSocketSslProtocols = WebSocketSslProtocols;
-                MapSpawnNetworkManager.webSocketCertificateFilePath = WebScoketCertificateFilePath;
-                MapSpawnNetworkManager.webSocketCertificatePassword = WebScoketCertificatePassword;
-
                 MapNetworkManager.useWebSocket = UseWebSocket;
                 MapNetworkManager.webSocketSecure = WebSocketSecure;
                 MapNetworkManager.webSocketSslProtocols = WebSocketSslProtocols;
@@ -451,12 +445,6 @@ namespace MultiplayerARPG.MMO
                 CentralNetworkManager.webSocketSslProtocols = WebSocketSslProtocols;
                 CentralNetworkManager.webSocketCertificateFilePath = WebScoketCertificateFilePath;
                 CentralNetworkManager.webSocketCertificatePassword = WebScoketCertificatePassword;
-
-                MapSpawnNetworkManager.useWebSocket = UseWebSocket;
-                MapSpawnNetworkManager.webSocketSecure = WebSocketSecure;
-                MapSpawnNetworkManager.webSocketSslProtocols = WebSocketSslProtocols;
-                MapSpawnNetworkManager.webSocketCertificateFilePath = WebScoketCertificateFilePath;
-                MapSpawnNetworkManager.webSocketCertificatePassword = WebScoketCertificatePassword;
 
                 MapNetworkManager.useWebSocket = UseWebSocket;
                 MapNetworkManager.webSocketSecure = WebSocketSecure;
