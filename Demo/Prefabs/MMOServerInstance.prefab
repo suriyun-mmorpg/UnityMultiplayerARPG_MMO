@@ -29,7 +29,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4009622383931608}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &114414512406587944
 MonoBehaviour:
@@ -95,69 +95,23 @@ MonoBehaviour:
   networkAddress: localhost
   networkPort: 7000
   useWebSocket: 0
+  webSocketSecure: 0
+  webSocketSslProtocols: 3072
+  webSocketCertificateFilePath: 
+  webSocketCertificatePassword: 
   maxConnections: 1100
   transportFactory: {fileID: 0}
   facebookLoginRequestType: 210
   googlePlayLoginRequestType: 211
   mapSpawnMillisecondsTimeout: 0
+  disableDefaultLogin: 0
   minUsernameLength: 2
   maxUsernameLength: 24
   minPasswordLength: 2
   minCharacterNameLength: 2
   maxCharacterNameLength: 16
---- !u!1 &1316728034786570
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 4906125570589406}
-  - component: {fileID: 114785914675753794}
-  m_Layer: 0
-  m_Name: ChatNetworkManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &4906125570589406
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1316728034786570}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 4009622383931608}
-  m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &114785914675753794
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1316728034786570}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 35d258770a98cc247aaae1ac37702d58, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  currentLogLevel: 2
-  networkAddress: localhost
-  networkPort: 6002
-  useWebSocket: 0
-  maxConnections: 1100
-  transportFactory: {fileID: 0}
-  centralTransportFactory: {fileID: 0}
-  centralNetworkAddress: 127.0.0.1
-  centralNetworkPort: 7000
-  machineAddress: 127.0.0.1
+  requireEmail: 0
+  requireEmailVerification: 0
 --- !u!1 &1454126604845530
 GameObject:
   m_ObjectHideFlags: 0
@@ -187,7 +141,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4009622383931608}
-  m_RootOrder: 4
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &114715813743394434
 MonoBehaviour:
@@ -234,7 +188,6 @@ Transform:
   m_Children:
   - {fileID: 4689870637795574}
   - {fileID: 4281435147628774}
-  - {fileID: 4906125570589406}
   - {fileID: 4765183370109292}
   - {fileID: 4889244740642296}
   - {fileID: 4049227467700674}
@@ -253,6 +206,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5e08d8ccbfded44bb2400909f8f4376, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  logFolder: log
+  logExtension: log
   logAreaHeight: 100
   showLogSize: 20
 --- !u!114 &114946005600446132
@@ -270,12 +225,15 @@ MonoBehaviour:
   centralNetworkManager: {fileID: 114543387092495668}
   mapSpawnNetworkManager: {fileID: 114788248445432888}
   mapNetworkManager: {fileID: 0}
-  chatNetworkManager: {fileID: 114785914675753794}
   databaseNetworkManager: {fileID: 114035231915985668}
   useWebSocket: 0
+  webSocketSecure: 0
+  webSocketSslProtocols: 3072
+  webSocketCertPath: 
+  webSocketCertPassword: 
   startCentralOnAwake: 0
   startMapSpawnOnAwake: 0
-  startChatOnAwake: 0
+  startClusterOnAwake: 0
   startDatabaseOnAwake: 0
   startMapOnAwake: 0
   startingMap: {fileID: 11400000, guid: de8b0e4099f8d444692e88f92309e90d, type: 2}
@@ -327,6 +285,10 @@ MonoBehaviour:
   networkAddress: localhost
   networkPort: 6001
   useWebSocket: 0
+  webSocketSecure: 0
+  webSocketSslProtocols: 3072
+  webSocketCertificateFilePath: 
+  webSocketCertificatePassword: 
   maxConnections: 1100
   transportFactory: {fileID: 0}
   centralTransportFactory: {fileID: 0}
@@ -369,7 +331,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4009622383931608}
-  m_RootOrder: 5
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &114035231915985668
 MonoBehaviour:
@@ -387,6 +349,10 @@ MonoBehaviour:
   networkAddress: 127.0.0.1
   networkPort: 6100
   useWebSocket: 0
+  webSocketSecure: 0
+  webSocketSslProtocols: 3072
+  webSocketCertificateFilePath: 
+  webSocketCertificatePassword: 
   maxConnections: 200
   transportFactory: {fileID: 0}
   database: {fileID: 114414512406587944}
