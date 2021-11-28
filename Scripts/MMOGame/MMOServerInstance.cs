@@ -24,6 +24,8 @@ namespace MultiplayerARPG.MMO
         public const string ARG_CENTRAL_PORT = "-" + CONFIG_CENTRAL_PORT;
         public const string CONFIG_CENTRAL_MAX_CONNECTIONS = "centralMaxConnections";
         public const string ARG_CENTRAL_MAX_CONNECTIONS = "-" + CONFIG_CENTRAL_MAX_CONNECTIONS;
+        public const string CONFIG_CLUSTER_PORT = "clusterPort";
+        public const string ARG_CLUSTER_PORT = "-" + CONFIG_CLUSTER_PORT;
         public const string CONFIG_MACHINE_ADDRESS = "machineAddress";
         public const string ARG_MACHINE_ADDRESS = "-" + CONFIG_MACHINE_ADDRESS;
         public const string CONFIG_USE_WEB_SOCKET = "useWebSocket";
@@ -37,8 +39,6 @@ namespace MultiplayerARPG.MMO
         // Map spawn server
         public const string CONFIG_MAP_SPAWN_PORT = "mapSpawnPort";
         public const string ARG_MAP_SPAWN_PORT = "-" + CONFIG_MAP_SPAWN_PORT;
-        public const string CONFIG_MAP_SPAWN_MAX_CONNECTIONS = "mapSpawnMaxConnections";
-        public const string ARG_MAP_SPAWN_MAX_CONNECTIONS = "-" + CONFIG_MAP_SPAWN_MAX_CONNECTIONS;
         public const string CONFIG_SPAWN_EXE_PATH = "spawnExePath";
         public const string ARG_SPAWN_EXE_PATH = "-" + CONFIG_SPAWN_EXE_PATH;
         public const string CONFIG_NOT_SPAWN_IN_BATCH_MODE = "notSpawnInBatchMode";
@@ -70,16 +70,11 @@ namespace MultiplayerARPG.MMO
         public const string ARG_INSTANCE_ROTATION_Y = "-" + CONFIG_INSTANCE_ROTATION_Y;
         public const string CONFIG_INSTANCE_ROTATION_Z = "instanceRotationZ";
         public const string ARG_INSTANCE_ROTATION_Z = "-" + CONFIG_INSTANCE_ROTATION_Z;
-        // Cluster server
-        public const string CONFIG_CHAT_PORT = "chatPort";
-        public const string ARG_CHAT_PORT = "-" + CONFIG_CHAT_PORT;
         // Database manager server
         public const string CONFIG_DATABASE_ADDRESS = "databaseManagerAddress";
         public const string ARG_DATABASE_ADDRESS = "-" + CONFIG_DATABASE_ADDRESS;
         public const string CONFIG_DATABASE_PORT = "databaseManagerPort";
         public const string ARG_DATABASE_PORT = "-" + CONFIG_DATABASE_PORT;
-        public const string CONFIG_DATABASE_MAX_CONNECTIONS = "databaseMaxConnections";
-        public const string ARG_DATABASE_MAX_CONNECTIONS = "-" + CONFIG_DATABASE_MAX_CONNECTIONS;
         // Start servers
         public const string CONFIG_START_CENTRAL_SERVER = "startCentralServer";
         public const string ARG_START_CENTRAL_SERVER = "-" + CONFIG_START_CENTRAL_SERVER;
@@ -87,8 +82,6 @@ namespace MultiplayerARPG.MMO
         public const string ARG_START_MAP_SPAWN_SERVER = "-" + CONFIG_START_MAP_SPAWN_SERVER;
         public const string CONFIG_START_MAP_SERVER = "startMapServer";
         public const string ARG_START_MAP_SERVER = "-" + CONFIG_START_MAP_SERVER;
-        public const string CONFIG_START_CHAT_SERVER = "startChatServer";
-        public const string ARG_START_CHAT_SERVER = "-" + CONFIG_START_CHAT_SERVER;
         public const string CONFIG_START_DATABASE_SERVER = "startDatabaseServer";
         public const string ARG_START_DATABASE_SERVER = "-" + CONFIG_START_DATABASE_SERVER;
 
@@ -117,7 +110,6 @@ namespace MultiplayerARPG.MMO
         public CentralNetworkManager CentralNetworkManager { get { return centralNetworkManager; } }
         public MapSpawnNetworkManager MapSpawnNetworkManager { get { return mapSpawnNetworkManager; } }
         public MapNetworkManager MapNetworkManager { get { return mapNetworkManager; } }
-        public ClusterServer ClusterServer { get; private set; } = new ClusterServer();
         public DatabaseNetworkManager DatabaseNetworkManager { get { return databaseNetworkManager; } }
         public bool UseWebSocket { get { return useWebSocket; } }
         public bool WebSocketSecure { get { return webSocketSecure; } }
@@ -139,7 +131,6 @@ namespace MultiplayerARPG.MMO
         [Header("Running In Editor")]
         public bool startCentralOnAwake;
         public bool startMapSpawnOnAwake;
-        public bool startClusterOnAwake;
         public bool startDatabaseOnAwake;
         public bool startMapOnAwake;
         public BaseMapInfo startingMap;
@@ -151,7 +142,6 @@ namespace MultiplayerARPG.MMO
         private bool startingCentralServer;
         private bool startingMapSpawnServer;
         private bool startingMapServer;
-        private bool startingClusterServer;
         private bool startingDatabaseServer;
 #endif
 
@@ -256,9 +246,8 @@ namespace MultiplayerARPG.MMO
                 if (ConfigReader.ReadArgs(args, ARG_CENTRAL_ADDRESS, out centralNetworkAddress, "localhost") ||
                     ConfigReader.ReadConfigs(jsonConfig, CONFIG_CENTRAL_ADDRESS, out centralNetworkAddress, "localhost"))
                 {
-                    mapSpawnNetworkManager.centralNetworkAddress = centralNetworkAddress;
-                    mapNetworkManager.centralNetworkAddress = centralNetworkAddress;
-                    ClusterServer.CentralNetworkAddress = centralNetworkAddress;
+                    mapSpawnNetworkManager.clusterServerAddress = centralNetworkAddress;
+                    mapNetworkManager.clusterServerAddress = centralNetworkAddress;
                 }
 
                 // Central network port
@@ -267,9 +256,6 @@ namespace MultiplayerARPG.MMO
                     ConfigReader.ReadConfigs(jsonConfig, CONFIG_CENTRAL_PORT, out centralNetworkPort, 6000))
                 {
                     centralNetworkManager.networkPort = centralNetworkPort;
-                    mapSpawnNetworkManager.centralNetworkPort = centralNetworkPort;
-                    mapNetworkManager.centralNetworkPort = centralNetworkPort;
-                    ClusterServer.CentralNetworkPort = centralNetworkPort;
                 }
 
                 // Central max connections
@@ -280,6 +266,16 @@ namespace MultiplayerARPG.MMO
                     centralNetworkManager.maxConnections = centralMaxConnections;
                 }
 
+                // Central network port
+                int clusterNetworkPort;
+                if (ConfigReader.ReadArgs(args, ARG_CLUSTER_PORT, out clusterNetworkPort, 6010) ||
+                    ConfigReader.ReadConfigs(jsonConfig, CONFIG_CLUSTER_PORT, out clusterNetworkPort, 6010))
+                {
+                    centralNetworkManager.clusterServerPort = clusterNetworkPort;
+                    mapSpawnNetworkManager.clusterServerPort = clusterNetworkPort;
+                    mapNetworkManager.clusterServerPort = clusterNetworkPort;
+                }
+
                 // Machine network address, will be set to map spawn / map / chat
                 string machineNetworkAddress;
                 if (ConfigReader.ReadArgs(args, ARG_MACHINE_ADDRESS, out machineNetworkAddress, "localhost") ||
@@ -287,7 +283,6 @@ namespace MultiplayerARPG.MMO
                 {
                     mapSpawnNetworkManager.machineAddress = machineNetworkAddress;
                     mapNetworkManager.machineAddress = machineNetworkAddress;
-                    ClusterServer.AppAddress = machineNetworkAddress;
                 }
 
                 // Map spawn network port
@@ -296,14 +291,6 @@ namespace MultiplayerARPG.MMO
                     ConfigReader.ReadConfigs(jsonConfig, CONFIG_MAP_SPAWN_PORT, out mapSpawnNetworkPort, 6001))
                 {
                     mapSpawnNetworkManager.networkPort = mapSpawnNetworkPort;
-                }
-
-                // Map spawn max connections
-                int mapSpawnMaxConnections;
-                if (ConfigReader.ReadArgs(args, ARG_MAP_SPAWN_MAX_CONNECTIONS, out mapSpawnMaxConnections, 1100) ||
-                    ConfigReader.ReadConfigs(jsonConfig, CONFIG_MAP_SPAWN_MAX_CONNECTIONS, out mapSpawnMaxConnections, 1100))
-                {
-                    mapSpawnNetworkManager.maxConnections = mapSpawnMaxConnections;
                 }
 
                 // Map spawn exe path
@@ -388,14 +375,6 @@ namespace MultiplayerARPG.MMO
                     mapNetworkManager.MapInstanceWarpToRotation = new Vector3(instanceRotX, instanceRotY, instanceRotZ);
                 }
 
-                // Cluster network port
-                int chatNetworkPort;
-                if (ConfigReader.ReadArgs(args, ARG_CHAT_PORT, out chatNetworkPort, 6003) ||
-                    ConfigReader.ReadConfigs(jsonConfig, CONFIG_CHAT_PORT, out chatNetworkPort, 6003))
-                {
-                    ClusterServer.AppPort = chatNetworkPort;
-                }
-
                 // Database network address
                 string databaseNetworkAddress;
                 if (ConfigReader.ReadArgs(args, ARG_DATABASE_ADDRESS, out databaseNetworkAddress, "localhost") ||
@@ -410,14 +389,6 @@ namespace MultiplayerARPG.MMO
                     ConfigReader.ReadConfigs(jsonConfig, CONFIG_DATABASE_PORT, out databaseNetworkPort, 6100))
                 {
                     databaseNetworkManager.networkPort = databaseNetworkPort;
-                }
-
-                // Database max connections
-                int databaseNetworkMaxConnections;
-                if (ConfigReader.ReadArgs(args, ARG_DATABASE_PORT, out databaseNetworkMaxConnections, 1000) ||
-                    ConfigReader.ReadConfigs(jsonConfig, CONFIG_DATABASE_PORT, out databaseNetworkMaxConnections, 1000))
-                {
-                    databaseNetworkManager.maxConnections = databaseNetworkMaxConnections;
                 }
 
                 string logFileName = "Log";
@@ -442,16 +413,6 @@ namespace MultiplayerARPG.MMO
                     logFileName += "Central";
                     startLog = true;
                     startingCentralServer = true;
-                }
-
-                if (ConfigReader.IsArgsProvided(args, ARG_START_CHAT_SERVER) ||
-                    (ConfigReader.ReadConfigs(jsonConfig, CONFIG_START_CHAT_SERVER, out tempStartServer) && tempStartServer))
-                {
-                    if (!string.IsNullOrEmpty(logFileName))
-                        logFileName += "_";
-                    logFileName += "Chat";
-                    startLog = true;
-                    startingClusterServer = true;
                 }
 
                 if (ConfigReader.IsArgsProvided(args, ARG_START_MAP_SPAWN_SERVER) ||
@@ -509,9 +470,6 @@ namespace MultiplayerARPG.MMO
                 if (startCentralOnAwake)
                     startingCentralServer = true;
 
-                if (startClusterOnAwake)
-                    startingClusterServer = true;
-
                 if (startMapSpawnOnAwake)
                     startingMapSpawnServer = true;
 
@@ -538,12 +496,6 @@ namespace MultiplayerARPG.MMO
             {
                 // Start central server
                 StartCentralServer();
-            }
-
-            if (startingClusterServer)
-            {
-                // Start chat manager server
-                StartChatServer();
             }
 
             if (startingMapSpawnServer)
@@ -579,7 +531,6 @@ namespace MultiplayerARPG.MMO
 
             if (startingCentralServer ||
                 startingMapSpawnServer ||
-                startingClusterServer ||
                 startingMapServer)
             {
                 // Start database manager client, it will connect to database manager server
@@ -605,11 +556,6 @@ namespace MultiplayerARPG.MMO
         public void StartMapServer()
         {
             mapNetworkManager.StartServer();
-        }
-
-        public void StartChatServer()
-        {
-            ClusterServer.StartServer();
         }
 
         public void StartDatabaseManagerServer()
