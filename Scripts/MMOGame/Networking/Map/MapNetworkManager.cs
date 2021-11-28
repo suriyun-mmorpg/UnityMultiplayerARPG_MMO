@@ -169,6 +169,8 @@ namespace MultiplayerARPG.MMO
             float tempTime = Time.fixedTime;
             if (IsServer)
             {
+                ClusterClient.Update();
+
                 if (tempTime - lastSaveTime > autoSaveDuration)
                 {
                     lastSaveTime = tempTime;
