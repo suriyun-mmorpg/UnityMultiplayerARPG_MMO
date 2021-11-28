@@ -103,6 +103,7 @@ MonoBehaviour:
   transportFactory: {fileID: 0}
   facebookLoginRequestType: 210
   googlePlayLoginRequestType: 211
+  clusterServerPort: 6010
   mapSpawnMillisecondsTimeout: 0
   disableDefaultLogin: 0
   minUsernameLength: 2
@@ -233,7 +234,6 @@ MonoBehaviour:
   webSocketCertPassword: 
   startCentralOnAwake: 0
   startMapSpawnOnAwake: 0
-  startClusterOnAwake: 0
   startDatabaseOnAwake: 0
   startMapOnAwake: 0
   startingMap: {fileID: 11400000, guid: de8b0e4099f8d444692e88f92309e90d, type: 2}
@@ -291,9 +291,8 @@ MonoBehaviour:
   webSocketCertificatePassword: 
   maxConnections: 1100
   transportFactory: {fileID: 0}
-  centralTransportFactory: {fileID: 0}
-  centralNetworkAddress: 127.0.0.1
-  centralNetworkPort: 7000
+  clusterServerAddress: 127.0.0.1
+  clusterServerPort: 6010
   machineAddress: 127.0.0.1
   exePath: ./Build.exe
   notSpawnInBatchMode: 0
