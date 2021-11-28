@@ -1,10 +1,9 @@
-﻿
-namespace MultiplayerARPG.MMO
+﻿namespace MultiplayerARPG.MMO
 {
     public interface IAppServer
     {
-        string CentralNetworkAddress { get; }
-        int CentralNetworkPort { get; }
+        string ClusterServerAddress { get; }
+        int ClusterServerPort { get; }
         string AppAddress { get; }
         int AppPort { get; }
         string AppExtra { get; }

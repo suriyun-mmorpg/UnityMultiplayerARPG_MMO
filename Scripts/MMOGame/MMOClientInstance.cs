@@ -57,7 +57,7 @@ namespace MultiplayerARPG.MMO
             Singleton = this;
 
             // Always accept SSL
-            ServicePointManager.ServerCertificateValidationCallback += new RemoteCertificateValidationCallback((sender, certificate, chain, policyErrors) => { return true; });
+            ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback((sender, certificate, chain, policyErrors) => { return true; });
 
             // Active WebSockets
             CentralNetworkManager.useWebSocket = UseWebSocket;

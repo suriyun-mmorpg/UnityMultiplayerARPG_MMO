@@ -9,23 +9,12 @@ namespace MultiplayerARPG.MMO
     public partial class CentralNetworkManager : LiteNetLibManager.LiteNetLibManager
     {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        protected readonly Dictionary<long, CentralServerPeerInfo> mapSpawnServerPeers = new Dictionary<long, CentralServerPeerInfo>();
-        // Map server peers
-        protected readonly Dictionary<long, CentralServerPeerInfo> mapServerPeers = new Dictionary<long, CentralServerPeerInfo>();
-        protected readonly Dictionary<string, CentralServerPeerInfo> mapServerPeersBySceneName = new Dictionary<string, CentralServerPeerInfo>();
-        // Instance map server peers
-        protected readonly Dictionary<long, CentralServerPeerInfo> instanceMapServerPeers = new Dictionary<long, CentralServerPeerInfo>();
-        protected readonly Dictionary<string, CentralServerPeerInfo> instanceMapServerPeersByInstanceId = new Dictionary<string, CentralServerPeerInfo>();
-        // Chat server peers
-        protected readonly Dictionary<long, CentralServerPeerInfo> chatServerPeers = new Dictionary<long, CentralServerPeerInfo>();
         // User peers (Login / Register / Manager characters)
         protected readonly Dictionary<long, CentralUserPeerInfo> userPeers = new Dictionary<long, CentralUserPeerInfo>();
         protected readonly Dictionary<string, CentralUserPeerInfo> userPeersByUserId = new Dictionary<string, CentralUserPeerInfo>();
-        // Map users, users whom connected to map server / instance map server will be kept in this list
-        protected readonly Dictionary<long, HashSet<string>> mapUserIds = new Dictionary<long, HashSet<string>>();
-        // <Request Id, Response Handler> dictionary
-        protected readonly Dictionary<string, RequestProceedResultDelegate<ResponseSpawnMapMessage>> requestSpawnMapHandlers = new Dictionary<string, RequestProceedResultDelegate<ResponseSpawnMapMessage>>();
 #endif
+        [Header("Cluster")]
+        public int clusterServerPort = 6010;
 
         [Header("Map Spawn")]
         public int mapSpawnMillisecondsTimeout = 0;
@@ -44,9 +33,32 @@ namespace MultiplayerARPG.MMO
         public System.Action<DisconnectInfo> onClientDisconnected;
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
+        public ClusterServer ClusterServer { get; private set; }
+#endif
+
+#if UNITY_STANDALONE && !CLIENT_BUILD
         public DatabaseNetworkManager DbServiceClient
         {
             get { return MMOServerInstance.Singleton.DatabaseNetworkManager; }
+        }
+#endif
+
+#if UNITY_STANDALONE && !CLIENT_BUILD
+        protected override void Start()
+        {
+            base.Start();
+            ClusterServer = new ClusterServer(this);
+        }
+#endif
+
+#if UNITY_STANDALONE && !CLIENT_BUILD
+        protected override void FixedUpdate()
+        {
+            base.FixedUpdate();
+            if (IsServer)
+            {
+                ClusterServer.Update();
+            }
         }
 #endif
 
@@ -54,11 +66,7 @@ namespace MultiplayerARPG.MMO
         {
             base.RegisterMessages();
             EnableRequestResponse(MMOMessageTypes.Request, MMOMessageTypes.Response);
-            // Messages
-            RegisterServerMessage(MMOMessageTypes.UpdateMapUser, HandleUpdateMapUser);
             // Requests
-            RegisterRequestToServer<RequestAppServerRegisterMessage, ResponseAppServerRegisterMessage>(MMORequestTypes.RequestAppServerRegister, HandleRequestAppServerRegister);
-            RegisterRequestToServer<RequestAppServerAddressMessage, ResponseAppServerAddressMessage>(MMORequestTypes.RequestAppServerAddress, HandleRequestAppServerAddress);
             RegisterRequestToServer<RequestUserLoginMessage, ResponseUserLoginMessage>(MMORequestTypes.RequestUserLogin, HandleRequestUserLogin);
             RegisterRequestToServer<RequestUserRegisterMessage, ResponseUserRegisterMessage>(MMORequestTypes.RequestUserRegister, HandleRequestUserRegister);
             RegisterRequestToServer<EmptyMessage, EmptyMessage>(MMORequestTypes.RequestUserLogout, HandleRequestUserLogout);
@@ -66,10 +74,7 @@ namespace MultiplayerARPG.MMO
             RegisterRequestToServer<RequestCreateCharacterMessage, ResponseCreateCharacterMessage>(MMORequestTypes.RequestCreateCharacter, HandleRequestCreateCharacter);
             RegisterRequestToServer<RequestDeleteCharacterMessage, ResponseDeleteCharacterMessage>(MMORequestTypes.RequestDeleteCharacter, HandleRequestDeleteCharacter);
             RegisterRequestToServer<RequestSelectCharacterMessage, ResponseSelectCharacterMessage>(MMORequestTypes.RequestSelectCharacter, HandleRequestSelectCharacter);
-            RegisterRequestToServer<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.RequestSpawnMap, HandleRequestSpawnMap);
             RegisterRequestToServer<RequestValidateAccessTokenMessage, ResponseValidateAccessTokenMessage>(MMORequestTypes.RequestValidateAccessToken, HandleRequestValidateAccessToken);
-            // Register this response for map-spawn requests
-            Server.RegisterResponseHandler<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.RequestSpawnMap, HandleResponseSpawnMap);
             // Keeping `RegisterClientMessages` and `RegisterServerMessages` for backward compatibility, can use any of below dev extension methods
             this.InvokeInstanceDevExtMethods("RegisterClientMessages");
             this.InvokeInstanceDevExtMethods("RegisterServerMessages");
@@ -80,16 +85,8 @@ namespace MultiplayerARPG.MMO
         {
             this.InvokeInstanceDevExtMethods("Clean");
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            mapSpawnServerPeers.Clear();
-            mapServerPeers.Clear();
-            mapServerPeersBySceneName.Clear();
-            instanceMapServerPeers.Clear();
-            instanceMapServerPeersByInstanceId.Clear();
-            chatServerPeers.Clear();
             userPeers.Clear();
             userPeersByUserId.Clear();
-            mapUserIds.Clear();
-            requestSpawnMapHandlers.Clear();
 #endif
         }
 
@@ -98,6 +95,7 @@ namespace MultiplayerARPG.MMO
         {
             this.InvokeInstanceDevExtMethods("OnStartServer");
             base.OnStartServer();
+            ClusterServer.StartServer();
         }
 #endif
 
@@ -106,6 +104,7 @@ namespace MultiplayerARPG.MMO
         {
             Clean();
             base.OnStopServer();
+            ClusterServer.StopServer();
         }
 #endif
 
@@ -126,26 +125,6 @@ namespace MultiplayerARPG.MMO
         {
             base.OnPeerDisconnected(connectionId, disconnectInfo);
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            // Remove disconnect map spawn server
-            mapSpawnServerPeers.Remove(connectionId);
-            // Remove disconnect map server
-            CentralServerPeerInfo mapServerPeerInfo;
-            if (mapServerPeers.TryGetValue(connectionId, out mapServerPeerInfo))
-            {
-                mapServerPeersBySceneName.Remove(mapServerPeerInfo.extra);
-                mapServerPeers.Remove(connectionId);
-                mapUserIds.Remove(connectionId);
-            }
-            // Remove disconnect instance map server
-            CentralServerPeerInfo instanceMapServerPeerInfo;
-            if (instanceMapServerPeers.TryGetValue(connectionId, out instanceMapServerPeerInfo))
-            {
-                instanceMapServerPeersByInstanceId.Remove(instanceMapServerPeerInfo.extra);
-                instanceMapServerPeers.Remove(connectionId);
-                mapUserIds.Remove(connectionId);
-            }
-            // Remove disconnect chat server
-            chatServerPeers.Remove(connectionId);
             // Remove disconnect user
             CentralUserPeerInfo userPeerInfo;
             if (userPeers.TryGetValue(connectionId, out userPeerInfo))
@@ -173,13 +152,10 @@ namespace MultiplayerARPG.MMO
         public bool MapContainsUser(string userId)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            foreach (HashSet<string> mapUser in mapUserIds.Values)
-            {
-                if (mapUser.Contains(userId))
-                    return true;
-            }
-#endif
+            return ClusterServer.MapContainsUser(userId);
+#else
             return false;
+#endif
         }
     }
 }

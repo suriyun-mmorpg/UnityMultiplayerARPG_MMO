@@ -15,9 +15,8 @@ namespace MultiplayerARPG.MMO
     public partial class MapSpawnNetworkManager : LiteNetLibManager.LiteNetLibManager, IAppServer
     {
         [Header("Central Network Connection")]
-        public BaseTransportFactory centralTransportFactory;
-        public string centralNetworkAddress = "127.0.0.1";
-        public int centralNetworkPort = 6000;
+        public string clusterServerAddress = "127.0.0.1";
+        public int clusterServerPort = 6010;
         public string machineAddress = "127.0.0.1";
 
         [Header("Map Spawn Settings")]
@@ -72,15 +71,11 @@ namespace MultiplayerARPG.MMO
             }
         }
 
-        public BaseTransportFactory CentralTransportFactory
-        {
-            get { return centralTransportFactory; }
-        }
-
-        public CentralAppServerRegister CentralAppServerRegister { get; private set; }
-
-        public string CentralNetworkAddress { get { return centralNetworkAddress; } }
-        public int CentralNetworkPort { get { return centralNetworkPort; } }
+#if UNITY_STANDALONE && !CLIENT_BUILD
+        public ClusterClient ClusterClient { get; private set; }
+#endif
+        public string ClusterServerAddress { get { return clusterServerAddress; } }
+        public int ClusterServerPort { get { return clusterServerPort; } }
         public string AppAddress { get { return machineAddress; } }
         public int AppPort { get { return networkPort; } }
         public string AppExtra { get { return string.Empty; } }
@@ -88,28 +83,16 @@ namespace MultiplayerARPG.MMO
 
         protected override void Start()
         {
+            // Force use TcpTransport for server-to-server connections.
+            useWebSocket = false;
+            TransportFactory = gameObject.GetOrAddComponent<TcpTransportFactory>();
+            maxConnections = int.MaxValue;
             base.Start();
-            if (useWebSocket)
-            {
-                if (centralTransportFactory == null || !(centralTransportFactory is IWebSocketTransportFactory))
-                {
-                    WebSocketTransportFactory webSocketTransportFactory = gameObject.AddComponent<WebSocketTransportFactory>();
-                    webSocketTransportFactory.Secure = webSocketSecure;
-                    webSocketTransportFactory.SslProtocols = webSocketSslProtocols;
-                    webSocketTransportFactory.CertificateFilePath = webSocketCertificateFilePath;
-                    webSocketTransportFactory.CertificatePassword = webSocketCertificatePassword;
-                    centralTransportFactory = webSocketTransportFactory;
-                }
-            }
-            else
-            {
-                if (centralTransportFactory == null)
-                    centralTransportFactory = gameObject.AddComponent<LiteNetLibTransportFactory>();
-            }
-            CentralAppServerRegister = new CentralAppServerRegister(CentralTransportFactory.Build(), this);
-            CentralAppServerRegister.onAppServerRegistered = OnAppServerRegistered;
-            CentralAppServerRegister.RegisterRequestHandler<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.RequestSpawnMap, HandleRequestSpawnMap);
-            this.InvokeInstanceDevExtMethods("OnInitCentralAppServerRegister");
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            ClusterClient = new ClusterClient(this);
+            ClusterClient.onResponseAppServerRegister = OnResponseAppServerRegister;
+            ClusterClient.RegisterRequestHandler<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.RequestSpawnMap, HandleRequestSpawnMap);
+#endif
         }
 
         protected virtual void Clean()
@@ -141,21 +124,25 @@ namespace MultiplayerARPG.MMO
             }
         }
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         public override void OnStartServer()
         {
             this.InvokeInstanceDevExtMethods("OnStartServer");
-            CentralAppServerRegister.OnStartServer();
+            ClusterClient.OnAppStart();
             spawningPort = startPort;
             portCounter = startPort;
             base.OnStartServer();
         }
+#endif
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         public override void OnStopServer()
         {
-            CentralAppServerRegister.OnStopServer();
+            ClusterClient.OnAppStop();
             Clean();
             base.OnStopServer();
         }
+#endif
 
         public override void OnStartClient(LiteNetLibClient client)
         {
@@ -170,13 +157,14 @@ namespace MultiplayerARPG.MMO
             base.OnStopClient();
         }
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         protected override void FixedUpdate()
         {
             base.FixedUpdate();
             if (IsServer)
             {
-                CentralAppServerRegister.Update();
-                if (CentralAppServerRegister.IsRegisteredToCentralServer)
+                ClusterClient.Update();
+                if (ClusterClient.IsAppRegistered)
                 {
                     if (restartingScenes.Count > 0)
                     {
@@ -198,6 +186,7 @@ namespace MultiplayerARPG.MMO
                 }
             }
         }
+#endif
 
         protected override void OnDestroy()
         {
@@ -205,13 +194,14 @@ namespace MultiplayerARPG.MMO
             base.OnDestroy();
         }
 
-        private UniTaskVoid HandleRequestSpawnMap(
+#if UNITY_STANDALONE && !CLIENT_BUILD
+        internal async UniTaskVoid HandleRequestSpawnMap(
             RequestHandlerData requestHandler,
             RequestSpawnMapMessage request,
             RequestProceedResultDelegate<ResponseSpawnMapMessage> result)
         {
             UITextKeys message = UITextKeys.NONE;
-            if (!CentralAppServerRegister.IsRegisteredToCentralServer)
+            if (!ClusterClient.IsAppRegistered)
                 message = UITextKeys.UI_ERROR_APP_NOT_READY;
             else if (string.IsNullOrEmpty(request.mapId))
                 message = UITextKeys.UI_ERROR_EMPTY_SCENE_NAME;
@@ -227,22 +217,25 @@ namespace MultiplayerARPG.MMO
             {
                 SpawnMap(request, result, false);
             }
-            return default;
+            await UniTask.Yield();
         }
+#endif
 
-        private void OnAppServerRegistered(AckResponseCode responseCode)
+#if UNITY_STANDALONE && !CLIENT_BUILD
+        private void OnResponseAppServerRegister(AckResponseCode responseCode)
         {
-            if (responseCode == AckResponseCode.Success)
+            if (responseCode != AckResponseCode.Success)
+                return;
+            if (spawningMaps == null || spawningMaps.Count == 0)
             {
-                if (spawningMaps == null || spawningMaps.Count == 0)
-                {
-                    spawningMaps = new List<BaseMapInfo>();
-                    spawningMaps.AddRange(GameInstance.MapInfos.Values);
-                }
-                SpawnMaps(spawningMaps).Forget();
+                spawningMaps = new List<BaseMapInfo>();
+                spawningMaps.AddRange(GameInstance.MapInfos.Values);
             }
+            SpawnMaps(spawningMaps).Forget();
         }
+#endif
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private async UniTaskVoid SpawnMaps(List<BaseMapInfo> spawningMaps)
         {
             foreach (BaseMapInfo map in spawningMaps)
@@ -252,12 +245,14 @@ namespace MultiplayerARPG.MMO
                 await UniTask.Delay(100, true);
             }
         }
+#endif
 
         private void FreePort(int port)
         {
             freePorts.Enqueue(port);
         }
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private void SpawnMap(
             RequestSpawnMapMessage message,
             RequestProceedResultDelegate<ResponseSpawnMapMessage> result,
@@ -265,7 +260,9 @@ namespace MultiplayerARPG.MMO
         {
             SpawnMap(message.mapId, autoRestart, message, result);
         }
+#endif
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private void SpawnMap(
             string mapId, bool autoRestart,
             RequestSpawnMapMessage request = null,
@@ -311,8 +308,8 @@ namespace MultiplayerARPG.MMO
                         $"{MMOServerInstance.ARG_INSTANCE_ROTATION_Y} {request.instanceWarpRotation.y} " +
                         $"{MMOServerInstance.ARG_INSTANCE_ROTATION_Z} {request.instanceWarpRotation.z} "
                         : string.Empty) +
-                    $"{MMOServerInstance.ARG_CENTRAL_ADDRESS} {centralNetworkAddress} " +
-                    $"{MMOServerInstance.ARG_CENTRAL_PORT} {centralNetworkPort} " +
+                    $"{MMOServerInstance.ARG_CENTRAL_ADDRESS} {clusterServerAddress} " +
+                    $"{MMOServerInstance.ARG_CENTRAL_PORT} {clusterServerPort} " +
                     $"{MMOServerInstance.ARG_MACHINE_ADDRESS} {machineAddress} " +
                     $"{MMOServerInstance.ARG_MAP_PORT} {port} " +
                     $"{MMOServerInstance.ARG_START_MAP_SERVER} ",
@@ -420,5 +417,6 @@ namespace MultiplayerARPG.MMO
                     Logging.LogException(LogTag, e);
             }
         }
+#endif
     }
 }

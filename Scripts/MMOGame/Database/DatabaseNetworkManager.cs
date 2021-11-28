@@ -51,6 +51,15 @@ namespace MultiplayerARPG.MMO
         private ConcurrentDictionary<StorageId, List<CharacterItem>> cachedStorageItems = new ConcurrentDictionary<StorageId, List<CharacterItem>>();
 #endif
 
+        protected override void Start()
+        {
+            // Force use TcpTransport for server-to-server connections.
+            useWebSocket = false;
+            TransportFactory = gameObject.GetOrAddComponent<TcpTransportFactory>();
+            maxConnections = int.MaxValue;
+            base.Start();
+        }
+
         public override void OnStartServer()
         {
             base.OnStartServer();

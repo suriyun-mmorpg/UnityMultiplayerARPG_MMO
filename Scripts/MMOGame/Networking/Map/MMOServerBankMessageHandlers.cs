@@ -6,12 +6,15 @@ namespace MultiplayerARPG.MMO
 {
     public partial class MMOServerBankMessageHandlers : MonoBehaviour, IServerBankMessageHandlers
     {
-        public ChatNetworkManager ChatNetworkManager { get; private set; }
-
 #if UNITY_STANDALONE && !CLIENT_BUILD
         public DatabaseNetworkManager DbServiceClient
         {
             get { return MMOServerInstance.Singleton.DatabaseNetworkManager; }
+        }
+
+        public ClusterClient ClusterClient
+        {
+            get { return (BaseGameNetworkManager.Singleton as MapNetworkManager).ClusterClient; }
         }
 #endif
 
@@ -54,9 +57,9 @@ namespace MultiplayerARPG.MMO
             playerCharacter.Gold -= request.gold;
             GameInstance.ServerGuildHandlers.SetGuild(playerCharacter.GuildId, guild);
             // Broadcast via chat server
-            if (ChatNetworkManager.IsClientConnected)
+            if (ClusterClient.IsNetworkActive)
             {
-                ChatNetworkManager.SendSetGuildGold(null, MMOMessageTypes.UpdateGuild, guild.id, guild.gold);
+                ClusterClient.SendSetGuildGold(MMOMessageTypes.UpdateGuild, guild.id, guild.gold);
             }
             GameInstance.ServerGameMessageHandlers.SendSetGuildGoldToMembers(guild);
             result.Invoke(AckResponseCode.Success, new ResponseDepositGuildGoldMessage());
@@ -140,9 +143,9 @@ namespace MultiplayerARPG.MMO
             playerCharacter.Gold = playerCharacter.Gold.Increase(request.gold);
             GameInstance.ServerGuildHandlers.SetGuild(playerCharacter.GuildId, guild);
             // Broadcast via chat server
-            if (ChatNetworkManager.IsClientConnected)
+            if (ClusterClient.IsNetworkActive)
             {
-                ChatNetworkManager.SendSetGuildGold(null, MMOMessageTypes.UpdateGuild, guild.id, guild.gold);
+                ClusterClient.SendSetGuildGold(MMOMessageTypes.UpdateGuild, guild.id, guild.gold);
             }
             GameInstance.ServerGameMessageHandlers.SendSetGuildGoldToMembers(guild);
             result.Invoke(AckResponseCode.Success, new ResponseWithdrawGuildGoldMessage());

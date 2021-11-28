@@ -18,7 +18,7 @@ namespace MultiplayerARPG.MMO
         public void Serialize(NetDataWriter writer)
         {
             time = System.DateTimeOffset.Now.ToUnixTimeSeconds();
-            hash = CentralNetworkManager.GetAppServerRegisterHash(peerInfo.peerType, time);
+            hash = ClusterServer.GetAppServerRegisterHash(peerInfo.peerType, time);
             peerInfo.Serialize(writer);
             writer.PutPackedLong(time);
             writer.Put(hash);
@@ -28,7 +28,7 @@ namespace MultiplayerARPG.MMO
         {
             if (string.IsNullOrEmpty(hash))
                 return false;
-            return hash.Equals(CentralNetworkManager.GetAppServerRegisterHash(peerInfo.peerType, time));
+            return hash.Equals(ClusterServer.GetAppServerRegisterHash(peerInfo.peerType, time));
         }
     }
 }

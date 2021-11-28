@@ -6,19 +6,17 @@ namespace MultiplayerARPG.MMO
 {
     public partial class MMOServerGuildMessageHandlers : MonoBehaviour, IServerGuildMessageHandlers
     {
-        public ChatNetworkManager ChatNetworkManager { get; private set; }
-
 #if UNITY_STANDALONE && !CLIENT_BUILD
         public DatabaseNetworkManager DbServiceClient
         {
             get { return MMOServerInstance.Singleton.DatabaseNetworkManager; }
         }
-#endif
 
-        private void Awake()
+        public ClusterClient ClusterClient
         {
-            ChatNetworkManager = GetComponent<ChatNetworkManager>();
+            get { return (BaseGameNetworkManager.Singleton as MapNetworkManager).ClusterClient; }
         }
+#endif
 
         public async UniTaskVoid HandleRequestAcceptGuildInvitation(RequestHandlerData requestHandler, RequestAcceptGuildInvitationMessage request, RequestProceedResultDelegate<ResponseAcceptGuildInvitationMessage> result)
         {
@@ -54,8 +52,10 @@ namespace MultiplayerARPG.MMO
                 GuildRole = validateResult.Guild.GetMemberRole(playerCharacter.Id)
             });
             // Broadcast via chat server
-            if (ChatNetworkManager.IsClientConnected)
-                ChatNetworkManager.SendAddSocialMember(null, MMOMessageTypes.UpdateGuildMember, request.guildId, playerCharacter.Id, playerCharacter.CharacterName, playerCharacter.DataId, playerCharacter.Level);
+            if (ClusterClient.IsNetworkActive)
+            {
+                ClusterClient.SendAddSocialMember(MMOMessageTypes.UpdateGuildMember, request.guildId, playerCharacter.Id, playerCharacter.CharacterName, playerCharacter.DataId, playerCharacter.Level);
+            }
             GameInstance.ServerGameMessageHandlers.SendSetGuildData(requestHandler.ConnectionId, validateResult.Guild);
             GameInstance.ServerGameMessageHandlers.SendAddGuildMembersToOne(requestHandler.ConnectionId, validateResult.Guild);
             GameInstance.ServerGameMessageHandlers.SendAddGuildMemberToMembers(validateResult.Guild, playerCharacter.Id, playerCharacter.CharacterName, playerCharacter.DataId, playerCharacter.Level);
@@ -192,10 +192,10 @@ namespace MultiplayerARPG.MMO
                 (playerCharacter as BasePlayerCharacterEntity).GuildName = request.guildName;
             }
             // Broadcast via chat server
-            if (ChatNetworkManager.IsClientConnected)
+            if (ClusterClient.IsNetworkActive)
             {
-                ChatNetworkManager.SendCreateGuild(null, MMOMessageTypes.UpdateGuild, guild.id, request.guildName, playerCharacter.Id);
-                ChatNetworkManager.SendAddSocialMember(null, MMOMessageTypes.UpdateGuildMember, guild.id, playerCharacter.Id, playerCharacter.CharacterName, playerCharacter.DataId, playerCharacter.Level);
+                ClusterClient.SendCreateGuild(MMOMessageTypes.UpdateGuild, guild.id, request.guildName, playerCharacter.Id);
+                ClusterClient.SendAddSocialMember(MMOMessageTypes.UpdateGuildMember, guild.id, playerCharacter.Id, playerCharacter.CharacterName, playerCharacter.DataId, playerCharacter.Level);
             }
             GameInstance.ServerGameMessageHandlers.SendSetGuildData(requestHandler.ConnectionId, guild);
             GameInstance.ServerGameMessageHandlers.SendAddGuildMembersToOne(requestHandler.ConnectionId, guild);
@@ -247,8 +247,10 @@ namespace MultiplayerARPG.MMO
                 GuildRole = validateResult.Guild.GetMemberRole(request.memberId)
             });
             // Broadcast via chat server
-            if (ChatNetworkManager.IsClientConnected)
-                ChatNetworkManager.SendChangeGuildLeader(null, MMOMessageTypes.UpdateGuild, validateResult.GuildId, request.memberId);
+            if (ClusterClient.IsNetworkActive)
+            {
+                ClusterClient.SendChangeGuildLeader(MMOMessageTypes.UpdateGuild, validateResult.GuildId, request.memberId);
+            }
             GameInstance.ServerGameMessageHandlers.SendSetGuildLeaderToMembers(validateResult.Guild);
             GameInstance.ServerGameMessageHandlers.SendSetGuildMemberRoleToMembers(validateResult.Guild, request.memberId, 0);
             result.Invoke(AckResponseCode.Success, new ResponseChangeGuildLeaderMessage());
@@ -293,8 +295,10 @@ namespace MultiplayerARPG.MMO
                 CharacterId = request.memberId
             });
             // Broadcast via chat server
-            if (ChatNetworkManager.IsClientConnected)
-                ChatNetworkManager.SendRemoveSocialMember(null, MMOMessageTypes.UpdateGuildMember, validateResult.GuildId, request.memberId);
+            if (ClusterClient.IsNetworkActive)
+            {
+                ClusterClient.SendRemoveSocialMember(MMOMessageTypes.UpdateGuildMember, validateResult.GuildId, request.memberId);
+            }
             GameInstance.ServerGameMessageHandlers.SendRemoveGuildMemberToMembers(validateResult.Guild, request.memberId);
             result.Invoke(AckResponseCode.Success, new ResponseKickMemberFromGuildMessage());
 #endif
@@ -340,8 +344,10 @@ namespace MultiplayerARPG.MMO
                         CharacterId = memberId
                     });
                     // Broadcast via chat server
-                    if (ChatNetworkManager.IsClientConnected)
-                        ChatNetworkManager.SendRemoveSocialMember(null, MMOMessageTypes.UpdateGuildMember, validateResult.GuildId, memberId);
+                    if (ClusterClient.IsNetworkActive)
+                    {
+                        ClusterClient.SendRemoveSocialMember(MMOMessageTypes.UpdateGuildMember, validateResult.GuildId, memberId);
+                    }
                 }
                 GameInstance.ServerGuildHandlers.RemoveGuild(validateResult.GuildId);
                 // Save to database
@@ -350,8 +356,10 @@ namespace MultiplayerARPG.MMO
                     GuildId = validateResult.GuildId
                 });
                 // Broadcast via chat server
-                if (ChatNetworkManager.IsClientConnected)
-                    ChatNetworkManager.SendGuildTerminate(null, MMOMessageTypes.UpdateGuild, validateResult.GuildId);
+                if (ClusterClient.IsNetworkActive)
+                {
+                    ClusterClient.SendGuildTerminate(MMOMessageTypes.UpdateGuild, validateResult.GuildId);
+                }
             }
             else
             {
@@ -366,8 +374,10 @@ namespace MultiplayerARPG.MMO
                     CharacterId = playerCharacter.Id
                 });
                 // Broadcast via chat server
-                if (ChatNetworkManager.IsClientConnected)
-                    ChatNetworkManager.SendRemoveSocialMember(null, MMOMessageTypes.UpdateGuildMember, validateResult.GuildId, playerCharacter.Id);
+                if (ClusterClient.IsNetworkActive)
+                {
+                    ClusterClient.SendRemoveSocialMember(MMOMessageTypes.UpdateGuildMember, validateResult.GuildId, playerCharacter.Id);
+                }
             }
             result.Invoke(AckResponseCode.Success, new ResponseLeaveGuildMessage());
 #endif
@@ -404,8 +414,10 @@ namespace MultiplayerARPG.MMO
                 GuildMessage = request.message
             });
             // Broadcast via chat server
-            if (ChatNetworkManager.IsClientConnected)
-                ChatNetworkManager.SendSetGuildMessage(null, MMOMessageTypes.UpdateGuild, validateResult.GuildId, request.message);
+            if (ClusterClient.IsNetworkActive)
+            {
+                ClusterClient.SendSetGuildMessage(MMOMessageTypes.UpdateGuild, validateResult.GuildId, request.message);
+            }
             GameInstance.ServerGameMessageHandlers.SendSetGuildMessageToMembers(validateResult.Guild);
             result.Invoke(AckResponseCode.Success, new ResponseChangeGuildMessageMessage());
 #endif
@@ -442,8 +454,10 @@ namespace MultiplayerARPG.MMO
                 GuildMessage = request.message
             });
             // Broadcast via chat server
-            if (ChatNetworkManager.IsClientConnected)
-                ChatNetworkManager.SendSetGuildMessage2(null, MMOMessageTypes.UpdateGuild, validateResult.GuildId, request.message);
+            if (ClusterClient.IsNetworkActive)
+            {
+                ClusterClient.SendSetGuildMessage2(MMOMessageTypes.UpdateGuild, validateResult.GuildId, request.message);
+            }
             GameInstance.ServerGameMessageHandlers.SendSetGuildMessage2ToMembers(validateResult.Guild);
             result.Invoke(AckResponseCode.Success, new ResponseChangeGuildMessageMessage());
 #endif
@@ -480,8 +494,10 @@ namespace MultiplayerARPG.MMO
                 Options = request.options
             });
             // Broadcast via chat server
-            if (ChatNetworkManager.IsClientConnected)
-                ChatNetworkManager.SendSetGuildOptions(null, MMOMessageTypes.UpdateGuild, validateResult.GuildId, request.options);
+            if (ClusterClient.IsNetworkActive)
+            {
+                ClusterClient.SendSetGuildOptions(MMOMessageTypes.UpdateGuild, validateResult.GuildId, request.options);
+            }
             GameInstance.ServerGameMessageHandlers.SendSetGuildOptionsToMembers(validateResult.Guild);
             result.Invoke(AckResponseCode.Success, new ResponseChangeGuildOptionsMessage());
 #endif
@@ -518,8 +534,10 @@ namespace MultiplayerARPG.MMO
                 AutoAcceptRequests = request.autoAcceptRequests
             });
             // Broadcast via chat server
-            if (ChatNetworkManager.IsClientConnected)
-                ChatNetworkManager.SendSetGuildAutoAcceptRequests(null, MMOMessageTypes.UpdateGuild, validateResult.GuildId, request.autoAcceptRequests);
+            if (ClusterClient.IsNetworkActive)
+            {
+                ClusterClient.SendSetGuildAutoAcceptRequests(MMOMessageTypes.UpdateGuild, validateResult.GuildId, request.autoAcceptRequests);
+            }
             GameInstance.ServerGameMessageHandlers.SendSetGuildAutoAcceptRequestsToMembers(validateResult.Guild);
             result.Invoke(AckResponseCode.Success, new ResponseChangeGuildAutoAcceptRequestsMessage());
 #endif
@@ -570,8 +588,10 @@ namespace MultiplayerARPG.MMO
                 ShareExpPercentage = request.shareExpPercentage
             });
             // Broadcast via chat server
-            if (ChatNetworkManager.IsClientConnected)
-                ChatNetworkManager.SendSetGuildRole(null, MMOMessageTypes.UpdateGuild, validateResult.GuildId, request.guildRole, request.name, request.canInvite, request.canKick, request.shareExpPercentage);
+            if (ClusterClient.IsNetworkActive)
+            {
+                ClusterClient.SendSetGuildRole(MMOMessageTypes.UpdateGuild, validateResult.GuildId, request.guildRole, request.name, request.canInvite, request.canKick, request.shareExpPercentage);
+            }
             GameInstance.ServerGameMessageHandlers.SendSetGuildRoleToMembers(validateResult.Guild, request.guildRole, request.name, request.canInvite, request.canKick, request.shareExpPercentage);
             result.Invoke(AckResponseCode.Success, new ResponseChangeGuildRoleMessage());
 #endif
@@ -614,8 +634,10 @@ namespace MultiplayerARPG.MMO
                 GuildRole = request.guildRole
             });
             // Broadcast via chat server
-            if (ChatNetworkManager.IsClientConnected)
-                ChatNetworkManager.SendSetGuildMemberRole(null, MMOMessageTypes.UpdateGuild, validateResult.GuildId, request.memberId, request.guildRole);
+            if (ClusterClient.IsNetworkActive)
+            {
+                ClusterClient.SendSetGuildMemberRole(MMOMessageTypes.UpdateGuild, validateResult.GuildId, request.memberId, request.guildRole);
+            }
             GameInstance.ServerGameMessageHandlers.SendSetGuildMemberRoleToMembers(validateResult.Guild, request.memberId, request.guildRole);
             result.Invoke(AckResponseCode.Success, new ResponseChangeMemberGuildRoleMessage());
 #endif
@@ -652,10 +674,10 @@ namespace MultiplayerARPG.MMO
             GuildData guild = resp.GuildData;
             GameInstance.ServerGuildHandlers.SetGuild(validateResult.GuildId, guild);
             // Broadcast via chat server
-            if (ChatNetworkManager.IsClientConnected)
+            if (ClusterClient.IsNetworkActive)
             {
-                ChatNetworkManager.SendSetGuildSkillLevel(null, MMOMessageTypes.UpdateGuild, validateResult.GuildId, request.dataId, guild.GetSkillLevel(request.dataId));
-                ChatNetworkManager.SendSetGuildLevelExpSkillPoint(null, MMOMessageTypes.UpdateGuild, validateResult.GuildId, guild.level, guild.exp, guild.skillPoint);
+                ClusterClient.SendSetGuildSkillLevel(MMOMessageTypes.UpdateGuild, validateResult.GuildId, request.dataId, guild.GetSkillLevel(request.dataId));
+                ClusterClient.SendSetGuildLevelExpSkillPoint(MMOMessageTypes.UpdateGuild, validateResult.GuildId, guild.level, guild.exp, guild.skillPoint);
             }
             GameInstance.ServerGameMessageHandlers.SendSetGuildSkillLevelToMembers(guild, request.dataId);
             GameInstance.ServerGameMessageHandlers.SendSetGuildLevelExpSkillPointToMembers(guild);
