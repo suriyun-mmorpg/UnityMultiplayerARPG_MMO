@@ -43,13 +43,24 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         protected override void Start()
         {
             base.Start();
-#if UNITY_STANDALONE && !CLIENT_BUILD
             ClusterServer = new ClusterServer(this);
-#endif
         }
+#endif
+
+#if UNITY_STANDALONE && !CLIENT_BUILD
+        protected override void FixedUpdate()
+        {
+            base.FixedUpdate();
+            if (IsServer)
+            {
+                ClusterServer.Update();
+            }
+        }
+#endif
 
         protected override void RegisterMessages()
         {
