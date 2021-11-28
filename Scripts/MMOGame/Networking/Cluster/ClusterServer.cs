@@ -14,8 +14,8 @@ namespace MultiplayerARPG.MMO
     {
         public override string LogTag { get { return nameof(ClusterServer); } }
 
-#if UNITY_STANDALONE && !CLIENT_BUILD
         private readonly CentralNetworkManager centralNetworkManager;
+#if UNITY_STANDALONE && !CLIENT_BUILD
         internal Dictionary<string, SocialCharacterData> MapUsersById { get; private set; } = new Dictionary<string, SocialCharacterData>();
         internal Dictionary<string, long> ConnectionIdsByCharacterId { get; private set; } = new Dictionary<string, long>();
         internal Dictionary<string, long> ConnectionIdsByCharacterName { get; private set; } = new Dictionary<string, long>();
@@ -31,8 +31,8 @@ namespace MultiplayerARPG.MMO
 
         public ClusterServer(CentralNetworkManager centralNetworkManager) : base(new TcpTransport())
         {
-#if UNITY_STANDALONE && !CLIENT_BUILD
             this.centralNetworkManager = centralNetworkManager;
+#if UNITY_STANDALONE && !CLIENT_BUILD
             EnableRequestResponse(MMOMessageTypes.Request, MMOMessageTypes.Response);
             // Generic
             RegisterRequestHandler<RequestAppServerRegisterMessage, ResponseAppServerRegisterMessage>(MMORequestTypes.RequestAppServerRegister, HandleRequestAppServerRegister);
@@ -50,10 +50,12 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         public bool StartServer()
         {
             return StartServer(centralNetworkManager.clusterServerPort, int.MaxValue);
         }
+#endif
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
         protected override void OnStopServer()
@@ -109,6 +111,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private void RemoveMapUsers(long connectionId)
         {
             SocialCharacterData userData;
@@ -122,6 +125,7 @@ namespace MultiplayerARPG.MMO
                 UpdateMapUser(UpdateUserCharacterMessage.UpdateType.Remove, userData, connectionId);
             }
         }
+#endif
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
         private async UniTaskVoid HandleRequestAppServerRegister(

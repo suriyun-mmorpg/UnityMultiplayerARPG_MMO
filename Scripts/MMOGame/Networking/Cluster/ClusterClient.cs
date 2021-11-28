@@ -5,19 +5,18 @@ namespace MultiplayerARPG.MMO
 {
     public class ClusterClient : LiteNetLibClient
     {
-        public override string LogTag { get { return nameof(ClusterClient) + ":" + appServer.PeerType; } }
-
 #if UNITY_STANDALONE && !CLIENT_BUILD
         public System.Action<AckResponseCode> onResponseAppServerRegister;
         public System.Action<AckResponseCode, CentralServerPeerInfo> onResponseAppServerAddress;
         public bool IsAppRegistered { get; private set; }
-        private readonly IAppServer appServer;
+        public override string LogTag { get { return nameof(ClusterClient) + ":" + appServer.PeerType; } }
 #endif
+        private readonly IAppServer appServer;
 
         public ClusterClient(IAppServer appServer) : base(new TcpTransport())
         {
-#if UNITY_STANDALONE && !CLIENT_BUILD
             this.appServer = appServer;
+#if UNITY_STANDALONE && !CLIENT_BUILD
             EnableRequestResponse(MMOMessageTypes.Request, MMOMessageTypes.Response);
             RegisterResponseHandler<RequestAppServerRegisterMessage, ResponseAppServerRegisterMessage>(MMORequestTypes.RequestAppServerRegister, HandleResponseAppServerRegister);
             RegisterResponseHandler<RequestAppServerAddressMessage, ResponseAppServerAddressMessage>(MMORequestTypes.RequestAppServerAddress, HandleResponseAppServerAddress);
@@ -71,25 +70,25 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private void ConnectToClusterServer()
         {
-#if UNITY_STANDALONE && !CLIENT_BUILD
             Logging.Log(LogTag, "Connecting to Cluster Server: " + appServer.ClusterServerAddress + ":" + appServer.ClusterServerPort);
             StartClient(appServer.ClusterServerAddress, appServer.ClusterServerPort);
+    }
 #endif
-        }
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private void DisconnectFromClusterServer()
         {
-#if UNITY_STANDALONE && !CLIENT_BUILD
             Logging.Log(LogTag, "Disconnecting from Cluster Server");
             StopClient();
+    }
 #endif
-        }
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private void OnConnectedToClusterServer()
         {
-#if UNITY_STANDALONE && !CLIENT_BUILD
             Logging.Log(LogTag, "Connected to Cluster Server");
             // Send Request
             RequestAppServerRegister(new CentralServerPeerInfo()
@@ -99,8 +98,8 @@ namespace MultiplayerARPG.MMO
                 networkPort = appServer.AppPort,
                 extra = appServer.AppExtra,
             });
+    }
 #endif
-        }
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
         private async UniTaskVoid OnDisconnectedFromClusterServer()
