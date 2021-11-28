@@ -92,15 +92,12 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
             Logging.Log(LogTag, "Connected to Cluster Server");
             // Send Request
-            SendRequest(MMORequestTypes.RequestAppServerRegister, new RequestAppServerRegisterMessage()
+            RequestAppServerRegister(new CentralServerPeerInfo()
             {
-                peerInfo = new CentralServerPeerInfo()
-                {
-                    peerType = appServer.PeerType,
-                    networkAddress = appServer.AppAddress,
-                    networkPort = appServer.AppPort,
-                    extra = appServer.AppExtra,
-                },
+                peerType = appServer.PeerType,
+                networkAddress = appServer.AppAddress,
+                networkPort = appServer.AppPort,
+                extra = appServer.AppExtra,
             });
 #endif
         }
@@ -127,6 +124,7 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
         public bool RequestAppServerRegister(CentralServerPeerInfo peerInfo)
         {
+            Logging.Log(LogTag, "App Register is requesting");
             return SendRequest(MMORequestTypes.RequestAppServerRegister, new RequestAppServerRegisterMessage()
             {
                 peerInfo = peerInfo,
@@ -141,7 +139,10 @@ namespace MultiplayerARPG.MMO
             ResponseAppServerRegisterMessage response)
         {
             if (responseCode == AckResponseCode.Success)
+            {
+                Logging.Log(LogTag, "App Registered successfully");
                 IsAppRegistered = true;
+            }
             if (onResponseAppServerRegister != null)
                 onResponseAppServerRegister.Invoke(responseCode);
         }
@@ -150,6 +151,7 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
         public bool RequestAppServerAddress(CentralServerPeerType peerType, string extra)
         {
+            Logging.Log(LogTag, "App Address is requesting");
             return SendRequest(MMORequestTypes.RequestAppServerAddress, new RequestAppServerAddressMessage()
             {
                 peerType = peerType,
@@ -164,8 +166,6 @@ namespace MultiplayerARPG.MMO
             AckResponseCode responseCode,
             ResponseAppServerAddressMessage response)
         {
-            if (responseCode == AckResponseCode.Success)
-                IsAppRegistered = true;
             if (onResponseAppServerAddress != null)
                 onResponseAppServerAddress.Invoke(responseCode, response.peerInfo);
         }
