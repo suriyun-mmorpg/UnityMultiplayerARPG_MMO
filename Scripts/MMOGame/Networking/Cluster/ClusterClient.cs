@@ -20,6 +20,7 @@ namespace MultiplayerARPG.MMO
             EnableRequestResponse(MMOMessageTypes.Request, MMOMessageTypes.Response);
             RegisterResponseHandler<RequestAppServerRegisterMessage, ResponseAppServerRegisterMessage>(MMORequestTypes.RequestAppServerRegister, HandleResponseAppServerRegister);
             RegisterResponseHandler<RequestAppServerAddressMessage, ResponseAppServerAddressMessage>(MMORequestTypes.RequestAppServerAddress, HandleResponseAppServerAddress);
+            RegisterMessageHandler(MMOMessageTypes.AppServerAddress, HandleAppServerAddress);
 #endif
         }
 
@@ -75,7 +76,7 @@ namespace MultiplayerARPG.MMO
         {
             Logging.Log(LogTag, "Connecting to Cluster Server: " + appServer.ClusterServerAddress + ":" + appServer.ClusterServerPort);
             StartClient(appServer.ClusterServerAddress, appServer.ClusterServerPort);
-    }
+        }
 #endif
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
@@ -83,7 +84,7 @@ namespace MultiplayerARPG.MMO
         {
             Logging.Log(LogTag, "Disconnecting from Cluster Server");
             StopClient();
-    }
+        }
 #endif
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
@@ -98,7 +99,7 @@ namespace MultiplayerARPG.MMO
                 networkPort = appServer.AppPort,
                 extra = appServer.AppExtra,
             });
-    }
+        }
 #endif
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
@@ -132,7 +133,7 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        public void HandleResponseAppServerRegister(
+        private void HandleResponseAppServerRegister(
             ResponseHandlerData responseHandler,
             AckResponseCode responseCode,
             ResponseAppServerRegisterMessage response)
@@ -160,7 +161,7 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        public void HandleResponseAppServerAddress(
+        private void HandleResponseAppServerAddress(
             ResponseHandlerData responseHandler,
             AckResponseCode responseCode,
             ResponseAppServerAddressMessage response)
@@ -169,5 +170,12 @@ namespace MultiplayerARPG.MMO
                 onResponseAppServerAddress.Invoke(responseCode, response.peerInfo);
         }
 #endif
+
+        private void HandleAppServerAddress(MessageHandlerData messageHandler)
+        {
+            ResponseAppServerAddressMessage response = messageHandler.ReadMessage<ResponseAppServerAddressMessage>();
+            if (onResponseAppServerAddress != null)
+                onResponseAppServerAddress.Invoke(AckResponseCode.Success, response.peerInfo);
+        }
     }
 }
