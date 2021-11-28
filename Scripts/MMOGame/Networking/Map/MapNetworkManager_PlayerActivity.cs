@@ -148,7 +148,7 @@ namespace MultiplayerARPG.MMO
                 overrideRotation = overrideRotation,
                 rotation = rotation,
             });
-            AppRegisterClient.SendRequest(MMORequestTypes.RequestSpawnMap, new RequestSpawnMapMessage()
+            ClusterClient.SendRequest(MMORequestTypes.RequestSpawnMap, new RequestSpawnMapMessage()
             {
                 mapId = mapName,
                 instanceId = instanceId,

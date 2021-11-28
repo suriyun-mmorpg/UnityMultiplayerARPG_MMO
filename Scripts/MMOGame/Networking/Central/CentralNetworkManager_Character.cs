@@ -191,7 +191,7 @@ namespace MultiplayerARPG.MMO
                 PlayerCharacterData character = characterResp.CharacterData;
                 if (character == null)
                     message = UITextKeys.UI_ERROR_INVALID_CHARACTER_DATA;
-                else if (!mapServerPeersBySceneName.TryGetValue(character.CurrentMapName, out mapServerPeerInfo))
+                else if (!ClusterServer.MapServerPeersByMapId.TryGetValue(character.CurrentMapName, out mapServerPeerInfo))
                     message = UITextKeys.UI_ERROR_MAP_SERVER_NOT_READY;
             }
             AckResponseCode responseCode = message == UITextKeys.NONE ? AckResponseCode.Success : AckResponseCode.Error;

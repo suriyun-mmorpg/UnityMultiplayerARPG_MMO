@@ -1,31 +1,44 @@
-﻿using LiteNetLibManager;
+﻿using Cysharp.Threading.Tasks;
+using LiteNetLibManager;
 
 namespace MultiplayerARPG.MMO
 {
     public class ClusterClient : LiteNetLibClient
     {
-        public override string LogTag { get { return nameof(ClusterClient); } }
+        public override string LogTag { get { return nameof(ClusterClient) + ":" + appServer.PeerType; } }
 
-        private readonly MapNetworkManager mapNetworkManager;
+#if UNITY_STANDALONE && !CLIENT_BUILD
+        public System.Action<AckResponseCode> onResponseAppServerRegister;
+        public System.Action<AckResponseCode, CentralServerPeerInfo> onResponseAppServerAddress;
+        public bool IsAppRegistered { get; private set; }
+        private readonly IAppServer appServer;
+#endif
 
-        public ClusterClient(MapNetworkManager mapNetworkManager) : base(new TcpTransport())
+        public ClusterClient(IAppServer appServer) : base(new TcpTransport())
         {
-            this.mapNetworkManager = mapNetworkManager;
-            RegisterMessageHandler(MMOMessageTypes.Chat, HandleChatAtClient);
-            RegisterMessageHandler(MMOMessageTypes.UpdateMapUser, HandleUpdateMapUserAtClient);
-            RegisterMessageHandler(MMOMessageTypes.UpdatePartyMember, HandleUpdatePartyMemberAtClient);
-            RegisterMessageHandler(MMOMessageTypes.UpdateParty, HandleUpdatePartyAtClient);
-            RegisterMessageHandler(MMOMessageTypes.UpdateGuildMember, HandleUpdateGuildMemberAtClient);
-            RegisterMessageHandler(MMOMessageTypes.UpdateGuild, HandleUpdateGuildAtClient);
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            this.appServer = appServer;
+            EnableRequestResponse(MMOMessageTypes.Request, MMOMessageTypes.Response);
+            RegisterResponseHandler<RequestAppServerRegisterMessage, ResponseAppServerRegisterMessage>(MMORequestTypes.RequestAppServerRegister, HandleResponseAppServerRegister);
+            RegisterResponseHandler<RequestAppServerAddressMessage, ResponseAppServerAddressMessage>(MMORequestTypes.RequestAppServerAddress, HandleResponseAppServerAddress);
+#endif
+        }
+
+        public ClusterClient(MapSpawnNetworkManager mapSpawnNetworkManager) : this(mapSpawnNetworkManager as IAppServer)
+        {
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            RegisterRequestHandler<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.RequestSpawnMap, mapSpawnNetworkManager.HandleRequestSpawnMap);
+#endif
         }
 
         public override void OnClientReceive(TransportEventData eventData)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             switch (eventData.type)
             {
                 case ENetworkEvent.ConnectEvent:
                     Logging.Log(LogTag, "OnClientConnected");
-                    mapNetworkManager.OnClusterServerConnected();
+                    OnConnectedToClusterServer();
                     break;
                 case ENetworkEvent.DataEvent:
                     ReadPacket(-1, eventData.reader);
@@ -33,41 +46,129 @@ namespace MultiplayerARPG.MMO
                 case ENetworkEvent.DisconnectEvent:
                     Logging.Log(LogTag, "OnClientDisconnected peer. disconnectInfo.Reason: " + eventData.disconnectInfo.Reason);
                     StopClient();
+                    OnDisconnectedFromClusterServer().Forget();
                     break;
                 case ENetworkEvent.ErrorEvent:
                     Logging.LogError(LogTag, "OnClientNetworkError endPoint: " + eventData.endPoint + " socketErrorCode " + eventData.socketError + " errorMessage " + eventData.errorMessage);
                     break;
             }
+#endif
         }
 
-        private void HandleChatAtClient(MessageHandlerData messageHandler)
+        public void OnAppStart()
         {
-            mapNetworkManager.OnChatMessageReceive(messageHandler.ReadMessage<ChatMessage>());
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            Logging.Log(LogTag, "Starting server");
+            ConnectToClusterServer();
+#endif
         }
 
-        private void HandleUpdateMapUserAtClient(MessageHandlerData messageHandler)
+        public void OnAppStop()
         {
-            mapNetworkManager.OnUpdateMapUser(messageHandler.ReadMessage<UpdateUserCharacterMessage>());
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            Logging.Log(LogTag, "Stopping server");
+            DisconnectFromClusterServer();
+#endif
         }
 
-        private void HandleUpdatePartyMemberAtClient(MessageHandlerData messageHandler)
+        private void ConnectToClusterServer()
         {
-            mapNetworkManager.OnUpdatePartyMember(messageHandler.ReadMessage<UpdateSocialMemberMessage>());
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            Logging.Log(LogTag, "Connecting to Cluster Server: " + appServer.ClusterServerAddress + ":" + appServer.ClusterServerPort);
+            StartClient(appServer.ClusterServerAddress, appServer.ClusterServerPort);
+#endif
         }
 
-        private void HandleUpdatePartyAtClient(MessageHandlerData messageHandler)
+        private void DisconnectFromClusterServer()
         {
-            mapNetworkManager.OnUpdateParty(messageHandler.ReadMessage<UpdatePartyMessage>());
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            Logging.Log(LogTag, "Disconnecting from Cluster Server");
+            StopClient();
+#endif
         }
 
-        private void HandleUpdateGuildMemberAtClient(MessageHandlerData messageHandler)
+        private void OnConnectedToClusterServer()
         {
-            mapNetworkManager.OnUpdateGuildMember(messageHandler.ReadMessage<UpdateSocialMemberMessage>());
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            Logging.Log(LogTag, "Connected to Cluster Server");
+            // Send Request
+            SendRequest(MMORequestTypes.RequestAppServerRegister, new RequestAppServerRegisterMessage()
+            {
+                peerInfo = new CentralServerPeerInfo()
+                {
+                    peerType = appServer.PeerType,
+                    networkAddress = appServer.AppAddress,
+                    networkPort = appServer.AppPort,
+                    extra = appServer.AppExtra,
+                },
+            });
+#endif
         }
 
-        private void HandleUpdateGuildAtClient(MessageHandlerData messageHandler)
+#if UNITY_STANDALONE && !CLIENT_BUILD
+        private async UniTaskVoid OnDisconnectedFromClusterServer()
         {
-            mapNetworkManager.OnUpdateGuild(messageHandler.ReadMessage<UpdateGuildMessage>());
+            Logging.Log(LogTag, "Disconnected from Central Server");
+            IsAppRegistered = false;
+            Logging.Log(LogTag, "Reconnect to central in 5 seconds...");
+            await UniTask.Delay(1000, true);
+            Logging.Log(LogTag, "Reconnect to central in 4 seconds...");
+            await UniTask.Delay(1000, true);
+            Logging.Log(LogTag, "Reconnect to central in 3 seconds...");
+            await UniTask.Delay(1000, true);
+            Logging.Log(LogTag, "Reconnect to central in 2 seconds...");
+            await UniTask.Delay(1000, true);
+            Logging.Log(LogTag, "Reconnect to central in 1 seconds...");
+            await UniTask.Delay(1000, true);
+            ConnectToClusterServer();
         }
+#endif
+
+#if UNITY_STANDALONE && !CLIENT_BUILD
+        public bool RequestAppServerRegister(CentralServerPeerInfo peerInfo)
+        {
+            return SendRequest(MMORequestTypes.RequestAppServerRegister, new RequestAppServerRegisterMessage()
+            {
+                peerInfo = peerInfo,
+            });
+        }
+#endif
+
+#if UNITY_STANDALONE && !CLIENT_BUILD
+        public void HandleResponseAppServerRegister(
+            ResponseHandlerData responseHandler,
+            AckResponseCode responseCode,
+            ResponseAppServerRegisterMessage response)
+        {
+            if (responseCode == AckResponseCode.Success)
+                IsAppRegistered = true;
+            if (onResponseAppServerRegister != null)
+                onResponseAppServerRegister.Invoke(responseCode);
+        }
+#endif
+
+#if UNITY_STANDALONE && !CLIENT_BUILD
+        public bool RequestAppServerAddress(CentralServerPeerType peerType, string extra)
+        {
+            return SendRequest(MMORequestTypes.RequestAppServerAddress, new RequestAppServerAddressMessage()
+            {
+                peerType = peerType,
+                extra = extra,
+            });
+        }
+#endif
+
+#if UNITY_STANDALONE && !CLIENT_BUILD
+        public void HandleResponseAppServerAddress(
+            ResponseHandlerData responseHandler,
+            AckResponseCode responseCode,
+            ResponseAppServerAddressMessage response)
+        {
+            if (responseCode == AckResponseCode.Success)
+                IsAppRegistered = true;
+            if (onResponseAppServerAddress != null)
+                onResponseAppServerAddress.Invoke(responseCode, response.peerInfo);
+        }
+#endif
     }
 }

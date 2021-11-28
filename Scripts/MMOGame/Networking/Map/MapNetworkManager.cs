@@ -39,13 +39,9 @@ namespace MultiplayerARPG.MMO
         public Vector3 MapInstanceWarpToRotation { get; set; }
 
         [Header("Central Network Connection")]
-        public BaseTransportFactory centralTransportFactory;
-        public string centralNetworkAddress = "127.0.0.1";
-        public int centralNetworkPort = 6000;
+        public string clusterServerAddress = "127.0.0.1";
+        public int clusterServerPort = 6001;
         public string machineAddress = "127.0.0.1";
-
-        [Header("Chat Network Connection")]
-        public BaseTransportFactory chatTransportFactory;
 
         [Header("Database")]
         public float autoSaveDuration = 2f;
@@ -59,22 +55,18 @@ namespace MultiplayerARPG.MMO
         private float terminatingTime;
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        public AppRegisterClient AppRegisterClient { get; private set; }
-#endif
-
-#if UNITY_STANDALONE && !CLIENT_BUILD
-        public ClusterClient ClusterClient { get; private set; }
-#endif
-
-#if UNITY_STANDALONE && !CLIENT_BUILD
         public DatabaseNetworkManager DbServiceClient
         {
             get { return MMOServerInstance.Singleton.DatabaseNetworkManager; }
         }
 #endif
 
-        public string CentralNetworkAddress { get { return centralNetworkAddress; } }
-        public int CentralNetworkPort { get { return centralNetworkPort; } }
+#if UNITY_STANDALONE && !CLIENT_BUILD
+        public ClusterClient ClusterClient { get; private set; }
+#endif
+
+        public string ClusterServerAddress { get { return clusterServerAddress; } }
+        public int ClusterServerPort { get { return clusterServerPort; } }
         public string AppAddress { get { return machineAddress; } }
         public int AppPort { get { return networkPort; } }
         public string AppExtra
@@ -155,34 +147,18 @@ namespace MultiplayerARPG.MMO
         protected override void Start()
         {
             base.Start();
-            // App client which will be used by map server to connect to central server
-            if (useWebSocket)
-            {
-                if (centralTransportFactory == null || !(centralTransportFactory is IWebSocketTransportFactory))
-                {
-                    WebSocketTransportFactory webSocketTransportFactory = gameObject.AddComponent<WebSocketTransportFactory>();
-                    webSocketTransportFactory.Secure = webSocketSecure;
-                    webSocketTransportFactory.SslProtocols = webSocketSslProtocols;
-                    webSocketTransportFactory.CertificateFilePath = webSocketCertificateFilePath;
-                    webSocketTransportFactory.CertificatePassword = webSocketCertificatePassword;
-                    centralTransportFactory = webSocketTransportFactory;
-                }
-            }
-            else
-            {
-                if (centralTransportFactory == null)
-                    centralTransportFactory = gameObject.AddComponent<LiteNetLibTransportFactory>();
-            }
-
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            AppRegisterClient = new AppRegisterClient(this);
-            AppRegisterClient.onAppServerRegistered = OnAppServerRegistered;
-            AppRegisterClient.RegisterMessageHandler(MMOMessageTypes.AppServerAddress, HandleResponseAppServerAddress);
-            AppRegisterClient.RegisterResponseHandler<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.RequestSpawnMap);
-            this.InvokeInstanceDevExtMethods("OnInitCentralAppServerRegister");
-
             // Cluster client which will be used by map server to connect to cluster server
             ClusterClient = new ClusterClient(this);
+            ClusterClient.onResponseAppServerRegister = OnResponseAppServerRegister;
+            ClusterClient.onResponseAppServerAddress = OnResponseAppServerAddress;
+            ClusterClient.RegisterResponseHandler<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.RequestSpawnMap);
+            ClusterClient.RegisterMessageHandler(MMOMessageTypes.Chat, HandleChat);
+            ClusterClient.RegisterMessageHandler(MMOMessageTypes.UpdateMapUser, HandleUpdateMapUser);
+            ClusterClient.RegisterMessageHandler(MMOMessageTypes.UpdatePartyMember, HandleUpdatePartyMember);
+            ClusterClient.RegisterMessageHandler(MMOMessageTypes.UpdateParty, HandleUpdateParty);
+            ClusterClient.RegisterMessageHandler(MMOMessageTypes.UpdateGuildMember, HandleUpdateGuildMember);
+            ClusterClient.RegisterMessageHandler(MMOMessageTypes.UpdateGuild, HandleUpdateGuild);
 #endif
         }
 
@@ -315,8 +291,7 @@ namespace MultiplayerARPG.MMO
                 userData.currentMp = playerCharacterEntity.CurrentMp;
                 userData.maxMp = playerCharacterEntity.MaxMp;
                 usersById.TryAdd(userData.id, userData);
-                // Add map user to central server and cluster server
-                UpdateMapUser(AppRegisterClient, UpdateUserCharacterMessage.UpdateType.Add, userData);
+                // Add map user to cluster server
                 if (ClusterClient.IsNetworkActive)
                     UpdateMapUser(ClusterClient, UpdateUserCharacterMessage.UpdateType.Add, userData);
             }
@@ -334,8 +309,7 @@ namespace MultiplayerARPG.MMO
                 usersById.TryGetValue(playerCharacter.Id, out userData))
             {
                 usersById.TryRemove(playerCharacter.Id, out _);
-                // Remove map user from central server and cluster server
-                UpdateMapUser(AppRegisterClient, UpdateUserCharacterMessage.UpdateType.Remove, userData);
+                // Remove map user from cluster server
                 if (ClusterClient.IsNetworkActive)
                     UpdateMapUser(ClusterClient, UpdateUserCharacterMessage.UpdateType.Remove, userData);
             }
@@ -412,9 +386,7 @@ namespace MultiplayerARPG.MMO
         public override void OnStopServer()
         {
             base.OnStopServer();
-            AppRegisterClient.OnAppStop();
-            if (ClusterClient.IsNetworkActive)
-                ClusterClient.StopClient();
+            ClusterClient.OnAppStop();
         }
 #endif
 
@@ -455,7 +427,7 @@ namespace MultiplayerARPG.MMO
         protected override async UniTask PostSpawnEntities()
         {
             await UniTask.Yield();
-            AppRegisterClient.OnAppStart();
+            ClusterClient.OnAppStart();
         }
 #endif
 
@@ -813,10 +785,19 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        private void HandleResponseAppServerAddress(MessageHandlerData messageHandler)
+        private void OnResponseAppServerRegister(AckResponseCode responseCode)
         {
-            ResponseAppServerAddressMessage message = messageHandler.ReadMessage<ResponseAppServerAddressMessage>();
-            CentralServerPeerInfo peerInfo = message.peerInfo;
+            if (responseCode != AckResponseCode.Success)
+                return;
+            UpdateMapUsers(ClusterClient, UpdateUserCharacterMessage.UpdateType.Add);
+        }
+#endif
+
+#if UNITY_STANDALONE && !CLIENT_BUILD
+        private void OnResponseAppServerAddress(AckResponseCode responseCode, CentralServerPeerInfo peerInfo)
+        {
+            if (responseCode != AckResponseCode.Success)
+                return;
             switch (peerInfo.peerType)
             {
                 case CentralServerPeerType.MapServer:
@@ -847,40 +828,16 @@ namespace MultiplayerARPG.MMO
                         }
                     }
                     break;
-                case CentralServerPeerType.ClusterServer:
-                    if (!ClusterClient.IsNetworkActive)
-                    {
-                        if (LogInfo)
-                            Logging.Log(LogTag, "Connecting to cluster server");
-                        ClusterClient.StartClient(peerInfo.networkAddress, peerInfo.networkPort);
-                    }
-                    break;
             }
-        }
-#endif
-
-#if UNITY_STANDALONE && !CLIENT_BUILD
-        private void OnAppServerRegistered(AckResponseCode responseCode)
-        {
-            if (responseCode == AckResponseCode.Success)
-                UpdateMapUsers(AppRegisterClient, UpdateUserCharacterMessage.UpdateType.Add);
         }
 #endif
         #endregion
 
-        #region Connect to cluster server
-        public void OnClusterServerConnected()
+        #region Social message handlers
+        internal void HandleChat(MessageHandlerData messageHandler)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            if (LogInfo)
-                Logging.Log(LogTag, "Connected to cluster server");
-            UpdateMapUsers(ClusterClient, UpdateUserCharacterMessage.UpdateType.Add);
-#endif
-        }
-
-        public void OnChatMessageReceive(ChatMessage message)
-        {
-#if UNITY_STANDALONE && !CLIENT_BUILD
+            ChatMessage message = messageHandler.ReadMessage<ChatMessage>();
             if (message.channel == ChatChannel.Local)
             {
                 // Handle GM command here, only GM command will be broadcasted as local channel
@@ -903,9 +860,10 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public void OnUpdateMapUser(UpdateUserCharacterMessage message)
+        internal void HandleUpdateMapUser(MessageHandlerData messageHandler)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
+            UpdateUserCharacterMessage message = messageHandler.ReadMessage<UpdateUserCharacterMessage>();
             int socialId;
             PartyData party;
             GuildData guild;
@@ -941,8 +899,10 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public void OnUpdatePartyMember(UpdateSocialMemberMessage message)
+        internal void HandleUpdatePartyMember(MessageHandlerData messageHandler)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            UpdateSocialMemberMessage message = messageHandler.ReadMessage<UpdateSocialMemberMessage>();
             PartyData party;
             BasePlayerCharacterEntity playerCharacterEntity;
             if (ServerPartyHandlers.TryGetParty(message.socialId, out party) && party.UpdateSocialGroupMember(message))
@@ -968,10 +928,13 @@ namespace MultiplayerARPG.MMO
                         break;
                 }
             }
+#endif
         }
 
-        public void OnUpdateParty(UpdatePartyMessage message)
+        internal void HandleUpdateParty(MessageHandlerData messageHandler)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            UpdatePartyMessage message = messageHandler.ReadMessage<UpdatePartyMessage>();
             BasePlayerCharacterEntity playerCharacterEntity;
             PartyData party;
             if (ServerPartyHandlers.TryGetParty(message.id, out party))
@@ -1001,10 +964,13 @@ namespace MultiplayerARPG.MMO
                         break;
                 }
             }
+#endif
         }
 
-        public void OnUpdateGuildMember(UpdateSocialMemberMessage message)
+        internal void HandleUpdateGuildMember(MessageHandlerData messageHandler)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            UpdateSocialMemberMessage message = messageHandler.ReadMessage<UpdateSocialMemberMessage>();
             GuildData guild;
             BasePlayerCharacterEntity playerCharacterEntity;
             if (ServerGuildHandlers.TryGetGuild(message.socialId, out guild) && guild.UpdateSocialGroupMember(message))
@@ -1032,10 +998,13 @@ namespace MultiplayerARPG.MMO
                         break;
                 }
             }
+#endif
         }
 
-        public void OnUpdateGuild(UpdateGuildMessage message)
+        internal void HandleUpdateGuild(MessageHandlerData messageHandler)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            UpdateGuildMessage message = messageHandler.ReadMessage<UpdateGuildMessage>();
             BasePlayerCharacterEntity playerCharacterEntity;
             GuildData guild;
             if (ServerGuildHandlers.TryGetGuild(message.id, out guild))
@@ -1126,6 +1095,7 @@ namespace MultiplayerARPG.MMO
                         break;
                 }
             }
+#endif
         }
         #endregion
 

@@ -15,9 +15,8 @@ namespace MultiplayerARPG.MMO
     public partial class MapSpawnNetworkManager : LiteNetLibManager.LiteNetLibManager, IAppServer
     {
         [Header("Central Network Connection")]
-        public BaseTransportFactory centralTransportFactory;
-        public string centralNetworkAddress = "127.0.0.1";
-        public int centralNetworkPort = 6000;
+        public string clusterServerAddress = "127.0.0.1";
+        public int clusterServerPort = 6001;
         public string machineAddress = "127.0.0.1";
 
         [Header("Map Spawn Settings")]
@@ -72,15 +71,9 @@ namespace MultiplayerARPG.MMO
             }
         }
 
-        public BaseTransportFactory CentralTransportFactory
-        {
-            get { return centralTransportFactory; }
-        }
-
-        public AppRegisterClient CentralAppServerRegister { get; private set; }
-
-        public string CentralNetworkAddress { get { return centralNetworkAddress; } }
-        public int CentralNetworkPort { get { return centralNetworkPort; } }
+        public ClusterClient ClusterClient { get; private set; }
+        public string ClusterServerAddress { get { return clusterServerAddress; } }
+        public int ClusterServerPort { get { return clusterServerPort; } }
         public string AppAddress { get { return machineAddress; } }
         public int AppPort { get { return networkPort; } }
         public string AppExtra { get { return string.Empty; } }
@@ -88,28 +81,14 @@ namespace MultiplayerARPG.MMO
 
         protected override void Start()
         {
+            // Force use TcpTransport for server-to-server connections.
+            useWebSocket = false;
+            TransportFactory = gameObject.GetOrAddComponent<TcpTransportFactory>();
+            maxConnections = int.MaxValue;
             base.Start();
-            if (useWebSocket)
-            {
-                if (centralTransportFactory == null || !(centralTransportFactory is IWebSocketTransportFactory))
-                {
-                    WebSocketTransportFactory webSocketTransportFactory = gameObject.AddComponent<WebSocketTransportFactory>();
-                    webSocketTransportFactory.Secure = webSocketSecure;
-                    webSocketTransportFactory.SslProtocols = webSocketSslProtocols;
-                    webSocketTransportFactory.CertificateFilePath = webSocketCertificateFilePath;
-                    webSocketTransportFactory.CertificatePassword = webSocketCertificatePassword;
-                    centralTransportFactory = webSocketTransportFactory;
-                }
-            }
-            else
-            {
-                if (centralTransportFactory == null)
-                    centralTransportFactory = gameObject.AddComponent<LiteNetLibTransportFactory>();
-            }
-            CentralAppServerRegister = new AppRegisterClient(this);
-            CentralAppServerRegister.onAppServerRegistered = OnAppServerRegistered;
-            CentralAppServerRegister.RegisterRequestHandler<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.RequestSpawnMap, HandleRequestSpawnMap);
-            this.InvokeInstanceDevExtMethods("OnInitCentralAppServerRegister");
+            ClusterClient = new ClusterClient(this);
+            ClusterClient.onResponseAppServerRegister = OnResponseAppServerRegister;
+            ClusterClient.RegisterRequestHandler<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.RequestSpawnMap, HandleRequestSpawnMap);
         }
 
         protected virtual void Clean()
@@ -144,7 +123,7 @@ namespace MultiplayerARPG.MMO
         public override void OnStartServer()
         {
             this.InvokeInstanceDevExtMethods("OnStartServer");
-            CentralAppServerRegister.OnAppStart();
+            ClusterClient.OnAppStart();
             spawningPort = startPort;
             portCounter = startPort;
             base.OnStartServer();
@@ -152,7 +131,7 @@ namespace MultiplayerARPG.MMO
 
         public override void OnStopServer()
         {
-            CentralAppServerRegister.OnAppStop();
+            ClusterClient.OnAppStop();
             Clean();
             base.OnStopServer();
         }
@@ -175,8 +154,8 @@ namespace MultiplayerARPG.MMO
             base.FixedUpdate();
             if (IsServer)
             {
-                CentralAppServerRegister.Update();
-                if (CentralAppServerRegister.IsRegisteredToCentralServer)
+                ClusterClient.Update();
+                if (ClusterClient.IsAppRegistered)
                 {
                     if (restartingScenes.Count > 0)
                     {
@@ -205,13 +184,14 @@ namespace MultiplayerARPG.MMO
             base.OnDestroy();
         }
 
-        private UniTaskVoid HandleRequestSpawnMap(
+#if UNITY_STANDALONE && !CLIENT_BUILD
+        internal async UniTaskVoid HandleRequestSpawnMap(
             RequestHandlerData requestHandler,
             RequestSpawnMapMessage request,
             RequestProceedResultDelegate<ResponseSpawnMapMessage> result)
         {
             UITextKeys message = UITextKeys.NONE;
-            if (!CentralAppServerRegister.IsRegisteredToCentralServer)
+            if (!ClusterClient.IsAppRegistered)
                 message = UITextKeys.UI_ERROR_APP_NOT_READY;
             else if (string.IsNullOrEmpty(request.mapId))
                 message = UITextKeys.UI_ERROR_EMPTY_SCENE_NAME;
@@ -227,10 +207,11 @@ namespace MultiplayerARPG.MMO
             {
                 SpawnMap(request, result, false);
             }
-            return default;
+            await UniTask.Yield();
         }
+#endif
 
-        private void OnAppServerRegistered(AckResponseCode responseCode)
+        private void OnResponseAppServerRegister(AckResponseCode responseCode)
         {
             if (responseCode == AckResponseCode.Success)
             {
@@ -311,8 +292,8 @@ namespace MultiplayerARPG.MMO
                         $"{MMOServerInstance.ARG_INSTANCE_ROTATION_Y} {request.instanceWarpRotation.y} " +
                         $"{MMOServerInstance.ARG_INSTANCE_ROTATION_Z} {request.instanceWarpRotation.z} "
                         : string.Empty) +
-                    $"{MMOServerInstance.ARG_CENTRAL_ADDRESS} {centralNetworkAddress} " +
-                    $"{MMOServerInstance.ARG_CENTRAL_PORT} {centralNetworkPort} " +
+                    $"{MMOServerInstance.ARG_CENTRAL_ADDRESS} {clusterServerAddress} " +
+                    $"{MMOServerInstance.ARG_CENTRAL_PORT} {clusterServerPort} " +
                     $"{MMOServerInstance.ARG_MACHINE_ADDRESS} {machineAddress} " +
                     $"{MMOServerInstance.ARG_MAP_PORT} {port} " +
                     $"{MMOServerInstance.ARG_START_MAP_SERVER} ",
