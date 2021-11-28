@@ -14,7 +14,7 @@ namespace MultiplayerARPG.MMO
         protected readonly Dictionary<string, CentralUserPeerInfo> userPeersByUserId = new Dictionary<string, CentralUserPeerInfo>();
 #endif
         [Header("Cluster")]
-        public int clusterServerPort = 6001;
+        public int clusterServerPort = 6010;
 
         [Header("Map Spawn")]
         public int mapSpawnMillisecondsTimeout = 0;

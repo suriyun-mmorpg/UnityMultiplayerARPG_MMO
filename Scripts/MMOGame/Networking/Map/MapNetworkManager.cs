@@ -40,7 +40,7 @@ namespace MultiplayerARPG.MMO
 
         [Header("Central Network Connection")]
         public string clusterServerAddress = "127.0.0.1";
-        public int clusterServerPort = 6001;
+        public int clusterServerPort = 6010;
         public string machineAddress = "127.0.0.1";
 
         [Header("Database")]
