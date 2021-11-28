@@ -171,11 +171,13 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
+#if UNITY_STANDALONE && !CLIENT_BUILD
         private void HandleAppServerAddress(MessageHandlerData messageHandler)
         {
             ResponseAppServerAddressMessage response = messageHandler.ReadMessage<ResponseAppServerAddressMessage>();
             if (onResponseAppServerAddress != null)
                 onResponseAppServerAddress.Invoke(AckResponseCode.Success, response.peerInfo);
         }
+#endif
     }
 }
