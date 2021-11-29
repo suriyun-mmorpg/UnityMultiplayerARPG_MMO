@@ -32,6 +32,8 @@ namespace MultiplayerARPG.MMO
         public const string ARG_USE_WEB_SOCKET = "-" + CONFIG_USE_WEB_SOCKET;
         public const string CONFIG_WEB_SOCKET_SECURE = "webSocketSecure";
         public const string ARG_WEB_SOCKET_SECURE = "-" + CONFIG_WEB_SOCKET_SECURE;
+        public const string CONFIG_WEB_SOCKET_SSL_PROTOCOL = "webSocketSslProtocol";
+        public const string ARG_WEB_SOCKET_SSL_PROTOCOL = "-" + CONFIG_WEB_SOCKET_SSL_PROTOCOL;
         public const string CONFIG_WEB_SOCKET_CERT_PATH = "webSocketCertPath";
         public const string ARG_WEB_SOCKET_CERT_PATH = "-" + CONFIG_WEB_SOCKET_CERT_PATH;
         public const string CONFIG_WEB_SOCKET_CERT_PASSWORD = "webSocketCertPassword";
@@ -191,49 +193,44 @@ namespace MultiplayerARPG.MMO
                     DatabaseNetworkManager.SetDatabaseByOptionIndex(dbOptionIndex);
                 }
 
-                // Active WebSockets
+                // Use Websocket or not?
                 bool useWebSocket = ConfigReader.IsArgsProvided(args, ARG_USE_WEB_SOCKET);
                 if (useWebSocket || ConfigReader.ReadConfigs(jsonConfig, CONFIG_USE_WEB_SOCKET, out useWebSocket))
                 {
                     this.useWebSocket = useWebSocket;
                 }
+
+                // Is websocket running in secure mode or not?
                 bool webSocketSecure = ConfigReader.IsArgsProvided(args, ARG_WEB_SOCKET_SECURE);
                 if (webSocketSecure || ConfigReader.ReadConfigs(jsonConfig, CONFIG_WEB_SOCKET_SECURE, out webSocketSecure))
                 {
                     this.webSocketSecure = webSocketSecure;
                 }
+
+                // Which ssl protocol for run secure mode?
                 string sslProtocols;
-                if (ConfigReader.ReadArgs(args, ARG_WEB_SOCKET_CERT_PATH, out sslProtocols, string.Empty) ||
-                    ConfigReader.ReadConfigs(jsonConfig, CONFIG_WEB_SOCKET_CERT_PATH, out sslProtocols, string.Empty))
+                if (ConfigReader.ReadArgs(args, ARG_WEB_SOCKET_SSL_PROTOCOL, out sslProtocols, string.Empty) ||
+                    ConfigReader.ReadConfigs(jsonConfig, CONFIG_WEB_SOCKET_SSL_PROTOCOL, out sslProtocols, string.Empty))
                 {
                     if (!Enum.TryParse(sslProtocols, out webSocketSslProtocols))
                         webSocketSslProtocols = SslProtocols.Tls12;
                 }
+
+                // Where is the certification file path?
                 string webSocketCertPath;
                 if (ConfigReader.ReadArgs(args, ARG_WEB_SOCKET_CERT_PATH, out webSocketCertPath, string.Empty) ||
                     ConfigReader.ReadConfigs(jsonConfig, CONFIG_WEB_SOCKET_CERT_PATH, out webSocketCertPath, string.Empty))
                 {
                     this.webSocketCertPath = webSocketCertPath;
                 }
+
+                // What is the certification password?
                 string webSocketCertPassword;
                 if (ConfigReader.ReadArgs(args, ARG_WEB_SOCKET_CERT_PASSWORD, out webSocketCertPassword, string.Empty) ||
                     ConfigReader.ReadConfigs(jsonConfig, CONFIG_WEB_SOCKET_CERT_PASSWORD, out webSocketCertPassword, string.Empty))
                 {
                     this.webSocketCertPassword = webSocketCertPassword;
                 }
-
-                // Active WebSockets
-                CentralNetworkManager.useWebSocket = UseWebSocket;
-                CentralNetworkManager.webSocketSecure = WebSocketSecure;
-                CentralNetworkManager.webSocketSslProtocols = WebSocketSslProtocols;
-                CentralNetworkManager.webSocketCertificateFilePath = WebScoketCertificateFilePath;
-                CentralNetworkManager.webSocketCertificatePassword = WebScoketCertificatePassword;
-
-                MapNetworkManager.useWebSocket = UseWebSocket;
-                MapNetworkManager.webSocketSecure = WebSocketSecure;
-                MapNetworkManager.webSocketSslProtocols = WebSocketSslProtocols;
-                MapNetworkManager.webSocketCertificateFilePath = WebScoketCertificateFilePath;
-                MapNetworkManager.webSocketCertificatePassword = WebScoketCertificatePassword;
 
                 // Central network address
                 string centralNetworkAddress;
@@ -254,8 +251,8 @@ namespace MultiplayerARPG.MMO
 
                 // Central max connections
                 int centralMaxConnections;
-                if (ConfigReader.ReadArgs(args, ARG_CENTRAL_MAX_CONNECTIONS, out centralMaxConnections, 1100) ||
-                    ConfigReader.ReadConfigs(jsonConfig, CONFIG_CENTRAL_MAX_CONNECTIONS, out centralMaxConnections, 1100))
+                if (ConfigReader.ReadArgs(args, ARG_CENTRAL_MAX_CONNECTIONS, out centralMaxConnections, 1000) ||
+                    ConfigReader.ReadConfigs(jsonConfig, CONFIG_CENTRAL_MAX_CONNECTIONS, out centralMaxConnections, 1000))
                 {
                     centralNetworkManager.maxConnections = centralMaxConnections;
                 }
@@ -328,8 +325,8 @@ namespace MultiplayerARPG.MMO
 
                 // Map max connections
                 int mapMaxConnections;
-                if (ConfigReader.ReadArgs(args, ARG_MAP_MAX_CONNECTIONS, out mapMaxConnections, 1100) ||
-                    ConfigReader.ReadConfigs(jsonConfig, CONFIG_MAP_MAX_CONNECTIONS, out mapMaxConnections, 1100))
+                if (ConfigReader.ReadArgs(args, ARG_MAP_MAX_CONNECTIONS, out mapMaxConnections, 1000) ||
+                    ConfigReader.ReadConfigs(jsonConfig, CONFIG_MAP_MAX_CONNECTIONS, out mapMaxConnections, 1000))
                 {
                     mapNetworkManager.maxConnections = mapMaxConnections;
                 }
@@ -439,19 +436,6 @@ namespace MultiplayerARPG.MMO
             {
                 DatabaseNetworkManager.SetDatabaseByOptionIndex(databaseOptionIndex);
 
-                // Active WebSockets
-                CentralNetworkManager.useWebSocket = UseWebSocket;
-                CentralNetworkManager.webSocketSecure = WebSocketSecure;
-                CentralNetworkManager.webSocketSslProtocols = WebSocketSslProtocols;
-                CentralNetworkManager.webSocketCertificateFilePath = WebScoketCertificateFilePath;
-                CentralNetworkManager.webSocketCertificatePassword = WebScoketCertificatePassword;
-
-                MapNetworkManager.useWebSocket = UseWebSocket;
-                MapNetworkManager.webSocketSecure = WebSocketSecure;
-                MapNetworkManager.webSocketSslProtocols = WebSocketSslProtocols;
-                MapNetworkManager.webSocketCertificateFilePath = WebScoketCertificateFilePath;
-                MapNetworkManager.webSocketCertificatePassword = WebScoketCertificatePassword;
-
                 if (startDatabaseOnAwake)
                     startingDatabaseServer = true;
 
@@ -533,7 +517,12 @@ namespace MultiplayerARPG.MMO
         #region Server functions
         public void StartCentralServer()
         {
-            centralNetworkManager.StartServer();
+            CentralNetworkManager.useWebSocket = UseWebSocket;
+            CentralNetworkManager.webSocketSecure = WebSocketSecure;
+            CentralNetworkManager.webSocketSslProtocols = WebSocketSslProtocols;
+            CentralNetworkManager.webSocketCertificateFilePath = WebScoketCertificateFilePath;
+            CentralNetworkManager.webSocketCertificatePassword = WebScoketCertificatePassword;
+            CentralNetworkManager.StartServer();
         }
 
         public void StartMapSpawnServer()
@@ -543,7 +532,12 @@ namespace MultiplayerARPG.MMO
 
         public void StartMapServer()
         {
-            mapNetworkManager.StartServer();
+            MapNetworkManager.useWebSocket = UseWebSocket;
+            MapNetworkManager.webSocketSecure = WebSocketSecure;
+            MapNetworkManager.webSocketSslProtocols = WebSocketSslProtocols;
+            MapNetworkManager.webSocketCertificateFilePath = WebScoketCertificateFilePath;
+            MapNetworkManager.webSocketCertificatePassword = WebScoketCertificatePassword;
+            MapNetworkManager.StartServer();
         }
 
         public void StartDatabaseManagerServer()

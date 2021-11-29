@@ -58,29 +58,20 @@ namespace MultiplayerARPG.MMO
 
             // Always accept SSL
             ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback((sender, certificate, chain, policyErrors) => { return true; });
-
-            // Active WebSockets
-            CentralNetworkManager.useWebSocket = UseWebSocket;
-            CentralNetworkManager.webSocketSecure = WebSocketSecure;
-            CentralNetworkManager.webSocketSslProtocols = WebSocketSslProtocols;
-
-            MapNetworkManager.useWebSocket = UseWebSocket;
-            MapNetworkManager.webSocketSecure = WebSocketSecure;
-            MapNetworkManager.webSocketSslProtocols = WebSocketSslProtocols;
         }
 
         private void OnEnable()
         {
-            centralNetworkManager.onClientConnected += OnCentralServerConnected;
-            centralNetworkManager.onClientDisconnected += OnCentralServerDisconnected;
+            CentralNetworkManager.onClientConnected += OnCentralServerConnected;
+            CentralNetworkManager.onClientDisconnected += OnCentralServerDisconnected;
             ClientGenericActions.onClientConnected += OnMapServerConnected;
             ClientGenericActions.onClientDisconnected += OnMapServerDisconnected;
         }
 
         private void OnDisable()
         {
-            centralNetworkManager.onClientConnected -= OnCentralServerConnected;
-            centralNetworkManager.onClientDisconnected -= OnCentralServerDisconnected;
+            CentralNetworkManager.onClientConnected -= OnCentralServerConnected;
+            CentralNetworkManager.onClientDisconnected -= OnCentralServerDisconnected;
             ClientGenericActions.onClientConnected -= OnMapServerConnected;
             ClientGenericActions.onClientDisconnected -= OnMapServerDisconnected;
         }
@@ -112,37 +103,36 @@ namespace MultiplayerARPG.MMO
         }
 
         #region Client functions
-        public void StartCentralClient()
-        {
-            centralNetworkManager.StartClient();
-        }
-
         public void StartCentralClient(string address, int port)
         {
-            centralNetworkManager.networkAddress = SelectedCentralAddress = address;
-            centralNetworkManager.networkPort = SelectedCentralPort = port;
-            StartCentralClient();
+            CentralNetworkManager.useWebSocket = UseWebSocket;
+            CentralNetworkManager.webSocketSecure = WebSocketSecure;
+            CentralNetworkManager.webSocketSslProtocols = WebSocketSslProtocols;
+            CentralNetworkManager.StartClient(address, port);
         }
 
         public void StopCentralClient()
         {
-            centralNetworkManager.StopClient();
+            CentralNetworkManager.StopClient();
         }
 
         public void StartMapClient(string sceneName, string address, int port)
         {
-            mapNetworkManager.Assets.onlineScene.SceneName = sceneName;
-            mapNetworkManager.StartClient(address, port);
+            MapNetworkManager.Assets.onlineScene.SceneName = sceneName;
+            MapNetworkManager.useWebSocket = UseWebSocket;
+            MapNetworkManager.webSocketSecure = WebSocketSecure;
+            MapNetworkManager.webSocketSslProtocols = WebSocketSslProtocols;
+            MapNetworkManager.StartClient(address, port);
         }
 
         public void StopMapClient()
         {
-            mapNetworkManager.StopClient();
+            MapNetworkManager.StopClient();
         }
 
         public bool IsConnectedToCentralServer()
         {
-            return centralNetworkManager.IsClientConnected;
+            return CentralNetworkManager.IsClientConnected;
         }
 
         public void ClearClientData()
@@ -156,42 +146,42 @@ namespace MultiplayerARPG.MMO
 
         public void RequestUserLogin(string username, string password, ResponseDelegate<ResponseUserLoginMessage> callback)
         {
-            centralNetworkManager.RequestUserLogin(username, password, (responseHandler, responseCode, response) => OnRequestUserLogin(responseHandler, responseCode, response, callback).Forget());
+            CentralNetworkManager.RequestUserLogin(username, password, (responseHandler, responseCode, response) => OnRequestUserLogin(responseHandler, responseCode, response, callback).Forget());
         }
 
         public void RequestUserRegister(string username, string password, string email, ResponseDelegate<ResponseUserRegisterMessage> callback)
         {
-            centralNetworkManager.RequestUserRegister(username, password, email, callback);
+            CentralNetworkManager.RequestUserRegister(username, password, email, callback);
         }
 
         public void RequestUserLogout(ResponseDelegate<INetSerializable> callback)
         {
-            centralNetworkManager.RequestUserLogout((responseHandler, responseCode, response) => OnRequestUserLogout(responseHandler, responseCode, response, callback).Forget());
+            CentralNetworkManager.RequestUserLogout((responseHandler, responseCode, response) => OnRequestUserLogout(responseHandler, responseCode, response, callback).Forget());
         }
 
         public void RequestValidateAccessToken(string userId, string accessToken, ResponseDelegate<ResponseValidateAccessTokenMessage> callback)
         {
-            centralNetworkManager.RequestValidateAccessToken(userId, accessToken, (responseHandler, responseCode, response) => OnRequestValidateAccessToken(responseHandler, responseCode, response, callback).Forget());
+            CentralNetworkManager.RequestValidateAccessToken(userId, accessToken, (responseHandler, responseCode, response) => OnRequestValidateAccessToken(responseHandler, responseCode, response, callback).Forget());
         }
 
         public void RequestCharacters(ResponseDelegate<ResponseCharactersMessage> callback)
         {
-            centralNetworkManager.RequestCharacters(callback);
+            CentralNetworkManager.RequestCharacters(callback);
         }
 
         public void RequestCreateCharacter(PlayerCharacterData characterData, ResponseDelegate<ResponseCreateCharacterMessage> callback)
         {
-            centralNetworkManager.RequestCreateCharacter(characterData, callback);
+            CentralNetworkManager.RequestCreateCharacter(characterData, callback);
         }
 
         public void RequestDeleteCharacter(string characterId, ResponseDelegate<ResponseDeleteCharacterMessage> callback)
         {
-            centralNetworkManager.RequestDeleteCharacter(characterId, callback);
+            CentralNetworkManager.RequestDeleteCharacter(characterId, callback);
         }
 
         public void RequestSelectCharacter(string characterId, ResponseDelegate<ResponseSelectCharacterMessage> callback)
         {
-            centralNetworkManager.RequestSelectCharacter(characterId, (responseHandler, responseCode, response) => OnRequestSelectCharacter(responseHandler, responseCode, response, characterId, callback).Forget());
+            CentralNetworkManager.RequestSelectCharacter(characterId, (responseHandler, responseCode, response) => OnRequestSelectCharacter(responseHandler, responseCode, response, characterId, callback).Forget());
         }
 
         private async UniTaskVoid OnRequestUserLogin(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseUserLoginMessage response, ResponseDelegate<ResponseUserLoginMessage> callback)
