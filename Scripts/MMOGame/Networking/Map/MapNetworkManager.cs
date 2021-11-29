@@ -480,7 +480,7 @@ namespace MultiplayerARPG.MMO
             string selectCharacterId = reader.GetString();
             if (!await ValidatePlayerConnection(connectionId, userId, accessToken, selectCharacterId))
             {
-                Transport.ServerDisconnect(connectionId);
+                ServerTransport.ServerDisconnect(connectionId);
                 return false;
             }
 
@@ -563,7 +563,7 @@ namespace MultiplayerARPG.MMO
             {
                 if (LogError)
                     Logging.LogError(LogTag, "Cannot find select character: " + selectCharacterId + " for user: " + userId);
-                Transport.ServerDisconnect(connectionId);
+                ServerTransport.ServerDisconnect(connectionId);
             }
             else
             {
@@ -573,7 +573,7 @@ namespace MultiplayerARPG.MMO
                 {
                     if (LogError)
                         Logging.LogError(LogTag, "Cannot find player character with entity Id: " + playerCharacterData.EntityId);
-                    Transport.ServerDisconnect(connectionId);
+                    ServerTransport.ServerDisconnect(connectionId);
                 }
                 else
                 {

@@ -54,7 +54,7 @@ namespace MultiplayerARPG.MMO
             IPlayerCharacterData playerCharacter;
             long connectionId;
             if (TryGetPlayerCharacterByName(characterName, out playerCharacter) && TryGetConnectionId(playerCharacter.Id, out connectionId))
-                Manager.Transport.ServerDisconnect(connectionId);
+                Manager.ServerTransport.ServerDisconnect(connectionId);
             DbServiceClient.SetUserUnbanTimeByCharacterNameAsync(new SetUserUnbanTimeByCharacterNameReq()
             {
                 CharacterName = characterName,
