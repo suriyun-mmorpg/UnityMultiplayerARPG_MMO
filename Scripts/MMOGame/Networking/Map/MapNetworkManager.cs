@@ -98,6 +98,7 @@ namespace MultiplayerARPG.MMO
         private readonly ConcurrentDictionary<string, InstanceMapWarpingLocation> instanceMapWarpingLocations = new ConcurrentDictionary<string, InstanceMapWarpingLocation>();
         private readonly ConcurrentDictionary<string, SocialCharacterData> usersById = new ConcurrentDictionary<string, SocialCharacterData>();
         private readonly ConcurrentDictionary<string, CancellationTokenSource> despawningPlayerCharacterCancellations = new ConcurrentDictionary<string, CancellationTokenSource>();
+        private readonly ConcurrentDictionary<string, BasePlayerCharacterEntity> despawningPlayerCharacterEntities = new ConcurrentDictionary<string, BasePlayerCharacterEntity>();
         // Database operations
         private readonly HashSet<StorageId> loadingStorageIds = new HashSet<StorageId>();
         private readonly HashSet<int> loadingPartyIds = new HashSet<int>();
@@ -334,7 +335,12 @@ namespace MultiplayerARPG.MMO
             BasePlayerCharacterEntity playerCharacterEntity;
             if (ServerUserHandlers.TryGetPlayerCharacter(connectionId, out playerCharacterEntity))
             {
+                playerCharacterEntity.StopMove();
                 string id = playerCharacterEntity.Id;
+                // Store despawning player character id, it will be used later if player not connect and continue playing the character
+                CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+                despawningPlayerCharacterCancellations.TryAdd(id, cancellationTokenSource);
+                despawningPlayerCharacterEntities.TryAdd(id, playerCharacterEntity);
                 // Save character immediately when player disconnect
                 while (savingCharacters.Contains(id))
                 {
@@ -344,12 +350,9 @@ namespace MultiplayerARPG.MMO
                 // Saved, so can unregister character and user
                 UnregisterPlayerCharacter(connectionId);
                 UnregisterUserId(connectionId);
-                // Store despawning player character id, it will be used later if player not connect and continue playing the character
-                CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
                 try
                 {
-                    if (despawningPlayerCharacterCancellations.TryAdd(id, cancellationTokenSource))
-                        await UniTask.Delay(playerCharacterDespawnMillisecondsDelay, true, PlayerLoopTiming.Update, cancellationTokenSource.Token);
+                    await UniTask.Delay(playerCharacterDespawnMillisecondsDelay, true, PlayerLoopTiming.Update, cancellationTokenSource.Token);
                     // Save character again before despawned (it may attacked by other characters)
                     while (savingCharacters.Contains(id))
                     {
@@ -359,6 +362,7 @@ namespace MultiplayerARPG.MMO
                     {
                         await SaveCharacter(playerCharacterEntity);
                         playerCharacterEntity.NetworkDestroy();
+                        despawningPlayerCharacterEntities.TryRemove(id, out _);
                     }
                 }
                 catch (System.OperationCanceledException)
@@ -372,8 +376,8 @@ namespace MultiplayerARPG.MMO
                 }
                 finally
                 {
-                    despawningPlayerCharacterCancellations.TryRemove(id, out cancellationTokenSource);
-                    cancellationTokenSource.Dispose();
+                    if (despawningPlayerCharacterCancellations.TryRemove(id, out cancellationTokenSource))
+                        cancellationTokenSource.Dispose();
                 }
             }
             else
@@ -451,6 +455,27 @@ namespace MultiplayerARPG.MMO
             {
                 return false;
             }
+
+            CancellationTokenSource cancellationTokenSource;
+            BasePlayerCharacterEntity playerCharacterEntity;
+            if (despawningPlayerCharacterCancellations.TryGetValue(selectCharacterId, out cancellationTokenSource) &&
+                despawningPlayerCharacterEntities.TryGetValue(selectCharacterId, out playerCharacterEntity) &&
+                !cancellationTokenSource.IsCancellationRequested)
+            {
+                // Cancel character despawning to despawning immediately
+                despawningPlayerCharacterCancellations.TryRemove(selectCharacterId, out _);
+                despawningPlayerCharacterEntities.TryRemove(selectCharacterId, out _);
+                cancellationTokenSource.Cancel();
+                cancellationTokenSource.Dispose();
+                // Save character before despawned
+                while (savingCharacters.Contains(selectCharacterId))
+                {
+                    await UniTask.Yield();
+                }
+                await SaveCharacter(playerCharacterEntity);
+                // Despawn the character
+                playerCharacterEntity.NetworkDestroy();
+            }
             return true;
         }
 #endif
@@ -499,24 +524,6 @@ namespace MultiplayerARPG.MMO
             }
 
             RegisterUserId(connectionId, userId);
-
-            CancellationTokenSource cancellationTokenSource;
-            BasePlayerCharacterEntity playerCharacterEntity;
-            if (despawningPlayerCharacterCancellations.TryGetValue(selectCharacterId, out cancellationTokenSource) &&
-                ServerUserHandlers.TryGetPlayerCharacterById(selectCharacterId, out playerCharacterEntity) &&
-                !cancellationTokenSource.IsCancellationRequested)
-            {
-                // Cancel character despawning to despawning immediately
-                cancellationTokenSource.Cancel();
-                // Save character before despawned
-                while (savingCharacters.Contains(selectCharacterId))
-                {
-                    await UniTask.Yield();
-                }
-                await SaveCharacter(playerCharacterEntity);
-                // Despawn the character
-                playerCharacterEntity.NetworkDestroy();
-            }
             SetPlayerReadyRoutine(connectionId, userId, selectCharacterId).Forget();
             return true;
         }
