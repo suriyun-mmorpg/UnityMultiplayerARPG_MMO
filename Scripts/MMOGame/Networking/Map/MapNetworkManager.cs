@@ -335,6 +335,8 @@ namespace MultiplayerARPG.MMO
             BasePlayerCharacterEntity playerCharacterEntity;
             if (ServerUserHandlers.TryGetPlayerCharacter(connectionId, out playerCharacterEntity))
             {
+                playerCharacterEntity.SetOwnerClient(-1);
+                playerCharacterEntity.StopMove();
                 string id = playerCharacterEntity.Id;
                 // Store despawning player character id, it will be used later if player not connect and continue playing the character
                 CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
