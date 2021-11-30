@@ -42,9 +42,11 @@ namespace MultiplayerARPG.MMO
 
         public System.Action onCentralClientConnected;
         public System.Action<DisconnectInfo> onCentralClientDisconnected;
+        public System.Action onCentralClientStopped;
 
         public System.Action onMapClientConnected;
         public System.Action<DisconnectInfo> onMapClientDisconnected;
+        public System.Action onMapClientStopped;
 
         private void Awake()
         {
@@ -62,47 +64,73 @@ namespace MultiplayerARPG.MMO
 
         private void OnEnable()
         {
-            CentralNetworkManager.onClientConnected += OnCentralServerConnected;
-            CentralNetworkManager.onClientDisconnected += OnCentralServerDisconnected;
-            ClientGenericActions.onClientConnected += OnMapServerConnected;
-            ClientGenericActions.onClientDisconnected += OnMapServerDisconnected;
+            CentralNetworkManager.onClientConnected += OnCentralConnected;
+            CentralNetworkManager.onClientDisconnected += OnCentralDisconnected;
+            CentralNetworkManager.onClientStopped += OnCentralStopped;
+            ClientGenericActions.onClientConnected += OnMapConnected;
+            ClientGenericActions.onClientDisconnected += OnMapDisconnected;
+            ClientGenericActions.onClientStopped += OnMapStopped;
         }
 
         private void OnDisable()
         {
-            CentralNetworkManager.onClientConnected -= OnCentralServerConnected;
-            CentralNetworkManager.onClientDisconnected -= OnCentralServerDisconnected;
-            ClientGenericActions.onClientConnected -= OnMapServerConnected;
-            ClientGenericActions.onClientDisconnected -= OnMapServerDisconnected;
+            CentralNetworkManager.onClientConnected -= OnCentralConnected;
+            CentralNetworkManager.onClientDisconnected -= OnCentralDisconnected;
+            CentralNetworkManager.onClientStopped -= OnCentralStopped;
+            ClientGenericActions.onClientConnected -= OnMapConnected;
+            ClientGenericActions.onClientDisconnected -= OnMapDisconnected;
+            ClientGenericActions.onClientStopped -= OnMapStopped;
         }
 
-        public void OnCentralServerConnected()
+        public void OnCentralConnected()
         {
             if (onCentralClientConnected != null)
                 onCentralClientConnected.Invoke();
         }
 
-        public void OnCentralServerDisconnected(DisconnectInfo disconnectInfo)
+        public void OnCentralDisconnected(DisconnectInfo disconnectInfo)
         {
             if (onCentralClientDisconnected != null)
                 onCentralClientDisconnected.Invoke(disconnectInfo);
-            GameInstance.UserId = string.Empty;
-            GameInstance.UserToken = string.Empty;
+            ClearClientData();
         }
 
-        public void OnMapServerConnected()
+        public void OnCentralStopped()
+        {
+            if (onCentralClientStopped != null)
+                onCentralClientStopped.Invoke();
+        }
+
+        public void OnMapConnected()
         {
             if (onMapClientConnected != null)
                 onMapClientConnected.Invoke();
         }
 
-        public void OnMapServerDisconnected(DisconnectInfo disconnectInfo)
+        public void OnMapDisconnected(DisconnectInfo disconnectInfo)
         {
             if (onMapClientDisconnected != null)
                 onMapClientDisconnected.Invoke(disconnectInfo);
         }
 
+        public void OnMapStopped()
+        {
+            if (onMapClientStopped != null)
+                onMapClientStopped.Invoke();
+            // Restart central client after exit from map-server to login and go to character management scene
+            if (!IsConnectedToCentralServer())
+                StartCentralClient();
+        }
+
         #region Client functions
+        public void StartCentralClient()
+        {
+            CentralNetworkManager.useWebSocket = UseWebSocket;
+            CentralNetworkManager.webSocketSecure = WebSocketSecure;
+            CentralNetworkManager.webSocketSslProtocols = WebSocketSslProtocols;
+            CentralNetworkManager.StartClient();
+        }
+
         public void StartCentralClient(string address, int port)
         {
             CentralNetworkManager.useWebSocket = UseWebSocket;
@@ -198,7 +226,6 @@ namespace MultiplayerARPG.MMO
             {
                 GameInstance.UserId = response.userId;
                 GameInstance.UserToken = response.accessToken;
-                GameInstance.SelectedCharacterId = string.Empty;
             }
         }
 

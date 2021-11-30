@@ -31,6 +31,7 @@ namespace MultiplayerARPG.MMO
 
         public System.Action onClientConnected;
         public System.Action<DisconnectInfo> onClientDisconnected;
+        public System.Action onClientStopped;
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
         public ClusterServer ClusterServer { get; private set; }
@@ -119,20 +120,8 @@ namespace MultiplayerARPG.MMO
             if (!IsServer)
                 Clean();
             base.OnStopClient();
-        }
-
-        public override void OnPeerDisconnected(long connectionId, DisconnectInfo disconnectInfo)
-        {
-            base.OnPeerDisconnected(connectionId, disconnectInfo);
-#if UNITY_STANDALONE && !CLIENT_BUILD
-            // Remove disconnect user
-            CentralUserPeerInfo userPeerInfo;
-            if (userPeers.TryGetValue(connectionId, out userPeerInfo))
-            {
-                userPeersByUserId.Remove(userPeerInfo.userId);
-                userPeers.Remove(connectionId);
-            }
-#endif
+            if (onClientStopped != null)
+                onClientStopped.Invoke();
         }
 
         public override void OnClientConnected()
@@ -147,6 +136,20 @@ namespace MultiplayerARPG.MMO
             base.OnClientDisconnected(disconnectInfo);
             if (onClientDisconnected != null)
                 onClientDisconnected.Invoke(disconnectInfo);
+        }
+
+        public override void OnPeerDisconnected(long connectionId, DisconnectInfo disconnectInfo)
+        {
+            base.OnPeerDisconnected(connectionId, disconnectInfo);
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            // Remove disconnect user
+            CentralUserPeerInfo userPeerInfo;
+            if (userPeers.TryGetValue(connectionId, out userPeerInfo))
+            {
+                userPeersByUserId.Remove(userPeerInfo.userId);
+                userPeers.Remove(connectionId);
+            }
+#endif
         }
 
         public bool MapContainsUser(string userId)

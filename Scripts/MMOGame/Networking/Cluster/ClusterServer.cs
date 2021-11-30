@@ -16,7 +16,7 @@ namespace MultiplayerARPG.MMO
 
         private readonly CentralNetworkManager centralNetworkManager;
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        internal Dictionary<string, SocialCharacterData> MapUsersById { get; private set; } = new Dictionary<string, SocialCharacterData>();
+        internal Dictionary<string, SocialCharacterData> MapUsersByCharacterId { get; private set; } = new Dictionary<string, SocialCharacterData>();
         internal Dictionary<string, long> ConnectionIdsByCharacterId { get; private set; } = new Dictionary<string, long>();
         internal Dictionary<string, long> ConnectionIdsByCharacterName { get; private set; } = new Dictionary<string, long>();
         // Map spawn server peers
@@ -61,7 +61,7 @@ namespace MultiplayerARPG.MMO
         protected override void OnStopServer()
         {
             base.OnStopServer();
-            MapUsersById.Clear();
+            MapUsersByCharacterId.Clear();
             ConnectionIdsByCharacterId.Clear();
             ConnectionIdsByCharacterName.Clear();
             MapSpawnServerPeers.Clear();
@@ -93,12 +93,6 @@ namespace MultiplayerARPG.MMO
                     if (MapServerPeers.TryGetValue(eventData.connectionId, out tempPeerInfo))
                     {
                         MapServerPeersByMapId.Remove(tempPeerInfo.extra);
-                        MapServerPeers.Remove(eventData.connectionId);
-                        RemoveMapUsers(eventData.connectionId);
-                    }
-                    // Remove disconnect instance map server
-                    if (MapServerPeers.TryGetValue(eventData.connectionId, out tempPeerInfo))
-                    {
                         MapServerPeersByInstanceId.Remove(tempPeerInfo.extra);
                         MapServerPeers.Remove(eventData.connectionId);
                         RemoveMapUsers(eventData.connectionId);
@@ -114,15 +108,21 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
         private void RemoveMapUsers(long connectionId)
         {
-            SocialCharacterData userData;
-            foreach (KeyValuePair<string, long> entry in ConnectionIdsByCharacterId)
+            List<KeyValuePair<string, SocialCharacterData>> mapUsers = MapUsersByCharacterId.ToList();
+            foreach (KeyValuePair<string, SocialCharacterData> entry in mapUsers)
             {
                 // Find characters which connected to disconnecting map server
-                if (connectionId != entry.Value || !MapUsersById.TryGetValue(entry.Key, out userData))
+                long tempConnectionId;
+                if (!ConnectionIdsByCharacterId.TryGetValue(entry.Key, out tempConnectionId) || connectionId != tempConnectionId)
                     continue;
 
                 // Send remove messages to other map servers
-                UpdateMapUser(UpdateUserCharacterMessage.UpdateType.Remove, userData, connectionId);
+                UpdateMapUser(UpdateUserCharacterMessage.UpdateType.Remove, entry.Value, connectionId);
+
+                // Clear disconnecting map users data
+                MapUsersByCharacterId.Remove(entry.Key);
+                ConnectionIdsByCharacterId.Remove(entry.Key);
+                ConnectionIdsByCharacterName.Remove(entry.Value.characterName);
             }
         }
 #endif
@@ -312,27 +312,27 @@ namespace MultiplayerARPG.MMO
             switch (message.type)
             {
                 case UpdateUserCharacterMessage.UpdateType.Add:
-                    if (!MapUsersById.ContainsKey(message.character.id))
+                    if (!MapUsersByCharacterId.ContainsKey(message.character.id))
                     {
-                        MapUsersById[message.character.id] = message.character;
+                        MapUsersByCharacterId[message.character.id] = message.character;
                         ConnectionIdsByCharacterId[message.character.id] = connectionId;
                         ConnectionIdsByCharacterName[message.character.characterName] = connectionId;
                         UpdateMapUser(UpdateUserCharacterMessage.UpdateType.Add, message.character, connectionId);
                     }
                     break;
                 case UpdateUserCharacterMessage.UpdateType.Remove:
-                    if (MapUsersById.TryGetValue(message.character.id, out userData))
+                    if (MapUsersByCharacterId.TryGetValue(message.character.id, out userData))
                     {
-                        MapUsersById.Remove(userData.id);
+                        MapUsersByCharacterId.Remove(userData.id);
                         ConnectionIdsByCharacterId.Remove(userData.id);
                         ConnectionIdsByCharacterName.Remove(userData.characterName);
                         UpdateMapUser(UpdateUserCharacterMessage.UpdateType.Remove, userData, connectionId);
                     }
                     break;
                 case UpdateUserCharacterMessage.UpdateType.Online:
-                    if (MapUsersById.ContainsKey(message.character.id))
+                    if (MapUsersByCharacterId.ContainsKey(message.character.id))
                     {
-                        MapUsersById[message.character.id] = message.character;
+                        MapUsersByCharacterId[message.character.id] = message.character;
                         UpdateMapUser(UpdateUserCharacterMessage.UpdateType.Online, message.character, connectionId);
                     }
                     break;
@@ -430,7 +430,7 @@ namespace MultiplayerARPG.MMO
         public bool MapContainsUser(string userId)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            foreach (SocialCharacterData mapUser in MapUsersById.Values)
+            foreach (SocialCharacterData mapUser in MapUsersByCharacterId.Values)
             {
                 if (mapUser.userId.Equals(userId))
                     return true;

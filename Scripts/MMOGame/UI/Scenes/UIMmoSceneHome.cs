@@ -50,7 +50,6 @@ namespace MultiplayerARPG.MMO
 
         public void OnClickDisconnect()
         {
-            MMOClientInstance.Singleton.ClearClientData();
             MMOClientInstance.Singleton.StopCentralClient();
         }
 
