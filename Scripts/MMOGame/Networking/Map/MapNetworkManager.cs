@@ -337,6 +337,12 @@ namespace MultiplayerARPG.MMO
             {
                 playerCharacterEntity.SetOwnerClient(-1);
                 playerCharacterEntity.StopMove();
+                MovementState movementState = playerCharacterEntity.MovementState;
+                movementState &= ~MovementState.Forward;
+                movementState &= ~MovementState.Backward;
+                movementState &= ~MovementState.Right;
+                movementState &= ~MovementState.Left;
+                playerCharacterEntity.KeyMovement(Vector3.zero, movementState);
                 string id = playerCharacterEntity.Id;
                 // Store despawning player character id, it will be used later if player not connect and continue playing the character
                 CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
