@@ -336,6 +336,7 @@ namespace MultiplayerARPG.MMO
             if (ServerUserHandlers.TryGetPlayerCharacter(connectionId, out playerCharacterEntity))
             {
                 playerCharacterEntity.SetOwnerClient(-1);
+                playerCharacterEntity.MovementSecure = MovementSecure.ServerAuthoritative;
                 playerCharacterEntity.StopMove();
                 MovementState movementState = playerCharacterEntity.MovementState;
                 movementState &= ~MovementState.Forward;
