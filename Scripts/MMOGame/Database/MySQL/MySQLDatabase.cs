@@ -296,6 +296,15 @@ namespace MultiplayerARPG.MMO
                 await InsertMigrationId(migrationId);
                 Logging.Log($"Migrated to {migrationId}");
             }
+            migrationId = "1.72d";
+            if (!await HasMigrationId(migrationId))
+            {
+                Logging.Log($"Migrating up to {migrationId}");
+                await ExecuteNonQuery("ALTER TABLE `characteritem` CHANGE `randomSeed` `randomSeed` INT NOT NULL DEFAULT '0';");
+                // Insert migrate history
+                await InsertMigrationId(migrationId);
+                Logging.Log($"Migrated to {migrationId}");
+            }
         }
 
         private async UniTask<bool> HasMigrationId(string migrationId)
