@@ -44,7 +44,7 @@ namespace MultiplayerARPG.MMO
                 result.exp = reader.GetInt32(6);
                 result.lockRemainsDuration = reader.GetFloat(7);
                 result.expireTime = reader.GetInt64(8);
-                result.randomSeed = reader.GetByte(9);
+                result.randomSeed = reader.GetInt16(9);
                 result.ammo = reader.GetInt16(10);
                 result.ReadSockets(reader.GetString(11));
                 return true;
