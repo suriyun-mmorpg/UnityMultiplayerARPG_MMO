@@ -29,15 +29,12 @@ namespace MultiplayerARPG.MMO
         [SerializeField]
         private bool webSocketSecure = false;
         [SerializeField]
-        private SslProtocols webSocketSslProtocols = SslProtocols.Tls12;
-        [SerializeField]
         private MmoNetworkSetting[] networkSettings = new MmoNetworkSetting[0];
 
         public CentralNetworkManager CentralNetworkManager { get { return centralNetworkManager; } }
         public MapNetworkManager MapNetworkManager { get { return mapNetworkManager; } }
         public bool UseWebSocket { get { return useWebSocket; } }
         public bool WebSocketSecure { get { return webSocketSecure; } }
-        public SslProtocols WebSocketSslProtocols { get { return webSocketSslProtocols; } }
         public MmoNetworkSetting[] NetworkSettings { get { return networkSettings; } }
 
         public System.Action onCentralClientConnected;
@@ -127,7 +124,6 @@ namespace MultiplayerARPG.MMO
         {
             CentralNetworkManager.useWebSocket = UseWebSocket;
             CentralNetworkManager.webSocketSecure = WebSocketSecure;
-            CentralNetworkManager.webSocketSslProtocols = WebSocketSslProtocols;
             CentralNetworkManager.StartClient();
         }
 
@@ -135,7 +131,6 @@ namespace MultiplayerARPG.MMO
         {
             CentralNetworkManager.useWebSocket = UseWebSocket;
             CentralNetworkManager.webSocketSecure = WebSocketSecure;
-            CentralNetworkManager.webSocketSslProtocols = WebSocketSslProtocols;
             CentralNetworkManager.StartClient(address, port);
         }
 
@@ -149,7 +144,6 @@ namespace MultiplayerARPG.MMO
             MapNetworkManager.Assets.onlineScene.SceneName = sceneName;
             MapNetworkManager.useWebSocket = UseWebSocket;
             MapNetworkManager.webSocketSecure = WebSocketSecure;
-            MapNetworkManager.webSocketSslProtocols = WebSocketSslProtocols;
             MapNetworkManager.StartClient(address, port);
         }
 

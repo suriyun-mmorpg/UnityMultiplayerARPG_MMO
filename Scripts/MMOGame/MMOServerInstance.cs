@@ -32,8 +32,6 @@ namespace MultiplayerARPG.MMO
         public const string ARG_USE_WEB_SOCKET = "-" + CONFIG_USE_WEB_SOCKET;
         public const string CONFIG_WEB_SOCKET_SECURE = "webSocketSecure";
         public const string ARG_WEB_SOCKET_SECURE = "-" + CONFIG_WEB_SOCKET_SECURE;
-        public const string CONFIG_WEB_SOCKET_SSL_PROTOCOL = "webSocketSslProtocol";
-        public const string ARG_WEB_SOCKET_SSL_PROTOCOL = "-" + CONFIG_WEB_SOCKET_SSL_PROTOCOL;
         public const string CONFIG_WEB_SOCKET_CERT_PATH = "webSocketCertPath";
         public const string ARG_WEB_SOCKET_CERT_PATH = "-" + CONFIG_WEB_SOCKET_CERT_PATH;
         public const string CONFIG_WEB_SOCKET_CERT_PASSWORD = "webSocketCertPassword";
@@ -103,8 +101,6 @@ namespace MultiplayerARPG.MMO
         [SerializeField]
         private bool webSocketSecure = false;
         [SerializeField]
-        private SslProtocols webSocketSslProtocols = SslProtocols.Tls12;
-        [SerializeField]
         private string webSocketCertPath = string.Empty;
         [SerializeField]
         private string webSocketCertPassword = string.Empty;
@@ -115,7 +111,6 @@ namespace MultiplayerARPG.MMO
         public DatabaseNetworkManager DatabaseNetworkManager { get { return databaseNetworkManager; } }
         public bool UseWebSocket { get { return useWebSocket; } }
         public bool WebSocketSecure { get { return webSocketSecure; } }
-        public SslProtocols WebSocketSslProtocols { get { return webSocketSslProtocols; } }
         public string WebScoketCertificateFilePath { get { return webSocketCertPath; } }
         public string WebScoketCertificatePassword { get { return webSocketCertPassword; } }
 
@@ -205,15 +200,6 @@ namespace MultiplayerARPG.MMO
                 if (webSocketSecure || ConfigReader.ReadConfigs(jsonConfig, CONFIG_WEB_SOCKET_SECURE, out webSocketSecure))
                 {
                     this.webSocketSecure = webSocketSecure;
-                }
-
-                // Which ssl protocol for run secure mode?
-                string sslProtocols;
-                if (ConfigReader.ReadArgs(args, ARG_WEB_SOCKET_SSL_PROTOCOL, out sslProtocols, string.Empty) ||
-                    ConfigReader.ReadConfigs(jsonConfig, CONFIG_WEB_SOCKET_SSL_PROTOCOL, out sslProtocols, string.Empty))
-                {
-                    if (!Enum.TryParse(sslProtocols, out webSocketSslProtocols))
-                        webSocketSslProtocols = SslProtocols.Tls12;
                 }
 
                 // Where is the certification file path?
@@ -519,7 +505,6 @@ namespace MultiplayerARPG.MMO
         {
             CentralNetworkManager.useWebSocket = UseWebSocket;
             CentralNetworkManager.webSocketSecure = WebSocketSecure;
-            CentralNetworkManager.webSocketSslProtocols = WebSocketSslProtocols;
             CentralNetworkManager.webSocketCertificateFilePath = WebScoketCertificateFilePath;
             CentralNetworkManager.webSocketCertificatePassword = WebScoketCertificatePassword;
             CentralNetworkManager.StartServer();
@@ -534,7 +519,6 @@ namespace MultiplayerARPG.MMO
         {
             MapNetworkManager.useWebSocket = UseWebSocket;
             MapNetworkManager.webSocketSecure = WebSocketSecure;
-            MapNetworkManager.webSocketSslProtocols = WebSocketSslProtocols;
             MapNetworkManager.webSocketCertificateFilePath = WebScoketCertificateFilePath;
             MapNetworkManager.webSocketCertificatePassword = WebScoketCertificatePassword;
             MapNetworkManager.StartServer();
