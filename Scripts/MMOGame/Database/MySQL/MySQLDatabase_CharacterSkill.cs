@@ -1,6 +1,5 @@
 ﻿#if UNITY_STANDALONE && !CLIENT_BUILD
 using System.Collections.Generic;
-using Cysharp.Threading.Tasks;
 using MySqlConnector;
 
 namespace MultiplayerARPG.MMO
@@ -20,9 +19,9 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public async UniTask CreateCharacterSkill(MySqlConnection connection, MySqlTransaction transaction, int idx, string characterId, CharacterSkill characterSkill)
+        public void CreateCharacterSkill(MySqlConnection connection, MySqlTransaction transaction, int idx, string characterId, CharacterSkill characterSkill)
         {
-            await ExecuteNonQuery(connection, transaction, "INSERT INTO characterskill (id, idx, characterId, dataId, level) VALUES (@id, @idx, @characterId, @dataId, @level)",
+            ExecuteNonQuerySync(connection, transaction, "INSERT INTO characterskill (id, idx, characterId, dataId, level) VALUES (@id, @idx, @characterId, @dataId, @level)",
                 new MySqlParameter("@id", characterId + "_" + idx),
                 new MySqlParameter("@idx", idx),
                 new MySqlParameter("@characterId", characterId),
@@ -30,11 +29,11 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@level", characterSkill.level));
         }
 
-        public async UniTask<List<CharacterSkill>> ReadCharacterSkills(string characterId, List<CharacterSkill> result = null)
+        public List<CharacterSkill> ReadCharacterSkills(string characterId, List<CharacterSkill> result = null)
         {
             if (result == null)
                 result = new List<CharacterSkill>();
-            await ExecuteReader((reader) =>
+            ExecuteReaderSync((reader) =>
             {
                 CharacterSkill tempSkill;
                 while (ReadCharacterSkill(reader, out tempSkill))
@@ -46,9 +45,9 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public async UniTask DeleteCharacterSkills(MySqlConnection connection, MySqlTransaction transaction, string characterId)
+        public void DeleteCharacterSkills(MySqlConnection connection, MySqlTransaction transaction, string characterId)
         {
-            await ExecuteNonQuery(connection, transaction, "DELETE FROM characterskill WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
+            ExecuteNonQuerySync(connection, transaction, "DELETE FROM characterskill WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
         }
     }
 }

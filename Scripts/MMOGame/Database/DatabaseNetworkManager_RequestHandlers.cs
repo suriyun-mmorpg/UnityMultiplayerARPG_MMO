@@ -10,7 +10,7 @@ namespace MultiplayerARPG.MMO
         protected async UniTaskVoid ValidateUserLogin(RequestHandlerData requestHandler, ValidateUserLoginReq request, RequestProceedResultDelegate<ValidateUserLoginResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            string userId = await Database.ValidateUserLogin(request.Username, request.Password);
+            string userId = Database.ValidateUserLogin(request.Username, request.Password);
             if (string.IsNullOrEmpty(userId))
             {
                 result.Invoke(AckResponseCode.Success, new ValidateUserLoginResp());
@@ -20,6 +20,7 @@ namespace MultiplayerARPG.MMO
             {
                 UserId = userId,
             });
+            await UniTask.Yield();
 #endif
         }
 
@@ -35,7 +36,7 @@ namespace MultiplayerARPG.MMO
             else
             {
                 // Doesn't cached yet, so try validate from database
-                isPass = await Database.ValidateAccessToken(request.UserId, request.AccessToken);
+                isPass = Database.ValidateAccessToken(request.UserId, request.AccessToken);
                 // Pass, store access token to the dictionary
                 if (isPass)
                     cachedUserAccessToken[request.UserId] = request.AccessToken;
@@ -44,6 +45,7 @@ namespace MultiplayerARPG.MMO
             {
                 IsPass = isPass
             });
+            await UniTask.Yield();
 #endif
         }
 
@@ -52,8 +54,9 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
             result.Invoke(AckResponseCode.Success, new GetUserLevelResp()
             {
-                UserLevel = await Database.GetUserLevel(request.UserId),
+                UserLevel = Database.GetUserLevel(request.UserId),
             });
+            await UniTask.Yield();
 #endif
         }
 
@@ -62,24 +65,26 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
             result.Invoke(AckResponseCode.Success, new GoldResp()
             {
-                Gold = await ReadGold(request.UserId)
+                Gold = ReadGold(request.UserId)
             });
+            await UniTask.Yield();
 #endif
         }
 
         protected async UniTaskVoid ChangeGold(RequestHandlerData requestHandler, ChangeGoldReq request, RequestProceedResultDelegate<GoldResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            int gold = await ReadGold(request.UserId);
+            int gold = ReadGold(request.UserId);
             gold += request.ChangeAmount;
             // Cache the data, it will be used later
             cachedUserGold[request.UserId] = gold;
             // Update data to database
-            await Database.UpdateGold(request.UserId, gold);
+            Database.UpdateGold(request.UserId, gold);
             result.Invoke(AckResponseCode.Success, new GoldResp()
             {
                 Gold = gold
             });
+            await UniTask.Yield();
 #endif
         }
 
@@ -88,24 +93,26 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
             result.Invoke(AckResponseCode.Success, new CashResp()
             {
-                Cash = await ReadCash(request.UserId)
+                Cash = ReadCash(request.UserId)
             });
+            await UniTask.Yield();
 #endif
         }
 
         protected async UniTaskVoid ChangeCash(RequestHandlerData requestHandler, ChangeCashReq request, RequestProceedResultDelegate<CashResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            int cash = await ReadCash(request.UserId);
+            int cash = ReadCash(request.UserId);
             cash += request.ChangeAmount;
             // Cache the data, it will be used later
             cachedUserCash[request.UserId] = cash;
             // Update data to database
-            await Database.UpdateCash(request.UserId, cash);
+            Database.UpdateCash(request.UserId, cash);
             result.Invoke(AckResponseCode.Success, new CashResp()
             {
                 Cash = cash
             });
+            await UniTask.Yield();
 #endif
         }
 
@@ -115,8 +122,9 @@ namespace MultiplayerARPG.MMO
             // Store access token to the dictionary, it will be used to validate later
             cachedUserAccessToken[request.UserId] = request.AccessToken;
             // Update data to database
-            await Database.UpdateAccessToken(request.UserId, request.AccessToken);
+            Database.UpdateAccessToken(request.UserId, request.AccessToken);
             result.Invoke(AckResponseCode.Success, EmptyMessage.Value);
+            await UniTask.Yield();
 #endif
         }
 
@@ -126,8 +134,9 @@ namespace MultiplayerARPG.MMO
             // Cache username, it will be used to validate later
             cachedUsernames.Add(request.Username);
             // Insert new user login to database
-            await Database.CreateUserLogin(request.Username, request.Password, request.Email);
+            Database.CreateUserLogin(request.Username, request.Password, request.Email);
             result.Invoke(AckResponseCode.Success, EmptyMessage.Value);
+            await UniTask.Yield();
 #endif
         }
 
@@ -143,7 +152,7 @@ namespace MultiplayerARPG.MMO
             else
             {
                 // Doesn't cached yet, so try validate from database
-                foundAmount = await Database.FindUsername(request.Username);
+                foundAmount = Database.FindUsername(request.Username);
                 // Cache username, it will be used to validate later
                 if (foundAmount > 0)
                     cachedUsernames.Add(request.Username);
@@ -152,6 +161,7 @@ namespace MultiplayerARPG.MMO
             {
                 FoundAmount = foundAmount
             });
+            await UniTask.Yield();
 #endif
         }
 
@@ -163,11 +173,12 @@ namespace MultiplayerARPG.MMO
             cachedUserCharacter[character.Id] = character;
             cachedCharacterNames.Add(character.CharacterName);
             // Insert new character to database
-            await Database.CreateCharacter(request.UserId, character);
+            Database.CreateCharacter(request.UserId, character);
             result.Invoke(AckResponseCode.Success, new CharacterResp()
             {
                 CharacterData = character
             });
+            await UniTask.Yield();
 #endif
         }
 
@@ -176,24 +187,26 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
             result.Invoke(AckResponseCode.Success, new CharacterResp()
             {
-                CharacterData = await ReadCharacter(request.CharacterId)
+                CharacterData = ReadCharacter(request.CharacterId)
             });
+            await UniTask.Yield();
 #endif
         }
 
         protected async UniTaskVoid ReadCharacters(RequestHandlerData requestHandler, ReadCharactersReq request, RequestProceedResultDelegate<CharactersResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            List<PlayerCharacterData> characters = await Database.ReadCharacters(request.UserId);
+            List<PlayerCharacterData> characters = Database.ReadCharacters(request.UserId);
             // Read and cache character (or load from cache)
             for (int i = 0; i < characters.Count; ++i)
             {
-                characters[i] = await ReadCharacter(characters[i].Id);
+                characters[i] = ReadCharacter(characters[i].Id);
             }
             result.Invoke(AckResponseCode.Success, new CharactersResp()
             {
                 List = characters
             });
+            await UniTask.Yield();
 #endif
         }
 
@@ -209,13 +222,14 @@ namespace MultiplayerARPG.MMO
                 cachedUserCharacter[character.Id] = character;
                 // Update data to database
                 // TODO: May update later to reduce amount of processes
-                await Database.UpdateCharacter(character);
+                Database.UpdateCharacter(character);
                 updatingCharacterIds.TryRemove(character.Id);
             }
             result.Invoke(AckResponseCode.Success, new CharacterResp()
             {
                 CharacterData = character
             });
+            await UniTask.Yield();
 #endif
         }
 
@@ -230,8 +244,9 @@ namespace MultiplayerARPG.MMO
                 cachedUserCharacter.TryRemove(request.CharacterId, out _);
             }
             // Delete data from database
-            await Database.DeleteCharacter(request.UserId, request.CharacterId);
+            Database.DeleteCharacter(request.UserId, request.CharacterId);
             result.Invoke(AckResponseCode.Success, EmptyMessage.Value);
+            await UniTask.Yield();
 #endif
         }
 
@@ -247,7 +262,7 @@ namespace MultiplayerARPG.MMO
             else
             {
                 // Doesn't cached yet, so try validate from database
-                foundAmount = await Database.FindCharacterName(request.CharacterName);
+                foundAmount = Database.FindCharacterName(request.CharacterName);
                 // Cache character name, it will be used to validate later
                 if (foundAmount > 0)
                     cachedCharacterNames.Add(request.CharacterName);
@@ -256,6 +271,7 @@ namespace MultiplayerARPG.MMO
             {
                 FoundAmount = foundAmount
             });
+            await UniTask.Yield();
 #endif
         }
 
@@ -264,15 +280,16 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
             result.Invoke(AckResponseCode.Success, new SocialCharactersResp()
             {
-                List = await Database.FindCharacters(request.CharacterName)
+                List = Database.FindCharacters(request.CharacterName)
             });
+            await UniTask.Yield();
 #endif
         }
 
         protected async UniTaskVoid CreateFriend(RequestHandlerData requestHandler, CreateFriendReq request, RequestProceedResultDelegate<SocialCharactersResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            List<SocialCharacterData> friends = await ReadFriends(request.Character1Id);
+            List<SocialCharacterData> friends = ReadFriends(request.Character1Id);
             // Update to cache
             for (int i = 0; i < friends.Count; ++i)
             {
@@ -282,22 +299,23 @@ namespace MultiplayerARPG.MMO
                     break;
                 }
             }
-            SocialCharacterData character = await ReadSocialCharacter(request.Character2Id);
+            SocialCharacterData character = ReadSocialCharacter(request.Character2Id);
             friends.Add(character);
             cachedFriend[request.Character1Id] = friends;
             // Update to database
-            await Database.CreateFriend(request.Character1Id, character.id);
+            Database.CreateFriend(request.Character1Id, character.id);
             result.Invoke(AckResponseCode.Success, new SocialCharactersResp()
             {
                 List = friends
             });
+            await UniTask.Yield();
 #endif
         }
 
         protected async UniTaskVoid DeleteFriend(RequestHandlerData requestHandler, DeleteFriendReq request, RequestProceedResultDelegate<SocialCharactersResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            List<SocialCharacterData> friends = await ReadFriends(request.Character1Id);
+            List<SocialCharacterData> friends = ReadFriends(request.Character1Id);
             // Update to cache
             for (int i = 0; i < friends.Count; ++i)
             {
@@ -309,11 +327,12 @@ namespace MultiplayerARPG.MMO
             }
             cachedFriend[request.Character1Id] = friends;
             // Update to database
-            await Database.DeleteFriend(request.Character1Id, request.Character2Id);
+            Database.DeleteFriend(request.Character1Id, request.Character2Id);
             result.Invoke(AckResponseCode.Success, new SocialCharactersResp()
             {
                 List = friends
             });
+            await UniTask.Yield();
 #endif
         }
 
@@ -322,8 +341,9 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
             result.Invoke(AckResponseCode.Success, new SocialCharactersResp()
             {
-                List = await ReadFriends(request.CharacterId)
+                List = ReadFriends(request.CharacterId)
             });
+            await UniTask.Yield();
 #endif
         }
 
@@ -340,11 +360,12 @@ namespace MultiplayerARPG.MMO
                     cachedBuilding[request.MapName].TryAdd(building.Id, building);
             }
             // Insert data to database
-            await Database.CreateBuilding(request.MapName, building);
+            Database.CreateBuilding(request.MapName, building);
             result.Invoke(AckResponseCode.Success, new BuildingResp()
             {
                 BuildingData = request.BuildingData
             });
+            await UniTask.Yield();
 #endif
         }
 
@@ -361,11 +382,12 @@ namespace MultiplayerARPG.MMO
                     cachedBuilding[request.MapName].TryAdd(building.Id, building);
             }
             // Update data to database
-            await Database.UpdateBuilding(request.MapName, building);
+            Database.UpdateBuilding(request.MapName, building);
             result.Invoke(AckResponseCode.Success, new BuildingResp()
             {
                 BuildingData = request.BuildingData
             });
+            await UniTask.Yield();
 #endif
         }
 
@@ -376,8 +398,9 @@ namespace MultiplayerARPG.MMO
             if (cachedBuilding.ContainsKey(request.MapName))
                 cachedBuilding[request.MapName].TryRemove(request.BuildingId, out _);
             // Remove from database
-            await Database.DeleteBuilding(request.MapName, request.BuildingId);
+            Database.DeleteBuilding(request.MapName, request.BuildingId);
             result.Invoke(AckResponseCode.Success, EmptyMessage.Value);
+            await UniTask.Yield();
 #endif
         }
 
@@ -393,7 +416,7 @@ namespace MultiplayerARPG.MMO
             else if (cachedBuilding.TryAdd(request.MapName, new ConcurrentDictionary<string, BuildingSaveData>()))
             {
                 // Store buildings to cache
-                buildings.AddRange(await Database.ReadBuildings(request.MapName));
+                buildings.AddRange(Database.ReadBuildings(request.MapName));
                 foreach (BuildingSaveData building in buildings)
                 {
                     cachedBuilding[request.MapName].TryAdd(building.Id, building);
@@ -403,6 +426,7 @@ namespace MultiplayerARPG.MMO
             {
                 List = buildings
             });
+            await UniTask.Yield();
 #endif
         }
 
@@ -410,7 +434,7 @@ namespace MultiplayerARPG.MMO
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             // Insert to database
-            int partyId = await Database.CreateParty(request.ShareExp, request.ShareItem, request.LeaderCharacterId);
+            int partyId = Database.CreateParty(request.ShareExp, request.ShareItem, request.LeaderCharacterId);
             // Cached the data
             PartyData party = new PartyData(partyId, request.ShareExp, request.ShareItem, request.LeaderCharacterId);
             cachedParty[partyId] = party;
@@ -418,53 +442,57 @@ namespace MultiplayerARPG.MMO
             {
                 PartyData = party
             });
+            await UniTask.Yield();
 #endif
         }
 
         protected async UniTaskVoid UpdateParty(RequestHandlerData requestHandler, UpdatePartyReq request, RequestProceedResultDelegate<PartyResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            PartyData party = await ReadParty(request.PartyId);
+            PartyData party = ReadParty(request.PartyId);
             // Update to cache
             party.Setting(request.ShareExp, request.ShareItem);
             cachedParty[request.PartyId] = party;
             // Update to database
-            await Database.UpdateParty(request.PartyId, request.ShareExp, request.ShareItem);
+            Database.UpdateParty(request.PartyId, request.ShareExp, request.ShareItem);
             result.Invoke(AckResponseCode.Success, new PartyResp()
             {
                 PartyData = party
             });
+            await UniTask.Yield();
 #endif
         }
 
         protected async UniTaskVoid UpdatePartyLeader(RequestHandlerData requestHandler, UpdatePartyLeaderReq request, RequestProceedResultDelegate<PartyResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            PartyData party = await ReadParty(request.PartyId);
+            PartyData party = ReadParty(request.PartyId);
             // Update to cache
             party.SetLeader(request.LeaderCharacterId);
             cachedParty[request.PartyId] = party;
             // Update to database
-            await Database.UpdatePartyLeader(request.PartyId, request.LeaderCharacterId);
+            Database.UpdatePartyLeader(request.PartyId, request.LeaderCharacterId);
             result.Invoke(AckResponseCode.Success, new PartyResp()
             {
                 PartyData = party
             });
+            await UniTask.Yield();
 #endif
         }
 
         protected async UniTaskVoid DeleteParty(RequestHandlerData requestHandler, DeletePartyReq request, RequestProceedResultDelegate<EmptyMessage> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            await Database.DeleteParty(request.PartyId);
+            Database.DeleteParty(request.PartyId);
             result.Invoke(AckResponseCode.Success, EmptyMessage.Value);
+            await UniTask.Yield();
 #endif
         }
 
         protected async UniTaskVoid UpdateCharacterParty(RequestHandlerData requestHandler, UpdateCharacterPartyReq request, RequestProceedResultDelegate<PartyResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            PartyData party = await ReadParty(request.PartyId);
+            PartyData party = ReadParty(request.PartyId);
             // Update to cache
             SocialCharacterData character = request.SocialCharacterData;
             party.AddMember(character);
@@ -473,19 +501,20 @@ namespace MultiplayerARPG.MMO
             if (cachedUserCharacter.ContainsKey(character.id))
                 cachedUserCharacter[character.id].PartyId = request.PartyId;
             // Update to database
-            await Database.UpdateCharacterParty(character.id, request.PartyId);
+            Database.UpdateCharacterParty(character.id, request.PartyId);
             result.Invoke(AckResponseCode.Success, new PartyResp()
             {
                 PartyData = party
             });
+            await UniTask.Yield();
 #endif
         }
 
         protected async UniTaskVoid ClearCharacterParty(RequestHandlerData requestHandler, ClearCharacterPartyReq request, RequestProceedResultDelegate<EmptyMessage> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            PlayerCharacterData character = await ReadCharacter(request.CharacterId);
-            PartyData party = await ReadParty(character.PartyId);
+            PlayerCharacterData character = ReadCharacter(request.CharacterId);
+            PartyData party = ReadParty(character.PartyId);
             // Update to cache
             party.RemoveMember(request.CharacterId);
             cachedParty[character.PartyId] = party;
@@ -493,8 +522,9 @@ namespace MultiplayerARPG.MMO
             if (cachedUserCharacter.ContainsKey(request.CharacterId))
                 cachedUserCharacter[request.CharacterId].PartyId = 0;
             // Update to database
-            await Database.UpdateCharacterParty(request.CharacterId, 0);
+            Database.UpdateCharacterParty(request.CharacterId, 0);
             result.Invoke(AckResponseCode.Success, EmptyMessage.Value);
+            await UniTask.Yield();
 #endif
         }
 
@@ -503,8 +533,9 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
             result.Invoke(AckResponseCode.Success, new PartyResp()
             {
-                PartyData = await ReadParty(request.PartyId)
+                PartyData = ReadParty(request.PartyId)
             });
+            await UniTask.Yield();
 #endif
         }
 
@@ -512,7 +543,7 @@ namespace MultiplayerARPG.MMO
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             // Insert to database
-            int guildId = await Database.CreateGuild(request.GuildName, request.LeaderCharacterId);
+            int guildId = Database.CreateGuild(request.GuildName, request.LeaderCharacterId);
             // Cached the data
             GuildData guild = new GuildData(guildId, request.GuildName, request.LeaderCharacterId);
             cachedGuild[guildId] = guild;
@@ -520,150 +551,160 @@ namespace MultiplayerARPG.MMO
             {
                 GuildData = guild
             });
+            await UniTask.Yield();
 #endif
         }
 
         protected async UniTaskVoid UpdateGuildLeader(RequestHandlerData requestHandler, UpdateGuildLeaderReq request, RequestProceedResultDelegate<GuildResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            GuildData guild = await ReadGuild(request.GuildId);
+            GuildData guild = ReadGuild(request.GuildId);
             // Update to cache
             guild.SetLeader(request.LeaderCharacterId);
             cachedGuild[request.GuildId] = guild;
             // Update to database
-            await Database.UpdateGuildLeader(request.GuildId, request.LeaderCharacterId);
+            Database.UpdateGuildLeader(request.GuildId, request.LeaderCharacterId);
             result.Invoke(AckResponseCode.Success, new GuildResp()
             {
                 GuildData = guild
             });
+            await UniTask.Yield();
 #endif
         }
 
         protected async UniTaskVoid UpdateGuildMessage(RequestHandlerData requestHandler, UpdateGuildMessageReq request, RequestProceedResultDelegate<GuildResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            GuildData guild = await ReadGuild(request.GuildId);
+            GuildData guild = ReadGuild(request.GuildId);
             // Update to cache
             guild.guildMessage = request.GuildMessage;
             cachedGuild[request.GuildId] = guild;
             // Update to database
-            await Database.UpdateGuildMessage(request.GuildId, request.GuildMessage);
+            Database.UpdateGuildMessage(request.GuildId, request.GuildMessage);
             result.Invoke(AckResponseCode.Success, new GuildResp()
             {
                 GuildData = guild
             });
+            await UniTask.Yield();
 #endif
         }
 
         protected async UniTaskVoid UpdateGuildMessage2(RequestHandlerData requestHandler, UpdateGuildMessageReq request, RequestProceedResultDelegate<GuildResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            GuildData guild = await ReadGuild(request.GuildId);
+            GuildData guild = ReadGuild(request.GuildId);
             // Update to cache
             guild.guildMessage2 = request.GuildMessage;
             cachedGuild[request.GuildId] = guild;
             // Update to database
-            await Database.UpdateGuildMessage2(request.GuildId, request.GuildMessage);
+            Database.UpdateGuildMessage2(request.GuildId, request.GuildMessage);
             result.Invoke(AckResponseCode.Success, new GuildResp()
             {
                 GuildData = guild
             });
+            await UniTask.Yield();
 #endif
         }
 
         protected async UniTaskVoid UpdateGuildScore(RequestHandlerData requestHandler, UpdateGuildScoreReq request, RequestProceedResultDelegate<GuildResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            GuildData guild = await ReadGuild(request.GuildId);
+            GuildData guild = ReadGuild(request.GuildId);
             // Update to cache
             guild.score = request.Score;
             cachedGuild[request.GuildId] = guild;
             // Update to database
-            await Database.UpdateGuildScore(request.GuildId, request.Score);
+            Database.UpdateGuildScore(request.GuildId, request.Score);
             result.Invoke(AckResponseCode.Success, new GuildResp()
             {
                 GuildData = guild
             });
+            await UniTask.Yield();
 #endif
         }
 
         protected async UniTaskVoid UpdateGuildOptions(RequestHandlerData requestHandler, UpdateGuildOptionsReq request, RequestProceedResultDelegate<GuildResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            GuildData guild = await ReadGuild(request.GuildId);
+            GuildData guild = ReadGuild(request.GuildId);
             // Update to cache
             guild.options = request.Options;
             cachedGuild[request.GuildId] = guild;
             // Update to database
-            await Database.UpdateGuildOptions(request.GuildId, request.Options);
+            Database.UpdateGuildOptions(request.GuildId, request.Options);
             result.Invoke(AckResponseCode.Success, new GuildResp()
             {
                 GuildData = guild
             });
+            await UniTask.Yield();
 #endif
         }
 
         protected async UniTaskVoid UpdateGuildAutoAcceptRequests(RequestHandlerData requestHandler, UpdateGuildAutoAcceptRequestsReq request, RequestProceedResultDelegate<GuildResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            GuildData guild = await ReadGuild(request.GuildId);
+            GuildData guild = ReadGuild(request.GuildId);
             // Update to cache
             guild.autoAcceptRequests = request.AutoAcceptRequests;
             cachedGuild[request.GuildId] = guild;
             // Update to database
-            await Database.UpdateGuildAutoAcceptRequests(request.GuildId, request.AutoAcceptRequests);
+            Database.UpdateGuildAutoAcceptRequests(request.GuildId, request.AutoAcceptRequests);
             result.Invoke(AckResponseCode.Success, new GuildResp()
             {
                 GuildData = guild
             });
+            await UniTask.Yield();
 #endif
         }
 
         protected async UniTaskVoid UpdateGuildRank(RequestHandlerData requestHandler, UpdateGuildRankReq request, RequestProceedResultDelegate<GuildResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            GuildData guild = await ReadGuild(request.GuildId);
+            GuildData guild = ReadGuild(request.GuildId);
             // Update to cache
             guild.score = request.Rank;
             cachedGuild[request.GuildId] = guild;
             // Update to database
-            await Database.UpdateGuildRank(request.GuildId, request.Rank);
+            Database.UpdateGuildRank(request.GuildId, request.Rank);
             result.Invoke(AckResponseCode.Success, new GuildResp()
             {
                 GuildData = guild
             });
+            await UniTask.Yield();
 #endif
         }
 
         protected async UniTaskVoid UpdateGuildRole(RequestHandlerData requestHandler, UpdateGuildRoleReq request, RequestProceedResultDelegate<GuildResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            GuildData guild = await ReadGuild(request.GuildId);
+            GuildData guild = ReadGuild(request.GuildId);
             // Update to cache
             guild.SetRole(request.GuildRole, request.RoleName, request.CanInvite, request.CanKick, request.ShareExpPercentage);
             cachedGuild[request.GuildId] = guild;
             // Update to
-            await Database.UpdateGuildRole(request.GuildId, request.GuildRole, request.RoleName, request.CanInvite, request.CanKick, request.ShareExpPercentage);
+            Database.UpdateGuildRole(request.GuildId, request.GuildRole, request.RoleName, request.CanInvite, request.CanKick, request.ShareExpPercentage);
             result.Invoke(AckResponseCode.Success, new GuildResp()
             {
                 GuildData = guild
             });
+            await UniTask.Yield();
 #endif
         }
 
         protected async UniTaskVoid UpdateGuildMemberRole(RequestHandlerData requestHandler, UpdateGuildMemberRoleReq request, RequestProceedResultDelegate<GuildResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            GuildData guild = await ReadGuild(request.GuildId);
+            GuildData guild = ReadGuild(request.GuildId);
             // Update to cache
             guild.SetMemberRole(request.MemberCharacterId, request.GuildRole);
             cachedGuild[request.GuildId] = guild;
             // Update to database
-            await Database.UpdateGuildMemberRole(request.MemberCharacterId, request.GuildRole);
+            Database.UpdateGuildMemberRole(request.MemberCharacterId, request.GuildRole);
             result.Invoke(AckResponseCode.Success, new GuildResp()
             {
                 GuildData = guild
             });
+            await UniTask.Yield();
 #endif
         }
 
@@ -678,15 +719,16 @@ namespace MultiplayerARPG.MMO
                 cachedGuild.TryRemove(request.GuildId, out _);
             }
             // Remove data from database
-            await Database.DeleteGuild(request.GuildId);
+            Database.DeleteGuild(request.GuildId);
             result.Invoke(AckResponseCode.Success, EmptyMessage.Value);
+            await UniTask.Yield();
 #endif
         }
 
         protected async UniTaskVoid UpdateCharacterGuild(RequestHandlerData requestHandler, UpdateCharacterGuildReq request, RequestProceedResultDelegate<GuildResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            GuildData guild = await ReadGuild(request.GuildId);
+            GuildData guild = ReadGuild(request.GuildId);
             // Update to cache
             SocialCharacterData character = request.SocialCharacterData;
             guild.AddMember(character, request.GuildRole);
@@ -695,19 +737,20 @@ namespace MultiplayerARPG.MMO
             if (cachedUserCharacter.ContainsKey(character.id))
                 cachedUserCharacter[character.id].GuildId = request.GuildId;
             // Update to database
-            await Database.UpdateCharacterGuild(character.id, request.GuildId, request.GuildRole);
+            Database.UpdateCharacterGuild(character.id, request.GuildId, request.GuildRole);
             result.Invoke(AckResponseCode.Success, new GuildResp()
             {
                 GuildData = guild
             });
+            await UniTask.Yield();
 #endif
         }
 
         protected async UniTaskVoid ClearCharacterGuild(RequestHandlerData requestHandler, ClearCharacterGuildReq request, RequestProceedResultDelegate<EmptyMessage> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            PlayerCharacterData character = await ReadCharacter(request.CharacterId);
-            GuildData guild = await ReadGuild(character.GuildId);
+            PlayerCharacterData character = ReadCharacter(request.CharacterId);
+            GuildData guild = ReadGuild(character.GuildId);
             // Update to cache
             guild.RemoveMember(request.CharacterId);
             cachedGuild[character.GuildId] = guild;
@@ -718,8 +761,9 @@ namespace MultiplayerARPG.MMO
                 cachedUserCharacter[request.CharacterId].GuildRole = 0;
             }
             // Update to database
-            await Database.UpdateCharacterGuild(request.CharacterId, 0, 0);
+            Database.UpdateCharacterGuild(request.CharacterId, 0, 0);
             result.Invoke(AckResponseCode.Success, EmptyMessage.Value);
+            await UniTask.Yield();
 #endif
         }
 
@@ -735,7 +779,7 @@ namespace MultiplayerARPG.MMO
             else
             {
                 // Doesn't cached yet, so try validate from database
-                foundAmount = await Database.FindGuildName(request.GuildName);
+                foundAmount = Database.FindGuildName(request.GuildName);
                 // Cache guild name, it will be used to validate later
                 if (foundAmount > 0)
                     cachedGuildNames.Add(request.GuildName);
@@ -744,6 +788,7 @@ namespace MultiplayerARPG.MMO
             {
                 FoundAmount = foundAmount
             });
+            await UniTask.Yield();
 #endif
         }
 
@@ -752,8 +797,9 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
             result.Invoke(AckResponseCode.Success, new GuildResp()
             {
-                GuildData = await ReadGuild(request.GuildId)
+                GuildData = ReadGuild(request.GuildId)
             });
+            await UniTask.Yield();
 #endif
         }
 
@@ -761,17 +807,18 @@ namespace MultiplayerARPG.MMO
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             // TODO: May validate guild by character
-            GuildData guild = await ReadGuild(request.GuildId);
+            GuildData guild = ReadGuild(request.GuildId);
             await UniTask.SwitchToMainThread();
             guild = GameInstance.Singleton.SocialSystemSetting.IncreaseGuildExp(guild, request.Exp);
             // Update to cache
             cachedGuild.TryAdd(guild.id, guild);
             // Update to database
-            await Database.UpdateGuildLevel(request.GuildId, guild.level, guild.exp, guild.skillPoint);
+            Database.UpdateGuildLevel(request.GuildId, guild.level, guild.exp, guild.skillPoint);
             result.Invoke(AckResponseCode.Success, new GuildResp()
             {
-                GuildData = await ReadGuild(request.GuildId)
+                GuildData = ReadGuild(request.GuildId)
             });
+            await UniTask.Yield();
 #endif
         }
 
@@ -779,7 +826,7 @@ namespace MultiplayerARPG.MMO
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             // TODO: May validate guild by character
-            GuildData guild = await ReadGuild(request.GuildId);
+            GuildData guild = ReadGuild(request.GuildId);
             await UniTask.SwitchToMainThread();
             if (!guild.IsSkillReachedMaxLevel(request.SkillId) && guild.skillPoint > 0)
             {
@@ -787,39 +834,42 @@ namespace MultiplayerARPG.MMO
                 // Update to cache
                 cachedGuild[guild.id] = guild;
                 // Update to database
-                await Database.UpdateGuildSkillLevel(request.GuildId, request.SkillId, guild.GetSkillLevel(request.SkillId), guild.skillPoint);
+                Database.UpdateGuildSkillLevel(request.GuildId, request.SkillId, guild.GetSkillLevel(request.SkillId), guild.skillPoint);
             }
             result.Invoke(AckResponseCode.Success, new GuildResp()
             {
-                GuildData = await ReadGuild(request.GuildId)
+                GuildData = ReadGuild(request.GuildId)
             });
+            await UniTask.Yield();
 #endif
         }
 
         protected async UniTaskVoid GetGuildGold(RequestHandlerData requestHandler, GetGuildGoldReq request, RequestProceedResultDelegate<GuildGoldResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            GuildData guild = await ReadGuild(request.GuildId);
+            GuildData guild = ReadGuild(request.GuildId);
             result.Invoke(AckResponseCode.Success, new GuildGoldResp()
             {
                 GuildGold = guild.gold
             });
+            await UniTask.Yield();
 #endif
         }
 
         protected async UniTaskVoid ChangeGuildGold(RequestHandlerData requestHandler, ChangeGuildGoldReq request, RequestProceedResultDelegate<GuildGoldResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            GuildData guild = await ReadGuild(request.GuildId);
+            GuildData guild = ReadGuild(request.GuildId);
             // Update to cache
             guild.gold += request.ChangeAmount;
             cachedGuild[request.GuildId] = guild;
             // Update to database
-            await Database.UpdateGuildGold(request.GuildId, guild.gold);
+            Database.UpdateGuildGold(request.GuildId, guild.gold);
             result.Invoke(AckResponseCode.Success, new GuildGoldResp()
             {
                 GuildGold = guild.gold
             });
+            await UniTask.Yield();
 #endif
         }
 
@@ -832,7 +882,7 @@ namespace MultiplayerARPG.MMO
             if (!cachedStorageItems.TryGetValue(storageId, out storageItems))
             {
                 // Doesn't cached yet, so get data from database
-                storageItems = await Database.ReadStorageItems(storageId.storageType, storageId.storageOwnerId);
+                storageItems = Database.ReadStorageItems(storageId.storageType, storageId.storageOwnerId);
                 // Cache data, it will be used to validate later
                 if (storageItems != null)
                     cachedStorageItems[storageId] = storageItems;
@@ -841,6 +891,7 @@ namespace MultiplayerARPG.MMO
             {
                 StorageCharacterItems = storageItems
             });
+            await UniTask.Yield();
 #endif
         }
 
@@ -948,13 +999,14 @@ namespace MultiplayerARPG.MMO
             storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
             // Update storage list
             // TODO: May update later to reduce amount of processes
-            await Database.UpdateStorageItems(request.StorageType, request.StorageOwnerId, storageItemList);
+            Database.UpdateStorageItems(request.StorageType, request.StorageOwnerId, storageItemList);
             result.Invoke(AckResponseCode.Success, new MoveItemToStorageResp()
             {
                 Error = UITextKeys.NONE,
                 InventoryItemItems = new List<CharacterItem>(character.NonEquipItems),
                 StorageCharacterItems = storageItemList,
             });
+            await UniTask.Yield();
 #endif
         }
 
@@ -1054,13 +1106,14 @@ namespace MultiplayerARPG.MMO
             character.FillEmptySlots();
             // Update storage list
             // TODO: May update later to reduce amount of processes
-            await Database.UpdateStorageItems(request.StorageType, request.StorageOwnerId, storageItemList);
+            Database.UpdateStorageItems(request.StorageType, request.StorageOwnerId, storageItemList);
             result.Invoke(AckResponseCode.Success, new MoveItemFromStorageResp()
             {
                 Error = UITextKeys.NONE,
                 InventoryItemItems = new List<CharacterItem>(character.NonEquipItems),
                 StorageCharacterItems = storageItemList,
             });
+            await UniTask.Yield();
 #endif
         }
 
@@ -1115,12 +1168,13 @@ namespace MultiplayerARPG.MMO
             storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
             // Update storage list
             // TODO: May update later to reduce amount of processes
-            await Database.UpdateStorageItems(request.StorageType, request.StorageOwnerId, storageItemList);
+            Database.UpdateStorageItems(request.StorageType, request.StorageOwnerId, storageItemList);
             result.Invoke(AckResponseCode.Success, new SwapOrMergeStorageItemResp()
             {
                 Error = UITextKeys.NONE,
                 StorageCharacterItems = storageItemList,
             });
+            await UniTask.Yield();
 #endif
         }
 
@@ -1161,12 +1215,13 @@ namespace MultiplayerARPG.MMO
             storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
             // Update storage list
             // TODO: May update later to reduce amount of processes
-            await Database.UpdateStorageItems(request.StorageType, request.StorageOwnerId, storageItemList);
+            Database.UpdateStorageItems(request.StorageType, request.StorageOwnerId, storageItemList);
             result.Invoke(AckResponseCode.Success, new IncreaseStorageItemsResp()
             {
                 Error = UITextKeys.NONE,
                 StorageCharacterItems = storageItemList,
             });
+            await UniTask.Yield();
 #endif
         }
 
@@ -1201,7 +1256,7 @@ namespace MultiplayerARPG.MMO
             storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
             // Update storage list
             // TODO: May update later to reduce amount of processes
-            await Database.UpdateStorageItems(request.StorageType, request.StorageOwnerId, storageItemList);
+            Database.UpdateStorageItems(request.StorageType, request.StorageOwnerId, storageItemList);
             List<ItemIndexAmountMap> decreasedItemList = new List<ItemIndexAmountMap>();
             foreach (int itemIndex in decreasedItems.Keys)
             {
@@ -1216,6 +1271,7 @@ namespace MultiplayerARPG.MMO
                 Error = UITextKeys.NONE,
                 StorageCharacterItems = storageItemList,
             });
+            await UniTask.Yield();
 #endif
         }
 
@@ -1224,15 +1280,16 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
             result.Invoke(AckResponseCode.Success, new MailListResp()
             {
-                List = await Database.MailList(request.UserId, request.OnlyNewMails)
+                List = Database.MailList(request.UserId, request.OnlyNewMails)
             });
+            await UniTask.Yield();
 #endif
         }
 
         protected async UniTaskVoid UpdateReadMailState(RequestHandlerData requestHandler, UpdateReadMailStateReq request, RequestProceedResultDelegate<UpdateReadMailStateResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            long updated = await Database.UpdateReadMailState(request.MailId, request.UserId);
+            long updated = Database.UpdateReadMailState(request.MailId, request.UserId);
             if (updated <= 0)
             {
                 result.Invoke(AckResponseCode.Success, new UpdateReadMailStateResp()
@@ -1243,15 +1300,16 @@ namespace MultiplayerARPG.MMO
             }
             result.Invoke(AckResponseCode.Success, new UpdateReadMailStateResp()
             {
-                Mail = await Database.GetMail(request.MailId, request.UserId)
+                Mail = Database.GetMail(request.MailId, request.UserId)
             });
+            await UniTask.Yield();
 #endif
         }
 
         protected async UniTaskVoid UpdateClaimMailItemsState(RequestHandlerData requestHandler, UpdateClaimMailItemsStateReq request, RequestProceedResultDelegate<UpdateClaimMailItemsStateResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            long updated = await Database.UpdateClaimMailItemsState(request.MailId, request.UserId);
+            long updated = Database.UpdateClaimMailItemsState(request.MailId, request.UserId);
             if (updated <= 0)
             {
                 result.Invoke(AckResponseCode.Success, new UpdateClaimMailItemsStateResp()
@@ -1262,15 +1320,16 @@ namespace MultiplayerARPG.MMO
             }
             result.Invoke(AckResponseCode.Success, new UpdateClaimMailItemsStateResp()
             {
-                Mail = await Database.GetMail(request.MailId, request.UserId)
+                Mail = Database.GetMail(request.MailId, request.UserId)
             });
+            await UniTask.Yield();
 #endif
         }
 
         protected async UniTaskVoid UpdateDeleteMailState(RequestHandlerData requestHandler, UpdateDeleteMailStateReq request, RequestProceedResultDelegate<UpdateDeleteMailStateResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            long updated = await Database.UpdateDeleteMailState(request.MailId, request.UserId);
+            long updated = Database.UpdateDeleteMailState(request.MailId, request.UserId);
             if (updated <= 0)
             {
                 result.Invoke(AckResponseCode.Success, new UpdateDeleteMailStateResp()
@@ -1280,6 +1339,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             result.Invoke(AckResponseCode.Success, new UpdateDeleteMailStateResp());
+            await UniTask.Yield();
 #endif
         }
 
@@ -1295,7 +1355,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            long created = await Database.CreateMail(mail);
+            long created = Database.CreateMail(mail);
             if (created <= 0)
             {
                 result.Invoke(AckResponseCode.Success, new SendMailResp()
@@ -1305,6 +1365,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             result.Invoke(AckResponseCode.Success, new SendMailResp());
+            await UniTask.Yield();
 #endif
         }
 
@@ -1313,8 +1374,9 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
             result.Invoke(AckResponseCode.Success, new GetMailResp()
             {
-                Mail = await Database.GetMail(request.MailId, request.UserId),
+                Mail = Database.GetMail(request.MailId, request.UserId),
             });
+            await UniTask.Yield();
 #endif
         }
 
@@ -1323,8 +1385,9 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
             result.Invoke(AckResponseCode.Success, new GetMailNotificationCountResp()
             {
-                NotificationCount = await Database.GetMailNotificationCount(request.UserId),
+                NotificationCount = Database.GetMailNotificationCount(request.UserId),
             });
+            await UniTask.Yield();
 #endif
         }
 
@@ -1333,8 +1396,9 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
             result.Invoke(AckResponseCode.Success, new GetIdByCharacterNameResp()
             {
-                Id = await Database.GetIdByCharacterName(request.CharacterName),
+                Id = Database.GetIdByCharacterName(request.CharacterName),
             });
+            await UniTask.Yield();
 #endif
         }
 
@@ -1343,35 +1407,39 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
             result.Invoke(AckResponseCode.Success, new GetUserIdByCharacterNameResp()
             {
-                UserId = await Database.GetUserIdByCharacterName(request.CharacterName),
+                UserId = Database.GetUserIdByCharacterName(request.CharacterName),
             });
+            await UniTask.Yield();
 #endif
         }
 
         protected async UniTaskVoid GetUserUnbanTime(RequestHandlerData requestHandler, GetUserUnbanTimeReq request, RequestProceedResultDelegate<GetUserUnbanTimeResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            long unbanTime = await Database.GetUserUnbanTime(request.UserId);
+            long unbanTime = Database.GetUserUnbanTime(request.UserId);
             result.Invoke(AckResponseCode.Success, new GetUserUnbanTimeResp()
             {
                 UnbanTime = unbanTime,
             });
+            await UniTask.Yield();
 #endif
         }
 
         protected async UniTaskVoid SetUserUnbanTimeByCharacterName(RequestHandlerData requestHandler, SetUserUnbanTimeByCharacterNameReq request, RequestProceedResultDelegate<EmptyMessage> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            await Database.SetUserUnbanTimeByCharacterName(request.CharacterName, request.UnbanTime);
+            Database.SetUserUnbanTimeByCharacterName(request.CharacterName, request.UnbanTime);
             result.Invoke(AckResponseCode.Success, EmptyMessage.Value);
+            await UniTask.Yield();
 #endif
         }
 
         protected async UniTaskVoid SetCharacterUnmuteTimeByName(RequestHandlerData requestHandler, SetCharacterUnmuteTimeByNameReq request, RequestProceedResultDelegate<EmptyMessage> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            await Database.SetCharacterUnmuteTimeByName(request.CharacterName, request.UnmuteTime);
+            Database.SetCharacterUnmuteTimeByName(request.CharacterName, request.UnmuteTime);
             result.Invoke(AckResponseCode.Success, EmptyMessage.Value);
+            await UniTask.Yield();
 #endif
         }
 
@@ -1380,16 +1448,18 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
             result.Invoke(AckResponseCode.Success, new GetSummonBuffsResp()
             {
-                SummonBuffs = await Database.GetSummonBuffs(request.CharacterId),
+                SummonBuffs = Database.GetSummonBuffs(request.CharacterId),
             });
+            await UniTask.Yield();
 #endif
         }
 
         protected async UniTaskVoid SetSummonBuffs(RequestHandlerData requestHandler, SetSummonBuffsReq request, RequestProceedResultDelegate<EmptyMessage> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            await Database.SetSummonBuffs(request.CharacterId, request.SummonBuffs);
+            Database.SetSummonBuffs(request.CharacterId, request.SummonBuffs);
             result.Invoke(AckResponseCode.Success, EmptyMessage.Value);
+            await UniTask.Yield();
 #endif
         }
 
@@ -1405,7 +1475,7 @@ namespace MultiplayerARPG.MMO
             else
             {
                 // Doesn't cached yet, so try validate from database
-                foundAmount = await Database.FindEmail(request.Email);
+                foundAmount = Database.FindEmail(request.Email);
                 // Cache username, it will be used to validate later
                 if (foundAmount > 0)
                     cachedEmails.Add(request.Email);
@@ -1414,52 +1484,54 @@ namespace MultiplayerARPG.MMO
             {
                 FoundAmount = foundAmount
             });
+            await UniTask.Yield();
 #endif
         }
 
         protected async UniTaskVoid ValidateEmailVerification(RequestHandlerData requestHandler, ValidateEmailVerificationReq request, RequestProceedResultDelegate<ValidateEmailVerificationResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            bool isPass = await Database.ValidateEmailVerification(request.UserId);
+            bool isPass = Database.ValidateEmailVerification(request.UserId);
             result.Invoke(AckResponseCode.Success, new ValidateEmailVerificationResp()
             {
                 IsPass = isPass
             });
+            await UniTask.Yield();
 #endif
         }
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        protected async UniTask<int> ReadGold(string userId)
+        protected int ReadGold(string userId)
         {
             int gold;
             if (!cachedUserGold.TryGetValue(userId, out gold))
             {
                 // Doesn't cached yet, so get data from database and cache it
-                gold = await Database.GetGold(userId);
+                gold = Database.GetGold(userId);
                 cachedUserGold[userId] = gold;
             }
             return gold;
         }
 
-        protected async UniTask<int> ReadCash(string userId)
+        protected int ReadCash(string userId)
         {
             int cash;
             if (!cachedUserCash.TryGetValue(userId, out cash))
             {
                 // Doesn't cached yet, so get data from database and cache it
-                cash = await Database.GetCash(userId);
+                cash = Database.GetCash(userId);
                 cachedUserCash[userId] = cash;
             }
             return cash;
         }
 
-        protected async UniTask<PlayerCharacterData> ReadCharacter(string id)
+        protected PlayerCharacterData ReadCharacter(string id)
         {
             PlayerCharacterData character;
             if (!cachedUserCharacter.TryGetValue(id, out character))
             {
                 // Doesn't cached yet, so get data from database
-                character = await Database.ReadCharacter(id);
+                character = Database.ReadCharacter(id);
                 // Cache character, it will be used to validate later
                 if (character != null)
                 {
@@ -1470,26 +1542,26 @@ namespace MultiplayerARPG.MMO
             return character;
         }
 
-        protected async UniTask<SocialCharacterData> ReadSocialCharacter(string id)
+        protected SocialCharacterData ReadSocialCharacter(string id)
         {
             SocialCharacterData character;
             if (!cachedSocialCharacter.TryGetValue(id, out character))
             {
                 // Doesn't cached yet, so get data from database
-                character = SocialCharacterData.Create(await Database.ReadCharacter(id, false, false, false, false, false, false, false, false, false, false));
+                character = SocialCharacterData.Create(Database.ReadCharacter(id, false, false, false, false, false, false, false, false, false, false));
                 // Cache the data
                 cachedSocialCharacter[id] = character;
             }
             return character;
         }
 
-        protected async UniTask<List<SocialCharacterData>> ReadFriends(string id)
+        protected List<SocialCharacterData> ReadFriends(string id)
         {
             List<SocialCharacterData> friends;
             if (!cachedFriend.TryGetValue(id, out friends))
             {
                 // Doesn't cached yet, so get data from database
-                friends = await Database.ReadFriends(id);
+                friends = Database.ReadFriends(id);
                 // Cache the data
                 if (friends != null)
                 {
@@ -1500,13 +1572,13 @@ namespace MultiplayerARPG.MMO
             return friends;
         }
 
-        protected async UniTask<PartyData> ReadParty(int id)
+        protected PartyData ReadParty(int id)
         {
             PartyData party;
             if (!cachedParty.TryGetValue(id, out party))
             {
                 // Doesn't cached yet, so get data from database
-                party = await Database.ReadParty(id);
+                party = Database.ReadParty(id);
                 // Cache the data
                 if (party != null)
                 {
@@ -1517,13 +1589,13 @@ namespace MultiplayerARPG.MMO
             return party;
         }
 
-        protected async UniTask<GuildData> ReadGuild(int id)
+        protected GuildData ReadGuild(int id)
         {
             GuildData guild;
             if (!cachedGuild.TryGetValue(id, out guild))
             {
                 // Doesn't cached yet, so get data from database
-                guild = await Database.ReadGuild(id, GameInstance.Singleton.SocialSystemSetting.GuildMemberRoles);
+                guild = Database.ReadGuild(id, GameInstance.Singleton.SocialSystemSetting.GuildMemberRoles);
                 // Cache the data
                 if (guild != null)
                 {

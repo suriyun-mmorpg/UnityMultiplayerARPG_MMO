@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Mono.Data.Sqlite;
-using Cysharp.Threading.Tasks;
 
 namespace MultiplayerARPG.MMO
 {
@@ -31,9 +30,8 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public override async UniTask CreateBuilding(string mapName, IBuildingSaveData saveData)
+        public override void CreateBuilding(string mapName, IBuildingSaveData saveData)
         {
-            await UniTask.Yield();
             ExecuteNonQuery("INSERT INTO buildings (id, parentId, entityId, currentHp, remainsLifeTime, mapName, positionX, positionY, positionZ, rotationX, rotationY, rotationZ, creatorId, creatorName, extraData) VALUES (@id, @parentId, @entityId, @currentHp, @remainsLifeTime, @mapName, @positionX, @positionY, @positionZ, @rotationX, @rotationY, @rotationZ, @creatorId, @creatorName, @extraData)",
                 new SqliteParameter("@id", saveData.Id),
                 new SqliteParameter("@parentId", saveData.ParentId),
@@ -52,9 +50,8 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@extraData", saveData.ExtraData));
         }
 
-        public override async UniTask<List<BuildingSaveData>> ReadBuildings(string mapName)
+        public override List<BuildingSaveData> ReadBuildings(string mapName)
         {
-            await UniTask.Yield();
             List<BuildingSaveData> result = new List<BuildingSaveData>();
             ExecuteReader((reader) =>
             {
@@ -67,9 +64,8 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public override async UniTask UpdateBuilding(string mapName, IBuildingSaveData building)
+        public override void UpdateBuilding(string mapName, IBuildingSaveData building)
         {
-            await UniTask.Yield();
             ExecuteNonQuery("UPDATE buildings SET " +
                 "parentId=@parentId, " +
                 "entityId=@entityId, " +
@@ -106,9 +102,8 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@mapName", mapName));
         }
 
-        public override async UniTask DeleteBuilding(string mapName, string id)
+        public override void DeleteBuilding(string mapName, string id)
         {
-            await UniTask.Yield();
             ExecuteNonQuery("DELETE FROM buildings WHERE id=@id AND mapName=@mapName", new SqliteParameter("@id", id), new SqliteParameter("@mapName", mapName));
         }
     }

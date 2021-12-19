@@ -1,6 +1,5 @@
 ﻿#if UNITY_STANDALONE && !CLIENT_BUILD
 using System.Collections.Generic;
-using Cysharp.Threading.Tasks;
 using MySqlConnector;
 
 namespace MultiplayerARPG.MMO
@@ -20,9 +19,9 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public async UniTask CreateCharacterCurrency(MySqlConnection connection, MySqlTransaction transaction, int idx, string characterId, CharacterCurrency characterCurrency)
+        public void CreateCharacterCurrency(MySqlConnection connection, MySqlTransaction transaction, int idx, string characterId, CharacterCurrency characterCurrency)
         {
-            await ExecuteNonQuery(connection, transaction, "INSERT INTO charactercurrency (id, idx, characterId, dataId, amount) VALUES (@id, @idx, @characterId, @dataId, @amount)",
+            ExecuteNonQuerySync(connection, transaction, "INSERT INTO charactercurrency (id, idx, characterId, dataId, amount) VALUES (@id, @idx, @characterId, @dataId, @amount)",
                 new MySqlParameter("@id", characterId + "_" + idx),
                 new MySqlParameter("@idx", idx),
                 new MySqlParameter("@characterId", characterId),
@@ -30,11 +29,11 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@amount", characterCurrency.amount));
         }
 
-        public async UniTask<List<CharacterCurrency>> ReadCharacterCurrencies(string characterId, List<CharacterCurrency> result = null)
+        public List<CharacterCurrency> ReadCharacterCurrencies(string characterId, List<CharacterCurrency> result = null)
         {
             if (result == null)
                 result = new List<CharacterCurrency>();
-            await ExecuteReader((reader) =>
+            ExecuteReaderSync((reader) =>
             {
                 CharacterCurrency tempCurrency;
                 while (ReadCharacterCurrency(reader, out tempCurrency))
@@ -46,9 +45,9 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public async UniTask DeleteCharacterCurrencies(MySqlConnection connection, MySqlTransaction transaction, string characterId)
+        public void DeleteCharacterCurrencies(MySqlConnection connection, MySqlTransaction transaction, string characterId)
         {
-            await ExecuteNonQuery(connection, transaction, "DELETE FROM charactercurrency WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
+            ExecuteNonQuerySync(connection, transaction, "DELETE FROM charactercurrency WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
         }
     }
 }

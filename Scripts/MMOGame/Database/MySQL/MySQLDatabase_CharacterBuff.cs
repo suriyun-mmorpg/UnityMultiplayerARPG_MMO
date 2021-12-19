@@ -1,6 +1,5 @@
 ﻿#if UNITY_STANDALONE && !CLIENT_BUILD
 using System.Collections.Generic;
-using Cysharp.Threading.Tasks;
 using MySqlConnector;
 
 namespace MultiplayerARPG.MMO
@@ -23,9 +22,9 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public async UniTask CreateCharacterBuff(MySqlConnection connection, MySqlTransaction transaction, string characterId, CharacterBuff characterBuff)
+        public void CreateCharacterBuff(MySqlConnection connection, MySqlTransaction transaction, string characterId, CharacterBuff characterBuff)
         {
-            await ExecuteNonQuery(connection, transaction, "INSERT INTO characterbuff (id, characterId, type, dataId, level, buffRemainsDuration) VALUES (@id, @characterId, @type, @dataId, @level, @buffRemainsDuration)",
+            ExecuteNonQuerySync(connection, transaction, "INSERT INTO characterbuff (id, characterId, type, dataId, level, buffRemainsDuration) VALUES (@id, @characterId, @type, @dataId, @level, @buffRemainsDuration)",
                 new MySqlParameter("@id", characterId + "_" + characterBuff.type + "_" + characterBuff.dataId),
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@type", (byte)characterBuff.type),
@@ -34,11 +33,11 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@buffRemainsDuration", characterBuff.buffRemainsDuration));
         }
 
-        public async UniTask<List<CharacterBuff>> ReadCharacterBuffs(string characterId, List<CharacterBuff> result = null)
+        public List<CharacterBuff> ReadCharacterBuffs(string characterId, List<CharacterBuff> result = null)
         {
             if (result == null)
                 result = new List<CharacterBuff>();
-            await ExecuteReader((reader) =>
+            ExecuteReaderSync((reader) =>
             {
                 CharacterBuff tempBuff;
                 while (ReadCharacterBuff(reader, out tempBuff))
@@ -50,9 +49,9 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public async UniTask DeleteCharacterBuffs(MySqlConnection connection, MySqlTransaction transaction, string characterId)
+        public void DeleteCharacterBuffs(MySqlConnection connection, MySqlTransaction transaction, string characterId)
         {
-            await ExecuteNonQuery(connection, transaction, "DELETE FROM characterbuff WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
+            ExecuteNonQuerySync(connection, transaction, "DELETE FROM characterbuff WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
         }
     }
 }

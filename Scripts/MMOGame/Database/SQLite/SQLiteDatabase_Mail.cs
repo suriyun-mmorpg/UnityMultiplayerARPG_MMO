@@ -1,5 +1,4 @@
 ﻿#if UNITY_STANDALONE && !CLIENT_BUILD
-using Cysharp.Threading.Tasks;
 using Mono.Data.Sqlite;
 using System;
 using System.Collections.Generic;
@@ -8,9 +7,8 @@ namespace MultiplayerARPG.MMO
 {
     public partial class SQLiteDatabase
     {
-        public override async UniTask<List<MailListEntry>> MailList(string userId, bool onlyNewMails)
+        public override List<MailListEntry> MailList(string userId, bool onlyNewMails)
         {
-            await UniTask.Yield();
             List<MailListEntry> result = new List<MailListEntry>();
             ExecuteReader((reader) =>
             {
@@ -47,9 +45,8 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public override async UniTask<Mail> GetMail(string mailId, string userId)
+        public override Mail GetMail(string mailId, string userId)
         {
-            await UniTask.Yield();
             Mail result = new Mail();
             ExecuteReader((reader) =>
             {
@@ -80,7 +77,7 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public override async UniTask<long> UpdateReadMailState(string mailId, string userId)
+        public override long UpdateReadMailState(string mailId, string userId)
         {
             object result = ExecuteScalar("SELECT COUNT(*) FROM mail WHERE id=@id AND receiverId LIKE @receiverId",
                 new SqliteParameter("@id", mailId),
@@ -88,7 +85,6 @@ namespace MultiplayerARPG.MMO
             long count = result != null ? (long)result : 0;
             if (count > 0)
             {
-                await UniTask.Yield();
                 ExecuteNonQuery("UPDATE mail SET isRead=1, readTimestamp=datetime('now', 'localtime') WHERE id=@id AND receiverId LIKE @receiverId AND isRead=0",
                     new SqliteParameter("@id", mailId),
                     new SqliteParameter("@receiverId", userId));
@@ -96,7 +92,7 @@ namespace MultiplayerARPG.MMO
             return count;
         }
 
-        public override async UniTask<long> UpdateClaimMailItemsState(string mailId, string userId)
+        public override long UpdateClaimMailItemsState(string mailId, string userId)
         {
             object result = ExecuteScalar("SELECT COUNT(*) FROM mail WHERE id=@id AND receiverId LIKE @receiverId",
                 new SqliteParameter("@id", mailId),
@@ -104,7 +100,6 @@ namespace MultiplayerARPG.MMO
             long count = result != null ? (long)result : 0;
             if (count > 0)
             {
-                await UniTask.Yield();
                 ExecuteNonQuery("UPDATE mail SET isClaim=1, claimTimestamp=datetime('now', 'localtime') WHERE id=@id AND receiverId LIKE @receiverId AND isClaim=0",
                     new SqliteParameter("@id", mailId),
                     new SqliteParameter("@receiverId", userId));
@@ -112,7 +107,7 @@ namespace MultiplayerARPG.MMO
             return count;
         }
 
-        public override async UniTask<long> UpdateDeleteMailState(string mailId, string userId)
+        public override long UpdateDeleteMailState(string mailId, string userId)
         {
             object result = ExecuteScalar("SELECT COUNT(*) FROM mail WHERE id=@id AND receiverId LIKE @receiverId",
                 new SqliteParameter("@id", mailId),
@@ -120,7 +115,6 @@ namespace MultiplayerARPG.MMO
             long count = result != null ? (long)result : 0;
             if (count > 0)
             {
-                await UniTask.Yield();
                 ExecuteNonQuery("UPDATE mail SET isDelete=1, deleteTimestamp=datetime('now', 'localtime') WHERE id=@id AND receiverId LIKE @receiverId AND isDelete=0",
                     new SqliteParameter("@id", mailId),
                     new SqliteParameter("@receiverId", userId));
@@ -128,9 +122,8 @@ namespace MultiplayerARPG.MMO
             return count;
         }
 
-        public override async UniTask<int> CreateMail(Mail mail)
+        public override int CreateMail(Mail mail)
         {
-            await UniTask.Yield();
             return ExecuteNonQuery("INSERT INTO mail (eventId, senderId, senderName, receiverId, title, content, gold, cash, currencies, items, sentTimestamp) " +
                 "VALUES (@eventId, @senderId, @senderName, @receiverId, @title, @content, @gold, @cash, @currencies, @items, datetime('now', 'localtime'))",
                     new SqliteParameter("@eventId", mail.EventId),
@@ -145,9 +138,8 @@ namespace MultiplayerARPG.MMO
                     new SqliteParameter("@items", mail.WriteItems()));
         }
 
-        public override async UniTask<int> GetMailNotificationCount(string userId)
+        public override int GetMailNotificationCount(string userId)
         {
-            await UniTask.Yield();
             int count = 0;
             ExecuteReader((reader) =>
             {

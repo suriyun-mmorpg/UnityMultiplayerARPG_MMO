@@ -14,24 +14,24 @@ namespace MultiplayerARPG.MMO
         public virtual void Initialize() { }
         public virtual void Destroy() { }
 
-        public abstract UniTask<string> ValidateUserLogin(string username, string password);
-        public abstract UniTask<bool> ValidateAccessToken(string userId, string accessToken);
-        public abstract UniTask<bool> ValidateEmailVerification(string userId);
-        public abstract UniTask<long> FindEmail(string email);
-        public abstract UniTask<byte> GetUserLevel(string userId);
-        public abstract UniTask<int> GetGold(string userId);
-        public abstract UniTask UpdateGold(string userId, int amount);
-        public abstract UniTask<int> GetCash(string userId);
-        public abstract UniTask UpdateCash(string userId, int amount);
-        public abstract UniTask UpdateAccessToken(string userId, string accessToken);
-        public abstract UniTask CreateUserLogin(string username, string password, string email);
-        public abstract UniTask<long> FindUsername(string username);
-        public abstract UniTask<long> GetUserUnbanTime(string userId);
-        public abstract UniTask SetUserUnbanTimeByCharacterName(string characterName, long unbanTime);
-        public abstract UniTask SetCharacterUnmuteTimeByName(string characterName, long unmuteTime);
+        public abstract string ValidateUserLogin(string username, string password);
+        public abstract bool ValidateAccessToken(string userId, string accessToken);
+        public abstract bool ValidateEmailVerification(string userId);
+        public abstract long FindEmail(string email);
+        public abstract byte GetUserLevel(string userId);
+        public abstract int GetGold(string userId);
+        public abstract void UpdateGold(string userId, int amount);
+        public abstract int GetCash(string userId);
+        public abstract void UpdateCash(string userId, int amount);
+        public abstract void UpdateAccessToken(string userId, string accessToken);
+        public abstract void CreateUserLogin(string username, string password, string email);
+        public abstract long FindUsername(string username);
+        public abstract long GetUserUnbanTime(string userId);
+        public abstract void SetUserUnbanTimeByCharacterName(string characterName, long unbanTime);
+        public abstract void SetCharacterUnmuteTimeByName(string characterName, long unmuteTime);
 
-        public abstract UniTask CreateCharacter(string userId, IPlayerCharacterData characterData);
-        public abstract UniTask<PlayerCharacterData> ReadCharacter(
+        public abstract void CreateCharacter(string userId, IPlayerCharacterData characterData);
+        public abstract PlayerCharacterData ReadCharacter(
             string id,
             bool withEquipWeapons = true,
             bool withAttributes = true,
@@ -44,60 +44,60 @@ namespace MultiplayerARPG.MMO
             bool withHotkeys = true,
             bool withQuests = true,
             bool withCurrencies = true);
-        public abstract UniTask<List<PlayerCharacterData>> ReadCharacters(string userId);
-        public abstract UniTask UpdateCharacter(IPlayerCharacterData character);
-        public abstract UniTask DeleteCharacter(string userId, string id);
-        public abstract UniTask<List<CharacterBuff>> GetSummonBuffs(string characterId);
-        public abstract UniTask SetSummonBuffs(string characterId, List<CharacterBuff> summonBuffs);
-        public abstract UniTask<long> FindCharacterName(string characterName);
-        public abstract UniTask<List<SocialCharacterData>> FindCharacters(string characterName);
-        public abstract UniTask CreateFriend(string id1, string id2);
-        public abstract UniTask DeleteFriend(string id1, string id2);
-        public abstract UniTask<List<SocialCharacterData>> ReadFriends(string id1);
-        public abstract UniTask<string> GetIdByCharacterName(string characterName);
-        public abstract UniTask<string> GetUserIdByCharacterName(string characterName);
+        public abstract List<PlayerCharacterData> ReadCharacters(string userId);
+        public abstract void UpdateCharacter(IPlayerCharacterData character);
+        public abstract void DeleteCharacter(string userId, string id);
+        public abstract List<CharacterBuff> GetSummonBuffs(string characterId);
+        public abstract void SetSummonBuffs(string characterId, List<CharacterBuff> summonBuffs);
+        public abstract long FindCharacterName(string characterName);
+        public abstract List<SocialCharacterData> FindCharacters(string characterName);
+        public abstract void CreateFriend(string id1, string id2);
+        public abstract void DeleteFriend(string id1, string id2);
+        public abstract List<SocialCharacterData> ReadFriends(string id1);
+        public abstract string GetIdByCharacterName(string characterName);
+        public abstract string GetUserIdByCharacterName(string characterName);
 
-        public abstract UniTask CreateBuilding(string mapName, IBuildingSaveData saveData);
-        public abstract UniTask<List<BuildingSaveData>> ReadBuildings(string mapName);
-        public abstract UniTask UpdateBuilding(string mapName, IBuildingSaveData building);
-        public abstract UniTask DeleteBuilding(string mapName, string id);
+        public abstract void CreateBuilding(string mapName, IBuildingSaveData saveData);
+        public abstract List<BuildingSaveData> ReadBuildings(string mapName);
+        public abstract void UpdateBuilding(string mapName, IBuildingSaveData building);
+        public abstract void DeleteBuilding(string mapName, string id);
 
-        public abstract UniTask<int> CreateParty(bool shareExp, bool shareItem, string leaderId);
-        public abstract UniTask<PartyData> ReadParty(int id);
-        public abstract UniTask UpdatePartyLeader(int id, string leaderId);
-        public abstract UniTask UpdateParty(int id, bool shareExp, bool shareItem);
-        public abstract UniTask DeleteParty(int id);
-        public abstract UniTask UpdateCharacterParty(string characterId, int partyId);
+        public abstract int CreateParty(bool shareExp, bool shareItem, string leaderId);
+        public abstract PartyData ReadParty(int id);
+        public abstract void UpdatePartyLeader(int id, string leaderId);
+        public abstract void UpdateParty(int id, bool shareExp, bool shareItem);
+        public abstract void DeleteParty(int id);
+        public abstract void UpdateCharacterParty(string characterId, int partyId);
 
-        public abstract UniTask<int> CreateGuild(string guildName, string leaderId);
-        public abstract UniTask<GuildData> ReadGuild(int id, GuildRoleData[] defaultGuildRoles);
-        public abstract UniTask UpdateGuildLevel(int id, short level, int exp, short skillPoint);
-        public abstract UniTask UpdateGuildLeader(int id, string leaderId);
-        public abstract UniTask UpdateGuildMessage(int id, string guildMessage);
-        public abstract UniTask UpdateGuildMessage2(int id, string guildMessage);
-        public abstract UniTask UpdateGuildScore(int id, int score);
-        public abstract UniTask UpdateGuildOptions(int id, string options);
-        public abstract UniTask UpdateGuildAutoAcceptRequests(int id, bool autoAcceptRequests);
-        public abstract UniTask UpdateGuildRank(int id, int rank);
-        public abstract UniTask UpdateGuildRole(int id, byte guildRole, string name, bool canInvite, bool canKick, byte shareExpPercentage);
-        public abstract UniTask UpdateGuildMemberRole(string characterId, byte guildRole);
-        public abstract UniTask UpdateGuildSkillLevel(int id, int dataId, short skillLevel, short skillPoint);
-        public abstract UniTask DeleteGuild(int id);
-        public abstract UniTask<long> FindGuildName(string guildName);
-        public abstract UniTask UpdateCharacterGuild(string characterId, int guildId, byte guildRole);
-        public abstract UniTask<int> GetGuildGold(int guildId);
-        public abstract UniTask UpdateGuildGold(int guildId, int gold);
+        public abstract int CreateGuild(string guildName, string leaderId);
+        public abstract GuildData ReadGuild(int id, GuildRoleData[] defaultGuildRoles);
+        public abstract void UpdateGuildLevel(int id, short level, int exp, short skillPoint);
+        public abstract void UpdateGuildLeader(int id, string leaderId);
+        public abstract void UpdateGuildMessage(int id, string guildMessage);
+        public abstract void UpdateGuildMessage2(int id, string guildMessage);
+        public abstract void UpdateGuildScore(int id, int score);
+        public abstract void UpdateGuildOptions(int id, string options);
+        public abstract void UpdateGuildAutoAcceptRequests(int id, bool autoAcceptRequests);
+        public abstract void UpdateGuildRank(int id, int rank);
+        public abstract void UpdateGuildRole(int id, byte guildRole, string name, bool canInvite, bool canKick, byte shareExpPercentage);
+        public abstract void UpdateGuildMemberRole(string characterId, byte guildRole);
+        public abstract void UpdateGuildSkillLevel(int id, int dataId, short skillLevel, short skillPoint);
+        public abstract void DeleteGuild(int id);
+        public abstract long FindGuildName(string guildName);
+        public abstract void UpdateCharacterGuild(string characterId, int guildId, byte guildRole);
+        public abstract int GetGuildGold(int guildId);
+        public abstract void UpdateGuildGold(int guildId, int gold);
 
-        public abstract UniTask UpdateStorageItems(StorageType storageType, string storageOwnerId, IList<CharacterItem> storageCharacterItems);
-        public abstract UniTask<List<CharacterItem>> ReadStorageItems(StorageType storageType, string storageOwnerId);
+        public abstract void UpdateStorageItems(StorageType storageType, string storageOwnerId, List<CharacterItem> storageCharacterItems);
+        public abstract List<CharacterItem> ReadStorageItems(StorageType storageType, string storageOwnerId);
 
-        public abstract UniTask<List<MailListEntry>> MailList(string userId, bool onlyNewMails);
-        public abstract UniTask<Mail> GetMail(string mailId, string userId);
-        public abstract UniTask<long> UpdateReadMailState(string mailId, string userId);
-        public abstract UniTask<long> UpdateClaimMailItemsState(string mailId, string userId);
-        public abstract UniTask<long> UpdateDeleteMailState(string mailId, string userId);
-        public abstract UniTask<int> CreateMail(Mail mail);
-        public abstract UniTask<int> GetMailNotificationCount(string userId);
+        public abstract List<MailListEntry> MailList(string userId, bool onlyNewMails);
+        public abstract Mail GetMail(string mailId, string userId);
+        public abstract long UpdateReadMailState(string mailId, string userId);
+        public abstract long UpdateClaimMailItemsState(string mailId, string userId);
+        public abstract long UpdateDeleteMailState(string mailId, string userId);
+        public abstract int CreateMail(Mail mail);
+        public abstract int GetMailNotificationCount(string userId);
 #endif
     }
 }
