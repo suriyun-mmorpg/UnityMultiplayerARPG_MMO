@@ -48,9 +48,8 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public override async UniTask<List<CharacterItem>> ReadStorageItems(StorageType storageType, string storageOwnerId)
+        public override List<CharacterItem> ReadStorageItems(StorageType storageType, string storageOwnerId)
         {
-            await UniTask.Yield();
             List<CharacterItem> result = new List<CharacterItem>();
             ExecuteReader((reader) =>
             {
@@ -65,9 +64,8 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public override async UniTask UpdateStorageItems(StorageType storageType, string storageOwnerId, IList<CharacterItem> characterItems)
+        public override void UpdateStorageItems(StorageType storageType, string storageOwnerId, List<CharacterItem> characterItems)
         {
-            await UniTask.Yield();
             SqliteTransaction transaction = connection.BeginTransaction();
             try
             {

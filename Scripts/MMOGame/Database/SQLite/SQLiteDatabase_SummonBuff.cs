@@ -24,9 +24,8 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public override async UniTask<List<CharacterBuff>> GetSummonBuffs(string characterId)
+        public override List<CharacterBuff> GetSummonBuffs(string characterId)
         {
-            await UniTask.Yield();
             List<CharacterBuff> result = new List<CharacterBuff>();
             ExecuteReader((reader) =>
             {
@@ -40,7 +39,7 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public override async UniTask SetSummonBuffs(string characterId, List<CharacterBuff> summonBuffs)
+        public override void SetSummonBuffs(string characterId, List<CharacterBuff> summonBuffs)
         {
             SqliteTransaction transaction = connection.BeginTransaction();
             try
@@ -66,7 +65,6 @@ namespace MultiplayerARPG.MMO
                 transaction.Rollback();
             }
             transaction.Dispose();
-            await UniTask.Yield();
         }
     }
 }

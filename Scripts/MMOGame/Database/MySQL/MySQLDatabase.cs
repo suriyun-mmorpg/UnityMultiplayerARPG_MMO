@@ -44,14 +44,14 @@ namespace MultiplayerARPG.MMO
             ConfigReader.ReadConfigs(jsonConfig, "mySqlPassword", out password, password);
             ConfigReader.ReadConfigs(jsonConfig, "mySqlDbName", out dbName, dbName);
 
-            Migration().Forget();
+            Migration();
         }
 
-        private async UniTaskVoid Migration()
+        private void Migration()
         {
             // 1.57b
             string migrationId = "1.57b";
-            if (!await HasMigrationId(migrationId))
+            if (!HasMigrationId(migrationId))
             {
                 Logging.Log($"Migrating up to {migrationId}");
                 // Migrate data
@@ -60,7 +60,7 @@ namespace MultiplayerARPG.MMO
                     // Avoid exception which occuring when `dataId` field not found
                     foreach (BuildingEntity prefab in GameInstance.BuildingEntities.Values)
                     {
-                        await ExecuteNonQuery("UPDATE buildings SET entityId=@entityId, dataId=0 WHERE dataId=@dataId",
+                        ExecuteNonQuerySync("UPDATE buildings SET entityId=@entityId, dataId=0 WHERE dataId=@dataId",
                             new MySqlParameter("entityId", prefab.EntityId),
                             new MySqlParameter("dataId", prefab.name.GenerateHashId()));
                     }
@@ -70,46 +70,46 @@ namespace MultiplayerARPG.MMO
                 try
                 {
                     // Avoid exception which occuring when `dataId` field not found
-                    await ExecuteNonQuery("ALTER TABLE buildings DROP dataId;");
+                    ExecuteNonQuerySync("ALTER TABLE buildings DROP dataId;");
                 }
                 catch { }
                 // Insert migrate history
-                await InsertMigrationId(migrationId);
+                InsertMigrationId(migrationId);
                 Logging.Log($"Migrated to {migrationId}");
             }
             migrationId = "1.58";
-            if (!await HasMigrationId(migrationId))
+            if (!HasMigrationId(migrationId))
             {
                 Logging.Log($"Migrating up to {migrationId}");
-                await ExecuteNonQuery("ALTER TABLE `characterbuff` CHANGE `type` `type` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0';");
-                await ExecuteNonQuery("ALTER TABLE `characterhotkey` CHANGE `type` `type` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0';");
-                await ExecuteNonQuery("ALTER TABLE `characteritem` CHANGE `inventoryType` `inventoryType` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0';");
-                await ExecuteNonQuery("ALTER TABLE `characterskillusage` CHANGE `type` `type` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0';");
-                await ExecuteNonQuery("ALTER TABLE `charactersummon` CHANGE `type` `type` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0';");
-                await ExecuteNonQuery("ALTER TABLE `storageitem` CHANGE `storageType` `storageType` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0';");
-                await ExecuteNonQuery("ALTER TABLE `userlogin` CHANGE `authType` `authType` TINYINT(3) UNSIGNED NOT NULL DEFAULT '1';");
-                await ExecuteNonQuery("ALTER TABLE `userlogin` CHANGE `userLevel` `userLevel` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0';");
-                await ExecuteNonQuery("ALTER TABLE `characters` ADD `currentRotationX` FLOAT NOT NULL DEFAULT '0' AFTER `currentPositionZ`;");
-                await ExecuteNonQuery("ALTER TABLE `characters` ADD `currentRotationY` FLOAT NOT NULL DEFAULT '0' AFTER `currentRotationX`;");
-                await ExecuteNonQuery("ALTER TABLE `characters` ADD `currentRotationZ` FLOAT NOT NULL DEFAULT '0' AFTER `currentRotationY`;");
+                ExecuteNonQuerySync("ALTER TABLE `characterbuff` CHANGE `type` `type` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0';");
+                ExecuteNonQuerySync("ALTER TABLE `characterhotkey` CHANGE `type` `type` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0';");
+                ExecuteNonQuerySync("ALTER TABLE `characteritem` CHANGE `inventoryType` `inventoryType` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0';");
+                ExecuteNonQuerySync("ALTER TABLE `characterskillusage` CHANGE `type` `type` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0';");
+                ExecuteNonQuerySync("ALTER TABLE `charactersummon` CHANGE `type` `type` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0';");
+                ExecuteNonQuerySync("ALTER TABLE `storageitem` CHANGE `storageType` `storageType` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0';");
+                ExecuteNonQuerySync("ALTER TABLE `userlogin` CHANGE `authType` `authType` TINYINT(3) UNSIGNED NOT NULL DEFAULT '1';");
+                ExecuteNonQuerySync("ALTER TABLE `userlogin` CHANGE `userLevel` `userLevel` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0';");
+                ExecuteNonQuerySync("ALTER TABLE `characters` ADD `currentRotationX` FLOAT NOT NULL DEFAULT '0' AFTER `currentPositionZ`;");
+                ExecuteNonQuerySync("ALTER TABLE `characters` ADD `currentRotationY` FLOAT NOT NULL DEFAULT '0' AFTER `currentRotationX`;");
+                ExecuteNonQuerySync("ALTER TABLE `characters` ADD `currentRotationZ` FLOAT NOT NULL DEFAULT '0' AFTER `currentRotationY`;");
                 // Insert migrate history
-                await InsertMigrationId(migrationId);
+                InsertMigrationId(migrationId);
                 Logging.Log($"Migrated to {migrationId}");
             }
             migrationId = "1.60c";
-            if (!await HasMigrationId(migrationId))
+            if (!HasMigrationId(migrationId))
             {
                 Logging.Log($"Migrating up to {migrationId}");
-                await ExecuteNonQuery("ALTER TABLE `characterquest` ADD `completedTasks` TEXT NOT NULL AFTER `killedMonsters`;");
+                ExecuteNonQuerySync("ALTER TABLE `characterquest` ADD `completedTasks` TEXT NOT NULL AFTER `killedMonsters`;");
                 // Insert migrate history
-                await InsertMigrationId(migrationId);
+                InsertMigrationId(migrationId);
                 Logging.Log($"Migrated to {migrationId}");
             }
             migrationId = "1.61";
-            if (!await HasMigrationId(migrationId))
+            if (!HasMigrationId(migrationId))
             {
                 Logging.Log($"Migrating up to {migrationId}");
-                await ExecuteNonQuery("CREATE TABLE `charactercurrency` ("
+                ExecuteNonQuerySync("CREATE TABLE `charactercurrency` ("
                     + "`id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,"
                     + "`idx` int(11) NOT NULL,"
                     + "`characterId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,"
@@ -118,7 +118,7 @@ namespace MultiplayerARPG.MMO
                     + "`createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,"
                     + "`updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,"
                     + "PRIMARY KEY(`id`)) ENGINE = InnoDB DEFAULT CHARSET = utf8 COLLATE = utf8_unicode_ci;");
-                await ExecuteNonQuery("CREATE TABLE `mail` ("
+                ExecuteNonQuerySync("CREATE TABLE `mail` ("
                     + "`id` bigint(20) NOT NULL AUTO_INCREMENT,"
                     + "`eventId` varchar(50) NULL DEFAULT NULL,"
                     + "`senderId` varchar(50) NULL DEFAULT NULL,"
@@ -136,140 +136,140 @@ namespace MultiplayerARPG.MMO
                     + "`sentTimestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,"
                     + "PRIMARY KEY(`id`)) ENGINE = InnoDB DEFAULT CHARSET = utf8 COLLATE utf8_unicode_ci;");
                 // Insert migrate history
-                await InsertMigrationId(migrationId);
+                InsertMigrationId(migrationId);
                 Logging.Log($"Migrated to {migrationId}");
             }
             migrationId = "1.61b";
-            if (!await HasMigrationId(migrationId))
+            if (!HasMigrationId(migrationId))
             {
                 Logging.Log($"Migrating up to {migrationId}");
-                await ExecuteNonQuery("ALTER TABLE `mail` ADD `isClaim` tinyint(1) NOT NULL DEFAULT 0 AFTER `readTimestamp`, ADD `claimTimestamp` timestamp NULL DEFAULT NULL AFTER `isClaim`;");
+                ExecuteNonQuerySync("ALTER TABLE `mail` ADD `isClaim` tinyint(1) NOT NULL DEFAULT 0 AFTER `readTimestamp`, ADD `claimTimestamp` timestamp NULL DEFAULT NULL AFTER `isClaim`;");
                 // Insert migrate history
-                await InsertMigrationId(migrationId);
+                InsertMigrationId(migrationId);
                 Logging.Log($"Migrated to {migrationId}");
             }
             migrationId = "1.62e";
-            if (!await HasMigrationId(migrationId))
+            if (!HasMigrationId(migrationId))
             {
                 Logging.Log($"Migrating up to {migrationId}");
-                await ExecuteNonQuery("ALTER TABLE `characterattribute` ADD INDEX(`idx`);");
-                await ExecuteNonQuery("ALTER TABLE `characterattribute` ADD INDEX(`characterId`);");
-                await ExecuteNonQuery("ALTER TABLE `characterbuff` ADD INDEX(`characterId`);");
-                await ExecuteNonQuery("ALTER TABLE `charactercurrency` ADD INDEX(`idx`);");
-                await ExecuteNonQuery("ALTER TABLE `charactercurrency` ADD INDEX(`characterId`);");
-                await ExecuteNonQuery("ALTER TABLE `characterhotkey` ADD INDEX(`characterId`);");
-                await ExecuteNonQuery("ALTER TABLE `characterhotkey` ADD INDEX(`hotkeyId`);");
-                await ExecuteNonQuery("ALTER TABLE `characteritem` ADD INDEX(`idx`);");
-                await ExecuteNonQuery("ALTER TABLE `characteritem` ADD INDEX(`inventoryType`);");
-                await ExecuteNonQuery("ALTER TABLE `characteritem` ADD INDEX(`characterId`);");
-                await ExecuteNonQuery("ALTER TABLE `characterquest` ADD INDEX(`idx`);");
-                await ExecuteNonQuery("ALTER TABLE `characterquest` ADD INDEX(`characterId`);");
-                await ExecuteNonQuery("ALTER TABLE `characters` ADD INDEX(`userId`);");
-                await ExecuteNonQuery("ALTER TABLE `characters` ADD INDEX(`factionId`);");
-                await ExecuteNonQuery("ALTER TABLE `characters` ADD INDEX(`partyId`);");
-                await ExecuteNonQuery("ALTER TABLE `characters` ADD INDEX(`guildId`);");
-                await ExecuteNonQuery("ALTER TABLE `characterskill` ADD INDEX(`idx`);");
-                await ExecuteNonQuery("ALTER TABLE `characterskill` ADD INDEX(`characterId`);");
-                await ExecuteNonQuery("ALTER TABLE `characterskillusage` ADD INDEX(`characterId`);");
-                await ExecuteNonQuery("ALTER TABLE `charactersummon` ADD INDEX(`characterId`);");
-                await ExecuteNonQuery("ALTER TABLE `friend` ADD INDEX(`characterId1`);");
-                await ExecuteNonQuery("ALTER TABLE `friend` ADD INDEX(`characterId2`);");
-                await ExecuteNonQuery("ALTER TABLE `guild` ADD INDEX(`leaderId`);");
-                await ExecuteNonQuery("ALTER TABLE `mail` ADD INDEX(`eventId`);");
-                await ExecuteNonQuery("ALTER TABLE `mail` ADD INDEX(`senderId`);");
-                await ExecuteNonQuery("ALTER TABLE `mail` ADD INDEX(`senderName`);");
-                await ExecuteNonQuery("ALTER TABLE `mail` ADD INDEX(`receiverId`);");
-                await ExecuteNonQuery("ALTER TABLE `mail` ADD INDEX(`isRead`);");
-                await ExecuteNonQuery("ALTER TABLE `mail` ADD INDEX(`isClaim`);");
-                await ExecuteNonQuery("ALTER TABLE `mail` ADD INDEX(`isDelete`);");
-                await ExecuteNonQuery("ALTER TABLE `party` ADD INDEX(`leaderId`);");
-                await ExecuteNonQuery("ALTER TABLE `storageitem` ADD INDEX(`idx`);");
-                await ExecuteNonQuery("ALTER TABLE `storageitem` ADD INDEX(`storageType`);");
-                await ExecuteNonQuery("ALTER TABLE `storageitem` ADD INDEX(`storageOwnerId`);");
+                ExecuteNonQuerySync("ALTER TABLE `characterattribute` ADD INDEX(`idx`);");
+                ExecuteNonQuerySync("ALTER TABLE `characterattribute` ADD INDEX(`characterId`);");
+                ExecuteNonQuerySync("ALTER TABLE `characterbuff` ADD INDEX(`characterId`);");
+                ExecuteNonQuerySync("ALTER TABLE `charactercurrency` ADD INDEX(`idx`);");
+                ExecuteNonQuerySync("ALTER TABLE `charactercurrency` ADD INDEX(`characterId`);");
+                ExecuteNonQuerySync("ALTER TABLE `characterhotkey` ADD INDEX(`characterId`);");
+                ExecuteNonQuerySync("ALTER TABLE `characterhotkey` ADD INDEX(`hotkeyId`);");
+                ExecuteNonQuerySync("ALTER TABLE `characteritem` ADD INDEX(`idx`);");
+                ExecuteNonQuerySync("ALTER TABLE `characteritem` ADD INDEX(`inventoryType`);");
+                ExecuteNonQuerySync("ALTER TABLE `characteritem` ADD INDEX(`characterId`);");
+                ExecuteNonQuerySync("ALTER TABLE `characterquest` ADD INDEX(`idx`);");
+                ExecuteNonQuerySync("ALTER TABLE `characterquest` ADD INDEX(`characterId`);");
+                ExecuteNonQuerySync("ALTER TABLE `characters` ADD INDEX(`userId`);");
+                ExecuteNonQuerySync("ALTER TABLE `characters` ADD INDEX(`factionId`);");
+                ExecuteNonQuerySync("ALTER TABLE `characters` ADD INDEX(`partyId`);");
+                ExecuteNonQuerySync("ALTER TABLE `characters` ADD INDEX(`guildId`);");
+                ExecuteNonQuerySync("ALTER TABLE `characterskill` ADD INDEX(`idx`);");
+                ExecuteNonQuerySync("ALTER TABLE `characterskill` ADD INDEX(`characterId`);");
+                ExecuteNonQuerySync("ALTER TABLE `characterskillusage` ADD INDEX(`characterId`);");
+                ExecuteNonQuerySync("ALTER TABLE `charactersummon` ADD INDEX(`characterId`);");
+                ExecuteNonQuerySync("ALTER TABLE `friend` ADD INDEX(`characterId1`);");
+                ExecuteNonQuerySync("ALTER TABLE `friend` ADD INDEX(`characterId2`);");
+                ExecuteNonQuerySync("ALTER TABLE `guild` ADD INDEX(`leaderId`);");
+                ExecuteNonQuerySync("ALTER TABLE `mail` ADD INDEX(`eventId`);");
+                ExecuteNonQuerySync("ALTER TABLE `mail` ADD INDEX(`senderId`);");
+                ExecuteNonQuerySync("ALTER TABLE `mail` ADD INDEX(`senderName`);");
+                ExecuteNonQuerySync("ALTER TABLE `mail` ADD INDEX(`receiverId`);");
+                ExecuteNonQuerySync("ALTER TABLE `mail` ADD INDEX(`isRead`);");
+                ExecuteNonQuerySync("ALTER TABLE `mail` ADD INDEX(`isClaim`);");
+                ExecuteNonQuerySync("ALTER TABLE `mail` ADD INDEX(`isDelete`);");
+                ExecuteNonQuerySync("ALTER TABLE `party` ADD INDEX(`leaderId`);");
+                ExecuteNonQuerySync("ALTER TABLE `storageitem` ADD INDEX(`idx`);");
+                ExecuteNonQuerySync("ALTER TABLE `storageitem` ADD INDEX(`storageType`);");
+                ExecuteNonQuerySync("ALTER TABLE `storageitem` ADD INDEX(`storageOwnerId`);");
                 // Insert migrate history
-                await InsertMigrationId(migrationId);
+                InsertMigrationId(migrationId);
                 Logging.Log($"Migrated to {migrationId}");
             }
             migrationId = "1.63b";
-            if (!await HasMigrationId(migrationId))
+            if (!HasMigrationId(migrationId))
             {
                 Logging.Log($"Migrating up to {migrationId}");
-                await ExecuteNonQuery("ALTER TABLE `characters` ADD `lastDeadTime` INT NOT NULL DEFAULT '0' AFTER `mountDataId`;");
+                ExecuteNonQuerySync("ALTER TABLE `characters` ADD `lastDeadTime` INT NOT NULL DEFAULT '0' AFTER `mountDataId`;");
                 // Insert migrate history
-                await InsertMigrationId(migrationId);
+                InsertMigrationId(migrationId);
                 Logging.Log($"Migrated to {migrationId}");
             }
             migrationId = "1.65d";
-            if (!await HasMigrationId(migrationId))
+            if (!HasMigrationId(migrationId))
             {
                 Logging.Log($"Migrating up to {migrationId}");
-                await ExecuteNonQuery("ALTER TABLE `characters` CHANGE `statPoint` `statPoint` FLOAT NOT NULL DEFAULT '0', CHANGE `skillPoint` `skillPoint` FLOAT NOT NULL DEFAULT '0';");
+                ExecuteNonQuerySync("ALTER TABLE `characters` CHANGE `statPoint` `statPoint` FLOAT NOT NULL DEFAULT '0', CHANGE `skillPoint` `skillPoint` FLOAT NOT NULL DEFAULT '0';");
                 // Insert migrate history
-                await InsertMigrationId(migrationId);
+                InsertMigrationId(migrationId);
                 Logging.Log($"Migrated to {migrationId}");
             }
             migrationId = "1.67";
-            if (!await HasMigrationId(migrationId))
+            if (!HasMigrationId(migrationId))
             {
                 Logging.Log($"Migrating up to {migrationId}");
-                await ExecuteNonQuery("ALTER TABLE `guild` ADD `guildMessage2` VARCHAR(160) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL AFTER `guildMessage`;");
-                await ExecuteNonQuery("ALTER TABLE `guild` ADD `score` INT(11) NOT NULL DEFAULT '0' AFTER `gold`;");
-                await ExecuteNonQuery("ALTER TABLE `guild` ADD `optionId1` INT(11) NOT NULL DEFAULT '0' AFTER `score`;");
-                await ExecuteNonQuery("ALTER TABLE `guild` ADD `optionId2` INT(11) NOT NULL DEFAULT '0' AFTER `optionId1`;");
-                await ExecuteNonQuery("ALTER TABLE `guild` ADD `optionId3` INT(11) NOT NULL DEFAULT '0' AFTER `optionId2`;");
-                await ExecuteNonQuery("ALTER TABLE `guild` ADD `optionId4` INT(11) NOT NULL DEFAULT '0' AFTER `optionId3`;");
-                await ExecuteNonQuery("ALTER TABLE `guild` ADD `optionId5` INT(11) NOT NULL DEFAULT '0' AFTER `optionId4`;");
-                await ExecuteNonQuery("ALTER TABLE `guild` ADD `autoAcceptRequests` TINYINT(1) NOT NULL DEFAULT '0' AFTER `optionId5`;");
-                await ExecuteNonQuery("ALTER TABLE `guild` ADD `rank` INT(11) NOT NULL DEFAULT '0' AFTER `autoAcceptRequests`;");
-                await ExecuteNonQuery("ALTER TABLE `guild` ADD `currentMembers` INT(11) NOT NULL DEFAULT '0' AFTER `rank`;");
-                await ExecuteNonQuery("ALTER TABLE `guild` ADD `maxMembers` INT(11) NOT NULL DEFAULT '0' AFTER `currentMembers`;");
+                ExecuteNonQuerySync("ALTER TABLE `guild` ADD `guildMessage2` VARCHAR(160) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL AFTER `guildMessage`;");
+                ExecuteNonQuerySync("ALTER TABLE `guild` ADD `score` INT(11) NOT NULL DEFAULT '0' AFTER `gold`;");
+                ExecuteNonQuerySync("ALTER TABLE `guild` ADD `optionId1` INT(11) NOT NULL DEFAULT '0' AFTER `score`;");
+                ExecuteNonQuerySync("ALTER TABLE `guild` ADD `optionId2` INT(11) NOT NULL DEFAULT '0' AFTER `optionId1`;");
+                ExecuteNonQuerySync("ALTER TABLE `guild` ADD `optionId3` INT(11) NOT NULL DEFAULT '0' AFTER `optionId2`;");
+                ExecuteNonQuerySync("ALTER TABLE `guild` ADD `optionId4` INT(11) NOT NULL DEFAULT '0' AFTER `optionId3`;");
+                ExecuteNonQuerySync("ALTER TABLE `guild` ADD `optionId5` INT(11) NOT NULL DEFAULT '0' AFTER `optionId4`;");
+                ExecuteNonQuerySync("ALTER TABLE `guild` ADD `autoAcceptRequests` TINYINT(1) NOT NULL DEFAULT '0' AFTER `optionId5`;");
+                ExecuteNonQuerySync("ALTER TABLE `guild` ADD `rank` INT(11) NOT NULL DEFAULT '0' AFTER `autoAcceptRequests`;");
+                ExecuteNonQuerySync("ALTER TABLE `guild` ADD `currentMembers` INT(11) NOT NULL DEFAULT '0' AFTER `rank`;");
+                ExecuteNonQuerySync("ALTER TABLE `guild` ADD `maxMembers` INT(11) NOT NULL DEFAULT '0' AFTER `currentMembers`;");
                 // Insert migrate history
-                await InsertMigrationId(migrationId);
+                InsertMigrationId(migrationId);
                 Logging.Log($"Migrated to {migrationId}");
             }
             migrationId = "1.67b";
-            if (!await HasMigrationId(migrationId))
+            if (!HasMigrationId(migrationId))
             {
                 Logging.Log($"Migrating up to {migrationId}");
-                await ExecuteNonQuery("ALTER TABLE `mail` CHANGE `gold` `gold` INT(11) NOT NULL DEFAULT '0';");
-                await ExecuteNonQuery("ALTER TABLE `mail` ADD `cash` INT(11) NOT NULL DEFAULT '0' AFTER `gold`;");
-                await ExecuteNonQuery("ALTER TABLE `guild` DROP `optionId1`, DROP `optionId2`, DROP `optionId3`, DROP `optionId4`, DROP `optionId5`;");
-                await ExecuteNonQuery("ALTER TABLE `guild` ADD `options` TEXT CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL AFTER `score`;");
+                ExecuteNonQuerySync("ALTER TABLE `mail` CHANGE `gold` `gold` INT(11) NOT NULL DEFAULT '0';");
+                ExecuteNonQuerySync("ALTER TABLE `mail` ADD `cash` INT(11) NOT NULL DEFAULT '0' AFTER `gold`;");
+                ExecuteNonQuerySync("ALTER TABLE `guild` DROP `optionId1`, DROP `optionId2`, DROP `optionId3`, DROP `optionId4`, DROP `optionId5`;");
+                ExecuteNonQuerySync("ALTER TABLE `guild` ADD `options` TEXT CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL AFTER `score`;");
                 // Insert migrate history
-                await InsertMigrationId(migrationId);
+                InsertMigrationId(migrationId);
                 Logging.Log($"Migrated to {migrationId}");
             }
             migrationId = "1.69";
-            if (!await HasMigrationId(migrationId))
+            if (!HasMigrationId(migrationId))
             {
                 Logging.Log($"Migrating up to {migrationId}");
-                await ExecuteNonQuery("ALTER TABLE `characterquest` ADD `isTracking` TINYINT(1) NOT NULL DEFAULT '0' AFTER `isComplete`;");
+                ExecuteNonQuerySync("ALTER TABLE `characterquest` ADD `isTracking` TINYINT(1) NOT NULL DEFAULT '0' AFTER `isComplete`;");
                 // Insert migrate history
-                await InsertMigrationId(migrationId);
+                InsertMigrationId(migrationId);
                 Logging.Log($"Migrated to {migrationId}");
             }
             migrationId = "1.70";
-            if (!await HasMigrationId(migrationId))
+            if (!HasMigrationId(migrationId))
             {
                 Logging.Log($"Migrating up to {migrationId}");
-                await ExecuteNonQuery("ALTER TABLE `characters` CHANGE `lastDeadTime` `lastDeadTime` BIGINT NOT NULL DEFAULT '0';");
-                await ExecuteNonQuery("ALTER TABLE `characters` ADD `unmuteTime` BIGINT NOT NULL DEFAULT '0' AFTER `lastDeadTime`;");
-                await ExecuteNonQuery("ALTER TABLE `characteritem` ADD `expireTime` BIGINT NOT NULL DEFAULT '0' AFTER `lockRemainsDuration`;");
-                await ExecuteNonQuery("ALTER TABLE `characteritem` ADD `randomSeed` TINYINT UNSIGNED NOT NULL DEFAULT '0' AFTER `expireTime`;");
-                await ExecuteNonQuery("ALTER TABLE `storageitem` ADD `expireTime` BIGINT NOT NULL DEFAULT '0' AFTER `lockRemainsDuration`;");
-                await ExecuteNonQuery("ALTER TABLE `storageitem` ADD `randomSeed` TINYINT UNSIGNED NOT NULL DEFAULT '0' AFTER `expireTime`;");
-                await ExecuteNonQuery("ALTER TABLE `userlogin` ADD `unbanTime` BIGINT NOT NULL DEFAULT '0' AFTER `userLevel`;");
-                await ExecuteNonQuery("ALTER TABLE `userlogin` CHANGE `password` `password` VARCHAR(72) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL;");
+                ExecuteNonQuerySync("ALTER TABLE `characters` CHANGE `lastDeadTime` `lastDeadTime` BIGINT NOT NULL DEFAULT '0';");
+                ExecuteNonQuerySync("ALTER TABLE `characters` ADD `unmuteTime` BIGINT NOT NULL DEFAULT '0' AFTER `lastDeadTime`;");
+                ExecuteNonQuerySync("ALTER TABLE `characteritem` ADD `expireTime` BIGINT NOT NULL DEFAULT '0' AFTER `lockRemainsDuration`;");
+                ExecuteNonQuerySync("ALTER TABLE `characteritem` ADD `randomSeed` TINYINT UNSIGNED NOT NULL DEFAULT '0' AFTER `expireTime`;");
+                ExecuteNonQuerySync("ALTER TABLE `storageitem` ADD `expireTime` BIGINT NOT NULL DEFAULT '0' AFTER `lockRemainsDuration`;");
+                ExecuteNonQuerySync("ALTER TABLE `storageitem` ADD `randomSeed` TINYINT UNSIGNED NOT NULL DEFAULT '0' AFTER `expireTime`;");
+                ExecuteNonQuerySync("ALTER TABLE `userlogin` ADD `unbanTime` BIGINT NOT NULL DEFAULT '0' AFTER `userLevel`;");
+                ExecuteNonQuerySync("ALTER TABLE `userlogin` CHANGE `password` `password` VARCHAR(72) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL;");
                 // Insert migrate history
-                await InsertMigrationId(migrationId);
+                InsertMigrationId(migrationId);
                 Logging.Log($"Migrated to {migrationId}");
             }
             migrationId = "1.71";
-            if (!await HasMigrationId(migrationId))
+            if (!HasMigrationId(migrationId))
             {
                 Logging.Log($"Migrating up to {migrationId}");
-                await ExecuteNonQuery("ALTER TABLE `buildings` ADD `extraData` TEXT CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL AFTER `creatorName`;");
-                await ExecuteNonQuery("CREATE TABLE `summonbuffs` (" +
+                ExecuteNonQuerySync("ALTER TABLE `buildings` ADD `extraData` TEXT CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL AFTER `creatorName`;");
+                ExecuteNonQuerySync("CREATE TABLE `summonbuffs` (" +
                     "`id` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL," +
                     "`characterId` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL," +
                     "`buffId` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL," +
@@ -280,43 +280,43 @@ namespace MultiplayerARPG.MMO
                     "`createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP," +
                     "`updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP" +
                     ") ENGINE = InnoDB DEFAULT CHARSET = utf8 COLLATE = utf8_unicode_ci;");
-                await ExecuteNonQuery("ALTER TABLE `summonbuffs` ADD PRIMARY KEY (`id`);");
-                await ExecuteNonQuery("ALTER TABLE `summonbuffs` ADD KEY (`characterId`);");
-                await ExecuteNonQuery("ALTER TABLE `summonbuffs` ADD KEY (`buffId`);");
+                ExecuteNonQuerySync("ALTER TABLE `summonbuffs` ADD PRIMARY KEY (`id`);");
+                ExecuteNonQuerySync("ALTER TABLE `summonbuffs` ADD KEY (`characterId`);");
+                ExecuteNonQuerySync("ALTER TABLE `summonbuffs` ADD KEY (`buffId`);");
                 // Insert migrate history
-                await InsertMigrationId(migrationId);
+                InsertMigrationId(migrationId);
                 Logging.Log($"Migrated to {migrationId}");
             }
             migrationId = "1.71b";
-            if (!await HasMigrationId(migrationId))
+            if (!HasMigrationId(migrationId))
             {
                 Logging.Log($"Migrating up to {migrationId}");
-                await ExecuteNonQuery("ALTER TABLE `userlogin` ADD `isEmailVerified` tinyint(1) NOT NULL DEFAULT '0' AFTER `email`;");
+                ExecuteNonQuerySync("ALTER TABLE `userlogin` ADD `isEmailVerified` tinyint(1) NOT NULL DEFAULT '0' AFTER `email`;");
                 // Insert migrate history
-                await InsertMigrationId(migrationId);
+                InsertMigrationId(migrationId);
                 Logging.Log($"Migrated to {migrationId}");
             }
             migrationId = "1.72d";
-            if (!await HasMigrationId(migrationId))
+            if (!HasMigrationId(migrationId))
             {
                 Logging.Log($"Migrating up to {migrationId}");
-                await ExecuteNonQuery("ALTER TABLE `characteritem` CHANGE `randomSeed` `randomSeed` INT NOT NULL DEFAULT '0';");
+                ExecuteNonQuerySync("ALTER TABLE `characteritem` CHANGE `randomSeed` `randomSeed` INT NOT NULL DEFAULT '0';");
                 // Insert migrate history
-                await InsertMigrationId(migrationId);
+                InsertMigrationId(migrationId);
                 Logging.Log($"Migrated to {migrationId}");
             }
         }
 
-        private async UniTask<bool> HasMigrationId(string migrationId)
+        private bool HasMigrationId(string migrationId)
         {
-            object result = await ExecuteScalar("SELECT COUNT(*) FROM __migrations WHERE migrationId=@migrationId", new MySqlParameter("@migrationId", migrationId));
+            object result = ExecuteScalarSync("SELECT COUNT(*) FROM __migrations WHERE migrationId=@migrationId", new MySqlParameter("@migrationId", migrationId));
             long count = result != null ? (long)result : 0;
             return count > 0;
         }
 
-        public async UniTask InsertMigrationId(string migrationId)
+        public void InsertMigrationId(string migrationId)
         {
-            await ExecuteNonQuery("INSERT INTO __migrations (migrationId) VALUES (@migrationId)", new MySqlParameter("@migrationId", migrationId));
+            ExecuteNonQuerySync("INSERT INTO __migrations (migrationId) VALUES (@migrationId)", new MySqlParameter("@migrationId", migrationId));
         }
 
         public string GetConnectionString()
@@ -695,10 +695,10 @@ namespace MultiplayerARPG.MMO
                 connection.Close();
         }
 
-        public override async UniTask<string> ValidateUserLogin(string username, string password)
+        public override string ValidateUserLogin(string username, string password)
         {
             string id = string.Empty;
-            await ExecuteReader((reader) =>
+            ExecuteReaderSync((reader) =>
             {
                 if (reader.Read())
                 {
@@ -714,18 +714,18 @@ namespace MultiplayerARPG.MMO
             return id;
         }
 
-        public override async UniTask<bool> ValidateAccessToken(string userId, string accessToken)
+        public override bool ValidateAccessToken(string userId, string accessToken)
         {
-            object result = await ExecuteScalar("SELECT COUNT(*) FROM userlogin WHERE id=@id AND accessToken=@accessToken",
+            object result = ExecuteScalarSync("SELECT COUNT(*) FROM userlogin WHERE id=@id AND accessToken=@accessToken",
                 new MySqlParameter("@id", userId),
                 new MySqlParameter("@accessToken", accessToken));
             return (result != null ? (long)result : 0) > 0;
         }
 
-        public override async UniTask<byte> GetUserLevel(string userId)
+        public override byte GetUserLevel(string userId)
         {
             byte userLevel = 0;
-            await ExecuteReader((reader) =>
+            ExecuteReaderSync((reader) =>
             {
                 if (reader.Read())
                     userLevel = reader.GetByte(0);
@@ -734,10 +734,10 @@ namespace MultiplayerARPG.MMO
             return userLevel;
         }
 
-        public override async UniTask<int> GetGold(string userId)
+        public override int GetGold(string userId)
         {
             int gold = 0;
-            await ExecuteReader((reader) =>
+            ExecuteReaderSync((reader) =>
             {
                 if (reader.Read())
                     gold = reader.GetInt32(0);
@@ -746,17 +746,17 @@ namespace MultiplayerARPG.MMO
             return gold;
         }
 
-        public override async UniTask UpdateGold(string userId, int gold)
+        public override void UpdateGold(string userId, int gold)
         {
-            await ExecuteNonQuery("UPDATE userlogin SET gold=@gold WHERE id=@id",
+            ExecuteNonQuerySync("UPDATE userlogin SET gold=@gold WHERE id=@id",
                 new MySqlParameter("@id", userId),
                 new MySqlParameter("@gold", gold));
         }
 
-        public override async UniTask<int> GetCash(string userId)
+        public override int GetCash(string userId)
         {
             int cash = 0;
-            await ExecuteReader((reader) =>
+            ExecuteReaderSync((reader) =>
             {
                 if (reader.Read())
                     cash = reader.GetInt32(0);
@@ -765,23 +765,23 @@ namespace MultiplayerARPG.MMO
             return cash;
         }
 
-        public override async UniTask UpdateCash(string userId, int cash)
+        public override void UpdateCash(string userId, int cash)
         {
-            await ExecuteNonQuery("UPDATE userlogin SET cash=@cash WHERE id=@id",
+            ExecuteNonQuerySync("UPDATE userlogin SET cash=@cash WHERE id=@id",
                 new MySqlParameter("@id", userId),
                 new MySqlParameter("@cash", cash));
         }
 
-        public override async UniTask UpdateAccessToken(string userId, string accessToken)
+        public override void UpdateAccessToken(string userId, string accessToken)
         {
-            await ExecuteNonQuery("UPDATE userlogin SET accessToken=@accessToken WHERE id=@id",
+            ExecuteNonQuerySync("UPDATE userlogin SET accessToken=@accessToken WHERE id=@id",
                 new MySqlParameter("@id", userId),
                 new MySqlParameter("@accessToken", accessToken));
         }
 
-        public override async UniTask CreateUserLogin(string username, string password, string email)
+        public override void CreateUserLogin(string username, string password, string email)
         {
-            await ExecuteNonQuery("INSERT INTO userlogin (id, username, password, email, authType) VALUES (@id, @username, @password, @email, @authType)",
+            ExecuteNonQuerySync("INSERT INTO userlogin (id, username, password, email, authType) VALUES (@id, @username, @password, @email, @authType)",
                 new MySqlParameter("@id", GenericUtils.GetUniqueId()),
                 new MySqlParameter("@username", username),
                 new MySqlParameter("@password", password.PasswordHash()),
@@ -789,17 +789,17 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@authType", AUTH_TYPE_NORMAL));
         }
 
-        public override async UniTask<long> FindUsername(string username)
+        public override long FindUsername(string username)
         {
-            object result = await ExecuteScalar("SELECT COUNT(*) FROM userlogin WHERE username LIKE @username",
+            object result = ExecuteScalarSync("SELECT COUNT(*) FROM userlogin WHERE username LIKE @username",
                 new MySqlParameter("@username", username));
             return result != null ? (long)result : 0;
         }
 
-        public override async UniTask<long> GetUserUnbanTime(string userId)
+        public override long GetUserUnbanTime(string userId)
         {
             long unbanTime = 0;
-            await ExecuteReader((reader) =>
+            ExecuteReaderSync((reader) =>
             {
                 if (reader.Read())
                 {
@@ -810,10 +810,10 @@ namespace MultiplayerARPG.MMO
             return unbanTime;
         }
 
-        public override async UniTask SetUserUnbanTimeByCharacterName(string characterName, long unbanTime)
+        public override void SetUserUnbanTimeByCharacterName(string characterName, long unbanTime)
         {
             string userId = string.Empty;
-            await ExecuteReader((reader) =>
+            ExecuteReaderSync((reader) =>
             {
                 if (reader.Read())
                 {
@@ -823,28 +823,28 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@characterName", characterName));
             if (string.IsNullOrEmpty(userId))
                 return;
-            await ExecuteNonQuery("UPDATE userlogin SET unbanTime=@unbanTime WHERE id=@id LIMIT 1",
+            ExecuteNonQuerySync("UPDATE userlogin SET unbanTime=@unbanTime WHERE id=@id LIMIT 1",
                 new MySqlParameter("@id", userId),
                 new MySqlParameter("@unbanTime", unbanTime));
         }
 
-        public override async UniTask SetCharacterUnmuteTimeByName(string characterName, long unmuteTime)
+        public override void SetCharacterUnmuteTimeByName(string characterName, long unmuteTime)
         {
-            await ExecuteNonQuery("UPDATE characters SET unmuteTime=@unmuteTime WHERE characterName LIKE @characterName LIMIT 1",
+            ExecuteNonQuerySync("UPDATE characters SET unmuteTime=@unmuteTime WHERE characterName LIKE @characterName LIMIT 1",
                 new MySqlParameter("@characterName", characterName),
                 new MySqlParameter("@unmuteTime", unmuteTime));
         }
 
-        public override async UniTask<bool> ValidateEmailVerification(string userId)
+        public override bool ValidateEmailVerification(string userId)
         {
-            object result = await ExecuteScalar("SELECT COUNT(*) FROM userlogin WHERE id=@userId AND isEmailVerified=1",
+            object result = ExecuteScalarSync("SELECT COUNT(*) FROM userlogin WHERE id=@userId AND isEmailVerified=1",
                 new MySqlParameter("@userId", userId));
             return (result != null ? (long)result : 0) > 0;
         }
 
-        public override async UniTask<long> FindEmail(string email)
+        public override long FindEmail(string email)
         {
-            object result = await ExecuteScalar("SELECT COUNT(*) FROM userlogin WHERE email LIKE @email",
+            object result = ExecuteScalarSync("SELECT COUNT(*) FROM userlogin WHERE email LIKE @email",
                 new MySqlParameter("@email", email));
             return result != null ? (long)result : 0;
         }
