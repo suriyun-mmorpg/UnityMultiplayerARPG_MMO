@@ -189,17 +189,25 @@ namespace MultiplayerARPG.MMO
                 }
 
                 // Use Websocket or not?
-                bool useWebSocket = ConfigReader.IsArgsProvided(args, ARG_USE_WEB_SOCKET);
-                if (useWebSocket || ConfigReader.ReadConfigs(jsonConfig, CONFIG_USE_WEB_SOCKET, out useWebSocket))
+                bool useWebSocket = this.useWebSocket = false;
+                if (ConfigReader.ReadConfigs(jsonConfig, CONFIG_USE_WEB_SOCKET, out useWebSocket))
                 {
                     this.useWebSocket = useWebSocket;
                 }
+                else if (ConfigReader.IsArgsProvided(args, ARG_USE_WEB_SOCKET))
+                {
+                    this.useWebSocket = true;
+                }
 
                 // Is websocket running in secure mode or not?
-                bool webSocketSecure = ConfigReader.IsArgsProvided(args, ARG_WEB_SOCKET_SECURE);
-                if (webSocketSecure || ConfigReader.ReadConfigs(jsonConfig, CONFIG_WEB_SOCKET_SECURE, out webSocketSecure))
+                bool webSocketSecure = this.webSocketSecure = false;
+                if (ConfigReader.ReadConfigs(jsonConfig, CONFIG_WEB_SOCKET_SECURE, out webSocketSecure))
                 {
                     this.webSocketSecure = webSocketSecure;
+                }
+                else if (ConfigReader.IsArgsProvided(args, ARG_WEB_SOCKET_SECURE))
+                {
+                    this.webSocketSecure = true;
                 }
 
                 // Where is the certification file path?
@@ -279,10 +287,14 @@ namespace MultiplayerARPG.MMO
                 }
 
                 // Map spawn in batch mode
-                bool notSpawnInBatchMode = ConfigReader.IsArgsProvided(args, ARG_NOT_SPAWN_IN_BATCH_MODE);
-                if (notSpawnInBatchMode || ConfigReader.ReadConfigs(jsonConfig, CONFIG_NOT_SPAWN_IN_BATCH_MODE, out notSpawnInBatchMode))
+                bool notSpawnInBatchMode = mapSpawnNetworkManager.notSpawnInBatchMode = false;
+                if (ConfigReader.ReadConfigs(jsonConfig, CONFIG_NOT_SPAWN_IN_BATCH_MODE, out notSpawnInBatchMode))
                 {
                     mapSpawnNetworkManager.notSpawnInBatchMode = notSpawnInBatchMode;
+                }
+                else if (ConfigReader.IsArgsProvided(args, ARG_NOT_SPAWN_IN_BATCH_MODE))
+                {
+                    mapSpawnNetworkManager.notSpawnInBatchMode = true;
                 }
 
                 // Map spawn start port
