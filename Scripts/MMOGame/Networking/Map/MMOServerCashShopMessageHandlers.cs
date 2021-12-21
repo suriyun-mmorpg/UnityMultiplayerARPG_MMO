@@ -19,135 +19,162 @@ namespace MultiplayerARPG.MMO
             RequestProceedResultDelegate<ResponseCashShopInfoMessage> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            // Set response data
-            UITextKeys message = UITextKeys.NONE;
-            int cash = 0;
-            List<int> cashShopItemIds = new List<int>();
-            IPlayerCharacterData playerCharacter;
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            string userId;
+            if (!GameInstance.ServerUserHandlers.TryGetUserId(requestHandler.ConnectionId, out userId))
             {
-                // Cannot find user
-                message = UITextKeys.UI_ERROR_NOT_LOGGED_IN;
+                result.Invoke(AckResponseCode.Error, new ResponseCashShopInfoMessage()
+                {
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                });
+                return;
             }
-            else
+
+            CashResp getCashResp = await DbServiceClient.GetCashAsync(new GetCashReq()
             {
-                // Get user cash amount
-                CashResp getCashResp = await DbServiceClient.GetCashAsync(new GetCashReq()
-                {
-                    UserId = playerCharacter.UserId
-                });
-                cash = getCashResp.Cash;
-                // Set cash shop item ids
-                cashShopItemIds.AddRange(GameInstance.CashShopItems.Keys);
-            }
-            // Send response message
-            result.Invoke(
-                message == UITextKeys.NONE ? AckResponseCode.Success : AckResponseCode.Error,
-                new ResponseCashShopInfoMessage()
-                {
-                    message = message,
-                    cash = cash,
-                    cashShopItemIds = cashShopItemIds.ToArray(),
-                });
+                UserId = userId
+            });
+
+            result.Invoke(AckResponseCode.Success, new ResponseCashShopInfoMessage()
+            {
+                cash = getCashResp.Cash,
+                cashShopItemIds = new List<int>(GameInstance.CashShopItems.Keys).ToArray(),
+            });
 #endif
-            await UniTask.Yield();
         }
         public async UniTaskVoid HandleRequestCashShopBuy(
             RequestHandlerData requestHandler, RequestCashShopBuyMessage request,
             RequestProceedResultDelegate<ResponseCashShopBuyMessage> result)
         {
-
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            // Set response data
-            UITextKeys message = UITextKeys.NONE;
-            int dataId = request.dataId;
-            int userCash = 0;
-            int userGold = 0;
             IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                // Cannot find user
-                message = UITextKeys.UI_ERROR_NOT_LOGGED_IN;
+                result.Invoke(AckResponseCode.Error, new ResponseCashShopBuyMessage()
+                {
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                });
+                return;
             }
-            else
+
+            if (request.amount <= 0)
             {
-                // Get user cash amount
-                CashResp getCashResp = await DbServiceClient.GetCashAsync(new GetCashReq()
+                result.Invoke(AckResponseCode.Error, new ResponseCashShopBuyMessage()
                 {
-                    UserId = playerCharacter.UserId
+                    message = UITextKeys.UI_ERROR_INVALID_DATA,
                 });
-                userCash = getCashResp.Cash;
-                // Get user gold amount
-                GoldResp getGoldResp = await DbServiceClient.GetGoldAsync(new GetGoldReq()
+                return;
+            }
+
+            CashShopItem cashShopItem;
+            if (!GameInstance.CashShopItems.TryGetValue(request.dataId, out cashShopItem))
+            {
+                result.Invoke(AckResponseCode.Error, new ResponseCashShopBuyMessage()
                 {
-                    UserId = playerCharacter.UserId
+                    message = UITextKeys.UI_ERROR_ITEM_NOT_FOUND,
                 });
-                userGold = getGoldResp.Gold;
-                CashShopItem cashShopItem;
-                if (!GameInstance.CashShopItems.TryGetValue(dataId, out cashShopItem))
+                return;
+            }
+
+            if ((request.currencyType == CashShopItemCurrencyType.CASH && cashShopItem.SellPriceCash <= 0) ||
+                (request.currencyType == CashShopItemCurrencyType.GOLD && cashShopItem.SellPriceGold <= 0))
+            {
+                result.Invoke(AckResponseCode.Error, new ResponseCashShopBuyMessage()
                 {
-                    // Cannot find item
-                    message = UITextKeys.UI_ERROR_ITEM_NOT_FOUND;
-                }
-                else if (userCash < cashShopItem.SellPriceCash)
+                    message = UITextKeys.UI_ERROR_INVALID_ITEM_DATA,
+                });
+                return;
+            }
+
+            int characterGold = playerCharacter.Gold;
+            int userCash = playerCharacter.UserCash;
+            int priceCash = 0;
+            int priceGold = 0;
+
+            if (request.currencyType == CashShopItemCurrencyType.CASH)
+            {
+                // Validate cash
+                priceCash = cashShopItem.SellPriceCash * request.amount;
+                if (userCash < priceCash)
                 {
-                    // Not enough cash
-                    message = UITextKeys.UI_ERROR_NOT_ENOUGH_CASH;
-                }
-                else if (userGold < cashShopItem.SellPriceGold)
-                {
-                    // Not enough cash
-                    message = UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD;
-                }
-                else if (playerCharacter.IncreasingItemsWillOverwhelming(cashShopItem.ReceiveItems))
-                {
-                    // Cannot carry all rewards
-                    message = UITextKeys.UI_ERROR_WILL_OVERWHELMING;
-                }
-                else
-                {
-                    // Decrease cash amount
-                    CashResp changeCashResp = await DbServiceClient.ChangeCashAsync(new ChangeCashReq()
+                    result.Invoke(AckResponseCode.Error, new ResponseCashShopBuyMessage()
                     {
-                        UserId = playerCharacter.UserId,
-                        ChangeAmount = -cashShopItem.SellPriceCash
+                        message = UITextKeys.UI_ERROR_NOT_ENOUGH_CASH,
                     });
-                    userCash = changeCashResp.Cash;
-                    playerCharacter.UserCash = userCash;
-                    // Decrease gold amount
-                    GoldResp changeGoldResp = await DbServiceClient.ChangeGoldAsync(new ChangeGoldReq()
-                    {
-                        UserId = playerCharacter.UserId,
-                        ChangeAmount = -cashShopItem.SellPriceGold
-                    });
-                    userGold = changeGoldResp.Gold;
-                    playerCharacter.UserGold = userGold;
-                    // Increase character gold
-                    playerCharacter.Gold = playerCharacter.Gold.Increase(cashShopItem.ReceiveGold);
-                    // Increase currencies
-                    playerCharacter.IncreaseCurrencies(cashShopItem.ReceiveCurrencies);
-                    // Increase character item
-                    if (cashShopItem.ReceiveItems != null && cashShopItem.ReceiveItems.Length > 0)
-                    {
-                        foreach (ItemAmount receiveItem in cashShopItem.ReceiveItems)
-                        {
-                            if (receiveItem.item == null || receiveItem.amount <= 0) continue;
-                            playerCharacter.AddOrSetNonEquipItems(CharacterItem.Create(receiveItem.item, 1, receiveItem.amount));
-                        }
-                        playerCharacter.FillEmptySlots();
-                    }
+                    return;
                 }
             }
-            // Send response message
-            result.Invoke(
-                message == UITextKeys.NONE ? AckResponseCode.Success : AckResponseCode.Error,
-                new ResponseCashShopBuyMessage()
+
+            if (request.currencyType == CashShopItemCurrencyType.GOLD)
+            {
+                // Validate gold
+                priceGold = cashShopItem.SellPriceGold * request.amount;
+                if (characterGold < priceGold)
                 {
-                    message = message,
-                    dataId = dataId,
+                    result.Invoke(AckResponseCode.Error, new ResponseCashShopBuyMessage()
+                    {
+                        message = UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD,
+                    });
+                    return;
+                }
+            }
+
+            // Increase items
+            if (cashShopItem.ReceiveItems != null &&
+                cashShopItem.ReceiveItems.Length > 0)
+            {
+                List<ItemAmount> receiveItems = new List<ItemAmount>();
+                foreach (ItemAmount itemAmount in cashShopItem.ReceiveItems)
+                {
+                    receiveItems.Add(new ItemAmount()
+                    {
+                        item = itemAmount.item,
+                        amount = (short)(itemAmount.amount * request.amount),
+                    });
+                }
+                if (playerCharacter.IncreasingItemsWillOverwhelming(receiveItems))
+                {
+                    result.Invoke(AckResponseCode.Error, new ResponseCashShopBuyMessage()
+                    {
+                        message = UITextKeys.UI_ERROR_WILL_OVERWHELMING,
+                    });
+                    return;
+                }
+                playerCharacter.IncreaseItems(receiveItems);
+                playerCharacter.FillEmptySlots();
+            }
+
+            if (request.currencyType == CashShopItemCurrencyType.CASH)
+            {
+                // Reduce cash
+                CashResp changeCashResp = await DbServiceClient.ChangeCashAsync(new ChangeCashReq()
+                {
+                    UserId = playerCharacter.UserId,
+                    ChangeAmount = -priceCash
                 });
+                userCash = changeCashResp.Cash;
+            }
+
+            if (request.currencyType == CashShopItemCurrencyType.GOLD)
+            {
+                // Reduce gold
+                characterGold -= priceGold;
+            }
+
+            if (cashShopItem.ReceiveGold > 0)
+            {
+                // Increase gold
+                characterGold = characterGold.Increase(cashShopItem.ReceiveGold * request.amount);
+            }
+
+            playerCharacter.Gold = characterGold;
+            playerCharacter.UserCash = userCash;
+
+            // Response to client
+            result.Invoke(AckResponseCode.Success, new ResponseCashShopBuyMessage()
+            {
+                dataId = request.dataId,
+            });
 #endif
-            await UniTask.Yield();
         }
 
         public async UniTaskVoid HandleRequestCashPackageInfo(
@@ -155,38 +182,27 @@ namespace MultiplayerARPG.MMO
             RequestProceedResultDelegate<ResponseCashPackageInfoMessage> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            // Set response data
-            UITextKeys message = UITextKeys.NONE;
-            int cash = 0;
-            List<int> cashPackageIds = new List<int>();
-            IPlayerCharacterData playerCharacter;
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            string userId;
+            if (!GameInstance.ServerUserHandlers.TryGetUserId(requestHandler.ConnectionId, out userId))
             {
-                // Cannot find user
-                message = UITextKeys.UI_ERROR_NOT_LOGGED_IN;
+                result.Invoke(AckResponseCode.Error, new ResponseCashPackageInfoMessage()
+                {
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                });
+                return;
             }
-            else
+
+            CashResp getCashResp = await DbServiceClient.GetCashAsync(new GetCashReq()
             {
-                // Get user cash amount
-                CashResp getCashResp = await DbServiceClient.GetCashAsync(new GetCashReq()
-                {
-                    UserId = playerCharacter.UserId
-                });
-                cash = getCashResp.Cash;
-                // Set cash package ids
-                cashPackageIds.AddRange(GameInstance.CashPackages.Keys);
-            }
-            // Send response message
-            result.Invoke(
-                message == UITextKeys.NONE ? AckResponseCode.Success : AckResponseCode.Error,
-                new ResponseCashPackageInfoMessage()
-                {
-                    message = message,
-                    cash = cash,
-                    cashPackageIds = cashPackageIds.ToArray(),
-                });
+                UserId = userId
+            });
+
+            result.Invoke(AckResponseCode.Success, new ResponseCashPackageInfoMessage()
+            {
+                cash = getCashResp.Cash,
+                cashPackageIds = new List<int>(GameInstance.CashPackages.Keys).ToArray(),
+            });
 #endif
-            await UniTask.Yield();
         }
 
         public async UniTaskVoid HandleRequestCashPackageBuyValidation(
@@ -195,53 +211,42 @@ namespace MultiplayerARPG.MMO
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             // TODO: Validate purchasing at server side
-            // Set response data
-            UITextKeys message = UITextKeys.NONE;
-            int dataId = request.dataId;
-            int cash = 0;
             IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                // Cannot find user
-                message = UITextKeys.UI_ERROR_NOT_LOGGED_IN;
+                result.Invoke(AckResponseCode.Error, new ResponseCashPackageBuyValidationMessage()
+                {
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                });
+                return;
             }
-            else
+
+            CashPackage cashPackage;
+            if (!GameInstance.CashPackages.TryGetValue(request.dataId, out cashPackage))
             {
-                // Get user cash amount
-                CashResp getCashResp = await DbServiceClient.GetCashAsync(new GetCashReq()
+                result.Invoke(AckResponseCode.Error, new ResponseCashPackageBuyValidationMessage()
                 {
-                    UserId = playerCharacter.UserId
+                    message = UITextKeys.UI_ERROR_CASH_PACKAGE_NOT_FOUND,
                 });
-                cash = getCashResp.Cash;
-                CashPackage cashPackage;
-                if (!GameInstance.CashPackages.TryGetValue(dataId, out cashPackage))
-                {
-                    // Cannot find package
-                    message = UITextKeys.UI_ERROR_CASH_PACKAGE_NOT_FOUND;
-                }
-                else
-                {
-                    // Increase cash amount
-                    CashResp changeCashResp = await DbServiceClient.ChangeCashAsync(new ChangeCashReq()
-                    {
-                        UserId = playerCharacter.UserId,
-                        ChangeAmount = cashPackage.CashAmount
-                    });
-                    cash = changeCashResp.Cash;
-                    playerCharacter.UserCash = cash;
-                }
+                return;
             }
-            // Send response message
-            result.Invoke(
-                message == UITextKeys.NONE ? AckResponseCode.Success : AckResponseCode.Error,
-                new ResponseCashPackageBuyValidationMessage()
-                {
-                    message = message,
-                    dataId = dataId,
-                    cash = cash,
-                });
+
+            CashResp changeCashResp = await DbServiceClient.ChangeCashAsync(new ChangeCashReq()
+            {
+                UserId = playerCharacter.UserId,
+                ChangeAmount = cashPackage.CashAmount
+            });
+            int cash = changeCashResp.Cash;
+
+            // Sync cash to game clients
+            playerCharacter.UserCash = cash;
+
+            result.Invoke(AckResponseCode.Success, new ResponseCashPackageBuyValidationMessage()
+            {
+                dataId = request.dataId,
+                cash = cash,
+            });
 #endif
-            await UniTask.Yield();
         }
     }
 }
