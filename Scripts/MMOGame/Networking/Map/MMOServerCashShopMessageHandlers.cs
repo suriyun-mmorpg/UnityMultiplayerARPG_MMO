@@ -41,6 +41,7 @@ namespace MultiplayerARPG.MMO
             });
 #endif
         }
+
         public async UniTaskVoid HandleRequestCashShopBuy(
             RequestHandlerData requestHandler, RequestCashShopBuyMessage request,
             RequestProceedResultDelegate<ResponseCashShopBuyMessage> result)
