@@ -21,6 +21,7 @@ namespace MultiplayerARPG.MMO
 
         public async UniTaskVoid HandleRequestOpenGacha(RequestHandlerData requestHandler, RequestOpenGachaMessage request, RequestProceedResultDelegate<ResponseOpenGachaMessage> result)
         {
+#if UNITY_STANDALONE && !CLIENT_BUILD
             IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
@@ -79,6 +80,7 @@ namespace MultiplayerARPG.MMO
             playerCharacter.FillEmptySlots();
             // Send response message
             result.Invoke(AckResponseCode.Success, new ResponseOpenGachaMessage());
+#endif
         }
     }
 }
