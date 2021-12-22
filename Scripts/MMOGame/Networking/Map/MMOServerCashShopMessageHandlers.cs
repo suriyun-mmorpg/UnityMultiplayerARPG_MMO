@@ -88,12 +88,14 @@ namespace MultiplayerARPG.MMO
 
             int characterGold = playerCharacter.Gold;
             int userCash = playerCharacter.UserCash;
-            int priceCash = 0;
             int priceGold = 0;
+            int priceCash = 0;
+            int changeCharacterGold = 0;
+            int changeUserCash = 0;
 
+            // Validate cash
             if (request.currencyType == CashShopItemCurrencyType.CASH)
             {
-                // Validate cash
                 priceCash = cashShopItem.SellPriceCash * request.amount;
                 if (userCash < priceCash)
                 {
@@ -103,11 +105,12 @@ namespace MultiplayerARPG.MMO
                     });
                     return;
                 }
+                changeUserCash -= priceCash;
             }
 
+            // Validate gold
             if (request.currencyType == CashShopItemCurrencyType.GOLD)
             {
-                // Validate gold
                 priceGold = cashShopItem.SellPriceGold * request.amount;
                 if (characterGold < priceGold)
                 {
@@ -117,7 +120,12 @@ namespace MultiplayerARPG.MMO
                     });
                     return;
                 }
+                changeCharacterGold -= priceGold;
             }
+
+            // Increase gold
+            if (cashShopItem.ReceiveGold > 0)
+                changeCharacterGold += cashShopItem.ReceiveGold * request.amount;
 
             // Increase items
             if (cashShopItem.ReceiveItems != null &&
@@ -144,9 +152,10 @@ namespace MultiplayerARPG.MMO
                 playerCharacter.FillEmptySlots();
             }
 
+            // Update currency
+            characterGold += priceGold;
             if (request.currencyType == CashShopItemCurrencyType.CASH)
             {
-                // Reduce cash
                 CashResp changeCashResp = await DbServiceClient.ChangeCashAsync(new ChangeCashReq()
                 {
                     UserId = playerCharacter.UserId,
@@ -154,19 +163,6 @@ namespace MultiplayerARPG.MMO
                 });
                 userCash = changeCashResp.Cash;
             }
-
-            if (request.currencyType == CashShopItemCurrencyType.GOLD)
-            {
-                // Reduce gold
-                characterGold -= priceGold;
-            }
-
-            if (cashShopItem.ReceiveGold > 0)
-            {
-                // Increase gold
-                characterGold = characterGold.Increase(cashShopItem.ReceiveGold * request.amount);
-            }
-
             playerCharacter.Gold = characterGold;
             playerCharacter.UserCash = userCash;
 
