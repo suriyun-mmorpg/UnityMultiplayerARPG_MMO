@@ -30,7 +30,7 @@ namespace MultiplayerARPG.MMO
             });
             result.Invoke(AckResponseCode.Success, new ResponseSocialCharacterListMessage()
             {
-                characters = resp.List.ToArray(),
+                characters = resp.List,
             });
 #endif
         }
@@ -53,7 +53,7 @@ namespace MultiplayerARPG.MMO
             });
             result.Invoke(AckResponseCode.Success, new ResponseGetFriendsMessage()
             {
-                friends = resp.List.ToArray(),
+                friends = resp.List,
             });
 #endif
         }
@@ -75,7 +75,7 @@ namespace MultiplayerARPG.MMO
                 Character1Id = playerCharacter.Id,
                 Character2Id = request.friendId,
             });
-            GameInstance.ServerGameMessageHandlers.SendSetFriends(requestHandler.ConnectionId, resp.List.ToArray());
+            GameInstance.ServerGameMessageHandlers.SendSetFriends(requestHandler.ConnectionId, resp.List);
             result.Invoke(AckResponseCode.Success, new ResponseAddFriendMessage()
             {
                 message = UITextKeys.UI_FRIEND_ADDED,
@@ -100,7 +100,7 @@ namespace MultiplayerARPG.MMO
                 Character1Id = playerCharacter.Id,
                 Character2Id = request.friendId
             });
-            GameInstance.ServerGameMessageHandlers.SendSetFriends(requestHandler.ConnectionId, resp.List.ToArray());
+            GameInstance.ServerGameMessageHandlers.SendSetFriends(requestHandler.ConnectionId, resp.List);
             result.Invoke(AckResponseCode.Success, new ResponseRemoveFriendMessage()
             {
                 message = UITextKeys.UI_FRIEND_REMOVED,

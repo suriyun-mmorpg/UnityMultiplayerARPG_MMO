@@ -31,7 +31,7 @@ namespace MultiplayerARPG.MMO
             result.Invoke(AckResponseCode.Success, new ResponseMailListMessage()
             {
                 onlyNewMails = request.onlyNewMails,
-                mails = mails.ToArray(),
+                mails = mails,
             });
 #endif
         }
