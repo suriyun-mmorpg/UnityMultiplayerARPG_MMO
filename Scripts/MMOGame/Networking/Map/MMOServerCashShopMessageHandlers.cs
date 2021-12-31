@@ -37,7 +37,7 @@ namespace MultiplayerARPG.MMO
             result.Invoke(AckResponseCode.Success, new ResponseCashShopInfoMessage()
             {
                 cash = getCashResp.Cash,
-                cashShopItemIds = new List<int>(GameInstance.CashShopItems.Keys).ToArray(),
+                cashShopItemIds = new List<int>(GameInstance.CashShopItems.Keys),
             });
 #endif
         }
@@ -128,19 +128,19 @@ namespace MultiplayerARPG.MMO
                 changeCharacterGold += cashShopItem.ReceiveGold * request.amount;
 
             // Increase items
+            List<ItemAmount> rewardItems = new List<ItemAmount>();
             if (cashShopItem.ReceiveItems != null &&
                 cashShopItem.ReceiveItems.Length > 0)
             {
-                List<ItemAmount> receiveItems = new List<ItemAmount>();
                 foreach (ItemAmount itemAmount in cashShopItem.ReceiveItems)
                 {
-                    receiveItems.Add(new ItemAmount()
+                    rewardItems.Add(new ItemAmount()
                     {
                         item = itemAmount.item,
                         amount = (short)(itemAmount.amount * request.amount),
                     });
                 }
-                if (playerCharacter.IncreasingItemsWillOverwhelming(receiveItems))
+                if (playerCharacter.IncreasingItemsWillOverwhelming(rewardItems))
                 {
                     result.Invoke(AckResponseCode.Error, new ResponseCashShopBuyMessage()
                     {
@@ -148,7 +148,7 @@ namespace MultiplayerARPG.MMO
                     });
                     return;
                 }
-                playerCharacter.IncreaseItems(receiveItems);
+                playerCharacter.IncreaseItems(rewardItems);
                 playerCharacter.FillEmptySlots();
             }
 
@@ -169,7 +169,9 @@ namespace MultiplayerARPG.MMO
             // Response to client
             result.Invoke(AckResponseCode.Success, new ResponseCashShopBuyMessage()
             {
-                dataId = request.dataId,
+                dataId = cashShopItem.DataId,
+                rewardGold = cashShopItem.ReceiveGold,
+                rewardItems = rewardItems,
             });
 #endif
         }
@@ -197,7 +199,7 @@ namespace MultiplayerARPG.MMO
             result.Invoke(AckResponseCode.Success, new ResponseCashPackageInfoMessage()
             {
                 cash = getCashResp.Cash,
-                cashPackageIds = new List<int>(GameInstance.CashPackages.Keys).ToArray(),
+                cashPackageIds = new List<int>(GameInstance.CashPackages.Keys),
             });
 #endif
         }
