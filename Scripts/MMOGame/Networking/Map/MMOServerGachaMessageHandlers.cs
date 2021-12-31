@@ -19,6 +19,34 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
+        public async UniTaskVoid HandleRequestGachaInfo(
+            RequestHandlerData requestHandler, EmptyMessage request,
+            RequestProceedResultDelegate<ResponseGachaInfoMessage> result)
+        {
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            string userId;
+            if (!GameInstance.ServerUserHandlers.TryGetUserId(requestHandler.ConnectionId, out userId))
+            {
+                result.Invoke(AckResponseCode.Error, new ResponseGachaInfoMessage()
+                {
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                });
+                return;
+            }
+
+            CashResp getCashResp = await DbServiceClient.GetCashAsync(new GetCashReq()
+            {
+                UserId = userId
+            });
+
+            result.Invoke(AckResponseCode.Success, new ResponseGachaInfoMessage()
+            {
+                cash = getCashResp.Cash,
+                gachaIds = new List<int>(GameInstance.Gachas.Keys),
+            });
+#endif
+        }
+
         public async UniTaskVoid HandleRequestOpenGacha(RequestHandlerData requestHandler, RequestOpenGachaMessage request, RequestProceedResultDelegate<ResponseOpenGachaMessage> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
