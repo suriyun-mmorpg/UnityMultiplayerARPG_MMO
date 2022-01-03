@@ -725,5 +725,43 @@ namespace MultiplayerARPG.MMO
             await UniTask.Yield();
 #endif
         }
+
+        public async UniTaskVoid HandleRequestGetGuildInfo(RequestHandlerData requestHandler, RequestGetGuildInfoMessage request, RequestProceedResultDelegate<ResponseGetGuildInfoMessage> result)
+        {
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            IPlayerCharacterData playerCharacter;
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            {
+                result.Invoke(AckResponseCode.Error, new ResponseGetGuildInfoMessage()
+                {
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                });
+                return;
+            }
+
+            GuildData guild;
+            if (!GameInstance.ServerGuildHandlers.TryGetGuild(request.guildId, out guild))
+            {
+                result.Invoke(AckResponseCode.Error, new ResponseGetGuildInfoMessage()
+                {
+                    message = UITextKeys.UI_ERROR_GUILD_NOT_FOUND,
+                });
+                return;
+            }
+
+            result.Invoke(AckResponseCode.Success, new ResponseGetGuildInfoMessage()
+            {
+                guild = new GuildListEntry()
+                {
+                    Id = guild.id,
+                    GuildName = guild.guildName,
+                    Level = guild.level,
+                    FieldOptions = GuildListFieldOptions.Options,
+                    Options = guild.options,
+                }
+            });
+            await UniTask.Yield();
+#endif
+        }
     }
 }
