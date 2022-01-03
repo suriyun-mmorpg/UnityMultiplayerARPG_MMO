@@ -169,7 +169,7 @@ namespace MultiplayerARPG.MMO
             // Response to client
             result.Invoke(AckResponseCode.Success, new ResponseCashShopBuyMessage()
             {
-                dataId = cashShopItem.DataId,
+                dataId = request.dataId,
                 rewardGold = cashShopItem.ReceiveGold,
                 rewardItems = rewardItems,
             });

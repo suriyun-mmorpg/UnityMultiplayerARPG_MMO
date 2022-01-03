@@ -87,8 +87,8 @@ namespace MultiplayerARPG.MMO
             }
 
             int openCount = request.openMode == GachaOpenMode.Multiple ? gacha.MultipleModeOpenCount : 1;
-            List<ItemAmount> itemAmounts = gacha.GetRandomedItems(openCount);
-            if (playerCharacter.IncreasingItemsWillOverwhelming(itemAmounts))
+            List<ItemAmount> rewardItems = gacha.GetRandomedItems(openCount);
+            if (playerCharacter.IncreasingItemsWillOverwhelming(rewardItems))
             {
                 result.Invoke(AckResponseCode.Error, new ResponseOpenGachaMessage()
                 {
@@ -104,10 +104,14 @@ namespace MultiplayerARPG.MMO
             });
             playerCharacter.UserCash = changeCashResp.Cash;
             // Increase character items
-            playerCharacter.IncreaseItems(itemAmounts);
+            playerCharacter.IncreaseItems(rewardItems);
             playerCharacter.FillEmptySlots();
             // Send response message
-            result.Invoke(AckResponseCode.Success, new ResponseOpenGachaMessage());
+            result.Invoke(AckResponseCode.Success, new ResponseOpenGachaMessage()
+            {
+                dataId = request.dataId,
+                rewardItems = rewardItems,
+            });
 #endif
         }
     }
