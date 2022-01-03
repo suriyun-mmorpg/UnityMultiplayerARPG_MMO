@@ -192,11 +192,6 @@ namespace MultiplayerARPG.MMO
             playerCharacter.GuildId = guild.id;
             playerCharacter.GuildRole = guild.GetMemberRole(playerCharacter.Id);
             playerCharacter.SharedGuildExp = 0;
-            if (playerCharacter is BasePlayerCharacterEntity)
-            {
-                // Sync guild name to client
-                (playerCharacter as BasePlayerCharacterEntity).GuildName = request.guildName;
-            }
             // Broadcast via chat server
             if (ClusterClient.IsNetworkActive)
             {

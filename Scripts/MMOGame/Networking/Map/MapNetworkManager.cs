@@ -667,7 +667,6 @@ namespace MultiplayerARPG.MMO
                         GuildData guild;
                         if (ServerGuildHandlers.TryGetGuild(playerCharacterEntity.GuildId, out guild))
                         {
-                            playerCharacterEntity.GuildName = guild.guildName;
                             playerCharacterEntity.GuildRole = guild.GetMemberRole(playerCharacterEntity.Id);
                             ServerGameMessageHandlers.SendSetGuildData(playerCharacterEntity.ConnectionId, guild);
                             ServerGameMessageHandlers.SendAddGuildMembersToOne(playerCharacterEntity.ConnectionId, guild);
@@ -999,7 +998,6 @@ namespace MultiplayerARPG.MMO
                         if (ServerUserHandlers.TryGetPlayerCharacterById(message.character.id, out playerCharacterEntity))
                         {
                             playerCharacterEntity.GuildId = message.socialId;
-                            playerCharacterEntity.GuildName = guild.guildName;
                             playerCharacterEntity.GuildRole = guild.GetMemberRole(playerCharacterEntity.Id);
                             ServerGameMessageHandlers.SendSetGuildData(playerCharacterEntity.ConnectionId, guild);
                             ServerGameMessageHandlers.SendAddGuildMembersToOne(playerCharacterEntity.ConnectionId, guild);
