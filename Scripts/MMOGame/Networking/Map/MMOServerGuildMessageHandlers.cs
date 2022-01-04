@@ -239,11 +239,13 @@ namespace MultiplayerARPG.MMO
             });
             _ = DbServiceClient.UpdateGuildMemberRoleAsync(new UpdateGuildMemberRoleReq()
             {
+                GuildId = validateResult.GuildId,
                 MemberCharacterId = request.memberId,
                 GuildRole = validateResult.Guild.GetMemberRole(request.memberId)
             });
             _ = DbServiceClient.UpdateGuildMemberRoleAsync(new UpdateGuildMemberRoleReq()
             {
+                GuildId = validateResult.GuildId,
                 MemberCharacterId = request.memberId,
                 GuildRole = validateResult.Guild.GetMemberRole(request.memberId)
             });
@@ -631,6 +633,7 @@ namespace MultiplayerARPG.MMO
             // Save to database
             _ = DbServiceClient.UpdateGuildMemberRoleAsync(new UpdateGuildMemberRoleReq()
             {
+                GuildId = validateResult.GuildId,
                 MemberCharacterId = request.memberId,
                 GuildRole = request.guildRole
             });
