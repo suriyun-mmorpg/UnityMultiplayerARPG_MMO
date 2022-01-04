@@ -128,17 +128,21 @@ namespace MultiplayerARPG.MMO
                 changeCharacterGold += cashShopItem.ReceiveGold * request.amount;
 
             // Increase items
-            List<ItemAmount> rewardItems = new List<ItemAmount>();
+            List<RewardedItem> rewardItems = new List<RewardedItem>();
             if (cashShopItem.ReceiveItems != null &&
                 cashShopItem.ReceiveItems.Length > 0)
             {
                 foreach (ItemAmount itemAmount in cashShopItem.ReceiveItems)
                 {
-                    rewardItems.Add(new ItemAmount()
+                    for (int i = 0; i < request.amount; ++i)
                     {
-                        item = itemAmount.item,
-                        amount = (short)(itemAmount.amount * request.amount),
-                    });
+                        rewardItems.Add(new RewardedItem()
+                        {
+                            item = itemAmount.item,
+                            amount = itemAmount.amount,
+                            randomSeed = (short)Random.Range(short.MinValue, short.MaxValue),
+                        });
+                    }
                 }
                 if (playerCharacter.IncreasingItemsWillOverwhelming(rewardItems))
                 {
