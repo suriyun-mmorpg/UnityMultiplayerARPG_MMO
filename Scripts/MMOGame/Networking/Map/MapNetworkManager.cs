@@ -414,12 +414,16 @@ namespace MultiplayerARPG.MMO
             {
                 // Load buildings
                 // Don't load buildings if it's instance map
-                BuildingsResp resp = await DbServiceClient.ReadBuildingsAsync(new ReadBuildingsReq()
+                AsyncResponseData<BuildingsResp> buildingsResp;
+                do
                 {
-                    MapName = CurrentMapInfo.Id,
-                });
+                    buildingsResp = await DbServiceClient.ReadBuildingsAsync(new ReadBuildingsReq()
+                    {
+                        MapName = CurrentMapInfo.Id,
+                    });
+                } while (!buildingsResp.IsSuccess);
                 HashSet<StorageId> storageIds = new HashSet<StorageId>();
-                List<BuildingSaveData> buildings = resp.List;
+                List<BuildingSaveData> buildings = buildingsResp.Response.List;
                 BuildingEntity buildingEntity;
                 foreach (BuildingSaveData building in buildings)
                 {
@@ -549,13 +553,13 @@ namespace MultiplayerARPG.MMO
                 return false;
             }
 
-            ValidateAccessTokenResp validateAccessTokenResp = await DbServiceClient.ValidateAccessTokenAsync(new ValidateAccessTokenReq()
+            AsyncResponseData<ValidateAccessTokenResp> validateAccessTokenResp = await DbServiceClient.ValidateAccessTokenAsync(new ValidateAccessTokenReq()
             {
                 UserId = userId,
                 AccessToken = accessToken
             });
 
-            if (!validateAccessTokenResp.IsPass)
+            if (!validateAccessTokenResp.IsSuccess || !validateAccessTokenResp.Response.IsPass)
             {
                 if (LogError)
                     Logging.LogError(LogTag, "Invalid access token for user: " + userId);
@@ -569,12 +573,17 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
         private async UniTaskVoid SetPlayerReadyRoutine(long connectionId, string userId, string selectCharacterId)
         {
-            CharacterResp characterResp = await DbServiceClient.ReadCharacterAsync(new ReadCharacterReq()
+            AsyncResponseData<CharacterResp> characterResp = await DbServiceClient.ReadCharacterAsync(new ReadCharacterReq()
             {
                 UserId = userId,
                 CharacterId = selectCharacterId
             });
-            PlayerCharacterData playerCharacterData = characterResp.CharacterData;
+            if (!characterResp.IsSuccess)
+            {
+                ServerTransport.ServerDisconnect(connectionId);
+                return;
+            }
+            PlayerCharacterData playerCharacterData = characterResp.Response.CharacterData;
             // If data is empty / cannot find character, disconnect user
             if (playerCharacterData == null)
             {
@@ -615,21 +624,32 @@ namespace MultiplayerARPG.MMO
                         characterRotation);
                     BasePlayerCharacterEntity playerCharacterEntity = spawnObj.GetComponent<BasePlayerCharacterEntity>();
                     playerCharacterData.CloneTo(playerCharacterEntity);
-                    Assets.NetworkSpawn(spawnObj, 0, connectionId);
 
                     // Set currencies
                     // Gold
-                    GoldResp getGoldResp = await DbServiceClient.GetGoldAsync(new GetGoldReq()
+                    AsyncResponseData<GoldResp> getGoldResp = await DbServiceClient.GetGoldAsync(new GetGoldReq()
                     {
                         UserId = userId
                     });
-                    playerCharacterEntity.UserGold = getGoldResp.Gold;
+                    if (!getGoldResp.IsSuccess)
+                    {
+                        Destroy(spawnObj.gameObject);
+                        ServerTransport.ServerDisconnect(connectionId);
+                        return;
+                    }
+                    playerCharacterEntity.UserGold = getGoldResp.Response.Gold;
                     // Cash
-                    CashResp getCashResp = await DbServiceClient.GetCashAsync(new GetCashReq()
+                    AsyncResponseData<CashResp> getCashResp = await DbServiceClient.GetCashAsync(new GetCashReq()
                     {
                         UserId = userId
                     });
-                    playerCharacterEntity.UserCash = getCashResp.Cash;
+                    if (!getCashResp.IsSuccess)
+                    {
+                        Destroy(spawnObj.gameObject);
+                        ServerTransport.ServerDisconnect(connectionId);
+                        return;
+                    }
+                    playerCharacterEntity.UserCash = getCashResp.Response.Cash;
 
                     // Prepare saving location for this character
                     if (IsInstanceMap())
@@ -639,11 +659,17 @@ namespace MultiplayerARPG.MMO
                     playerCharacterEntity.UserId = userId;
 
                     // Load user level
-                    GetUserLevelResp getUserLevelResp = await DbServiceClient.GetUserLevelAsync(new GetUserLevelReq()
+                    AsyncResponseData<GetUserLevelResp> getUserLevelResp = await DbServiceClient.GetUserLevelAsync(new GetUserLevelReq()
                     {
                         UserId = userId
                     });
-                    playerCharacterEntity.UserLevel = getUserLevelResp.UserLevel;
+                    if (!getUserLevelResp.IsSuccess)
+                    {
+                        Destroy(spawnObj.gameObject);
+                        ServerTransport.ServerDisconnect(connectionId);
+                        return;
+                    }
+                    playerCharacterEntity.UserLevel = getUserLevelResp.Response.UserLevel;
 
                     // Load party data, if this map-server does not have party data
                     if (playerCharacterEntity.PartyId > 0)
@@ -683,15 +709,23 @@ namespace MultiplayerARPG.MMO
                             ServerGameMessageHandlers.SendSetGuildLevelExpSkillPoint(playerCharacterEntity.ConnectionId, guild);
                         }
                         else
+                        {
                             playerCharacterEntity.ClearGuild();
+                        }
                     }
 
                     // Summon saved summons
-                    GetSummonBuffsResp summonBuffsResp = await DbServiceClient.GetSummonBuffsAsync(new GetSummonBuffsReq()
+                    AsyncResponseData<GetSummonBuffsResp> summonBuffsResp = await DbServiceClient.GetSummonBuffsAsync(new GetSummonBuffsReq()
                     {
                         CharacterId = playerCharacterEntity.Id,
                     });
-                    List<CharacterBuff> summonBuffs = summonBuffsResp.SummonBuffs;
+                    if (!summonBuffsResp.IsSuccess)
+                    {
+                        Destroy(spawnObj.gameObject);
+                        ServerTransport.ServerDisconnect(connectionId);
+                        return;
+                    }
+                    List<CharacterBuff> summonBuffs = summonBuffsResp.Response.SummonBuffs;
                     for (int i = 0; i < playerCharacterEntity.Summons.Count; ++i)
                     {
                         CharacterSummon summon = playerCharacterEntity.Summons[i];
@@ -707,6 +741,9 @@ namespace MultiplayerARPG.MMO
                         }
                         playerCharacterEntity.Summons[i] = summon;
                     }
+
+                    // Spawn the character
+                    Assets.NetworkSpawn(spawnObj, 0, connectionId);
 
                     // Summon saved mount entity
                     if (GameInstance.VehicleEntities.ContainsKey(playerCharacterData.MountDataId))
