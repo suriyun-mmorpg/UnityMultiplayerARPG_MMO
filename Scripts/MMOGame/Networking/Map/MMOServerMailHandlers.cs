@@ -1,4 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
+using LiteNetLibManager;
 using UnityEngine;
 
 namespace MultiplayerARPG.MMO
@@ -15,11 +16,11 @@ namespace MultiplayerARPG.MMO
         public async UniTask<bool> SendMail(Mail mail)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            SendMailResp resp = await DbServiceClient.SendMailAsync(new SendMailReq()
+            AsyncResponseData<SendMailResp> resp = await DbServiceClient.SendMailAsync(new SendMailReq()
             {
                 Mail = mail,
             });
-            if (resp.Error == 0)
+            if (resp.IsSuccess && resp.Response.Error == 0)
                 return true;
 #endif
             return false;
