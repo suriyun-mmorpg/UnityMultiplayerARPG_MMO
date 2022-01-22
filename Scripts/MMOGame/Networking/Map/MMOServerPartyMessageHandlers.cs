@@ -277,8 +277,6 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            validateResult.Party.Setting(request.shareExp, request.shareItem);
-            GameInstance.ServerPartyHandlers.SetParty(validateResult.PartyId, validateResult.Party);
             // Save to database
             AsyncResponseData<PartyResp> updateResp = await DbServiceClient.UpdatePartyAsync(new UpdatePartyReq()
             {
@@ -294,6 +292,9 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
+            // Update cache
+            validateResult.Party.Setting(request.shareExp, request.shareItem);
+            GameInstance.ServerPartyHandlers.SetParty(validateResult.PartyId, validateResult.Party);
             // Broadcast via chat server
             if (ClusterClient.IsNetworkActive)
             {
