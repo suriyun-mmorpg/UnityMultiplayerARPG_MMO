@@ -24,7 +24,7 @@ namespace MultiplayerARPG.MMO
             IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseDepositGuildGoldMessage()
+                result.InvokeError(new ResponseDepositGuildGoldMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -33,7 +33,7 @@ namespace MultiplayerARPG.MMO
             GuildData guild;
             if (!GameInstance.ServerGuildHandlers.TryGetGuild(playerCharacter.GuildId, out guild))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseDepositGuildGoldMessage()
+                result.InvokeError(new ResponseDepositGuildGoldMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_JOINED_GUILD,
                 });
@@ -41,7 +41,7 @@ namespace MultiplayerARPG.MMO
             }
             if (playerCharacter.Gold - request.gold < 0)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseDepositGuildGoldMessage()
+                result.InvokeError(new ResponseDepositGuildGoldMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD_TO_DEPOSIT,
                 });
@@ -55,7 +55,7 @@ namespace MultiplayerARPG.MMO
             });
             if (!changeGoldResp.IsSuccess)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseDepositGuildGoldMessage()
+                result.InvokeError(new ResponseDepositGuildGoldMessage()
                 {
                     message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
                 });
@@ -70,7 +70,7 @@ namespace MultiplayerARPG.MMO
                 ClusterClient.SendSetGuildGold(MMOMessageTypes.UpdateGuild, guild.id, guild.gold);
             }
             GameInstance.ServerGameMessageHandlers.SendSetGuildGoldToMembers(guild);
-            result.Invoke(AckResponseCode.Success, new ResponseDepositGuildGoldMessage());
+            result.InvokeSuccess(new ResponseDepositGuildGoldMessage());
 #endif
         }
 
@@ -80,7 +80,7 @@ namespace MultiplayerARPG.MMO
             IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseDepositUserGoldMessage()
+                result.InvokeError(new ResponseDepositUserGoldMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -88,7 +88,7 @@ namespace MultiplayerARPG.MMO
             }
             if (playerCharacter.Gold - request.gold < 0)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseDepositUserGoldMessage()
+                result.InvokeError(new ResponseDepositUserGoldMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD_TO_DEPOSIT,
                 });
@@ -102,7 +102,7 @@ namespace MultiplayerARPG.MMO
             });
             if (!changeGoldResp.IsSuccess)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseDepositUserGoldMessage()
+                result.InvokeError(new ResponseDepositUserGoldMessage()
                 {
                     message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
                 });
@@ -110,7 +110,7 @@ namespace MultiplayerARPG.MMO
             }
             playerCharacter.UserGold = changeGoldResp.Response.Gold;
             playerCharacter.Gold -= request.gold;
-            result.Invoke(AckResponseCode.Success, new ResponseDepositUserGoldMessage());
+            result.InvokeSuccess(new ResponseDepositUserGoldMessage());
 #endif
         }
 
@@ -120,7 +120,7 @@ namespace MultiplayerARPG.MMO
             IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseWithdrawGuildGoldMessage()
+                result.InvokeError(new ResponseWithdrawGuildGoldMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -129,7 +129,7 @@ namespace MultiplayerARPG.MMO
             GuildData guild;
             if (!GameInstance.ServerGuildHandlers.TryGetGuild(playerCharacter.GuildId, out guild))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseWithdrawGuildGoldMessage()
+                result.InvokeError(new ResponseWithdrawGuildGoldMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_JOINED_GUILD,
                 });
@@ -142,7 +142,7 @@ namespace MultiplayerARPG.MMO
             });
             if (!goldResp.IsSuccess)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseWithdrawGuildGoldMessage()
+                result.InvokeError(new ResponseWithdrawGuildGoldMessage()
                 {
                     message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
                 });
@@ -150,7 +150,7 @@ namespace MultiplayerARPG.MMO
             }
             if (goldResp.Response.GuildGold - request.gold < 0)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseWithdrawGuildGoldMessage()
+                result.InvokeError(new ResponseWithdrawGuildGoldMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD_TO_WITHDRAW,
                 });
@@ -164,7 +164,7 @@ namespace MultiplayerARPG.MMO
             });
             if (!changeGoldResp.IsSuccess)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseWithdrawGuildGoldMessage()
+                result.InvokeError(new ResponseWithdrawGuildGoldMessage()
                 {
                     message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
                 });
@@ -179,7 +179,7 @@ namespace MultiplayerARPG.MMO
                 ClusterClient.SendSetGuildGold(MMOMessageTypes.UpdateGuild, guild.id, guild.gold);
             }
             GameInstance.ServerGameMessageHandlers.SendSetGuildGoldToMembers(guild);
-            result.Invoke(AckResponseCode.Success, new ResponseWithdrawGuildGoldMessage());
+            result.InvokeSuccess(new ResponseWithdrawGuildGoldMessage());
 #endif
         }
 
@@ -189,7 +189,7 @@ namespace MultiplayerARPG.MMO
             IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseWithdrawUserGoldMessage()
+                result.InvokeError(new ResponseWithdrawUserGoldMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -202,7 +202,7 @@ namespace MultiplayerARPG.MMO
             });
             if (!goldResp.IsSuccess)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseWithdrawUserGoldMessage()
+                result.InvokeError(new ResponseWithdrawUserGoldMessage()
                 {
                     message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
                 });
@@ -210,7 +210,7 @@ namespace MultiplayerARPG.MMO
             }
             if (goldResp.Response.Gold - request.gold < 0)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseWithdrawUserGoldMessage()
+                result.InvokeError(new ResponseWithdrawUserGoldMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD_TO_WITHDRAW,
                 });
@@ -224,7 +224,7 @@ namespace MultiplayerARPG.MMO
             });
             if (!changeGoldResp.IsSuccess)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseWithdrawUserGoldMessage()
+                result.InvokeError(new ResponseWithdrawUserGoldMessage()
                 {
                     message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
                 });
@@ -232,7 +232,7 @@ namespace MultiplayerARPG.MMO
             }
             playerCharacter.UserGold = changeGoldResp.Response.Gold;
             playerCharacter.Gold = playerCharacter.Gold.Increase(request.gold);
-            result.Invoke(AckResponseCode.Success, new ResponseWithdrawUserGoldMessage());
+            result.InvokeSuccess(new ResponseWithdrawUserGoldMessage());
 #endif
         }
     }
