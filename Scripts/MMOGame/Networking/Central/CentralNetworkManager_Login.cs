@@ -48,85 +48,118 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
             if (disableDefaultLogin)
             {
-                result.Invoke(AckResponseCode.Error,
-                    new ResponseUserLoginMessage()
-                    {
-                        message = UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE
-                    });
+                result.InvokeError(new ResponseUserLoginMessage()
+                {
+                    message = UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE,
+                });
                 return;
             }
 
             long connectionId = requestHandler.ConnectionId;
-            UITextKeys message = UITextKeys.NONE;
-            ValidateUserLoginResp validateUserLoginResp = await DbServiceClient.ValidateUserLoginAsync(new ValidateUserLoginReq()
+            AsyncResponseData<ValidateUserLoginResp> validateUserLoginResp = await DbServiceClient.ValidateUserLoginAsync(new ValidateUserLoginReq()
             {
                 Username = request.username,
                 Password = request.password
             });
-            string userId = validateUserLoginResp.UserId;
+            if (!validateUserLoginResp.IsSuccess)
+            {
+                result.InvokeError(new ResponseUserLoginMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                });
+                return;
+            }
+            string userId = validateUserLoginResp.Response.UserId;
             string accessToken = string.Empty;
             long unbanTime = 0;
             if (string.IsNullOrEmpty(userId))
             {
-                message = UITextKeys.UI_ERROR_INVALID_USERNAME_OR_PASSWORD;
-                userId = string.Empty;
-            }
-            else if (userPeersByUserId.ContainsKey(userId) || MapContainsUser(userId))
-            {
-                message = UITextKeys.UI_ERROR_ALREADY_LOGGED_IN;
-                userId = string.Empty;
-            }
-            else
-            {
-                bool emailVerified = true;
-                if (requireEmailVerification)
+                result.InvokeError(new ResponseUserLoginMessage()
                 {
-                    ValidateEmailVerificationResp validateEmailVerificationResp = await DbServiceClient.ValidateEmailVerificationAsync(new ValidateEmailVerificationReq()
-                    {
-                        UserId = userId
-                    });
-                    emailVerified = validateEmailVerificationResp.IsPass;
-                }
-                GetUserUnbanTimeResp resp = await DbServiceClient.GetUserUnbanTimeAsync(new GetUserUnbanTimeReq()
+                    message = UITextKeys.UI_ERROR_INVALID_USERNAME_OR_PASSWORD,
+                });
+                return;
+            }
+            if (userPeersByUserId.ContainsKey(userId) || MapContainsUser(userId))
+            {
+                result.InvokeError(new ResponseUserLoginMessage()
+                {
+                    message = UITextKeys.UI_ERROR_ALREADY_LOGGED_IN,
+                });
+                return;
+            }
+            bool emailVerified = true;
+            if (requireEmailVerification)
+            {
+                AsyncResponseData<ValidateEmailVerificationResp> validateEmailVerificationResp = await DbServiceClient.ValidateEmailVerificationAsync(new ValidateEmailVerificationReq()
                 {
                     UserId = userId
                 });
-                unbanTime = resp.UnbanTime;
-                if (unbanTime > System.DateTimeOffset.UtcNow.ToUnixTimeSeconds())
+                if (!validateEmailVerificationResp.IsSuccess)
                 {
-                    message = UITextKeys.UI_ERROR_USER_BANNED;
-                    userId = string.Empty;
-                }
-                else if (!emailVerified)
-                {
-                    message = UITextKeys.UI_ERROR_EMAIL_NOT_VERIFIED;
-                    userId = string.Empty;
-                }
-                else
-                {
-                    CentralUserPeerInfo userPeerInfo = new CentralUserPeerInfo();
-                    userPeerInfo.connectionId = connectionId;
-                    userPeerInfo.userId = userId;
-                    userPeerInfo.accessToken = accessToken = Regex.Replace(System.Convert.ToBase64String(System.Guid.NewGuid().ToByteArray()), "[/+=]", "");
-                    userPeersByUserId[userId] = userPeerInfo;
-                    userPeers[connectionId] = userPeerInfo;
-                    await DbServiceClient.UpdateAccessTokenAsync(new UpdateAccessTokenReq()
+                    result.InvokeError(new ResponseUserLoginMessage()
                     {
-                        UserId = userId,
-                        AccessToken = accessToken
+                        message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
                     });
+                    return;
                 }
+                emailVerified = validateEmailVerificationResp.Response.IsPass;
+            }
+            AsyncResponseData<GetUserUnbanTimeResp> unbanTimeResp = await DbServiceClient.GetUserUnbanTimeAsync(new GetUserUnbanTimeReq()
+            {
+                UserId = userId
+            });
+            if (!unbanTimeResp.IsSuccess)
+            {
+                result.InvokeError(new ResponseUserLoginMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                });
+                return;
+            }
+            unbanTime = unbanTimeResp.Response.UnbanTime;
+            if (unbanTime > System.DateTimeOffset.UtcNow.ToUnixTimeSeconds())
+            {
+                result.InvokeError(new ResponseUserLoginMessage()
+                {
+                    message = UITextKeys.UI_ERROR_USER_BANNED,
+                });
+                return;
+            }
+            if (!emailVerified)
+            {
+                result.InvokeError(new ResponseUserLoginMessage()
+                {
+                    message = UITextKeys.UI_ERROR_EMAIL_NOT_VERIFIED,
+                });
+                return;
+            }
+            CentralUserPeerInfo userPeerInfo = new CentralUserPeerInfo();
+            userPeerInfo.connectionId = connectionId;
+            userPeerInfo.userId = userId;
+            userPeerInfo.accessToken = accessToken = Regex.Replace(System.Convert.ToBase64String(System.Guid.NewGuid().ToByteArray()), "[/+=]", "");
+            userPeersByUserId[userId] = userPeerInfo;
+            userPeers[connectionId] = userPeerInfo;
+            AsyncResponseData<EmptyMessage> updateAccessTokenResp = await DbServiceClient.UpdateAccessTokenAsync(new UpdateAccessTokenReq()
+            {
+                UserId = userId,
+                AccessToken = accessToken
+            });
+            if (!updateAccessTokenResp.IsSuccess)
+            {
+                result.InvokeError(new ResponseUserLoginMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                });
+                return;
             }
             // Response
-            result.Invoke(
-                message == UITextKeys.NONE ? AckResponseCode.Success : AckResponseCode.Error,
-                new ResponseUserLoginMessage()
-                {
-                    message = message,
-                    userId = userId,
-                    accessToken = accessToken,
-                    unbanTime = unbanTime,
-                });
+            result.InvokeSuccess(new ResponseUserLoginMessage()
+            {
+                userId = userId,
+                accessToken = accessToken,
+                unbanTime = unbanTime,
+            });
 #endif
         }
 
@@ -138,68 +171,106 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
             if (disableDefaultLogin)
             {
-                result.Invoke(AckResponseCode.Error,
-                    new ResponseUserRegisterMessage()
-                    {
-                        message = UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE
-                    });
+                result.InvokeError(new ResponseUserRegisterMessage()
+                {
+                    message = UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE
+                });
                 return;
             }
-
-            UITextKeys message = UITextKeys.NONE;
             string username = request.username;
             string password = request.password;
             string email = request.email.Trim();
-            FindUsernameResp findUsernameResp = await DbServiceClient.FindUsernameAsync(new FindUsernameReq()
-            {
-                Username = username
-            });
-            bool emailVerified = true;
             if (requireEmail)
             {
                 if (string.IsNullOrEmpty(email) || !Email.IsValid(email))
                 {
-                    message = UITextKeys.UI_ERROR_INVALID_EMAIL;
-                    emailVerified = false;
-                }
-                else
-                {
-                    FindEmailResp findEmailResp = await DbServiceClient.FindEmailAsync(new FindEmailReq()
+                    result.InvokeError(new ResponseUserRegisterMessage()
                     {
-                        Email = email
+                        message = UITextKeys.UI_ERROR_INVALID_EMAIL,
                     });
-                    emailVerified = findEmailResp.FoundAmount <= 0;
-                    if (!emailVerified)
-                        message = UITextKeys.UI_ERROR_EMAIL_ALREADY_IN_USE;
+                    return;
+                }
+                AsyncResponseData<FindEmailResp> findEmailResp = await DbServiceClient.FindEmailAsync(new FindEmailReq()
+                {
+                    Email = email
+                });
+                if (!findEmailResp.IsSuccess)
+                {
+                    result.InvokeError(new ResponseUserRegisterMessage()
+                    {
+                        message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                    });
+                    return;
+                }
+                if (findEmailResp.Response.FoundAmount > 0)
+                {
+                    result.InvokeError(new ResponseUserRegisterMessage()
+                    {
+                        message = UITextKeys.UI_ERROR_EMAIL_ALREADY_IN_USE,
+                    });
+                    return;
                 }
             }
-            if (emailVerified)
+            AsyncResponseData<FindUsernameResp> findUsernameResp = await DbServiceClient.FindUsernameAsync(new FindUsernameReq()
             {
-                if (findUsernameResp.FoundAmount > 0)
-                    message = UITextKeys.UI_ERROR_USERNAME_EXISTED;
-                else if (string.IsNullOrEmpty(username) || username.Length < minUsernameLength)
-                    message = UITextKeys.UI_ERROR_USERNAME_TOO_SHORT;
-                else if (username.Length > maxUsernameLength)
-                    message = UITextKeys.UI_ERROR_USERNAME_TOO_LONG;
-                else if (string.IsNullOrEmpty(password) || password.Length < minPasswordLength)
-                    message = UITextKeys.UI_ERROR_PASSWORD_TOO_SHORT;
-                else
+                Username = username
+            });
+            if (!findUsernameResp.IsSuccess)
+            {
+                result.InvokeError(new ResponseUserRegisterMessage()
                 {
-                    await DbServiceClient.CreateUserLoginAsync(new CreateUserLoginReq()
-                    {
-                        Username = username,
-                        Password = password,
-                        Email = email,
-                    });
-                }
+                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                });
+                return;
+            }
+            if (findUsernameResp.Response.FoundAmount > 0)
+            {
+                result.InvokeError(new ResponseUserRegisterMessage()
+                {
+                    message = UITextKeys.UI_ERROR_USERNAME_EXISTED,
+                });
+                return;
+            }
+            if (string.IsNullOrEmpty(username) || username.Length < minUsernameLength)
+            {
+                result.InvokeError(new ResponseUserRegisterMessage()
+                {
+                    message = UITextKeys.UI_ERROR_USERNAME_TOO_SHORT,
+                });
+                return;
+            }
+            if (username.Length > maxUsernameLength)
+            {
+                result.InvokeError(new ResponseUserRegisterMessage()
+                {
+                    message = UITextKeys.UI_ERROR_USERNAME_TOO_LONG,
+                });
+                return;
+            }
+            if (string.IsNullOrEmpty(password) || password.Length < minPasswordLength)
+            {
+                result.InvokeError(new ResponseUserRegisterMessage()
+                {
+                    message = UITextKeys.UI_ERROR_PASSWORD_TOO_SHORT,
+                });
+                return;
+            }
+            AsyncResponseData<EmptyMessage> createResp = await DbServiceClient.CreateUserLoginAsync(new CreateUserLoginReq()
+            {
+                Username = username,
+                Password = password,
+                Email = email,
+            });
+            if (!createResp.IsSuccess)
+            {
+                result.InvokeError(new ResponseUserRegisterMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                });
+                return;
             }
             // Response
-            result.Invoke(
-                message == UITextKeys.NONE ? AckResponseCode.Success : AckResponseCode.Error,
-                new ResponseUserRegisterMessage()
-                {
-                    message = message,
-                });
+            result.InvokeSuccess(new ResponseUserRegisterMessage());
 #endif
         }
 
@@ -215,14 +286,19 @@ namespace MultiplayerARPG.MMO
             {
                 userPeersByUserId.Remove(userPeerInfo.userId);
                 userPeers.Remove(connectionId);
-                await DbServiceClient.UpdateAccessTokenAsync(new UpdateAccessTokenReq()
+                AsyncResponseData<EmptyMessage> updateAccessTokenResp = await DbServiceClient.UpdateAccessTokenAsync(new UpdateAccessTokenReq()
                 {
                     UserId = userPeerInfo.userId,
                     AccessToken = string.Empty
                 });
+                if (!updateAccessTokenResp.IsSuccess)
+                {
+                    result.InvokeError(EmptyMessage.Value);
+                    return;
+                }
             }
             // Response
-            result.Invoke(AckResponseCode.Success, EmptyMessage.Value);
+            result.InvokeSuccess(EmptyMessage.Value);
 #endif
         }
 
@@ -233,64 +309,82 @@ namespace MultiplayerARPG.MMO
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             long connectionId = requestHandler.ConnectionId;
-            UITextKeys message = UITextKeys.NONE;
             string userId = request.userId;
             string accessToken = request.accessToken;
             long unbanTime = 0;
-            ValidateAccessTokenResp validateAccessTokenResp = await DbServiceClient.ValidateAccessTokenAsync(new ValidateAccessTokenReq()
+            AsyncResponseData<ValidateAccessTokenResp> validateAccessTokenResp = await DbServiceClient.ValidateAccessTokenAsync(new ValidateAccessTokenReq()
             {
                 UserId = userId,
                 AccessToken = accessToken
             });
-            if (!validateAccessTokenResp.IsPass)
+            if (!validateAccessTokenResp.IsSuccess)
             {
-                message = UITextKeys.UI_ERROR_INVALID_USER_TOKEN;
-                userId = string.Empty;
-                accessToken = string.Empty;
-            }
-            else
-            {
-                GetUserUnbanTimeResp resp = await DbServiceClient.GetUserUnbanTimeAsync(new GetUserUnbanTimeReq()
+                result.InvokeError(new ResponseValidateAccessTokenMessage()
                 {
-                    UserId = userId
+                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
                 });
-                unbanTime = resp.UnbanTime;
-                if (unbanTime > System.DateTimeOffset.UtcNow.ToUnixTimeSeconds())
+                return;
+            }
+            if (!validateAccessTokenResp.Response.IsPass)
+            {
+                result.InvokeError(new ResponseValidateAccessTokenMessage()
                 {
-                    message = UITextKeys.UI_ERROR_USER_BANNED;
-                    userId = string.Empty;
-                    accessToken = string.Empty;
-                }
-                else
+                    message = UITextKeys.UI_ERROR_INVALID_USER_TOKEN,
+                });
+                return;
+            }
+            AsyncResponseData<GetUserUnbanTimeResp> unbanTimeResp = await DbServiceClient.GetUserUnbanTimeAsync(new GetUserUnbanTimeReq()
+            {
+                UserId = userId
+            });
+            if (!unbanTimeResp.IsSuccess)
+            {
+                result.InvokeError(new ResponseValidateAccessTokenMessage()
                 {
-                    CentralUserPeerInfo userPeerInfo;
-                    if (userPeersByUserId.TryGetValue(userId, out userPeerInfo))
-                    {
-                        userPeersByUserId.Remove(userPeerInfo.userId);
-                        userPeers.Remove(userPeerInfo.connectionId);
-                    }
-                    userPeerInfo = new CentralUserPeerInfo();
-                    userPeerInfo.connectionId = connectionId;
-                    userPeerInfo.userId = userId;
-                    userPeerInfo.accessToken = accessToken = Regex.Replace(System.Convert.ToBase64String(System.Guid.NewGuid().ToByteArray()), "[/+=]", "");
-                    userPeersByUserId[userId] = userPeerInfo;
-                    userPeers[connectionId] = userPeerInfo;
-                    await DbServiceClient.UpdateAccessTokenAsync(new UpdateAccessTokenReq()
-                    {
-                        UserId = userPeerInfo.userId,
-                        AccessToken = accessToken
-                    });
-                }
+                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                });
+                return;
+            }
+            unbanTime = unbanTimeResp.Response.UnbanTime;
+            if (unbanTime > System.DateTimeOffset.UtcNow.ToUnixTimeSeconds())
+            {
+                result.InvokeError(new ResponseValidateAccessTokenMessage()
+                {
+                    message = UITextKeys.UI_ERROR_USER_BANNED,
+                });
+                return;
+            }
+            CentralUserPeerInfo userPeerInfo;
+            if (userPeersByUserId.TryGetValue(userId, out userPeerInfo))
+            {
+                userPeersByUserId.Remove(userPeerInfo.userId);
+                userPeers.Remove(userPeerInfo.connectionId);
+            }
+            userPeerInfo = new CentralUserPeerInfo();
+            userPeerInfo.connectionId = connectionId;
+            userPeerInfo.userId = userId;
+            userPeerInfo.accessToken = accessToken = Regex.Replace(System.Convert.ToBase64String(System.Guid.NewGuid().ToByteArray()), "[/+=]", "");
+            userPeersByUserId[userId] = userPeerInfo;
+            userPeers[connectionId] = userPeerInfo;
+            AsyncResponseData<EmptyMessage> updateAccessTokenResp = await DbServiceClient.UpdateAccessTokenAsync(new UpdateAccessTokenReq()
+            {
+                UserId = userPeerInfo.userId,
+                AccessToken = accessToken
+            });
+            if (!updateAccessTokenResp.IsSuccess)
+            {
+                result.InvokeError(new ResponseValidateAccessTokenMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                });
+                return;
             }
             // Response
-            result.Invoke(
-                message == UITextKeys.NONE ? AckResponseCode.Success : AckResponseCode.Error,
-                new ResponseValidateAccessTokenMessage()
-                {
-                    message = message,
-                    userId = userId,
-                    accessToken = accessToken,
-                });
+            result.InvokeSuccess(new ResponseValidateAccessTokenMessage()
+            {
+                userId = userId,
+                accessToken = accessToken,
+            });
 #endif
         }
     }
