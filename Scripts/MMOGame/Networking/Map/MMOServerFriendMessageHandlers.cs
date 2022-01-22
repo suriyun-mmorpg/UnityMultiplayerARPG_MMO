@@ -24,13 +24,21 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            SocialCharactersResp resp = await DbServiceClient.FindCharactersAsync(new FindCharacterNameReq()
+            AsyncResponseData<SocialCharactersResp> resp = await DbServiceClient.FindCharactersAsync(new FindCharacterNameReq()
             {
                 CharacterName = request.characterName
             });
+            if (!resp.IsSuccess)
+            {
+                result.InvokeError(new ResponseSocialCharacterListMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                });
+                return;
+            }
             result.Invoke(AckResponseCode.Success, new ResponseSocialCharacterListMessage()
             {
-                characters = resp.List,
+                characters = resp.Response.List,
             });
 #endif
         }
@@ -47,13 +55,21 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            SocialCharactersResp resp = await DbServiceClient.ReadFriendsAsync(new ReadFriendsReq()
+            AsyncResponseData<SocialCharactersResp> resp = await DbServiceClient.ReadFriendsAsync(new ReadFriendsReq()
             {
                 CharacterId = playerCharacter.Id,
             });
+            if (!resp.IsSuccess)
+            {
+                result.InvokeError(new ResponseGetFriendsMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                });
+                return;
+            }
             result.Invoke(AckResponseCode.Success, new ResponseGetFriendsMessage()
             {
-                friends = resp.List,
+                friends = resp.Response.List,
             });
 #endif
         }
@@ -70,12 +86,20 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            SocialCharactersResp resp = await DbServiceClient.CreateFriendAsync(new CreateFriendReq()
+            AsyncResponseData<SocialCharactersResp> resp = await DbServiceClient.CreateFriendAsync(new CreateFriendReq()
             {
                 Character1Id = playerCharacter.Id,
                 Character2Id = request.friendId,
             });
-            GameInstance.ServerGameMessageHandlers.SendSetFriends(requestHandler.ConnectionId, resp.List);
+            if (!resp.IsSuccess)
+            {
+                result.InvokeError(new ResponseAddFriendMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                });
+                return;
+            }
+            GameInstance.ServerGameMessageHandlers.SendSetFriends(requestHandler.ConnectionId, resp.Response.List);
             result.Invoke(AckResponseCode.Success, new ResponseAddFriendMessage()
             {
                 message = UITextKeys.UI_FRIEND_ADDED,
@@ -95,12 +119,20 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            SocialCharactersResp resp = await DbServiceClient.DeleteFriendAsync(new DeleteFriendReq()
+            AsyncResponseData<SocialCharactersResp> resp = await DbServiceClient.DeleteFriendAsync(new DeleteFriendReq()
             {
                 Character1Id = playerCharacter.Id,
                 Character2Id = request.friendId
             });
-            GameInstance.ServerGameMessageHandlers.SendSetFriends(requestHandler.ConnectionId, resp.List);
+            if (!resp.IsSuccess)
+            {
+                result.InvokeError(new ResponseRemoveFriendMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                });
+                return;
+            }
+            GameInstance.ServerGameMessageHandlers.SendSetFriends(requestHandler.ConnectionId, resp.Response.List);
             result.Invoke(AckResponseCode.Success, new ResponseRemoveFriendMessage()
             {
                 message = UITextKeys.UI_FRIEND_REMOVED,
