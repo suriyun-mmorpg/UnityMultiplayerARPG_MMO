@@ -10,7 +10,7 @@ namespace MultiplayerARPG.MMO
         private readonly HashSet<string> storageUsers = new HashSet<string>();
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        public DatabaseNetworkManager DbServiceClient
+        public IDatabaseClient DbServiceClient
         {
             get { return MMOServerInstance.Singleton.DatabaseNetworkManager; }
         }

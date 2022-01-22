@@ -14,7 +14,7 @@ namespace MultiplayerARPG.MMO
         public static readonly HashSet<string> GuildInvitations = new HashSet<string>();
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        public DatabaseNetworkManager DbServiceClient
+        public IDatabaseClient DbServiceClient
         {
             get { return MMOServerInstance.Singleton.DatabaseNetworkManager; }
         }

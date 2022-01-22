@@ -55,7 +55,7 @@ namespace MultiplayerARPG.MMO
         private float terminatingTime;
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        public DatabaseNetworkManager DbServiceClient
+        public IDatabaseClient DbServiceClient
         {
             get { return MMOServerInstance.Singleton.DatabaseNetworkManager; }
         }
