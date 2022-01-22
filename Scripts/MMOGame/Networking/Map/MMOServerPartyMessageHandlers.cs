@@ -168,13 +168,21 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            PartyResp createPartyResp = await DbServiceClient.CreatePartyAsync(new CreatePartyReq()
+            AsyncResponseData<PartyResp> createPartyResp = await DbServiceClient.CreatePartyAsync(new CreatePartyReq()
             {
                 LeaderCharacterId = playerCharacter.Id,
                 ShareExp = request.shareExp,
                 ShareItem = request.shareItem
             });
-            PartyData party = createPartyResp.PartyData;
+            if (!createPartyResp.IsSuccess)
+            {
+                result.Invoke(AckResponseCode.Error, new ResponseCreatePartyMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                });
+                return;
+            }
+            PartyData party = createPartyResp.Response.PartyData;
             GameInstance.ServerPartyHandlers.SetParty(party.id, party);
             playerCharacter.PartyId = party.id;
             // Broadcast via chat server
