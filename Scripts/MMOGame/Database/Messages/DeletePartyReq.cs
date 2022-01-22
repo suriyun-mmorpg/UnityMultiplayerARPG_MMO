@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG.MMO
 {
-    public class DeletePartyReq : INetSerializable
+    public struct DeletePartyReq : INetSerializable
     {
         public int PartyId { get; set; }
 
