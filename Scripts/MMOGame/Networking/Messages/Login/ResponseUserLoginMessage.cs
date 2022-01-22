@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG.MMO
 {
-    public class ResponseUserLoginMessage : INetSerializable
+    public struct ResponseUserLoginMessage : INetSerializable
     {
         public UITextKeys message;
         public string userId;

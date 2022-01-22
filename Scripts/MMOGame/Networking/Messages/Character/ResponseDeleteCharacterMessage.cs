@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG.MMO
 {
-    public class ResponseDeleteCharacterMessage : INetSerializable
+    public struct ResponseDeleteCharacterMessage : INetSerializable
     {
         public UITextKeys message;
 

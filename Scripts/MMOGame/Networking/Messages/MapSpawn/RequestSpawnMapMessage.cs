@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG.MMO
 {
-    public class RequestSpawnMapMessage : INetSerializable
+    public struct RequestSpawnMapMessage : INetSerializable
     {
         public string mapId;
         public string instanceId;

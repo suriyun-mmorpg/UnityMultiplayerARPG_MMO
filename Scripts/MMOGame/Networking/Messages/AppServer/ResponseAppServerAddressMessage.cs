@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG.MMO
 {
-    public class ResponseAppServerAddressMessage : INetSerializable
+    public struct ResponseAppServerAddressMessage : INetSerializable
     {
         public UITextKeys message;
         public CentralServerPeerInfo peerInfo;

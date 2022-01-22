@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG.MMO
 {
-    public class ResponseCreateCharacterMessage : INetSerializable
+    public struct ResponseCreateCharacterMessage : INetSerializable
     {
         public UITextKeys message;
 
