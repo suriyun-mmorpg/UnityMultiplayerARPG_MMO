@@ -1,4 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
+using LiteNetLibManager;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using UnityEngine;
@@ -35,11 +36,16 @@ namespace MultiplayerARPG.MMO
             usingStorageIds.TryRemove(connectionId, out _);
             usingStorageIds.TryAdd(connectionId, storageId);
             // Load storage items from database
-            ReadStorageItemsReq req = new ReadStorageItemsReq();
-            req.StorageType = storageId.storageType;
-            req.StorageOwnerId = storageId.storageOwnerId;
-            ReadStorageItemsResp resp = await DbServiceClient.ReadStorageItemsAsync(req);
-            List<CharacterItem> storageItems = resp.StorageCharacterItems;
+            AsyncResponseData<ReadStorageItemsResp> resp = await DbServiceClient.ReadStorageItemsAsync(new ReadStorageItemsReq()
+            {
+                StorageType = storageId.storageType,
+                StorageOwnerId = storageId.storageOwnerId,
+            });
+            if (!resp.IsSuccess)
+            {
+                return;
+            }
+            List<CharacterItem> storageItems = resp.Response.StorageCharacterItems;
             SetStorageItems(storageId, storageItems);
             // Notify storage items to client
             uint storageObjectId;
@@ -78,19 +84,20 @@ namespace MultiplayerARPG.MMO
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             Storage storge = GetStorage(storageId, out _);
-            IncreaseStorageItemsReq req = new IncreaseStorageItemsReq();
-            req.StorageType = storageId.storageType;
-            req.StorageOwnerId = storageId.storageOwnerId;
-            req.WeightLimit = storge.weightLimit;
-            req.SlotLimit = storge.slotLimit;
-            req.Item = addingItem;
-            IncreaseStorageItemsResp resp = await DbServiceClient.IncreaseStorageItemsAsync(req);
-            if (UITextKeys.NONE != (UITextKeys)resp.Error)
+            AsyncResponseData<IncreaseStorageItemsResp> resp = await DbServiceClient.IncreaseStorageItemsAsync(new IncreaseStorageItemsReq()
+            {
+                StorageType = storageId.storageType,
+                StorageOwnerId = storageId.storageOwnerId,
+                WeightLimit = storge.weightLimit,
+                SlotLimit = storge.slotLimit,
+                Item = addingItem,
+            });
+            if (!resp.IsSuccess || UITextKeys.NONE != resp.Response.Error)
             {
                 // Error ocurring, storage may overwhelming let's it drop items to ground
                 return false;
             }
-            SetStorageItems(storageId, resp.StorageCharacterItems);
+            SetStorageItems(storageId, resp.Response.StorageCharacterItems);
             NotifyStorageItemsUpdated(storageId.storageType, storageId.storageOwnerId);
             return true;
 #else
@@ -102,23 +109,24 @@ namespace MultiplayerARPG.MMO
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             Storage storge = GetStorage(storageId, out _);
-            DecreaseStorageItemsReq req = new DecreaseStorageItemsReq();
-            req.StorageType = storageId.storageType;
-            req.StorageOwnerId = storageId.storageOwnerId;
-            req.WeightLimit = storge.weightLimit;
-            req.SlotLimit = storge.slotLimit;
-            req.DataId = dataId;
-            req.Amount = amount;
-            DecreaseStorageItemsResp resp = await DbServiceClient.DecreaseStorageItemsAsync(req);
-            if (UITextKeys.NONE != (UITextKeys)resp.Error)
+            AsyncResponseData<DecreaseStorageItemsResp> resp = await DbServiceClient.DecreaseStorageItemsAsync(new DecreaseStorageItemsReq()
+            {
+                StorageType = storageId.storageType,
+                StorageOwnerId = storageId.storageOwnerId,
+                WeightLimit = storge.weightLimit,
+                SlotLimit = storge.slotLimit,
+                DataId = dataId,
+                Amount = amount,
+            });
+            if (!resp.IsSuccess || UITextKeys.NONE != resp.Response.Error)
             {
                 // Error ocurring, storage may overwhelming let's it drop items to ground
                 return new DecreaseStorageItemsResult();
             }
-            SetStorageItems(storageId, resp.StorageCharacterItems);
+            SetStorageItems(storageId, resp.Response.StorageCharacterItems);
             NotifyStorageItemsUpdated(storageId.storageType, storageId.storageOwnerId);
             Dictionary<int, short> decreasedItems = new Dictionary<int, short>();
-            foreach (ItemIndexAmountMap entry in resp.DecreasedItems)
+            foreach (ItemIndexAmountMap entry in resp.Response.DecreasedItems)
             {
                 decreasedItems.Add(entry.Index, (short)entry.Amount);
             }
