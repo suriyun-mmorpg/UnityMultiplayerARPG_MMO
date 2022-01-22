@@ -18,7 +18,7 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out _))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseSocialCharacterListMessage()
+                result.InvokeError(new ResponseSocialCharacterListMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -36,7 +36,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            result.Invoke(AckResponseCode.Success, new ResponseSocialCharacterListMessage()
+            result.InvokeSuccess(new ResponseSocialCharacterListMessage()
             {
                 characters = resp.Response.List,
             });
@@ -49,7 +49,7 @@ namespace MultiplayerARPG.MMO
             IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseGetFriendsMessage()
+                result.InvokeError(new ResponseGetFriendsMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -67,7 +67,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            result.Invoke(AckResponseCode.Success, new ResponseGetFriendsMessage()
+            result.InvokeSuccess(new ResponseGetFriendsMessage()
             {
                 friends = resp.Response.List,
             });
@@ -80,7 +80,7 @@ namespace MultiplayerARPG.MMO
             IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseAddFriendMessage()
+                result.InvokeError(new ResponseAddFriendMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -100,7 +100,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             GameInstance.ServerGameMessageHandlers.SendSetFriends(requestHandler.ConnectionId, resp.Response.List);
-            result.Invoke(AckResponseCode.Success, new ResponseAddFriendMessage()
+            result.InvokeSuccess(new ResponseAddFriendMessage()
             {
                 message = UITextKeys.UI_FRIEND_ADDED,
             });
@@ -113,7 +113,7 @@ namespace MultiplayerARPG.MMO
             IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseRemoveFriendMessage()
+                result.InvokeError(new ResponseRemoveFriendMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -133,7 +133,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             GameInstance.ServerGameMessageHandlers.SendSetFriends(requestHandler.ConnectionId, resp.Response.List);
-            result.Invoke(AckResponseCode.Success, new ResponseRemoveFriendMessage()
+            result.InvokeSuccess(new ResponseRemoveFriendMessage()
             {
                 message = UITextKeys.UI_FRIEND_REMOVED,
             });
