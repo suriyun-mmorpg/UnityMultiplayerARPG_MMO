@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG.MMO
 {
-    public class UpdateDeleteMailStateReq : INetSerializable
+    public struct UpdateDeleteMailStateReq : INetSerializable
     {
         public string MailId { get; set; }
         public string UserId { get; set; }

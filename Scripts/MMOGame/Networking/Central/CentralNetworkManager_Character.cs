@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using LiteNetLibManager;
+﻿using LiteNetLibManager;
 using LiteNetLib.Utils;
 using Cysharp.Threading.Tasks;
 
@@ -14,14 +13,13 @@ namespace MultiplayerARPG.MMO
 
         public bool RequestCreateCharacter(PlayerCharacterData characterData, ResponseDelegate<ResponseCreateCharacterMessage> callback)
         {
-            return ClientSendRequest(MMORequestTypes.RequestCreateCharacter,
-                new RequestCreateCharacterMessage()
-                {
-                    characterName = characterData.CharacterName,
-                    dataId = characterData.DataId,
-                    entityId = characterData.EntityId,
-                    factionId = characterData.FactionId,
-                }, callback, extraRequestSerializer: (writer) => SerializeCreateCharacterExtra(characterData, writer));
+            return ClientSendRequest(MMORequestTypes.RequestCreateCharacter, new RequestCreateCharacterMessage()
+            {
+                characterName = characterData.CharacterName,
+                dataId = characterData.DataId,
+                entityId = characterData.EntityId,
+                factionId = characterData.FactionId,
+            }, callback, extraRequestSerializer: (writer) => SerializeCreateCharacterExtra(characterData, writer));
         }
 
         private void SerializeCreateCharacterExtra(PlayerCharacterData characterData, NetDataWriter writer)
@@ -52,27 +50,33 @@ namespace MultiplayerARPG.MMO
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             long connectionId = requestHandler.ConnectionId;
-            UITextKeys message = UITextKeys.NONE;
-            List<PlayerCharacterData> characters = null;
             CentralUserPeerInfo userPeerInfo;
             if (!userPeers.TryGetValue(connectionId, out userPeerInfo))
-                message = UITextKeys.UI_ERROR_NOT_LOGGED_IN;
-            else
             {
-                CharactersResp charactersResp = await DbServiceClient.ReadCharactersAsync(new ReadCharactersReq()
+                result.InvokeError(new ResponseCharactersMessage()
                 {
-                    UserId = userPeerInfo.userId
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
-                characters = charactersResp.List;
+                return;
+            }
+            // Get characters from server
+            AsyncResponseData<CharactersResp> charactersResp = await DbServiceClient.ReadCharactersAsync(new ReadCharactersReq()
+            {
+                UserId = userPeerInfo.userId
+            });
+            if (!charactersResp.IsSuccess)
+            {
+                result.InvokeError(new ResponseCharactersMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                });
+                return;
             }
             // Response
-            result.Invoke(
-                message == UITextKeys.NONE ? AckResponseCode.Success : AckResponseCode.Error,
-                new ResponseCharactersMessage()
-                {
-                    message = message,
-                    characters = characters,
-                });
+            result.InvokeSuccess(new ResponseCharactersMessage()
+            {
+                characters = charactersResp.Response.List,
+            });
 #endif
         }
 
@@ -84,52 +88,88 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
             long connectionId = requestHandler.ConnectionId;
             NetDataReader reader = requestHandler.Reader;
-            UITextKeys message = UITextKeys.NONE;
             string characterName = request.characterName;
             int dataId = request.dataId;
             int entityId = request.entityId;
             int factionId = request.factionId;
             CentralUserPeerInfo userPeerInfo;
-            FindCharacterNameResp findCharacterNameResp = await DbServiceClient.FindCharacterNameAsync(new FindCharacterNameReq()
+            // Validate character name
+            AsyncResponseData<FindCharacterNameResp> findCharacterNameResp = await DbServiceClient.FindCharacterNameAsync(new FindCharacterNameReq()
             {
                 CharacterName = characterName
             });
-            if (findCharacterNameResp.FoundAmount > 0)
-                message = UITextKeys.UI_ERROR_CHARACTER_NAME_EXISTED;
-            else if (!userPeers.TryGetValue(connectionId, out userPeerInfo))
-                message = UITextKeys.UI_ERROR_NOT_LOGGED_IN;
-            else if (string.IsNullOrEmpty(characterName) || characterName.Length < minCharacterNameLength)
-                message = UITextKeys.UI_ERROR_CHARACTER_NAME_TOO_SHORT;
-            else if (characterName.Length > maxCharacterNameLength)
-                message = UITextKeys.UI_ERROR_CHARACTER_NAME_TOO_LONG;
-            else if (!GameInstance.PlayerCharacters.ContainsKey(dataId) ||
+            if (!findCharacterNameResp.IsSuccess)
+            {
+                result.InvokeError(new ResponseCreateCharacterMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                });
+                return;
+            }
+            if (findCharacterNameResp.Response.FoundAmount > 0)
+            {
+                result.InvokeError(new ResponseCreateCharacterMessage()
+                {
+                    message = UITextKeys.UI_ERROR_CHARACTER_NAME_EXISTED,
+                });
+                return;
+            }
+            if (!userPeers.TryGetValue(connectionId, out userPeerInfo))
+            {
+                result.InvokeError(new ResponseCreateCharacterMessage()
+                {
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                });
+                return;
+            }
+            if (string.IsNullOrEmpty(characterName) || characterName.Length < minCharacterNameLength)
+            {
+                result.InvokeError(new ResponseCreateCharacterMessage()
+                {
+                    message = UITextKeys.UI_ERROR_CHARACTER_NAME_TOO_SHORT,
+                });
+                return;
+            }
+            if (characterName.Length > maxCharacterNameLength)
+            {
+                result.InvokeError(new ResponseCreateCharacterMessage()
+                {
+                    message = UITextKeys.UI_ERROR_CHARACTER_NAME_TOO_LONG,
+                });
+                return;
+            }
+            if (!GameInstance.PlayerCharacters.ContainsKey(dataId) ||
                 !GameInstance.PlayerCharacterEntities.ContainsKey(entityId) ||
                 (GameInstance.Factions.Count > 0 && !GameInstance.Factions.ContainsKey(factionId)))
             {
                 // If there is factions, it must have faction with the id stored in faction dictionary
-                message = UITextKeys.UI_ERROR_INVALID_DATA;
-            }
-            else
-            {
-                string characterId = GenericUtils.GetUniqueId();
-                PlayerCharacterData characterData = new PlayerCharacterData();
-                characterData.Id = characterId;
-                characterData.SetNewPlayerCharacterData(characterName, dataId, entityId);
-                characterData.FactionId = factionId;
-                DeserializeCreateCharacterExtra(characterData, reader);
-                await DbServiceClient.CreateCharacterAsync(new CreateCharacterReq()
+                result.InvokeError(new ResponseCreateCharacterMessage()
                 {
-                    UserId = userPeerInfo.userId,
-                    CharacterData = characterData,
+                    message = UITextKeys.UI_ERROR_INVALID_DATA,
                 });
+                return;
+            }
+            string characterId = GenericUtils.GetUniqueId();
+            PlayerCharacterData characterData = new PlayerCharacterData();
+            characterData.Id = characterId;
+            characterData.SetNewPlayerCharacterData(characterName, dataId, entityId);
+            characterData.FactionId = factionId;
+            DeserializeCreateCharacterExtra(characterData, reader);
+            AsyncResponseData<CharacterResp> createResp = await DbServiceClient.CreateCharacterAsync(new CreateCharacterReq()
+            {
+                UserId = userPeerInfo.userId,
+                CharacterData = characterData,
+            });
+            if (!createResp.IsSuccess)
+            {
+                result.InvokeError(new ResponseCreateCharacterMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                });
+                return;
             }
             // Response
-            result.Invoke(
-                message == UITextKeys.NONE ? AckResponseCode.Success : AckResponseCode.Error,
-                new ResponseCreateCharacterMessage()
-                {
-                    message = message,
-                });
+            result.InvokeSuccess(new ResponseCreateCharacterMessage());
 #endif
         }
 
@@ -147,25 +187,30 @@ namespace MultiplayerARPG.MMO
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             long connectionId = requestHandler.ConnectionId;
-            UITextKeys message = UITextKeys.NONE;
             CentralUserPeerInfo userPeerInfo;
             if (!userPeers.TryGetValue(connectionId, out userPeerInfo))
-                message = UITextKeys.UI_ERROR_NOT_LOGGED_IN;
-            else
             {
-                await DbServiceClient.DeleteCharacterAsync(new DeleteCharacterReq()
+                result.InvokeError(new ResponseDeleteCharacterMessage()
                 {
-                    UserId = userPeerInfo.userId,
-                    CharacterId = request.characterId
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
+                return;
+            }
+            AsyncResponseData<EmptyMessage> deleteResp = await DbServiceClient.DeleteCharacterAsync(new DeleteCharacterReq()
+            {
+                UserId = userPeerInfo.userId,
+                CharacterId = request.characterId
+            });
+            if (!deleteResp.IsSuccess)
+            {
+                result.InvokeError(new ResponseDeleteCharacterMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                });
+                return;
             }
             // Response
-            result.Invoke(
-                message == UITextKeys.NONE ? AckResponseCode.Success : AckResponseCode.Error,
-                new ResponseDeleteCharacterMessage()
-                {
-                    message = message,
-                });
+            result.InvokeSuccess(new ResponseDeleteCharacterMessage());
 #endif
         }
 
@@ -176,35 +221,53 @@ namespace MultiplayerARPG.MMO
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             long connectionId = requestHandler.ConnectionId;
-            UITextKeys message = UITextKeys.NONE;
             CentralServerPeerInfo mapServerPeerInfo = default;
             CentralUserPeerInfo userPeerInfo;
             if (!userPeers.TryGetValue(connectionId, out userPeerInfo))
-                message = UITextKeys.UI_ERROR_NOT_LOGGED_IN;
-            else
             {
-                CharacterResp characterResp = await DbServiceClient.ReadCharacterAsync(new ReadCharacterReq()
+                result.InvokeError(new ResponseSelectCharacterMessage()
                 {
-                    UserId = userPeerInfo.userId,
-                    CharacterId = request.characterId
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
-                PlayerCharacterData character = characterResp.CharacterData;
-                if (character == null)
-                    message = UITextKeys.UI_ERROR_INVALID_CHARACTER_DATA;
-                else if (!ClusterServer.MapServerPeersByMapId.TryGetValue(character.CurrentMapName, out mapServerPeerInfo))
-                    message = UITextKeys.UI_ERROR_MAP_SERVER_NOT_READY;
+                return;
             }
-            AckResponseCode responseCode = message == UITextKeys.NONE ? AckResponseCode.Success : AckResponseCode.Error;
-            ResponseSelectCharacterMessage response = new ResponseSelectCharacterMessage();
-            response.message = message;
-            if (message != UITextKeys.UI_ERROR_MAP_SERVER_NOT_READY)
+            AsyncResponseData<CharacterResp> characterResp = await DbServiceClient.ReadCharacterAsync(new ReadCharacterReq()
             {
-                response.sceneName = mapServerPeerInfo.extra;
-                response.networkAddress = mapServerPeerInfo.networkAddress;
-                response.networkPort = mapServerPeerInfo.networkPort;
+                UserId = userPeerInfo.userId,
+                CharacterId = request.characterId
+            });
+            if (!characterResp.IsSuccess)
+            {
+                result.InvokeError(new ResponseSelectCharacterMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                });
+                return;
+            }
+            PlayerCharacterData character = characterResp.Response.CharacterData;
+            if (character == null)
+            {
+                result.InvokeError(new ResponseSelectCharacterMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INVALID_CHARACTER_DATA,
+                });
+                return;
+            }
+            if (!ClusterServer.MapServerPeersByMapId.TryGetValue(character.CurrentMapName, out mapServerPeerInfo))
+            {
+                result.InvokeError(new ResponseSelectCharacterMessage()
+                {
+                    message = UITextKeys.UI_ERROR_MAP_SERVER_NOT_READY,
+                });
+                return;
             }
             // Response
-            result.Invoke(responseCode, response);
+            result.InvokeSuccess(new ResponseSelectCharacterMessage()
+            {
+                sceneName = mapServerPeerInfo.extra,
+                networkAddress = mapServerPeerInfo.networkAddress,
+                networkPort = mapServerPeerInfo.networkPort,
+            });
 #endif
         }
     }

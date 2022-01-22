@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG.MMO
 {
-    public class RequestAppServerAddressMessage : INetSerializable
+    public struct RequestAppServerAddressMessage : INetSerializable
     {
         public CentralServerPeerType peerType;
         public string extra;

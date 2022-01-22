@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace MultiplayerARPG.MMO
 {
-    public class SwapOrMergeStorageItemResp : INetSerializable
+    public struct SwapOrMergeStorageItemResp : INetSerializable
     {
         public UITextKeys Error { get; set; }
         public List<CharacterItem> StorageCharacterItems { get; set; }

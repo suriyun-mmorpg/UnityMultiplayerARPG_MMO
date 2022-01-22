@@ -8,7 +8,7 @@ namespace MultiplayerARPG.MMO
     public partial class MMOServerGachaMessageHandlers : MonoBehaviour, IServerGachaMessageHandlers
     {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        public DatabaseNetworkManager DbServiceClient
+        public IDatabaseClient DbServiceClient
         {
             get { return MMOServerInstance.Singleton.DatabaseNetworkManager; }
         }
@@ -34,14 +34,22 @@ namespace MultiplayerARPG.MMO
                 return;
             }
 
-            CashResp getCashResp = await DbServiceClient.GetCashAsync(new GetCashReq()
+            AsyncResponseData<CashResp> getCashResp = await DbServiceClient.GetCashAsync(new GetCashReq()
             {
                 UserId = userId
             });
+            if (!getCashResp.IsSuccess)
+            {
+                result.InvokeError(new ResponseGachaInfoMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                });
+                return;
+            }
 
             result.Invoke(AckResponseCode.Success, new ResponseGachaInfoMessage()
             {
-                cash = getCashResp.Cash,
+                cash = getCashResp.Response.Cash,
                 gachaIds = new List<int>(GameInstance.Gachas.Keys),
             });
 #endif
@@ -72,11 +80,19 @@ namespace MultiplayerARPG.MMO
 
             int price = request.openMode == GachaOpenMode.Multiple ? gacha.MultipleModeOpenPrice : gacha.SingleModeOpenPrice;
             // Get user cash amount
-            CashResp getCashResp = await DbServiceClient.GetCashAsync(new GetCashReq()
+            AsyncResponseData<CashResp> getCashResp = await DbServiceClient.GetCashAsync(new GetCashReq()
             {
                 UserId = playerCharacter.UserId
             });
-            int cash = getCashResp.Cash;
+            if (!getCashResp.IsSuccess)
+            {
+                result.InvokeError(new ResponseOpenGachaMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                });
+                return;
+            }
+            int cash = getCashResp.Response.Cash;
             if (cash < price)
             {
                 result.Invoke(AckResponseCode.Error, new ResponseOpenGachaMessage()
@@ -97,12 +113,20 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             // Decrease cash amount
-            CashResp changeCashResp = await DbServiceClient.ChangeCashAsync(new ChangeCashReq()
+            AsyncResponseData<CashResp> changeCashResp = await DbServiceClient.ChangeCashAsync(new ChangeCashReq()
             {
                 UserId = playerCharacter.UserId,
                 ChangeAmount = -price
             });
-            playerCharacter.UserCash = changeCashResp.Cash;
+            if (!changeCashResp.IsSuccess)
+            {
+                result.InvokeError(new ResponseOpenGachaMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                });
+                return;
+            }
+            playerCharacter.UserCash = changeCashResp.Response.Cash;
             // Increase character items
             playerCharacter.IncreaseItems(rewardItems);
             playerCharacter.FillEmptySlots();

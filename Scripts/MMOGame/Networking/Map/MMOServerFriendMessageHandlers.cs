@@ -7,7 +7,7 @@ namespace MultiplayerARPG.MMO
     public partial class MMOServerFriendMessageHandlers : MonoBehaviour, IServerFriendMessageHandlers
     {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        public DatabaseNetworkManager DbServiceClient
+        public IDatabaseClient DbServiceClient
         {
             get { return MMOServerInstance.Singleton.DatabaseNetworkManager; }
         }
@@ -18,19 +18,27 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out _))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseSocialCharacterListMessage()
+                result.InvokeError(new ResponseSocialCharacterListMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
-            SocialCharactersResp resp = await DbServiceClient.FindCharactersAsync(new FindCharacterNameReq()
+            AsyncResponseData<SocialCharactersResp> resp = await DbServiceClient.FindCharactersAsync(new FindCharacterNameReq()
             {
                 CharacterName = request.characterName
             });
-            result.Invoke(AckResponseCode.Success, new ResponseSocialCharacterListMessage()
+            if (!resp.IsSuccess)
             {
-                characters = resp.List,
+                result.InvokeError(new ResponseSocialCharacterListMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                });
+                return;
+            }
+            result.InvokeSuccess(new ResponseSocialCharacterListMessage()
+            {
+                characters = resp.Response.List,
             });
 #endif
         }
@@ -41,19 +49,27 @@ namespace MultiplayerARPG.MMO
             IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseGetFriendsMessage()
+                result.InvokeError(new ResponseGetFriendsMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
-            SocialCharactersResp resp = await DbServiceClient.ReadFriendsAsync(new ReadFriendsReq()
+            AsyncResponseData<SocialCharactersResp> resp = await DbServiceClient.ReadFriendsAsync(new ReadFriendsReq()
             {
                 CharacterId = playerCharacter.Id,
             });
-            result.Invoke(AckResponseCode.Success, new ResponseGetFriendsMessage()
+            if (!resp.IsSuccess)
             {
-                friends = resp.List,
+                result.InvokeError(new ResponseGetFriendsMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                });
+                return;
+            }
+            result.InvokeSuccess(new ResponseGetFriendsMessage()
+            {
+                friends = resp.Response.List,
             });
 #endif
         }
@@ -64,19 +80,27 @@ namespace MultiplayerARPG.MMO
             IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseAddFriendMessage()
+                result.InvokeError(new ResponseAddFriendMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
-            SocialCharactersResp resp = await DbServiceClient.CreateFriendAsync(new CreateFriendReq()
+            AsyncResponseData<SocialCharactersResp> resp = await DbServiceClient.CreateFriendAsync(new CreateFriendReq()
             {
                 Character1Id = playerCharacter.Id,
                 Character2Id = request.friendId,
             });
-            GameInstance.ServerGameMessageHandlers.SendSetFriends(requestHandler.ConnectionId, resp.List);
-            result.Invoke(AckResponseCode.Success, new ResponseAddFriendMessage()
+            if (!resp.IsSuccess)
+            {
+                result.InvokeError(new ResponseAddFriendMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                });
+                return;
+            }
+            GameInstance.ServerGameMessageHandlers.SendSetFriends(requestHandler.ConnectionId, resp.Response.List);
+            result.InvokeSuccess(new ResponseAddFriendMessage()
             {
                 message = UITextKeys.UI_FRIEND_ADDED,
             });
@@ -89,19 +113,27 @@ namespace MultiplayerARPG.MMO
             IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseRemoveFriendMessage()
+                result.InvokeError(new ResponseRemoveFriendMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
-            SocialCharactersResp resp = await DbServiceClient.DeleteFriendAsync(new DeleteFriendReq()
+            AsyncResponseData<SocialCharactersResp> resp = await DbServiceClient.DeleteFriendAsync(new DeleteFriendReq()
             {
                 Character1Id = playerCharacter.Id,
                 Character2Id = request.friendId
             });
-            GameInstance.ServerGameMessageHandlers.SendSetFriends(requestHandler.ConnectionId, resp.List);
-            result.Invoke(AckResponseCode.Success, new ResponseRemoveFriendMessage()
+            if (!resp.IsSuccess)
+            {
+                result.InvokeError(new ResponseRemoveFriendMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                });
+                return;
+            }
+            GameInstance.ServerGameMessageHandlers.SendSetFriends(requestHandler.ConnectionId, resp.Response.List);
+            result.InvokeSuccess(new ResponseRemoveFriendMessage()
             {
                 message = UITextKeys.UI_FRIEND_REMOVED,
             });

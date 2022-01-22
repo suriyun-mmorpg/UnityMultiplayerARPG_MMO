@@ -7,7 +7,7 @@ namespace MultiplayerARPG.MMO
     public partial class MMOServerGuildMessageHandlers : MonoBehaviour, IServerGuildMessageHandlers
     {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        public DatabaseNetworkManager DbServiceClient
+        public IDatabaseClient DbServiceClient
         {
             get { return MMOServerInstance.Singleton.DatabaseNetworkManager; }
         }
@@ -25,7 +25,7 @@ namespace MultiplayerARPG.MMO
             BasePlayerCharacterEntity playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseAcceptGuildInvitationMessage()
+                result.InvokeError(new ResponseAcceptGuildInvitationMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -34,7 +34,7 @@ namespace MultiplayerARPG.MMO
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanAcceptGuildInvitation(request.guildId, playerCharacter);
             if (!validateResult.IsSuccess)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseAcceptGuildInvitationMessage()
+                result.InvokeError(new ResponseAcceptGuildInvitationMessage()
                 {
                     message = validateResult.GameMessage,
                 });
@@ -45,12 +45,20 @@ namespace MultiplayerARPG.MMO
             GameInstance.ServerGuildHandlers.SetGuild(request.guildId, validateResult.Guild);
             GameInstance.ServerGuildHandlers.RemoveGuildInvitation(request.guildId, playerCharacter.Id);
             // Save to database
-            _ = DbServiceClient.UpdateCharacterGuildAsync(new UpdateCharacterGuildReq()
+            AsyncResponseData<GuildResp> updateResp = await DbServiceClient.UpdateCharacterGuildAsync(new UpdateCharacterGuildReq()
             {
                 SocialCharacterData = SocialCharacterData.Create(playerCharacter),
                 GuildId = request.guildId,
                 GuildRole = validateResult.Guild.GetMemberRole(playerCharacter.Id)
             });
+            if (!updateResp.IsSuccess)
+            {
+                result.InvokeError(new ResponseAcceptGuildInvitationMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                });
+                return;
+            }
             // Broadcast via chat server
             if (ClusterClient.IsNetworkActive)
             {
@@ -62,7 +70,7 @@ namespace MultiplayerARPG.MMO
             // Send message to inviter
             GameInstance.ServerGameMessageHandlers.SendGameMessageByCharacterId(request.inviterId, UITextKeys.UI_GUILD_INVITATION_ACCEPTED);
             // Response to invitee
-            result.Invoke(AckResponseCode.Success, new ResponseAcceptGuildInvitationMessage()
+            result.InvokeSuccess(new ResponseAcceptGuildInvitationMessage()
             {
                 message = UITextKeys.UI_GUILD_INVITATION_ACCEPTED,
             });
@@ -76,7 +84,7 @@ namespace MultiplayerARPG.MMO
             BasePlayerCharacterEntity playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseDeclineGuildInvitationMessage()
+                result.InvokeError(new ResponseDeclineGuildInvitationMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -85,7 +93,7 @@ namespace MultiplayerARPG.MMO
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanDeclineGuildInvitation(request.guildId, playerCharacter);
             if (!validateResult.IsSuccess)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseDeclineGuildInvitationMessage()
+                result.InvokeError(new ResponseDeclineGuildInvitationMessage()
                 {
                     message = validateResult.GameMessage,
                 });
@@ -95,7 +103,7 @@ namespace MultiplayerARPG.MMO
             // Send message to inviter
             GameInstance.ServerGameMessageHandlers.SendGameMessageByCharacterId(request.inviterId, UITextKeys.UI_GUILD_INVITATION_DECLINED);
             // Response to invitee
-            result.Invoke(AckResponseCode.Success, new ResponseDeclineGuildInvitationMessage()
+            result.InvokeSuccess(new ResponseDeclineGuildInvitationMessage()
             {
                 message = UITextKeys.UI_GUILD_INVITATION_DECLINED,
             });
@@ -109,7 +117,7 @@ namespace MultiplayerARPG.MMO
             BasePlayerCharacterEntity playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseSendGuildInvitationMessage()
+                result.InvokeError(new ResponseSendGuildInvitationMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -118,7 +126,7 @@ namespace MultiplayerARPG.MMO
             BasePlayerCharacterEntity inviteeCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(request.inviteeId, out inviteeCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseSendGuildInvitationMessage()
+                result.InvokeError(new ResponseSendGuildInvitationMessage()
                 {
                     message = UITextKeys.UI_ERROR_CHARACTER_NOT_FOUND,
                 });
@@ -127,7 +135,7 @@ namespace MultiplayerARPG.MMO
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanSendGuildInvitation(playerCharacter, inviteeCharacter);
             if (!validateResult.IsSuccess)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseSendGuildInvitationMessage()
+                result.InvokeError(new ResponseSendGuildInvitationMessage()
                 {
                     message = validateResult.GameMessage,
                 });
@@ -143,7 +151,7 @@ namespace MultiplayerARPG.MMO
                 GuildName = validateResult.Guild.guildName,
                 GuildLevel = validateResult.Guild.level,
             });
-            result.Invoke(AckResponseCode.Success, new ResponseSendGuildInvitationMessage());
+            result.InvokeSuccess(new ResponseSendGuildInvitationMessage());
 #endif
         }
 
@@ -154,7 +162,7 @@ namespace MultiplayerARPG.MMO
             IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseCreateGuildMessage()
+                result.InvokeError(new ResponseCreateGuildMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -163,30 +171,47 @@ namespace MultiplayerARPG.MMO
             ValidateGuildRequestResult validateResult = playerCharacter.CanCreateGuild(request.guildName);
             if (!validateResult.IsSuccess)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseCreateGuildMessage()
+                result.InvokeError(new ResponseCreateGuildMessage()
                 {
                     message = validateResult.GameMessage,
                 });
                 return;
             }
-            FindGuildNameResp findGuildNameResp = await DbServiceClient.FindGuildNameAsync(new FindGuildNameReq()
+            AsyncResponseData<FindGuildNameResp> findGuildNameResp = await DbServiceClient.FindGuildNameAsync(new FindGuildNameReq()
             {
                 GuildName = request.guildName,
             });
-            if (findGuildNameResp.FoundAmount > 0)
+            if (!findGuildNameResp.IsSuccess)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseCreateGuildMessage()
+                result.InvokeError(new ResponseCreateGuildMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                });
+                return;
+            }
+            if (findGuildNameResp.Response.FoundAmount > 0)
+            {
+                result.InvokeError(new ResponseCreateGuildMessage()
                 {
                     message = UITextKeys.UI_ERROR_GUILD_NAME_EXISTED,
                 });
                 return;
             }
-            GuildResp createGuildResp = await DbServiceClient.CreateGuildAsync(new CreateGuildReq()
+            AsyncResponseData<GuildResp> createGuildResp = await DbServiceClient.CreateGuildAsync(new CreateGuildReq()
             {
                 LeaderCharacterId = playerCharacter.Id,
                 GuildName = request.guildName,
             });
-            GuildData guild = createGuildResp.GuildData;
+            if (!createGuildResp.IsSuccess)
+            {
+                result.InvokeError(new ResponseCreateGuildMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                });
+                return;
+            }
+            // Update cache
+            GuildData guild = createGuildResp.Response.GuildData;
             GameInstance.Singleton.SocialSystemSetting.DecreaseCreateGuildResource(playerCharacter);
             GameInstance.ServerGuildHandlers.SetGuild(guild.id, guild);
             playerCharacter.GuildId = guild.id;
@@ -200,7 +225,7 @@ namespace MultiplayerARPG.MMO
             }
             GameInstance.ServerGameMessageHandlers.SendSetGuildData(requestHandler.ConnectionId, guild);
             GameInstance.ServerGameMessageHandlers.SendAddGuildMembersToOne(requestHandler.ConnectionId, guild);
-            result.Invoke(AckResponseCode.Success, new ResponseCreateGuildMessage());
+            result.InvokeSuccess(new ResponseCreateGuildMessage());
 #endif
         }
 
@@ -211,7 +236,7 @@ namespace MultiplayerARPG.MMO
             IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseChangeGuildLeaderMessage()
+                result.InvokeError(new ResponseChangeGuildLeaderMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -220,35 +245,46 @@ namespace MultiplayerARPG.MMO
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanChangeGuildLeader(playerCharacter, request.memberId);
             if (!validateResult.IsSuccess)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseChangeGuildLeaderMessage()
+                result.InvokeError(new ResponseChangeGuildLeaderMessage()
                 {
                     message = validateResult.GameMessage,
                 });
                 return;
             }
+            // Save to database
+            AsyncResponseData<GuildResp> updateResp = await DbServiceClient.UpdateGuildLeaderAsync(new UpdateGuildLeaderReq()
+            {
+                GuildId = validateResult.GuildId,
+                LeaderCharacterId = request.memberId
+            });
+            if (!updateResp.IsSuccess)
+            {
+                result.InvokeError(new ResponseChangeGuildLeaderMessage()
+                {
+                    message = validateResult.GameMessage,
+                });
+                return;
+            }
+            AsyncResponseData<GuildResp> updateRoleResp = await DbServiceClient.UpdateGuildMemberRoleAsync(new UpdateGuildMemberRoleReq()
+            {
+                GuildId = validateResult.GuildId,
+                MemberCharacterId = request.memberId,
+                GuildRole = validateResult.Guild.GetMemberRole(request.memberId)
+            });
+            if (!updateRoleResp.IsSuccess)
+            {
+                result.InvokeError(new ResponseChangeGuildLeaderMessage()
+                {
+                    message = validateResult.GameMessage,
+                });
+                return;
+            }
+            // Update cache
             byte swappingGuildRole = validateResult.Guild.GetMemberRole(request.memberId);
             validateResult.Guild.SetLeader(request.memberId);
             validateResult.Guild.SetMemberRole(playerCharacter.Id, swappingGuildRole);
             playerCharacter.GuildRole = swappingGuildRole;
             GameInstance.ServerGuildHandlers.SetGuild(validateResult.GuildId, validateResult.Guild);
-            // Save to database
-            _ = DbServiceClient.UpdateGuildLeaderAsync(new UpdateGuildLeaderReq()
-            {
-                GuildId = validateResult.GuildId,
-                LeaderCharacterId = request.memberId
-            });
-            _ = DbServiceClient.UpdateGuildMemberRoleAsync(new UpdateGuildMemberRoleReq()
-            {
-                GuildId = validateResult.GuildId,
-                MemberCharacterId = request.memberId,
-                GuildRole = validateResult.Guild.GetMemberRole(request.memberId)
-            });
-            _ = DbServiceClient.UpdateGuildMemberRoleAsync(new UpdateGuildMemberRoleReq()
-            {
-                GuildId = validateResult.GuildId,
-                MemberCharacterId = request.memberId,
-                GuildRole = validateResult.Guild.GetMemberRole(request.memberId)
-            });
             // Broadcast via chat server
             if (ClusterClient.IsNetworkActive)
             {
@@ -256,7 +292,7 @@ namespace MultiplayerARPG.MMO
             }
             GameInstance.ServerGameMessageHandlers.SendSetGuildLeaderToMembers(validateResult.Guild);
             GameInstance.ServerGameMessageHandlers.SendSetGuildMemberRoleToMembers(validateResult.Guild, request.memberId, 0);
-            result.Invoke(AckResponseCode.Success, new ResponseChangeGuildLeaderMessage());
+            result.InvokeSuccess(new ResponseChangeGuildLeaderMessage());
 #endif
         }
 
@@ -267,7 +303,7 @@ namespace MultiplayerARPG.MMO
             IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseKickMemberFromGuildMessage()
+                result.InvokeError(new ResponseKickMemberFromGuildMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -276,12 +312,26 @@ namespace MultiplayerARPG.MMO
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanKickMemberFromGuild(playerCharacter, request.memberId);
             if (!validateResult.IsSuccess)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseKickMemberFromGuildMessage()
+                result.InvokeError(new ResponseKickMemberFromGuildMessage()
                 {
                     message = validateResult.GameMessage,
                 });
                 return;
             }
+            // Save to database
+            AsyncResponseData<EmptyMessage> updateResp = await DbServiceClient.ClearCharacterGuildAsync(new ClearCharacterGuildReq()
+            {
+                CharacterId = request.memberId
+            });
+            if (!updateResp.IsSuccess)
+            {
+                result.InvokeError(new ResponseKickMemberFromGuildMessage()
+                {
+                    message = validateResult.GameMessage,
+                });
+                return;
+            }
+            // Delete from cache
             IPlayerCharacterData memberCharacter;
             long memberConnectionId;
             if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(request.memberId, out memberCharacter) &&
@@ -292,18 +342,13 @@ namespace MultiplayerARPG.MMO
             }
             validateResult.Guild.RemoveMember(request.memberId);
             GameInstance.ServerGuildHandlers.SetGuild(validateResult.GuildId, validateResult.Guild);
-            // Save to database
-            _ = DbServiceClient.ClearCharacterGuildAsync(new ClearCharacterGuildReq()
-            {
-                CharacterId = request.memberId
-            });
             // Broadcast via chat server
             if (ClusterClient.IsNetworkActive)
             {
                 ClusterClient.SendRemoveSocialMember(MMOMessageTypes.UpdateGuildMember, validateResult.GuildId, request.memberId);
             }
             GameInstance.ServerGameMessageHandlers.SendRemoveGuildMemberToMembers(validateResult.Guild, request.memberId);
-            result.Invoke(AckResponseCode.Success, new ResponseKickMemberFromGuildMessage());
+            result.InvokeSuccess(new ResponseKickMemberFromGuildMessage());
 #endif
         }
 
@@ -314,7 +359,7 @@ namespace MultiplayerARPG.MMO
             IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseLeaveGuildMessage()
+                result.InvokeError(new ResponseLeaveGuildMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -323,7 +368,7 @@ namespace MultiplayerARPG.MMO
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanLeaveGuild(playerCharacter);
             if (!validateResult.IsSuccess)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseLeaveGuildMessage()
+                result.InvokeError(new ResponseLeaveGuildMessage()
                 {
                     message = validateResult.GameMessage,
                 });
@@ -331,21 +376,35 @@ namespace MultiplayerARPG.MMO
             }
             if (validateResult.Guild.IsLeader(playerCharacter.Id))
             {
+                // Delete from database
+                AsyncResponseData<EmptyMessage> deleteResp = await DbServiceClient.DeleteGuildAsync(new DeleteGuildReq()
+                {
+                    GuildId = validateResult.GuildId
+                });
+                if (!deleteResp.IsSuccess)
+                {
+                    result.InvokeError(new ResponseLeaveGuildMessage()
+                    {
+                        message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                    });
+                    return;
+                }
                 IPlayerCharacterData memberCharacter;
                 long memberConnectionId;
                 foreach (string memberId in validateResult.Guild.GetMemberIds())
                 {
+                    // Save to database
+                    _ = DbServiceClient.ClearCharacterGuildAsync(new ClearCharacterGuildReq()
+                    {
+                        CharacterId = memberId
+                    });
+                    // Update cache
                     if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(memberId, out memberCharacter) &&
                         GameInstance.ServerUserHandlers.TryGetConnectionId(memberId, out memberConnectionId))
                     {
                         memberCharacter.ClearGuild();
                         GameInstance.ServerGameMessageHandlers.SendClearGuildData(memberConnectionId, validateResult.GuildId);
                     }
-                    // Save to database
-                    _ = DbServiceClient.ClearCharacterGuildAsync(new ClearCharacterGuildReq()
-                    {
-                        CharacterId = memberId
-                    });
                     // Broadcast via chat server
                     if (ClusterClient.IsNetworkActive)
                     {
@@ -353,11 +412,6 @@ namespace MultiplayerARPG.MMO
                     }
                 }
                 GameInstance.ServerGuildHandlers.RemoveGuild(validateResult.GuildId);
-                // Save to database
-                _ = DbServiceClient.DeleteGuildAsync(new DeleteGuildReq()
-                {
-                    GuildId = validateResult.GuildId
-                });
                 // Broadcast via chat server
                 if (ClusterClient.IsNetworkActive)
                 {
@@ -366,23 +420,32 @@ namespace MultiplayerARPG.MMO
             }
             else
             {
+                // Save to database
+                AsyncResponseData<EmptyMessage> updateResp = await DbServiceClient.ClearCharacterGuildAsync(new ClearCharacterGuildReq()
+                {
+                    CharacterId = playerCharacter.Id
+                });
+                if (!updateResp.IsSuccess)
+                {
+                    result.InvokeError(new ResponseLeaveGuildMessage()
+                    {
+                        message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                    });
+                    return;
+                }
+                // Update cache
                 playerCharacter.ClearGuild();
                 validateResult.Guild.RemoveMember(playerCharacter.Id);
                 GameInstance.ServerGuildHandlers.SetGuild(validateResult.GuildId, validateResult.Guild);
                 GameInstance.ServerGameMessageHandlers.SendRemoveGuildMemberToMembers(validateResult.Guild, playerCharacter.Id);
                 GameInstance.ServerGameMessageHandlers.SendClearGuildData(requestHandler.ConnectionId, validateResult.GuildId);
-                // Save to database
-                _ = DbServiceClient.ClearCharacterGuildAsync(new ClearCharacterGuildReq()
-                {
-                    CharacterId = playerCharacter.Id
-                });
                 // Broadcast via chat server
                 if (ClusterClient.IsNetworkActive)
                 {
                     ClusterClient.SendRemoveSocialMember(MMOMessageTypes.UpdateGuildMember, validateResult.GuildId, playerCharacter.Id);
                 }
             }
-            result.Invoke(AckResponseCode.Success, new ResponseLeaveGuildMessage());
+            result.InvokeSuccess(new ResponseLeaveGuildMessage());
 #endif
         }
 
@@ -393,7 +456,7 @@ namespace MultiplayerARPG.MMO
             IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseChangeGuildMessageMessage()
+                result.InvokeError(new ResponseChangeGuildMessageMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -402,27 +465,36 @@ namespace MultiplayerARPG.MMO
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanChangeGuildMessage(playerCharacter, request.message);
             if (!validateResult.IsSuccess)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseChangeGuildMessageMessage()
+                result.InvokeError(new ResponseChangeGuildMessageMessage()
                 {
                     message = validateResult.GameMessage,
                 });
                 return;
             }
-            validateResult.Guild.guildMessage = request.message;
-            GameInstance.ServerGuildHandlers.SetGuild(validateResult.GuildId, validateResult.Guild);
             // Save to database
-            _ = DbServiceClient.UpdateGuildMessageAsync(new UpdateGuildMessageReq()
+            AsyncResponseData<GuildResp> updateResp = await DbServiceClient.UpdateGuildMessageAsync(new UpdateGuildMessageReq()
             {
                 GuildId = validateResult.GuildId,
                 GuildMessage = request.message
             });
+            if (!updateResp.IsSuccess)
+            {
+                result.InvokeError(new ResponseChangeGuildMessageMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                });
+                return;
+            }
+            // Update cache
+            validateResult.Guild.guildMessage = request.message;
+            GameInstance.ServerGuildHandlers.SetGuild(validateResult.GuildId, validateResult.Guild);
             // Broadcast via chat server
             if (ClusterClient.IsNetworkActive)
             {
                 ClusterClient.SendSetGuildMessage(MMOMessageTypes.UpdateGuild, validateResult.GuildId, request.message);
             }
             GameInstance.ServerGameMessageHandlers.SendSetGuildMessageToMembers(validateResult.Guild);
-            result.Invoke(AckResponseCode.Success, new ResponseChangeGuildMessageMessage());
+            result.InvokeSuccess(new ResponseChangeGuildMessageMessage());
 #endif
         }
 
@@ -433,7 +505,7 @@ namespace MultiplayerARPG.MMO
             IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseChangeGuildMessageMessage()
+                result.InvokeError(new ResponseChangeGuildMessageMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -442,27 +514,36 @@ namespace MultiplayerARPG.MMO
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanChangeGuildMessage2(playerCharacter, request.message);
             if (!validateResult.IsSuccess)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseChangeGuildMessageMessage()
+                result.InvokeError(new ResponseChangeGuildMessageMessage()
                 {
                     message = validateResult.GameMessage,
                 });
                 return;
             }
-            validateResult.Guild.guildMessage2 = request.message;
-            GameInstance.ServerGuildHandlers.SetGuild(validateResult.GuildId, validateResult.Guild);
             // Save to database
-            _ = DbServiceClient.UpdateGuildMessage2Async(new UpdateGuildMessageReq()
+            AsyncResponseData<GuildResp> updateResp = await DbServiceClient.UpdateGuildMessage2Async(new UpdateGuildMessageReq()
             {
                 GuildId = validateResult.GuildId,
                 GuildMessage = request.message
             });
+            if (!updateResp.IsSuccess)
+            {
+                result.InvokeError(new ResponseChangeGuildMessageMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                });
+                return;
+            }
+            // Update cache
+            validateResult.Guild.guildMessage2 = request.message;
+            GameInstance.ServerGuildHandlers.SetGuild(validateResult.GuildId, validateResult.Guild);
             // Broadcast via chat server
             if (ClusterClient.IsNetworkActive)
             {
                 ClusterClient.SendSetGuildMessage2(MMOMessageTypes.UpdateGuild, validateResult.GuildId, request.message);
             }
             GameInstance.ServerGameMessageHandlers.SendSetGuildMessage2ToMembers(validateResult.Guild);
-            result.Invoke(AckResponseCode.Success, new ResponseChangeGuildMessageMessage());
+            result.InvokeSuccess(new ResponseChangeGuildMessageMessage());
 #endif
         }
 
@@ -473,7 +554,7 @@ namespace MultiplayerARPG.MMO
             IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseChangeGuildOptionsMessage()
+                result.InvokeError(new ResponseChangeGuildOptionsMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -482,27 +563,36 @@ namespace MultiplayerARPG.MMO
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanChangeGuildOptions(playerCharacter);
             if (!validateResult.IsSuccess)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseChangeGuildOptionsMessage()
+                result.InvokeError(new ResponseChangeGuildOptionsMessage()
                 {
                     message = validateResult.GameMessage,
                 });
                 return;
             }
-            validateResult.Guild.options = request.options;
-            GameInstance.ServerGuildHandlers.SetGuild(validateResult.GuildId, validateResult.Guild);
             // Save to database
-            _ = DbServiceClient.UpdateGuildOptionsAsync(new UpdateGuildOptionsReq()
+            AsyncResponseData<GuildResp> updateResp = await DbServiceClient.UpdateGuildOptionsAsync(new UpdateGuildOptionsReq()
             {
                 GuildId = validateResult.GuildId,
                 Options = request.options
             });
+            if (!updateResp.IsSuccess)
+            {
+                result.InvokeError(new ResponseChangeGuildOptionsMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                });
+                return;
+            }
+            // Update cache
+            validateResult.Guild.options = request.options;
+            GameInstance.ServerGuildHandlers.SetGuild(validateResult.GuildId, validateResult.Guild);
             // Broadcast via chat server
             if (ClusterClient.IsNetworkActive)
             {
                 ClusterClient.SendSetGuildOptions(MMOMessageTypes.UpdateGuild, validateResult.GuildId, request.options);
             }
             GameInstance.ServerGameMessageHandlers.SendSetGuildOptionsToMembers(validateResult.Guild);
-            result.Invoke(AckResponseCode.Success, new ResponseChangeGuildOptionsMessage());
+            result.InvokeSuccess(new ResponseChangeGuildOptionsMessage());
 #endif
         }
 
@@ -513,7 +603,7 @@ namespace MultiplayerARPG.MMO
             IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseChangeGuildAutoAcceptRequestsMessage()
+                result.InvokeError(new ResponseChangeGuildAutoAcceptRequestsMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -522,27 +612,36 @@ namespace MultiplayerARPG.MMO
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanChangeGuildOptions(playerCharacter);
             if (!validateResult.IsSuccess)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseChangeGuildAutoAcceptRequestsMessage()
+                result.InvokeError(new ResponseChangeGuildAutoAcceptRequestsMessage()
                 {
                     message = validateResult.GameMessage,
                 });
                 return;
             }
-            validateResult.Guild.autoAcceptRequests = request.autoAcceptRequests;
-            GameInstance.ServerGuildHandlers.SetGuild(validateResult.GuildId, validateResult.Guild);
             // Save to database
-            _ = DbServiceClient.UpdateGuildAutoAcceptRequestsAsync(new UpdateGuildAutoAcceptRequestsReq()
+            AsyncResponseData<GuildResp> updateResp = await DbServiceClient.UpdateGuildAutoAcceptRequestsAsync(new UpdateGuildAutoAcceptRequestsReq()
             {
                 GuildId = validateResult.GuildId,
                 AutoAcceptRequests = request.autoAcceptRequests
             });
+            if (!updateResp.IsSuccess)
+            {
+                result.InvokeError(new ResponseChangeGuildAutoAcceptRequestsMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                });
+                return;
+            }
+            // Update cache
+            validateResult.Guild.autoAcceptRequests = request.autoAcceptRequests;
+            GameInstance.ServerGuildHandlers.SetGuild(validateResult.GuildId, validateResult.Guild);
             // Broadcast via chat server
             if (ClusterClient.IsNetworkActive)
             {
                 ClusterClient.SendSetGuildAutoAcceptRequests(MMOMessageTypes.UpdateGuild, validateResult.GuildId, request.autoAcceptRequests);
             }
             GameInstance.ServerGameMessageHandlers.SendSetGuildAutoAcceptRequestsToMembers(validateResult.Guild);
-            result.Invoke(AckResponseCode.Success, new ResponseChangeGuildAutoAcceptRequestsMessage());
+            result.InvokeSuccess(new ResponseChangeGuildAutoAcceptRequestsMessage());
 #endif
         }
 
@@ -553,7 +652,7 @@ namespace MultiplayerARPG.MMO
             IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseChangeGuildRoleMessage()
+                result.InvokeError(new ResponseChangeGuildRoleMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -562,12 +661,31 @@ namespace MultiplayerARPG.MMO
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanChangeGuildRole(playerCharacter, request.guildRole, request.name);
             if (!validateResult.IsSuccess)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseChangeGuildRoleMessage()
+                result.InvokeError(new ResponseChangeGuildRoleMessage()
                 {
                     message = validateResult.GameMessage,
                 });
                 return;
             }
+            // Save to database
+            AsyncResponseData<GuildResp> updateResp = await DbServiceClient.UpdateGuildRoleAsync(new UpdateGuildRoleReq()
+            {
+                GuildId = validateResult.GuildId,
+                GuildRole = request.guildRole,
+                RoleName = request.name,
+                CanInvite = request.canInvite,
+                CanKick = request.canKick,
+                ShareExpPercentage = request.shareExpPercentage
+            });
+            if (!updateResp.IsSuccess)
+            {
+                result.InvokeError(new ResponseChangeGuildRoleMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                });
+                return;
+            }
+            // Update cache
             validateResult.Guild.SetRole(request.guildRole, request.name, request.canInvite, request.canKick, request.shareExpPercentage);
             GameInstance.ServerGuildHandlers.SetGuild(validateResult.GuildId, validateResult.Guild);
             // Change characters guild role
@@ -580,23 +698,13 @@ namespace MultiplayerARPG.MMO
                         memberCharacter.SharedGuildExp = request.shareExpPercentage;
                 }
             }
-            // Save to database
-            _ = DbServiceClient.UpdateGuildRoleAsync(new UpdateGuildRoleReq()
-            {
-                GuildId = validateResult.GuildId,
-                GuildRole = request.guildRole,
-                RoleName = request.name,
-                CanInvite = request.canInvite,
-                CanKick = request.canKick,
-                ShareExpPercentage = request.shareExpPercentage
-            });
             // Broadcast via chat server
             if (ClusterClient.IsNetworkActive)
             {
                 ClusterClient.SendSetGuildRole(MMOMessageTypes.UpdateGuild, validateResult.GuildId, request.guildRole, request.name, request.canInvite, request.canKick, request.shareExpPercentage);
             }
             GameInstance.ServerGameMessageHandlers.SendSetGuildRoleToMembers(validateResult.Guild, request.guildRole, request.name, request.canInvite, request.canKick, request.shareExpPercentage);
-            result.Invoke(AckResponseCode.Success, new ResponseChangeGuildRoleMessage());
+            result.InvokeSuccess(new ResponseChangeGuildRoleMessage());
 #endif
         }
 
@@ -607,7 +715,7 @@ namespace MultiplayerARPG.MMO
             IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseChangeMemberGuildRoleMessage()
+                result.InvokeError(new ResponseChangeMemberGuildRoleMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -616,12 +724,28 @@ namespace MultiplayerARPG.MMO
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanChangeGuildMemberRole(playerCharacter, request.memberId);
             if (!validateResult.IsSuccess)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseChangeMemberGuildRoleMessage()
+                result.InvokeError(new ResponseChangeMemberGuildRoleMessage()
                 {
                     message = validateResult.GameMessage,
                 });
                 return;
             }
+            // Save to database
+            AsyncResponseData<GuildResp> updateResp = await DbServiceClient.UpdateGuildMemberRoleAsync(new UpdateGuildMemberRoleReq()
+            {
+                GuildId = validateResult.GuildId,
+                MemberCharacterId = request.memberId,
+                GuildRole = request.guildRole
+            });
+            if (!updateResp.IsSuccess)
+            {
+                result.InvokeError(new ResponseChangeMemberGuildRoleMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                });
+                return;
+            }
+            // Update cache
             validateResult.Guild.SetMemberRole(request.memberId, request.guildRole);
             GameInstance.ServerGuildHandlers.SetGuild(validateResult.GuildId, validateResult.Guild);
             IPlayerCharacterData memberCharacter;
@@ -630,20 +754,13 @@ namespace MultiplayerARPG.MMO
                 memberCharacter.GuildRole = request.guildRole;
                 memberCharacter.SharedGuildExp = validateResult.Guild.GetRole(request.guildRole).shareExpPercentage;
             }
-            // Save to database
-            _ = DbServiceClient.UpdateGuildMemberRoleAsync(new UpdateGuildMemberRoleReq()
-            {
-                GuildId = validateResult.GuildId,
-                MemberCharacterId = request.memberId,
-                GuildRole = request.guildRole
-            });
             // Broadcast via chat server
             if (ClusterClient.IsNetworkActive)
             {
                 ClusterClient.SendSetGuildMemberRole(MMOMessageTypes.UpdateGuild, validateResult.GuildId, request.memberId, request.guildRole);
             }
             GameInstance.ServerGameMessageHandlers.SendSetGuildMemberRoleToMembers(validateResult.Guild, request.memberId, request.guildRole);
-            result.Invoke(AckResponseCode.Success, new ResponseChangeMemberGuildRoleMessage());
+            result.InvokeSuccess(new ResponseChangeMemberGuildRoleMessage());
 #endif
         }
 
@@ -654,7 +771,7 @@ namespace MultiplayerARPG.MMO
             IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseIncreaseGuildSkillLevelMessage()
+                result.InvokeError(new ResponseIncreaseGuildSkillLevelMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -663,19 +780,27 @@ namespace MultiplayerARPG.MMO
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanIncreaseGuildSkillLevel(playerCharacter, request.dataId);
             if (!validateResult.IsSuccess)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseIncreaseGuildSkillLevelMessage()
+                result.InvokeError(new ResponseIncreaseGuildSkillLevelMessage()
                 {
                     message = validateResult.GameMessage,
                 });
                 return;
             }
             // Save to database
-            GuildResp resp = await DbServiceClient.AddGuildSkillAsync(new AddGuildSkillReq()
+            AsyncResponseData<GuildResp> updateResp = await DbServiceClient.AddGuildSkillAsync(new AddGuildSkillReq()
             {
                 GuildId = validateResult.GuildId,
                 SkillId = request.dataId,
             });
-            GuildData guild = resp.GuildData;
+            if (!updateResp.IsSuccess)
+            {
+                result.InvokeError(new ResponseIncreaseGuildSkillLevelMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                });
+                return;
+            }
+            GuildData guild = updateResp.Response.GuildData;
             GameInstance.ServerGuildHandlers.SetGuild(validateResult.GuildId, guild);
             // Broadcast via chat server
             if (ClusterClient.IsNetworkActive)
@@ -685,7 +810,7 @@ namespace MultiplayerARPG.MMO
             }
             GameInstance.ServerGameMessageHandlers.SendSetGuildSkillLevelToMembers(guild, request.dataId);
             GameInstance.ServerGameMessageHandlers.SendSetGuildLevelExpSkillPointToMembers(guild);
-            result.Invoke(AckResponseCode.Success, new ResponseIncreaseGuildSkillLevelMessage());
+            result.InvokeSuccess(new ResponseIncreaseGuildSkillLevelMessage());
 #endif
         }
 
@@ -735,7 +860,7 @@ namespace MultiplayerARPG.MMO
             IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseGetGuildInfoMessage()
+                result.InvokeError(new ResponseGetGuildInfoMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -745,14 +870,14 @@ namespace MultiplayerARPG.MMO
             GuildData guild;
             if (!GameInstance.ServerGuildHandlers.TryGetGuild(request.guildId, out guild))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseGetGuildInfoMessage()
+                result.InvokeError(new ResponseGetGuildInfoMessage()
                 {
                     message = UITextKeys.UI_ERROR_GUILD_NOT_FOUND,
                 });
                 return;
             }
 
-            result.Invoke(AckResponseCode.Success, new ResponseGetGuildInfoMessage()
+            result.InvokeSuccess(new ResponseGetGuildInfoMessage()
             {
                 guild = new GuildListEntry()
                 {

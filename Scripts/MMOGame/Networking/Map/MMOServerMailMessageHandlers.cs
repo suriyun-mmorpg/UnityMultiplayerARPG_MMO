@@ -21,12 +21,13 @@ namespace MultiplayerARPG.MMO
             string userId;
             if (GameInstance.ServerUserHandlers.TryGetUserId(requestHandler.ConnectionId, out userId))
             {
-                MailListResp resp = await DbServiceClient.MailListAsync(new MailListReq()
+                AsyncResponseData<MailListResp> resp = await DbServiceClient.MailListAsync(new MailListReq()
                 {
                     UserId = userId,
                     OnlyNewMails = request.onlyNewMails,
                 });
-                mails.AddRange(resp.List);
+                if (resp.IsSuccess)
+                    mails.AddRange(resp.Response.List);
             }
             result.Invoke(AckResponseCode.Success, new ResponseMailListMessage()
             {
@@ -42,18 +43,26 @@ namespace MultiplayerARPG.MMO
             string userId;
             if (GameInstance.ServerUserHandlers.TryGetUserId(requestHandler.ConnectionId, out userId))
             {
-                UpdateReadMailStateResp resp = await DbServiceClient.UpdateReadMailStateAsync(new UpdateReadMailStateReq()
+                AsyncResponseData<UpdateReadMailStateResp> resp = await DbServiceClient.UpdateReadMailStateAsync(new UpdateReadMailStateReq()
                 {
                     MailId = request.id,
                     UserId = userId,
                 });
-                UITextKeys message = resp.Error;
+                if (!resp.IsSuccess)
+                {
+                    result.InvokeError(new ResponseReadMailMessage()
+                    {
+                        message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                    });
+                    return;
+                }
+                UITextKeys message = resp.Response.Error;
                 result.Invoke(
                     message == UITextKeys.NONE ? AckResponseCode.Success : AckResponseCode.Error,
                     new ResponseReadMailMessage()
                     {
                         message = message,
-                        mail = resp.Mail,
+                        mail = resp.Response.Mail,
                     });
             }
             else
@@ -69,12 +78,14 @@ namespace MultiplayerARPG.MMO
         private async UniTask<UITextKeys> ClaimMailItems(string mailId, IPlayerCharacterData playerCharacter)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            GetMailResp mailResp = await DbServiceClient.GetMailAsync(new GetMailReq()
+            AsyncResponseData<GetMailResp> mailResp = await DbServiceClient.GetMailAsync(new GetMailReq()
             {
                 MailId = mailId,
                 UserId = playerCharacter.UserId,
             });
-            Mail mail = mailResp.Mail;
+            if (!mailResp.IsSuccess)
+                return UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR;
+            Mail mail = mailResp.Response.Mail;
             if (mail.IsClaim)
             {
                 return UITextKeys.UI_ERROR_MAIL_CLAIM_ALREADY_CLAIMED;
@@ -102,15 +113,17 @@ namespace MultiplayerARPG.MMO
                 }
                 if (mail.Cash > 0)
                 {
-                    CashResp changeCashResp = await DbServiceClient.ChangeCashAsync(new ChangeCashReq()
+                    AsyncResponseData<CashResp> changeCashResp = await DbServiceClient.ChangeCashAsync(new ChangeCashReq()
                     {
                         UserId = playerCharacter.UserId,
                         ChangeAmount = -mail.Cash
                     });
-                    playerCharacter.UserCash = changeCashResp.Cash;
+                    if (!changeCashResp.IsSuccess)
+                        return UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR;
+                    playerCharacter.UserCash = changeCashResp.Response.Cash;
                 }
             }
-            UpdateClaimMailItemsStateResp resp = await DbServiceClient.UpdateClaimMailItemsStateAsync(new UpdateClaimMailItemsStateReq()
+            AsyncResponseData<UpdateClaimMailItemsStateResp> resp = await DbServiceClient.UpdateClaimMailItemsStateAsync(new UpdateClaimMailItemsStateReq()
             {
                 MailId = mailId,
                 UserId = playerCharacter.UserId,
@@ -149,12 +162,14 @@ namespace MultiplayerARPG.MMO
         private async UniTask<UITextKeys> DeleteMail(string mailId, string userId)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            UpdateDeleteMailStateResp resp = await DbServiceClient.UpdateDeleteMailStateAsync(new UpdateDeleteMailStateReq()
+            AsyncResponseData<UpdateDeleteMailStateResp> resp = await DbServiceClient.UpdateDeleteMailStateAsync(new UpdateDeleteMailStateReq()
             {
                 MailId = mailId,
                 UserId = userId,
             });
-            return resp.Error;
+            if (!resp.IsSuccess)
+                return UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR;
+            return resp.Response.Error;
 #else
             return UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE;
 #endif
@@ -207,11 +222,19 @@ namespace MultiplayerARPG.MMO
                     return;
                 }
                 // Find receiver
-                GetUserIdByCharacterNameResp userIdResp = await DbServiceClient.GetUserIdByCharacterNameAsync(new GetUserIdByCharacterNameReq()
+                AsyncResponseData<GetUserIdByCharacterNameResp> userIdResp = await DbServiceClient.GetUserIdByCharacterNameAsync(new GetUserIdByCharacterNameReq()
                 {
                     CharacterName = request.receiverName,
                 });
-                string receiverId = userIdResp.UserId;
+                if (!userIdResp.IsSuccess)
+                {
+                    result.Invoke(AckResponseCode.Error, new ResponseSendMailMessage()
+                    {
+                        message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                    });
+                    return;
+                }
+                string receiverId = userIdResp.Response.UserId;
                 if (string.IsNullOrEmpty(receiverId))
                 {
                     result.Invoke(AckResponseCode.Error, new ResponseSendMailMessage()
@@ -229,11 +252,19 @@ namespace MultiplayerARPG.MMO
                     Content = request.content,
                     Gold = request.gold,
                 };
-                SendMailResp resp = await DbServiceClient.SendMailAsync(new SendMailReq()
+                AsyncResponseData<SendMailResp> resp = await DbServiceClient.SendMailAsync(new SendMailReq()
                 {
                     Mail = mail,
                 });
-                UITextKeys message = resp.Error;
+                if (!resp.IsSuccess)
+                {
+                    result.Invoke(AckResponseCode.Error, new ResponseSendMailMessage()
+                    {
+                        message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                    });
+                    return;
+                }
+                UITextKeys message = resp.Response.Error;
                 result.Invoke(
                     message == UITextKeys.NONE ? AckResponseCode.Success : AckResponseCode.Error,
                     new ResponseSendMailMessage()
@@ -258,11 +289,12 @@ namespace MultiplayerARPG.MMO
             string userId;
             if (GameInstance.ServerUserHandlers.TryGetUserId(requestHandler.ConnectionId, out userId))
             {
-                GetMailNotificationCountResp resp = await DbServiceClient.GetMailsCountAsync(new GetMailNotificationCountReq()
+                AsyncResponseData<GetMailNotificationCountResp> resp = await DbServiceClient.GetMailsCountAsync(new GetMailNotificationCountReq()
                 {
                     UserId = userId,
                 });
-                notificationCount = resp.NotificationCount;
+                if (resp.IsSuccess)
+                    notificationCount = resp.Response.NotificationCount;
             }
             result.Invoke(AckResponseCode.Success, new ResponseMailNotificationMessage()
             {
@@ -283,12 +315,20 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            MailListResp resp = await DbServiceClient.MailListAsync(new MailListReq()
+            AsyncResponseData<MailListResp> resp = await DbServiceClient.MailListAsync(new MailListReq()
             {
                 UserId = playerCharacter.UserId,
                 OnlyNewMails = true,
             });
-            foreach (MailListEntry entry in resp.List)
+            if (!resp.IsSuccess)
+            {
+                result.Invoke(AckResponseCode.Error, new ResponseClaimAllMailsItemsMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                });
+                return;
+            }
+            foreach (MailListEntry entry in resp.Response.List)
             {
                 await ClaimMailItems(entry.Id, playerCharacter);
             }
@@ -307,12 +347,20 @@ namespace MultiplayerARPG.MMO
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
             }
-            MailListResp resp = await DbServiceClient.MailListAsync(new MailListReq()
+            AsyncResponseData<MailListResp> resp = await DbServiceClient.MailListAsync(new MailListReq()
             {
                 UserId = userId,
                 OnlyNewMails = false,
             });
-            foreach (MailListEntry entry in resp.List)
+            if (!resp.IsSuccess)
+            {
+                result.Invoke(AckResponseCode.Error, new ResponseDeleteAllMailsMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                });
+                return;
+            }
+            foreach (MailListEntry entry in resp.Response.List)
             {
                 await DeleteMail(entry.Id, userId);
             }

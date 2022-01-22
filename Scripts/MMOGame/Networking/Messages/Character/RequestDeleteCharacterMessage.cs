@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG.MMO
 {
-    public class RequestDeleteCharacterMessage : INetSerializable
+    public struct RequestDeleteCharacterMessage : INetSerializable
     {
         public string characterId;
 

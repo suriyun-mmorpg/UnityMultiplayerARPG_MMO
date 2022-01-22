@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG.MMO
 {
-    public class ResponseSpawnMapMessage : INetSerializable
+    public struct ResponseSpawnMapMessage : INetSerializable
     {
         public UITextKeys message;
         public string instanceId;

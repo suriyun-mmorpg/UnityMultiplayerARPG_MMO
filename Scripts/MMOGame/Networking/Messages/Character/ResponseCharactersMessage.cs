@@ -3,7 +3,7 @@ using LiteNetLib.Utils;
 
 namespace MultiplayerARPG.MMO
 {
-    public class ResponseCharactersMessage : INetSerializable
+    public struct ResponseCharactersMessage : INetSerializable
     {
         public UITextKeys message;
         public List<PlayerCharacterData> characters;

@@ -7,7 +7,7 @@ namespace MultiplayerARPG.MMO
     public partial class MMOServerBankMessageHandlers : MonoBehaviour, IServerBankMessageHandlers
     {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        public DatabaseNetworkManager DbServiceClient
+        public IDatabaseClient DbServiceClient
         {
             get { return MMOServerInstance.Singleton.DatabaseNetworkManager; }
         }
@@ -24,7 +24,7 @@ namespace MultiplayerARPG.MMO
             IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseDepositGuildGoldMessage()
+                result.InvokeError(new ResponseDepositGuildGoldMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -33,7 +33,7 @@ namespace MultiplayerARPG.MMO
             GuildData guild;
             if (!GameInstance.ServerGuildHandlers.TryGetGuild(playerCharacter.GuildId, out guild))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseDepositGuildGoldMessage()
+                result.InvokeError(new ResponseDepositGuildGoldMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_JOINED_GUILD,
                 });
@@ -41,19 +41,27 @@ namespace MultiplayerARPG.MMO
             }
             if (playerCharacter.Gold - request.gold < 0)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseDepositGuildGoldMessage()
+                result.InvokeError(new ResponseDepositGuildGoldMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD_TO_DEPOSIT,
                 });
                 return;
             }
             // Update gold
-            GuildGoldResp changeGoldResp = await DbServiceClient.ChangeGuildGoldAsync(new ChangeGuildGoldReq()
+            AsyncResponseData<GuildGoldResp> changeGoldResp = await DbServiceClient.ChangeGuildGoldAsync(new ChangeGuildGoldReq()
             {
                 GuildId = playerCharacter.GuildId,
                 ChangeAmount = request.gold
             });
-            guild.gold = changeGoldResp.GuildGold;
+            if (!changeGoldResp.IsSuccess)
+            {
+                result.InvokeError(new ResponseDepositGuildGoldMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                });
+                return;
+            }
+            guild.gold = changeGoldResp.Response.GuildGold;
             playerCharacter.Gold -= request.gold;
             GameInstance.ServerGuildHandlers.SetGuild(playerCharacter.GuildId, guild);
             // Broadcast via chat server
@@ -62,7 +70,7 @@ namespace MultiplayerARPG.MMO
                 ClusterClient.SendSetGuildGold(MMOMessageTypes.UpdateGuild, guild.id, guild.gold);
             }
             GameInstance.ServerGameMessageHandlers.SendSetGuildGoldToMembers(guild);
-            result.Invoke(AckResponseCode.Success, new ResponseDepositGuildGoldMessage());
+            result.InvokeSuccess(new ResponseDepositGuildGoldMessage());
 #endif
         }
 
@@ -72,7 +80,7 @@ namespace MultiplayerARPG.MMO
             IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseDepositUserGoldMessage()
+                result.InvokeError(new ResponseDepositUserGoldMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -80,21 +88,29 @@ namespace MultiplayerARPG.MMO
             }
             if (playerCharacter.Gold - request.gold < 0)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseDepositUserGoldMessage()
+                result.InvokeError(new ResponseDepositUserGoldMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD_TO_DEPOSIT,
                 });
                 return;
             }
             // Update gold
-            GoldResp changeGoldResp = await DbServiceClient.ChangeGoldAsync(new ChangeGoldReq()
+            AsyncResponseData<GoldResp> changeGoldResp = await DbServiceClient.ChangeGoldAsync(new ChangeGoldReq()
             {
                 UserId = playerCharacter.UserId,
                 ChangeAmount = request.gold
             });
-            playerCharacter.UserGold = changeGoldResp.Gold;
+            if (!changeGoldResp.IsSuccess)
+            {
+                result.InvokeError(new ResponseDepositUserGoldMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                });
+                return;
+            }
+            playerCharacter.UserGold = changeGoldResp.Response.Gold;
             playerCharacter.Gold -= request.gold;
-            result.Invoke(AckResponseCode.Success, new ResponseDepositUserGoldMessage());
+            result.InvokeSuccess(new ResponseDepositUserGoldMessage());
 #endif
         }
 
@@ -104,7 +120,7 @@ namespace MultiplayerARPG.MMO
             IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseWithdrawGuildGoldMessage()
+                result.InvokeError(new ResponseWithdrawGuildGoldMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -113,33 +129,48 @@ namespace MultiplayerARPG.MMO
             GuildData guild;
             if (!GameInstance.ServerGuildHandlers.TryGetGuild(playerCharacter.GuildId, out guild))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseWithdrawGuildGoldMessage()
+                result.InvokeError(new ResponseWithdrawGuildGoldMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_JOINED_GUILD,
                 });
                 return;
             }
             // Get gold
-            GuildGoldResp goldResp = await DbServiceClient.GetGuildGoldAsync(new GetGuildGoldReq()
+            AsyncResponseData<GuildGoldResp> goldResp = await DbServiceClient.GetGuildGoldAsync(new GetGuildGoldReq()
             {
                 GuildId = playerCharacter.GuildId
             });
-            int gold = goldResp.GuildGold - request.gold;
-            if (gold < 0)
+            if (!goldResp.IsSuccess)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseWithdrawGuildGoldMessage()
+                result.InvokeError(new ResponseWithdrawGuildGoldMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                });
+                return;
+            }
+            if (goldResp.Response.GuildGold - request.gold < 0)
+            {
+                result.InvokeError(new ResponseWithdrawGuildGoldMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD_TO_WITHDRAW,
                 });
                 return;
             }
             // Update gold
-            GuildGoldResp changeGoldResp = await DbServiceClient.ChangeGuildGoldAsync(new ChangeGuildGoldReq()
+            AsyncResponseData<GuildGoldResp> changeGoldResp = await DbServiceClient.ChangeGuildGoldAsync(new ChangeGuildGoldReq()
             {
                 GuildId = playerCharacter.GuildId,
                 ChangeAmount = -request.gold
             });
-            guild.gold = changeGoldResp.GuildGold;
+            if (!changeGoldResp.IsSuccess)
+            {
+                result.InvokeError(new ResponseWithdrawGuildGoldMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                });
+                return;
+            }
+            guild.gold = changeGoldResp.Response.GuildGold;
             playerCharacter.Gold = playerCharacter.Gold.Increase(request.gold);
             GameInstance.ServerGuildHandlers.SetGuild(playerCharacter.GuildId, guild);
             // Broadcast via chat server
@@ -148,7 +179,7 @@ namespace MultiplayerARPG.MMO
                 ClusterClient.SendSetGuildGold(MMOMessageTypes.UpdateGuild, guild.id, guild.gold);
             }
             GameInstance.ServerGameMessageHandlers.SendSetGuildGoldToMembers(guild);
-            result.Invoke(AckResponseCode.Success, new ResponseWithdrawGuildGoldMessage());
+            result.InvokeSuccess(new ResponseWithdrawGuildGoldMessage());
 #endif
         }
 
@@ -158,35 +189,50 @@ namespace MultiplayerARPG.MMO
             IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseWithdrawUserGoldMessage()
+                result.InvokeError(new ResponseWithdrawUserGoldMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
             // Get gold
-            GoldResp goldResp = await DbServiceClient.GetGoldAsync(new GetGoldReq()
+            AsyncResponseData<GoldResp> goldResp = await DbServiceClient.GetGoldAsync(new GetGoldReq()
             {
                 UserId = playerCharacter.UserId
             });
-            int gold = goldResp.Gold - request.gold;
-            if (gold < 0)
+            if (!goldResp.IsSuccess)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseWithdrawUserGoldMessage()
+                result.InvokeError(new ResponseWithdrawUserGoldMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                });
+                return;
+            }
+            if (goldResp.Response.Gold - request.gold < 0)
+            {
+                result.InvokeError(new ResponseWithdrawUserGoldMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD_TO_WITHDRAW,
                 });
                 return;
             }
             // Update gold
-            GoldResp changeGoldResp = await DbServiceClient.ChangeGoldAsync(new ChangeGoldReq()
+            AsyncResponseData<GoldResp> changeGoldResp = await DbServiceClient.ChangeGoldAsync(new ChangeGoldReq()
             {
                 UserId = playerCharacter.UserId,
                 ChangeAmount = -request.gold
             });
-            playerCharacter.UserGold = changeGoldResp.Gold;
+            if (!changeGoldResp.IsSuccess)
+            {
+                result.InvokeError(new ResponseWithdrawUserGoldMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                });
+                return;
+            }
+            playerCharacter.UserGold = changeGoldResp.Response.Gold;
             playerCharacter.Gold = playerCharacter.Gold.Increase(request.gold);
-            result.Invoke(AckResponseCode.Success, new ResponseWithdrawUserGoldMessage());
+            result.InvokeSuccess(new ResponseWithdrawUserGoldMessage());
 #endif
         }
     }

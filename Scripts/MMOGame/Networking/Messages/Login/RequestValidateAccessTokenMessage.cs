@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG.MMO
 {
-    public class RequestValidateAccessTokenMessage : INetSerializable
+    public struct RequestValidateAccessTokenMessage : INetSerializable
     {
         public string userId;
         public string accessToken;

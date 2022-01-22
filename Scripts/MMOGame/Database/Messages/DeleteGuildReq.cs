@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG.MMO
 {
-    public class DeleteGuildReq : INetSerializable
+    public struct DeleteGuildReq : INetSerializable
     {
         public int GuildId { get; set; }
 

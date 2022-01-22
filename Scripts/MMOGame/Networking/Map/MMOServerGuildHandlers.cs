@@ -1,4 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
+using LiteNetLibManager;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,7 +14,7 @@ namespace MultiplayerARPG.MMO
         public static readonly HashSet<string> GuildInvitations = new HashSet<string>();
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        public DatabaseNetworkManager DbServiceClient
+        public IDatabaseClient DbServiceClient
         {
             get { return MMOServerInstance.Singleton.DatabaseNetworkManager; }
         }
@@ -79,12 +80,14 @@ namespace MultiplayerARPG.MMO
             ValidateGuildRequestResult validateResult = this.CanIncreaseGuildExp(playerCharacter, exp);
             if (!validateResult.IsSuccess)
                 return;
-            GuildResp resp = await DbServiceClient.IncreaseGuildExpAsync(new IncreaseGuildExpReq()
+            AsyncResponseData<GuildResp> resp = await DbServiceClient.IncreaseGuildExpAsync(new IncreaseGuildExpReq()
             {
                 GuildId = validateResult.GuildId,
                 Exp = exp,
             });
-            GuildData guild = resp.GuildData;
+            if (!resp.IsSuccess)
+                return;
+            GuildData guild = resp.Response.GuildData;
             SetGuild(validateResult.GuildId, guild);
             // Broadcast via chat server
             if (ClusterClient.IsNetworkActive)

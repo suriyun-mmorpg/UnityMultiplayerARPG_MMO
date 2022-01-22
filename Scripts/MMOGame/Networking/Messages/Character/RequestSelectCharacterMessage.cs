@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG.MMO
 {
-    public class RequestSelectCharacterMessage : INetSerializable
+    public struct RequestSelectCharacterMessage : INetSerializable
     {
         public string characterId;
 

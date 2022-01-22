@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG.MMO
 {
-    public class RequestUserLoginMessage : INetSerializable
+    public struct RequestUserLoginMessage : INetSerializable
     {
         public string username;
         public string password;

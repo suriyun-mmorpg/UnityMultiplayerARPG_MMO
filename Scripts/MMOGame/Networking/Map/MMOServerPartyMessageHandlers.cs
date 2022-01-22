@@ -7,7 +7,7 @@ namespace MultiplayerARPG.MMO
     public partial class MMOServerPartyMessageHandlers : MonoBehaviour, IServerPartyMessageHandlers
     {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        public DatabaseNetworkManager DbServiceClient
+        public IDatabaseClient DbServiceClient
         {
             get { return MMOServerInstance.Singleton.DatabaseNetworkManager; }
         }
@@ -25,7 +25,7 @@ namespace MultiplayerARPG.MMO
             BasePlayerCharacterEntity playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseAcceptPartyInvitationMessage()
+                result.InvokeError(new ResponseAcceptPartyInvitationMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -34,7 +34,7 @@ namespace MultiplayerARPG.MMO
             ValidatePartyRequestResult validateResult = GameInstance.ServerPartyHandlers.CanAcceptPartyInvitation(request.partyId, playerCharacter);
             if (!validateResult.IsSuccess)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseAcceptPartyInvitationMessage()
+                result.InvokeError(new ResponseAcceptPartyInvitationMessage()
                 {
                     message = validateResult.GameMessage,
                 });
@@ -45,11 +45,19 @@ namespace MultiplayerARPG.MMO
             GameInstance.ServerPartyHandlers.SetParty(request.partyId, validateResult.Party);
             GameInstance.ServerPartyHandlers.RemovePartyInvitation(request.partyId, playerCharacter.Id);
             // Save to database
-            _ = DbServiceClient.UpdateCharacterPartyAsync(new UpdateCharacterPartyReq()
+            AsyncResponseData<PartyResp> updateResp = await DbServiceClient.UpdateCharacterPartyAsync(new UpdateCharacterPartyReq()
             {
                 SocialCharacterData = SocialCharacterData.Create(playerCharacter),
                 PartyId = request.partyId
             });
+            if (!updateResp.IsSuccess)
+            {
+                result.InvokeError(new ResponseAcceptPartyInvitationMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                });
+                return;
+            }
             // Broadcast via chat server
             if (ClusterClient.IsNetworkActive)
             {
@@ -61,7 +69,7 @@ namespace MultiplayerARPG.MMO
             // Send message to inviter
             GameInstance.ServerGameMessageHandlers.SendGameMessageByCharacterId(request.inviterId, UITextKeys.UI_PARTY_INVITATION_ACCEPTED);
             // Response to invitee
-            result.Invoke(AckResponseCode.Success, new ResponseAcceptPartyInvitationMessage()
+            result.InvokeSuccess(new ResponseAcceptPartyInvitationMessage()
             {
                 message = UITextKeys.UI_PARTY_INVITATION_ACCEPTED,
             });
@@ -75,7 +83,7 @@ namespace MultiplayerARPG.MMO
             BasePlayerCharacterEntity playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseDeclinePartyInvitationMessage()
+                result.InvokeError(new ResponseDeclinePartyInvitationMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -84,7 +92,7 @@ namespace MultiplayerARPG.MMO
             ValidatePartyRequestResult validateResult = GameInstance.ServerPartyHandlers.CanDeclinePartyInvitation(request.partyId, playerCharacter);
             if (!validateResult.IsSuccess)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseDeclinePartyInvitationMessage()
+                result.InvokeError(new ResponseDeclinePartyInvitationMessage()
                 {
                     message = validateResult.GameMessage,
                 });
@@ -94,7 +102,7 @@ namespace MultiplayerARPG.MMO
             // Send message to inviter
             GameInstance.ServerGameMessageHandlers.SendGameMessageByCharacterId(request.inviterId, UITextKeys.UI_PARTY_INVITATION_DECLINED);
             // Response to invitee
-            result.Invoke(AckResponseCode.Success, new ResponseDeclinePartyInvitationMessage()
+            result.InvokeSuccess(new ResponseDeclinePartyInvitationMessage()
             {
                 message = UITextKeys.UI_PARTY_INVITATION_DECLINED,
             });
@@ -108,7 +116,7 @@ namespace MultiplayerARPG.MMO
             BasePlayerCharacterEntity playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseSendPartyInvitationMessage()
+                result.InvokeError(new ResponseSendPartyInvitationMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -117,7 +125,7 @@ namespace MultiplayerARPG.MMO
             BasePlayerCharacterEntity inviteeCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(request.inviteeId, out inviteeCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseSendPartyInvitationMessage()
+                result.InvokeError(new ResponseSendPartyInvitationMessage()
                 {
                     message = UITextKeys.UI_ERROR_CHARACTER_NOT_FOUND,
                 });
@@ -126,7 +134,7 @@ namespace MultiplayerARPG.MMO
             ValidatePartyRequestResult validateResult = GameInstance.ServerPartyHandlers.CanSendPartyInvitation(playerCharacter, inviteeCharacter);
             if (!validateResult.IsSuccess)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseSendPartyInvitationMessage()
+                result.InvokeError(new ResponseSendPartyInvitationMessage()
                 {
                     message = validateResult.GameMessage,
                 });
@@ -142,7 +150,7 @@ namespace MultiplayerARPG.MMO
                 ShareExp = validateResult.Party.shareExp,
                 ShareItem = validateResult.Party.shareItem,
             });
-            result.Invoke(AckResponseCode.Success, new ResponseSendPartyInvitationMessage());
+            result.InvokeSuccess(new ResponseSendPartyInvitationMessage());
 #endif
         }
 
@@ -153,7 +161,7 @@ namespace MultiplayerARPG.MMO
             IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseCreatePartyMessage()
+                result.InvokeError(new ResponseCreatePartyMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -162,19 +170,28 @@ namespace MultiplayerARPG.MMO
             ValidatePartyRequestResult validateResult = playerCharacter.CanCreateParty();
             if (!validateResult.IsSuccess)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseCreatePartyMessage()
+                result.InvokeError(new ResponseCreatePartyMessage()
                 {
                     message = validateResult.GameMessage,
                 });
                 return;
             }
-            PartyResp createPartyResp = await DbServiceClient.CreatePartyAsync(new CreatePartyReq()
+            AsyncResponseData<PartyResp> createPartyResp = await DbServiceClient.CreatePartyAsync(new CreatePartyReq()
             {
                 LeaderCharacterId = playerCharacter.Id,
                 ShareExp = request.shareExp,
                 ShareItem = request.shareItem
             });
-            PartyData party = createPartyResp.PartyData;
+            if (!createPartyResp.IsSuccess)
+            {
+                result.InvokeError(new ResponseCreatePartyMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                });
+                return;
+            }
+            // Update cache
+            PartyData party = createPartyResp.Response.PartyData;
             GameInstance.ServerPartyHandlers.SetParty(party.id, party);
             playerCharacter.PartyId = party.id;
             // Broadcast via chat server
@@ -185,7 +202,7 @@ namespace MultiplayerARPG.MMO
             }
             GameInstance.ServerGameMessageHandlers.SendSetPartyData(requestHandler.ConnectionId, party);
             GameInstance.ServerGameMessageHandlers.SendAddPartyMembersToOne(requestHandler.ConnectionId, party);
-            result.Invoke(AckResponseCode.Success, new ResponseCreatePartyMessage());
+            result.InvokeSuccess(new ResponseCreatePartyMessage());
 #endif
         }
 
@@ -196,7 +213,7 @@ namespace MultiplayerARPG.MMO
             IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseChangePartyLeaderMessage()
+                result.InvokeError(new ResponseChangePartyLeaderMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -205,27 +222,36 @@ namespace MultiplayerARPG.MMO
             ValidatePartyRequestResult validateResult = GameInstance.ServerPartyHandlers.CanChangePartyLeader(playerCharacter, request.memberId);
             if (!validateResult.IsSuccess)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseChangePartyLeaderMessage()
+                result.InvokeError(new ResponseChangePartyLeaderMessage()
                 {
                     message = validateResult.GameMessage,
                 });
                 return;
             }
-            validateResult.Party.SetLeader(request.memberId);
-            GameInstance.ServerPartyHandlers.SetParty(validateResult.PartyId, validateResult.Party);
             // Save to database
-            _ = DbServiceClient.UpdatePartyLeaderAsync(new UpdatePartyLeaderReq()
+            AsyncResponseData<PartyResp> updateResp = await DbServiceClient.UpdatePartyLeaderAsync(new UpdatePartyLeaderReq()
             {
                 PartyId = validateResult.PartyId,
                 LeaderCharacterId = request.memberId,
             });
+            if (!updateResp.IsSuccess)
+            {
+                result.InvokeError(new ResponseChangePartyLeaderMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                });
+                return;
+            }
+            // Update cache
+            validateResult.Party.SetLeader(request.memberId);
+            GameInstance.ServerPartyHandlers.SetParty(validateResult.PartyId, validateResult.Party);
             // Broadcast via chat server
             if (ClusterClient.IsNetworkActive)
             {
                 ClusterClient.SendChangePartyLeader(MMOMessageTypes.UpdateParty, validateResult.PartyId, request.memberId);
             }
             GameInstance.ServerGameMessageHandlers.SendSetPartyLeaderToMembers(validateResult.Party);
-            result.Invoke(AckResponseCode.Success, new ResponseChangePartyLeaderMessage());
+            result.InvokeSuccess(new ResponseChangePartyLeaderMessage());
 #endif
         }
 
@@ -236,7 +262,7 @@ namespace MultiplayerARPG.MMO
             IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseChangePartySettingMessage()
+                result.InvokeError(new ResponseChangePartySettingMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -245,28 +271,37 @@ namespace MultiplayerARPG.MMO
             ValidatePartyRequestResult validateResult = GameInstance.ServerPartyHandlers.CanChangePartySetting(playerCharacter);
             if (!validateResult.IsSuccess)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseChangePartySettingMessage()
+                result.InvokeError(new ResponseChangePartySettingMessage()
                 {
                     message = validateResult.GameMessage,
                 });
                 return;
             }
-            validateResult.Party.Setting(request.shareExp, request.shareItem);
-            GameInstance.ServerPartyHandlers.SetParty(validateResult.PartyId, validateResult.Party);
             // Save to database
-            _ = DbServiceClient.UpdatePartyAsync(new UpdatePartyReq()
+            AsyncResponseData<PartyResp> updateResp = await DbServiceClient.UpdatePartyAsync(new UpdatePartyReq()
             {
                 PartyId = validateResult.PartyId,
                 ShareExp = request.shareExp,
                 ShareItem = request.shareItem
             });
+            if (!updateResp.IsSuccess)
+            {
+                result.InvokeError(new ResponseChangePartySettingMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                });
+                return;
+            }
+            // Update cache
+            validateResult.Party.Setting(request.shareExp, request.shareItem);
+            GameInstance.ServerPartyHandlers.SetParty(validateResult.PartyId, validateResult.Party);
             // Broadcast via chat server
             if (ClusterClient.IsNetworkActive)
             {
                 ClusterClient.SendPartySetting(MMOMessageTypes.UpdateParty, validateResult.PartyId, request.shareExp, request.shareItem);
             }
             GameInstance.ServerGameMessageHandlers.SendSetPartySettingToMembers(validateResult.Party);
-            result.Invoke(AckResponseCode.Success, new ResponseChangePartySettingMessage());
+            result.InvokeSuccess(new ResponseChangePartySettingMessage());
 #endif
         }
 
@@ -277,7 +312,7 @@ namespace MultiplayerARPG.MMO
             IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseKickMemberFromPartyMessage()
+                result.InvokeError(new ResponseKickMemberFromPartyMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -286,12 +321,26 @@ namespace MultiplayerARPG.MMO
             ValidatePartyRequestResult validateResult = GameInstance.ServerPartyHandlers.CanKickMemberFromParty(playerCharacter, request.memberId);
             if (!validateResult.IsSuccess)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseKickMemberFromPartyMessage()
+                result.InvokeError(new ResponseKickMemberFromPartyMessage()
                 {
                     message = validateResult.GameMessage,
                 });
                 return;
             }
+            // Save to database
+            AsyncResponseData<EmptyMessage> updateResp = await DbServiceClient.ClearCharacterPartyAsync(new ClearCharacterPartyReq()
+            {
+                CharacterId = request.memberId
+            });
+            if (!updateResp.IsSuccess)
+            {
+                result.InvokeError(new ResponseKickMemberFromPartyMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                });
+                return;
+            }
+            // Delete from cache
             IPlayerCharacterData memberCharacter;
             long memberConnectionId;
             if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(request.memberId, out memberCharacter) &&
@@ -302,18 +351,13 @@ namespace MultiplayerARPG.MMO
             }
             validateResult.Party.RemoveMember(request.memberId);
             GameInstance.ServerPartyHandlers.SetParty(validateResult.PartyId, validateResult.Party);
-            // Save to database
-            _ = DbServiceClient.ClearCharacterPartyAsync(new ClearCharacterPartyReq()
-            {
-                CharacterId = request.memberId
-            });
             // Broadcast via chat server
             if (ClusterClient.IsNetworkActive)
             {
                 ClusterClient.SendRemoveSocialMember(MMOMessageTypes.UpdatePartyMember, validateResult.PartyId, request.memberId);
             }
             GameInstance.ServerGameMessageHandlers.SendRemovePartyMemberToMembers(validateResult.Party, request.memberId);
-            result.Invoke(AckResponseCode.Success, new ResponseKickMemberFromPartyMessage());
+            result.InvokeSuccess(new ResponseKickMemberFromPartyMessage());
 #endif
         }
 
@@ -324,7 +368,7 @@ namespace MultiplayerARPG.MMO
             IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseLeavePartyMessage()
+                result.InvokeError(new ResponseLeavePartyMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -333,7 +377,7 @@ namespace MultiplayerARPG.MMO
             ValidatePartyRequestResult validateResult = GameInstance.ServerPartyHandlers.CanLeaveParty(playerCharacter);
             if (!validateResult.IsSuccess)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseLeavePartyMessage()
+                result.InvokeError(new ResponseLeavePartyMessage()
                 {
                     message = validateResult.GameMessage,
                 });
@@ -342,21 +386,35 @@ namespace MultiplayerARPG.MMO
             // If it is leader kick all members and terminate party
             if (validateResult.Party.IsLeader(playerCharacter.Id))
             {
+                // Delete from database
+                AsyncResponseData<EmptyMessage> deleteResp = await DbServiceClient.DeletePartyAsync(new DeletePartyReq()
+                {
+                    PartyId = validateResult.PartyId
+                });
+                if (!deleteResp.IsSuccess)
+                {
+                    result.InvokeError(new ResponseLeavePartyMessage()
+                    {
+                        message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                    });
+                    return;
+                }
                 IPlayerCharacterData memberCharacter;
                 long memberConnectionId;
                 foreach (string memberId in validateResult.Party.GetMemberIds())
                 {
+                    // Save to database
+                    _ = DbServiceClient.ClearCharacterPartyAsync(new ClearCharacterPartyReq()
+                    {
+                        CharacterId = memberId
+                    });
+                    // Update cache
                     if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(memberId, out memberCharacter) &&
                         GameInstance.ServerUserHandlers.TryGetConnectionId(memberId, out memberConnectionId))
                     {
                         memberCharacter.ClearParty();
                         GameInstance.ServerGameMessageHandlers.SendClearPartyData(memberConnectionId, validateResult.PartyId);
                     }
-                    // Save to database
-                    _ = DbServiceClient.ClearCharacterPartyAsync(new ClearCharacterPartyReq()
-                    {
-                        CharacterId = memberId
-                    });
                     // Broadcast via chat server
                     if (ClusterClient.IsNetworkActive)
                     {
@@ -364,11 +422,6 @@ namespace MultiplayerARPG.MMO
                     }
                 }
                 GameInstance.ServerPartyHandlers.RemoveParty(validateResult.PartyId);
-                // Save to database
-                _ = DbServiceClient.DeletePartyAsync(new DeletePartyReq()
-                {
-                    PartyId = validateResult.PartyId
-                });
                 // Broadcast via chat server
                 if (ClusterClient.IsNetworkActive)
                 {
@@ -377,23 +430,32 @@ namespace MultiplayerARPG.MMO
             }
             else
             {
+                // Save to database
+                AsyncResponseData<EmptyMessage> updateResp = await DbServiceClient.ClearCharacterPartyAsync(new ClearCharacterPartyReq()
+                {
+                    CharacterId = playerCharacter.Id
+                });
+                if (!updateResp.IsSuccess)
+                {
+                    result.InvokeError(new ResponseLeavePartyMessage()
+                    {
+                        message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                    });
+                    return;
+                }
+                // Update cache
                 playerCharacter.ClearParty();
                 validateResult.Party.RemoveMember(playerCharacter.Id);
                 GameInstance.ServerPartyHandlers.SetParty(validateResult.PartyId, validateResult.Party);
                 GameInstance.ServerGameMessageHandlers.SendRemovePartyMemberToMembers(validateResult.Party, playerCharacter.Id);
                 GameInstance.ServerGameMessageHandlers.SendClearPartyData(requestHandler.ConnectionId, validateResult.PartyId);
-                // Save to database
-                _ = DbServiceClient.ClearCharacterPartyAsync(new ClearCharacterPartyReq()
-                {
-                    CharacterId = playerCharacter.Id
-                });
                 // Broadcast via chat server
                 if (ClusterClient.IsNetworkActive)
                 {
                     ClusterClient.SendRemoveSocialMember(MMOMessageTypes.UpdatePartyMember, validateResult.PartyId, playerCharacter.Id);
                 }
             }
-            result.Invoke(AckResponseCode.Success, new ResponseLeavePartyMessage());
+            result.InvokeSuccess(new ResponseLeavePartyMessage());
 #endif
         }
     }
