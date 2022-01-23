@@ -5,354 +5,564 @@ namespace MultiplayerARPG.MMO
 {
     public partial class DatabaseNetworkManager : IDatabaseClient
     {
-        public UniTask<AsyncResponseData<ValidateUserLoginResp>> ValidateUserLoginAsync(ValidateUserLoginReq request)
+        public async UniTask<AsyncResponseData<ValidateUserLoginResp>> ValidateUserLoginAsync(ValidateUserLoginReq request)
         {
-            return Client.SendRequestAsync<ValidateUserLoginReq, ValidateUserLoginResp>(DatabaseRequestTypes.RequestValidateUserLogin, request);
+            var resp = await Client.SendRequestAsync<ValidateUserLoginReq, ValidateUserLoginResp>(DatabaseRequestTypes.RequestValidateUserLogin, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(ValidateUserLoginAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<ValidateAccessTokenResp>> ValidateAccessTokenAsync(ValidateAccessTokenReq request)
+        public async UniTask<AsyncResponseData<ValidateAccessTokenResp>> ValidateAccessTokenAsync(ValidateAccessTokenReq request)
         {
-            return Client.SendRequestAsync<ValidateAccessTokenReq, ValidateAccessTokenResp>(DatabaseRequestTypes.RequestValidateAccessToken, request);
+            var resp = await Client.SendRequestAsync<ValidateAccessTokenReq, ValidateAccessTokenResp>(DatabaseRequestTypes.RequestValidateAccessToken, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(ValidateAccessTokenAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<GetUserLevelResp>> GetUserLevelAsync(GetUserLevelReq request)
+        public async UniTask<AsyncResponseData<GetUserLevelResp>> GetUserLevelAsync(GetUserLevelReq request)
         {
-            return Client.SendRequestAsync<GetUserLevelReq, GetUserLevelResp>(DatabaseRequestTypes.RequestGetUserLevel, request);
+            var resp = await Client.SendRequestAsync<GetUserLevelReq, GetUserLevelResp>(DatabaseRequestTypes.RequestGetUserLevel, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(GetUserLevelAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<GoldResp>> GetGoldAsync(GetGoldReq request)
+        public async UniTask<AsyncResponseData<GoldResp>> GetGoldAsync(GetGoldReq request)
         {
-            return Client.SendRequestAsync<GetGoldReq, GoldResp>(DatabaseRequestTypes.RequestGetGold, request);
+            var resp = await Client.SendRequestAsync<GetGoldReq, GoldResp>(DatabaseRequestTypes.RequestGetGold, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(GetGoldAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<GoldResp>> ChangeGoldAsync(ChangeGoldReq request)
+        public async UniTask<AsyncResponseData<GoldResp>> ChangeGoldAsync(ChangeGoldReq request)
         {
-            return Client.SendRequestAsync<ChangeGoldReq, GoldResp>(DatabaseRequestTypes.RequestChangeGold, request);
+            var resp = await Client.SendRequestAsync<ChangeGoldReq, GoldResp>(DatabaseRequestTypes.RequestChangeGold, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(ChangeGoldAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<CashResp>> GetCashAsync(GetCashReq request)
+        public async UniTask<AsyncResponseData<CashResp>> GetCashAsync(GetCashReq request)
         {
-            return Client.SendRequestAsync<GetCashReq, CashResp>(DatabaseRequestTypes.RequestGetCash, request);
+            var resp = await Client.SendRequestAsync<GetCashReq, CashResp>(DatabaseRequestTypes.RequestGetCash, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(GetCashAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<CashResp>> ChangeCashAsync(ChangeCashReq request)
+        public async UniTask<AsyncResponseData<CashResp>> ChangeCashAsync(ChangeCashReq request)
         {
-            return Client.SendRequestAsync<ChangeCashReq, CashResp>(DatabaseRequestTypes.RequestChangeCash, request);
+            var resp = await Client.SendRequestAsync<ChangeCashReq, CashResp>(DatabaseRequestTypes.RequestChangeCash, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(ChangeCashAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<EmptyMessage>> UpdateAccessTokenAsync(UpdateAccessTokenReq request)
+        public async UniTask<AsyncResponseData<EmptyMessage>> UpdateAccessTokenAsync(UpdateAccessTokenReq request)
         {
-            return Client.SendRequestAsync<UpdateAccessTokenReq, EmptyMessage>(DatabaseRequestTypes.RequestUpdateAccessToken, request);
+            var resp = await Client.SendRequestAsync<UpdateAccessTokenReq, EmptyMessage>(DatabaseRequestTypes.RequestUpdateAccessToken, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(UpdateAccessTokenAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<EmptyMessage>> CreateUserLoginAsync(CreateUserLoginReq request)
+        public async UniTask<AsyncResponseData<EmptyMessage>> CreateUserLoginAsync(CreateUserLoginReq request)
         {
-            return Client.SendRequestAsync<CreateUserLoginReq, EmptyMessage>(DatabaseRequestTypes.RequestCreateUserLogin, request);
+            var resp = await Client.SendRequestAsync<CreateUserLoginReq, EmptyMessage>(DatabaseRequestTypes.RequestCreateUserLogin, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(CreateUserLoginAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<FindUsernameResp>> FindUsernameAsync(FindUsernameReq request)
+        public async UniTask<AsyncResponseData<FindUsernameResp>> FindUsernameAsync(FindUsernameReq request)
         {
-            return Client.SendRequestAsync<FindUsernameReq, FindUsernameResp>(DatabaseRequestTypes.RequestFindUsername, request);
+            var resp = await Client.SendRequestAsync<FindUsernameReq, FindUsernameResp>(DatabaseRequestTypes.RequestFindUsername, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(FindUsernameAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<CharacterResp>> CreateCharacterAsync(CreateCharacterReq request)
+        public async UniTask<AsyncResponseData<CharacterResp>> CreateCharacterAsync(CreateCharacterReq request)
         {
-            return Client.SendRequestAsync<CreateCharacterReq, CharacterResp>(DatabaseRequestTypes.RequestCreateCharacter, request);
+            var resp = await Client.SendRequestAsync<CreateCharacterReq, CharacterResp>(DatabaseRequestTypes.RequestCreateCharacter, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(CreateCharacterAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<CharacterResp>> ReadCharacterAsync(ReadCharacterReq request)
+        public async UniTask<AsyncResponseData<CharacterResp>> ReadCharacterAsync(ReadCharacterReq request)
         {
-            return Client.SendRequestAsync<ReadCharacterReq, CharacterResp>(DatabaseRequestTypes.RequestReadCharacter, request);
+            var resp = await Client.SendRequestAsync<ReadCharacterReq, CharacterResp>(DatabaseRequestTypes.RequestReadCharacter, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(ReadCharacterAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<CharactersResp>> ReadCharactersAsync(ReadCharactersReq request)
+        public async UniTask<AsyncResponseData<CharactersResp>> ReadCharactersAsync(ReadCharactersReq request)
         {
-            return Client.SendRequestAsync<ReadCharactersReq, CharactersResp>(DatabaseRequestTypes.RequestReadCharacters, request);
+            var resp = await Client.SendRequestAsync<ReadCharactersReq, CharactersResp>(DatabaseRequestTypes.RequestReadCharacters, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(ReadCharactersAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<CharacterResp>> UpdateCharacterAsync(UpdateCharacterReq request)
+        public async UniTask<AsyncResponseData<CharacterResp>> UpdateCharacterAsync(UpdateCharacterReq request)
         {
-            return Client.SendRequestAsync<UpdateCharacterReq, CharacterResp>(DatabaseRequestTypes.RequestUpdateCharacter, request);
+            var resp = await Client.SendRequestAsync<UpdateCharacterReq, CharacterResp>(DatabaseRequestTypes.RequestUpdateCharacter, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(UpdateCharacterAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<EmptyMessage>> DeleteCharacterAsync(DeleteCharacterReq request)
+        public async UniTask<AsyncResponseData<EmptyMessage>> DeleteCharacterAsync(DeleteCharacterReq request)
         {
-            return Client.SendRequestAsync<DeleteCharacterReq, EmptyMessage>(DatabaseRequestTypes.RequestDeleteCharacter, request);
+            var resp = await Client.SendRequestAsync<DeleteCharacterReq, EmptyMessage>(DatabaseRequestTypes.RequestDeleteCharacter, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(DeleteCharacterAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<FindCharacterNameResp>> FindCharacterNameAsync(FindCharacterNameReq request)
+        public async UniTask<AsyncResponseData<FindCharacterNameResp>> FindCharacterNameAsync(FindCharacterNameReq request)
         {
-            return Client.SendRequestAsync<FindCharacterNameReq, FindCharacterNameResp>(DatabaseRequestTypes.RequestFindCharacterName, request);
+            var resp = await Client.SendRequestAsync<FindCharacterNameReq, FindCharacterNameResp>(DatabaseRequestTypes.RequestFindCharacterName, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(FindCharacterNameAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<SocialCharactersResp>> FindCharactersAsync(FindCharacterNameReq request)
+        public async UniTask<AsyncResponseData<SocialCharactersResp>> FindCharactersAsync(FindCharacterNameReq request)
         {
-            return Client.SendRequestAsync<FindCharacterNameReq, SocialCharactersResp>(DatabaseRequestTypes.RequestFindCharacters, request);
+            var resp = await Client.SendRequestAsync<FindCharacterNameReq, SocialCharactersResp>(DatabaseRequestTypes.RequestFindCharacters, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(FindCharactersAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<SocialCharactersResp>> CreateFriendAsync(CreateFriendReq request)
+        public async UniTask<AsyncResponseData<SocialCharactersResp>> CreateFriendAsync(CreateFriendReq request)
         {
-            return Client.SendRequestAsync<CreateFriendReq, SocialCharactersResp>(DatabaseRequestTypes.RequestCreateFriend, request);
+            var resp = await Client.SendRequestAsync<CreateFriendReq, SocialCharactersResp>(DatabaseRequestTypes.RequestCreateFriend, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(CreateFriendAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<SocialCharactersResp>> DeleteFriendAsync(DeleteFriendReq request)
+        public async UniTask<AsyncResponseData<SocialCharactersResp>> DeleteFriendAsync(DeleteFriendReq request)
         {
-            return Client.SendRequestAsync<DeleteFriendReq, SocialCharactersResp>(DatabaseRequestTypes.RequestDeleteFriend, request);
+            var resp = await Client.SendRequestAsync<DeleteFriendReq, SocialCharactersResp>(DatabaseRequestTypes.RequestDeleteFriend, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(DeleteFriendAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<SocialCharactersResp>> ReadFriendsAsync(ReadFriendsReq request)
+        public async UniTask<AsyncResponseData<SocialCharactersResp>> ReadFriendsAsync(ReadFriendsReq request)
         {
-            return Client.SendRequestAsync<ReadFriendsReq, SocialCharactersResp>(DatabaseRequestTypes.RequestReadFriends, request);
+            var resp = await Client.SendRequestAsync<ReadFriendsReq, SocialCharactersResp>(DatabaseRequestTypes.RequestReadFriends, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(ReadFriendsAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<BuildingResp>> CreateBuildingAsync(CreateBuildingReq request)
+        public async UniTask<AsyncResponseData<BuildingResp>> CreateBuildingAsync(CreateBuildingReq request)
         {
-            return Client.SendRequestAsync<CreateBuildingReq, BuildingResp>(DatabaseRequestTypes.RequestCreateBuilding, request);
+            var resp = await Client.SendRequestAsync<CreateBuildingReq, BuildingResp>(DatabaseRequestTypes.RequestCreateBuilding, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(CreateBuildingAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<BuildingResp>> UpdateBuildingAsync(UpdateBuildingReq request)
+        public async UniTask<AsyncResponseData<BuildingResp>> UpdateBuildingAsync(UpdateBuildingReq request)
         {
-            return Client.SendRequestAsync<UpdateBuildingReq, BuildingResp>(DatabaseRequestTypes.RequestUpdateBuilding, request);
+            var resp = await Client.SendRequestAsync<UpdateBuildingReq, BuildingResp>(DatabaseRequestTypes.RequestUpdateBuilding, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(UpdateBuildingAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<EmptyMessage>> DeleteBuildingAsync(DeleteBuildingReq request)
+        public async UniTask<AsyncResponseData<EmptyMessage>> DeleteBuildingAsync(DeleteBuildingReq request)
         {
-            return Client.SendRequestAsync<DeleteBuildingReq, EmptyMessage>(DatabaseRequestTypes.RequestDeleteBuilding, request);
+            var resp = await Client.SendRequestAsync<DeleteBuildingReq, EmptyMessage>(DatabaseRequestTypes.RequestDeleteBuilding, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(DeleteBuildingAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<BuildingsResp>> ReadBuildingsAsync(ReadBuildingsReq request)
+        public async UniTask<AsyncResponseData<BuildingsResp>> ReadBuildingsAsync(ReadBuildingsReq request)
         {
-            return Client.SendRequestAsync<ReadBuildingsReq, BuildingsResp>(DatabaseRequestTypes.RequestReadBuildings, request);
+            var resp = await Client.SendRequestAsync<ReadBuildingsReq, BuildingsResp>(DatabaseRequestTypes.RequestReadBuildings, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(ReadBuildingsAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<PartyResp>> CreatePartyAsync(CreatePartyReq request)
+        public async UniTask<AsyncResponseData<PartyResp>> CreatePartyAsync(CreatePartyReq request)
         {
-            return Client.SendRequestAsync<CreatePartyReq, PartyResp>(DatabaseRequestTypes.RequestCreateParty, request);
+            var resp = await Client.SendRequestAsync<CreatePartyReq, PartyResp>(DatabaseRequestTypes.RequestCreateParty, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(CreatePartyAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<PartyResp>> UpdatePartyAsync(UpdatePartyReq request)
+        public async UniTask<AsyncResponseData<PartyResp>> UpdatePartyAsync(UpdatePartyReq request)
         {
-            return Client.SendRequestAsync<UpdatePartyReq, PartyResp>(DatabaseRequestTypes.RequestUpdateParty, request);
+            var resp = await Client.SendRequestAsync<UpdatePartyReq, PartyResp>(DatabaseRequestTypes.RequestUpdateParty, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(UpdatePartyAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<PartyResp>> UpdatePartyLeaderAsync(UpdatePartyLeaderReq request)
+        public async UniTask<AsyncResponseData<PartyResp>> UpdatePartyLeaderAsync(UpdatePartyLeaderReq request)
         {
-            return Client.SendRequestAsync<UpdatePartyLeaderReq, PartyResp>(DatabaseRequestTypes.RequestUpdatePartyLeader, request);
+            var resp = await Client.SendRequestAsync<UpdatePartyLeaderReq, PartyResp>(DatabaseRequestTypes.RequestUpdatePartyLeader, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(UpdatePartyLeaderAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<EmptyMessage>> DeletePartyAsync(DeletePartyReq request)
+        public async UniTask<AsyncResponseData<EmptyMessage>> DeletePartyAsync(DeletePartyReq request)
         {
-            return Client.SendRequestAsync<DeletePartyReq, EmptyMessage>(DatabaseRequestTypes.RequestDeleteParty, request);
+            var resp = await Client.SendRequestAsync<DeletePartyReq, EmptyMessage>(DatabaseRequestTypes.RequestDeleteParty, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(DeletePartyAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<PartyResp>> UpdateCharacterPartyAsync(UpdateCharacterPartyReq request)
+        public async UniTask<AsyncResponseData<PartyResp>> UpdateCharacterPartyAsync(UpdateCharacterPartyReq request)
         {
-            return Client.SendRequestAsync<UpdateCharacterPartyReq, PartyResp>(DatabaseRequestTypes.RequestUpdateCharacterParty, request);
+            var resp = await Client.SendRequestAsync<UpdateCharacterPartyReq, PartyResp>(DatabaseRequestTypes.RequestUpdateCharacterParty, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(UpdateCharacterPartyAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<EmptyMessage>> ClearCharacterPartyAsync(ClearCharacterPartyReq request)
+        public async UniTask<AsyncResponseData<EmptyMessage>> ClearCharacterPartyAsync(ClearCharacterPartyReq request)
         {
-            return Client.SendRequestAsync<ClearCharacterPartyReq, EmptyMessage>(DatabaseRequestTypes.RequestClearCharacterParty, request);
+            var resp = await Client.SendRequestAsync<ClearCharacterPartyReq, EmptyMessage>(DatabaseRequestTypes.RequestClearCharacterParty, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(ClearCharacterPartyAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<PartyResp>> ReadPartyAsync(ReadPartyReq request)
+        public async UniTask<AsyncResponseData<PartyResp>> ReadPartyAsync(ReadPartyReq request)
         {
-            return Client.SendRequestAsync<ReadPartyReq, PartyResp>(DatabaseRequestTypes.RequestReadParty, request);
+            var resp = await Client.SendRequestAsync<ReadPartyReq, PartyResp>(DatabaseRequestTypes.RequestReadParty, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(ReadPartyAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<GuildResp>> CreateGuildAsync(CreateGuildReq request)
+        public async UniTask<AsyncResponseData<GuildResp>> CreateGuildAsync(CreateGuildReq request)
         {
-            return Client.SendRequestAsync<CreateGuildReq, GuildResp>(DatabaseRequestTypes.RequestCreateGuild, request);
+            var resp = await Client.SendRequestAsync<CreateGuildReq, GuildResp>(DatabaseRequestTypes.RequestCreateGuild, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(CreateGuildAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<GuildResp>> UpdateGuildLeaderAsync(UpdateGuildLeaderReq request)
+        public async UniTask<AsyncResponseData<GuildResp>> UpdateGuildLeaderAsync(UpdateGuildLeaderReq request)
         {
-            return Client.SendRequestAsync<UpdateGuildLeaderReq, GuildResp>(DatabaseRequestTypes.RequestUpdateGuildLeader, request);
+            var resp = await Client.SendRequestAsync<UpdateGuildLeaderReq, GuildResp>(DatabaseRequestTypes.RequestUpdateGuildLeader, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(UpdateGuildLeaderAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<GuildResp>> UpdateGuildMessageAsync(UpdateGuildMessageReq request)
+        public async UniTask<AsyncResponseData<GuildResp>> UpdateGuildMessageAsync(UpdateGuildMessageReq request)
         {
-            return Client.SendRequestAsync<UpdateGuildMessageReq, GuildResp>(DatabaseRequestTypes.RequestUpdateGuildMessage, request);
+            var resp = await Client.SendRequestAsync<UpdateGuildMessageReq, GuildResp>(DatabaseRequestTypes.RequestUpdateGuildMessage, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(UpdateGuildMessageAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<GuildResp>> UpdateGuildMessage2Async(UpdateGuildMessageReq request)
+        public async UniTask<AsyncResponseData<GuildResp>> UpdateGuildMessage2Async(UpdateGuildMessageReq request)
         {
-            return Client.SendRequestAsync<UpdateGuildMessageReq, GuildResp>(DatabaseRequestTypes.RequestUpdateGuildMessage2, request);
+            var resp = await Client.SendRequestAsync<UpdateGuildMessageReq, GuildResp>(DatabaseRequestTypes.RequestUpdateGuildMessage2, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(UpdateGuildMessage2Async)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<GuildResp>> UpdateGuildOptionsAsync(UpdateGuildOptionsReq request)
+        public async UniTask<AsyncResponseData<GuildResp>> UpdateGuildOptionsAsync(UpdateGuildOptionsReq request)
         {
-            return Client.SendRequestAsync<UpdateGuildOptionsReq, GuildResp>(DatabaseRequestTypes.RequestUpdateGuildOptions, request);
+            var resp = await Client.SendRequestAsync<UpdateGuildOptionsReq, GuildResp>(DatabaseRequestTypes.RequestUpdateGuildOptions, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(UpdateGuildOptionsAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<GuildResp>> UpdateGuildAutoAcceptRequestsAsync(UpdateGuildAutoAcceptRequestsReq request)
+        public async UniTask<AsyncResponseData<GuildResp>> UpdateGuildAutoAcceptRequestsAsync(UpdateGuildAutoAcceptRequestsReq request)
         {
-            return Client.SendRequestAsync<UpdateGuildAutoAcceptRequestsReq, GuildResp>(DatabaseRequestTypes.RequestUpdateGuildAutoAcceptRequests, request);
+            var resp = await Client.SendRequestAsync<UpdateGuildAutoAcceptRequestsReq, GuildResp>(DatabaseRequestTypes.RequestUpdateGuildAutoAcceptRequests, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(UpdateGuildAutoAcceptRequestsAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<GuildResp>> UpdateGuildRoleAsync(UpdateGuildRoleReq request)
+        public async UniTask<AsyncResponseData<GuildResp>> UpdateGuildRoleAsync(UpdateGuildRoleReq request)
         {
-            return Client.SendRequestAsync<UpdateGuildRoleReq, GuildResp>(DatabaseRequestTypes.RequestUpdateGuildRole, request);
+            var resp = await Client.SendRequestAsync<UpdateGuildRoleReq, GuildResp>(DatabaseRequestTypes.RequestUpdateGuildRole, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(UpdateGuildRoleAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<GuildResp>> UpdateGuildMemberRoleAsync(UpdateGuildMemberRoleReq request)
+        public async UniTask<AsyncResponseData<GuildResp>> UpdateGuildMemberRoleAsync(UpdateGuildMemberRoleReq request)
         {
-            return Client.SendRequestAsync<UpdateGuildMemberRoleReq, GuildResp>(DatabaseRequestTypes.RequestUpdateGuildMemberRole, request);
+            var resp = await Client.SendRequestAsync<UpdateGuildMemberRoleReq, GuildResp>(DatabaseRequestTypes.RequestUpdateGuildMemberRole, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(UpdateGuildMemberRoleAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<EmptyMessage>> DeleteGuildAsync(DeleteGuildReq request)
+        public async UniTask<AsyncResponseData<EmptyMessage>> DeleteGuildAsync(DeleteGuildReq request)
         {
-            return Client.SendRequestAsync<DeleteGuildReq, EmptyMessage>(DatabaseRequestTypes.RequestDeleteGuild, request);
+            var resp = await Client.SendRequestAsync<DeleteGuildReq, EmptyMessage>(DatabaseRequestTypes.RequestDeleteGuild, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(DeleteGuildAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<GuildResp>> UpdateCharacterGuildAsync(UpdateCharacterGuildReq request)
+        public async UniTask<AsyncResponseData<GuildResp>> UpdateCharacterGuildAsync(UpdateCharacterGuildReq request)
         {
-            return Client.SendRequestAsync<UpdateCharacterGuildReq, GuildResp>(DatabaseRequestTypes.RequestUpdateCharacterGuild, request);
+            var resp = await Client.SendRequestAsync<UpdateCharacterGuildReq, GuildResp>(DatabaseRequestTypes.RequestUpdateCharacterGuild, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(UpdateCharacterGuildAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<EmptyMessage>> ClearCharacterGuildAsync(ClearCharacterGuildReq request)
+        public async UniTask<AsyncResponseData<EmptyMessage>> ClearCharacterGuildAsync(ClearCharacterGuildReq request)
         {
-            return Client.SendRequestAsync<ClearCharacterGuildReq, EmptyMessage>(DatabaseRequestTypes.RequestClearCharacterGuild, request);
+            var resp = await Client.SendRequestAsync<ClearCharacterGuildReq, EmptyMessage>(DatabaseRequestTypes.RequestClearCharacterGuild, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(ClearCharacterGuildAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<FindGuildNameResp>> FindGuildNameAsync(FindGuildNameReq request)
+        public async UniTask<AsyncResponseData<FindGuildNameResp>> FindGuildNameAsync(FindGuildNameReq request)
         {
-            return Client.SendRequestAsync<FindGuildNameReq, FindGuildNameResp>(DatabaseRequestTypes.RequestFindGuildName, request);
+            var resp = await Client.SendRequestAsync<FindGuildNameReq, FindGuildNameResp>(DatabaseRequestTypes.RequestFindGuildName, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(FindGuildNameAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<GuildResp>> ReadGuildAsync(ReadGuildReq request)
+        public async UniTask<AsyncResponseData<GuildResp>> ReadGuildAsync(ReadGuildReq request)
         {
-            return Client.SendRequestAsync<ReadGuildReq, GuildResp>(DatabaseRequestTypes.RequestReadGuild, request);
+            var resp = await Client.SendRequestAsync<ReadGuildReq, GuildResp>(DatabaseRequestTypes.RequestReadGuild, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(ReadGuildAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<GuildResp>> IncreaseGuildExpAsync(IncreaseGuildExpReq request)
+        public async UniTask<AsyncResponseData<GuildResp>> IncreaseGuildExpAsync(IncreaseGuildExpReq request)
         {
-            return Client.SendRequestAsync<IncreaseGuildExpReq, GuildResp>(DatabaseRequestTypes.RequestIncreaseGuildExp, request);
+            var resp = await Client.SendRequestAsync<IncreaseGuildExpReq, GuildResp>(DatabaseRequestTypes.RequestIncreaseGuildExp, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(IncreaseGuildExpAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<GuildResp>> AddGuildSkillAsync(AddGuildSkillReq request)
+        public async UniTask<AsyncResponseData<GuildResp>> AddGuildSkillAsync(AddGuildSkillReq request)
         {
-            return Client.SendRequestAsync<AddGuildSkillReq, GuildResp>(DatabaseRequestTypes.RequestAddGuildSkill, request);
+            var resp = await Client.SendRequestAsync<AddGuildSkillReq, GuildResp>(DatabaseRequestTypes.RequestAddGuildSkill, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(AddGuildSkillAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<GuildGoldResp>> GetGuildGoldAsync(GetGuildGoldReq request)
+        public async UniTask<AsyncResponseData<GuildGoldResp>> GetGuildGoldAsync(GetGuildGoldReq request)
         {
-            return Client.SendRequestAsync<GetGuildGoldReq, GuildGoldResp>(DatabaseRequestTypes.RequestGetGuildGold, request);
+            var resp = await Client.SendRequestAsync<GetGuildGoldReq, GuildGoldResp>(DatabaseRequestTypes.RequestGetGuildGold, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(GetGuildGoldAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<GuildGoldResp>> ChangeGuildGoldAsync(ChangeGuildGoldReq request)
+        public async UniTask<AsyncResponseData<GuildGoldResp>> ChangeGuildGoldAsync(ChangeGuildGoldReq request)
         {
-            return Client.SendRequestAsync<ChangeGuildGoldReq, GuildGoldResp>(DatabaseRequestTypes.RequestChangeGuildGold, request);
+            var resp = await Client.SendRequestAsync<ChangeGuildGoldReq, GuildGoldResp>(DatabaseRequestTypes.RequestChangeGuildGold, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(ChangeGuildGoldAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<ReadStorageItemsResp>> ReadStorageItemsAsync(ReadStorageItemsReq request)
+        public async UniTask<AsyncResponseData<ReadStorageItemsResp>> ReadStorageItemsAsync(ReadStorageItemsReq request)
         {
-            return Client.SendRequestAsync<ReadStorageItemsReq, ReadStorageItemsResp>(DatabaseRequestTypes.RequestReadStorageItems, request);
+            var resp = await Client.SendRequestAsync<ReadStorageItemsReq, ReadStorageItemsResp>(DatabaseRequestTypes.RequestReadStorageItems, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(ReadStorageItemsAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<MoveItemToStorageResp>> MoveItemToStorageAsync(MoveItemToStorageReq request)
+        public async UniTask<AsyncResponseData<MoveItemToStorageResp>> MoveItemToStorageAsync(MoveItemToStorageReq request)
         {
-            return Client.SendRequestAsync<MoveItemToStorageReq, MoveItemToStorageResp>(DatabaseRequestTypes.RequestMoveItemToStorage, request);
+            var resp = await Client.SendRequestAsync<MoveItemToStorageReq, MoveItemToStorageResp>(DatabaseRequestTypes.RequestMoveItemToStorage, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(MoveItemToStorageAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<MoveItemFromStorageResp>> MoveItemFromStorageAsync(MoveItemFromStorageReq request)
+        public async UniTask<AsyncResponseData<MoveItemFromStorageResp>> MoveItemFromStorageAsync(MoveItemFromStorageReq request)
         {
-            return Client.SendRequestAsync<MoveItemFromStorageReq, MoveItemFromStorageResp>(DatabaseRequestTypes.RequestMoveItemFromStorage, request);
+            var resp = await Client.SendRequestAsync<MoveItemFromStorageReq, MoveItemFromStorageResp>(DatabaseRequestTypes.RequestMoveItemFromStorage, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(MoveItemFromStorageAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<SwapOrMergeStorageItemResp>> SwapOrMergeStorageItemAsync(SwapOrMergeStorageItemReq request)
+        public async UniTask<AsyncResponseData<SwapOrMergeStorageItemResp>> SwapOrMergeStorageItemAsync(SwapOrMergeStorageItemReq request)
         {
-            return Client.SendRequestAsync<SwapOrMergeStorageItemReq, SwapOrMergeStorageItemResp>(DatabaseRequestTypes.RequestSwapOrMergeStorageItem, request);
+            var resp = await Client.SendRequestAsync<SwapOrMergeStorageItemReq, SwapOrMergeStorageItemResp>(DatabaseRequestTypes.RequestSwapOrMergeStorageItem, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(SwapOrMergeStorageItemAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<IncreaseStorageItemsResp>> IncreaseStorageItemsAsync(IncreaseStorageItemsReq request)
+        public async UniTask<AsyncResponseData<IncreaseStorageItemsResp>> IncreaseStorageItemsAsync(IncreaseStorageItemsReq request)
         {
-            return Client.SendRequestAsync<IncreaseStorageItemsReq, IncreaseStorageItemsResp>(DatabaseRequestTypes.RequestIncreaseStorageItems, request);
+            var resp = await Client.SendRequestAsync<IncreaseStorageItemsReq, IncreaseStorageItemsResp>(DatabaseRequestTypes.RequestIncreaseStorageItems, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(IncreaseStorageItemsAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<DecreaseStorageItemsResp>> DecreaseStorageItemsAsync(DecreaseStorageItemsReq request)
+        public async UniTask<AsyncResponseData<DecreaseStorageItemsResp>> DecreaseStorageItemsAsync(DecreaseStorageItemsReq request)
         {
-            return Client.SendRequestAsync<DecreaseStorageItemsReq, DecreaseStorageItemsResp>(DatabaseRequestTypes.RequestDecreaseStorageItems, request);
+            var resp = await Client.SendRequestAsync<DecreaseStorageItemsReq, DecreaseStorageItemsResp>(DatabaseRequestTypes.RequestDecreaseStorageItems, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(DecreaseStorageItemsAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<MailListResp>> MailListAsync(MailListReq request)
+        public async UniTask<AsyncResponseData<MailListResp>> MailListAsync(MailListReq request)
         {
-            return Client.SendRequestAsync<MailListReq, MailListResp>(DatabaseRequestTypes.RequestMailList, request);
+            var resp = await Client.SendRequestAsync<MailListReq, MailListResp>(DatabaseRequestTypes.RequestMailList, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(MailListAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<UpdateReadMailStateResp>> UpdateReadMailStateAsync(UpdateReadMailStateReq request)
+        public async UniTask<AsyncResponseData<UpdateReadMailStateResp>> UpdateReadMailStateAsync(UpdateReadMailStateReq request)
         {
-            return Client.SendRequestAsync<UpdateReadMailStateReq, UpdateReadMailStateResp>(DatabaseRequestTypes.RequestUpdateReadMailState, request);
+            var resp = await Client.SendRequestAsync<UpdateReadMailStateReq, UpdateReadMailStateResp>(DatabaseRequestTypes.RequestUpdateReadMailState, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(UpdateReadMailStateAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<UpdateClaimMailItemsStateResp>> UpdateClaimMailItemsStateAsync(UpdateClaimMailItemsStateReq request)
+        public async UniTask<AsyncResponseData<UpdateClaimMailItemsStateResp>> UpdateClaimMailItemsStateAsync(UpdateClaimMailItemsStateReq request)
         {
-            return Client.SendRequestAsync<UpdateClaimMailItemsStateReq, UpdateClaimMailItemsStateResp>(DatabaseRequestTypes.RequestUpdateClaimMailItemsState, request);
+            var resp = await Client.SendRequestAsync<UpdateClaimMailItemsStateReq, UpdateClaimMailItemsStateResp>(DatabaseRequestTypes.RequestUpdateClaimMailItemsState, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(UpdateClaimMailItemsStateAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<UpdateDeleteMailStateResp>> UpdateDeleteMailStateAsync(UpdateDeleteMailStateReq request)
+        public async UniTask<AsyncResponseData<UpdateDeleteMailStateResp>> UpdateDeleteMailStateAsync(UpdateDeleteMailStateReq request)
         {
-            return Client.SendRequestAsync<UpdateDeleteMailStateReq, UpdateDeleteMailStateResp>(DatabaseRequestTypes.RequestUpdateDeleteMailState, request);
+            var resp = await Client.SendRequestAsync<UpdateDeleteMailStateReq, UpdateDeleteMailStateResp>(DatabaseRequestTypes.RequestUpdateDeleteMailState, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(UpdateDeleteMailStateAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<SendMailResp>> SendMailAsync(SendMailReq request)
+        public async UniTask<AsyncResponseData<SendMailResp>> SendMailAsync(SendMailReq request)
         {
-            return Client.SendRequestAsync<SendMailReq, SendMailResp>(DatabaseRequestTypes.RequestSendMail, request);
+            var resp = await Client.SendRequestAsync<SendMailReq, SendMailResp>(DatabaseRequestTypes.RequestSendMail, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(SendMailAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<GetMailResp>> GetMailAsync(GetMailReq request)
+        public async UniTask<AsyncResponseData<GetMailResp>> GetMailAsync(GetMailReq request)
         {
-            return Client.SendRequestAsync<GetMailReq, GetMailResp>(DatabaseRequestTypes.RequestGetMail, request);
+            var resp = await Client.SendRequestAsync<GetMailReq, GetMailResp>(DatabaseRequestTypes.RequestGetMail, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(GetMailAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<GetIdByCharacterNameResp>> GetIdByCharacterNameAsync(GetIdByCharacterNameReq request)
+        public async UniTask<AsyncResponseData<GetIdByCharacterNameResp>> GetIdByCharacterNameAsync(GetIdByCharacterNameReq request)
         {
-            return Client.SendRequestAsync<GetIdByCharacterNameReq, GetIdByCharacterNameResp>(DatabaseRequestTypes.RequestGetIdByCharacterName, request);
+            var resp = await Client.SendRequestAsync<GetIdByCharacterNameReq, GetIdByCharacterNameResp>(DatabaseRequestTypes.RequestGetIdByCharacterName, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(GetIdByCharacterNameAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<GetUserIdByCharacterNameResp>> GetUserIdByCharacterNameAsync(GetUserIdByCharacterNameReq request)
+        public async UniTask<AsyncResponseData<GetUserIdByCharacterNameResp>> GetUserIdByCharacterNameAsync(GetUserIdByCharacterNameReq request)
         {
-            return Client.SendRequestAsync<GetUserIdByCharacterNameReq, GetUserIdByCharacterNameResp>(DatabaseRequestTypes.RequestGetUserIdByCharacterName, request);
+            var resp = await Client.SendRequestAsync<GetUserIdByCharacterNameReq, GetUserIdByCharacterNameResp>(DatabaseRequestTypes.RequestGetUserIdByCharacterName, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(GetUserIdByCharacterNameAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<GetMailNotificationCountResp>> GetMailsCountAsync(GetMailNotificationCountReq request)
+        public async UniTask<AsyncResponseData<GetMailNotificationCountResp>> GetMailsCountAsync(GetMailNotificationCountReq request)
         {
-            return Client.SendRequestAsync<GetMailNotificationCountReq, GetMailNotificationCountResp>(DatabaseRequestTypes.RequestGetMailNotificationCount, request);
+            var resp = await Client.SendRequestAsync<GetMailNotificationCountReq, GetMailNotificationCountResp>(DatabaseRequestTypes.RequestGetMailNotificationCount, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(GetMailsCountAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<GetUserUnbanTimeResp>> GetUserUnbanTimeAsync(GetUserUnbanTimeReq request)
+        public async UniTask<AsyncResponseData<GetUserUnbanTimeResp>> GetUserUnbanTimeAsync(GetUserUnbanTimeReq request)
         {
-            return Client.SendRequestAsync<GetUserUnbanTimeReq, GetUserUnbanTimeResp>(DatabaseRequestTypes.RequestGetUserUnbanTime, request);
+            var resp = await Client.SendRequestAsync<GetUserUnbanTimeReq, GetUserUnbanTimeResp>(DatabaseRequestTypes.RequestGetUserUnbanTime, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(GetUserUnbanTimeAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<EmptyMessage>> SetUserUnbanTimeByCharacterNameAsync(SetUserUnbanTimeByCharacterNameReq request)
+        public async UniTask<AsyncResponseData<EmptyMessage>> SetUserUnbanTimeByCharacterNameAsync(SetUserUnbanTimeByCharacterNameReq request)
         {
-            return Client.SendRequestAsync<SetUserUnbanTimeByCharacterNameReq, EmptyMessage>(DatabaseRequestTypes.RequestSetUserUnbanTimeByCharacterName, request);
+            var resp = await Client.SendRequestAsync<SetUserUnbanTimeByCharacterNameReq, EmptyMessage>(DatabaseRequestTypes.RequestSetUserUnbanTimeByCharacterName, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(SetUserUnbanTimeByCharacterNameAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<EmptyMessage>> SetCharacterUnmuteTimeByNameAsync(SetCharacterUnmuteTimeByNameReq request)
+        public async UniTask<AsyncResponseData<EmptyMessage>> SetCharacterUnmuteTimeByNameAsync(SetCharacterUnmuteTimeByNameReq request)
         {
-            return Client.SendRequestAsync<SetCharacterUnmuteTimeByNameReq, EmptyMessage>(DatabaseRequestTypes.RequestSetCharacterUnmuteTimeByName, request);
+            var resp = await Client.SendRequestAsync<SetCharacterUnmuteTimeByNameReq, EmptyMessage>(DatabaseRequestTypes.RequestSetCharacterUnmuteTimeByName, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(SetCharacterUnmuteTimeByNameAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<GetSummonBuffsResp>> GetSummonBuffsAsync(GetSummonBuffsReq request)
+        public async UniTask<AsyncResponseData<GetSummonBuffsResp>> GetSummonBuffsAsync(GetSummonBuffsReq request)
         {
-            return Client.SendRequestAsync<GetSummonBuffsReq, GetSummonBuffsResp>(DatabaseRequestTypes.RequestGetSummonBuffs, request);
+            var resp = await Client.SendRequestAsync<GetSummonBuffsReq, GetSummonBuffsResp>(DatabaseRequestTypes.RequestGetSummonBuffs, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(GetSummonBuffsAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<EmptyMessage>> SetSummonBuffsAsync(SetSummonBuffsReq request)
+        public async UniTask<AsyncResponseData<EmptyMessage>> SetSummonBuffsAsync(SetSummonBuffsReq request)
         {
-            return Client.SendRequestAsync<SetSummonBuffsReq, EmptyMessage>(DatabaseRequestTypes.RequestSetSummonBuffs, request);
+            var resp = await Client.SendRequestAsync<SetSummonBuffsReq, EmptyMessage>(DatabaseRequestTypes.RequestSetSummonBuffs, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(SetSummonBuffsAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<ValidateEmailVerificationResp>> ValidateEmailVerificationAsync(ValidateEmailVerificationReq request)
+        public async UniTask<AsyncResponseData<ValidateEmailVerificationResp>> ValidateEmailVerificationAsync(ValidateEmailVerificationReq request)
         {
-            return Client.SendRequestAsync<ValidateEmailVerificationReq, ValidateEmailVerificationResp>(DatabaseRequestTypes.RequestValidateEmailVerification, request);
+            var resp = await Client.SendRequestAsync<ValidateEmailVerificationReq, ValidateEmailVerificationResp>(DatabaseRequestTypes.RequestValidateEmailVerification, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(ValidateEmailVerificationAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
 
-        public UniTask<AsyncResponseData<FindEmailResp>> FindEmailAsync(FindEmailReq request)
+        public async UniTask<AsyncResponseData<FindEmailResp>> FindEmailAsync(FindEmailReq request)
         {
-            return Client.SendRequestAsync<FindEmailReq, FindEmailResp>(DatabaseRequestTypes.RequestFindEmail, request);
+            var resp = await Client.SendRequestAsync<FindEmailReq, FindEmailResp>(DatabaseRequestTypes.RequestFindEmail, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(FindEmailAsync)} status: {resp.ResponseCode}");
+            return resp;
         }
     }
 }
