@@ -569,13 +569,6 @@ MonoBehaviour:
   pingDuration: 1
   doNotEnterGameOnConnect: 0
   doNotDestroyOnSceneChanges: 0
-  auctionHouseMessageTypes:
-    createAuctionMsgType: 1300
-    bidMsgType: 1301
-    buyoutMsgType: 1302
-    getAccessTokenMsgType: 1303
-  auctionHouseServiceUrl: http://localhost:9800/auction-house
-  auctionHouseSecretKey: secret
   hitToSomeoneNotifyMessageId: 2001
   hitFromSomeoneNotifyMessageId: 2002
   killNotifyMessageId: 2000
@@ -592,9 +585,15 @@ MonoBehaviour:
   recoverMonstersWhenRoundEnd: 1
   guildWarMailSenderId: GUILDWAR
   guildWarMailSenderName: Guild War Manager
-  centralTransportFactory: {fileID: 0}
-  centralNetworkAddress: 127.0.0.1
-  centralNetworkPort: 7000
+  auctionHouseMessageTypes:
+    createAuctionRequestType: 1300
+    bidRequestType: 1301
+    buyoutRequestType: 1302
+    getClientConfigRequestType: 1303
+  auctionHouseServiceUrl: http://localhost:9800/auction-house
+  auctionHouseSecretKey: secret
+  clusterServerAddress: 127.0.0.1
+  clusterServerPort: 6010
   machineAddress: 127.0.0.1
   autoSaveDuration: 30
   mapSpawnMillisecondsTimeout: 0
@@ -894,14 +893,22 @@ MonoBehaviour:
     tag: MonsterTag
   npcTag:
     tag: NpcTag
+  vehicleTag:
+    tag: VehicleTag
   itemDropTag:
     tag: ItemDropTag
   buildingTag:
     tag: BuildingTag
   harvestableTag:
     tag: HarvestableTag
-  characterLayer:
-    layerIndex: 8
+  playerLayer:
+    layerIndex: 17
+  monsterLayer:
+    layerIndex: 18
+  npcLayer:
+    layerIndex: 19
+  vehicleLayer:
+    layerIndex: 20
   itemDropLayer:
     layerIndex: 9
   buildingLayer:
@@ -923,7 +930,12 @@ MonoBehaviour:
   currentPositionSaveMode: 0
   playerDropItemMode: 0
   playerDeadDropItemMode: 0
+  playerCorpseAppearDuration: 60
   monsterDeadDropItemMode: 0
+  monsterCorpseAppearDuration: 60
+  returnMoveSpeedDelayAfterAction: 0.1
+  mountDelay: 1
+  useItemDelay: 0.25
   dismantleFilter:
     includeJunk: 0
     includeArmor: 1
@@ -940,6 +952,7 @@ MonoBehaviour:
   canDismantleItemByPlayer: 0
   canRepairItemByPlayer: 0
   inventorySystem: 1
+  noInventoryWeightLimit: 0
   doNotFillEmptySlots: 0
   baseSlotLimit: 60
   playerStorage:
@@ -1048,12 +1061,72 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ignoreOptions:
   - layer1:
-      layerIndex: 8
+      layerIndex: 17
     layer2:
-      layerIndex: 8
+      layerIndex: 17
     ignore: 1
   - layer1:
-      layerIndex: 8
+      layerIndex: 17
+    layer2:
+      layerIndex: 18
+    ignore: 1
+  - layer1:
+      layerIndex: 17
+    layer2:
+      layerIndex: 19
+    ignore: 1
+  - layer1:
+      layerIndex: 17
+    layer2:
+      layerIndex: 20
+    ignore: 1
+  - layer1:
+      layerIndex: 17
+    layer2:
+      layerIndex: 9
+    ignore: 1
+  - layer1:
+      layerIndex: 18
+    layer2:
+      layerIndex: 18
+    ignore: 1
+  - layer1:
+      layerIndex: 18
+    layer2:
+      layerIndex: 19
+    ignore: 1
+  - layer1:
+      layerIndex: 18
+    layer2:
+      layerIndex: 20
+    ignore: 1
+  - layer1:
+      layerIndex: 18
+    layer2:
+      layerIndex: 9
+    ignore: 1
+  - layer1:
+      layerIndex: 19
+    layer2:
+      layerIndex: 19
+    ignore: 1
+  - layer1:
+      layerIndex: 19
+    layer2:
+      layerIndex: 20
+    ignore: 1
+  - layer1:
+      layerIndex: 19
+    layer2:
+      layerIndex: 9
+    ignore: 1
+  - layer1:
+      layerIndex: 20
+    layer2:
+      layerIndex: 20
+    ignore: 1
+  - layer1:
+      layerIndex: 20
     layer2:
       layerIndex: 9
     ignore: 1
