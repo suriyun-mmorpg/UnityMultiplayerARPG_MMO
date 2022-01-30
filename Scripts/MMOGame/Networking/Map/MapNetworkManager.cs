@@ -714,40 +714,8 @@ namespace MultiplayerARPG.MMO
                         }
                     }
 
-                    // Summon saved summons
-                    AsyncResponseData<GetSummonBuffsResp> summonBuffsResp = await DbServiceClient.GetSummonBuffsAsync(new GetSummonBuffsReq()
-                    {
-                        CharacterId = playerCharacterEntity.Id,
-                    });
-                    if (!summonBuffsResp.IsSuccess)
-                    {
-                        Destroy(spawnObj.gameObject);
-                        ServerTransport.ServerDisconnect(connectionId);
-                        return;
-                    }
-                    List<CharacterBuff> summonBuffs = summonBuffsResp.Response.SummonBuffs;
-                    for (int i = 0; i < playerCharacterEntity.Summons.Count; ++i)
-                    {
-                        CharacterSummon summon = playerCharacterEntity.Summons[i];
-                        summon.Summon(playerCharacterEntity, summon.Level, summon.summonRemainsDuration, summon.Exp, summon.CurrentHp, summon.CurrentMp);
-                        for (int j = 0; j < summonBuffs.Count; ++j)
-                        {
-                            if (summonBuffs[j].id.StartsWith(i.ToString()))
-                            {
-                                summon.CacheEntity.Buffs.Add(summonBuffs[j]);
-                                summonBuffs.RemoveAt(j);
-                                j--;
-                            }
-                        }
-                        playerCharacterEntity.Summons[i] = summon;
-                    }
-
                     // Spawn the character
                     Assets.NetworkSpawn(spawnObj, 0, connectionId);
-
-                    // Summon saved mount entity
-                    if (GameInstance.VehicleEntities.ContainsKey(playerCharacterData.MountDataId))
-                        playerCharacterEntity.Mount(GameInstance.VehicleEntities[playerCharacterData.MountDataId]);
 
                     // Force make caches, to calculate current stats to fill empty slots items
                     playerCharacterEntity.ForceMakeCaches();
@@ -755,9 +723,45 @@ namespace MultiplayerARPG.MMO
 
                     // Notify clients that this character is spawn or dead
                     if (!playerCharacterEntity.IsDead())
+                    {
+                        // Summon saved summons
+                        AsyncResponseData<GetSummonBuffsResp> summonBuffsResp = await DbServiceClient.GetSummonBuffsAsync(new GetSummonBuffsReq()
+                        {
+                            CharacterId = playerCharacterEntity.Id,
+                        });
+                        if (!summonBuffsResp.IsSuccess)
+                        {
+                            Destroy(spawnObj.gameObject);
+                            ServerTransport.ServerDisconnect(connectionId);
+                            return;
+                        }
+                        List<CharacterBuff> summonBuffs = summonBuffsResp.Response.SummonBuffs;
+                        for (int i = 0; i < playerCharacterEntity.Summons.Count; ++i)
+                        {
+                            CharacterSummon summon = playerCharacterEntity.Summons[i];
+                            summon.Summon(playerCharacterEntity, summon.Level, summon.summonRemainsDuration, summon.Exp, summon.CurrentHp, summon.CurrentMp);
+                            for (int j = 0; j < summonBuffs.Count; ++j)
+                            {
+                                if (summonBuffs[j].id.StartsWith(i.ToString()))
+                                {
+                                    summon.CacheEntity.Buffs.Add(summonBuffs[j]);
+                                    summonBuffs.RemoveAt(j);
+                                    j--;
+                                }
+                            }
+                            playerCharacterEntity.Summons[i] = summon;
+                        }
+
+                        // Summon saved mount entity
+                        if (GameInstance.VehicleEntities.ContainsKey(playerCharacterData.MountDataId))
+                            playerCharacterEntity.Mount(GameInstance.VehicleEntities[playerCharacterData.MountDataId]);
+
                         playerCharacterEntity.CallAllOnRespawn();
+                    }
                     else
+                    {
                         playerCharacterEntity.CallAllOnDead();
+                    }
 
                     // Register player character entity to the server
                     RegisterPlayerCharacter(connectionId, playerCharacterEntity);
