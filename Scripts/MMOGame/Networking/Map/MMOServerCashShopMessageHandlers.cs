@@ -163,8 +163,22 @@ namespace MultiplayerARPG.MMO
                 }
             }
 
+            // Increase custom currencies
+            List<CharacterCurrency> customCurrencies = new List<CharacterCurrency>();
+            if (cashShopItem.ReceiveCurrencies != null &&
+                cashShopItem.ReceiveCurrencies.Length > 0)
+            {
+                foreach (CurrencyAmount currencyAmount in cashShopItem.ReceiveCurrencies)
+                {
+                    for (int i = 0; i < request.amount; ++i)
+                    {
+                        customCurrencies.Add(CharacterCurrency.Create(currencyAmount.currency, currencyAmount.amount));
+                    }
+                }
+            }
+
             // Update currency
-            characterGold += priceGold;
+            characterGold += changeCharacterGold;
             if (request.currencyType == CashShopItemCurrencyType.CASH)
             {
                 AsyncResponseData<CashResp> changeCashResp = await DbServiceClient.ChangeCashAsync(new ChangeCashReq()
@@ -185,6 +199,7 @@ namespace MultiplayerARPG.MMO
             playerCharacter.Gold = characterGold;
             playerCharacter.UserCash = userCash;
             playerCharacter.IncreaseItems(rewardItems);
+            playerCharacter.IncreaseCurrencies(customCurrencies);
             playerCharacter.FillEmptySlots();
 
             // Response to client
