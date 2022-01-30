@@ -22,7 +22,7 @@ namespace MultiplayerARPG.MMO
                         StorageType = storageId.storageType,
                         StorageOwnerId = storageId.storageOwnerId,
                     });
-                } while (resp.IsSuccess);
+                } while (!resp.IsSuccess);
                 ServerStorageHandlers.SetStorageItems(storageId, resp.Response.StorageCharacterItems);
                 loadingStorageIds.Remove(storageId);
             }
@@ -42,7 +42,7 @@ namespace MultiplayerARPG.MMO
                     {
                         PartyId = id,
                     });
-                } while (resp.IsSuccess);
+                } while (!resp.IsSuccess);
                 ServerPartyHandlers.SetParty(id, resp.Response.PartyData);
                 loadingPartyIds.Remove(id);
             }
@@ -62,7 +62,7 @@ namespace MultiplayerARPG.MMO
                     {
                         GuildId = id,
                     });
-                } while (resp.IsSuccess);
+                } while (!resp.IsSuccess);
                 ServerGuildHandlers.SetGuild(id, resp.Response.GuildData);
                 loadingGuildIds.Remove(id);
             }
