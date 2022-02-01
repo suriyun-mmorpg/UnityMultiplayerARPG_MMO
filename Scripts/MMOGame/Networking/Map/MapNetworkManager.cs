@@ -679,8 +679,8 @@ namespace MultiplayerARPG.MMO
                         PartyData party;
                         if (ServerPartyHandlers.TryGetParty(playerCharacterEntity.PartyId, out party))
                         {
-                            ServerGameMessageHandlers.SendSetPartyData(playerCharacterEntity.ConnectionId, party);
-                            ServerGameMessageHandlers.SendAddPartyMembersToOne(playerCharacterEntity.ConnectionId, party);
+                            ServerGameMessageHandlers.SendSetPartyData(connectionId, party);
+                            ServerGameMessageHandlers.SendAddPartyMembersToOne(connectionId, party);
                         }
                         else
                             playerCharacterEntity.ClearParty();
@@ -695,18 +695,18 @@ namespace MultiplayerARPG.MMO
                         if (ServerGuildHandlers.TryGetGuild(playerCharacterEntity.GuildId, out guild))
                         {
                             playerCharacterEntity.GuildRole = guild.GetMemberRole(playerCharacterEntity.Id);
-                            ServerGameMessageHandlers.SendSetGuildData(playerCharacterEntity.ConnectionId, guild);
-                            ServerGameMessageHandlers.SendAddGuildMembersToOne(playerCharacterEntity.ConnectionId, guild);
-                            ServerGameMessageHandlers.SendSetGuildMessage(playerCharacterEntity.ConnectionId, guild);
-                            ServerGameMessageHandlers.SendSetGuildMessage2(playerCharacterEntity.ConnectionId, guild);
-                            ServerGameMessageHandlers.SendSetGuildRank(playerCharacterEntity.ConnectionId, guild);
-                            ServerGameMessageHandlers.SendSetGuildScore(playerCharacterEntity.ConnectionId, guild);
-                            ServerGameMessageHandlers.SendSetGuildOptions(playerCharacterEntity.ConnectionId, guild);
-                            ServerGameMessageHandlers.SendSetGuildRolesToOne(playerCharacterEntity.ConnectionId, guild);
-                            ServerGameMessageHandlers.SendSetGuildMemberRolesToOne(playerCharacterEntity.ConnectionId, guild);
-                            ServerGameMessageHandlers.SendSetGuildSkillLevelsToOne(playerCharacterEntity.ConnectionId, guild);
-                            ServerGameMessageHandlers.SendSetGuildGold(playerCharacterEntity.ConnectionId, guild);
-                            ServerGameMessageHandlers.SendSetGuildLevelExpSkillPoint(playerCharacterEntity.ConnectionId, guild);
+                            ServerGameMessageHandlers.SendSetGuildData(connectionId, guild);
+                            ServerGameMessageHandlers.SendAddGuildMembersToOne(connectionId, guild);
+                            ServerGameMessageHandlers.SendSetGuildMessage(connectionId, guild);
+                            ServerGameMessageHandlers.SendSetGuildMessage2(connectionId, guild);
+                            ServerGameMessageHandlers.SendSetGuildRank(connectionId, guild);
+                            ServerGameMessageHandlers.SendSetGuildScore(connectionId, guild);
+                            ServerGameMessageHandlers.SendSetGuildOptions(connectionId, guild);
+                            ServerGameMessageHandlers.SendSetGuildRolesToOne(connectionId, guild);
+                            ServerGameMessageHandlers.SendSetGuildMemberRolesToOne(connectionId, guild);
+                            ServerGameMessageHandlers.SendSetGuildSkillLevelsToOne(connectionId, guild);
+                            ServerGameMessageHandlers.SendSetGuildGold(connectionId, guild);
+                            ServerGameMessageHandlers.SendSetGuildLevelExpSkillPoint(connectionId, guild);
                         }
                         else
                         {
