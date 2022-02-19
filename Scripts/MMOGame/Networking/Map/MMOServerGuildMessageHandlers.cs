@@ -177,9 +177,18 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
+            string guildName = request.guildName.Trim();
+            if (!NameValidating.ValidateGuildName(guildName))
+            {
+                result.InvokeError(new ResponseCreateGuildMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INVALID_GUILD_NAME
+                });
+                return;
+            }
             AsyncResponseData<FindGuildNameResp> findGuildNameResp = await DbServiceClient.FindGuildNameAsync(new FindGuildNameReq()
             {
-                GuildName = request.guildName,
+                GuildName = guildName,
             });
             if (!findGuildNameResp.IsSuccess)
             {
@@ -200,7 +209,7 @@ namespace MultiplayerARPG.MMO
             AsyncResponseData<GuildResp> createGuildResp = await DbServiceClient.CreateGuildAsync(new CreateGuildReq()
             {
                 LeaderCharacterId = playerCharacter.Id,
-                GuildName = request.guildName,
+                GuildName = guildName,
             });
             if (!createGuildResp.IsSuccess)
             {
@@ -220,7 +229,7 @@ namespace MultiplayerARPG.MMO
             // Broadcast via chat server
             if (ClusterClient.IsNetworkActive)
             {
-                ClusterClient.SendCreateGuild(MMOMessageTypes.UpdateGuild, guild.id, request.guildName, playerCharacter.Id);
+                ClusterClient.SendCreateGuild(MMOMessageTypes.UpdateGuild, guild.id, guildName, playerCharacter.Id);
                 ClusterClient.SendAddSocialMember(MMOMessageTypes.UpdateGuildMember, guild.id, playerCharacter.Id, playerCharacter.CharacterName, playerCharacter.DataId, playerCharacter.Level);
             }
             GameInstance.ServerGameMessageHandlers.SendSetGuildData(requestHandler.ConnectionId, guild);

@@ -177,9 +177,17 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            string username = request.username;
-            string password = request.password;
+            string username = request.username.Trim();
+            string password = request.password.Trim();
             string email = request.email.Trim();
+            if (!NameValidating.ValidateUsername(username))
+            {
+                result.InvokeError(new ResponseUserRegisterMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INVALID_USERNAME
+                });
+                return;
+            }
             if (requireEmail)
             {
                 if (string.IsNullOrEmpty(email) || !Email.IsValid(email))

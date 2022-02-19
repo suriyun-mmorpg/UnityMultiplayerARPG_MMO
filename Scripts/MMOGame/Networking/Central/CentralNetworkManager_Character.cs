@@ -88,11 +88,19 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
             long connectionId = requestHandler.ConnectionId;
             NetDataReader reader = requestHandler.Reader;
-            string characterName = request.characterName;
+            string characterName = request.characterName.Trim();
             int dataId = request.dataId;
             int entityId = request.entityId;
             int factionId = request.factionId;
             CentralUserPeerInfo userPeerInfo;
+            if (!NameValidating.ValidateCharacterName(characterName))
+            {
+                result.InvokeError(new ResponseCreateCharacterMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INVALID_CHARACTER_NAME
+                });
+                return;
+            }
             // Validate character name
             AsyncResponseData<FindCharacterNameResp> findCharacterNameResp = await DbServiceClient.FindCharacterNameAsync(new FindCharacterNameReq()
             {
