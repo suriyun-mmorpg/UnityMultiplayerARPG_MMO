@@ -334,6 +334,7 @@ namespace MultiplayerARPG.MMO
                 try
                 {
                     ExecuteNonQuery(transaction, "DELETE FROM characters WHERE id=@characterId", new SqliteParameter("@characterId", id));
+                    ExecuteNonQuery(transaction, "DELETE FROM friend WHERE characterId1 LIKE @characterId OR characterId2 LIKE @characterId", new SqliteParameter("@characterId", id));
                     DeleteCharacterAttributes(transaction, id);
                     DeleteCharacterCurrencies(transaction, id);
                     DeleteCharacterBuffs(transaction, id);

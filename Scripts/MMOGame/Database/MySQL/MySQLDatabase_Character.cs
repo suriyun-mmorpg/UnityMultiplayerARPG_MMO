@@ -544,6 +544,7 @@ namespace MultiplayerARPG.MMO
                 try
                 {
                     ExecuteNonQuerySync(connection, transaction, "DELETE FROM characters WHERE id=@characterId", new MySqlParameter("@characterId", id));
+                    ExecuteNonQuerySync(connection, transaction, "DELETE FROM friend WHERE characterId1 LIKE @characterId OR characterId2 LIKE @characterId", new MySqlParameter("@characterId", id));
                     DeleteCharacterAttributes(connection, transaction, id);
                     DeleteCharacterCurrencies(connection, transaction, id);
                     DeleteCharacterBuffs(connection, transaction, id);
