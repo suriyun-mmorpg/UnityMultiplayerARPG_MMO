@@ -19,11 +19,10 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public void CreateCharacterCurrency(MySqlConnection connection, MySqlTransaction transaction, int idx, string characterId, CharacterCurrency characterCurrency)
+        public void CreateCharacterCurrency(MySqlConnection connection, MySqlTransaction transaction, string characterId, CharacterCurrency characterCurrency)
         {
-            ExecuteNonQuerySync(connection, transaction, "INSERT INTO charactercurrency (id, idx, characterId, dataId, amount) VALUES (@id, @idx, @characterId, @dataId, @amount)",
-                new MySqlParameter("@id", characterId + "_" + idx),
-                new MySqlParameter("@idx", idx),
+            ExecuteNonQuerySync(connection, transaction, "INSERT INTO charactercurrency (id, characterId, dataId, amount) VALUES (@id, @characterId, @dataId, @amount)",
+                new MySqlParameter("@id", characterId + "_" + characterCurrency.dataId),
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@dataId", characterCurrency.dataId),
                 new MySqlParameter("@amount", characterCurrency.amount));
@@ -40,7 +39,7 @@ namespace MultiplayerARPG.MMO
                 {
                     result.Add(tempCurrency);
                 }
-            }, "SELECT dataId, amount FROM charactercurrency WHERE characterId=@characterId ORDER BY idx ASC",
+            }, "SELECT dataId, amount FROM charactercurrency WHERE characterId=@characterId",
                 new MySqlParameter("@characterId", characterId));
             return result;
         }
