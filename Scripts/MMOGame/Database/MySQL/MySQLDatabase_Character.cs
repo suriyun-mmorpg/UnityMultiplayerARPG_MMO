@@ -19,7 +19,7 @@ namespace MultiplayerARPG.MMO
                 int i;
                 for (i = 0; i < characterData.Attributes.Count; ++i)
                 {
-                    CreateCharacterAttribute(connection, transaction, i, characterData.Id, characterData.Attributes[i]);
+                    CreateCharacterAttribute(connection, transaction, characterData.Id, characterData.Attributes[i]);
                 }
                 transaction.Commit();
             }
@@ -152,7 +152,7 @@ namespace MultiplayerARPG.MMO
                 int i;
                 for (i = 0; i < characterData.Currencies.Count; ++i)
                 {
-                    CreateCharacterCurrency(connection, transaction, i, characterData.Id, characterData.Currencies[i]);
+                    CreateCharacterCurrency(connection, transaction, characterData.Id, characterData.Currencies[i]);
                 }
                 transaction.Commit();
             }

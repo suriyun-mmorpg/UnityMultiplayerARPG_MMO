@@ -40,11 +40,11 @@ namespace MultiplayerARPG.MMO
                 }
                 for (i = 0; i < characterData.Attributes.Count; ++i)
                 {
-                    CreateCharacterAttribute(transaction, i, characterData.Id, characterData.Attributes[i]);
+                    CreateCharacterAttribute(transaction, characterData.Id, characterData.Attributes[i]);
                 }
                 for (i = 0; i < characterData.Currencies.Count; ++i)
                 {
-                    CreateCharacterCurrency(transaction, i, characterData.Id, characterData.Currencies[i]);
+                    CreateCharacterCurrency(transaction, characterData.Id, characterData.Currencies[i]);
                 }
                 for (i = 0; i < characterData.Skills.Count; ++i)
                 {
