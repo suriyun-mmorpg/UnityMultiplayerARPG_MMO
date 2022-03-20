@@ -514,6 +514,11 @@ namespace MultiplayerARPG.MMO
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             PlayerCharacterData character = ReadCharacter(request.CharacterId);
+            if (character == null)
+            {
+                result.Invoke(AckResponseCode.Success, EmptyMessage.Value);
+                return;
+            }
             PartyData party = ReadParty(character.PartyId);
             // Update to cache
             party.RemoveMember(request.CharacterId);
@@ -750,6 +755,11 @@ namespace MultiplayerARPG.MMO
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             PlayerCharacterData character = ReadCharacter(request.CharacterId);
+            if (character == null)
+            {
+                result.Invoke(AckResponseCode.Success, EmptyMessage.Value);
+                return;
+            }
             GuildData guild = ReadGuild(character.GuildId);
             // Update to cache
             guild.RemoveMember(request.CharacterId);
