@@ -34,7 +34,6 @@ namespace MultiplayerARPG.MMO
         // In the future it may implements Redis
         // It's going to get some data from all tables but not every records
         // Just some records that players were requested
-        private ConcurrentHashSet<string> updatingCharacterIds = new ConcurrentHashSet<string>();
         private ConcurrentHashSet<string> cachedUsernames = new ConcurrentHashSet<string>(StringComparer.OrdinalIgnoreCase);
         private ConcurrentHashSet<string> cachedEmails = new ConcurrentHashSet<string>(StringComparer.OrdinalIgnoreCase);
         private ConcurrentHashSet<string> cachedCharacterNames = new ConcurrentHashSet<string>(StringComparer.OrdinalIgnoreCase);

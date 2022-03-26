@@ -214,22 +214,16 @@ namespace MultiplayerARPG.MMO
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             PlayerCharacterData character = request.CharacterData;
-            // Avoid duplicating updates
-            if (!updatingCharacterIds.Contains(character.Id))
-            {
-                updatingCharacterIds.Add(character.Id);
-                // Cache the data, it will be used later
-                cachedUserCharacter[character.Id] = character;
-                // Update data to database
-                // TODO: May update later to reduce amount of processes
-                Database.UpdateCharacter(character);
-                updatingCharacterIds.TryRemove(character.Id);
-            }
+            // Cache the data, it will be used later
+            cachedUserCharacter[character.Id] = character;
+            // Response success immediately
             result.Invoke(AckResponseCode.Success, new CharacterResp()
             {
                 CharacterData = character
             });
             await UniTask.Yield();
+            // Update data to database
+            Database.UpdateCharacter(character);
 #endif
         }
 
