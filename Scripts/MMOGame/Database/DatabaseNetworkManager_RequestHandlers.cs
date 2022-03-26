@@ -237,10 +237,10 @@ namespace MultiplayerARPG.MMO
                 cachedCharacterNames.TryRemove(characterName);
                 cachedUserCharacter.TryRemove(request.CharacterId, out _);
             }
-            // Delete data from database
-            Database.DeleteCharacter(request.UserId, request.CharacterId);
             result.Invoke(AckResponseCode.Success, EmptyMessage.Value);
             await UniTask.Yield();
+            // Delete data from database
+            Database.DeleteCharacter(request.UserId, request.CharacterId);
 #endif
         }
 
