@@ -651,10 +651,6 @@ namespace MultiplayerARPG.MMO
                     }
                     playerCharacterEntity.UserCash = getCashResp.Response.Cash;
 
-                    // Prepare saving location for this character
-                    if (IsInstanceMap())
-                        instanceMapCurrentLocations.TryAdd(playerCharacterEntity.ObjectId, new KeyValuePair<string, Vector3>(savingCurrentMapName, savingCurrentPosition));
-
                     // Set user Id
                     playerCharacterEntity.UserId = userId;
 
@@ -768,6 +764,10 @@ namespace MultiplayerARPG.MMO
 
                     // Don't destroy player character entity when disconnect
                     playerCharacterEntity.Identity.DoNotDestroyWhenDisconnect = true;
+
+                    // Prepare saving location for this character
+                    if (IsInstanceMap())
+                        instanceMapCurrentLocations.TryAdd(playerCharacterEntity.ObjectId, new KeyValuePair<string, Vector3>(savingCurrentMapName, savingCurrentPosition));
                 }
             }
         }
