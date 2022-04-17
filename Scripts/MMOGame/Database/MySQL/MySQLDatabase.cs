@@ -314,16 +314,6 @@ namespace MultiplayerARPG.MMO
                 InsertMigrationId(migrationId);
                 Logging.Log($"Migrated to {migrationId}");
             }
-            migrationId = "1.74";
-            if (!HasMigrationId(migrationId))
-            {
-                Logging.Log($"Migrating up to {migrationId}");
-                ExecuteNonQuerySync("ALTER TABLE `characterattribute` DROP `idx`;");
-                ExecuteNonQuerySync("ALTER TABLE `charactercurrency` DROP `idx`;");
-                // Insert migrate history
-                InsertMigrationId(migrationId);
-                Logging.Log($"Migrated to {migrationId}");
-            }
         }
 
         private bool HasMigrationId(string migrationId)

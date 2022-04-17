@@ -19,10 +19,11 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public void CreateCharacterAttribute(MySqlConnection connection, MySqlTransaction transaction, string characterId, CharacterAttribute characterAttribute)
+        public void CreateCharacterAttribute(MySqlConnection connection, MySqlTransaction transaction, int idx, string characterId, CharacterAttribute characterAttribute)
         {
-            ExecuteNonQuerySync(connection, transaction, "INSERT INTO characterattribute (id, characterId, dataId, amount) VALUES (@id, @characterId, @dataId, @amount)",
-                new MySqlParameter("@id", characterId + "_" + characterAttribute.dataId),
+            ExecuteNonQuerySync(connection, transaction, "INSERT INTO characterattribute (id, idx, characterId, dataId, amount) VALUES (@id, @idx, @characterId, @dataId, @amount)",
+                new MySqlParameter("@id", characterId + "_" + idx),
+                new MySqlParameter("@idx", idx),
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@dataId", characterAttribute.dataId),
                 new MySqlParameter("@amount", characterAttribute.amount));
@@ -39,7 +40,7 @@ namespace MultiplayerARPG.MMO
                 {
                     result.Add(tempAttribute);
                 }
-            }, "SELECT dataId, amount FROM characterattribute WHERE characterId=@characterId",
+            }, "SELECT dataId, amount FROM characterattribute WHERE characterId=@characterId ORDER BY idx ASC",
                 new MySqlParameter("@characterId", characterId));
             return result;
         }

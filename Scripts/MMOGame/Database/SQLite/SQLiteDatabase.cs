@@ -52,6 +52,7 @@ namespace MultiplayerARPG.MMO
         {
             ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS characterattribute (
               id TEXT NOT NULL PRIMARY KEY,
+              idx INTEGER NOT NULL,
               characterId TEXT NOT NULL,
               dataId INTEGER NOT NULL,
               amount INTEGER NOT NULL,
@@ -61,6 +62,7 @@ namespace MultiplayerARPG.MMO
 
             ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS charactercurrency (
               id TEXT NOT NULL PRIMARY KEY,
+              idx INTEGER NOT NULL,
               characterId TEXT NOT NULL,
               dataId INTEGER NOT NULL,
               amount INTEGER NOT NULL,
