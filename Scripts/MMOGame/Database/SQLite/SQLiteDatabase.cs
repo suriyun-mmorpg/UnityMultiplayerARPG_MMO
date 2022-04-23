@@ -40,6 +40,7 @@ namespace MultiplayerARPG.MMO
             connection = NewConnection();
             connection.Open();
             Init();
+            this.InvokeInstanceDevExtMethods("Init");
         }
 
         public override void Destroy()
@@ -580,8 +581,6 @@ namespace MultiplayerARPG.MMO
                 ExecuteNonQuery("DROP TABLE characters_delete;");
                 ExecuteNonQuery("ALTER TABLE characters_modifying RENAME TO characters;");
             }
-
-            this.InvokeInstanceDevExtMethods("Init");
         }
 
         private bool IsColumnExist(string tableName, string findingColumn)

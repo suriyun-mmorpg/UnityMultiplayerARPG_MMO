@@ -45,6 +45,7 @@ namespace MultiplayerARPG.MMO
             ConfigReader.ReadConfigs(jsonConfig, "mySqlDbName", out dbName, dbName);
 
             Migration();
+            this.InvokeInstanceDevExtMethods("Init");
         }
 
         private void Migration()
