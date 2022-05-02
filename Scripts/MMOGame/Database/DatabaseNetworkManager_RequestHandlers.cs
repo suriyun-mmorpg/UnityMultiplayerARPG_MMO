@@ -169,9 +169,6 @@ namespace MultiplayerARPG.MMO
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             PlayerCharacterData character = request.CharacterData;
-            // Store character to the dictionary, it will be used later
-            cachedUserCharacter[character.Id] = character;
-            cachedCharacterNames.Add(character.CharacterName);
             // Insert new character to database
             Database.CreateCharacter(request.UserId, character);
             result.Invoke(AckResponseCode.Success, new CharacterResp()
@@ -1542,6 +1539,7 @@ namespace MultiplayerARPG.MMO
                     cachedUserCharacter[id] = character;
                     cachedCharacterNames.Add(character.CharacterName);
                 }
+                UnityEngine.Debug.LogError(id + " " + character.CharacterName + " " + character.LastUpdate);
             }
             return character;
         }
