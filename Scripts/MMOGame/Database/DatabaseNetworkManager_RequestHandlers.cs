@@ -1539,7 +1539,6 @@ namespace MultiplayerARPG.MMO
                     cachedUserCharacter[id] = character;
                     cachedCharacterNames.Add(character.CharacterName);
                 }
-                UnityEngine.Debug.LogError(id + " " + character.CharacterName + " " + character.LastUpdate);
             }
             return character;
         }
