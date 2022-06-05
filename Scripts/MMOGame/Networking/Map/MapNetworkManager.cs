@@ -362,7 +362,8 @@ namespace MultiplayerARPG.MMO
                 UnregisterUserId(connectionId);
                 try
                 {
-                    await UniTask.Delay(playerCharacterDespawnMillisecondsDelay, true, PlayerLoopTiming.Update, cancellationTokenSource.Token);
+                    if (IsInstanceMap())
+                        await UniTask.Delay(playerCharacterDespawnMillisecondsDelay, true, PlayerLoopTiming.Update, cancellationTokenSource.Token);
                     // Save character again before despawned (it may attacked by other characters)
                     while (savingCharacters.Contains(id))
                     {
