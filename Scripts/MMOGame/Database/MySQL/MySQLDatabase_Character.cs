@@ -589,7 +589,7 @@ namespace MultiplayerARPG.MMO
             return result != null ? (string)result : string.Empty;
         }
 
-        public override List<SocialCharacterData> FindCharacters(string characterName, int skip = 0, int limit = 25)
+        public override List<SocialCharacterData> FindCharacters(string characterName, int skip, int limit)
         {
             List<SocialCharacterData> result = new List<SocialCharacterData>();
             ExecuteReaderSync((reader) =>
@@ -610,7 +610,7 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public override void CreateFriend(string id1, string id2, int state = 0)
+        public override void CreateFriend(string id1, string id2, byte state)
         {
             DeleteFriend(id1, id2);
             ExecuteNonQuerySync("INSERT INTO friend " +
@@ -630,7 +630,7 @@ namespace MultiplayerARPG.MMO
                new MySqlParameter("@characterId2", id2));
         }
 
-        public override List<SocialCharacterData> ReadFriends(string id1, int state = 0, int skip = 0, int limit = 25)
+        public override List<SocialCharacterData> ReadFriends(string id1, byte state, int skip, int limit)
         {
             List<SocialCharacterData> result = new List<SocialCharacterData>();
             List<string> characterIds = new List<string>();

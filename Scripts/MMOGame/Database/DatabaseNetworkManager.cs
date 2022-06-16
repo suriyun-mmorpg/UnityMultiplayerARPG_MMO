@@ -44,7 +44,6 @@ namespace MultiplayerARPG.MMO
         private ConcurrentDictionary<string, PlayerCharacterData> cachedUserCharacter = new ConcurrentDictionary<string, PlayerCharacterData>();
         private ConcurrentDictionary<string, SocialCharacterData> cachedSocialCharacter = new ConcurrentDictionary<string, SocialCharacterData>();
         private ConcurrentDictionary<string, ConcurrentDictionary<string, BuildingSaveData>> cachedBuilding = new ConcurrentDictionary<string, ConcurrentDictionary<string, BuildingSaveData>>();
-        private ConcurrentDictionary<string, List<SocialCharacterData>> cachedFriend = new ConcurrentDictionary<string, List<SocialCharacterData>>();
         private ConcurrentDictionary<int, PartyData> cachedParty = new ConcurrentDictionary<int, PartyData>();
         private ConcurrentDictionary<int, GuildData> cachedGuild = new ConcurrentDictionary<int, GuildData>();
         private ConcurrentDictionary<StorageId, List<CharacterItem>> cachedStorageItems = new ConcurrentDictionary<StorageId, List<CharacterItem>>();
@@ -88,8 +87,8 @@ namespace MultiplayerARPG.MMO
             RegisterRequestToServer<DeleteCharacterReq, EmptyMessage>(DatabaseRequestTypes.RequestDeleteCharacter, DeleteCharacter);
             RegisterRequestToServer<FindCharacterNameReq, FindCharacterNameResp>(DatabaseRequestTypes.RequestFindCharacterName, FindCharacterName);
             RegisterRequestToServer<FindCharacterNameReq, SocialCharactersResp>(DatabaseRequestTypes.RequestFindCharacters, FindCharacters);
-            RegisterRequestToServer<CreateFriendReq, SocialCharactersResp>(DatabaseRequestTypes.RequestCreateFriend, CreateFriend);
-            RegisterRequestToServer<DeleteFriendReq, SocialCharactersResp>(DatabaseRequestTypes.RequestDeleteFriend, DeleteFriend);
+            RegisterRequestToServer<CreateFriendReq, EmptyMessage>(DatabaseRequestTypes.RequestCreateFriend, CreateFriend);
+            RegisterRequestToServer<DeleteFriendReq, EmptyMessage>(DatabaseRequestTypes.RequestDeleteFriend, DeleteFriend);
             RegisterRequestToServer<ReadFriendsReq, SocialCharactersResp>(DatabaseRequestTypes.RequestReadFriends, ReadFriends);
             RegisterRequestToServer<CreateBuildingReq, BuildingResp>(DatabaseRequestTypes.RequestCreateBuilding, CreateBuilding);
             RegisterRequestToServer<UpdateBuildingReq, BuildingResp>(DatabaseRequestTypes.RequestUpdateBuilding, UpdateBuilding);

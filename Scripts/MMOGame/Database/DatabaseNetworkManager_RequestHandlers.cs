@@ -271,58 +271,26 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
             result.Invoke(AckResponseCode.Success, new SocialCharactersResp()
             {
-                List = Database.FindCharacters(request.CharacterName)
+                List = Database.FindCharacters(request.CharacterName, request.Skip, request.Limit)
             });
             await UniTask.Yield();
 #endif
         }
 
-        protected async UniTaskVoid CreateFriend(RequestHandlerData requestHandler, CreateFriendReq request, RequestProceedResultDelegate<SocialCharactersResp> result)
+        protected async UniTaskVoid CreateFriend(RequestHandlerData requestHandler, CreateFriendReq request, RequestProceedResultDelegate<EmptyMessage> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            List<SocialCharacterData> friends = ReadFriends(request.Character1Id);
-            // Update to cache
-            for (int i = 0; i < friends.Count; ++i)
-            {
-                if (friends[i].id.Equals(request.Character2Id))
-                {
-                    friends.RemoveAt(i);
-                    break;
-                }
-            }
-            SocialCharacterData character = ReadSocialCharacter(request.Character2Id);
-            friends.Add(character);
-            cachedFriend[request.Character1Id] = friends;
-            // Update to database
-            Database.CreateFriend(request.Character1Id, character.id);
-            result.Invoke(AckResponseCode.Success, new SocialCharactersResp()
-            {
-                List = friends
-            });
+            Database.CreateFriend(request.Character1Id, request.Character2Id, request.State);
+            result.Invoke(AckResponseCode.Success, EmptyMessage.Value);
             await UniTask.Yield();
 #endif
         }
 
-        protected async UniTaskVoid DeleteFriend(RequestHandlerData requestHandler, DeleteFriendReq request, RequestProceedResultDelegate<SocialCharactersResp> result)
+        protected async UniTaskVoid DeleteFriend(RequestHandlerData requestHandler, DeleteFriendReq request, RequestProceedResultDelegate<EmptyMessage> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            List<SocialCharacterData> friends = ReadFriends(request.Character1Id);
-            // Update to cache
-            for (int i = 0; i < friends.Count; ++i)
-            {
-                if (friends[i].id.Equals(request.Character2Id))
-                {
-                    friends.RemoveAt(i);
-                    break;
-                }
-            }
-            cachedFriend[request.Character1Id] = friends;
-            // Update to database
             Database.DeleteFriend(request.Character1Id, request.Character2Id);
-            result.Invoke(AckResponseCode.Success, new SocialCharactersResp()
-            {
-                List = friends
-            });
+            result.Invoke(AckResponseCode.Success, EmptyMessage.Value);
             await UniTask.Yield();
 #endif
         }
@@ -332,7 +300,7 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
             result.Invoke(AckResponseCode.Success, new SocialCharactersResp()
             {
-                List = ReadFriends(request.CharacterId)
+                List = ReadFriends(request.CharacterId, request.State, request.Skip, request.Limit)
             });
             await UniTask.Yield();
 #endif
@@ -1556,21 +1524,9 @@ namespace MultiplayerARPG.MMO
             return character;
         }
 
-        protected List<SocialCharacterData> ReadFriends(string id)
+        protected List<SocialCharacterData> ReadFriends(string id, byte state, int skip = 0, int limit = 50)
         {
-            List<SocialCharacterData> friends;
-            if (!cachedFriend.TryGetValue(id, out friends))
-            {
-                // Doesn't cached yet, so get data from database
-                friends = Database.ReadFriends(id);
-                // Cache the data
-                if (friends != null)
-                {
-                    cachedFriend[id] = friends;
-                    CacheSocialCharacters(friends);
-                }
-            }
-            return friends;
+            return Database.ReadFriends(id, state, skip, limit);
         }
 
         protected PartyData ReadParty(int id)

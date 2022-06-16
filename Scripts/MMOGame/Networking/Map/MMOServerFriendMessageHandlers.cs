@@ -58,6 +58,7 @@ namespace MultiplayerARPG.MMO
             AsyncResponseData<SocialCharactersResp> resp = await DbServiceClient.ReadFriendsAsync(new ReadFriendsReq()
             {
                 CharacterId = playerCharacter.Id,
+                State = 0,
             });
             if (!resp.IsSuccess)
             {
@@ -90,6 +91,7 @@ namespace MultiplayerARPG.MMO
             {
                 Character1Id = playerCharacter.Id,
                 Character2Id = request.friendId,
+                State = 0,
             });
             if (!resp.IsSuccess)
             {
@@ -122,7 +124,7 @@ namespace MultiplayerARPG.MMO
             AsyncResponseData<SocialCharactersResp> resp = await DbServiceClient.DeleteFriendAsync(new DeleteFriendReq()
             {
                 Character1Id = playerCharacter.Id,
-                Character2Id = request.friendId
+                Character2Id = request.friendId,
             });
             if (!resp.IsSuccess)
             {
@@ -143,32 +145,139 @@ namespace MultiplayerARPG.MMO
         public async UniTaskVoid HandleRequestSendFriendRequest(RequestHandlerData requestHandler, RequestSendFriendRequestMessage request, RequestProceedResultDelegate<ResponseSendFriendRequestMessage> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            result.Invoke(AckResponseCode.Unimplemented, new ResponseSendFriendRequestMessage());
-            await UniTask.Yield();
+            IPlayerCharacterData playerCharacter;
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            {
+                result.InvokeError(new ResponseSendFriendRequestMessage()
+                {
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                });
+                return;
+            }
+            AsyncResponseData<SocialCharactersResp> resp = await DbServiceClient.CreateFriendAsync(new CreateFriendReq()
+            {
+                Character1Id = playerCharacter.Id,
+                Character2Id = request.requesteeId,
+                State = 1,
+            });
+            if (!resp.IsSuccess)
+            {
+                result.InvokeError(new ResponseSendFriendRequestMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                });
+                return;
+            }
+            GameInstance.ServerGameMessageHandlers.SendSetFriends(requestHandler.ConnectionId, resp.Response.List);
+            result.InvokeSuccess(new ResponseSendFriendRequestMessage()
+            {
+                message = UITextKeys.UI_FRIEND_REQUESTED,
+            });
 #endif
         }
 
         public async UniTaskVoid HandleRequestAcceptFriendRequest(RequestHandlerData requestHandler, RequestAcceptFriendRequestMessage request, RequestProceedResultDelegate<ResponseAcceptFriendRequestMessage> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            result.Invoke(AckResponseCode.Unimplemented, new ResponseAcceptFriendRequestMessage());
-            await UniTask.Yield();
+            IPlayerCharacterData playerCharacter;
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            {
+                result.InvokeError(new ResponseAcceptFriendRequestMessage()
+                {
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                });
+                return;
+            }
+            AsyncResponseData<SocialCharactersResp> resp1 = await DbServiceClient.CreateFriendAsync(new CreateFriendReq()
+            {
+                Character1Id = playerCharacter.Id,
+                Character2Id = request.requesterId,
+                State = 0,
+            });
+            AsyncResponseData<SocialCharactersResp> resp2 = await DbServiceClient.CreateFriendAsync(new CreateFriendReq()
+            {
+                Character1Id = request.requesterId,
+                Character2Id = playerCharacter.Id,
+                State = 0,
+            });
+            if (!resp1.IsSuccess || !resp2.IsSuccess)
+            {
+                result.InvokeError(new ResponseAcceptFriendRequestMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                });
+                return;
+            }
+            GameInstance.ServerGameMessageHandlers.SendSetFriends(requestHandler.ConnectionId, resp1.Response.List);
+            result.InvokeSuccess(new ResponseAcceptFriendRequestMessage()
+            {
+                message = UITextKeys.UI_FRIEND_REQUEST_ACCEPTED,
+            });
 #endif
         }
 
         public async UniTaskVoid HandleRequestDeclineFriendRequest(RequestHandlerData requestHandler, RequestDeclineFriendRequestMessage request, RequestProceedResultDelegate<ResponseDeclineFriendRequestMessage> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            result.Invoke(AckResponseCode.Unimplemented, new ResponseDeclineFriendRequestMessage());
-            await UniTask.Yield();
+            IPlayerCharacterData playerCharacter;
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            {
+                result.InvokeError(new ResponseDeclineFriendRequestMessage()
+                {
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                });
+                return;
+            }
+            AsyncResponseData<SocialCharactersResp> resp = await DbServiceClient.DeleteFriendAsync(new DeleteFriendReq()
+            {
+                Character1Id = playerCharacter.Id,
+                Character2Id = request.requesterId,
+            });
+            if (!resp.IsSuccess)
+            {
+                result.InvokeError(new ResponseDeclineFriendRequestMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                });
+                return;
+            }
+            GameInstance.ServerGameMessageHandlers.SendSetFriends(requestHandler.ConnectionId, resp.Response.List);
+            result.InvokeSuccess(new ResponseDeclineFriendRequestMessage()
+            {
+                message = UITextKeys.UI_FRIEND_REQUEST_DECLINED,
+            });
 #endif
         }
 
         public async UniTaskVoid HandleRequestGetFriendRequests(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<ResponseGetFriendRequestsMessage> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            result.Invoke(AckResponseCode.Unimplemented, new ResponseGetFriendRequestsMessage());
-            await UniTask.Yield();
+            IPlayerCharacterData playerCharacter;
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            {
+                result.InvokeError(new ResponseGetFriendRequestsMessage()
+                {
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                });
+                return;
+            }
+            AsyncResponseData<SocialCharactersResp> resp = await DbServiceClient.ReadFriendsAsync(new ReadFriendsReq()
+            {
+                CharacterId = playerCharacter.Id,
+                State = 1,
+            });
+            if (!resp.IsSuccess)
+            {
+                result.InvokeError(new ResponseGetFriendRequestsMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                });
+                return;
+            }
+            result.InvokeSuccess(new ResponseGetFriendRequestsMessage()
+            {
+                friendRequests = resp.Response.List,
+            });
 #endif
         }
     }
