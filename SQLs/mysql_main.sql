@@ -253,6 +253,7 @@ CREATE TABLE `friend` (
   `id` int NOT NULL,
   `characterId1` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   `characterId2` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+  `state` tinyint(1) NOT NULL DEFAULT '0',
   `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -442,7 +443,9 @@ INSERT INTO `__migrations` (`migrationId`) VALUES
 ('1.70'),
 ('1.71'),
 ('1.71b'),
-('1.72d');
+('1.72d'),
+('1.73'),
+('1.76');
 
 --
 -- Indexes for dumped tables

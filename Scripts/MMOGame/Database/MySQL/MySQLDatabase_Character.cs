@@ -589,7 +589,7 @@ namespace MultiplayerARPG.MMO
             return result != null ? (string)result : string.Empty;
         }
 
-        public override List<SocialCharacterData> FindCharacters(string characterName)
+        public override List<SocialCharacterData> FindCharacters(string characterName, int skip = 0, int limit = 25)
         {
             List<SocialCharacterData> result = new List<SocialCharacterData>();
             ExecuteReaderSync((reader) =>
@@ -605,19 +605,20 @@ namespace MultiplayerARPG.MMO
                     socialCharacterData.level = reader.GetInt16(3);
                     result.Add(socialCharacterData);
                 }
-            }, "SELECT id, dataId, characterName, level FROM characters WHERE characterName LIKE @characterName LIMIT 0, 20",
+            }, "SELECT id, dataId, characterName, level FROM characters WHERE characterName LIKE @characterName ORDER BY RAND() LIMIT " + skip + ", " + limit,
                 new MySqlParameter("@characterName", "%" + characterName + "%"));
             return result;
         }
 
-        public override void CreateFriend(string id1, string id2)
+        public override void CreateFriend(string id1, string id2, int state = 0)
         {
             DeleteFriend(id1, id2);
             ExecuteNonQuerySync("INSERT INTO friend " +
-                "(characterId1, characterId2) VALUES " +
-                "(@characterId1, @characterId2)",
+                "(characterId1, characterId2, state) VALUES " +
+                "(@characterId1, @characterId2, @state)",
                 new MySqlParameter("@characterId1", id1),
-                new MySqlParameter("@characterId2", id2));
+                new MySqlParameter("@characterId2", id2),
+                new MySqlParameter("@state", state));
         }
 
         public override void DeleteFriend(string id1, string id2)
@@ -629,7 +630,7 @@ namespace MultiplayerARPG.MMO
                new MySqlParameter("@characterId2", id2));
         }
 
-        public override List<SocialCharacterData> ReadFriends(string id1)
+        public override List<SocialCharacterData> ReadFriends(string id1, int state = 0, int skip = 0, int limit = 25)
         {
             List<SocialCharacterData> result = new List<SocialCharacterData>();
             List<string> characterIds = new List<string>();
@@ -639,8 +640,9 @@ namespace MultiplayerARPG.MMO
                 {
                     characterIds.Add(reader.GetString(0));
                 }
-            }, "SELECT characterId2 FROM friend WHERE characterId1=@id1",
-                new MySqlParameter("@id1", id1));
+            }, "SELECT characterId2 FROM friend WHERE characterId1=@id1 AND state=@state LIMIT " + skip + ", " + limit,
+                new MySqlParameter("@id1", id1),
+                new MySqlParameter("@state", state));
             SocialCharacterData socialCharacterData;
             foreach (string characterId in characterIds)
             {

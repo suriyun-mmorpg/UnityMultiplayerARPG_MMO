@@ -235,6 +235,7 @@ namespace MultiplayerARPG.MMO
               id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
               characterId1 TEXT NOT NULL,
               characterId2 TEXT NOT NULL,
+              state INTEGER NOT NULL DEFAULT 0,
               createAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
               updateAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
             )");
@@ -407,6 +408,9 @@ namespace MultiplayerARPG.MMO
 
             if (!IsColumnExist("characterquest", "completedTasks"))
                 ExecuteNonQuery("ALTER TABLE characterquest ADD completedTasks TEXT NOT NULL DEFAULT '';");
+
+            if (!IsColumnExist("friend", "gold"))
+                ExecuteNonQuery("ALTER TABLE friend ADD state INTEGER NOT NULL DEFAULT 0;");
 
             if (!IsColumnExist("userlogin", "gold"))
                 ExecuteNonQuery("ALTER TABLE userlogin ADD gold INTEGER NOT NULL DEFAULT 0;");
