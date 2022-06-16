@@ -409,7 +409,7 @@ namespace MultiplayerARPG.MMO
             if (!IsColumnExist("characterquest", "completedTasks"))
                 ExecuteNonQuery("ALTER TABLE characterquest ADD completedTasks TEXT NOT NULL DEFAULT '';");
 
-            if (!IsColumnExist("friend", "gold"))
+            if (!IsColumnExist("friend", "state"))
                 ExecuteNonQuery("ALTER TABLE friend ADD state INTEGER NOT NULL DEFAULT 0;");
 
             if (!IsColumnExist("userlogin", "gold"))
