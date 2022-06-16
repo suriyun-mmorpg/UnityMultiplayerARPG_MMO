@@ -300,7 +300,7 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
             result.Invoke(AckResponseCode.Success, new SocialCharactersResp()
             {
-                List = ReadFriends(request.CharacterId, request.State, request.Skip, request.Limit)
+                List = Database.ReadFriends(request.CharacterId, request.ReadById2, request.State, request.Skip, request.Limit),
             });
             await UniTask.Yield();
 #endif
@@ -1522,11 +1522,6 @@ namespace MultiplayerARPG.MMO
                 cachedSocialCharacter[id] = character;
             }
             return character;
-        }
-
-        protected List<SocialCharacterData> ReadFriends(string id, byte state, int skip = 0, int limit = 50)
-        {
-            return Database.ReadFriends(id, state, skip, limit);
         }
 
         protected PartyData ReadParty(int id)

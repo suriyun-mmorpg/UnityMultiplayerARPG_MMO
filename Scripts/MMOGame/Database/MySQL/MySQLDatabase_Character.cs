@@ -630,19 +630,34 @@ namespace MultiplayerARPG.MMO
                new MySqlParameter("@characterId2", id2));
         }
 
-        public override List<SocialCharacterData> ReadFriends(string id1, byte state, int skip, int limit)
+        public override List<SocialCharacterData> ReadFriends(string id, bool readById2, byte state, int skip, int limit)
         {
             List<SocialCharacterData> result = new List<SocialCharacterData>();
             List<string> characterIds = new List<string>();
-            ExecuteReaderSync((reader) =>
+            if (readById2)
             {
-                while (reader.Read())
+                ExecuteReaderSync((reader) =>
                 {
-                    characterIds.Add(reader.GetString(0));
-                }
-            }, "SELECT characterId2 FROM friend WHERE characterId1=@id1 AND state=@state LIMIT " + skip + ", " + limit,
-                new MySqlParameter("@id1", id1),
-                new MySqlParameter("@state", state));
+                    while (reader.Read())
+                    {
+                        characterIds.Add(reader.GetString(0));
+                    }
+                }, "SELECT characterId1 FROM friend WHERE characterId2=@id AND state=@state LIMIT " + skip + ", " + limit,
+                    new MySqlParameter("@id", id),
+                    new MySqlParameter("@state", (int)state));
+            }
+            else
+            {
+                ExecuteReaderSync((reader) =>
+                {
+                    while (reader.Read())
+                    {
+                        characterIds.Add(reader.GetString(0));
+                    }
+                }, "SELECT characterId2 FROM friend WHERE characterId1=@id AND state=@state LIMIT " + skip + ", " + limit,
+                    new MySqlParameter("@id", id),
+                    new MySqlParameter("@state", (int)state));
+            }
             SocialCharacterData socialCharacterData;
             foreach (string characterId in characterIds)
             {

@@ -26,7 +26,9 @@ namespace MultiplayerARPG.MMO
             }
             AsyncResponseData<SocialCharactersResp> resp = await DbServiceClient.FindCharactersAsync(new FindCharacterNameReq()
             {
-                CharacterName = request.characterName
+                CharacterName = request.characterName,
+                Skip = 0,
+                Limit = 50,
             });
             if (!resp.IsSuccess)
             {
@@ -58,7 +60,10 @@ namespace MultiplayerARPG.MMO
             AsyncResponseData<SocialCharactersResp> resp = await DbServiceClient.ReadFriendsAsync(new ReadFriendsReq()
             {
                 CharacterId = playerCharacter.Id,
+                ReadById2 = false,
                 State = 0,
+                Skip = 0,
+                Limit = 50,
             });
             if (!resp.IsSuccess)
             {
@@ -264,7 +269,10 @@ namespace MultiplayerARPG.MMO
             AsyncResponseData<SocialCharactersResp> resp = await DbServiceClient.ReadFriendsAsync(new ReadFriendsReq()
             {
                 CharacterId = playerCharacter.Id,
+                ReadById2 = true,
                 State = 1,
+                Skip = 0,
+                Limit = 50,
             });
             if (!resp.IsSuccess)
             {

@@ -407,7 +407,7 @@ namespace MultiplayerARPG.MMO
                 "(@characterId1, @characterId2, state)",
                 new SqliteParameter("@characterId1", id1),
                 new SqliteParameter("@characterId2", id2),
-                new SqliteParameter("@state", state));
+                new SqliteParameter("@state", (int)state));
         }
 
         public override void DeleteFriend(string id1, string id2)
@@ -419,19 +419,34 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@characterId2", id2));
         }
 
-        public override List<SocialCharacterData> ReadFriends(string id1, byte state, int skip, int limit)
+        public override List<SocialCharacterData> ReadFriends(string id, bool readById2, byte state, int skip, int limit)
         {
             List<SocialCharacterData> result = new List<SocialCharacterData>();
             List<string> characterIds = new List<string>();
-            ExecuteReader((reader) =>
+            if (readById2)
             {
-                while (reader.Read())
+                ExecuteReader((reader) =>
                 {
-                    characterIds.Add(reader.GetString(0));
-                }
-            }, "SELECT characterId2 FROM friend WHERE characterId1=@id1 AND state=@state LIMIT " + skip + ", " + limit,
-                new SqliteParameter("@id1", id1),
-                new SqliteParameter("@state", state));
+                    while (reader.Read())
+                    {
+                        characterIds.Add(reader.GetString(0));
+                    }
+                }, "SELECT characterId1 FROM friend WHERE characterId2=@id AND state=@state LIMIT " + skip + ", " + limit,
+                    new SqliteParameter("@id", id),
+                    new SqliteParameter("@state", (int)state));
+            }
+            else
+            {
+                ExecuteReader((reader) =>
+                {
+                    while (reader.Read())
+                    {
+                        characterIds.Add(reader.GetString(0));
+                    }
+                }, "SELECT characterId2 FROM friend WHERE characterId1=@id AND state=@state LIMIT " + skip + ", " + limit,
+                    new SqliteParameter("@id", id),
+                    new SqliteParameter("@state", (int)state));
+            }
             SocialCharacterData socialCharacterData;
             foreach (string characterId in characterIds)
             {
