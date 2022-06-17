@@ -50,7 +50,7 @@ namespace MultiplayerARPG.MMO
         public abstract List<CharacterBuff> GetSummonBuffs(string characterId);
         public abstract void SetSummonBuffs(string characterId, List<CharacterBuff> summonBuffs);
         public abstract long FindCharacterName(string characterName);
-        public abstract List<SocialCharacterData> FindCharacters(string characterName, int skip, int limit);
+        public abstract List<SocialCharacterData> FindCharacters(string finderId, string characterName, int skip, int limit);
         public abstract void CreateFriend(string id1, string id2, byte state);
         public abstract void DeleteFriend(string id1, string id2);
         public abstract List<SocialCharacterData> ReadFriends(string id, bool readById2, byte state, int skip, int limit);

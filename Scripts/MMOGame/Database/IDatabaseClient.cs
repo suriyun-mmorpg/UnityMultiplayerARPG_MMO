@@ -39,9 +39,9 @@ namespace MultiplayerARPG.MMO
 
         UniTask<AsyncResponseData<SocialCharactersResp>> FindCharactersAsync(FindCharacterNameReq request);
 
-        UniTask<AsyncResponseData<SocialCharactersResp>> CreateFriendAsync(CreateFriendReq request);
+        UniTask<AsyncResponseData<EmptyMessage>> CreateFriendAsync(CreateFriendReq request);
 
-        UniTask<AsyncResponseData<SocialCharactersResp>> DeleteFriendAsync(DeleteFriendReq request);
+        UniTask<AsyncResponseData<EmptyMessage>> DeleteFriendAsync(DeleteFriendReq request);
 
         UniTask<AsyncResponseData<SocialCharactersResp>> ReadFriendsAsync(ReadFriendsReq request);
 

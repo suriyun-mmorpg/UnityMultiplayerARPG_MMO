@@ -271,7 +271,7 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
             result.Invoke(AckResponseCode.Success, new SocialCharactersResp()
             {
-                List = Database.FindCharacters(request.CharacterName, request.Skip, request.Limit)
+                List = Database.FindCharacters(request.FinderId, request.CharacterName, request.Skip, request.Limit)
             });
             await UniTask.Yield();
 #endif

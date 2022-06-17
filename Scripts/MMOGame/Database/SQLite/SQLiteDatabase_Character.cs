@@ -378,8 +378,18 @@ namespace MultiplayerARPG.MMO
             return result != null ? (string)result : string.Empty;
         }
 
-        public override List<SocialCharacterData> FindCharacters(string characterName, int skip, int limit)
+        public override List<SocialCharacterData> FindCharacters(string finderId, string characterName, int skip, int limit)
         {
+            string excludeIdsQuery = "(id!='" + finderId + "'";
+            // Exclude friend, requested characters
+            ExecuteReader((reader) =>
+            {
+                while (reader.Read())
+                {
+                    excludeIdsQuery += " AND id!='" + reader.GetString(0) + "'";
+                }
+            }, "SELECT characterId2 FROM friend WHERE characterId1='" + finderId + "'");
+            excludeIdsQuery += ")";
             List<SocialCharacterData> result = new List<SocialCharacterData>();
             ExecuteReader((reader) =>
             {
@@ -394,7 +404,7 @@ namespace MultiplayerARPG.MMO
                     socialCharacterData.level = reader.GetInt16(3);
                     result.Add(socialCharacterData);
                 }
-            }, "SELECT id, dataId, characterName, level FROM characters WHERE characterName LIKE @characterName LIMIT " + skip + ", " + limit,
+            }, "SELECT id, dataId, characterName, level FROM characters WHERE characterName LIKE @characterName AND " + excludeIdsQuery + " LIMIT " + skip + ", " + limit,
                 new SqliteParameter("@characterName", "%" + characterName + "%"));
             return result;
         }
@@ -404,7 +414,7 @@ namespace MultiplayerARPG.MMO
             DeleteFriend(id1, id2);
             ExecuteNonQuery("INSERT INTO friend " +
                 "(characterId1, characterId2, state) VALUES " +
-                "(@characterId1, @characterId2, state)",
+                "(@characterId1, @characterId2, @state)",
                 new SqliteParameter("@characterId1", id1),
                 new SqliteParameter("@characterId2", id2),
                 new SqliteParameter("@state", (int)state));
@@ -431,9 +441,8 @@ namespace MultiplayerARPG.MMO
                     {
                         characterIds.Add(reader.GetString(0));
                     }
-                }, "SELECT characterId1 FROM friend WHERE characterId2=@id AND state=@state LIMIT " + skip + ", " + limit,
-                    new SqliteParameter("@id", id),
-                    new SqliteParameter("@state", (int)state));
+                }, "SELECT characterId1 FROM friend WHERE characterId2=@id AND state=" + state + " LIMIT " + skip + ", " + limit,
+                    new SqliteParameter("@id", id));
             }
             else
             {
@@ -443,9 +452,8 @@ namespace MultiplayerARPG.MMO
                     {
                         characterIds.Add(reader.GetString(0));
                     }
-                }, "SELECT characterId2 FROM friend WHERE characterId1=@id AND state=@state LIMIT " + skip + ", " + limit,
-                    new SqliteParameter("@id", id),
-                    new SqliteParameter("@state", (int)state));
+                }, "SELECT characterId2 FROM friend WHERE characterId1=@id AND state=" + state + " LIMIT " + skip + ", " + limit,
+                    new SqliteParameter("@id", id));
             }
             SocialCharacterData socialCharacterData;
             foreach (string characterId in characterIds)

@@ -141,17 +141,17 @@ namespace MultiplayerARPG.MMO
             return resp;
         }
 
-        public async UniTask<AsyncResponseData<SocialCharactersResp>> CreateFriendAsync(CreateFriendReq request)
+        public async UniTask<AsyncResponseData<EmptyMessage>> CreateFriendAsync(CreateFriendReq request)
         {
-            var resp = await Client.SendRequestAsync<CreateFriendReq, SocialCharactersResp>(DatabaseRequestTypes.RequestCreateFriend, request);
+            var resp = await Client.SendRequestAsync<CreateFriendReq, EmptyMessage>(DatabaseRequestTypes.RequestCreateFriend, request);
             if (!resp.IsSuccess)
                 Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(CreateFriendAsync)} status: {resp.ResponseCode}");
             return resp;
         }
 
-        public async UniTask<AsyncResponseData<SocialCharactersResp>> DeleteFriendAsync(DeleteFriendReq request)
+        public async UniTask<AsyncResponseData<EmptyMessage>> DeleteFriendAsync(DeleteFriendReq request)
         {
-            var resp = await Client.SendRequestAsync<DeleteFriendReq, SocialCharactersResp>(DatabaseRequestTypes.RequestDeleteFriend, request);
+            var resp = await Client.SendRequestAsync<DeleteFriendReq, EmptyMessage>(DatabaseRequestTypes.RequestDeleteFriend, request);
             if (!resp.IsSuccess)
                 Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(DeleteFriendAsync)} status: {resp.ResponseCode}");
             return resp;

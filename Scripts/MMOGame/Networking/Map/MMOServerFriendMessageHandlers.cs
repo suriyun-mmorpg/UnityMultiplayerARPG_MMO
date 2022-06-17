@@ -16,7 +16,8 @@ namespace MultiplayerARPG.MMO
         public async UniTaskVoid HandleRequestFindCharacters(RequestHandlerData requestHandler, RequestFindCharactersMessage request, RequestProceedResultDelegate<ResponseSocialCharacterListMessage> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out _))
+            IPlayerCharacterData playerCharacter;
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
                 result.InvokeError(new ResponseSocialCharacterListMessage()
                 {
@@ -26,6 +27,7 @@ namespace MultiplayerARPG.MMO
             }
             AsyncResponseData<SocialCharactersResp> resp = await DbServiceClient.FindCharactersAsync(new FindCharacterNameReq()
             {
+                FinderId = playerCharacter.Id,
                 CharacterName = request.characterName,
                 Skip = 0,
                 Limit = 50,
@@ -92,7 +94,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            AsyncResponseData<SocialCharactersResp> resp = await DbServiceClient.CreateFriendAsync(new CreateFriendReq()
+            AsyncResponseData<EmptyMessage> resp = await DbServiceClient.CreateFriendAsync(new CreateFriendReq()
             {
                 Character1Id = playerCharacter.Id,
                 Character2Id = request.friendId,
@@ -106,7 +108,6 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            GameInstance.ServerGameMessageHandlers.SendSetFriends(requestHandler.ConnectionId, resp.Response.List);
             result.InvokeSuccess(new ResponseAddFriendMessage()
             {
                 message = UITextKeys.UI_FRIEND_ADDED,
@@ -126,7 +127,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            AsyncResponseData<SocialCharactersResp> resp = await DbServiceClient.DeleteFriendAsync(new DeleteFriendReq()
+            AsyncResponseData<EmptyMessage> resp = await DbServiceClient.DeleteFriendAsync(new DeleteFriendReq()
             {
                 Character1Id = playerCharacter.Id,
                 Character2Id = request.friendId,
@@ -139,7 +140,6 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            GameInstance.ServerGameMessageHandlers.SendSetFriends(requestHandler.ConnectionId, resp.Response.List);
             result.InvokeSuccess(new ResponseRemoveFriendMessage()
             {
                 message = UITextKeys.UI_FRIEND_REMOVED,
@@ -159,7 +159,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            AsyncResponseData<SocialCharactersResp> resp = await DbServiceClient.CreateFriendAsync(new CreateFriendReq()
+            AsyncResponseData<EmptyMessage> resp = await DbServiceClient.CreateFriendAsync(new CreateFriendReq()
             {
                 Character1Id = playerCharacter.Id,
                 Character2Id = request.requesteeId,
@@ -173,7 +173,6 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            GameInstance.ServerGameMessageHandlers.SendSetFriends(requestHandler.ConnectionId, resp.Response.List);
             result.InvokeSuccess(new ResponseSendFriendRequestMessage()
             {
                 message = UITextKeys.UI_FRIEND_REQUESTED,
@@ -193,13 +192,13 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            AsyncResponseData<SocialCharactersResp> resp1 = await DbServiceClient.CreateFriendAsync(new CreateFriendReq()
+            AsyncResponseData<EmptyMessage> resp1 = await DbServiceClient.CreateFriendAsync(new CreateFriendReq()
             {
                 Character1Id = playerCharacter.Id,
                 Character2Id = request.requesterId,
                 State = 0,
             });
-            AsyncResponseData<SocialCharactersResp> resp2 = await DbServiceClient.CreateFriendAsync(new CreateFriendReq()
+            AsyncResponseData<EmptyMessage> resp2 = await DbServiceClient.CreateFriendAsync(new CreateFriendReq()
             {
                 Character1Id = request.requesterId,
                 Character2Id = playerCharacter.Id,
@@ -213,7 +212,6 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            GameInstance.ServerGameMessageHandlers.SendSetFriends(requestHandler.ConnectionId, resp1.Response.List);
             result.InvokeSuccess(new ResponseAcceptFriendRequestMessage()
             {
                 message = UITextKeys.UI_FRIEND_REQUEST_ACCEPTED,
@@ -233,7 +231,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            AsyncResponseData<SocialCharactersResp> resp = await DbServiceClient.DeleteFriendAsync(new DeleteFriendReq()
+            AsyncResponseData<EmptyMessage> resp = await DbServiceClient.DeleteFriendAsync(new DeleteFriendReq()
             {
                 Character1Id = playerCharacter.Id,
                 Character2Id = request.requesterId,
@@ -246,7 +244,6 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            GameInstance.ServerGameMessageHandlers.SendSetFriends(requestHandler.ConnectionId, resp.Response.List);
             result.InvokeSuccess(new ResponseDeclineFriendRequestMessage()
             {
                 message = UITextKeys.UI_FRIEND_REQUEST_DECLINED,
