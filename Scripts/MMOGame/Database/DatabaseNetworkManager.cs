@@ -90,6 +90,7 @@ namespace MultiplayerARPG.MMO
             RegisterRequestToServer<CreateFriendReq, EmptyMessage>(DatabaseRequestTypes.RequestCreateFriend, CreateFriend);
             RegisterRequestToServer<DeleteFriendReq, EmptyMessage>(DatabaseRequestTypes.RequestDeleteFriend, DeleteFriend);
             RegisterRequestToServer<ReadFriendsReq, SocialCharactersResp>(DatabaseRequestTypes.RequestReadFriends, ReadFriends);
+            RegisterRequestToServer<GetFriendRequestNotificationReq, GetFriendRequestNotificationResp>(DatabaseRequestTypes.RequestGetFriendRequestNotification, GetFriendRequestNotification);
             RegisterRequestToServer<CreateBuildingReq, BuildingResp>(DatabaseRequestTypes.RequestCreateBuilding, CreateBuilding);
             RegisterRequestToServer<UpdateBuildingReq, BuildingResp>(DatabaseRequestTypes.RequestUpdateBuilding, UpdateBuilding);
             RegisterRequestToServer<DeleteBuildingReq, EmptyMessage>(DatabaseRequestTypes.RequestDeleteBuilding, DeleteBuilding);
