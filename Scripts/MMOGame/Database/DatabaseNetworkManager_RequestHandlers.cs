@@ -1349,12 +1349,12 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        protected async UniTaskVoid GetMailNotificationCount(RequestHandlerData requestHandler, GetMailNotificationCountReq request, RequestProceedResultDelegate<GetMailNotificationCountResp> result)
+        protected async UniTaskVoid GetMailNotification(RequestHandlerData requestHandler, GetMailNotificationReq request, RequestProceedResultDelegate<GetMailNotificationResp> result)
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-            result.Invoke(AckResponseCode.Success, new GetMailNotificationCountResp()
+            result.Invoke(AckResponseCode.Success, new GetMailNotificationResp()
             {
-                NotificationCount = Database.GetMailNotificationCount(request.UserId),
+                NotificationCount = Database.GetMailNotification(request.UserId),
             });
             await UniTask.Yield();
 #endif
@@ -1464,6 +1464,17 @@ namespace MultiplayerARPG.MMO
             result.Invoke(AckResponseCode.Success, new ValidateEmailVerificationResp()
             {
                 IsPass = isPass
+            });
+            await UniTask.Yield();
+#endif
+        }
+
+        protected async UniTaskVoid GetFriendRequestNotification(RequestHandlerData requestHandler, GetFriendRequestNotificationReq request, RequestProceedResultDelegate<GetFriendRequestNotificationResp> result)
+        {
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            result.Invoke(AckResponseCode.Success, new GetFriendRequestNotificationResp()
+            {
+                NotificationCount = Database.GetFriendRequestNotification(request.CharacterId),
             });
             await UniTask.Yield();
 #endif

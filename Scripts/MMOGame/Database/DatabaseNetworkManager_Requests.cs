@@ -501,11 +501,11 @@ namespace MultiplayerARPG.MMO
             return resp;
         }
 
-        public async UniTask<AsyncResponseData<GetMailNotificationCountResp>> GetMailsCountAsync(GetMailNotificationCountReq request)
+        public async UniTask<AsyncResponseData<GetMailNotificationResp>> GetMailNotificationAsync(GetMailNotificationReq request)
         {
-            var resp = await Client.SendRequestAsync<GetMailNotificationCountReq, GetMailNotificationCountResp>(DatabaseRequestTypes.RequestGetMailNotificationCount, request);
+            var resp = await Client.SendRequestAsync<GetMailNotificationReq, GetMailNotificationResp>(DatabaseRequestTypes.RequestGetMailNotification, request);
             if (!resp.IsSuccess)
-                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(GetMailsCountAsync)} status: {resp.ResponseCode}");
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(GetMailNotificationAsync)} status: {resp.ResponseCode}");
             return resp;
         }
 
@@ -562,6 +562,14 @@ namespace MultiplayerARPG.MMO
             var resp = await Client.SendRequestAsync<FindEmailReq, FindEmailResp>(DatabaseRequestTypes.RequestFindEmail, request);
             if (!resp.IsSuccess)
                 Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(FindEmailAsync)} status: {resp.ResponseCode}");
+            return resp;
+        }
+
+        public async UniTask<AsyncResponseData<GetFriendRequestNotificationResp>> GetFriendRequestNotificationAsync(GetFriendRequestNotificationReq request)
+        {
+            var resp = await Client.SendRequestAsync<GetFriendRequestNotificationReq, GetFriendRequestNotificationResp>(DatabaseRequestTypes.RequestGetFriendRequestNotification, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(GetFriendRequestNotificationAsync)} status: {resp.ResponseCode}");
             return resp;
         }
     }

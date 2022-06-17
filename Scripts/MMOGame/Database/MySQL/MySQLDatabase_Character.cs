@@ -687,6 +687,13 @@ namespace MultiplayerARPG.MMO
             }
             return result;
         }
+
+        public override int GetFriendRequestNotification(string userId)
+        {
+            object result = ExecuteScalar("SELECT COUNT(*) FROM friend WHERE characterId2=@userId AND state=1",
+                new MySqlParameter("@userId", userId));
+            return (int)(long)result;
+        }
     }
 }
 #endif

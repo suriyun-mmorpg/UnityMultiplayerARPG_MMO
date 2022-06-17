@@ -2,18 +2,18 @@
 
 namespace MultiplayerARPG.MMO
 {
-    public struct GetMailNotificationCountReq : INetSerializable
+    public struct GetFriendRequestNotificationResp : INetSerializable
     {
-        public string UserId { get; set; }
+        public int NotificationCount { get; set; }
 
         public void Deserialize(NetDataReader reader)
         {
-            UserId = reader.GetString();
+            NotificationCount = reader.GetInt();
         }
 
         public void Serialize(NetDataWriter writer)
         {
-            writer.Put(UserId);
+            writer.Put(NotificationCount);
         }
     }
 }

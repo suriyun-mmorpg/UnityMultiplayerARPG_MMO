@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG.MMO
 {
-    public struct GetMailNotificationCountResp : INetSerializable
+    public struct GetMailNotificationResp : INetSerializable
     {
         public int NotificationCount { get; set; }
 

@@ -288,7 +288,23 @@ namespace MultiplayerARPG.MMO
 
         public async UniTaskVoid HandleRequestFriendRequestNotification(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<ResponseFriendRequestNotificationMessage> result)
         {
-            throw new System.NotImplementedException();
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            int notificationCount = 0;
+            IPlayerCharacterData playerCharacter;
+            if (GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            {
+                AsyncResponseData<GetFriendRequestNotificationResp> resp = await DbServiceClient.GetFriendRequestNotificationAsync(new GetFriendRequestNotificationReq()
+                {
+                    CharacterId = playerCharacter.Id,
+                });
+                if (resp.IsSuccess)
+                    notificationCount = resp.Response.NotificationCount;
+            }
+            result.Invoke(AckResponseCode.Success, new ResponseFriendRequestNotificationMessage()
+            {
+                notificationCount = notificationCount,
+            });
+#endif
         }
     }
 }

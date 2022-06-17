@@ -289,7 +289,7 @@ namespace MultiplayerARPG.MMO
             string userId;
             if (GameInstance.ServerUserHandlers.TryGetUserId(requestHandler.ConnectionId, out userId))
             {
-                AsyncResponseData<GetMailNotificationCountResp> resp = await DbServiceClient.GetMailsCountAsync(new GetMailNotificationCountReq()
+                AsyncResponseData<GetMailNotificationResp> resp = await DbServiceClient.GetMailNotificationAsync(new GetMailNotificationReq()
                 {
                     UserId = userId,
                 });

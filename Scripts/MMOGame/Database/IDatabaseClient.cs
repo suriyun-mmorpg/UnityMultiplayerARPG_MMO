@@ -129,7 +129,7 @@ namespace MultiplayerARPG.MMO
 
         UniTask<AsyncResponseData<GetUserIdByCharacterNameResp>> GetUserIdByCharacterNameAsync(GetUserIdByCharacterNameReq request);
 
-        UniTask<AsyncResponseData<GetMailNotificationCountResp>> GetMailsCountAsync(GetMailNotificationCountReq request);
+        UniTask<AsyncResponseData<GetMailNotificationResp>> GetMailNotificationAsync(GetMailNotificationReq request);
 
         UniTask<AsyncResponseData<GetUserUnbanTimeResp>> GetUserUnbanTimeAsync(GetUserUnbanTimeReq request);
 
@@ -144,5 +144,7 @@ namespace MultiplayerARPG.MMO
         UniTask<AsyncResponseData<ValidateEmailVerificationResp>> ValidateEmailVerificationAsync(ValidateEmailVerificationReq request);
 
         UniTask<AsyncResponseData<FindEmailResp>> FindEmailAsync(FindEmailReq request);
+
+        UniTask<AsyncResponseData<GetFriendRequestNotificationResp>> GetFriendRequestNotificationAsync(GetFriendRequestNotificationReq request);
     }
 }

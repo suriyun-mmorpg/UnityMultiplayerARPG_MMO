@@ -138,7 +138,7 @@ namespace MultiplayerARPG.MMO
                     new SqliteParameter("@items", mail.WriteItems()));
         }
 
-        public override int GetMailNotificationCount(string userId)
+        public override int GetMailNotification(string userId)
         {
             int count = 0;
             ExecuteReader((reader) =>

@@ -66,7 +66,7 @@
         public const ushort RequestUpdateGuildOptions = 62;
         public const ushort RequestUpdateGuildAutoAcceptRequests = 67;
         public const ushort RequestUpdateGuildRank = 68;
-        public const ushort RequestGetMailNotificationCount = 69;
+        public const ushort RequestGetMailNotification = 69;
         public const ushort RequestGetUserUnbanTime = 70;
         public const ushort RequestSetUserUnbanTimeByCharacterName = 71;
         public const ushort RequestSetCharacterUnmuteTimeByName = 72;
@@ -74,5 +74,6 @@
         public const ushort RequestSetSummonBuffs = 74;
         public const ushort RequestValidateEmailVerification = 75;
         public const ushort RequestFindEmail = 76;
+        public const ushort RequestGetFriendRequestNotification = 77;
     }
 }
