@@ -285,5 +285,10 @@ namespace MultiplayerARPG.MMO
             });
 #endif
         }
+
+        public async UniTaskVoid HandleRequestFriendRequestNotification(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<ResponseFriendRequestNotificationMessage> result)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

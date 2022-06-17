@@ -900,5 +900,13 @@ namespace MultiplayerARPG.MMO
             await UniTask.Yield();
 #endif
         }
+
+        public async UniTaskVoid HandleRequestGuildRequestNotification(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<ResponseGuildRequestNotificationMessage> result)
+        {
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            result.Invoke(AckResponseCode.Unimplemented, new ResponseGuildRequestNotificationMessage());
+            await UniTask.Yield();
+#endif
+        }
     }
 }
