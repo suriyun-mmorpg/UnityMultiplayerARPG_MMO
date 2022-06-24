@@ -70,8 +70,8 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        private async UniTask SaveCharacter(BasePlayerCharacterEntity playerCharacterEntity, 
-            bool changeMap = false, string mapName = "", 
+        private async UniTask SaveCharacter(BasePlayerCharacterEntity playerCharacterEntity,
+            bool changeMap = false, string mapName = "",
             Vector3 position = new Vector3(), bool overrideRotation = false, Vector3 rotation = new Vector3())
         {
             PlayerCharacterData savingCharacterData = playerCharacterEntity.CloneTo(new PlayerCharacterData());
@@ -158,7 +158,7 @@ namespace MultiplayerARPG.MMO
                 // Update building
                 await DbServiceClient.UpdateBuildingAsync(new UpdateBuildingReq()
                 {
-                    MapName = Assets.onlineScene.SceneName,
+                    MapName = CurrentMapInfo.Id,
                     BuildingData = buildingSaveData,
                 });
                 savingBuildings.Remove(buildingSaveData.Id);
@@ -201,7 +201,7 @@ namespace MultiplayerARPG.MMO
             {
                 await DbServiceClient.CreateBuildingAsync(new CreateBuildingReq()
                 {
-                    MapName = Assets.onlineScene.SceneName,
+                    MapName = CurrentMapInfo.Id,
                     BuildingData = saveData,
                 });
             }
@@ -219,7 +219,7 @@ namespace MultiplayerARPG.MMO
         {
             await DbServiceClient.DeleteBuildingAsync(new DeleteBuildingReq()
             {
-                MapName = Assets.onlineScene.SceneName,
+                MapName = CurrentMapInfo.Id,
                 BuildingId = id
             });
         }
