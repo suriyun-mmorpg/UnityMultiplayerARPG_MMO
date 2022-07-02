@@ -1,10 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using System.Collections.Generic;
 
 namespace MultiplayerARPG.MMO
 {
-    public class ConfigReader : MonoBehaviour
+    public class ConfigReader
     {
         public static bool ReadConfigs(Dictionary<string, object> config, string configName, out string result, string defaultValue = null)
         {
