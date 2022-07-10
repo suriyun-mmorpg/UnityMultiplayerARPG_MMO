@@ -28,11 +28,10 @@ namespace MultiplayerARPG.MMO
             PlayerCharacterDataById.Clear();
             // Proceed response
             List<PlayerCharacterData> selectableCharacters = new List<PlayerCharacterData>();
-            if (!responseCode.ShowUnhandledResponseMessageDialog(response.message))
-            {
-                // Success, so set selectable characters by response's data
-                selectableCharacters = response.characters;
-            }
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.message))
+                return;
+            // Success, so set selectable characters by response's data
+            selectableCharacters = response.characters;
             // Show list of created characters
             for (int i = selectableCharacters.Count - 1; i >= 0; --i)
             {

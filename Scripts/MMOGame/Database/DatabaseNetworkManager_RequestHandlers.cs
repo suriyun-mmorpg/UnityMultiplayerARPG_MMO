@@ -195,9 +195,12 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
             List<PlayerCharacterData> characters = Database.ReadCharacters(request.UserId);
             // Read and cache character (or load from cache)
+            long lastUpdate;
             for (int i = 0; i < characters.Count; ++i)
             {
+                lastUpdate = characters[i].LastUpdate;
                 characters[i] = ReadCharacter(characters[i].Id);
+                characters[i].LastUpdate = lastUpdate;
             }
             result.Invoke(AckResponseCode.Success, new CharactersResp()
             {
