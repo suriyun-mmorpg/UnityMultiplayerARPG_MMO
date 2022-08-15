@@ -116,7 +116,7 @@ namespace MultiplayerARPG.MMO
                     AsyncResponseData<CashResp> changeCashResp = await DbServiceClient.ChangeCashAsync(new ChangeCashReq()
                     {
                         UserId = playerCharacter.UserId,
-                        ChangeAmount = -mail.Cash
+                        ChangeAmount = mail.Cash
                     });
                     if (!changeCashResp.IsSuccess)
                         return UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR;
