@@ -341,7 +341,7 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        private void HandleUpdatePartyMember(MessageHandlerData messageHandler)
+        public void HandleUpdatePartyMember(MessageHandlerData messageHandler)
         {
             long connectionId = messageHandler.ConnectionId;
             UpdateSocialMemberMessage message = messageHandler.ReadMessage<UpdateSocialMemberMessage>();
@@ -357,7 +357,7 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        private void HandleUpdateParty(MessageHandlerData messageHandler)
+        public void HandleUpdateParty(MessageHandlerData messageHandler)
         {
             long connectionId = messageHandler.ConnectionId;
             UpdatePartyMessage message = messageHandler.ReadMessage<UpdatePartyMessage>();
@@ -373,7 +373,7 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        private void HandleUpdateGuildMember(MessageHandlerData messageHandler)
+        public void HandleUpdateGuildMember(MessageHandlerData messageHandler)
         {
             long connectionId = messageHandler.ConnectionId;
             UpdateSocialMemberMessage message = messageHandler.ReadMessage<UpdateSocialMemberMessage>();
@@ -389,7 +389,7 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        private void HandleUpdateGuild(MessageHandlerData messageHandler)
+        public void HandleUpdateGuild(MessageHandlerData messageHandler)
         {
             long connectionId = messageHandler.ConnectionId;
             UpdateGuildMessage message = messageHandler.ReadMessage<UpdateGuildMessage>();
@@ -405,7 +405,7 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        private void UpdateMapUser(UpdateUserCharacterMessage.UpdateType updateType, SocialCharacterData userData, long exceptConnectionId)
+        public void UpdateMapUser(UpdateUserCharacterMessage.UpdateType updateType, SocialCharacterData userData, long exceptConnectionId)
         {
             foreach (long mapServerConnectionId in MapServerPeers.Keys)
             {
@@ -418,12 +418,22 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        private void UpdateMapUser(long connectionId, UpdateUserCharacterMessage.UpdateType updateType, SocialCharacterData userData)
+        public void UpdateMapUser(long connectionId, UpdateUserCharacterMessage.UpdateType updateType, SocialCharacterData userData)
         {
             UpdateUserCharacterMessage message = new UpdateUserCharacterMessage();
             message.type = updateType;
             message.character = userData;
             SendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.UpdateMapUser, (writer) => writer.PutValue(message));
+        }
+#endif
+
+#if UNITY_STANDALONE && !CLIENT_BUILD
+        public void KickUser(string userId)
+        {
+            foreach (long connectionId in MapServerPeers.Keys)
+            {
+                SendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.KickUser, (writer) => writer.Put(userId));
+            }
         }
 #endif
 

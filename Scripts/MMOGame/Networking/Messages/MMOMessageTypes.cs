@@ -11,5 +11,6 @@
         public const ushort UpdateParty = 7;
         public const ushort UpdateGuildMember = 8;
         public const ushort UpdateGuild = 9;
+        public const ushort KickUser = 10;
     }
 }

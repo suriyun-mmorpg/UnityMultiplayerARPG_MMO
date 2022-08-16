@@ -21,6 +21,7 @@ namespace MultiplayerARPG.MMO
             RegisterResponseHandler<RequestAppServerRegisterMessage, ResponseAppServerRegisterMessage>(MMORequestTypes.RequestAppServerRegister, HandleResponseAppServerRegister);
             RegisterResponseHandler<RequestAppServerAddressMessage, ResponseAppServerAddressMessage>(MMORequestTypes.RequestAppServerAddress, HandleResponseAppServerAddress);
             RegisterMessageHandler(MMOMessageTypes.AppServerAddress, HandleAppServerAddress);
+            RegisterMessageHandler(MMOMessageTypes.KickUser, HandleKickUser);
 #endif
         }
 
@@ -177,6 +178,15 @@ namespace MultiplayerARPG.MMO
             ResponseAppServerAddressMessage response = messageHandler.ReadMessage<ResponseAppServerAddressMessage>();
             if (onResponseAppServerAddress != null)
                 onResponseAppServerAddress.Invoke(AckResponseCode.Success, response.peerInfo);
+        }
+#endif
+
+#if UNITY_STANDALONE && !CLIENT_BUILD
+        private void HandleKickUser(MessageHandlerData messageHandler)
+        {
+            string kickUserId = messageHandler.Reader.GetString();
+            if (appServer is MapNetworkManager)
+                (appServer as MapNetworkManager).KickUserById(kickUserId);
         }
 #endif
     }

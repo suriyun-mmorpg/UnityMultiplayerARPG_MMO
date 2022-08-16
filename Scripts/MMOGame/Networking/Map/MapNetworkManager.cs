@@ -99,6 +99,7 @@ namespace MultiplayerARPG.MMO
         private readonly ConcurrentDictionary<string, SocialCharacterData> usersById = new ConcurrentDictionary<string, SocialCharacterData>();
         private readonly ConcurrentDictionary<string, CancellationTokenSource> despawningPlayerCharacterCancellations = new ConcurrentDictionary<string, CancellationTokenSource>();
         private readonly ConcurrentDictionary<string, BasePlayerCharacterEntity> despawningPlayerCharacterEntities = new ConcurrentDictionary<string, BasePlayerCharacterEntity>();
+        private readonly ConcurrentDictionary<string, long> connectionsByUserId = new ConcurrentDictionary<string, long>();
         // Database operations
         private readonly HashSet<StorageId> loadingStorageIds = new HashSet<StorageId>();
         private readonly HashSet<int> loadingPartyIds = new HashSet<int>();
@@ -226,6 +227,7 @@ namespace MultiplayerARPG.MMO
             loadingGuildIds.Clear();
             savingCharacters.Clear();
             savingBuildings.Clear();
+            connectionsByUserId.Clear();
 #endif
         }
 
@@ -319,6 +321,25 @@ namespace MultiplayerARPG.MMO
                     UpdateMapUser(ClusterClient, UpdateUserCharacterMessage.UpdateType.Remove, userData);
             }
             base.UnregisterPlayerCharacter(connectionId);
+        }
+#endif
+
+#if UNITY_STANDALONE && !CLIENT_BUILD
+        public override void RegisterUserId(long connectionId, string userId)
+        {
+            base.RegisterUserId(connectionId, userId);
+            connectionsByUserId.TryRemove(userId, out _);
+            connectionsByUserId.TryAdd(userId, connectionId);
+        }
+#endif
+
+#if UNITY_STANDALONE && !CLIENT_BUILD
+        public override void UnregisterUserId(long connectionId)
+        {
+            string userId;
+            if (ServerUserHandlers.TryGetUserId(connectionId, out userId))
+                connectionsByUserId.TryRemove(userId, out _);
+            base.UnregisterUserId(connectionId);
         }
 #endif
 
@@ -1169,5 +1190,14 @@ namespace MultiplayerARPG.MMO
 #endif
         }
         #endregion
+
+        public void KickUserById(string userId)
+        {
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            long connectionId;
+            if (connectionsByUserId.TryGetValue(userId, out connectionId))
+                ServerTransport.ServerDisconnect(connectionId);
+#endif
+        }
     }
 }
