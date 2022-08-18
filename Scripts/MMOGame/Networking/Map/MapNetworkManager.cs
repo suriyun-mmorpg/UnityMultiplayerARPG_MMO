@@ -383,7 +383,7 @@ namespace MultiplayerARPG.MMO
                 UnregisterUserId(connectionId);
                 try
                 {
-                    if (IsInstanceMap())
+                    if (!IsInstanceMap())
                         await UniTask.Delay(playerCharacterDespawnMillisecondsDelay, true, PlayerLoopTiming.Update, cancellationTokenSource.Token);
                     // Save character again before despawned (it may attacked by other characters)
                     while (savingCharacters.Contains(id))
@@ -771,11 +771,15 @@ namespace MultiplayerARPG.MMO
                         playerCharacterEntity.CallAllOnDead();
                     }
 
-                    // Register player character entity to the server
-                    RegisterPlayerCharacter(connectionId, playerCharacterEntity);
+                    // Make sure that player does not exit before character data loaded
+                    if (ContainsConnectionId(connectionId))
+                    {
+                        // Register player character entity to the server
+                        RegisterPlayerCharacter(connectionId, playerCharacterEntity);
 
-                    // Don't destroy player character entity when disconnect
-                    playerCharacterEntity.Identity.DoNotDestroyWhenDisconnect = true;
+                        // Don't destroy player character entity when disconnect
+                        playerCharacterEntity.Identity.DoNotDestroyWhenDisconnect = true;
+                    }
 
                     // Prepare saving location for this character
                     if (IsInstanceMap())
