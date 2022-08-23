@@ -803,10 +803,20 @@ namespace MultiplayerARPG.MMO
         protected override void HandleChatAtServer(MessageHandlerData messageHandler)
         {
             ChatMessage message = messageHandler.ReadMessage<ChatMessage>().FillChannelId();
-            // Check muting character
+            // Get character
             IPlayerCharacterData playerCharacter = null;
             if (!string.IsNullOrEmpty(message.sender))
                 ServerUserHandlers.TryGetPlayerCharacterByName(message.sender, out playerCharacter);
+            // Set guild data
+            if (playerCharacter != null)
+            {
+                if (ServerGuildHandlers.TryGetGuild(playerCharacter.GuildId, out GuildData guildData))
+                {
+                    message.guildId = playerCharacter.GuildId;
+                    message.guildName = guildData.guildName;
+                }
+            }
+            // Character muted?
             if (!message.sendByServer && playerCharacter != null && playerCharacter.IsMuting())
             {
                 long connectionId;
