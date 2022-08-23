@@ -412,6 +412,14 @@ namespace MultiplayerARPG.MMO
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             PartyData party = ReadParty(request.PartyId);
+            if (party == null)
+            {
+                result.Invoke(AckResponseCode.Error, new PartyResp()
+                {
+                    PartyData = null
+                });
+                return;
+            }
             // Update to cache
             party.Setting(request.ShareExp, request.ShareItem);
             cachedParty[request.PartyId] = party;
@@ -429,6 +437,14 @@ namespace MultiplayerARPG.MMO
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             PartyData party = ReadParty(request.PartyId);
+            if (party == null)
+            {
+                result.Invoke(AckResponseCode.Error, new PartyResp()
+                {
+                    PartyData = null
+                });
+                return;
+            }
             // Update to cache
             party.SetLeader(request.LeaderCharacterId);
             cachedParty[request.PartyId] = party;
@@ -455,6 +471,14 @@ namespace MultiplayerARPG.MMO
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             PartyData party = ReadParty(request.PartyId);
+            if (party == null)
+            {
+                result.Invoke(AckResponseCode.Error, new PartyResp()
+                {
+                    PartyData = null
+                });
+                return;
+            }
             // Update to cache
             SocialCharacterData character = request.SocialCharacterData;
             party.AddMember(character);
@@ -482,6 +506,11 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             PartyData party = ReadParty(character.PartyId);
+            if (party == null)
+            {
+                result.Invoke(AckResponseCode.Success, EmptyMessage.Value);
+                return;
+            }
             // Update to cache
             party.RemoveMember(request.CharacterId);
             cachedParty[character.PartyId] = party;
@@ -526,6 +555,14 @@ namespace MultiplayerARPG.MMO
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             GuildData guild = ReadGuild(request.GuildId);
+            if (guild == null)
+            {
+                result.Invoke(AckResponseCode.Error, new GuildResp()
+                {
+                    GuildData = null
+                });
+                return;
+            }
             // Update to cache
             guild.SetLeader(request.LeaderCharacterId);
             cachedGuild[request.GuildId] = guild;
@@ -543,6 +580,14 @@ namespace MultiplayerARPG.MMO
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             GuildData guild = ReadGuild(request.GuildId);
+            if (guild == null)
+            {
+                result.Invoke(AckResponseCode.Error, new GuildResp()
+                {
+                    GuildData = null
+                });
+                return;
+            }
             // Update to cache
             guild.guildMessage = request.GuildMessage;
             cachedGuild[request.GuildId] = guild;
@@ -560,6 +605,14 @@ namespace MultiplayerARPG.MMO
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             GuildData guild = ReadGuild(request.GuildId);
+            if (guild == null)
+            {
+                result.Invoke(AckResponseCode.Error, new GuildResp()
+                {
+                    GuildData = null
+                });
+                return;
+            }
             // Update to cache
             guild.guildMessage2 = request.GuildMessage;
             cachedGuild[request.GuildId] = guild;
@@ -577,6 +630,14 @@ namespace MultiplayerARPG.MMO
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             GuildData guild = ReadGuild(request.GuildId);
+            if (guild == null)
+            {
+                result.Invoke(AckResponseCode.Error, new GuildResp()
+                {
+                    GuildData = null
+                });
+                return;
+            }
             // Update to cache
             guild.score = request.Score;
             cachedGuild[request.GuildId] = guild;
@@ -594,6 +655,14 @@ namespace MultiplayerARPG.MMO
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             GuildData guild = ReadGuild(request.GuildId);
+            if (guild == null)
+            {
+                result.Invoke(AckResponseCode.Error, new GuildResp()
+                {
+                    GuildData = null
+                });
+                return;
+            }
             // Update to cache
             guild.options = request.Options;
             cachedGuild[request.GuildId] = guild;
@@ -611,6 +680,14 @@ namespace MultiplayerARPG.MMO
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             GuildData guild = ReadGuild(request.GuildId);
+            if (guild == null)
+            {
+                result.Invoke(AckResponseCode.Error, new GuildResp()
+                {
+                    GuildData = null
+                });
+                return;
+            }
             // Update to cache
             guild.autoAcceptRequests = request.AutoAcceptRequests;
             cachedGuild[request.GuildId] = guild;
@@ -628,6 +705,14 @@ namespace MultiplayerARPG.MMO
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             GuildData guild = ReadGuild(request.GuildId);
+            if (guild == null)
+            {
+                result.Invoke(AckResponseCode.Error, new GuildResp()
+                {
+                    GuildData = null
+                });
+                return;
+            }
             // Update to cache
             guild.score = request.Rank;
             cachedGuild[request.GuildId] = guild;
@@ -645,6 +730,14 @@ namespace MultiplayerARPG.MMO
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             GuildData guild = ReadGuild(request.GuildId);
+            if (guild == null)
+            {
+                result.Invoke(AckResponseCode.Error, new GuildResp()
+                {
+                    GuildData = null
+                });
+                return;
+            }
             // Update to cache
             guild.SetRole(request.GuildRole, request.RoleName, request.CanInvite, request.CanKick, request.ShareExpPercentage);
             cachedGuild[request.GuildId] = guild;
@@ -662,6 +755,14 @@ namespace MultiplayerARPG.MMO
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             GuildData guild = ReadGuild(request.GuildId);
+            if (guild == null)
+            {
+                result.Invoke(AckResponseCode.Error, new GuildResp()
+                {
+                    GuildData = null
+                });
+                return;
+            }
             // Update to cache
             guild.SetMemberRole(request.MemberCharacterId, request.GuildRole);
             cachedGuild[request.GuildId] = guild;
@@ -696,6 +797,14 @@ namespace MultiplayerARPG.MMO
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             GuildData guild = ReadGuild(request.GuildId);
+            if (guild == null)
+            {
+                result.Invoke(AckResponseCode.Error, new GuildResp()
+                {
+                    GuildData = null
+                });
+                return;
+            }
             // Update to cache
             SocialCharacterData character = request.SocialCharacterData;
             guild.AddMember(character, request.GuildRole);
@@ -723,6 +832,11 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             GuildData guild = ReadGuild(character.GuildId);
+            if (guild == null)
+            {
+                result.Invoke(AckResponseCode.Success, EmptyMessage.Value);
+                return;
+            }
             // Update to cache
             guild.RemoveMember(request.CharacterId);
             cachedGuild[character.GuildId] = guild;
@@ -780,6 +894,14 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
             // TODO: May validate guild by character
             GuildData guild = ReadGuild(request.GuildId);
+            if (guild == null)
+            {
+                result.Invoke(AckResponseCode.Error, new GuildResp()
+                {
+                    GuildData = null
+                });
+                return;
+            }
             await UniTask.SwitchToMainThread();
             guild = GameInstance.Singleton.SocialSystemSetting.IncreaseGuildExp(guild, request.Exp);
             // Update to cache
@@ -799,6 +921,14 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
             // TODO: May validate guild by character
             GuildData guild = ReadGuild(request.GuildId);
+            if (guild == null)
+            {
+                result.Invoke(AckResponseCode.Error, new GuildResp()
+                {
+                    GuildData = null
+                });
+                return;
+            }
             await UniTask.SwitchToMainThread();
             if (!guild.IsSkillReachedMaxLevel(request.SkillId) && guild.skillPoint > 0)
             {
@@ -820,6 +950,14 @@ namespace MultiplayerARPG.MMO
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             GuildData guild = ReadGuild(request.GuildId);
+            if (guild == null)
+            {
+                result.Invoke(AckResponseCode.Error, new GuildGoldResp()
+                {
+                    GuildGold = 0
+                });
+                return;
+            }
             result.Invoke(AckResponseCode.Success, new GuildGoldResp()
             {
                 GuildGold = guild.gold
@@ -832,6 +970,14 @@ namespace MultiplayerARPG.MMO
         {
 #if UNITY_STANDALONE && !CLIENT_BUILD
             GuildData guild = ReadGuild(request.GuildId);
+            if (guild == null)
+            {
+                result.Invoke(AckResponseCode.Error, new GuildGoldResp()
+                {
+                    GuildGold = 0
+                });
+                return;
+            }
             // Update to cache
             guild.gold += request.ChangeAmount;
             cachedGuild[request.GuildId] = guild;
