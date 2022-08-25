@@ -29,9 +29,14 @@ namespace MultiplayerARPG.MMO
         public bool requireEmail = false;
         public bool requireEmailVerification = false;
 
+        [Header("Statistic")]
+        public float updateUserCountInterval = 5f;
+
         public System.Action onClientConnected;
         public System.Action<DisconnectInfo> onClientDisconnected;
         public System.Action onClientStopped;
+
+        private float lastUserCountUpdateTime = float.MinValue;
 
 #if UNITY_STANDALONE && !CLIENT_BUILD
         public ClusterServer ClusterServer { get; private set; }
@@ -59,6 +64,15 @@ namespace MultiplayerARPG.MMO
             if (IsServer)
             {
                 ClusterServer.Update();
+                if (Time.unscaledTime - lastUserCountUpdateTime > updateUserCountInterval)
+                {
+                    lastUserCountUpdateTime = Time.unscaledTime;
+                    // Update user count
+                    DbServiceClient.UpdateUserCount(new UpdateUserCountReq()
+                    {
+                        UserCount = ClusterServer.MapUsersByCharacterId.Count,
+                    });
+                }
             }
         }
 #endif

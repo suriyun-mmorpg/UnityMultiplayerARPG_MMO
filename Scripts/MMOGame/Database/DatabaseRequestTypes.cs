@@ -75,5 +75,6 @@
         public const ushort RequestValidateEmailVerification = 75;
         public const ushort RequestFindEmail = 76;
         public const ushort RequestGetFriendRequestNotification = 77;
+        public const ushort RequestUpdateUserCount = 78;
     }
 }

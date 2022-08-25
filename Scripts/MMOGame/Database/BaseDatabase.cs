@@ -98,6 +98,8 @@ namespace MultiplayerARPG.MMO
         public abstract long UpdateDeleteMailState(string mailId, string userId);
         public abstract int CreateMail(Mail mail);
         public abstract int GetMailNotification(string userId);
+
+        public abstract void UpdateUserCount(int userCount);
 #endif
     }
 }

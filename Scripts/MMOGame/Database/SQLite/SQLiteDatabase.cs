@@ -7,6 +7,7 @@ using MiniJSON;
 using System;
 #endif
 using UnityEngine;
+using ENet;
 
 namespace MultiplayerARPG.MMO
 {
@@ -25,7 +26,9 @@ namespace MultiplayerARPG.MMO
         public override void Initialize()
         {
             // Json file read
-            string configFilePath = "./config/sqliteConfig.json";
+            bool configFileFound = false;
+            string configFolder = "./config";
+            string configFilePath = configFolder + "/sqliteConfig.json";
             Dictionary<string, object> jsonConfig = new Dictionary<string, object>();
             Logging.Log("Reading config file from " + configFilePath);
             if (File.Exists(configFilePath))
@@ -33,9 +36,20 @@ namespace MultiplayerARPG.MMO
                 Logging.Log("Found config file");
                 string dataAsJson = File.ReadAllText(configFilePath);
                 jsonConfig = Json.Deserialize(dataAsJson) as Dictionary<string, object>;
+                configFileFound = true;
             }
 
             ConfigReader.ReadConfigs(jsonConfig, "sqliteDbPath", out dbPath, dbPath);
+            jsonConfig["sqliteDbPath"] = dbPath;
+
+            if (!configFileFound)
+            {
+                // Write config file
+                Logging.Log("Not found config file, creating a new one");
+                if (!Directory.Exists(configFolder))
+                    Directory.CreateDirectory(configFolder);
+                File.WriteAllText(configFilePath, Json.Serialize(jsonConfig));
+            }
 
             connection = NewConnection();
             connection.Open();
@@ -879,6 +893,11 @@ namespace MultiplayerARPG.MMO
             object result = ExecuteScalar("SELECT COUNT(*) FROM userlogin WHERE email LIKE @email",
                 new SqliteParameter("@email", email));
             return result != null ? (long)result : 0;
+        }
+
+        public override void UpdateUserCount(int userCount)
+        {
+            // TODO: Implement this later
         }
 #endif
     }

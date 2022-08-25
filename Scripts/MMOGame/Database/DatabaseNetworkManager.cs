@@ -143,6 +143,7 @@ namespace MultiplayerARPG.MMO
             RegisterRequestToServer<SetSummonBuffsReq, EmptyMessage>(DatabaseRequestTypes.RequestSetSummonBuffs, SetSummonBuffs);
             RegisterRequestToServer<FindEmailReq, FindEmailResp>(DatabaseRequestTypes.RequestFindEmail, FindEmail);
             RegisterRequestToServer<ValidateEmailVerificationReq, ValidateEmailVerificationResp>(DatabaseRequestTypes.RequestValidateEmailVerification, ValidateEmailVerification);
+            RegisterRequestToServer<UpdateUserCountReq, EmptyMessage>(DatabaseRequestTypes.RequestUpdateUserCount, UpdateUserCount);
             this.InvokeInstanceDevExtMethods("RegisterMessages");
         }
     }

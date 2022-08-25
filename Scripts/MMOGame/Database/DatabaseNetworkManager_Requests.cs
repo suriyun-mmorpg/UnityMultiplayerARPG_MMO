@@ -572,5 +572,13 @@ namespace MultiplayerARPG.MMO
                 Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(GetFriendRequestNotificationAsync)} status: {resp.ResponseCode}");
             return resp;
         }
+
+        public async UniTask<AsyncResponseData<EmptyMessage>> UpdateUserCount(UpdateUserCountReq request)
+        {
+            var resp = await Client.SendRequestAsync<UpdateUserCountReq, EmptyMessage>(DatabaseRequestTypes.RequestUpdateUserCount, request);
+            if (!resp.IsSuccess)
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(UpdateUserCount)} status: {resp.ResponseCode}");
+            return resp;
+        }
     }
 }

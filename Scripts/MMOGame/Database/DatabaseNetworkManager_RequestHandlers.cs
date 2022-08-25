@@ -1629,6 +1629,15 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
+        protected async UniTaskVoid UpdateUserCount(RequestHandlerData requestHandler, UpdateUserCountReq request, RequestProceedResultDelegate<EmptyMessage> result)
+        {
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            Database.UpdateUserCount(request.UserCount);
+            result.Invoke(AckResponseCode.Success, EmptyMessage.Value);
+            await UniTask.Yield();
+#endif
+        }
+
 #if UNITY_STANDALONE && !CLIENT_BUILD
         protected int ReadGold(string userId)
         {

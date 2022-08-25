@@ -8,6 +8,7 @@ using System.IO;
 using Cysharp.Threading.Tasks;
 #endif
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace MultiplayerARPG.MMO
 {
@@ -28,7 +29,9 @@ namespace MultiplayerARPG.MMO
         public override void Initialize()
         {
             // Json file read
-            string configFilePath = "./config/mySqlConfig.json";
+            bool configFileFound = false;
+            string configFolder = "./config";
+            string configFilePath = configFolder + "/mySqlConfig.json";
             Dictionary<string, object> jsonConfig = new Dictionary<string, object>();
             Logging.Log("Reading config file from " + configFilePath);
             if (File.Exists(configFilePath))
@@ -36,13 +39,32 @@ namespace MultiplayerARPG.MMO
                 Logging.Log("Found config file");
                 string dataAsJson = File.ReadAllText(configFilePath);
                 jsonConfig = Json.Deserialize(dataAsJson) as Dictionary<string, object>;
+                configFileFound = true;
             }
 
             ConfigReader.ReadConfigs(jsonConfig, "mySqlAddress", out address, address);
+            jsonConfig["mySqlAddress"] = address;
+
             ConfigReader.ReadConfigs(jsonConfig, "mySqlPort", out port, port);
+            jsonConfig["mySqlPort"] = port;
+
             ConfigReader.ReadConfigs(jsonConfig, "mySqlUsername", out username, username);
+            jsonConfig["mySqlUsername"] = username;
+
             ConfigReader.ReadConfigs(jsonConfig, "mySqlPassword", out password, password);
+            jsonConfig["mySqlPassword"] = password;
+
             ConfigReader.ReadConfigs(jsonConfig, "mySqlDbName", out dbName, dbName);
+            jsonConfig["mySqlDbName"] = dbName;
+
+            if (!configFileFound)
+            {
+                // Write config file
+                Logging.Log("Not found config file, creating a new one");
+                if (!Directory.Exists(configFolder))
+                    Directory.CreateDirectory(configFolder);
+                File.WriteAllText(configFilePath, Json.Serialize(jsonConfig));
+            }
 
             Migration();
             this.InvokeInstanceDevExtMethods("Init");
@@ -320,6 +342,15 @@ namespace MultiplayerARPG.MMO
             {
                 Logging.Log($"Migrating up to {migrationId}");
                 ExecuteNonQuerySync("ALTER TABLE `friend` ADD `state` tinyint(1) NOT NULL DEFAULT '0' AFTER `characterId2`;");
+                // Insert migrate history
+                InsertMigrationId(migrationId);
+                Logging.Log($"Migrated to {migrationId}");
+            }
+            migrationId = " 1.77";
+            if (!HasMigrationId(migrationId))
+            {
+                Logging.Log($"Migrating up to {migrationId}");
+                ExecuteNonQuerySync("CREATE TABLE `statistic` (`userCount` INT NOT NULL DEFAULT '0' ) ENGINE = InnoDB DEFAULT CHARSET = utf8 COLLATE = utf8_unicode_ci");
                 // Insert migrate history
                 InsertMigrationId(migrationId);
                 Logging.Log($"Migrated to {migrationId}");
@@ -866,6 +897,22 @@ namespace MultiplayerARPG.MMO
             object result = ExecuteScalarSync("SELECT COUNT(*) FROM userlogin WHERE email LIKE @email",
                 new MySqlParameter("@email", email));
             return result != null ? (long)result : 0;
+        }
+
+        public override void UpdateUserCount(int userCount)
+        {
+            object result = ExecuteScalarSync("SELECT COUNT(*) FROM statistic WHERE 1");
+            long count = result != null ? (long)result : 0;
+            if (count > 0)
+            {
+                ExecuteNonQuerySync("UPDATE statistic SET userCount=@userCount;",
+                    new MySqlParameter("@userCount", userCount));
+            }
+            else
+            {
+                ExecuteNonQuerySync("INSERT INTO statistic (userCount) VALUES(@userCount);",
+                    new MySqlParameter("@userCount", userCount));
+            }
         }
 #endif
     }

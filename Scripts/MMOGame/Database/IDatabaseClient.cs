@@ -146,5 +146,7 @@ namespace MultiplayerARPG.MMO
         UniTask<AsyncResponseData<FindEmailResp>> FindEmailAsync(FindEmailReq request);
 
         UniTask<AsyncResponseData<GetFriendRequestNotificationResp>> GetFriendRequestNotificationAsync(GetFriendRequestNotificationReq request);
+
+        UniTask<AsyncResponseData<EmptyMessage>> UpdateUserCount(UpdateUserCountReq request);
     }
 }
