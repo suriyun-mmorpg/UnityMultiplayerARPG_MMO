@@ -8,7 +8,7 @@ namespace MultiplayerARPG.MMO
     public partial class MMOServerMailMessageHandlers : MonoBehaviour, IServerMailMessageHandlers
     {
 #if UNITY_STANDALONE && !CLIENT_BUILD
-        public DatabaseNetworkManager DbServiceClient
+        public IDatabaseClient DbServiceClient
         {
             get { return MMOServerInstance.Singleton.DatabaseNetworkManager; }
         }
