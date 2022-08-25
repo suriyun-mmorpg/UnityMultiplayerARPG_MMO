@@ -8,6 +8,7 @@ using System;
 #endif
 using UnityEngine;
 using ENet;
+using MySqlConnector;
 
 namespace MultiplayerARPG.MMO
 {
@@ -351,6 +352,10 @@ namespace MultiplayerARPG.MMO
               isDelete INTEGER NOT NULL DEFAULT 0,
               deleteTimestamp TIMESTAMP NULL DEFAULT NULL,
               sentTimestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+            )");
+
+            ExecuteNonQuery(@"CREATE TABLE IF NOT EXISTS statistic (
+              userCount INTEGER NOT NULL DEFAULT 0
             )");
 
             // Migrate data
@@ -897,7 +902,18 @@ namespace MultiplayerARPG.MMO
 
         public override void UpdateUserCount(int userCount)
         {
-            // TODO: Implement this later
+            object result = ExecuteScalar("SELECT COUNT(*) FROM statistic WHERE 1");
+            long count = result != null ? (long)result : 0;
+            if (count > 0)
+            {
+                ExecuteNonQuery("UPDATE statistic SET userCount=@userCount;",
+                    new SqliteParameter("@userCount", userCount));
+            }
+            else
+            {
+                ExecuteNonQuery("INSERT INTO statistic (userCount) VALUES(@userCount);",
+                    new SqliteParameter("@userCount", userCount));
+            }
         }
 #endif
     }
