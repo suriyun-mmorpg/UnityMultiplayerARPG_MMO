@@ -13,5 +13,6 @@
         public const ushort RequestSelectCharacter = 8;
         public const ushort RequestSpawnMap = 9;
         public const ushort RequestValidateAccessToken = 10;
+        public const ushort RequestUserCount = 11;
     }
 }

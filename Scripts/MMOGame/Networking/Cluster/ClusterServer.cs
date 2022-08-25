@@ -47,6 +47,7 @@ namespace MultiplayerARPG.MMO
             // Map-spawn
             RegisterRequestHandler<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.RequestSpawnMap, HandleRequestSpawnMap);
             RegisterResponseHandler<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.RequestSpawnMap, HandleResponseSpawnMap);
+            RegisterRequestHandler<EmptyMessage, ResponseUserCountMessage>(MMORequestTypes.RequestUserCount, HandleRequestUserCount);
 #endif
         }
 
@@ -500,6 +501,24 @@ namespace MultiplayerARPG.MMO
             if (RequestSpawnMapHandlers.TryGetValue(response.requestId, out result))
                 result.Invoke(responseCode, response);
 #endif
+        }
+
+        /// <summary>
+        /// This is function which read request from any server to get online users count (May being used by GM command)
+        /// </summary>
+        /// <param name="messageHandler"></param>
+        protected UniTaskVoid HandleRequestUserCount(
+            RequestHandlerData requestHandler,
+            EmptyMessage request,
+            RequestProceedResultDelegate<ResponseUserCountMessage> result)
+        {
+#if UNITY_STANDALONE && !CLIENT_BUILD
+            result.Invoke(AckResponseCode.Success, new ResponseUserCountMessage()
+            {
+                userCount = MapUsersByCharacterId.Count,
+            });
+#endif
+            return default;
         }
 
         public static string GetAppServerRegisterHash(CentralServerPeerType peerType, long time)

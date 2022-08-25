@@ -8,6 +8,7 @@ namespace MultiplayerARPG.MMO
 #if UNITY_STANDALONE && !CLIENT_BUILD
         public System.Action<AckResponseCode> onResponseAppServerRegister;
         public System.Action<AckResponseCode, CentralServerPeerInfo> onResponseAppServerAddress;
+        public System.Action<AckResponseCode, int> onResponseUserCount;
         public bool IsAppRegistered { get; private set; }
         public override string LogTag { get { return nameof(ClusterClient) + ":" + appServer.PeerType; } }
 #endif
@@ -20,6 +21,7 @@ namespace MultiplayerARPG.MMO
             EnableRequestResponse(MMOMessageTypes.Request, MMOMessageTypes.Response);
             RegisterResponseHandler<RequestAppServerRegisterMessage, ResponseAppServerRegisterMessage>(MMORequestTypes.RequestAppServerRegister, HandleResponseAppServerRegister);
             RegisterResponseHandler<RequestAppServerAddressMessage, ResponseAppServerAddressMessage>(MMORequestTypes.RequestAppServerAddress, HandleResponseAppServerAddress);
+            RegisterResponseHandler<EmptyMessage, ResponseUserCountMessage>(MMORequestTypes.RequestUserCount, HandleResponseUserCount);
             RegisterMessageHandler(MMOMessageTypes.AppServerAddress, HandleAppServerAddress);
             RegisterMessageHandler(MMOMessageTypes.KickUser, HandleKickUser);
 #endif
@@ -169,6 +171,17 @@ namespace MultiplayerARPG.MMO
         {
             if (onResponseAppServerAddress != null)
                 onResponseAppServerAddress.Invoke(responseCode, response.peerInfo);
+        }
+#endif
+
+#if UNITY_STANDALONE && !CLIENT_BUILD
+        private void HandleResponseUserCount(
+            ResponseHandlerData responseHandler,
+            AckResponseCode responseCode,
+            ResponseUserCountMessage response)
+        {
+            if (onResponseUserCount != null)
+                onResponseUserCount.Invoke(responseCode, response.userCount);
         }
 #endif
 
