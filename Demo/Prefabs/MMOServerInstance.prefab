@@ -96,7 +96,6 @@ MonoBehaviour:
   networkPort: 7000
   useWebSocket: 0
   webSocketSecure: 0
-  webSocketSslProtocols: 3072
   webSocketCertificateFilePath: 
   webSocketCertificatePassword: 
   maxConnections: 1100
@@ -113,6 +112,7 @@ MonoBehaviour:
   maxCharacterNameLength: 16
   requireEmail: 0
   requireEmailVerification: 0
+  updateUserCountInterval: 5
 --- !u!1 &1454126604845530
 GameObject:
   m_ObjectHideFlags: 0
@@ -227,9 +227,10 @@ MonoBehaviour:
   mapSpawnNetworkManager: {fileID: 114788248445432888}
   mapNetworkManager: {fileID: 0}
   databaseNetworkManager: {fileID: 114035231915985668}
+  useCustomDatabaseClient: 0
+  customDatabaseClientSource: {fileID: 0}
   useWebSocket: 0
   webSocketSecure: 0
-  webSocketSslProtocols: 3072
   webSocketCertPath: 
   webSocketCertPassword: 
   startCentralOnAwake: 0
@@ -286,7 +287,6 @@ MonoBehaviour:
   networkPort: 6001
   useWebSocket: 0
   webSocketSecure: 0
-  webSocketSslProtocols: 3072
   webSocketCertificateFilePath: 
   webSocketCertificatePassword: 
   maxConnections: 1100
@@ -297,7 +297,10 @@ MonoBehaviour:
   exePath: ./Build.exe
   notSpawnInBatchMode: 0
   startPort: 8000
-  spawningMaps: []
+  spawningMaps:
+  - {fileID: 11400000, guid: de8b0e4099f8d444692e88f92309e90d, type: 2}
+  - {fileID: 11400000, guid: fbe2a93dfafee544cbeaf175d3491e33, type: 2}
+  - {fileID: 11400000, guid: 7d05446271b4d8f459650ee3e2489a34, type: 2}
   isOverrideExePath: 1
   overrideExePath: C:\Users\Ittipon\Desktop\UnityBuilds\MMORPG_KIT\UnityMultiplayerARPG.exe
   editorNotSpawnInBatchMode: 1
@@ -349,7 +352,6 @@ MonoBehaviour:
   networkPort: 6100
   useWebSocket: 0
   webSocketSecure: 0
-  webSocketSslProtocols: 3072
   webSocketCertificateFilePath: 
   webSocketCertificatePassword: 
   maxConnections: 200
