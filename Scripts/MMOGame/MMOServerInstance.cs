@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Security;
 using System.IO;
-using System.Security.Authentication;
 using LiteNetLibManager;
 using UnityEngine;
 using MiniJSON;
@@ -94,6 +93,12 @@ namespace MultiplayerARPG.MMO
         private MapNetworkManager mapNetworkManager = null;
         [SerializeField]
         private DatabaseNetworkManager databaseNetworkManager = null;
+        [SerializeField]
+        [Tooltip("Use custom database client or not, if yes, it won't use `databaseNetworkManager` for network management")]
+        private bool useCustomDatabaseClient = false;
+        [SerializeField]
+        [Tooltip("Which game object has a custom database client attached")]
+        private GameObject customDatabaseClientSource = null;
 
         [Header("Settings")]
         [SerializeField]
@@ -108,7 +113,16 @@ namespace MultiplayerARPG.MMO
         public CentralNetworkManager CentralNetworkManager { get { return centralNetworkManager; } }
         public MapSpawnNetworkManager MapSpawnNetworkManager { get { return mapSpawnNetworkManager; } }
         public MapNetworkManager MapNetworkManager { get { return mapNetworkManager; } }
-        public DatabaseNetworkManager DatabaseNetworkManager { get { return databaseNetworkManager; } }
+        public IDatabaseClient DatabaseNetworkManager
+        {
+            get
+            {
+                if (!useCustomDatabaseClient)
+                    return databaseNetworkManager;
+                else
+                    return customDatabaseClient;
+            }
+        }
         public bool UseWebSocket { get { return useWebSocket; } }
         public bool WebSocketSecure { get { return webSocketSecure; } }
         public string WebScoketCertificateFilePath { get { return webSocketCertPath; } }
@@ -141,6 +155,7 @@ namespace MultiplayerARPG.MMO
         private bool startingMapServer;
         private bool startingDatabaseServer;
 #endif
+        private IDatabaseClient customDatabaseClient;
 
         private void Awake()
         {
@@ -155,6 +170,11 @@ namespace MultiplayerARPG.MMO
             // Always accept SSL
             ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback((sender, certificate, chain, policyErrors) => { return true; });
 
+            // Setup custom database client
+            if (customDatabaseClientSource == null)
+                customDatabaseClientSource = gameObject;
+            customDatabaseClient = customDatabaseClientSource.GetComponent<IDatabaseClient>();
+
             CacheLogGUI.enabled = false;
 #if UNITY_STANDALONE && !CLIENT_BUILD
             GameInstance gameInstance = FindObjectOfType<GameInstance>();
@@ -163,14 +183,18 @@ namespace MultiplayerARPG.MMO
             if (!Application.isEditor)
             {
                 // Json file read
-                string configFilePath = "./config/serverConfig.json";
+                bool configFileFound = false;
+                string configFolder = "./config";
+                string configFilePath = configFolder + "/serverConfig.json";
                 Dictionary<string, object> jsonConfig = new Dictionary<string, object>();
                 Logging.Log(ToString(), "Reading config file from " + configFilePath);
                 if (File.Exists(configFilePath))
                 {
+                    // Read config file
                     Logging.Log(ToString(), "Found config file");
                     string dataAsJson = File.ReadAllText(configFilePath);
                     jsonConfig = Json.Deserialize(dataAsJson) as Dictionary<string, object>;
+                    configFileFound = true;
                 }
 
                 // Prepare data
@@ -182,157 +206,197 @@ namespace MultiplayerARPG.MMO
 
                 // Database option index
                 int dbOptionIndex;
-                if (ConfigReader.ReadArgs(args, ARG_DATABASE_OPTION_INDEX, out dbOptionIndex, -1) ||
-                    ConfigReader.ReadConfigs(jsonConfig, CONFIG_DATABASE_OPTION_INDEX, out dbOptionIndex, -1))
+                if (ConfigReader.ReadArgs(args, ARG_DATABASE_OPTION_INDEX, out dbOptionIndex, 0) ||
+                    ConfigReader.ReadConfigs(jsonConfig, CONFIG_DATABASE_OPTION_INDEX, out dbOptionIndex, 0))
                 {
-                    DatabaseNetworkManager.SetDatabaseByOptionIndex(dbOptionIndex);
+                    if (!useCustomDatabaseClient)
+                        databaseNetworkManager.SetDatabaseByOptionIndex(dbOptionIndex);
+                    jsonConfig[CONFIG_DATABASE_OPTION_INDEX] = dbOptionIndex;
                 }
+                jsonConfig[CONFIG_DATABASE_OPTION_INDEX] = dbOptionIndex;
 
                 // Use Websocket or not?
                 bool useWebSocket = this.useWebSocket = false;
-                if (ConfigReader.ReadConfigs(jsonConfig, CONFIG_USE_WEB_SOCKET, out useWebSocket))
+                if (ConfigReader.ReadConfigs(jsonConfig, CONFIG_USE_WEB_SOCKET, out useWebSocket, this.useWebSocket))
                 {
                     this.useWebSocket = useWebSocket;
+                    jsonConfig[CONFIG_USE_WEB_SOCKET] = useWebSocket;
                 }
                 else if (ConfigReader.IsArgsProvided(args, ARG_USE_WEB_SOCKET))
                 {
                     this.useWebSocket = true;
                 }
+                jsonConfig[CONFIG_USE_WEB_SOCKET] = useWebSocket;
 
                 // Is websocket running in secure mode or not?
                 bool webSocketSecure = this.webSocketSecure = false;
-                if (ConfigReader.ReadConfigs(jsonConfig, CONFIG_WEB_SOCKET_SECURE, out webSocketSecure))
+                if (ConfigReader.ReadConfigs(jsonConfig, CONFIG_WEB_SOCKET_SECURE, out webSocketSecure, this.webSocketSecure))
                 {
                     this.webSocketSecure = webSocketSecure;
+                    jsonConfig[CONFIG_WEB_SOCKET_SECURE] = webSocketSecure;
                 }
                 else if (ConfigReader.IsArgsProvided(args, ARG_WEB_SOCKET_SECURE))
                 {
                     this.webSocketSecure = true;
                 }
+                jsonConfig[CONFIG_WEB_SOCKET_SECURE] = webSocketSecure;
 
                 // Where is the certification file path?
                 string webSocketCertPath;
-                if (ConfigReader.ReadArgs(args, ARG_WEB_SOCKET_CERT_PATH, out webSocketCertPath, string.Empty) ||
-                    ConfigReader.ReadConfigs(jsonConfig, CONFIG_WEB_SOCKET_CERT_PATH, out webSocketCertPath, string.Empty))
+                if (ConfigReader.ReadArgs(args, ARG_WEB_SOCKET_CERT_PATH, out webSocketCertPath, this.webSocketCertPath) ||
+                    ConfigReader.ReadConfigs(jsonConfig, CONFIG_WEB_SOCKET_CERT_PATH, out webSocketCertPath, this.webSocketCertPath))
                 {
                     this.webSocketCertPath = webSocketCertPath;
+                    jsonConfig[CONFIG_WEB_SOCKET_CERT_PATH] = webSocketCertPath;
                 }
+                jsonConfig[CONFIG_WEB_SOCKET_CERT_PATH] = webSocketCertPath;
 
                 // What is the certification password?
                 string webSocketCertPassword;
-                if (ConfigReader.ReadArgs(args, ARG_WEB_SOCKET_CERT_PASSWORD, out webSocketCertPassword, string.Empty) ||
-                    ConfigReader.ReadConfigs(jsonConfig, CONFIG_WEB_SOCKET_CERT_PASSWORD, out webSocketCertPassword, string.Empty))
+                if (ConfigReader.ReadArgs(args, ARG_WEB_SOCKET_CERT_PASSWORD, out webSocketCertPassword, this.webSocketCertPassword) ||
+                    ConfigReader.ReadConfigs(jsonConfig, CONFIG_WEB_SOCKET_CERT_PASSWORD, out webSocketCertPassword, this.webSocketCertPassword))
                 {
                     this.webSocketCertPassword = webSocketCertPassword;
+                    jsonConfig[CONFIG_WEB_SOCKET_CERT_PASSWORD] = webSocketCertPassword;
                 }
+                jsonConfig[CONFIG_WEB_SOCKET_CERT_PASSWORD] = webSocketCertPassword;
 
                 // Central network address
                 string centralNetworkAddress;
-                if (ConfigReader.ReadArgs(args, ARG_CENTRAL_ADDRESS, out centralNetworkAddress, "localhost") ||
-                    ConfigReader.ReadConfigs(jsonConfig, CONFIG_CENTRAL_ADDRESS, out centralNetworkAddress, "localhost"))
+                if (ConfigReader.ReadArgs(args, ARG_CENTRAL_ADDRESS, out centralNetworkAddress, mapSpawnNetworkManager.clusterServerAddress) ||
+                    ConfigReader.ReadConfigs(jsonConfig, CONFIG_CENTRAL_ADDRESS, out centralNetworkAddress, mapSpawnNetworkManager.clusterServerAddress))
                 {
                     mapSpawnNetworkManager.clusterServerAddress = centralNetworkAddress;
                     mapNetworkManager.clusterServerAddress = centralNetworkAddress;
+                    jsonConfig[CONFIG_CENTRAL_ADDRESS] = centralNetworkAddress;
                 }
+                jsonConfig[CONFIG_CENTRAL_ADDRESS] = centralNetworkAddress;
 
                 // Central network port
                 int centralNetworkPort;
-                if (ConfigReader.ReadArgs(args, ARG_CENTRAL_PORT, out centralNetworkPort, 6000) ||
-                    ConfigReader.ReadConfigs(jsonConfig, CONFIG_CENTRAL_PORT, out centralNetworkPort, 6000))
+                if (ConfigReader.ReadArgs(args, ARG_CENTRAL_PORT, out centralNetworkPort, centralNetworkManager.networkPort) ||
+                    ConfigReader.ReadConfigs(jsonConfig, CONFIG_CENTRAL_PORT, out centralNetworkPort, centralNetworkManager.networkPort))
                 {
                     centralNetworkManager.networkPort = centralNetworkPort;
+                    jsonConfig[CONFIG_CENTRAL_PORT] = centralNetworkPort;
                 }
+                jsonConfig[CONFIG_CENTRAL_PORT] = centralNetworkPort;
 
                 // Central max connections
                 int centralMaxConnections;
-                if (ConfigReader.ReadArgs(args, ARG_CENTRAL_MAX_CONNECTIONS, out centralMaxConnections, 1000) ||
-                    ConfigReader.ReadConfigs(jsonConfig, CONFIG_CENTRAL_MAX_CONNECTIONS, out centralMaxConnections, 1000))
+                if (ConfigReader.ReadArgs(args, ARG_CENTRAL_MAX_CONNECTIONS, out centralMaxConnections, centralNetworkManager.maxConnections) ||
+                    ConfigReader.ReadConfigs(jsonConfig, CONFIG_CENTRAL_MAX_CONNECTIONS, out centralMaxConnections, centralNetworkManager.maxConnections))
                 {
                     centralNetworkManager.maxConnections = centralMaxConnections;
+                    jsonConfig[CONFIG_CENTRAL_MAX_CONNECTIONS] = centralMaxConnections;
                 }
+                jsonConfig[CONFIG_CENTRAL_MAX_CONNECTIONS] = centralMaxConnections;
 
                 // Central network port
                 int clusterNetworkPort;
-                if (ConfigReader.ReadArgs(args, ARG_CLUSTER_PORT, out clusterNetworkPort, 6010) ||
-                    ConfigReader.ReadConfigs(jsonConfig, CONFIG_CLUSTER_PORT, out clusterNetworkPort, 6010))
+                if (ConfigReader.ReadArgs(args, ARG_CLUSTER_PORT, out clusterNetworkPort, centralNetworkManager.clusterServerPort) ||
+                    ConfigReader.ReadConfigs(jsonConfig, CONFIG_CLUSTER_PORT, out clusterNetworkPort, centralNetworkManager.clusterServerPort))
                 {
                     centralNetworkManager.clusterServerPort = clusterNetworkPort;
                     mapSpawnNetworkManager.clusterServerPort = clusterNetworkPort;
                     mapNetworkManager.clusterServerPort = clusterNetworkPort;
+                    jsonConfig[CONFIG_CLUSTER_PORT] = clusterNetworkPort;
                 }
+                jsonConfig[CONFIG_CLUSTER_PORT] = clusterNetworkPort;
 
                 // Machine network address, will be set to map spawn / map / chat
                 string machineNetworkAddress;
-                if (ConfigReader.ReadArgs(args, ARG_MACHINE_ADDRESS, out machineNetworkAddress, "localhost") ||
-                    ConfigReader.ReadConfigs(jsonConfig, CONFIG_MACHINE_ADDRESS, out machineNetworkAddress, "localhost"))
+                if (ConfigReader.ReadArgs(args, ARG_MACHINE_ADDRESS, out machineNetworkAddress, mapSpawnNetworkManager.machineAddress) ||
+                    ConfigReader.ReadConfigs(jsonConfig, CONFIG_MACHINE_ADDRESS, out machineNetworkAddress, mapSpawnNetworkManager.machineAddress))
                 {
                     mapSpawnNetworkManager.machineAddress = machineNetworkAddress;
                     mapNetworkManager.machineAddress = machineNetworkAddress;
+                    jsonConfig[CONFIG_MACHINE_ADDRESS] = machineNetworkAddress;
                 }
+                jsonConfig[CONFIG_MACHINE_ADDRESS] = machineNetworkAddress;
 
                 // Map spawn network port
                 int mapSpawnNetworkPort;
-                if (ConfigReader.ReadArgs(args, ARG_MAP_SPAWN_PORT, out mapSpawnNetworkPort, 6001) ||
-                    ConfigReader.ReadConfigs(jsonConfig, CONFIG_MAP_SPAWN_PORT, out mapSpawnNetworkPort, 6001))
+                if (ConfigReader.ReadArgs(args, ARG_MAP_SPAWN_PORT, out mapSpawnNetworkPort, mapSpawnNetworkManager.networkPort) ||
+                    ConfigReader.ReadConfigs(jsonConfig, CONFIG_MAP_SPAWN_PORT, out mapSpawnNetworkPort, mapSpawnNetworkManager.networkPort))
                 {
                     mapSpawnNetworkManager.networkPort = mapSpawnNetworkPort;
+                    jsonConfig[CONFIG_MAP_SPAWN_PORT] = mapSpawnNetworkPort;
                 }
+                jsonConfig[CONFIG_MAP_SPAWN_PORT] = mapSpawnNetworkPort;
 
                 // Map spawn exe path
                 string spawnExePath;
-                if (ConfigReader.ReadArgs(args, ARG_SPAWN_EXE_PATH, out spawnExePath, "./Build.exe") ||
-                    ConfigReader.ReadConfigs(jsonConfig, CONFIG_SPAWN_EXE_PATH, out spawnExePath, "./Build.exe"))
+                if (ConfigReader.ReadArgs(args, ARG_SPAWN_EXE_PATH, out spawnExePath, mapSpawnNetworkManager.exePath) ||
+                    ConfigReader.ReadConfigs(jsonConfig, CONFIG_SPAWN_EXE_PATH, out spawnExePath, mapSpawnNetworkManager.exePath))
                 {
                     mapSpawnNetworkManager.exePath = spawnExePath;
+                    jsonConfig[CONFIG_SPAWN_EXE_PATH] = spawnExePath;
                 }
+                jsonConfig[CONFIG_SPAWN_EXE_PATH] = spawnExePath;
 
                 // Map spawn in batch mode
                 bool notSpawnInBatchMode = mapSpawnNetworkManager.notSpawnInBatchMode = false;
-                if (ConfigReader.ReadConfigs(jsonConfig, CONFIG_NOT_SPAWN_IN_BATCH_MODE, out notSpawnInBatchMode))
+                if (ConfigReader.ReadConfigs(jsonConfig, CONFIG_NOT_SPAWN_IN_BATCH_MODE, out notSpawnInBatchMode, mapSpawnNetworkManager.notSpawnInBatchMode))
                 {
                     mapSpawnNetworkManager.notSpawnInBatchMode = notSpawnInBatchMode;
+                    jsonConfig[CONFIG_NOT_SPAWN_IN_BATCH_MODE] = notSpawnInBatchMode;
                 }
                 else if (ConfigReader.IsArgsProvided(args, ARG_NOT_SPAWN_IN_BATCH_MODE))
                 {
                     mapSpawnNetworkManager.notSpawnInBatchMode = true;
                 }
+                jsonConfig[CONFIG_NOT_SPAWN_IN_BATCH_MODE] = notSpawnInBatchMode;
 
                 // Map spawn start port
                 int spawnStartPort;
-                if (ConfigReader.ReadArgs(args, ARG_SPAWN_START_PORT, out spawnStartPort, 8001) ||
-                    ConfigReader.ReadConfigs(jsonConfig, CONFIG_SPAWN_START_PORT, out spawnStartPort, 8001))
+                if (ConfigReader.ReadArgs(args, ARG_SPAWN_START_PORT, out spawnStartPort, mapSpawnNetworkManager.startPort) ||
+                    ConfigReader.ReadConfigs(jsonConfig, CONFIG_SPAWN_START_PORT, out spawnStartPort, mapSpawnNetworkManager.startPort))
                 {
                     mapSpawnNetworkManager.startPort = spawnStartPort;
+                    jsonConfig[CONFIG_SPAWN_START_PORT] = spawnStartPort;
                 }
+                jsonConfig[CONFIG_SPAWN_START_PORT] = spawnStartPort;
 
                 // Spawn maps
+                List<string> defaultSpawnMapIds = new List<string>();
+                foreach (BaseMapInfo mapInfo in mapSpawnNetworkManager.spawningMaps)
+                {
+                    if (mapInfo != null)
+                        defaultSpawnMapIds.Add(mapInfo.Id);
+                }
                 List<string> spawnMapIds;
-                if (ConfigReader.ReadArgs(args, ARG_SPAWN_MAPS, out spawnMapIds, new List<string>()) ||
-                    ConfigReader.ReadConfigs(jsonConfig, CONFIG_SPAWN_MAPS, out spawnMapIds, new List<string>()))
+                if (ConfigReader.ReadArgs(args, ARG_SPAWN_MAPS, out spawnMapIds, defaultSpawnMapIds) ||
+                    ConfigReader.ReadConfigs(jsonConfig, CONFIG_SPAWN_MAPS, out spawnMapIds, defaultSpawnMapIds))
                 {
                     spawningMapIds = spawnMapIds;
+                    jsonConfig[CONFIG_SPAWN_MAPS] = spawnMapIds;
                 }
+                jsonConfig[CONFIG_SPAWN_MAPS] = spawnMapIds;
 
                 // Map network port
                 int mapNetworkPort;
-                if (ConfigReader.ReadArgs(args, ARG_MAP_PORT, out mapNetworkPort, 6002) ||
-                    ConfigReader.ReadConfigs(jsonConfig, CONFIG_MAP_PORT, out mapNetworkPort, 6002))
+                if (ConfigReader.ReadArgs(args, ARG_MAP_PORT, out mapNetworkPort, mapNetworkManager.networkPort) ||
+                    ConfigReader.ReadConfigs(jsonConfig, CONFIG_MAP_PORT, out mapNetworkPort, mapNetworkManager.networkPort))
                 {
                     mapNetworkManager.networkPort = mapNetworkPort;
+                    jsonConfig[CONFIG_MAP_PORT] = mapNetworkPort;
                 }
+                jsonConfig[CONFIG_MAP_PORT] = mapNetworkPort;
 
                 // Map max connections
                 int mapMaxConnections;
-                if (ConfigReader.ReadArgs(args, ARG_MAP_MAX_CONNECTIONS, out mapMaxConnections, 1000) ||
-                    ConfigReader.ReadConfigs(jsonConfig, CONFIG_MAP_MAX_CONNECTIONS, out mapMaxConnections, 1000))
+                if (ConfigReader.ReadArgs(args, ARG_MAP_MAX_CONNECTIONS, out mapMaxConnections, mapNetworkManager.maxConnections) ||
+                    ConfigReader.ReadConfigs(jsonConfig, CONFIG_MAP_MAX_CONNECTIONS, out mapMaxConnections, mapNetworkManager.maxConnections))
                 {
                     mapNetworkManager.maxConnections = mapMaxConnections;
+                    jsonConfig[CONFIG_MAP_MAX_CONNECTIONS] = mapMaxConnections;
                 }
+                jsonConfig[CONFIG_MAP_MAX_CONNECTIONS] = mapMaxConnections;
 
                 // Map scene name
                 string mapId = string.Empty;
-                if (ConfigReader.ReadArgs(args, ARG_MAP_ID, out mapId, string.Empty) ||
-                    ConfigReader.ReadConfigs(jsonConfig, CONFIG_MAP_ID, out mapId))
+                if (ConfigReader.ReadArgs(args, ARG_MAP_ID, out mapId, string.Empty))
                 {
                     startingMapId = mapId;
                 }
@@ -364,28 +428,34 @@ namespace MultiplayerARPG.MMO
                     mapNetworkManager.MapInstanceWarpToRotation = new Vector3(instanceRotX, instanceRotY, instanceRotZ);
                 }
 
-                // Database network address
-                string databaseNetworkAddress;
-                if (ConfigReader.ReadArgs(args, ARG_DATABASE_ADDRESS, out databaseNetworkAddress, "localhost") ||
-                    ConfigReader.ReadConfigs(jsonConfig, CONFIG_DATABASE_ADDRESS, out databaseNetworkAddress, "localhost"))
+                if (!useCustomDatabaseClient)
                 {
-                    databaseNetworkManager.networkAddress = databaseNetworkAddress;
-                }
+                    // Database network address
+                    string databaseNetworkAddress;
+                    if (ConfigReader.ReadArgs(args, ARG_DATABASE_ADDRESS, out databaseNetworkAddress, databaseNetworkManager.networkAddress) ||
+                        ConfigReader.ReadConfigs(jsonConfig, CONFIG_DATABASE_ADDRESS, out databaseNetworkAddress, databaseNetworkManager.networkAddress))
+                    {
+                        databaseNetworkManager.networkAddress = databaseNetworkAddress;
+                        jsonConfig[CONFIG_DATABASE_ADDRESS] = databaseNetworkAddress;
+                    }
+                    jsonConfig[CONFIG_DATABASE_ADDRESS] = databaseNetworkAddress;
 
-                // Database network port
-                int databaseNetworkPort;
-                if (ConfigReader.ReadArgs(args, ARG_DATABASE_PORT, out databaseNetworkPort, 6100) ||
-                    ConfigReader.ReadConfigs(jsonConfig, CONFIG_DATABASE_PORT, out databaseNetworkPort, 6100))
-                {
-                    databaseNetworkManager.networkPort = databaseNetworkPort;
+                    // Database network port
+                    int databaseNetworkPort;
+                    if (ConfigReader.ReadArgs(args, ARG_DATABASE_PORT, out databaseNetworkPort, databaseNetworkManager.networkPort) ||
+                        ConfigReader.ReadConfigs(jsonConfig, CONFIG_DATABASE_PORT, out databaseNetworkPort, databaseNetworkManager.networkPort))
+                    {
+                        if (!useCustomDatabaseClient)
+                            databaseNetworkManager.networkPort = databaseNetworkPort;
+                        jsonConfig[CONFIG_DATABASE_PORT] = databaseNetworkPort;
+                    }
+                    jsonConfig[CONFIG_DATABASE_PORT] = databaseNetworkPort;
                 }
 
                 string logFileName = "Log";
                 bool startLog = false;
-                bool tempStartServer;
 
-                if (ConfigReader.IsArgsProvided(args, ARG_START_DATABASE_SERVER) ||
-                    (ConfigReader.ReadConfigs(jsonConfig, CONFIG_START_DATABASE_SERVER, out tempStartServer) && tempStartServer))
+                if (ConfigReader.IsArgsProvided(args, ARG_START_DATABASE_SERVER))
                 {
                     if (!string.IsNullOrEmpty(logFileName))
                         logFileName += "_";
@@ -394,8 +464,7 @@ namespace MultiplayerARPG.MMO
                     startingDatabaseServer = true;
                 }
 
-                if (ConfigReader.IsArgsProvided(args, ARG_START_CENTRAL_SERVER) ||
-                    (ConfigReader.ReadConfigs(jsonConfig, CONFIG_START_CENTRAL_SERVER, out tempStartServer) && tempStartServer))
+                if (ConfigReader.IsArgsProvided(args, ARG_START_CENTRAL_SERVER))
                 {
                     if (!string.IsNullOrEmpty(logFileName))
                         logFileName += "_";
@@ -404,8 +473,7 @@ namespace MultiplayerARPG.MMO
                     startingCentralServer = true;
                 }
 
-                if (ConfigReader.IsArgsProvided(args, ARG_START_MAP_SPAWN_SERVER) ||
-                    (ConfigReader.ReadConfigs(jsonConfig, CONFIG_START_MAP_SPAWN_SERVER, out tempStartServer) && tempStartServer))
+                if (ConfigReader.IsArgsProvided(args, ARG_START_MAP_SPAWN_SERVER))
                 {
                     if (!string.IsNullOrEmpty(logFileName))
                         logFileName += "_";
@@ -414,14 +482,62 @@ namespace MultiplayerARPG.MMO
                     startingMapSpawnServer = true;
                 }
 
-                if (ConfigReader.IsArgsProvided(args, ARG_START_MAP_SERVER) ||
-                    (ConfigReader.ReadConfigs(jsonConfig, CONFIG_START_MAP_SERVER, out tempStartServer) && tempStartServer))
+                if (ConfigReader.IsArgsProvided(args, ARG_START_MAP_SERVER))
                 {
                     if (!string.IsNullOrEmpty(logFileName))
                         logFileName += "_";
                     logFileName += "Map(" + mapId + ") Instance(" + instanceId + ")";
                     startLog = true;
                     startingMapServer = true;
+                }
+
+                if (startingDatabaseServer || startingCentralServer || startingMapSpawnServer || startingMapServer)
+                {
+                    if (!configFileFound)
+                    {
+                        // Write config file
+                        Logging.Log(ToString(), "Not found config file, creating a new one");
+                        if (!Directory.Exists(configFolder))
+                            Directory.CreateDirectory(configFolder);
+                        string jsonContent = string.Empty;
+                        foreach (KeyValuePair<string, object> kv in jsonConfig)
+                        {
+                            if (!string.IsNullOrEmpty(jsonContent))
+                            {
+                                jsonContent += ",\n";
+                            }
+                            if (kv.Value is string)
+                            {
+                                jsonContent += $" \"{kv.Key}\": \"{kv.Value}\"";
+                            }
+                            if (kv.Value is byte || kv.Value is ushort || kv.Value is uint || kv.Value is ulong ||
+                                kv.Value is sbyte || kv.Value is short || kv.Value is int || kv.Value is long)
+                            {
+                                jsonContent += $" \"{kv.Key}\": {kv.Value}";
+                            }
+                            if (kv.Value is bool)
+                            {
+                                jsonContent += $" \"{kv.Key}\": {kv.Value.ToString().ToLower()}";
+                            }
+                            if (kv.Value is List<string>)
+                            {
+                                jsonContent += $" \"{kv.Key}\": ";
+                                string arrayContent = string.Empty;
+                                foreach (string entry in (List<string>)kv.Value)
+                                {
+                                    if (!string.IsNullOrEmpty(arrayContent))
+                                    {
+                                        arrayContent += ",";
+                                    }
+                                    arrayContent += $"\"{entry}\"";
+                                }
+                                arrayContent = $"[{arrayContent}]";
+                                jsonContent += arrayContent;
+                            }
+                        }
+                        jsonContent = "{\n" + jsonContent + "\n}";
+                        File.WriteAllText(configFilePath, jsonContent);
+                    }
                 }
 
                 if (startLog)
@@ -432,7 +548,8 @@ namespace MultiplayerARPG.MMO
             }
             else
             {
-                DatabaseNetworkManager.SetDatabaseByOptionIndex(databaseOptionIndex);
+                if (!useCustomDatabaseClient)
+                    databaseNetworkManager.SetDatabaseByOptionIndex(databaseOptionIndex);
 
                 if (startDatabaseOnAwake)
                     startingDatabaseServer = true;
@@ -538,12 +655,14 @@ namespace MultiplayerARPG.MMO
 
         public void StartDatabaseManagerServer()
         {
-            DatabaseNetworkManager.StartServer();
+            if (!useCustomDatabaseClient)
+                databaseNetworkManager.StartServer();
         }
 
         public void StartDatabaseManagerClient()
         {
-            DatabaseNetworkManager.StartClient();
+            if (!useCustomDatabaseClient)
+                databaseNetworkManager.StartClient();
         }
         #endregion
 #endif
