@@ -352,6 +352,16 @@ CREATE TABLE `party` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `statistic`
+--
+
+CREATE TABLE `statistic` (
+  `userCount` INT NOT NULL DEFAULT '0' 
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `storageitem`
 --
 
@@ -445,7 +455,8 @@ INSERT INTO `__migrations` (`migrationId`) VALUES
 ('1.71b'),
 ('1.72d'),
 ('1.73'),
-('1.76');
+('1.76'),
+('1.77');
 
 --
 -- Indexes for dumped tables
