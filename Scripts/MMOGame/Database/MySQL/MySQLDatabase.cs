@@ -8,7 +8,6 @@ using System.IO;
 using Cysharp.Threading.Tasks;
 #endif
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace MultiplayerARPG.MMO
 {

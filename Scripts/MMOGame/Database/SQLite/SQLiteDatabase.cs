@@ -7,8 +7,6 @@ using MiniJSON;
 using System;
 #endif
 using UnityEngine;
-using ENet;
-using MySqlConnector;
 
 namespace MultiplayerARPG.MMO
 {
