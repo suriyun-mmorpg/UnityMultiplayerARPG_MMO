@@ -357,7 +357,7 @@ CREATE TABLE `party` (
 
 CREATE TABLE `statistic` (
   `userCount` INT NOT NULL DEFAULT '0' 
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
 
