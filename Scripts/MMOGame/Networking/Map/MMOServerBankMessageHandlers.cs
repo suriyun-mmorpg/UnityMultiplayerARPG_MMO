@@ -6,7 +6,7 @@ namespace MultiplayerARPG.MMO
 {
     public partial class MMOServerBankMessageHandlers : MonoBehaviour, IServerBankMessageHandlers
     {
-#if UNITY_SERVER || !MMO_BUILD
+#if UNITY_EDITOR || UNITY_SERVER || !MMO_BUILD
         public IDatabaseClient DbServiceClient
         {
             get { return MMOServerInstance.Singleton.DatabaseNetworkManager; }
@@ -20,7 +20,7 @@ namespace MultiplayerARPG.MMO
 
         public async UniTaskVoid HandleRequestDepositGuildGold(RequestHandlerData requestHandler, RequestDepositGuildGoldMessage request, RequestProceedResultDelegate<ResponseDepositGuildGoldMessage> result)
         {
-#if UNITY_SERVER || !MMO_BUILD
+#if UNITY_EDITOR || UNITY_SERVER || !MMO_BUILD
             IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
@@ -76,7 +76,7 @@ namespace MultiplayerARPG.MMO
 
         public async UniTaskVoid HandleRequestDepositUserGold(RequestHandlerData requestHandler, RequestDepositUserGoldMessage request, RequestProceedResultDelegate<ResponseDepositUserGoldMessage> result)
         {
-#if UNITY_SERVER || !MMO_BUILD
+#if UNITY_EDITOR || UNITY_SERVER || !MMO_BUILD
             IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
@@ -116,7 +116,7 @@ namespace MultiplayerARPG.MMO
 
         public async UniTaskVoid HandleRequestWithdrawGuildGold(RequestHandlerData requestHandler, RequestWithdrawGuildGoldMessage request, RequestProceedResultDelegate<ResponseWithdrawGuildGoldMessage> result)
         {
-#if UNITY_SERVER || !MMO_BUILD
+#if UNITY_EDITOR || UNITY_SERVER || !MMO_BUILD
             IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
@@ -185,7 +185,7 @@ namespace MultiplayerARPG.MMO
 
         public async UniTaskVoid HandleRequestWithdrawUserGold(RequestHandlerData requestHandler, RequestWithdrawUserGoldMessage request, RequestProceedResultDelegate<ResponseWithdrawUserGoldMessage> result)
         {
-#if UNITY_SERVER || !MMO_BUILD
+#if UNITY_EDITOR || UNITY_SERVER || !MMO_BUILD
             IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {

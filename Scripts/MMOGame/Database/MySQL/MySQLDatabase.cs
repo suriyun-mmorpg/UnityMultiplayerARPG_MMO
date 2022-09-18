@@ -1,4 +1,4 @@
-﻿#if UNITY_SERVER || !MMO_BUILD
+﻿#if UNITY_EDITOR || UNITY_SERVER || !MMO_BUILD
 using MySqlConnector;
 using System.Collections.Generic;
 using LiteNetLibManager;
@@ -24,7 +24,7 @@ namespace MultiplayerARPG.MMO
         [SerializeField]
         private string dbName = "mmorpgtemplate";
 
-#if UNITY_SERVER || !MMO_BUILD
+#if UNITY_EDITOR || UNITY_SERVER || !MMO_BUILD
         public override void Initialize()
         {
             // Json file read
