@@ -11,7 +11,7 @@ namespace MultiplayerARPG.MMO
     {
         public override string GetCurrentMapId(BasePlayerCharacterEntity playerCharacterEntity)
         {
-#if UNITY_STANDALONE && !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
             if (!IsInstanceMap())
                 return base.GetCurrentMapId(playerCharacterEntity);
             return instanceMapCurrentLocations[playerCharacterEntity.ObjectId].Key;
@@ -22,7 +22,7 @@ namespace MultiplayerARPG.MMO
 
         public override Vector3 GetCurrentPosition(BasePlayerCharacterEntity playerCharacterEntity)
         {
-#if UNITY_STANDALONE && !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
             if (!IsInstanceMap())
                 return base.GetCurrentPosition(playerCharacterEntity);
             return instanceMapCurrentLocations[playerCharacterEntity.ObjectId].Value;
@@ -38,7 +38,7 @@ namespace MultiplayerARPG.MMO
 
         public override void WarpCharacter(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position, bool overrideRotation, Vector3 rotation)
         {
-#if UNITY_STANDALONE && !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
             if (!CanWarpCharacter(playerCharacterEntity))
                 return;
 
@@ -55,7 +55,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-#if UNITY_STANDALONE && !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
         /// <summary>
         /// Warp to different map.
         /// </summary>
@@ -104,7 +104,7 @@ namespace MultiplayerARPG.MMO
 
         public override void WarpCharacterToInstance(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position, bool overrideRotation, Vector3 rotation)
         {
-#if UNITY_STANDALONE && !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
             if (!CanWarpCharacter(playerCharacterEntity))
                 return;
             // Generate instance id
@@ -159,7 +159,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-#if UNITY_STANDALONE && !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
         private async UniTaskVoid WarpCharacterToInstanceRoutine(BasePlayerCharacterEntity playerCharacterEntity, string instanceId)
         {
             // If warping to different map
@@ -198,7 +198,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if UNITY_STANDALONE && !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
         private void OnRequestSpawnMap(ResponseHandlerData requestHandler, AckResponseCode responseCode, INetSerializable response, string instanceId)
         {
             if (responseCode == AckResponseCode.Error ||

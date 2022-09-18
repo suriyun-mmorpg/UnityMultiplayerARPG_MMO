@@ -45,7 +45,7 @@ namespace MultiplayerARPG.MMO
             RequestUserLoginMessage request,
             RequestProceedResultDelegate<ResponseUserLoginMessage> result)
         {
-#if UNITY_STANDALONE && !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
             if (disableDefaultLogin)
             {
                 result.InvokeError(new ResponseUserLoginMessage()
@@ -172,7 +172,7 @@ namespace MultiplayerARPG.MMO
             RequestUserRegisterMessage request,
             RequestProceedResultDelegate<ResponseUserRegisterMessage> result)
         {
-#if UNITY_STANDALONE && !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
             if (disableDefaultLogin)
             {
                 result.InvokeError(new ResponseUserRegisterMessage()
@@ -291,7 +291,7 @@ namespace MultiplayerARPG.MMO
             EmptyMessage request,
             RequestProceedResultDelegate<EmptyMessage> result)
         {
-#if UNITY_STANDALONE && !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
             long connectionId = requestHandler.ConnectionId;
             CentralUserPeerInfo userPeerInfo;
             if (userPeers.TryGetValue(connectionId, out userPeerInfo))
@@ -319,7 +319,7 @@ namespace MultiplayerARPG.MMO
             RequestValidateAccessTokenMessage request,
             RequestProceedResultDelegate<ResponseValidateAccessTokenMessage> result)
         {
-#if UNITY_STANDALONE && !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
             long connectionId = requestHandler.ConnectionId;
             string userId = request.userId;
             string accessToken = request.accessToken;

@@ -1,5 +1,4 @@
-﻿#if UNITY_STANDALONE && !CLIENT_BUILD
-using Cysharp.Threading.Tasks;
+﻿#if UNITY_SERVER || !MMO_BUILD
 using LiteNetLibManager;
 using Mono.Data.Sqlite;
 using System.Collections.Generic;

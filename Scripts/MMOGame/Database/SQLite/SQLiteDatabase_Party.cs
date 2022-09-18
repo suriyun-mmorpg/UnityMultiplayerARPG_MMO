@@ -1,4 +1,4 @@
-﻿#if UNITY_STANDALONE && !CLIENT_BUILD
+﻿#if UNITY_SERVER || !MMO_BUILD
 using Mono.Data.Sqlite;
 
 namespace MultiplayerARPG.MMO

@@ -7,7 +7,7 @@ namespace MultiplayerARPG.MMO
 {
     public partial class MapNetworkManager
     {
-#if UNITY_STANDALONE && !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
         private async UniTask LoadStorageRoutine(StorageId storageId)
         {
             if (!loadingStorageIds.Contains(storageId))
@@ -29,7 +29,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if UNITY_STANDALONE && !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
         private async UniTask LoadPartyRoutine(int id)
         {
             if (id > 0 && !loadingPartyIds.Contains(id))
@@ -49,7 +49,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if UNITY_STANDALONE && !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
         private async UniTask LoadGuildRoutine(int id)
         {
             if (id > 0 && !loadingGuildIds.Contains(id))
@@ -69,7 +69,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if UNITY_STANDALONE && !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
         private async UniTask SaveCharacter(BasePlayerCharacterEntity playerCharacterEntity,
             bool changeMap = false, string mapName = "",
             Vector3 position = new Vector3(), bool overrideRotation = false, Vector3 rotation = new Vector3())
@@ -106,7 +106,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if UNITY_STANDALONE && !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
         private async UniTask SaveCharacterRoutine(PlayerCharacterData playerCharacterData, List<CharacterBuff> summonBuffs)
         {
             if (playerCharacterData != null && !savingCharacters.Contains(playerCharacterData.Id))
@@ -129,7 +129,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if UNITY_STANDALONE && !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
         private async UniTaskVoid SaveCharactersRoutine()
         {
             if (savingCharacters.Count == 0)
@@ -149,7 +149,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if UNITY_STANDALONE && !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
         private async UniTask SaveBuildingRoutine(BuildingSaveData buildingSaveData)
         {
             if (!savingBuildings.Contains(buildingSaveData.Id))
@@ -168,7 +168,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if UNITY_STANDALONE && !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
         private async UniTaskVoid SaveBuildingsRoutine()
         {
             if (savingBuildings.Count == 0)
@@ -188,7 +188,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if UNITY_STANDALONE && !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
         public override BuildingEntity CreateBuildingEntity(BuildingSaveData saveData, bool initialize)
         {
             CreateBuildingEntityRoutine(saveData, initialize).Forget();
@@ -208,7 +208,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if UNITY_STANDALONE && !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
         public override void DestroyBuildingEntity(string id)
         {
             base.DestroyBuildingEntity(id);

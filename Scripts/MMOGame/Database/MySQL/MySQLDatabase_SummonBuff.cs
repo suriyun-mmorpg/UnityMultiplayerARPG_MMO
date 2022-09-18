@@ -1,4 +1,4 @@
-﻿#if UNITY_STANDALONE && !CLIENT_BUILD
+﻿#if UNITY_SERVER || !MMO_BUILD
 using LiteNetLibManager;
 using MySqlConnector;
 using System.Collections.Generic;

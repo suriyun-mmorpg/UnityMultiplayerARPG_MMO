@@ -13,7 +13,7 @@ namespace MultiplayerARPG.MMO
         public static readonly ConcurrentDictionary<long, GuildData> UpdatingGuildMembers = new ConcurrentDictionary<long, GuildData>();
         public static readonly HashSet<string> GuildInvitations = new HashSet<string>();
 
-#if UNITY_STANDALONE && !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
         public IDatabaseClient DbServiceClient
         {
             get { return MMOServerInstance.Singleton.DatabaseNetworkManager; }
@@ -76,7 +76,7 @@ namespace MultiplayerARPG.MMO
 
         public async UniTaskVoid IncreaseGuildExp(IPlayerCharacterData playerCharacter, int exp)
         {
-#if UNITY_STANDALONE && !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
             ValidateGuildRequestResult validateResult = this.CanIncreaseGuildExp(playerCharacter, exp);
             if (!validateResult.IsSuccess)
                 return;

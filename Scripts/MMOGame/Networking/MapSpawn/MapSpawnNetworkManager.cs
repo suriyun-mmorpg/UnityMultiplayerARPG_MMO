@@ -71,7 +71,7 @@ namespace MultiplayerARPG.MMO
             }
         }
 
-#if UNITY_STANDALONE && !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
         public ClusterClient ClusterClient { get; private set; }
 #endif
         public string ClusterServerAddress { get { return clusterServerAddress; } }
@@ -88,7 +88,7 @@ namespace MultiplayerARPG.MMO
             TransportFactory = gameObject.GetOrAddComponent<TcpTransportFactory>();
             maxConnections = int.MaxValue;
             base.Start();
-#if UNITY_STANDALONE && !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
             ClusterClient = new ClusterClient(this);
             ClusterClient.onResponseAppServerRegister = OnResponseAppServerRegister;
             ClusterClient.RegisterRequestHandler<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.RequestSpawnMap, HandleRequestSpawnMap);
@@ -124,7 +124,7 @@ namespace MultiplayerARPG.MMO
             }
         }
 
-#if UNITY_STANDALONE && !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
         public override void OnStartServer()
         {
             this.InvokeInstanceDevExtMethods("OnStartServer");
@@ -135,7 +135,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if UNITY_STANDALONE && !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
         public override void OnStopServer()
         {
             ClusterClient.OnAppStop();
@@ -157,7 +157,7 @@ namespace MultiplayerARPG.MMO
             base.OnStopClient();
         }
 
-#if UNITY_STANDALONE && !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
         protected override void FixedUpdate()
         {
             base.FixedUpdate();
@@ -194,7 +194,7 @@ namespace MultiplayerARPG.MMO
             base.OnDestroy();
         }
 
-#if UNITY_STANDALONE && !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
         internal async UniTaskVoid HandleRequestSpawnMap(
             RequestHandlerData requestHandler,
             RequestSpawnMapMessage request,
@@ -221,7 +221,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if UNITY_STANDALONE && !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
         private void OnResponseAppServerRegister(AckResponseCode responseCode)
         {
             if (responseCode != AckResponseCode.Success)
@@ -235,7 +235,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if UNITY_STANDALONE && !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
         private async UniTaskVoid SpawnMaps(List<BaseMapInfo> spawningMaps)
         {
             foreach (BaseMapInfo map in spawningMaps)
@@ -252,7 +252,7 @@ namespace MultiplayerARPG.MMO
             freePorts.Enqueue(port);
         }
 
-#if UNITY_STANDALONE && !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
         private void SpawnMap(
             RequestSpawnMapMessage message,
             RequestProceedResultDelegate<ResponseSpawnMapMessage> result,
@@ -262,7 +262,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if UNITY_STANDALONE && !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
         private void SpawnMap(
             string mapId, bool autoRestart,
             RequestSpawnMapMessage? request = null,

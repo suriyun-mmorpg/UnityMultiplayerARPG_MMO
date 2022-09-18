@@ -7,7 +7,7 @@ namespace MultiplayerARPG.MMO
 {
     public partial class MMOServerCashShopMessageHandlers : MonoBehaviour, IServerCashShopMessageHandlers
     {
-#if UNITY_STANDALONE && !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
         public IDatabaseClient DbServiceClient
         {
             get { return MMOServerInstance.Singleton.DatabaseNetworkManager; }
@@ -18,7 +18,7 @@ namespace MultiplayerARPG.MMO
             RequestHandlerData requestHandler, EmptyMessage request,
             RequestProceedResultDelegate<ResponseCashShopInfoMessage> result)
         {
-#if UNITY_STANDALONE && !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
             string userId;
             if (!GameInstance.ServerUserHandlers.TryGetUserId(requestHandler.ConnectionId, out userId))
             {
@@ -54,7 +54,7 @@ namespace MultiplayerARPG.MMO
             RequestHandlerData requestHandler, RequestCashShopBuyMessage request,
             RequestProceedResultDelegate<ResponseCashShopBuyMessage> result)
         {
-#if UNITY_STANDALONE && !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
             IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
@@ -216,7 +216,7 @@ namespace MultiplayerARPG.MMO
             RequestHandlerData requestHandler, EmptyMessage request,
             RequestProceedResultDelegate<ResponseCashPackageInfoMessage> result)
         {
-#if UNITY_STANDALONE && !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
             string userId;
             if (!GameInstance.ServerUserHandlers.TryGetUserId(requestHandler.ConnectionId, out userId))
             {
@@ -252,7 +252,7 @@ namespace MultiplayerARPG.MMO
             RequestHandlerData requestHandler, RequestCashPackageBuyValidationMessage request,
             RequestProceedResultDelegate<ResponseCashPackageBuyValidationMessage> result)
         {
-#if UNITY_STANDALONE && !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
             // TODO: Validate purchasing at server side
             IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))

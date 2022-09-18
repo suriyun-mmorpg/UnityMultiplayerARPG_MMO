@@ -6,7 +6,7 @@ namespace MultiplayerARPG.MMO
 {
     public partial class MMOServerMailHandlers : MonoBehaviour, IServerMailHandlers
     {
-#if UNITY_STANDALONE && !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
         public IDatabaseClient DbServiceClient
         {
             get { return MMOServerInstance.Singleton.DatabaseNetworkManager; }
@@ -15,7 +15,7 @@ namespace MultiplayerARPG.MMO
 
         public async UniTask<bool> SendMail(Mail mail)
         {
-#if UNITY_STANDALONE && !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
             AsyncResponseData<SendMailResp> resp = await DbServiceClient.SendMailAsync(new SendMailReq()
             {
                 Mail = mail,

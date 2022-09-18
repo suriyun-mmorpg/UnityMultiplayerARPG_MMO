@@ -16,7 +16,7 @@ namespace MultiplayerARPG.MMO
         [SerializeField]
         private BaseDatabase[] databaseOptions = new BaseDatabase[0];
 
-#if UNITY_STANDALONE && !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
         public BaseDatabase Database { get { return database == null ? databaseOptions.FirstOrDefault() : database; } }
 
         public void SetDatabaseByOptionIndex(int index)
@@ -29,7 +29,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if UNITY_STANDALONE && !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
         // TODO: I'm going to make in-memory database without Redis for now
         // In the future it may implements Redis
         // It's going to get some data from all tables but not every records
@@ -61,7 +61,7 @@ namespace MultiplayerARPG.MMO
         public override void OnStartServer()
         {
             base.OnStartServer();
-#if UNITY_STANDALONE && !CLIENT_BUILD
+#if UNITY_SERVER || !MMO_BUILD
             Database.Initialize();
 #endif
         }
