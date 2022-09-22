@@ -15,7 +15,7 @@ namespace MultiplayerARPG.MMO
         public override string LogTag { get { return nameof(ClusterServer); } }
 
         private readonly CentralNetworkManager centralNetworkManager;
-#if UNITY_EDITOR || UNITY_SERVER || !MMO_BUILD
+#if UNITY_EDITOR || UNITY_SERVER
         internal Dictionary<string, SocialCharacterData> MapUsersByCharacterId { get; private set; } = new Dictionary<string, SocialCharacterData>();
         internal Dictionary<string, long> ConnectionIdsByCharacterId { get; private set; } = new Dictionary<string, long>();
         internal Dictionary<string, long> ConnectionIdsByCharacterName { get; private set; } = new Dictionary<string, long>();
@@ -32,7 +32,7 @@ namespace MultiplayerARPG.MMO
         public ClusterServer(CentralNetworkManager centralNetworkManager) : base(new TcpTransport())
         {
             this.centralNetworkManager = centralNetworkManager;
-#if UNITY_EDITOR || UNITY_SERVER || !MMO_BUILD
+#if UNITY_EDITOR || UNITY_SERVER
             EnableRequestResponse(MMOMessageTypes.Request, MMOMessageTypes.Response);
             // Generic
             RegisterRequestHandler<RequestAppServerRegisterMessage, ResponseAppServerRegisterMessage>(MMORequestTypes.RequestAppServerRegister, HandleRequestAppServerRegister);
@@ -51,14 +51,14 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-#if UNITY_EDITOR || UNITY_SERVER || !MMO_BUILD
+#if UNITY_EDITOR || UNITY_SERVER
         public bool StartServer()
         {
             return StartServer(centralNetworkManager.clusterServerPort, int.MaxValue);
         }
 #endif
 
-#if UNITY_EDITOR || UNITY_SERVER || !MMO_BUILD
+#if UNITY_EDITOR || UNITY_SERVER
         protected override void OnStopServer()
         {
             base.OnStopServer();
@@ -72,7 +72,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if UNITY_EDITOR || UNITY_SERVER || !MMO_BUILD
+#if UNITY_EDITOR || UNITY_SERVER
         public override void OnServerReceive(TransportEventData eventData)
         {
             CentralServerPeerInfo tempPeerInfo;
@@ -106,7 +106,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if UNITY_EDITOR || UNITY_SERVER || !MMO_BUILD
+#if UNITY_EDITOR || UNITY_SERVER
         private void RemoveMapUsers(long connectionId)
         {
             List<KeyValuePair<string, SocialCharacterData>> mapUsers = MapUsersByCharacterId.ToList();
@@ -128,7 +128,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if UNITY_EDITOR || UNITY_SERVER || !MMO_BUILD
+#if UNITY_EDITOR || UNITY_SERVER
         private async UniTaskVoid HandleRequestAppServerRegister(
             RequestHandlerData requestHandler,
             RequestAppServerRegisterMessage request,
@@ -196,7 +196,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if UNITY_EDITOR || UNITY_SERVER || !MMO_BUILD
+#if UNITY_EDITOR || UNITY_SERVER
         /// <summary>
         /// This function will be used to send connection information to connected map servers and cluster servers
         /// </summary>
@@ -223,7 +223,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if UNITY_EDITOR || UNITY_SERVER || !MMO_BUILD
+#if UNITY_EDITOR || UNITY_SERVER
         private async UniTaskVoid HandleRequestAppServerAddress(
             RequestHandlerData requestHandler,
             RequestAppServerAddressMessage request,
@@ -276,7 +276,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if UNITY_EDITOR || UNITY_SERVER || !MMO_BUILD
+#if UNITY_EDITOR || UNITY_SERVER
         private void HandleChat(MessageHandlerData messageHandler)
         {
             long connectionId = messageHandler.ConnectionId;
@@ -304,7 +304,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if UNITY_EDITOR || UNITY_SERVER || !MMO_BUILD
+#if UNITY_EDITOR || UNITY_SERVER
         private void HandleUpdateMapUser(MessageHandlerData messageHandler)
         {
             long connectionId = messageHandler.ConnectionId;
@@ -341,7 +341,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if UNITY_EDITOR || UNITY_SERVER || !MMO_BUILD
+#if UNITY_EDITOR || UNITY_SERVER
         public void HandleUpdatePartyMember(MessageHandlerData messageHandler)
         {
             long connectionId = messageHandler.ConnectionId;
@@ -357,7 +357,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if UNITY_EDITOR || UNITY_SERVER || !MMO_BUILD
+#if UNITY_EDITOR || UNITY_SERVER
         public void HandleUpdateParty(MessageHandlerData messageHandler)
         {
             long connectionId = messageHandler.ConnectionId;
@@ -373,7 +373,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if UNITY_EDITOR || UNITY_SERVER || !MMO_BUILD
+#if UNITY_EDITOR || UNITY_SERVER
         public void HandleUpdateGuildMember(MessageHandlerData messageHandler)
         {
             long connectionId = messageHandler.ConnectionId;
@@ -389,7 +389,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if UNITY_EDITOR || UNITY_SERVER || !MMO_BUILD
+#if UNITY_EDITOR || UNITY_SERVER
         public void HandleUpdateGuild(MessageHandlerData messageHandler)
         {
             long connectionId = messageHandler.ConnectionId;
@@ -405,7 +405,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if UNITY_EDITOR || UNITY_SERVER || !MMO_BUILD
+#if UNITY_EDITOR || UNITY_SERVER
         public void UpdateMapUser(UpdateUserCharacterMessage.UpdateType updateType, SocialCharacterData userData, long exceptConnectionId)
         {
             foreach (long mapServerConnectionId in MapServerPeers.Keys)
@@ -418,7 +418,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if UNITY_EDITOR || UNITY_SERVER || !MMO_BUILD
+#if UNITY_EDITOR || UNITY_SERVER
         public void UpdateMapUser(long connectionId, UpdateUserCharacterMessage.UpdateType updateType, SocialCharacterData userData)
         {
             UpdateUserCharacterMessage message = new UpdateUserCharacterMessage();
@@ -428,7 +428,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if UNITY_EDITOR || UNITY_SERVER || !MMO_BUILD
+#if UNITY_EDITOR || UNITY_SERVER
         public void KickUser(string userId)
         {
             foreach (long connectionId in MapServerPeers.Keys)
@@ -440,7 +440,7 @@ namespace MultiplayerARPG.MMO
 
         public bool MapContainsUser(string userId)
         {
-#if UNITY_EDITOR || UNITY_SERVER || !MMO_BUILD
+#if UNITY_EDITOR || UNITY_SERVER
             foreach (SocialCharacterData mapUser in MapUsersByCharacterId.Values)
             {
                 if (mapUser.userId.Equals(userId))
@@ -477,7 +477,7 @@ namespace MultiplayerARPG.MMO
             RequestSpawnMapMessage request,
             RequestProceedResultDelegate<ResponseSpawnMapMessage> result)
         {
-#if UNITY_EDITOR || UNITY_SERVER || !MMO_BUILD
+#if UNITY_EDITOR || UNITY_SERVER
             string requestId = GenericUtils.GetUniqueId();
             request.requestId = requestId;
             List<long> connectionIds = new List<long>(MapSpawnServerPeers.Keys);
@@ -495,7 +495,7 @@ namespace MultiplayerARPG.MMO
             AckResponseCode responseCode,
             ResponseSpawnMapMessage response)
         {
-#if UNITY_EDITOR || UNITY_SERVER || !MMO_BUILD
+#if UNITY_EDITOR || UNITY_SERVER
             // Forward responses to map server transport handler
             RequestProceedResultDelegate<ResponseSpawnMapMessage> result;
             if (RequestSpawnMapHandlers.TryGetValue(response.requestId, out result))
@@ -512,7 +512,7 @@ namespace MultiplayerARPG.MMO
             EmptyMessage request,
             RequestProceedResultDelegate<ResponseUserCountMessage> result)
         {
-#if UNITY_EDITOR || UNITY_SERVER || !MMO_BUILD
+#if UNITY_EDITOR || UNITY_SERVER
             result.Invoke(AckResponseCode.Success, new ResponseUserCountMessage()
             {
                 userCount = MapUsersByCharacterId.Count,

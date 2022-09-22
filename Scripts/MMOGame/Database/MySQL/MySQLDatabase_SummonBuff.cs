@@ -1,4 +1,4 @@
-﻿#if UNITY_EDITOR || UNITY_SERVER || !MMO_BUILD
+﻿#if UNITY_EDITOR || UNITY_SERVER
 using LiteNetLibManager;
 using MySqlConnector;
 using System.Collections.Generic;

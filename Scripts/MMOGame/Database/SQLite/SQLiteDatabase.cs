@@ -1,4 +1,4 @@
-﻿#if UNITY_EDITOR || UNITY_SERVER || !MMO_BUILD
+﻿#if UNITY_EDITOR || UNITY_SERVER
 using Mono.Data.Sqlite;
 using System.Collections.Generic;
 using System.IO;
@@ -19,7 +19,7 @@ namespace MultiplayerARPG.MMO
         [SerializeField]
         [Tooltip("You should set this to where you build app to make database path as same as map server")]
         private string editorDbPath = "./mmorpgtemplate.sqlite3";
-#if UNITY_EDITOR || UNITY_SERVER || !MMO_BUILD
+#if UNITY_EDITOR || UNITY_SERVER
         private SqliteConnection connection;
 
         public override void Initialize()
