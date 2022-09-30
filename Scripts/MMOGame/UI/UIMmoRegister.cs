@@ -8,7 +8,7 @@ using UnityEditor;
 
 namespace MultiplayerARPG.MMO
 {
-    public class UIMmoRegister : UIBase
+    public partial class UIMmoRegister : UIBase
     {
         [System.Obsolete("Deprecated, use `uiTextUsername` instead.")]
         [HideInInspector]
