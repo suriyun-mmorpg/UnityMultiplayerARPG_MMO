@@ -37,7 +37,7 @@ public class LogGUI : MonoBehaviour
         LogManager.LoggerFactory = UnityLoggerFactory.Create(builder =>
         {
             builder.SetMinimumLevel(LogLevel.Trace);
-#if !UNITY_SERVER
+#if !UNITY_SERVER || DEVELOPMENT_BUILD
             builder.AddConfiguration();
             builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<ILoggerProvider, LogGUIProvider>(x => new LogGUIProvider(this, x.GetService<IOptions<ZLoggerOptions>>())));
             LoggerProviderOptions.RegisterProviderOptions<ZLoggerOptions, LogGUIProvider>(builder.Services);
@@ -52,21 +52,21 @@ public class LogGUI : MonoBehaviour
 
     private void OnEnable()
     {
-#if !UNITY_SERVER
+#if !UNITY_SERVER || DEVELOPMENT_BUILD
         Application.logMessageReceivedThreaded += HandleLog;
 #endif
     }
 
     private void OnDisable()
     {
-#if !UNITY_SERVER
+#if !UNITY_SERVER || DEVELOPMENT_BUILD
         Application.logMessageReceivedThreaded -= HandleLog;
 #endif
     }
 
     private void HandleLog(LogType type, string logString)
     {
-#if !UNITY_SERVER
+#if !UNITY_SERVER || DEVELOPMENT_BUILD
         if (!loggingEnabled)
             return;
         Color color = Color.white;
@@ -98,7 +98,7 @@ public class LogGUI : MonoBehaviour
         HandleLog(type, condition);
     }
 
-#if !UNITY_SERVER
+#if !UNITY_SERVER || DEVELOPMENT_BUILD
     void OnGUI()
     {
         if (logScrollingToBottom)
