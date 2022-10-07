@@ -295,9 +295,9 @@ namespace MultiplayerARPG.MMO
                     long senderConnectionId = 0;
                     long receiverConnectionId = 0;
                     // Send message to map server which have the character
-                    if (!string.IsNullOrEmpty(message.sender) && ConnectionIdsByCharacterName.TryGetValue(message.sender, out senderConnectionId))
+                    if (!string.IsNullOrEmpty(message.senderName) && ConnectionIdsByCharacterName.TryGetValue(message.senderName, out senderConnectionId))
                         SendPacket(senderConnectionId, 0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.Chat, (writer) => writer.PutValue(message));
-                    if (!string.IsNullOrEmpty(message.receiver) && ConnectionIdsByCharacterName.TryGetValue(message.receiver, out receiverConnectionId) && (receiverConnectionId != senderConnectionId))
+                    if (!string.IsNullOrEmpty(message.receiverName) && ConnectionIdsByCharacterName.TryGetValue(message.receiverName, out receiverConnectionId) && (receiverConnectionId != senderConnectionId))
                         SendPacket(receiverConnectionId, 0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.Chat, (writer) => writer.PutValue(message));
                     break;
             }

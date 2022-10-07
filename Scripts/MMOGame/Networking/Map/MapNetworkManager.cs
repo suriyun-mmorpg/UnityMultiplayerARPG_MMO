@@ -805,8 +805,8 @@ namespace MultiplayerARPG.MMO
             ChatMessage message = messageHandler.ReadMessage<ChatMessage>().FillChannelId();
             // Get character
             IPlayerCharacterData playerCharacter = null;
-            if (!string.IsNullOrEmpty(message.sender))
-                ServerUserHandlers.TryGetPlayerCharacterByName(message.sender, out playerCharacter);
+            if (!string.IsNullOrEmpty(message.senderName))
+                ServerUserHandlers.TryGetPlayerCharacterByName(message.senderName, out playerCharacter);
             // Set guild data
             if (playerCharacter != null)
             {
@@ -842,7 +842,7 @@ namespace MultiplayerARPG.MMO
                         CurrentGameInstance.GMCommands.IsGMCommand(message.message, out gmCommand) &&
                         CurrentGameInstance.GMCommands.CanUseGMCommand(playerCharacterEntity, gmCommand)))
                     {
-                        // If it's GM command and sender's user level > 0, handle gm commands
+                        // If it's GM command and senderName's user level > 0, handle gm commands
                         // Send GM command to cluster server to broadcast to other servers later
                         if (ClusterClient.IsNetworkActive)
                             ClusterClient.SendPacket(0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.Chat, (writer) => writer.PutValue(message));
@@ -855,7 +855,7 @@ namespace MultiplayerARPG.MMO
             }
             if (message.channel == ChatChannel.System)
             {
-                if (ServerChatHandlers.CanSendSystemAnnounce(message.sender))
+                if (ServerChatHandlers.CanSendSystemAnnounce(message.senderName))
                 {
                     // Send chat message to cluster server, for MMO mode chat message handling by cluster server
                     if (ClusterClient.IsNetworkActive)
@@ -927,8 +927,8 @@ namespace MultiplayerARPG.MMO
             {
                 // Handle GM command here, only GM command will be broadcasted as local channel
                 BasePlayerCharacterEntity playerCharacterEntity;
-                ServerUserHandlers.TryGetPlayerCharacterByName(message.sender, out playerCharacterEntity);
-                string response = CurrentGameInstance.GMCommands.HandleGMCommand(message.sender, playerCharacterEntity, message.message);
+                ServerUserHandlers.TryGetPlayerCharacterByName(message.senderName, out playerCharacterEntity);
+                string response = CurrentGameInstance.GMCommands.HandleGMCommand(message.senderName, playerCharacterEntity, message.message);
                 if (playerCharacterEntity != null && !string.IsNullOrEmpty(response))
                 {
                     ServerSendPacket(playerCharacterEntity.ConnectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, new ChatMessage()
@@ -1001,7 +1001,7 @@ namespace MultiplayerARPG.MMO
                             ServerGameMessageHandlers.SendSetPartyData(playerCharacterEntity.ConnectionId, party);
                             ServerGameMessageHandlers.SendAddPartyMembersToOne(playerCharacterEntity.ConnectionId, party);
                         }
-                        ServerGameMessageHandlers.SendAddPartyMemberToMembers(party, message.character.id, message.character.characterName, message.character.dataId, message.character.level);
+                        ServerGameMessageHandlers.SendAddPartyMemberToMembers(party, message.character);
                         break;
                     case UpdateSocialMemberMessage.UpdateType.Remove:
                         if (ServerUserHandlers.TryGetPlayerCharacterById(message.character.id, out playerCharacterEntity))
@@ -1070,7 +1070,7 @@ namespace MultiplayerARPG.MMO
                             ServerGameMessageHandlers.SendSetGuildData(playerCharacterEntity.ConnectionId, guild);
                             ServerGameMessageHandlers.SendAddGuildMembersToOne(playerCharacterEntity.ConnectionId, guild);
                         }
-                        ServerGameMessageHandlers.SendAddGuildMemberToMembers(guild, message.character.id, message.character.characterName, message.character.dataId, message.character.level);
+                        ServerGameMessageHandlers.SendAddGuildMemberToMembers(guild, message.character);
                         break;
                     case UpdateSocialMemberMessage.UpdateType.Remove:
                         if (ServerUserHandlers.TryGetPlayerCharacterById(message.character.id, out playerCharacterEntity))
