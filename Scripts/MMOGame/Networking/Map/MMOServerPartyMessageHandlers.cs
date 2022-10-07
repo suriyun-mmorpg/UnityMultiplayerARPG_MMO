@@ -61,11 +61,11 @@ namespace MultiplayerARPG.MMO
             // Broadcast via chat server
             if (ClusterClient.IsNetworkActive)
             {
-                ClusterClient.SendAddSocialMember(MMOMessageTypes.UpdatePartyMember, request.partyId, playerCharacter.Id, playerCharacter.CharacterName, playerCharacter.DataId, playerCharacter.Level);
+                ClusterClient.SendAddSocialMember(MMOMessageTypes.UpdatePartyMember, request.partyId, SocialCharacterData.Create(playerCharacter));
             }
             GameInstance.ServerGameMessageHandlers.SendSetPartyData(requestHandler.ConnectionId, validateResult.Party);
             GameInstance.ServerGameMessageHandlers.SendAddPartyMembersToOne(requestHandler.ConnectionId, validateResult.Party);
-            GameInstance.ServerGameMessageHandlers.SendAddPartyMemberToMembers(validateResult.Party, playerCharacter.Id, playerCharacter.CharacterName, playerCharacter.DataId, playerCharacter.Level);
+            GameInstance.ServerGameMessageHandlers.SendAddPartyMemberToMembers(validateResult.Party, SocialCharacterData.Create(playerCharacter));
             // Send message to inviter
             GameInstance.ServerGameMessageHandlers.SendGameMessageByCharacterId(request.inviterId, UITextKeys.UI_PARTY_INVITATION_ACCEPTED);
             // Response to invitee
@@ -198,7 +198,7 @@ namespace MultiplayerARPG.MMO
             if (ClusterClient.IsNetworkActive)
             {
                 ClusterClient.SendCreateParty(MMOMessageTypes.UpdateParty, party.id, party.shareExp, party.shareItem, playerCharacter.Id);
-                ClusterClient.SendAddSocialMember(MMOMessageTypes.UpdatePartyMember, party.id, playerCharacter.Id, playerCharacter.CharacterName, playerCharacter.DataId, playerCharacter.Level);
+                ClusterClient.SendAddSocialMember(MMOMessageTypes.UpdatePartyMember, party.id, SocialCharacterData.Create(playerCharacter));
             }
             GameInstance.ServerGameMessageHandlers.SendSetPartyData(requestHandler.ConnectionId, party);
             GameInstance.ServerGameMessageHandlers.SendAddPartyMembersToOne(requestHandler.ConnectionId, party);

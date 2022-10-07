@@ -62,11 +62,11 @@ namespace MultiplayerARPG.MMO
             // Broadcast via chat server
             if (ClusterClient.IsNetworkActive)
             {
-                ClusterClient.SendAddSocialMember(MMOMessageTypes.UpdateGuildMember, request.guildId, playerCharacter.Id, playerCharacter.CharacterName, playerCharacter.DataId, playerCharacter.Level);
+                ClusterClient.SendAddSocialMember(MMOMessageTypes.UpdateGuildMember, request.guildId, SocialCharacterData.Create(playerCharacter));
             }
             GameInstance.ServerGameMessageHandlers.SendSetGuildData(requestHandler.ConnectionId, validateResult.Guild);
             GameInstance.ServerGameMessageHandlers.SendAddGuildMembersToOne(requestHandler.ConnectionId, validateResult.Guild);
-            GameInstance.ServerGameMessageHandlers.SendAddGuildMemberToMembers(validateResult.Guild, playerCharacter.Id, playerCharacter.CharacterName, playerCharacter.DataId, playerCharacter.Level);
+            GameInstance.ServerGameMessageHandlers.SendAddGuildMemberToMembers(validateResult.Guild, SocialCharacterData.Create(playerCharacter));
             // Send message to inviter
             GameInstance.ServerGameMessageHandlers.SendGameMessageByCharacterId(request.inviterId, UITextKeys.UI_GUILD_INVITATION_ACCEPTED);
             // Response to invitee
@@ -230,7 +230,7 @@ namespace MultiplayerARPG.MMO
             if (ClusterClient.IsNetworkActive)
             {
                 ClusterClient.SendCreateGuild(MMOMessageTypes.UpdateGuild, guild.id, guildName, playerCharacter.Id);
-                ClusterClient.SendAddSocialMember(MMOMessageTypes.UpdateGuildMember, guild.id, playerCharacter.Id, playerCharacter.CharacterName, playerCharacter.DataId, playerCharacter.Level);
+                ClusterClient.SendAddSocialMember(MMOMessageTypes.UpdateGuildMember, guild.id, SocialCharacterData.Create(playerCharacter));
             }
             GameInstance.ServerGameMessageHandlers.SendSetGuildData(requestHandler.ConnectionId, guild);
             GameInstance.ServerGameMessageHandlers.SendAddGuildMembersToOne(requestHandler.ConnectionId, guild);
