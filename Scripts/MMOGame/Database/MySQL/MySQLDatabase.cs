@@ -354,25 +354,31 @@ namespace MultiplayerARPG.MMO
                 InsertMigrationId(migrationId);
                 Logging.Log($"Migrated to {migrationId}");
             }
+            migrationId = " 1.78";
+            if (!HasMigrationId(migrationId))
+            {
+                Logging.Log($"Migrating up to {migrationId}");
+                ExecuteNonQuerySync("ALTER TABLE `characters` ADD `iconDataId` INT NOT NULL DEFAULT '0' AFTER `mountDataId`, ADD `frameDataId` INT NOT NULL DEFAULT '0' AFTER `iconDataId`, ADD `titleDataId` INT NOT NULL DEFAULT '0' AFTER `frameDataId`;");
+                // Insert migrate history
+                InsertMigrationId(migrationId);
+                Logging.Log($"Migrated to {migrationId}");
+            }
         }
-
         private bool HasMigrationId(string migrationId)
         {
             object result = ExecuteScalarSync("SELECT COUNT(*) FROM __migrations WHERE migrationId=@migrationId", new MySqlParameter("@migrationId", migrationId));
             long count = result != null ? (long)result : 0;
             return count > 0;
         }
-
         public void InsertMigrationId(string migrationId)
         {
             ExecuteNonQuerySync("INSERT INTO __migrations (migrationId) VALUES (@migrationId)", new MySqlParameter("@migrationId", migrationId));
         }
-
         public string GetConnectionString()
         {
             string connectionString = "Server=" + address + ";" +
-                "Port=" + port + ";" +
-                "Uid=" + username + ";" +
+            "Port=" + port + ";" +
+            "Uid=" + username + ";" +
                 (string.IsNullOrEmpty(password) ? "" : "Pwd=\"" + password + "\";") +
                 "Database=" + dbName + ";" +
                 "SSL Mode=None;";

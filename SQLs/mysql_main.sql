@@ -184,6 +184,9 @@ CREATE TABLE `characters` (
   `respawnPositionY` float NOT NULL DEFAULT '0',
   `respawnPositionZ` float NOT NULL DEFAULT '0',
   `mountDataId` int NOT NULL DEFAULT '0',
+  `iconDataId` int NOT NULL DEFAULT '0',
+  `frameDataId` int NOT NULL DEFAULT '0',
+  `titleDataId` int NOT NULL DEFAULT '0',
   `lastDeadTime` bigint NOT NULL DEFAULT '0',
   `unmuteTime` bigint NOT NULL DEFAULT '0',
   `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -456,7 +459,8 @@ INSERT INTO `__migrations` (`migrationId`) VALUES
 ('1.72d'),
 ('1.73'),
 ('1.76'),
-('1.77');
+('1.77'),
+('1.78');
 
 --
 -- Indexes for dumped tables
