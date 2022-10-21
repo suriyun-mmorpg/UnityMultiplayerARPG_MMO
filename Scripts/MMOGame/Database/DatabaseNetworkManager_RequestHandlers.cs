@@ -1118,6 +1118,10 @@ namespace MultiplayerARPG.MMO
             // Update storage list
             // TODO: May update later to reduce amount of processes
             Database.UpdateStorageItems(request.StorageType, request.StorageOwnerId, storageItemList);
+            // Update character inventory
+            cachedUserCharacter[character.Id] = character;
+            Database.UpdateCharacter(character);
+            // Response
             result.Invoke(AckResponseCode.Success, new MoveItemToStorageResp()
             {
                 InventoryItemItems = new List<CharacterItem>(character.NonEquipItems),
@@ -1224,6 +1228,10 @@ namespace MultiplayerARPG.MMO
             // Update storage list
             // TODO: May update later to reduce amount of processes
             Database.UpdateStorageItems(request.StorageType, request.StorageOwnerId, storageItemList);
+            // Update character inventory
+            cachedUserCharacter[character.Id] = character;
+            Database.UpdateCharacter(character);
+            // Response
             result.Invoke(AckResponseCode.Success, new MoveItemFromStorageResp()
             {
                 InventoryItemItems = new List<CharacterItem>(character.NonEquipItems),
