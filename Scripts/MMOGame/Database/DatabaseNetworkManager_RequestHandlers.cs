@@ -1076,7 +1076,7 @@ namespace MultiplayerARPG.MMO
                     return;
                 }
                 // Remove from inventory
-                character.DecreaseItemsByIndex(request.InventoryItemIndex, request.InventoryItemAmount);
+                character.DecreaseItemsByIndex(request.InventoryItemIndex, request.InventoryItemAmount, true);
                 character.FillEmptySlots();
             }
             else
@@ -1102,7 +1102,7 @@ namespace MultiplayerARPG.MMO
                     movingItem.id = GenericUtils.GetUniqueId();
                     storageItemList[request.StorageItemIndex] = movingItem;
                     // Remove from inventory
-                    character.DecreaseItemsByIndex(request.InventoryItemIndex, request.InventoryItemAmount);
+                    character.DecreaseItemsByIndex(request.InventoryItemIndex, request.InventoryItemAmount, true);
                     character.FillEmptySlots();
                 }
                 else
@@ -1188,7 +1188,7 @@ namespace MultiplayerARPG.MMO
                     return;
                 }
                 // Remove from storage
-                storageItemList.DecreaseItemsByIndex(request.StorageItemIndex, request.StorageItemAmount, isLimitSlot);
+                storageItemList.DecreaseItemsByIndex(request.StorageItemIndex, request.StorageItemAmount, isLimitSlot, true);
                 storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
             }
             else
@@ -1212,7 +1212,7 @@ namespace MultiplayerARPG.MMO
                     movingItem.id = GenericUtils.GetUniqueId();
                     character.NonEquipItems[request.InventoryItemIndex] = movingItem;
                     // Remove from storage
-                    storageItemList.DecreaseItemsByIndex(request.StorageItemIndex, request.StorageItemAmount, isLimitSlot);
+                    storageItemList.DecreaseItemsByIndex(request.StorageItemIndex, request.StorageItemAmount, isLimitSlot, true);
                     storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
                 }
                 else
