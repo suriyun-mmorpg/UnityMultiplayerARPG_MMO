@@ -101,6 +101,15 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
+            // TODO: Implement move item from equipped armor/weapon/shield later
+            if (request.inventoryType != InventoryType.NonEquipItems)
+            {
+                result.InvokeError(new ResponseMoveItemFromStorageMessage()
+                {
+                    message = UITextKeys.UI_ERROR_ITEM_NOT_FOUND,
+                });
+                return;
+            }
             Storage storage = GameInstance.ServerStorageHandlers.GetStorage(storageId, out _);
             AsyncResponseData<MoveItemFromStorageResp> resp = await DbServiceClient.MoveItemFromStorageAsync(new MoveItemFromStorageReq()
             {
@@ -168,6 +177,15 @@ namespace MultiplayerARPG.MMO
                 result.InvokeError(new ResponseMoveItemToStorageMessage()
                 {
                     message = UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE,
+                });
+                return;
+            }
+            // TODO: Implement move item from equipped armor/weapon/shield later
+            if (request.inventoryType != InventoryType.NonEquipItems)
+            {
+                result.InvokeError(new ResponseMoveItemToStorageMessage()
+                {
+                    message = UITextKeys.UI_ERROR_ITEM_NOT_FOUND,
                 });
                 return;
             }
