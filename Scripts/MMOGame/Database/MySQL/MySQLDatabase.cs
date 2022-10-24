@@ -363,6 +363,15 @@ namespace MultiplayerARPG.MMO
                 InsertMigrationId(migrationId);
                 Logging.Log($"Migrated to {migrationId}");
             }
+            migrationId = " 1.78b";
+            if (!HasMigrationId(migrationId))
+            {
+                Logging.Log($"Migrating up to {migrationId}");
+                ExecuteNonQuerySync("ALTER TABLE `storageitem` CHANGE `randomSeed` `randomSeed` INT(11) NOT NULL DEFAULT '0';");
+                // Insert migrate history
+                InsertMigrationId(migrationId);
+                Logging.Log($"Migrated to {migrationId}");
+            }
         }
         private bool HasMigrationId(string migrationId)
         {
