@@ -11,11 +11,11 @@ namespace MultiplayerARPG.MMO
             if (reader.Read())
             {
                 result = new CharacterBuff();
-                result.id = GenericUtils.GetUniqueId();
-                result.type = (BuffType)reader.GetByte(0);
-                result.dataId = reader.GetInt32(1);
-                result.level = reader.GetInt16(2);
-                result.buffRemainsDuration = reader.GetFloat(3);
+                result.id = reader.GetString(0);
+                result.type = (BuffType)reader.GetByte(1);
+                result.dataId = reader.GetInt32(2);
+                result.level = reader.GetInt16(3);
+                result.buffRemainsDuration = reader.GetFloat(4);
                 return true;
             }
             result = CharacterBuff.Empty;
@@ -25,7 +25,7 @@ namespace MultiplayerARPG.MMO
         public void CreateCharacterBuff(SqliteTransaction transaction, string characterId, CharacterBuff characterBuff)
         {
             ExecuteNonQuery(transaction, "INSERT INTO characterbuff (id, characterId, type, dataId, level, buffRemainsDuration) VALUES (@id, @characterId, @type, @dataId, @level, @buffRemainsDuration)",
-                new SqliteParameter("@id", characterId + "_" + characterBuff.type + "_" + characterBuff.dataId),
+                new SqliteParameter("@id", characterBuff.id),
                 new SqliteParameter("@characterId", characterId),
                 new SqliteParameter("@type", (byte)characterBuff.type),
                 new SqliteParameter("@dataId", characterBuff.dataId),
@@ -43,7 +43,7 @@ namespace MultiplayerARPG.MMO
                 {
                     result.Add(tempBuff);
                 }
-            }, "SELECT type, dataId, level, buffRemainsDuration FROM characterbuff WHERE characterId=@characterId ORDER BY buffRemainsDuration ASC",
+            }, "SELECT id, type, dataId, level, buffRemainsDuration FROM characterbuff WHERE characterId=@characterId ORDER BY buffRemainsDuration ASC",
                 new SqliteParameter("@characterId", characterId));
             return result;
         }
