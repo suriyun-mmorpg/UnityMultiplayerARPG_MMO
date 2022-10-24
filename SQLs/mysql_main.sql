@@ -380,7 +380,7 @@ CREATE TABLE `storageitem` (
   `exp` int NOT NULL DEFAULT '0',
   `lockRemainsDuration` float NOT NULL DEFAULT '0',
   `expireTime` bigint NOT NULL DEFAULT '0',
-  `randomSeed` tinyint UNSIGNED NOT NULL DEFAULT '0',
+  `randomSeed` int NOT NULL DEFAULT '0',
   `ammo` int NOT NULL DEFAULT '0',
   `sockets` text CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -460,7 +460,8 @@ INSERT INTO `__migrations` (`migrationId`) VALUES
 ('1.73'),
 ('1.76'),
 ('1.77'),
-('1.78');
+('1.78'),
+('1.78b');
 
 --
 -- Indexes for dumped tables
