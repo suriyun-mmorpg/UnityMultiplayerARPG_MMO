@@ -110,6 +110,14 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
+            BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
+            if (playerCharacterEntity != null && !playerCharacterEntity.CanMoveItem)
+            {
+                result.InvokeError(new ResponseMoveItemFromStorageMessage());
+                return;
+            }
+            if (playerCharacterEntity != null)
+                playerCharacterEntity.IsUpdatingStorage = true;
             Storage storage = GameInstance.ServerStorageHandlers.GetStorage(storageId, out _);
             AsyncResponseData<MoveItemFromStorageResp> resp = await DbServiceClient.MoveItemFromStorageAsync(new MoveItemFromStorageReq()
             {
@@ -123,6 +131,8 @@ namespace MultiplayerARPG.MMO
                 InventoryItemIndex = request.inventoryItemIndex,
                 Inventory = new List<CharacterItem>(playerCharacter.NonEquipItems),
             });
+            if (playerCharacterEntity != null)
+                playerCharacterEntity.IsUpdatingStorage = false;
             if (!resp.IsSuccess)
             {
                 result.InvokeError(new ResponseMoveItemFromStorageMessage()
@@ -189,6 +199,14 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
+            BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
+            if (playerCharacterEntity != null && !playerCharacterEntity.CanMoveItem)
+            {
+                result.InvokeError(new ResponseMoveItemToStorageMessage());
+                return;
+            }
+            if (playerCharacterEntity != null)
+                playerCharacterEntity.IsUpdatingStorage = true;
             Storage storage = GameInstance.ServerStorageHandlers.GetStorage(storageId, out _);
             AsyncResponseData<MoveItemToStorageResp> resp = await DbServiceClient.MoveItemToStorageAsync(new MoveItemToStorageReq()
             {
@@ -202,6 +220,8 @@ namespace MultiplayerARPG.MMO
                 StorageItemIndex = request.storageItemIndex,
                 Inventory = new List<CharacterItem>(playerCharacter.NonEquipItems),
             });
+            if (playerCharacterEntity != null)
+                playerCharacterEntity.IsUpdatingStorage = false;
             if (!resp.IsSuccess)
             {
                 result.InvokeError(new ResponseMoveItemToStorageMessage()
@@ -259,6 +279,14 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
+            BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
+            if (playerCharacterEntity != null && !playerCharacterEntity.CanMoveItem)
+            {
+                result.InvokeError(new ResponseSwapOrMergeStorageItemMessage());
+                return;
+            }
+            if (playerCharacterEntity != null)
+                playerCharacterEntity.IsUpdatingStorage = true;
             Storage storage = GameInstance.ServerStorageHandlers.GetStorage(storageId, out _);
             AsyncResponseData<SwapOrMergeStorageItemResp> resp = await DbServiceClient.SwapOrMergeStorageItemAsync(new SwapOrMergeStorageItemReq()
             {
@@ -270,6 +298,8 @@ namespace MultiplayerARPG.MMO
                 FromIndex = request.fromIndex,
                 ToIndex = request.toIndex,
             });
+            if (playerCharacterEntity != null)
+                playerCharacterEntity.IsUpdatingStorage = false;
             if (!resp.IsSuccess)
             {
                 result.InvokeError(new ResponseSwapOrMergeStorageItemMessage()
