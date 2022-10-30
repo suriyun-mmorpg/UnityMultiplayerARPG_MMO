@@ -526,6 +526,16 @@ namespace MultiplayerARPG.MMO
             }
         }
 
+        protected override void HandleClientReadyResponse(ResponseHandlerData responseHandler, AckResponseCode responseCode, EmptyMessage response)
+        {
+            base.HandleClientReadyResponse(responseHandler, responseCode, response);
+            if (responseCode != AckResponseCode.Success)
+            {
+                OnClientConnectionRefused();
+                UISceneGlobal.Singleton.ShowDisconnectDialog(DisconnectReason.ConnectionRejected);
+            }
+        }
+
         public override void SerializeClientReadyData(NetDataWriter writer)
         {
             writer.Put(GameInstance.UserId);
@@ -558,6 +568,9 @@ namespace MultiplayerARPG.MMO
                 });
                 return false;
             }
+
+            if (connectionsByUserId.ContainsKey(userId))
+                return false;
 
             RegisterUserId(connectionId, userId);
             SetPlayerReadyRoutine(connectionId, userId, selectCharacterId).Forget();
