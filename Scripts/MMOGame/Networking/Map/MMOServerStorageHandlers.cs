@@ -83,21 +83,44 @@ namespace MultiplayerARPG.MMO
         public async UniTask<bool> IncreaseStorageItems(StorageId storageId, CharacterItem addingItem)
         {
 #if UNITY_EDITOR || UNITY_SERVER
-            Storage storge = GetStorage(storageId, out _);
-            AsyncResponseData<IncreaseStorageItemsResp> resp = await DbServiceClient.IncreaseStorageItemsAsync(new IncreaseStorageItemsReq()
+            Storage storage = GetStorage(storageId, out _);
+            StorageType storageType = storageId.storageType;
+            string storageOwnerId = storageId.storageOwnerId;
+            short weightLimit = storage.weightLimit;
+            short slotLimit = storage.slotLimit;
+            bool isLimitWeight = weightLimit > 0;
+            bool isLimitSlot = slotLimit > 0;
+
+            // Refresh storage item from database
+            AsyncResponseData<ReadStorageItemsResp> readResp = await DbServiceClient.ReadStorageItemsAsync(new ReadStorageItemsReq()
             {
-                StorageType = storageId.storageType,
-                StorageOwnerId = storageId.storageOwnerId,
-                WeightLimit = storge.weightLimit,
-                SlotLimit = storge.slotLimit,
-                Item = addingItem,
+                StorageType = storageType,
+                StorageOwnerId = storageOwnerId,
+                ReadForUpdate = true,
             });
-            if (!resp.IsSuccess || UITextKeys.NONE != resp.Response.Error)
+            if (!readResp.IsSuccess)
+                return false;
+            List<CharacterItem> storageItems = readResp.Response.StorageCharacterItems;
+            bool isOverwhelming = storageItems.IncreasingItemsWillOverwhelming(
+                addingItem.dataId, addingItem.amount, isLimitWeight, weightLimit,
+                storageItems.GetTotalItemWeight(), isLimitSlot, slotLimit);
+            if (isOverwhelming || !storageItems.IncreaseItems(addingItem))
             {
-                // Error ocurring, storage may overwhelming let's it drop items to ground
+                // Storage will overwhelming
                 return false;
             }
-            SetStorageItems(storageId, resp.Response.StorageCharacterItems);
+            storageItems.FillEmptySlots(isLimitSlot, slotLimit);
+            // Update storage items to database
+            AsyncResponseData<EmptyMessage> updateResp = await DbServiceClient.UpdateStorageItemsAsync(new UpdateStorageItemsReq()
+            {
+                StorageType = storageType,
+                StorageOwnerId = storageOwnerId,
+                StorageItems = storageItems,
+                UpdateCharacterData = false,
+            });
+            if (!updateResp.IsSuccess)
+                return false;
+            SetStorageItems(storageId, storageItems);
             NotifyStorageItemsUpdated(storageId.storageType, storageId.storageOwnerId);
             return true;
 #else
@@ -109,32 +132,46 @@ namespace MultiplayerARPG.MMO
         {
 #if UNITY_EDITOR || UNITY_SERVER
             Storage storge = GetStorage(storageId, out _);
-            AsyncResponseData<DecreaseStorageItemsResp> resp = await DbServiceClient.DecreaseStorageItemsAsync(new DecreaseStorageItemsReq()
+            StorageType storageType = storageId.storageType;
+            string storageOwnerId = storageId.storageOwnerId;
+            short weightLimit = storge.weightLimit;
+            short slotLimit = storge.slotLimit;
+            bool isLimitSlot = slotLimit > 0;
+
+            // Refresh storage item from database
+            AsyncResponseData<ReadStorageItemsResp> readResp = await DbServiceClient.ReadStorageItemsAsync(new ReadStorageItemsReq()
             {
-                StorageType = storageId.storageType,
-                StorageOwnerId = storageId.storageOwnerId,
-                WeightLimit = storge.weightLimit,
-                SlotLimit = storge.slotLimit,
-                DataId = dataId,
-                Amount = amount,
+                StorageType = storageType,
+                StorageOwnerId = storageOwnerId,
+                ReadForUpdate = true,
             });
-            if (!resp.IsSuccess || UITextKeys.NONE != resp.Response.Error)
-            {
-                // Error ocurring, storage may overwhelming let's it drop items to ground
+            if (!readResp.IsSuccess)
                 return new DecreaseStorageItemsResult();
-            }
-            SetStorageItems(storageId, resp.Response.StorageCharacterItems);
-            NotifyStorageItemsUpdated(storageId.storageType, storageId.storageOwnerId);
-            Dictionary<int, short> decreasedItems = new Dictionary<int, short>();
-            foreach (ItemIndexAmountMap entry in resp.Response.DecreasedItems)
+            List<CharacterItem> storageItems = readResp.Response.StorageCharacterItems;
+            Dictionary<int, short> decreasedItems;
+            if (storageItems.DecreaseItems(dataId, amount, isLimitSlot, out decreasedItems))
             {
-                decreasedItems.Add(entry.Index, (short)entry.Amount);
+                // Update slots
+                storageItems.FillEmptySlots(isLimitSlot, slotLimit);
+                // Update storage items to database
+                AsyncResponseData<EmptyMessage> updateResp = await DbServiceClient.UpdateStorageItemsAsync(new UpdateStorageItemsReq()
+                {
+                    StorageType = storageType,
+                    StorageOwnerId = storageOwnerId,
+                    StorageItems = storageItems,
+                    UpdateCharacterData = false,
+                });
+                if (!updateResp.IsSuccess)
+                    return new DecreaseStorageItemsResult();
+                SetStorageItems(storageId, storageItems);
+                NotifyStorageItemsUpdated(storageId.storageType, storageId.storageOwnerId);
+                return new DecreaseStorageItemsResult()
+                {
+                    IsSuccess = true,
+                    DecreasedItems = decreasedItems,
+                };
             }
-            return new DecreaseStorageItemsResult()
-            {
-                IsSuccess = true,
-                DecreasedItems = decreasedItems,
-            };
+            return new DecreaseStorageItemsResult();
 #else
             return new DecreaseStorageItemsResult();
 #endif

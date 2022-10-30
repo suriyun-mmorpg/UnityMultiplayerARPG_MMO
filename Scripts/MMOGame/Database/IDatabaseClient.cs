@@ -103,15 +103,7 @@ namespace MultiplayerARPG.MMO
 
         UniTask<AsyncResponseData<ReadStorageItemsResp>> ReadStorageItemsAsync(ReadStorageItemsReq request);
 
-        UniTask<AsyncResponseData<MoveItemToStorageResp>> MoveItemToStorageAsync(MoveItemToStorageReq request);
-
-        UniTask<AsyncResponseData<MoveItemFromStorageResp>> MoveItemFromStorageAsync(MoveItemFromStorageReq request);
-
-        UniTask<AsyncResponseData<SwapOrMergeStorageItemResp>> SwapOrMergeStorageItemAsync(SwapOrMergeStorageItemReq request);
-
-        UniTask<AsyncResponseData<IncreaseStorageItemsResp>> IncreaseStorageItemsAsync(IncreaseStorageItemsReq request);
-
-        UniTask<AsyncResponseData<DecreaseStorageItemsResp>> DecreaseStorageItemsAsync(DecreaseStorageItemsReq request);
+        UniTask<AsyncResponseData<EmptyMessage>> UpdateStorageItemsAsync(UpdateStorageItemsReq request);
 
         UniTask<AsyncResponseData<MailListResp>> MailListAsync(MailListReq request);
 

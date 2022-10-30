@@ -48,11 +48,7 @@
         public const ushort RequestGetGuildGold = 44;
         public const ushort RequestChangeGuildGold = 45;
         public const ushort RequestReadStorageItems = 46;
-        public const ushort RequestMoveItemToStorage = 47;
-        public const ushort RequestMoveItemFromStorage = 48;
-        public const ushort RequestSwapOrMergeStorageItem = 49;
-        public const ushort RequestIncreaseStorageItems = 50;
-        public const ushort RequestDecreaseStorageItems = 51;
+        public const ushort RequestUpdateStorageItems = 47;
         public const ushort RequestMailList = 52;
         public const ushort RequestUpdateReadMailState = 53;
         public const ushort RequestUpdateClaimMailItemsState = 54;

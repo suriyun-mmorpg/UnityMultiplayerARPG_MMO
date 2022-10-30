@@ -397,43 +397,11 @@ namespace MultiplayerARPG.MMO
             return resp;
         }
 
-        public async UniTask<AsyncResponseData<MoveItemToStorageResp>> MoveItemToStorageAsync(MoveItemToStorageReq request)
+        public async UniTask<AsyncResponseData<EmptyMessage>> UpdateStorageItemsAsync(UpdateStorageItemsReq request)
         {
-            var resp = await Client.SendRequestAsync<MoveItemToStorageReq, MoveItemToStorageResp>(DatabaseRequestTypes.RequestMoveItemToStorage, request);
+            var resp = await Client.SendRequestAsync<UpdateStorageItemsReq, EmptyMessage>(DatabaseRequestTypes.RequestUpdateStorageItems, request);
             if (!resp.IsSuccess)
-                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(MoveItemToStorageAsync)} status: {resp.ResponseCode}");
-            return resp;
-        }
-
-        public async UniTask<AsyncResponseData<MoveItemFromStorageResp>> MoveItemFromStorageAsync(MoveItemFromStorageReq request)
-        {
-            var resp = await Client.SendRequestAsync<MoveItemFromStorageReq, MoveItemFromStorageResp>(DatabaseRequestTypes.RequestMoveItemFromStorage, request);
-            if (!resp.IsSuccess)
-                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(MoveItemFromStorageAsync)} status: {resp.ResponseCode}");
-            return resp;
-        }
-
-        public async UniTask<AsyncResponseData<SwapOrMergeStorageItemResp>> SwapOrMergeStorageItemAsync(SwapOrMergeStorageItemReq request)
-        {
-            var resp = await Client.SendRequestAsync<SwapOrMergeStorageItemReq, SwapOrMergeStorageItemResp>(DatabaseRequestTypes.RequestSwapOrMergeStorageItem, request);
-            if (!resp.IsSuccess)
-                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(SwapOrMergeStorageItemAsync)} status: {resp.ResponseCode}");
-            return resp;
-        }
-
-        public async UniTask<AsyncResponseData<IncreaseStorageItemsResp>> IncreaseStorageItemsAsync(IncreaseStorageItemsReq request)
-        {
-            var resp = await Client.SendRequestAsync<IncreaseStorageItemsReq, IncreaseStorageItemsResp>(DatabaseRequestTypes.RequestIncreaseStorageItems, request);
-            if (!resp.IsSuccess)
-                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(IncreaseStorageItemsAsync)} status: {resp.ResponseCode}");
-            return resp;
-        }
-
-        public async UniTask<AsyncResponseData<DecreaseStorageItemsResp>> DecreaseStorageItemsAsync(DecreaseStorageItemsReq request)
-        {
-            var resp = await Client.SendRequestAsync<DecreaseStorageItemsReq, DecreaseStorageItemsResp>(DatabaseRequestTypes.RequestDecreaseStorageItems, request);
-            if (!resp.IsSuccess)
-                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(DecreaseStorageItemsAsync)} status: {resp.ResponseCode}");
+                Logging.LogError(nameof(DatabaseNetworkManager), $"Cannot {nameof(UpdateStorageItemsAsync)} status: {resp.ResponseCode}");
             return resp;
         }
 

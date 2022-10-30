@@ -2,6 +2,7 @@
 using LiteNetLibManager;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace MultiplayerARPG.MMO
 {
@@ -923,393 +924,52 @@ namespace MultiplayerARPG.MMO
         protected async UniTaskVoid ReadStorageItems(RequestHandlerData requestHandler, ReadStorageItemsReq request, RequestProceedResultDelegate<ReadStorageItemsResp> result)
         {
 #if UNITY_EDITOR || UNITY_SERVER
+            StorageId storageId = new StorageId(request.StorageType, request.StorageOwnerId);
+            if (request.ReadForUpdate)
+            {
+                float time = Time.unscaledTime;
+                if (updatingStorages.TryGetValue(storageId, out float oldTime) && time - oldTime < 0.5f)
+                {
+                    // Not allow to update yet
+                    result.Invoke(AckResponseCode.Error, new ReadStorageItemsResp());
+                    return;
+                }
+                updatingStorages.TryRemove(storageId, out _);
+                updatingStorages.TryAdd(storageId, time);
+            }
             result.Invoke(AckResponseCode.Success, new ReadStorageItemsResp()
             {
-                StorageCharacterItems = ReadStorageItems(new StorageId(request.StorageType, request.StorageOwnerId)),
+                StorageCharacterItems = ReadStorageItems(storageId),
             });
             await UniTask.Yield();
 #endif
         }
 
-        protected async UniTaskVoid MoveItemToStorage(RequestHandlerData requestHandler, MoveItemToStorageReq request, RequestProceedResultDelegate<MoveItemToStorageResp> result)
-        {
-#if UNITY_EDITOR || UNITY_SERVER
-            // Prepare storage data
-            StorageId storageId = new StorageId(request.StorageType, request.StorageOwnerId);
-            List<CharacterItem> storageItems = ReadStorageItems(storageId);
-            if (storageItems == null)
-            {
-                // Cannot find storage
-                result.Invoke(AckResponseCode.Error, new MoveItemToStorageResp()
-                {
-                    Error = UITextKeys.UI_ERROR_STORAGE_NOT_FOUND
-                });
-                return;
-            }
-            PlayerCharacterData character = ReadCharacter(request.CharacterId);
-            if (character == null)
-            {
-                // Cannot find character
-                result.Invoke(AckResponseCode.Error, new MoveItemToStorageResp()
-                {
-                    Error = UITextKeys.UI_ERROR_CHARACTER_NOT_FOUND
-                });
-                return;
-            }
-            if (request.InventoryItemIndex < 0 ||
-                request.InventoryItemIndex >= request.Inventory.Count)
-            {
-                // Invalid inventory index
-                result.Invoke(AckResponseCode.Error, new MoveItemToStorageResp()
-                {
-                    Error = UITextKeys.UI_ERROR_INVALID_ITEM_INDEX
-                });
-                return;
-            }
-            character.NonEquipItems = request.Inventory;
-            await UniTask.SwitchToMainThread();
-            bool isLimitWeight = request.WeightLimit > 0;
-            bool isLimitSlot = request.SlotLimit > 0;
-            short weightLimit = request.WeightLimit;
-            short slotLimit = request.SlotLimit;
-            // Prepare character and item data
-            CharacterItem movingItem = character.NonEquipItems[request.InventoryItemIndex].Clone(true);
-            movingItem.id = GenericUtils.GetUniqueId();
-            movingItem.amount = request.InventoryItemAmount;
-            if (request.StorageItemIndex < 0 ||
-                request.StorageItemIndex >= storageItems.Count ||
-                storageItems[request.StorageItemIndex].dataId == movingItem.dataId)
-            {
-                // Add to storage or merge
-                bool isOverwhelming = storageItems.IncreasingItemsWillOverwhelming(
-                    movingItem.dataId, movingItem.amount, isLimitWeight, weightLimit,
-                    storageItems.GetTotalItemWeight(), isLimitSlot, slotLimit);
-                if (isOverwhelming || !storageItems.IncreaseItems(movingItem))
-                {
-                    // Storage will overwhelming
-                    result.Invoke(AckResponseCode.Error, new MoveItemToStorageResp()
-                    {
-                        Error = UITextKeys.UI_ERROR_STORAGE_WILL_OVERWHELMING
-                    });
-                    return;
-                }
-                // Remove from inventory
-                character.DecreaseItemsByIndex(request.InventoryItemIndex, request.InventoryItemAmount, true);
-                character.FillEmptySlots();
-            }
-            else
-            {
-                CharacterItem storageItem = storageItems[request.StorageItemIndex];
-                CharacterItem nonEquipItem = character.NonEquipItems[request.InventoryItemIndex];
-                if (storageItem.IsEmptySlot())
-                {
-                    // Add to storage or merge
-                    bool isOverwhelming = storageItems.IncreasingItemsWillOverwhelming(
-                        movingItem.dataId, movingItem.amount, isLimitWeight, weightLimit,
-                        storageItems.GetTotalItemWeight(), isLimitSlot, slotLimit);
-                    if (isOverwhelming)
-                    {
-                        // Storage will overwhelming
-                        result.Invoke(AckResponseCode.Error, new MoveItemToStorageResp()
-                        {
-                            Error = UITextKeys.UI_ERROR_STORAGE_WILL_OVERWHELMING
-                        });
-                        return;
-                    }
-                    // Increase to storage
-                    movingItem.id = GenericUtils.GetUniqueId();
-                    storageItems[request.StorageItemIndex] = movingItem;
-                    // Remove from inventory
-                    character.DecreaseItemsByIndex(request.InventoryItemIndex, request.InventoryItemAmount, true);
-                    character.FillEmptySlots();
-                }
-                else
-                {
-                    // Swapping
-                    storageItem.id = GenericUtils.GetUniqueId();
-                    nonEquipItem.id = GenericUtils.GetUniqueId();
-                    storageItems[request.StorageItemIndex] = nonEquipItem;
-                    character.NonEquipItems[request.InventoryItemIndex] = storageItem;
-                }
-            }
-            storageItems.FillEmptySlots(isLimitSlot, slotLimit);
-            // Update storage list
-            // TODO: May update later to reduce amount of processes
-            Database.UpdateStorageItems(request.StorageType, request.StorageOwnerId, storageItems);
-            // Update character inventory
-            cachedUserCharacter[character.Id] = character;
-            Database.UpdateCharacter(character);
-            // Response
-            result.Invoke(AckResponseCode.Success, new MoveItemToStorageResp()
-            {
-                InventoryItemItems = new List<CharacterItem>(character.NonEquipItems),
-                StorageCharacterItems = storageItems,
-            });
-            await UniTask.Yield();
-#endif
-        }
-
-        protected async UniTaskVoid MoveItemFromStorage(RequestHandlerData requestHandler, MoveItemFromStorageReq request, RequestProceedResultDelegate<MoveItemFromStorageResp> result)
+        protected async UniTaskVoid UpdateStorageItems(RequestHandlerData requestHandler, UpdateStorageItemsReq request, RequestProceedResultDelegate<EmptyMessage> result)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             StorageId storageId = new StorageId(request.StorageType, request.StorageOwnerId);
-            List<CharacterItem> storageItems = ReadStorageItems(storageId);
-            if (storageItems == null)
+            float time = Time.unscaledTime;
+            if (updatingStorages.TryGetValue(storageId, out float oldTime) && time - oldTime >= 0.5f)
             {
-                // Cannot find storage
-                result.Invoke(AckResponseCode.Error, new MoveItemFromStorageResp()
-                {
-                    Error = UITextKeys.UI_ERROR_STORAGE_NOT_FOUND
-                });
+                // Timeout
+                result.Invoke(AckResponseCode.Error, EmptyMessage.Value);
                 return;
             }
-            PlayerCharacterData character = ReadCharacter(request.CharacterId);
-            if (character == null)
+            if (request.UpdateCharacterData)
             {
-                // Cannot find character
-                result.Invoke(AckResponseCode.Error, new MoveItemFromStorageResp()
-                {
-                    Error = UITextKeys.UI_ERROR_CHARACTER_NOT_FOUND
-                });
-                return;
+                PlayerCharacterData character = request.CharacterData;
+                // Cache the data, it will be used later
+                cachedUserCharacter[character.Id] = character;
+                // Update data to database
+                Database.UpdateCharacter(character);
             }
-            if (request.StorageItemIndex < 0 ||
-                request.StorageItemIndex >= storageItems.Count)
-            {
-                // Invalid storage index
-                result.Invoke(AckResponseCode.Error, new MoveItemFromStorageResp()
-                {
-                    Error = UITextKeys.UI_ERROR_INVALID_ITEM_INDEX
-                });
-                return;
-            }
-            character.NonEquipItems = request.Inventory;
-            await UniTask.SwitchToMainThread();
-            bool isLimitSlot = request.SlotLimit > 0;
-            short slotLimit = request.SlotLimit;
-            // Prepare item data
-            CharacterItem movingItem = storageItems[request.StorageItemIndex].Clone(true);
-            movingItem.amount = request.StorageItemAmount;
-            if (request.InventoryItemIndex < 0 ||
-                request.InventoryItemIndex >= character.NonEquipItems.Count ||
-                character.NonEquipItems[request.InventoryItemIndex].dataId == movingItem.dataId)
-            {
-                // Add to inventory or merge
-                bool isOverwhelming = character.IncreasingItemsWillOverwhelming(movingItem.dataId, movingItem.amount);
-                if (isOverwhelming || !character.IncreaseItems(movingItem))
-                {
-                    // inventory will overwhelming
-                    result.Invoke(AckResponseCode.Error, new MoveItemFromStorageResp()
-                    {
-                        Error = UITextKeys.UI_ERROR_WILL_OVERWHELMING
-                    });
-                    return;
-                }
-                // Remove from storage
-                storageItems.DecreaseItemsByIndex(request.StorageItemIndex, request.StorageItemAmount, isLimitSlot, true);
-                storageItems.FillEmptySlots(isLimitSlot, slotLimit);
-            }
-            else
-            {
-                CharacterItem storageItem = storageItems[request.StorageItemIndex];
-                CharacterItem nonEquipItem = character.NonEquipItems[request.InventoryItemIndex];
-                if (nonEquipItem.IsEmptySlot())
-                {
-                    // Add to inventory or merge
-                    bool isOverwhelming = character.IncreasingItemsWillOverwhelming(movingItem.dataId, movingItem.amount);
-                    if (isOverwhelming)
-                    {
-                        // inventory will overwhelming
-                        result.Invoke(AckResponseCode.Error, new MoveItemFromStorageResp()
-                        {
-                            Error = UITextKeys.UI_ERROR_WILL_OVERWHELMING
-                        });
-                        return;
-                    }
-                    // Increase to inventory
-                    movingItem.id = GenericUtils.GetUniqueId();
-                    character.NonEquipItems[request.InventoryItemIndex] = movingItem;
-                    // Remove from storage
-                    storageItems.DecreaseItemsByIndex(request.StorageItemIndex, request.StorageItemAmount, isLimitSlot, true);
-                    storageItems.FillEmptySlots(isLimitSlot, slotLimit);
-                }
-                else
-                {
-                    // Swapping
-                    storageItem.id = GenericUtils.GetUniqueId();
-                    nonEquipItem.id = GenericUtils.GetUniqueId();
-                    storageItems[request.StorageItemIndex] = nonEquipItem;
-                    character.NonEquipItems[request.InventoryItemIndex] = storageItem;
-                }
-            }
-            character.FillEmptySlots();
-            // Update storage list
-            // TODO: May update later to reduce amount of processes
-            Database.UpdateStorageItems(request.StorageType, request.StorageOwnerId, storageItems);
-            // Update character inventory
-            cachedUserCharacter[character.Id] = character;
-            Database.UpdateCharacter(character);
-            // Response
-            result.Invoke(AckResponseCode.Success, new MoveItemFromStorageResp()
-            {
-                InventoryItemItems = new List<CharacterItem>(character.NonEquipItems),
-                StorageCharacterItems = storageItems,
-            });
-            await UniTask.Yield();
-#endif
-        }
-
-        protected async UniTaskVoid SwapOrMergeStorageItem(RequestHandlerData requestHandler, SwapOrMergeStorageItemReq request, RequestProceedResultDelegate<SwapOrMergeStorageItemResp> result)
-        {
-#if UNITY_EDITOR || UNITY_SERVER
-            // Prepare storage data
-            StorageId storageId = new StorageId(request.StorageType, request.StorageOwnerId);
-            List<CharacterItem> storageItems = ReadStorageItems(storageId);
-            if (storageItems == null)
-            {
-                // Cannot find storage
-                result.Invoke(AckResponseCode.Error, new SwapOrMergeStorageItemResp()
-                {
-                    Error = UITextKeys.UI_ERROR_STORAGE_NOT_FOUND
-                });
-                return;
-            }
-            await UniTask.SwitchToMainThread();
-            bool isLimitSlot = request.SlotLimit > 0;
-            short slotLimit = request.SlotLimit;
-            // Prepare item data
-            CharacterItem fromItem = storageItems[request.FromIndex];
-            CharacterItem toItem = storageItems[request.ToIndex];
-            fromItem.id = GenericUtils.GetUniqueId();
-            toItem.id = GenericUtils.GetUniqueId();
-            if (fromItem.dataId.Equals(toItem.dataId) && !fromItem.IsFull() && !toItem.IsFull())
-            {
-                // Merge if same id and not full
-                short maxStack = toItem.GetMaxStack();
-                if (toItem.amount + fromItem.amount <= maxStack)
-                {
-                    toItem.amount += fromItem.amount;
-                    storageItems[request.FromIndex] = CharacterItem.Empty;
-                    storageItems[request.ToIndex] = toItem;
-                }
-                else
-                {
-                    short remains = (short)(toItem.amount + fromItem.amount - maxStack);
-                    toItem.amount = maxStack;
-                    fromItem.amount = remains;
-                    storageItems[request.FromIndex] = fromItem;
-                    storageItems[request.ToIndex] = toItem;
-                }
-            }
-            else
-            {
-                // Swap
-                storageItems[request.FromIndex] = toItem;
-                storageItems[request.ToIndex] = fromItem;
-            }
-            storageItems.FillEmptySlots(isLimitSlot, slotLimit);
-            // Update storage list
-            // TODO: May update later to reduce amount of processes
-            Database.UpdateStorageItems(request.StorageType, request.StorageOwnerId, storageItems);
-            result.Invoke(AckResponseCode.Success, new SwapOrMergeStorageItemResp()
-            {
-                StorageCharacterItems = storageItems,
-            });
-            await UniTask.Yield();
-#endif
-        }
-
-        protected async UniTaskVoid IncreaseStorageItems(RequestHandlerData requestHandler, IncreaseStorageItemsReq request, RequestProceedResultDelegate<IncreaseStorageItemsResp> result)
-        {
-#if UNITY_EDITOR || UNITY_SERVER
-            // Prepare storage data
-            StorageId storageId = new StorageId(request.StorageType, request.StorageOwnerId);
-            List<CharacterItem> storageItems = ReadStorageItems(storageId);
-            if (storageItems == null)
-            {
-                // Cannot find storage
-                result.Invoke(AckResponseCode.Error, new IncreaseStorageItemsResp()
-                {
-                    Error = UITextKeys.UI_ERROR_STORAGE_NOT_FOUND
-                });
-                return;
-            }
-            await UniTask.SwitchToMainThread();
-            bool isLimitWeight = request.WeightLimit > 0;
-            bool isLimitSlot = request.SlotLimit > 0;
-            short weightLimit = request.WeightLimit;
-            short slotLimit = request.SlotLimit;
-            CharacterItem addingItem = request.Item;
-            // Increase item to storage
-            bool isOverwhelming = storageItems.IncreasingItemsWillOverwhelming(
-                addingItem.dataId, addingItem.amount, isLimitWeight, weightLimit,
-                storageItems.GetTotalItemWeight(), isLimitSlot, slotLimit);
-            if (isOverwhelming || !storageItems.IncreaseItems(addingItem))
-            {
-                // Storage will overwhelming
-                result.Invoke(AckResponseCode.Error, new IncreaseStorageItemsResp()
-                {
-                    Error = UITextKeys.UI_ERROR_STORAGE_WILL_OVERWHELMING
-                });
-                return;
-            }
-            storageItems.FillEmptySlots(isLimitSlot, slotLimit);
-            // Update storage list
-            // TODO: May update later to reduce amount of processes
-            Database.UpdateStorageItems(request.StorageType, request.StorageOwnerId, storageItems);
-            result.Invoke(AckResponseCode.Success, new IncreaseStorageItemsResp()
-            {
-                StorageCharacterItems = storageItems,
-            });
-            await UniTask.Yield();
-#endif
-        }
-
-        protected async UniTaskVoid DecreaseStorageItems(RequestHandlerData requestHandler, DecreaseStorageItemsReq request, RequestProceedResultDelegate<DecreaseStorageItemsResp> result)
-        {
-#if UNITY_EDITOR || UNITY_SERVER
-            // Prepare storage data
-            StorageId storageId = new StorageId(request.StorageType, request.StorageOwnerId);
-            List<CharacterItem> storageItems = ReadStorageItems(storageId);
-            if (storageItems == null)
-            {
-                // Cannot find storage
-                result.Invoke(AckResponseCode.Error, new DecreaseStorageItemsResp()
-                {
-                    Error = UITextKeys.UI_ERROR_STORAGE_NOT_FOUND,
-                });
-                return;
-            }
-            await UniTask.SwitchToMainThread();
-            bool isLimitSlot = request.SlotLimit > 0;
-            short slotLimit = request.SlotLimit;
-            // Decrease item from storage
-            Dictionary<int, short> decreasedItems;
-            if (!storageItems.DecreaseItems(request.DataId, request.Amount, isLimitSlot, out decreasedItems))
-            {
-                result.Invoke(AckResponseCode.Error, new DecreaseStorageItemsResp()
-                {
-                    Error = UITextKeys.UI_ERROR_NOT_ENOUGH_ITEMS,
-                });
-                return;
-            }
-            storageItems.FillEmptySlots(isLimitSlot, slotLimit);
-            // Update storage list
-            // TODO: May update later to reduce amount of processes
-            Database.UpdateStorageItems(request.StorageType, request.StorageOwnerId, storageItems);
-            List<ItemIndexAmountMap> decreasedItemList = new List<ItemIndexAmountMap>();
-            foreach (int itemIndex in decreasedItems.Keys)
-            {
-                decreasedItemList.Add(new ItemIndexAmountMap()
-                {
-                    Index = itemIndex,
-                    Amount = decreasedItems[itemIndex]
-                });
-            }
-            result.Invoke(AckResponseCode.Success, new DecreaseStorageItemsResp()
-            {
-                StorageCharacterItems = storageItems,
-            });
+            // Cache the data, it will be used later
+            cachedStorageItems[storageId] = request.StorageItems;
+            // Update data to database
+            Database.UpdateStorageItems(request.StorageType, request.StorageOwnerId, request.StorageItems);
+            updatingStorages.TryRemove(storageId, out _);
+            result.Invoke(AckResponseCode.Success, EmptyMessage.Value);
             await UniTask.Yield();
 #endif
         }
@@ -1696,7 +1356,7 @@ namespace MultiplayerARPG.MMO
             {
                 // Doesn't cached yet, so get data from database
                 character = Database.ReadCharacter(id);
-                // Cache character, it will be used to validate later
+                // Cache the data, it will be used later
                 if (character != null)
                 {
                     cachedUserCharacter[id] = character;
@@ -1761,7 +1421,7 @@ namespace MultiplayerARPG.MMO
             {
                 // Doesn't cached yet, so get data from database
                 storageItems = Database.ReadStorageItems(storageId.storageType, storageId.storageOwnerId);
-                // Cache data, it will be used to validate later
+                // Cache the data, it will be used later
                 if (storageItems != null)
                     cachedStorageItems[storageId] = storageItems;
             }
