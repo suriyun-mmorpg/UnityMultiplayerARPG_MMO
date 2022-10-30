@@ -80,17 +80,17 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTask<bool> IncreaseStorageItems(StorageId storageId, CharacterItem addingItem)
+        public async UniTask<CharacterItem> ConvertStorageItems(StorageId storageId, int dataId, short amount, int convertedDataId, short convertedAmount)
         {
 #if UNITY_EDITOR || UNITY_SERVER
-            Storage storage = GetStorage(storageId, out _);
+            // Prepare storage data
             StorageType storageType = storageId.storageType;
             string storageOwnerId = storageId.storageOwnerId;
+            Storage storage = GetStorage(storageId, out _);
+            bool isLimitWeight = storage.weightLimit > 0;
+            bool isLimitSlot = storage.slotLimit > 0;
             short weightLimit = storage.weightLimit;
             short slotLimit = storage.slotLimit;
-            bool isLimitWeight = weightLimit > 0;
-            bool isLimitSlot = slotLimit > 0;
-
             // Refresh storage item from database
             AsyncResponseData<ReadStorageItemsResp> readResp = await DbServiceClient.ReadStorageItemsAsync(new ReadStorageItemsReq()
             {
@@ -99,16 +99,24 @@ namespace MultiplayerARPG.MMO
                 ReadForUpdate = true,
             });
             if (!readResp.IsSuccess)
-                return false;
+                return null;
             List<CharacterItem> storageItems = readResp.Response.StorageCharacterItems;
-            bool isOverwhelming = storageItems.IncreasingItemsWillOverwhelming(
-                addingItem.dataId, addingItem.amount, isLimitWeight, weightLimit,
-                storageItems.GetTotalItemWeight(), isLimitSlot, slotLimit);
-            if (isOverwhelming || !storageItems.IncreaseItems(addingItem))
+            // Decrease item from storage
+            if (!storageItems.DecreaseItems(dataId, amount, isLimitSlot, out _))
+                return null;
+            // Increase item to storage
+            CharacterItem droppingItem = null;
+            if (GameInstance.Items.ContainsKey(convertedDataId) && convertedAmount > 0)
             {
-                // Storage will overwhelming
-                return false;
+                // Increase item to storage
+                droppingItem = CharacterItem.Create(convertedDataId, convertedAmount);
+                if (!storageItems.IncreasingItemsWillOverwhelming(convertedDataId, convertedAmount, isLimitWeight, weightLimit, storageItems.GetTotalItemWeight(), isLimitSlot, slotLimit))
+                {
+                    storageItems.IncreaseItems(droppingItem);
+                    droppingItem = null;
+                }
             }
+            // Update slots
             storageItems.FillEmptySlots(isLimitSlot, slotLimit);
             // Update storage items to database
             AsyncResponseData<EmptyMessage> updateResp = await DbServiceClient.UpdateStorageItemsAsync(new UpdateStorageItemsReq()
@@ -119,61 +127,10 @@ namespace MultiplayerARPG.MMO
                 UpdateCharacterData = false,
             });
             if (!updateResp.IsSuccess)
-                return false;
-            SetStorageItems(storageId, storageItems);
-            NotifyStorageItemsUpdated(storageId.storageType, storageId.storageOwnerId);
-            return true;
+                return null;
+            return droppingItem;
 #else
-            return false;
-#endif
-        }
-
-        public async UniTask<DecreaseStorageItemsResult> DecreaseStorageItems(StorageId storageId, int dataId, short amount)
-        {
-#if UNITY_EDITOR || UNITY_SERVER
-            Storage storge = GetStorage(storageId, out _);
-            StorageType storageType = storageId.storageType;
-            string storageOwnerId = storageId.storageOwnerId;
-            short weightLimit = storge.weightLimit;
-            short slotLimit = storge.slotLimit;
-            bool isLimitSlot = slotLimit > 0;
-
-            // Refresh storage item from database
-            AsyncResponseData<ReadStorageItemsResp> readResp = await DbServiceClient.ReadStorageItemsAsync(new ReadStorageItemsReq()
-            {
-                StorageType = storageType,
-                StorageOwnerId = storageOwnerId,
-                ReadForUpdate = true,
-            });
-            if (!readResp.IsSuccess)
-                return new DecreaseStorageItemsResult();
-            List<CharacterItem> storageItems = readResp.Response.StorageCharacterItems;
-            Dictionary<int, short> decreasedItems;
-            if (storageItems.DecreaseItems(dataId, amount, isLimitSlot, out decreasedItems))
-            {
-                // Update slots
-                storageItems.FillEmptySlots(isLimitSlot, slotLimit);
-                // Update storage items to database
-                AsyncResponseData<EmptyMessage> updateResp = await DbServiceClient.UpdateStorageItemsAsync(new UpdateStorageItemsReq()
-                {
-                    StorageType = storageType,
-                    StorageOwnerId = storageOwnerId,
-                    StorageItems = storageItems,
-                    UpdateCharacterData = false,
-                });
-                if (!updateResp.IsSuccess)
-                    return new DecreaseStorageItemsResult();
-                SetStorageItems(storageId, storageItems);
-                NotifyStorageItemsUpdated(storageId.storageType, storageId.storageOwnerId);
-                return new DecreaseStorageItemsResult()
-                {
-                    IsSuccess = true,
-                    DecreasedItems = decreasedItems,
-                };
-            }
-            return new DecreaseStorageItemsResult();
-#else
-            return new DecreaseStorageItemsResult();
+            return null;
 #endif
         }
 
