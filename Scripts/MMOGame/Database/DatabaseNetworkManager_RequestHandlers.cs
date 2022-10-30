@@ -27,23 +27,9 @@ namespace MultiplayerARPG.MMO
         protected async UniTaskVoid ValidateAccessToken(RequestHandlerData requestHandler, ValidateAccessTokenReq request, RequestProceedResultDelegate<ValidateAccessTokenResp> result)
         {
 #if UNITY_EDITOR || UNITY_SERVER
-            bool isPass;
-            if (cachedUserAccessToken.ContainsKey(request.UserId))
-            {
-                // Already cached access token, so validate access token from cache
-                isPass = request.AccessToken.Equals(cachedUserAccessToken[request.UserId]);
-            }
-            else
-            {
-                // Doesn't cached yet, so try validate from database
-                isPass = Database.ValidateAccessToken(request.UserId, request.AccessToken);
-                // Pass, store access token to the dictionary
-                if (isPass)
-                    cachedUserAccessToken[request.UserId] = request.AccessToken;
-            }
             result.Invoke(AckResponseCode.Success, new ValidateAccessTokenResp()
             {
-                IsPass = isPass
+                IsPass = ValidateAccessToken(request.UserId, request.AccessToken),
             });
             await UniTask.Yield();
 #endif
@@ -143,23 +129,9 @@ namespace MultiplayerARPG.MMO
         protected async UniTaskVoid FindUsername(RequestHandlerData requestHandler, FindUsernameReq request, RequestProceedResultDelegate<FindUsernameResp> result)
         {
 #if UNITY_EDITOR || UNITY_SERVER
-            long foundAmount;
-            if (cachedUsernames.Contains(request.Username))
-            {
-                // Already cached username, so validate username from cache
-                foundAmount = 1;
-            }
-            else
-            {
-                // Doesn't cached yet, so try validate from database
-                foundAmount = Database.FindUsername(request.Username);
-                // Cache username, it will be used to validate later
-                if (foundAmount > 0)
-                    cachedUsernames.Add(request.Username);
-            }
             result.Invoke(AckResponseCode.Success, new FindUsernameResp()
             {
-                FoundAmount = foundAmount
+                FoundAmount = FindUsername(request.Username),
             });
             await UniTask.Yield();
 #endif
@@ -247,23 +219,9 @@ namespace MultiplayerARPG.MMO
         protected async UniTaskVoid FindCharacterName(RequestHandlerData requestHandler, FindCharacterNameReq request, RequestProceedResultDelegate<FindCharacterNameResp> result)
         {
 #if UNITY_EDITOR || UNITY_SERVER
-            long foundAmount;
-            if (cachedCharacterNames.Contains(request.CharacterName))
-            {
-                // Already cached character name, so validate character name from cache
-                foundAmount = 1;
-            }
-            else
-            {
-                // Doesn't cached yet, so try validate from database
-                foundAmount = Database.FindCharacterName(request.CharacterName);
-                // Cache character name, it will be used to validate later
-                if (foundAmount > 0)
-                    cachedCharacterNames.Add(request.CharacterName);
-            }
             result.Invoke(AckResponseCode.Success, new FindCharacterNameResp()
             {
-                FoundAmount = foundAmount
+                FoundAmount = FindCharacterName(request.CharacterName),
             });
             await UniTask.Yield();
 #endif
@@ -369,24 +327,9 @@ namespace MultiplayerARPG.MMO
         protected async UniTaskVoid ReadBuildings(RequestHandlerData requestHandler, ReadBuildingsReq request, RequestProceedResultDelegate<BuildingsResp> result)
         {
 #if UNITY_EDITOR || UNITY_SERVER
-            List<BuildingSaveData> buildings = new List<BuildingSaveData>();
-            if (cachedBuilding.ContainsKey(request.MapName))
-            {
-                // Get buildings from cache
-                buildings.AddRange(cachedBuilding[request.MapName].Values);
-            }
-            else if (cachedBuilding.TryAdd(request.MapName, new ConcurrentDictionary<string, BuildingSaveData>()))
-            {
-                // Store buildings to cache
-                buildings.AddRange(Database.ReadBuildings(request.MapName));
-                foreach (BuildingSaveData building in buildings)
-                {
-                    cachedBuilding[request.MapName].TryAdd(building.Id, building);
-                }
-            }
             result.Invoke(AckResponseCode.Success, new BuildingsResp()
             {
-                List = buildings
+                List = ReadBuildings(request.MapName),
             });
             await UniTask.Yield();
 #endif
@@ -856,23 +799,9 @@ namespace MultiplayerARPG.MMO
         protected async UniTaskVoid FindGuildName(RequestHandlerData requestHandler, FindGuildNameReq request, RequestProceedResultDelegate<FindGuildNameResp> result)
         {
 #if UNITY_EDITOR || UNITY_SERVER
-            long foundAmount;
-            if (cachedGuildNames.Contains(request.GuildName))
-            {
-                // Already cached username, so validate username from cache
-                foundAmount = 1;
-            }
-            else
-            {
-                // Doesn't cached yet, so try validate from database
-                foundAmount = Database.FindGuildName(request.GuildName);
-                // Cache guild name, it will be used to validate later
-                if (foundAmount > 0)
-                    cachedGuildNames.Add(request.GuildName);
-            }
             result.Invoke(AckResponseCode.Success, new FindGuildNameResp()
             {
-                FoundAmount = foundAmount
+                FoundAmount = FindGuildName(request.GuildName),
             });
             await UniTask.Yield();
 #endif
@@ -994,20 +923,9 @@ namespace MultiplayerARPG.MMO
         protected async UniTaskVoid ReadStorageItems(RequestHandlerData requestHandler, ReadStorageItemsReq request, RequestProceedResultDelegate<ReadStorageItemsResp> result)
         {
 #if UNITY_EDITOR || UNITY_SERVER
-            // Prepare storage data
-            StorageId storageId = new StorageId(request.StorageType, request.StorageOwnerId);
-            List<CharacterItem> storageItems;
-            if (!cachedStorageItems.TryGetValue(storageId, out storageItems))
-            {
-                // Doesn't cached yet, so get data from database
-                storageItems = Database.ReadStorageItems(storageId.storageType, storageId.storageOwnerId);
-                // Cache data, it will be used to validate later
-                if (storageItems != null)
-                    cachedStorageItems[storageId] = storageItems;
-            }
             result.Invoke(AckResponseCode.Success, new ReadStorageItemsResp()
             {
-                StorageCharacterItems = storageItems
+                StorageCharacterItems = ReadStorageItems(new StorageId(request.StorageType, request.StorageOwnerId)),
             });
             await UniTask.Yield();
 #endif
@@ -1018,8 +936,8 @@ namespace MultiplayerARPG.MMO
 #if UNITY_EDITOR || UNITY_SERVER
             // Prepare storage data
             StorageId storageId = new StorageId(request.StorageType, request.StorageOwnerId);
-            List<CharacterItem> storageItemList;
-            if (!cachedStorageItems.TryGetValue(storageId, out storageItemList))
+            List<CharacterItem> storageItems = ReadStorageItems(storageId);
+            if (storageItems == null)
             {
                 // Cannot find storage
                 result.Invoke(AckResponseCode.Error, new MoveItemToStorageResp()
@@ -1028,8 +946,8 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            PlayerCharacterData character;
-            if (!cachedUserCharacter.TryGetValue(request.CharacterId, out character))
+            PlayerCharacterData character = ReadCharacter(request.CharacterId);
+            if (character == null)
             {
                 // Cannot find character
                 result.Invoke(AckResponseCode.Error, new MoveItemToStorageResp()
@@ -1059,14 +977,14 @@ namespace MultiplayerARPG.MMO
             movingItem.id = GenericUtils.GetUniqueId();
             movingItem.amount = request.InventoryItemAmount;
             if (request.StorageItemIndex < 0 ||
-                request.StorageItemIndex >= storageItemList.Count ||
-                storageItemList[request.StorageItemIndex].dataId == movingItem.dataId)
+                request.StorageItemIndex >= storageItems.Count ||
+                storageItems[request.StorageItemIndex].dataId == movingItem.dataId)
             {
                 // Add to storage or merge
-                bool isOverwhelming = storageItemList.IncreasingItemsWillOverwhelming(
+                bool isOverwhelming = storageItems.IncreasingItemsWillOverwhelming(
                     movingItem.dataId, movingItem.amount, isLimitWeight, weightLimit,
-                    storageItemList.GetTotalItemWeight(), isLimitSlot, slotLimit);
-                if (isOverwhelming || !storageItemList.IncreaseItems(movingItem))
+                    storageItems.GetTotalItemWeight(), isLimitSlot, slotLimit);
+                if (isOverwhelming || !storageItems.IncreaseItems(movingItem))
                 {
                     // Storage will overwhelming
                     result.Invoke(AckResponseCode.Error, new MoveItemToStorageResp()
@@ -1081,14 +999,14 @@ namespace MultiplayerARPG.MMO
             }
             else
             {
-                CharacterItem storageItem = storageItemList[request.StorageItemIndex];
+                CharacterItem storageItem = storageItems[request.StorageItemIndex];
                 CharacterItem nonEquipItem = character.NonEquipItems[request.InventoryItemIndex];
                 if (storageItem.IsEmptySlot())
                 {
                     // Add to storage or merge
-                    bool isOverwhelming = storageItemList.IncreasingItemsWillOverwhelming(
+                    bool isOverwhelming = storageItems.IncreasingItemsWillOverwhelming(
                         movingItem.dataId, movingItem.amount, isLimitWeight, weightLimit,
-                        storageItemList.GetTotalItemWeight(), isLimitSlot, slotLimit);
+                        storageItems.GetTotalItemWeight(), isLimitSlot, slotLimit);
                     if (isOverwhelming)
                     {
                         // Storage will overwhelming
@@ -1100,7 +1018,7 @@ namespace MultiplayerARPG.MMO
                     }
                     // Increase to storage
                     movingItem.id = GenericUtils.GetUniqueId();
-                    storageItemList[request.StorageItemIndex] = movingItem;
+                    storageItems[request.StorageItemIndex] = movingItem;
                     // Remove from inventory
                     character.DecreaseItemsByIndex(request.InventoryItemIndex, request.InventoryItemAmount, true);
                     character.FillEmptySlots();
@@ -1110,14 +1028,14 @@ namespace MultiplayerARPG.MMO
                     // Swapping
                     storageItem.id = GenericUtils.GetUniqueId();
                     nonEquipItem.id = GenericUtils.GetUniqueId();
-                    storageItemList[request.StorageItemIndex] = nonEquipItem;
+                    storageItems[request.StorageItemIndex] = nonEquipItem;
                     character.NonEquipItems[request.InventoryItemIndex] = storageItem;
                 }
             }
-            storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
+            storageItems.FillEmptySlots(isLimitSlot, slotLimit);
             // Update storage list
             // TODO: May update later to reduce amount of processes
-            Database.UpdateStorageItems(request.StorageType, request.StorageOwnerId, storageItemList);
+            Database.UpdateStorageItems(request.StorageType, request.StorageOwnerId, storageItems);
             // Update character inventory
             cachedUserCharacter[character.Id] = character;
             Database.UpdateCharacter(character);
@@ -1125,7 +1043,7 @@ namespace MultiplayerARPG.MMO
             result.Invoke(AckResponseCode.Success, new MoveItemToStorageResp()
             {
                 InventoryItemItems = new List<CharacterItem>(character.NonEquipItems),
-                StorageCharacterItems = storageItemList,
+                StorageCharacterItems = storageItems,
             });
             await UniTask.Yield();
 #endif
@@ -1135,8 +1053,8 @@ namespace MultiplayerARPG.MMO
         {
 #if UNITY_EDITOR || UNITY_SERVER
             StorageId storageId = new StorageId(request.StorageType, request.StorageOwnerId);
-            List<CharacterItem> storageItemList;
-            if (!cachedStorageItems.TryGetValue(storageId, out storageItemList))
+            List<CharacterItem> storageItems = ReadStorageItems(storageId);
+            if (storageItems == null)
             {
                 // Cannot find storage
                 result.Invoke(AckResponseCode.Error, new MoveItemFromStorageResp()
@@ -1145,8 +1063,8 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            PlayerCharacterData character;
-            if (!cachedUserCharacter.TryGetValue(request.CharacterId, out character))
+            PlayerCharacterData character = ReadCharacter(request.CharacterId);
+            if (character == null)
             {
                 // Cannot find character
                 result.Invoke(AckResponseCode.Error, new MoveItemFromStorageResp()
@@ -1156,7 +1074,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             if (request.StorageItemIndex < 0 ||
-                request.StorageItemIndex >= storageItemList.Count)
+                request.StorageItemIndex >= storageItems.Count)
             {
                 // Invalid storage index
                 result.Invoke(AckResponseCode.Error, new MoveItemFromStorageResp()
@@ -1170,7 +1088,7 @@ namespace MultiplayerARPG.MMO
             bool isLimitSlot = request.SlotLimit > 0;
             short slotLimit = request.SlotLimit;
             // Prepare item data
-            CharacterItem movingItem = storageItemList[request.StorageItemIndex].Clone(true);
+            CharacterItem movingItem = storageItems[request.StorageItemIndex].Clone(true);
             movingItem.amount = request.StorageItemAmount;
             if (request.InventoryItemIndex < 0 ||
                 request.InventoryItemIndex >= character.NonEquipItems.Count ||
@@ -1188,12 +1106,12 @@ namespace MultiplayerARPG.MMO
                     return;
                 }
                 // Remove from storage
-                storageItemList.DecreaseItemsByIndex(request.StorageItemIndex, request.StorageItemAmount, isLimitSlot, true);
-                storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
+                storageItems.DecreaseItemsByIndex(request.StorageItemIndex, request.StorageItemAmount, isLimitSlot, true);
+                storageItems.FillEmptySlots(isLimitSlot, slotLimit);
             }
             else
             {
-                CharacterItem storageItem = storageItemList[request.StorageItemIndex];
+                CharacterItem storageItem = storageItems[request.StorageItemIndex];
                 CharacterItem nonEquipItem = character.NonEquipItems[request.InventoryItemIndex];
                 if (nonEquipItem.IsEmptySlot())
                 {
@@ -1212,22 +1130,22 @@ namespace MultiplayerARPG.MMO
                     movingItem.id = GenericUtils.GetUniqueId();
                     character.NonEquipItems[request.InventoryItemIndex] = movingItem;
                     // Remove from storage
-                    storageItemList.DecreaseItemsByIndex(request.StorageItemIndex, request.StorageItemAmount, isLimitSlot, true);
-                    storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
+                    storageItems.DecreaseItemsByIndex(request.StorageItemIndex, request.StorageItemAmount, isLimitSlot, true);
+                    storageItems.FillEmptySlots(isLimitSlot, slotLimit);
                 }
                 else
                 {
                     // Swapping
                     storageItem.id = GenericUtils.GetUniqueId();
                     nonEquipItem.id = GenericUtils.GetUniqueId();
-                    storageItemList[request.StorageItemIndex] = nonEquipItem;
+                    storageItems[request.StorageItemIndex] = nonEquipItem;
                     character.NonEquipItems[request.InventoryItemIndex] = storageItem;
                 }
             }
             character.FillEmptySlots();
             // Update storage list
             // TODO: May update later to reduce amount of processes
-            Database.UpdateStorageItems(request.StorageType, request.StorageOwnerId, storageItemList);
+            Database.UpdateStorageItems(request.StorageType, request.StorageOwnerId, storageItems);
             // Update character inventory
             cachedUserCharacter[character.Id] = character;
             Database.UpdateCharacter(character);
@@ -1235,7 +1153,7 @@ namespace MultiplayerARPG.MMO
             result.Invoke(AckResponseCode.Success, new MoveItemFromStorageResp()
             {
                 InventoryItemItems = new List<CharacterItem>(character.NonEquipItems),
-                StorageCharacterItems = storageItemList,
+                StorageCharacterItems = storageItems,
             });
             await UniTask.Yield();
 #endif
@@ -1246,8 +1164,8 @@ namespace MultiplayerARPG.MMO
 #if UNITY_EDITOR || UNITY_SERVER
             // Prepare storage data
             StorageId storageId = new StorageId(request.StorageType, request.StorageOwnerId);
-            List<CharacterItem> storageItemList;
-            if (!cachedStorageItems.TryGetValue(storageId, out storageItemList))
+            List<CharacterItem> storageItems = ReadStorageItems(storageId);
+            if (storageItems == null)
             {
                 // Cannot find storage
                 result.Invoke(AckResponseCode.Error, new SwapOrMergeStorageItemResp()
@@ -1260,8 +1178,8 @@ namespace MultiplayerARPG.MMO
             bool isLimitSlot = request.SlotLimit > 0;
             short slotLimit = request.SlotLimit;
             // Prepare item data
-            CharacterItem fromItem = storageItemList[request.FromIndex];
-            CharacterItem toItem = storageItemList[request.ToIndex];
+            CharacterItem fromItem = storageItems[request.FromIndex];
+            CharacterItem toItem = storageItems[request.ToIndex];
             fromItem.id = GenericUtils.GetUniqueId();
             toItem.id = GenericUtils.GetUniqueId();
             if (fromItem.dataId.Equals(toItem.dataId) && !fromItem.IsFull() && !toItem.IsFull())
@@ -1271,31 +1189,31 @@ namespace MultiplayerARPG.MMO
                 if (toItem.amount + fromItem.amount <= maxStack)
                 {
                     toItem.amount += fromItem.amount;
-                    storageItemList[request.FromIndex] = CharacterItem.Empty;
-                    storageItemList[request.ToIndex] = toItem;
+                    storageItems[request.FromIndex] = CharacterItem.Empty;
+                    storageItems[request.ToIndex] = toItem;
                 }
                 else
                 {
                     short remains = (short)(toItem.amount + fromItem.amount - maxStack);
                     toItem.amount = maxStack;
                     fromItem.amount = remains;
-                    storageItemList[request.FromIndex] = fromItem;
-                    storageItemList[request.ToIndex] = toItem;
+                    storageItems[request.FromIndex] = fromItem;
+                    storageItems[request.ToIndex] = toItem;
                 }
             }
             else
             {
                 // Swap
-                storageItemList[request.FromIndex] = toItem;
-                storageItemList[request.ToIndex] = fromItem;
+                storageItems[request.FromIndex] = toItem;
+                storageItems[request.ToIndex] = fromItem;
             }
-            storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
+            storageItems.FillEmptySlots(isLimitSlot, slotLimit);
             // Update storage list
             // TODO: May update later to reduce amount of processes
-            Database.UpdateStorageItems(request.StorageType, request.StorageOwnerId, storageItemList);
+            Database.UpdateStorageItems(request.StorageType, request.StorageOwnerId, storageItems);
             result.Invoke(AckResponseCode.Success, new SwapOrMergeStorageItemResp()
             {
-                StorageCharacterItems = storageItemList,
+                StorageCharacterItems = storageItems,
             });
             await UniTask.Yield();
 #endif
@@ -1306,8 +1224,8 @@ namespace MultiplayerARPG.MMO
 #if UNITY_EDITOR || UNITY_SERVER
             // Prepare storage data
             StorageId storageId = new StorageId(request.StorageType, request.StorageOwnerId);
-            List<CharacterItem> storageItemList;
-            if (!cachedStorageItems.TryGetValue(storageId, out storageItemList))
+            List<CharacterItem> storageItems = ReadStorageItems(storageId);
+            if (storageItems == null)
             {
                 // Cannot find storage
                 result.Invoke(AckResponseCode.Error, new IncreaseStorageItemsResp()
@@ -1323,10 +1241,10 @@ namespace MultiplayerARPG.MMO
             short slotLimit = request.SlotLimit;
             CharacterItem addingItem = request.Item;
             // Increase item to storage
-            bool isOverwhelming = storageItemList.IncreasingItemsWillOverwhelming(
+            bool isOverwhelming = storageItems.IncreasingItemsWillOverwhelming(
                 addingItem.dataId, addingItem.amount, isLimitWeight, weightLimit,
-                storageItemList.GetTotalItemWeight(), isLimitSlot, slotLimit);
-            if (isOverwhelming || !storageItemList.IncreaseItems(addingItem))
+                storageItems.GetTotalItemWeight(), isLimitSlot, slotLimit);
+            if (isOverwhelming || !storageItems.IncreaseItems(addingItem))
             {
                 // Storage will overwhelming
                 result.Invoke(AckResponseCode.Error, new IncreaseStorageItemsResp()
@@ -1335,13 +1253,13 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
+            storageItems.FillEmptySlots(isLimitSlot, slotLimit);
             // Update storage list
             // TODO: May update later to reduce amount of processes
-            Database.UpdateStorageItems(request.StorageType, request.StorageOwnerId, storageItemList);
+            Database.UpdateStorageItems(request.StorageType, request.StorageOwnerId, storageItems);
             result.Invoke(AckResponseCode.Success, new IncreaseStorageItemsResp()
             {
-                StorageCharacterItems = storageItemList,
+                StorageCharacterItems = storageItems,
             });
             await UniTask.Yield();
 #endif
@@ -1352,8 +1270,8 @@ namespace MultiplayerARPG.MMO
 #if UNITY_EDITOR || UNITY_SERVER
             // Prepare storage data
             StorageId storageId = new StorageId(request.StorageType, request.StorageOwnerId);
-            List<CharacterItem> storageItemList;
-            if (!cachedStorageItems.TryGetValue(storageId, out storageItemList))
+            List<CharacterItem> storageItems = ReadStorageItems(storageId);
+            if (storageItems == null)
             {
                 // Cannot find storage
                 result.Invoke(AckResponseCode.Error, new DecreaseStorageItemsResp()
@@ -1367,7 +1285,7 @@ namespace MultiplayerARPG.MMO
             short slotLimit = request.SlotLimit;
             // Decrease item from storage
             Dictionary<int, short> decreasedItems;
-            if (!storageItemList.DecreaseItems(request.DataId, request.Amount, isLimitSlot, out decreasedItems))
+            if (!storageItems.DecreaseItems(request.DataId, request.Amount, isLimitSlot, out decreasedItems))
             {
                 result.Invoke(AckResponseCode.Error, new DecreaseStorageItemsResp()
                 {
@@ -1375,10 +1293,10 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            storageItemList.FillEmptySlots(isLimitSlot, slotLimit);
+            storageItems.FillEmptySlots(isLimitSlot, slotLimit);
             // Update storage list
             // TODO: May update later to reduce amount of processes
-            Database.UpdateStorageItems(request.StorageType, request.StorageOwnerId, storageItemList);
+            Database.UpdateStorageItems(request.StorageType, request.StorageOwnerId, storageItems);
             List<ItemIndexAmountMap> decreasedItemList = new List<ItemIndexAmountMap>();
             foreach (int itemIndex in decreasedItems.Keys)
             {
@@ -1390,7 +1308,7 @@ namespace MultiplayerARPG.MMO
             }
             result.Invoke(AckResponseCode.Success, new DecreaseStorageItemsResp()
             {
-                StorageCharacterItems = storageItemList,
+                StorageCharacterItems = storageItems,
             });
             await UniTask.Yield();
 #endif
@@ -1587,23 +1505,9 @@ namespace MultiplayerARPG.MMO
         protected async UniTaskVoid FindEmail(RequestHandlerData requestHandler, FindEmailReq request, RequestProceedResultDelegate<FindEmailResp> result)
         {
 #if UNITY_EDITOR || UNITY_SERVER
-            long foundAmount;
-            if (cachedEmails.Contains(request.Email))
-            {
-                // Already cached username, so validate username from cache
-                foundAmount = 1;
-            }
-            else
-            {
-                // Doesn't cached yet, so try validate from database
-                foundAmount = Database.FindEmail(request.Email);
-                // Cache username, it will be used to validate later
-                if (foundAmount > 0)
-                    cachedEmails.Add(request.Email);
-            }
             result.Invoke(AckResponseCode.Success, new FindEmailResp()
             {
-                FoundAmount = foundAmount
+                FoundAmount = FindEmail(request.Email),
             });
             await UniTask.Yield();
 #endif
@@ -1612,10 +1516,9 @@ namespace MultiplayerARPG.MMO
         protected async UniTaskVoid ValidateEmailVerification(RequestHandlerData requestHandler, ValidateEmailVerificationReq request, RequestProceedResultDelegate<ValidateEmailVerificationResp> result)
         {
 #if UNITY_EDITOR || UNITY_SERVER
-            bool isPass = Database.ValidateEmailVerification(request.UserId);
             result.Invoke(AckResponseCode.Success, new ValidateEmailVerificationResp()
             {
-                IsPass = isPass
+                IsPass = Database.ValidateEmailVerification(request.UserId),
             });
             await UniTask.Yield();
 #endif
@@ -1642,6 +1545,122 @@ namespace MultiplayerARPG.MMO
         }
 
 #if UNITY_EDITOR || UNITY_SERVER
+        protected bool ValidateAccessToken(string userId, string accessToken)
+        {
+            if (cachedUserAccessToken.ContainsKey(userId))
+            {
+                // Already cached access token, so validate access token from cache
+                return accessToken.Equals(cachedUserAccessToken[userId]);
+            }
+            else
+            {
+                // Doesn't cached yet, so try validate from database
+                if (Database.ValidateAccessToken(userId, accessToken))
+                {
+                    // Pass, store access token to the dictionary
+                    cachedUserAccessToken[userId] = accessToken;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        protected long FindUsername(string username)
+        {
+            long foundAmount;
+            if (cachedUsernames.Contains(username))
+            {
+                // Already cached username, so validate username from cache
+                foundAmount = 1;
+            }
+            else
+            {
+                // Doesn't cached yet, so try validate from database
+                foundAmount = Database.FindUsername(username);
+                // Cache username, it will be used to validate later
+                if (foundAmount > 0)
+                    cachedUsernames.Add(username);
+            }
+            return foundAmount;
+        }
+
+        protected long FindCharacterName(string characterName)
+        {
+            long foundAmount;
+            if (cachedCharacterNames.Contains(characterName))
+            {
+                // Already cached character name, so validate character name from cache
+                foundAmount = 1;
+            }
+            else
+            {
+                // Doesn't cached yet, so try validate from database
+                foundAmount = Database.FindCharacterName(characterName);
+                // Cache character name, it will be used to validate later
+                if (foundAmount > 0)
+                    cachedCharacterNames.Add(characterName);
+            }
+            return foundAmount;
+        }
+
+        protected long FindGuildName(string guildName)
+        {
+            long foundAmount;
+            if (cachedGuildNames.Contains(guildName))
+            {
+                // Already cached username, so validate username from cache
+                foundAmount = 1;
+            }
+            else
+            {
+                // Doesn't cached yet, so try validate from database
+                foundAmount = Database.FindGuildName(guildName);
+                // Cache guild name, it will be used to validate later
+                if (foundAmount > 0)
+                    cachedGuildNames.Add(guildName);
+            }
+            return foundAmount;
+        }
+
+        protected long FindEmail(string email)
+        {
+            long foundAmount;
+            if (cachedEmails.Contains(email))
+            {
+                // Already cached username, so validate username from cache
+                foundAmount = 1;
+            }
+            else
+            {
+                // Doesn't cached yet, so try validate from database
+                foundAmount = Database.FindEmail(email);
+                // Cache username, it will be used to validate later
+                if (foundAmount > 0)
+                    cachedEmails.Add(email);
+            }
+            return foundAmount;
+        }
+
+        protected List<BuildingSaveData> ReadBuildings(string mapName)
+        {
+            List<BuildingSaveData> buildings = new List<BuildingSaveData>();
+            if (cachedBuilding.ContainsKey(mapName))
+            {
+                // Get buildings from cache
+                buildings.AddRange(cachedBuilding[mapName].Values);
+            }
+            else if (cachedBuilding.TryAdd(mapName, new ConcurrentDictionary<string, BuildingSaveData>()))
+            {
+                // Store buildings to cache
+                buildings.AddRange(Database.ReadBuildings(mapName));
+                foreach (BuildingSaveData building in buildings)
+                {
+                    cachedBuilding[mapName].TryAdd(building.Id, building);
+                }
+            }
+            return buildings;
+        }
+
         protected int ReadGold(string userId)
         {
             int gold;
@@ -1731,7 +1750,21 @@ namespace MultiplayerARPG.MMO
             return guild;
         }
 
-        public void CacheSocialCharacters(IEnumerable<SocialCharacterData> socialCharacters)
+        protected List<CharacterItem> ReadStorageItems(StorageId storageId)
+        {
+            List<CharacterItem> storageItems;
+            if (!cachedStorageItems.TryGetValue(storageId, out storageItems))
+            {
+                // Doesn't cached yet, so get data from database
+                storageItems = Database.ReadStorageItems(storageId.storageType, storageId.storageOwnerId);
+                // Cache data, it will be used to validate later
+                if (storageItems != null)
+                    cachedStorageItems[storageId] = storageItems;
+            }
+            return storageItems;
+        }
+
+        protected void CacheSocialCharacters(IEnumerable<SocialCharacterData> socialCharacters)
         {
             foreach (SocialCharacterData socialCharacter in socialCharacters)
             {
