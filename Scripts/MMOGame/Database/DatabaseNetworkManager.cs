@@ -15,9 +15,22 @@ namespace MultiplayerARPG.MMO
         private BaseDatabase database = null;
         [SerializeField]
         private BaseDatabase[] databaseOptions = new BaseDatabase[0];
+        [SerializeField]
+        private bool disableCacheReading = false;
 
-#if UNITY_EDITOR || UNITY_SERVER
-        public BaseDatabase Database { get { return database == null ? databaseOptions.FirstOrDefault() : database; } }
+        public BaseDatabase Database
+        {
+            get
+            {
+                return database == null ? databaseOptions.FirstOrDefault() : database;
+            }
+        }
+
+        public bool DisableCacheReading
+        {
+            get { return disableCacheReading; }
+            set { disableCacheReading = value; }
+        }
 
         public void SetDatabaseByOptionIndex(int index)
         {
@@ -27,7 +40,6 @@ namespace MultiplayerARPG.MMO
                 index < databaseOptions.Length)
                 database = databaseOptions[index];
         }
-#endif
 
 #if UNITY_EDITOR || UNITY_SERVER
         // TODO: I'm going to make in-memory database without Redis for now

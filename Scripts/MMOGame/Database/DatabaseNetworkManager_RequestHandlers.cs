@@ -1547,7 +1547,7 @@ namespace MultiplayerARPG.MMO
 #if UNITY_EDITOR || UNITY_SERVER
         protected bool ValidateAccessToken(string userId, string accessToken)
         {
-            if (cachedUserAccessToken.ContainsKey(userId))
+            if (!disableCacheReading && cachedUserAccessToken.ContainsKey(userId))
             {
                 // Already cached access token, so validate access token from cache
                 return accessToken.Equals(cachedUserAccessToken[userId]);
@@ -1568,7 +1568,7 @@ namespace MultiplayerARPG.MMO
         protected long FindUsername(string username)
         {
             long foundAmount;
-            if (cachedUsernames.Contains(username))
+            if (!disableCacheReading && cachedUsernames.Contains(username))
             {
                 // Already cached username, so validate username from cache
                 foundAmount = 1;
@@ -1587,7 +1587,7 @@ namespace MultiplayerARPG.MMO
         protected long FindCharacterName(string characterName)
         {
             long foundAmount;
-            if (cachedCharacterNames.Contains(characterName))
+            if (!disableCacheReading && cachedCharacterNames.Contains(characterName))
             {
                 // Already cached character name, so validate character name from cache
                 foundAmount = 1;
@@ -1606,7 +1606,7 @@ namespace MultiplayerARPG.MMO
         protected long FindGuildName(string guildName)
         {
             long foundAmount;
-            if (cachedGuildNames.Contains(guildName))
+            if (!disableCacheReading && cachedGuildNames.Contains(guildName))
             {
                 // Already cached username, so validate username from cache
                 foundAmount = 1;
@@ -1625,7 +1625,7 @@ namespace MultiplayerARPG.MMO
         protected long FindEmail(string email)
         {
             long foundAmount;
-            if (cachedEmails.Contains(email))
+            if (!disableCacheReading && cachedEmails.Contains(email))
             {
                 // Already cached username, so validate username from cache
                 foundAmount = 1;
@@ -1644,18 +1644,22 @@ namespace MultiplayerARPG.MMO
         protected List<BuildingSaveData> ReadBuildings(string mapName)
         {
             List<BuildingSaveData> buildings = new List<BuildingSaveData>();
-            if (cachedBuilding.ContainsKey(mapName))
+            if (!disableCacheReading && cachedBuilding.ContainsKey(mapName))
             {
                 // Get buildings from cache
                 buildings.AddRange(cachedBuilding[mapName].Values);
             }
-            else if (cachedBuilding.TryAdd(mapName, new ConcurrentDictionary<string, BuildingSaveData>()))
+            else
             {
-                // Store buildings to cache
+                // Read buildings from database
                 buildings.AddRange(Database.ReadBuildings(mapName));
-                foreach (BuildingSaveData building in buildings)
+                // Store buildings to cache
+                if (cachedBuilding.TryAdd(mapName, new ConcurrentDictionary<string, BuildingSaveData>()))
                 {
-                    cachedBuilding[mapName].TryAdd(building.Id, building);
+                    foreach (BuildingSaveData building in buildings)
+                    {
+                        cachedBuilding[mapName].TryAdd(building.Id, building);
+                    }
                 }
             }
             return buildings;
@@ -1664,7 +1668,7 @@ namespace MultiplayerARPG.MMO
         protected int ReadGold(string userId)
         {
             int gold;
-            if (!cachedUserGold.TryGetValue(userId, out gold))
+            if (disableCacheReading || !cachedUserGold.TryGetValue(userId, out gold))
             {
                 // Doesn't cached yet, so get data from database and cache it
                 gold = Database.GetGold(userId);
@@ -1676,7 +1680,7 @@ namespace MultiplayerARPG.MMO
         protected int ReadCash(string userId)
         {
             int cash;
-            if (!cachedUserCash.TryGetValue(userId, out cash))
+            if (disableCacheReading || !cachedUserCash.TryGetValue(userId, out cash))
             {
                 // Doesn't cached yet, so get data from database and cache it
                 cash = Database.GetCash(userId);
@@ -1688,7 +1692,7 @@ namespace MultiplayerARPG.MMO
         protected PlayerCharacterData ReadCharacter(string id)
         {
             PlayerCharacterData character;
-            if (!cachedUserCharacter.TryGetValue(id, out character))
+            if (disableCacheReading || !cachedUserCharacter.TryGetValue(id, out character))
             {
                 // Doesn't cached yet, so get data from database
                 character = Database.ReadCharacter(id);
@@ -1705,7 +1709,7 @@ namespace MultiplayerARPG.MMO
         protected SocialCharacterData ReadSocialCharacter(string id)
         {
             SocialCharacterData character;
-            if (!cachedSocialCharacter.TryGetValue(id, out character))
+            if (disableCacheReading || !cachedSocialCharacter.TryGetValue(id, out character))
             {
                 // Doesn't cached yet, so get data from database
                 character = SocialCharacterData.Create(Database.ReadCharacter(id, false, false, false, false, false, false, false, false, false, false));
@@ -1718,7 +1722,7 @@ namespace MultiplayerARPG.MMO
         protected PartyData ReadParty(int id)
         {
             PartyData party;
-            if (!cachedParty.TryGetValue(id, out party))
+            if (disableCacheReading || !cachedParty.TryGetValue(id, out party))
             {
                 // Doesn't cached yet, so get data from database
                 party = Database.ReadParty(id);
@@ -1735,7 +1739,7 @@ namespace MultiplayerARPG.MMO
         protected GuildData ReadGuild(int id)
         {
             GuildData guild;
-            if (!cachedGuild.TryGetValue(id, out guild))
+            if (disableCacheReading || !cachedGuild.TryGetValue(id, out guild))
             {
                 // Doesn't cached yet, so get data from database
                 guild = Database.ReadGuild(id, GameInstance.Singleton.SocialSystemSetting.GuildMemberRoles);
@@ -1753,7 +1757,7 @@ namespace MultiplayerARPG.MMO
         protected List<CharacterItem> ReadStorageItems(StorageId storageId)
         {
             List<CharacterItem> storageItems;
-            if (!cachedStorageItems.TryGetValue(storageId, out storageItems))
+            if (disableCacheReading || !cachedStorageItems.TryGetValue(storageId, out storageItems))
             {
                 // Doesn't cached yet, so get data from database
                 storageItems = Database.ReadStorageItems(storageId.storageType, storageId.storageOwnerId);

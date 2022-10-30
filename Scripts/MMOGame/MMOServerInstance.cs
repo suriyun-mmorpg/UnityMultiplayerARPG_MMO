@@ -17,6 +17,8 @@ namespace MultiplayerARPG.MMO
 
         public const string CONFIG_DATABASE_OPTION_INDEX = "databaseOptionIndex";
         public const string ARG_DATABASE_OPTION_INDEX = "-" + CONFIG_DATABASE_OPTION_INDEX;
+        public const string CONFIG_DATABASE_DISABLE_CACHE_READING = "databaseDisableCacheReading";
+        public const string ARG_DATABASE_DISABLE_CACHE_READING = "-" + CONFIG_DATABASE_DISABLE_CACHE_READING;
         public const string CONFIG_CENTRAL_ADDRESS = "centralAddress";
         public const string ARG_CENTRAL_ADDRESS = "-" + CONFIG_CENTRAL_ADDRESS;
         public const string CONFIG_CENTRAL_PORT = "centralPort";
@@ -146,6 +148,7 @@ namespace MultiplayerARPG.MMO
         public bool startMapOnAwake;
         public BaseMapInfo startingMap;
         public int databaseOptionIndex;
+        public bool databaseDisableCacheReading;
 
 #if UNITY_EDITOR || UNITY_SERVER
         private List<string> spawningMapIds;
@@ -214,6 +217,19 @@ namespace MultiplayerARPG.MMO
                     jsonConfig[CONFIG_DATABASE_OPTION_INDEX] = dbOptionIndex;
                 }
                 jsonConfig[CONFIG_DATABASE_OPTION_INDEX] = dbOptionIndex;
+
+                // Database disable cache reading or not?
+                bool databaseDisableCacheReading = this.databaseDisableCacheReading = false;
+                if (ConfigReader.ReadConfigs(jsonConfig, CONFIG_DATABASE_DISABLE_CACHE_READING, out databaseDisableCacheReading, this.databaseDisableCacheReading))
+                {
+                    this.databaseDisableCacheReading = databaseDisableCacheReading;
+                    jsonConfig[CONFIG_DATABASE_DISABLE_CACHE_READING] = databaseDisableCacheReading;
+                }
+                else if (ConfigReader.IsArgsProvided(args, ARG_DATABASE_DISABLE_CACHE_READING))
+                {
+                    this.databaseDisableCacheReading = true;
+                }
+                jsonConfig[CONFIG_DATABASE_DISABLE_CACHE_READING] = databaseDisableCacheReading;
 
                 // Use Websocket or not?
                 bool useWebSocket = this.useWebSocket = false;
@@ -549,7 +565,10 @@ namespace MultiplayerARPG.MMO
             else
             {
                 if (!useCustomDatabaseClient)
+                {
                     databaseNetworkManager.SetDatabaseByOptionIndex(databaseOptionIndex);
+                    databaseNetworkManager.DisableCacheReading = databaseDisableCacheReading;
+                }
 
                 if (startDatabaseOnAwake)
                     startingDatabaseServer = true;
