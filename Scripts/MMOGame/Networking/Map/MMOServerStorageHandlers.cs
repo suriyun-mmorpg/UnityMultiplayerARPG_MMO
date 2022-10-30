@@ -128,6 +128,8 @@ namespace MultiplayerARPG.MMO
             });
             if (!updateResp.IsSuccess)
                 return null;
+            SetStorageItems(storageId, storageItems);
+            NotifyStorageItemsUpdated(storageId.storageType, storageId.storageOwnerId);
             return droppingItem;
 #else
             return null;
