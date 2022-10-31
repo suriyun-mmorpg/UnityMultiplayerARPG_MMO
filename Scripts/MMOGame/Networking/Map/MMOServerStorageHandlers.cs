@@ -80,7 +80,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTask<CharacterItem> ConvertStorageItems(StorageId storageId, int dataId, short amount, int convertedDataId, short convertedAmount)
+        public async UniTask<List<CharacterItem>> ConvertStorageItems(StorageId storageId, List<StorageConvertItemsEntry> convertItems)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             // Prepare storage data
@@ -101,19 +101,29 @@ namespace MultiplayerARPG.MMO
             if (!readResp.IsSuccess)
                 return null;
             List<CharacterItem> storageItems = readResp.Response.StorageCharacterItems;
-            // Decrease item from storage
-            if (!storageItems.DecreaseItems(dataId, amount, isLimitSlot, out _))
-                return null;
-            // Increase item to storage
-            CharacterItem droppingItem = null;
-            if (GameInstance.Items.ContainsKey(convertedDataId) && convertedAmount > 0)
+            List<CharacterItem> droppingItems = new List<CharacterItem>();
+            for (int i = 0; i < convertItems.Count; ++i)
             {
+                int dataId = convertItems[i].dataId;
+                short amount = convertItems[i].amount;
+                int convertedDataId = convertItems[i].convertedDataId;
+                short convertedAmount = convertItems[i].convertedAmount;
+                // Decrease item from storage
+                if (!storageItems.DecreaseItems(dataId, amount, isLimitSlot, out _))
+                    continue;
                 // Increase item to storage
-                droppingItem = CharacterItem.Create(convertedDataId, convertedAmount);
-                if (!storageItems.IncreasingItemsWillOverwhelming(convertedDataId, convertedAmount, isLimitWeight, weightLimit, storageItems.GetTotalItemWeight(), isLimitSlot, slotLimit))
+                if (GameInstance.Items.ContainsKey(convertedDataId) && convertedAmount > 0)
                 {
-                    storageItems.IncreaseItems(droppingItem);
-                    droppingItem = null;
+                    // Increase item to storage
+                    CharacterItem droppingItem = CharacterItem.Create(convertedDataId, convertedAmount);
+                    if (!storageItems.IncreasingItemsWillOverwhelming(convertedDataId, convertedAmount, isLimitWeight, weightLimit, storageItems.GetTotalItemWeight(), isLimitSlot, slotLimit))
+                    {
+                        storageItems.IncreaseItems(droppingItem);
+                    }
+                    else
+                    {
+                        droppingItems.Add(droppingItem);
+                    }
                 }
             }
             // Update slots
@@ -130,7 +140,7 @@ namespace MultiplayerARPG.MMO
                 return null;
             SetStorageItems(storageId, storageItems);
             NotifyStorageItemsUpdated(storageId.storageType, storageId.storageOwnerId);
-            return droppingItem;
+            return droppingItems;
 #else
             return null;
 #endif
