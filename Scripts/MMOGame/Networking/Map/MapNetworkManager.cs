@@ -806,15 +806,24 @@ namespace MultiplayerARPG.MMO
         protected override void HandleChatAtServer(MessageHandlerData messageHandler)
         {
             ChatMessage message = messageHandler.ReadMessage<ChatMessage>().FillChannelId();
-            // Get character
-            if (!ServerUserHandlers.TryGetPlayerCharacter(messageHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
+            IPlayerCharacterData playerCharacter;
+            if (messageHandler.ConnectionId >= 0 && message.sendByServer)
             {
-                // Not allow to enter chat
+                // This message should be sent by server but its connection >= 0, which means it is not a server ;)
                 return;
             }
-            message.senderId = playerCharacter.Id;
-            message.senderUserId = playerCharacter.UserId;
-            message.senderName = playerCharacter.CharacterName;
+            else
+            {
+                // Get character
+                if (!ServerUserHandlers.TryGetPlayerCharacter(messageHandler.ConnectionId, out playerCharacter))
+                {
+                    // Not allow to enter chat
+                    return;
+                }
+                message.senderId = playerCharacter.Id;
+                message.senderUserId = playerCharacter.UserId;
+                message.senderName = playerCharacter.CharacterName;
+            }
             // Set guild data
             if (playerCharacter != null)
             {
@@ -827,15 +836,11 @@ namespace MultiplayerARPG.MMO
             // Character muted?
             if (!message.sendByServer && playerCharacter != null && playerCharacter.IsMuting())
             {
-                long connectionId;
-                if (ServerUserHandlers.TryGetConnectionId(playerCharacter.Id, out connectionId))
+                ServerSendPacket(messageHandler.ConnectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, new ChatMessage()
                 {
-                    ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, new ChatMessage()
-                    {
-                        channel = ChatChannel.System,
-                        message = "You have been muted.",
-                    });
-                }
+                    channel = ChatChannel.System,
+                    message = "You have been muted.",
+                });
                 return;
             }
             // Local chat will processes immediately, not have to be sent to cluster server
@@ -844,9 +849,8 @@ namespace MultiplayerARPG.MMO
                 bool sentGmCommand = false;
                 if (message.sendByServer || playerCharacter != null)
                 {
-                    BasePlayerCharacterEntity playerCharacterEntity = playerCharacter == null ? null : playerCharacter as BasePlayerCharacterEntity;
                     string gmCommand;
-                    if (message.sendByServer || (playerCharacterEntity != null &&
+                    if (message.sendByServer || (playerCharacter is BasePlayerCharacterEntity playerCharacterEntity &&
                         CurrentGameInstance.GMCommands.IsGMCommand(message.message, out gmCommand) &&
                         CurrentGameInstance.GMCommands.CanUseGMCommand(playerCharacterEntity, gmCommand)))
                     {
