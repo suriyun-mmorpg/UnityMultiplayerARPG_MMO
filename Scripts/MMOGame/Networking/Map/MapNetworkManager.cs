@@ -807,9 +807,14 @@ namespace MultiplayerARPG.MMO
         {
             ChatMessage message = messageHandler.ReadMessage<ChatMessage>().FillChannelId();
             // Get character
-            IPlayerCharacterData playerCharacter = null;
-            if (!string.IsNullOrEmpty(message.senderName))
-                ServerUserHandlers.TryGetPlayerCharacterByName(message.senderName, out playerCharacter);
+            if (!ServerUserHandlers.TryGetPlayerCharacter(messageHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
+            {
+                // Not allow to enter chat
+                return;
+            }
+            message.senderId = playerCharacter.Id;
+            message.senderUserId = playerCharacter.UserId;
+            message.senderName = playerCharacter.CharacterName;
             // Set guild data
             if (playerCharacter != null)
             {
