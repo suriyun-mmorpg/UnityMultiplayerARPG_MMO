@@ -157,7 +157,7 @@ namespace MultiplayerARPG.MMO
 #if UNITY_EDITOR || UNITY_SERVER
             result.Invoke(AckResponseCode.Success, new CharacterResp()
             {
-                CharacterData = ReadCharacter(request.CharacterId)
+                CharacterData = ReadCharacterWithUserIdValidation(request.CharacterId, request.UserId),
             });
             await UniTask.Yield();
 #endif
@@ -1363,6 +1363,25 @@ namespace MultiplayerARPG.MMO
                     cachedCharacterNames.Add(character.CharacterName);
                 }
             }
+            return character;
+        }
+
+        protected PlayerCharacterData ReadCharacterWithUserIdValidation(string id, string userId)
+        {
+            PlayerCharacterData character;
+            if (disableCacheReading || !cachedUserCharacter.TryGetValue(id, out character))
+            {
+                // Doesn't cached yet, so get data from database
+                character = Database.ReadCharacter(id);
+                // Cache the data, it will be used later
+                if (character != null)
+                {
+                    cachedUserCharacter[id] = character;
+                    cachedCharacterNames.Add(character.CharacterName);
+                }
+            }
+            if (character != null && character.UserId != userId)
+                character = null;
             return character;
         }
 
