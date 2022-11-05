@@ -301,46 +301,47 @@ namespace MultiplayerARPG.MMO
             {
                 result = new PlayerCharacterData();
                 result.Id = reader.GetString(0);
-                result.DataId = reader.GetInt32(1);
-                result.EntityId = reader.GetInt32(2);
-                result.FactionId = reader.GetInt32(3);
-                result.CharacterName = reader.GetString(4);
-                result.Level = reader.GetInt16(5);
-                result.Exp = reader.GetInt32(6);
-                result.CurrentHp = reader.GetInt32(7);
-                result.CurrentMp = reader.GetInt32(8);
-                result.CurrentStamina = reader.GetInt32(9);
-                result.CurrentFood = reader.GetInt32(10);
-                result.CurrentWater = reader.GetInt32(11);
-                result.EquipWeaponSet = reader.GetByte(12);
-                result.StatPoint = reader.GetFloat(13);
-                result.SkillPoint = reader.GetFloat(14);
-                result.Gold = reader.GetInt32(15);
-                result.PartyId = reader.GetInt32(16);
-                result.GuildId = reader.GetInt32(17);
-                result.GuildRole = reader.GetByte(18);
-                result.SharedGuildExp = reader.GetInt32(19);
-                result.CurrentMapName = reader.GetString(20);
+                result.UserId = reader.GetString(1);
+                result.DataId = reader.GetInt32(2);
+                result.EntityId = reader.GetInt32(3);
+                result.FactionId = reader.GetInt32(4);
+                result.CharacterName = reader.GetString(5);
+                result.Level = reader.GetInt16(6);
+                result.Exp = reader.GetInt32(7);
+                result.CurrentHp = reader.GetInt32(8);
+                result.CurrentMp = reader.GetInt32(9);
+                result.CurrentStamina = reader.GetInt32(10);
+                result.CurrentFood = reader.GetInt32(11);
+                result.CurrentWater = reader.GetInt32(12);
+                result.EquipWeaponSet = reader.GetByte(13);
+                result.StatPoint = reader.GetFloat(14);
+                result.SkillPoint = reader.GetFloat(15);
+                result.Gold = reader.GetInt32(16);
+                result.PartyId = reader.GetInt32(17);
+                result.GuildId = reader.GetInt32(18);
+                result.GuildRole = reader.GetByte(19);
+                result.SharedGuildExp = reader.GetInt32(20);
+                result.CurrentMapName = reader.GetString(21);
                 result.CurrentPosition = new Vector3(
-                    reader.GetFloat(21),
                     reader.GetFloat(22),
-                    reader.GetFloat(23));
+                    reader.GetFloat(23),
+                    reader.GetFloat(24));
                 result.CurrentRotation = new Vector3(
-                    reader.GetFloat(24),
                     reader.GetFloat(25),
-                    reader.GetFloat(26));
-                result.RespawnMapName = reader.GetString(27);
+                    reader.GetFloat(26),
+                    reader.GetFloat(27));
+                result.RespawnMapName = reader.GetString(28);
                 result.RespawnPosition = new Vector3(
-                    reader.GetFloat(28),
                     reader.GetFloat(29),
-                    reader.GetFloat(30));
-                result.MountDataId = reader.GetInt32(31);
-                result.IconDataId = reader.GetInt32(32);
-                result.FrameDataId = reader.GetInt32(33);
-                result.TitleDataId = reader.GetInt32(34);
-                result.LastDeadTime = reader.GetInt64(35);
-                result.UnmuteTime = reader.GetInt64(36);
-                result.LastUpdate = ((System.DateTimeOffset)reader.GetDateTime(37)).ToUnixTimeSeconds();
+                    reader.GetFloat(30),
+                    reader.GetFloat(31));
+                result.MountDataId = reader.GetInt32(32);
+                result.IconDataId = reader.GetInt32(33);
+                result.FrameDataId = reader.GetInt32(34);
+                result.TitleDataId = reader.GetInt32(35);
+                result.LastDeadTime = reader.GetInt64(36);
+                result.UnmuteTime = reader.GetInt64(37);
+                result.LastUpdate = ((System.DateTimeOffset)reader.GetDateTime(38)).ToUnixTimeSeconds();
                 return true;
             }
             result = null;
@@ -366,7 +367,7 @@ namespace MultiplayerARPG.MMO
             {
                 ReadCharacter(reader, out result);
             }, "SELECT " +
-                "id, dataId, entityId, factionId, characterName, level, exp, " +
+                "id, userId, dataId, entityId, factionId, characterName, level, exp, " +
                 "currentHp, currentMp, currentStamina, currentFood, currentWater, " +
                 "equipWeaponSet, statPoint, skillPoint, gold, partyId, guildId, guildRole, sharedGuildExp, " +
                 "currentMapName, currentPositionX, currentPositionY, currentPositionZ, currentRotationX, currentRotationY, currentRotationZ," +
