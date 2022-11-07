@@ -115,7 +115,7 @@ namespace MultiplayerARPG.MMO
                 if (GameInstance.Items.ContainsKey(convertedDataId) && convertedAmount > 0)
                 {
                     // Increase item to storage
-                    CharacterItem droppingItem = CharacterItem.Create(convertedDataId, convertedAmount);
+                    CharacterItem droppingItem = CharacterItem.Create(convertedDataId, 1, convertedAmount);
                     if (!storageItems.IncreasingItemsWillOverwhelming(convertedDataId, convertedAmount, isLimitWeight, weightLimit, storageItems.GetTotalItemWeight(), isLimitSlot, slotLimit))
                     {
                         storageItems.IncreaseItems(droppingItem);
