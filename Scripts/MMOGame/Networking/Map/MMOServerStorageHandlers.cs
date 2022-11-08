@@ -1,7 +1,9 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using ConcurrentCollections;
+using Cysharp.Threading.Tasks;
 using LiteNetLibManager;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using UnityEditor.PackageManager.Requests;
 using UnityEngine;
 
 namespace MultiplayerARPG.MMO
@@ -12,6 +14,7 @@ namespace MultiplayerARPG.MMO
         private readonly ConcurrentDictionary<StorageId, List<CharacterItem>> storageItems = new ConcurrentDictionary<StorageId, List<CharacterItem>>();
         private readonly ConcurrentDictionary<StorageId, HashSet<long>> usingStorageClients = new ConcurrentDictionary<StorageId, HashSet<long>>();
         private readonly ConcurrentDictionary<long, StorageId> usingStorageIds = new ConcurrentDictionary<long, StorageId>();
+        private readonly ConcurrentHashSet<StorageId> busyStorages = new ConcurrentHashSet<StorageId>();
 #endif
 
 #if UNITY_EDITOR || UNITY_SERVER
@@ -83,6 +86,7 @@ namespace MultiplayerARPG.MMO
         public async UniTask<List<CharacterItem>> ConvertStorageItems(StorageId storageId, List<StorageConvertItemsEntry> convertItems)
         {
 #if UNITY_EDITOR || UNITY_SERVER
+            SetStorageBusy(storageId, true);
             // Prepare storage data
             StorageType storageType = storageId.storageType;
             string storageOwnerId = storageId.storageOwnerId;
@@ -99,7 +103,10 @@ namespace MultiplayerARPG.MMO
                 ReadForUpdate = true,
             });
             if (!readResp.IsSuccess)
+            {
+                SetStorageBusy(storageId, false);
                 return null;
+            }
             List<CharacterItem> storageItems = readResp.Response.StorageCharacterItems;
             List<CharacterItem> droppingItems = new List<CharacterItem>();
             for (int i = 0; i < convertItems.Count; ++i)
@@ -137,7 +144,11 @@ namespace MultiplayerARPG.MMO
                 UpdateCharacterData = false,
             });
             if (!updateResp.IsSuccess)
+            {
+                SetStorageBusy(storageId, false);
                 return null;
+            }
+            SetStorageBusy(storageId, false);
             SetStorageItems(storageId, storageItems);
             NotifyStorageItemsUpdated(storageId.storageType, storageId.storageOwnerId);
             return droppingItems;
@@ -242,6 +253,7 @@ namespace MultiplayerARPG.MMO
             storageItems.Clear();
             usingStorageClients.Clear();
             usingStorageIds.Clear();
+            busyStorages.Clear();
 #endif
         }
 
@@ -259,6 +271,25 @@ namespace MultiplayerARPG.MMO
             return storageItems;
 #else
             return new ConcurrentDictionary<StorageId, List<CharacterItem>>();
+#endif
+        }
+
+        public void SetStorageBusy(StorageId storageId, bool isBusy)
+        {
+#if UNITY_EDITOR || UNITY_SERVER
+            if (isBusy)
+                busyStorages.Add(storageId);
+            else
+                busyStorages.TryRemove(storageId);
+#endif
+        }
+
+        public bool IsStorageBusy(StorageId storageId)
+        {
+#if UNITY_EDITOR || UNITY_SERVER
+            return busyStorages.Contains(storageId);
+#else
+            return false;
 #endif
         }
     }
