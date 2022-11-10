@@ -1,4 +1,5 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using ConcurrentCollections;
+using Cysharp.Threading.Tasks;
 using LiteNetLibManager;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,6 +13,8 @@ namespace MultiplayerARPG.MMO
         {
             get { return MMOServerInstance.Singleton.DatabaseNetworkManager; }
         }
+
+        private ConcurrentHashSet<string> busyMailBoxes = new ConcurrentHashSet<string>();
 #endif
 
         public async UniTaskVoid HandleRequestMailList(RequestHandlerData requestHandler, RequestMailListMessage request, RequestProceedResultDelegate<ResponseMailListMessage> result)
@@ -137,6 +140,11 @@ namespace MultiplayerARPG.MMO
         public async UniTaskVoid HandleRequestClaimMailItems(RequestHandlerData requestHandler, RequestClaimMailItemsMessage request, RequestProceedResultDelegate<ResponseClaimMailItemsMessage> result)
         {
 #if UNITY_EDITOR || UNITY_SERVER
+            if (busyMailBoxes.Contains(request.id))
+            {
+                result.Invoke(AckResponseCode.Error, new ResponseClaimMailItemsMessage());
+                return;
+            }
             IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
@@ -146,7 +154,9 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
+            busyMailBoxes.Add(request.id);
             UITextKeys message = await ClaimMailItems(request.id, playerCharacter);
+            busyMailBoxes.TryRemove(request.id);
             if (message != UITextKeys.NONE)
             {
                 result.Invoke(AckResponseCode.Error, new ResponseClaimMailItemsMessage()
