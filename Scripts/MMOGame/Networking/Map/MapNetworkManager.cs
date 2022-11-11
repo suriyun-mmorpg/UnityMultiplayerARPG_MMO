@@ -849,9 +849,8 @@ namespace MultiplayerARPG.MMO
                 bool sentGmCommand = false;
                 if (message.sendByServer || playerCharacter != null)
                 {
-                    string gmCommand;
                     if (message.sendByServer || (playerCharacter is BasePlayerCharacterEntity playerCharacterEntity &&
-                        CurrentGameInstance.GMCommands.IsGMCommand(message.message, out gmCommand) &&
+                        CurrentGameInstance.GMCommands.IsGMCommand(message.message, out string gmCommand) &&
                         CurrentGameInstance.GMCommands.CanUseGMCommand(playerCharacterEntity, gmCommand)))
                     {
                         // If it's GM command and senderName's user level > 0, handle gm commands
@@ -938,10 +937,20 @@ namespace MultiplayerARPG.MMO
             if (message.channel == ChatChannel.Local)
             {
                 // Handle GM command here, only GM command will be broadcasted as local channel
-                BasePlayerCharacterEntity playerCharacterEntity;
-                ServerUserHandlers.TryGetPlayerCharacterByName(message.senderName, out playerCharacterEntity);
+                if (!ServerUserHandlers.TryGetPlayerCharacterByName(message.senderName, out BasePlayerCharacterEntity playerCharacterEntity))
+                {
+                    // No this character in this server
+                    return;
+                }
+                if (!CurrentGameInstance.GMCommands.IsGMCommand(message.message, out string gmCommand) || 
+                    !CurrentGameInstance.GMCommands.CanUseGMCommand(playerCharacterEntity, gmCommand))
+                {
+                    // Handle only GM command, if it is not GM command or the player is not GM then skip
+                    return;
+                }
+                // Response enter GM command message
                 string response = CurrentGameInstance.GMCommands.HandleGMCommand(message.senderName, playerCharacterEntity, message.message);
-                if (playerCharacterEntity != null && !string.IsNullOrEmpty(response))
+                if (!string.IsNullOrEmpty(response))
                 {
                     ServerSendPacket(playerCharacterEntity.ConnectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, new ChatMessage()
                     {
