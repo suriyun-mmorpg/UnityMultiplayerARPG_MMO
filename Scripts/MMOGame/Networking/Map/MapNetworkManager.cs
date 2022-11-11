@@ -18,6 +18,7 @@ namespace MultiplayerARPG.MMO
         {
             public long connectionId;
             public string userId;
+            public string accessToken;
             public string selectCharacterId;
         }
 
@@ -100,6 +101,7 @@ namespace MultiplayerARPG.MMO
         private readonly ConcurrentDictionary<string, CancellationTokenSource> despawningPlayerCharacterCancellations = new ConcurrentDictionary<string, CancellationTokenSource>();
         private readonly ConcurrentDictionary<string, BasePlayerCharacterEntity> despawningPlayerCharacterEntities = new ConcurrentDictionary<string, BasePlayerCharacterEntity>();
         private readonly ConcurrentDictionary<string, long> connectionsByUserId = new ConcurrentDictionary<string, long>();
+        private readonly ConcurrentDictionary<long, string> accessTokensByConnectionId = new ConcurrentDictionary<long, string>();
         // Database operations
         private readonly HashSet<StorageId> loadingStorageIds = new HashSet<StorageId>();
         private readonly HashSet<int> loadingPartyIds = new HashSet<int>();
@@ -205,7 +207,7 @@ namespace MultiplayerARPG.MMO
                         if (!Players.TryGetValue(spawnPlayerCharacter.connectionId, out player))
                             continue;
                         player.IsReady = true;
-                        SetPlayerReadyRoutine(spawnPlayerCharacter.connectionId, spawnPlayerCharacter.userId, spawnPlayerCharacter.selectCharacterId).Forget();
+                        SetPlayerReadyRoutine(spawnPlayerCharacter.connectionId, spawnPlayerCharacter.userId, spawnPlayerCharacter.accessToken, spawnPlayerCharacter.selectCharacterId).Forget();
                     }
                     pendingSpawnPlayerCharacters.Clear();
                 }
@@ -229,6 +231,7 @@ namespace MultiplayerARPG.MMO
             savingCharacters.Clear();
             savingBuildings.Clear();
             connectionsByUserId.Clear();
+            accessTokensByConnectionId.Clear();
 #endif
         }
 
@@ -381,6 +384,7 @@ namespace MultiplayerARPG.MMO
                 // Saved, so can unregister character and user
                 UnregisterPlayerCharacter(connectionId);
                 UnregisterUserId(connectionId);
+                accessTokensByConnectionId.TryRemove(connectionId, out _);
                 try
                 {
                     if (!IsInstanceMap())
@@ -416,6 +420,7 @@ namespace MultiplayerARPG.MMO
             {
                 UnregisterPlayerCharacter(connectionId);
                 UnregisterUserId(connectionId);
+                accessTokensByConnectionId.TryRemove(connectionId, out _);
             }
         }
 #endif
@@ -554,7 +559,8 @@ namespace MultiplayerARPG.MMO
                 {
                     connectionId = connectionId,
                     userId = userId,
-                    selectCharacterId = selectCharacterId
+                    accessToken = accessToken,
+                    selectCharacterId = selectCharacterId,
                 });
                 return false;
             }
@@ -562,8 +568,10 @@ namespace MultiplayerARPG.MMO
             if (connectionsByUserId.ContainsKey(userId))
                 return false;
 
+            accessTokensByConnectionId.TryRemove(connectionId, out _);
+            accessTokensByConnectionId.TryAdd(connectionId, accessToken);
             RegisterUserId(connectionId, userId);
-            SetPlayerReadyRoutine(connectionId, userId, selectCharacterId).Forget();
+            SetPlayerReadyRoutine(connectionId, userId, accessToken, selectCharacterId).Forget();
             return true;
         }
 #endif
@@ -581,7 +589,7 @@ namespace MultiplayerARPG.MMO
             AsyncResponseData<ValidateAccessTokenResp> validateAccessTokenResp = await DbServiceClient.ValidateAccessTokenAsync(new ValidateAccessTokenReq()
             {
                 UserId = userId,
-                AccessToken = accessToken
+                AccessToken = accessToken,
             });
 
             if (!validateAccessTokenResp.IsSuccess || !validateAccessTokenResp.Response.IsPass)
@@ -596,7 +604,7 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if UNITY_EDITOR || UNITY_SERVER
-        private async UniTaskVoid SetPlayerReadyRoutine(long connectionId, string userId, string selectCharacterId)
+        private async UniTaskVoid SetPlayerReadyRoutine(long connectionId, string userId, string accessToken, string selectCharacterId)
         {
             AsyncResponseData<CharacterResp> characterResp = await DbServiceClient.ReadCharacterAsync(new ReadCharacterReq()
             {
@@ -654,7 +662,7 @@ namespace MultiplayerARPG.MMO
                     // Gold
                     AsyncResponseData<GoldResp> getGoldResp = await DbServiceClient.GetGoldAsync(new GetGoldReq()
                     {
-                        UserId = userId
+                        UserId = userId,
                     });
                     if (!getGoldResp.IsSuccess)
                     {
@@ -666,7 +674,7 @@ namespace MultiplayerARPG.MMO
                     // Cash
                     AsyncResponseData<CashResp> getCashResp = await DbServiceClient.GetCashAsync(new GetCashReq()
                     {
-                        UserId = userId
+                        UserId = userId,
                     });
                     if (!getCashResp.IsSuccess)
                     {
@@ -682,7 +690,8 @@ namespace MultiplayerARPG.MMO
                     // Load user level
                     AsyncResponseData<GetUserLevelResp> getUserLevelResp = await DbServiceClient.GetUserLevelAsync(new GetUserLevelReq()
                     {
-                        UserId = userId
+                        UserId = userId,
+                        AccessToken = accessToken,
                     });
                     if (!getUserLevelResp.IsSuccess)
                     {
@@ -806,6 +815,8 @@ namespace MultiplayerARPG.MMO
         protected override void HandleChatAtServer(MessageHandlerData messageHandler)
         {
             ChatMessage message = messageHandler.ReadMessage<ChatMessage>().FillChannelId();
+            string userId = string.Empty;
+            string accessToken = string.Empty;
             IPlayerCharacterData playerCharacter;
             if (messageHandler.ConnectionId >= 0 && message.sendByServer)
             {
@@ -823,6 +834,9 @@ namespace MultiplayerARPG.MMO
                 message.senderId = playerCharacter.Id;
                 message.senderUserId = playerCharacter.UserId;
                 message.senderName = playerCharacter.CharacterName;
+                userId = playerCharacter.UserId;
+                if (!accessTokensByConnectionId.TryGetValue(messageHandler.ConnectionId, out accessToken))
+                    accessToken = string.Empty;
             }
             // Set guild data
             if (playerCharacter != null)
@@ -851,12 +865,19 @@ namespace MultiplayerARPG.MMO
                 {
                     if (message.sendByServer || (playerCharacter is BasePlayerCharacterEntity playerCharacterEntity &&
                         CurrentGameInstance.GMCommands.IsGMCommand(message.message, out string gmCommand) &&
-                        CurrentGameInstance.GMCommands.CanUseGMCommand(playerCharacterEntity, gmCommand)))
+                        CurrentGameInstance.GMCommands.CanUseGMCommand(playerCharacterEntity.UserLevel, gmCommand)))
                     {
                         // If it's GM command and senderName's user level > 0, handle gm commands
                         // Send GM command to cluster server to broadcast to other servers later
                         if (ClusterClient.IsNetworkActive)
-                            ClusterClient.SendPacket(0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.Chat, (writer) => writer.PutValue(message));
+                        {
+                            ClusterClient.SendPacket(0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.Chat, (writer) =>
+                            {
+                                writer.PutValue(message);
+                                writer.Put(userId);
+                                writer.Put(accessToken);
+                            });
+                        }
                         sentGmCommand = true;
                     }
                 }
@@ -870,13 +891,27 @@ namespace MultiplayerARPG.MMO
                 {
                     // Send chat message to cluster server, for MMO mode chat message handling by cluster server
                     if (ClusterClient.IsNetworkActive)
-                        ClusterClient.SendPacket(0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.Chat, (writer) => writer.PutValue(message));
+                    {
+                        ClusterClient.SendPacket(0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.Chat, (writer) =>
+                        {
+                            writer.PutValue(message);
+                            writer.Put(userId);
+                            writer.Put(accessToken);
+                        });
+                    }
                 }
                 return;
             }
             // Send chat message to chat server, for MMO mode chat message handling by chat server
             if (ClusterClient.IsNetworkActive)
-                ClusterClient.SendPacket(0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.Chat, (writer) => writer.PutValue(message));
+            {
+                ClusterClient.SendPacket(0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.Chat, (writer) =>
+                {
+                    writer.PutValue(message);
+                    writer.Put(userId);
+                    writer.Put(accessToken);
+                });
+            }
         }
 #endif
 
@@ -930,27 +965,41 @@ namespace MultiplayerARPG.MMO
         #endregion
 
         #region Social message handlers
-        internal void HandleChat(MessageHandlerData messageHandler)
+        internal async void HandleChat(MessageHandlerData messageHandler)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             ChatMessage message = messageHandler.ReadMessage<ChatMessage>();
             if (message.channel == ChatChannel.Local)
             {
                 // Handle GM command here, only GM command will be broadcasted as local channel
-                if (!ServerUserHandlers.TryGetPlayerCharacterByName(message.senderName, out BasePlayerCharacterEntity playerCharacterEntity))
+                if (!CurrentGameInstance.GMCommands.IsGMCommand(message.message, out string gmCommand))
                 {
-                    // No this character in this server
+                    // Handle only GM command, if it is not GM command then skip
                     return;
                 }
-                if (!CurrentGameInstance.GMCommands.IsGMCommand(message.message, out string gmCommand) || 
-                    !CurrentGameInstance.GMCommands.CanUseGMCommand(playerCharacterEntity, gmCommand))
+
+                // Get user level from server to validate user level
+                AsyncResponseData<GetUserLevelResp> resp = await DbServiceClient.GetUserLevelAsync(new GetUserLevelReq()
                 {
-                    // Handle only GM command, if it is not GM command or the player is not GM then skip
+                    UserId = messageHandler.Reader.GetString(),
+                    AccessToken = messageHandler.Reader.GetString(),
+                });
+                if (!resp.IsSuccess)
+                {
+                    // Error occuring when retreiving user level
                     return;
                 }
+                if (!CurrentGameInstance.GMCommands.CanUseGMCommand(resp.Response.UserLevel, gmCommand))
+                {
+                    // User not able to use this command
+                    return;
+                }
+
                 // Response enter GM command message
+                if (!ServerUserHandlers.TryGetPlayerCharacterByName(message.senderName, out BasePlayerCharacterEntity playerCharacterEntity))
+                    playerCharacterEntity = null;
                 string response = CurrentGameInstance.GMCommands.HandleGMCommand(message.senderName, playerCharacterEntity, message.message);
-                if (!string.IsNullOrEmpty(response))
+                if (playerCharacterEntity != null && !string.IsNullOrEmpty(response))
                 {
                     ServerSendPacket(playerCharacterEntity.ConnectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, new ChatMessage()
                     {

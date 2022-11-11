@@ -289,7 +289,12 @@ namespace MultiplayerARPG.MMO
                 case ChatChannel.Party:
                 case ChatChannel.Guild:
                     // Send message to all map servers, let's map servers filter messages
-                    SendPacketToAllConnections(0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.Chat, (writer) => writer.PutValue(message));
+                    SendPacketToAllConnections(0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.Chat, (writer) =>
+                    {
+                        writer.PutValue(message);
+                        writer.Put(messageHandler.Reader.GetString()); // User ID
+                        writer.Put(messageHandler.Reader.GetString()); // Access Token
+                    });
                     break;
                 case ChatChannel.Whisper:
                     long senderConnectionId = 0;
