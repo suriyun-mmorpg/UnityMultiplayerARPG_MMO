@@ -39,6 +39,11 @@ namespace MultiplayerARPG.MMO
         protected async UniTaskVoid GetUserLevel(RequestHandlerData requestHandler, GetUserLevelReq request, RequestProceedResultDelegate<GetUserLevelResp> result)
         {
 #if UNITY_EDITOR || UNITY_SERVER
+            if (!Database.ValidateAccessToken(request.UserId, request.AccessToken))
+            {
+                result.Invoke(AckResponseCode.Error, new GetUserLevelResp());
+                return;
+            }
             result.Invoke(AckResponseCode.Success, new GetUserLevelResp()
             {
                 UserLevel = Database.GetUserLevel(request.UserId),
