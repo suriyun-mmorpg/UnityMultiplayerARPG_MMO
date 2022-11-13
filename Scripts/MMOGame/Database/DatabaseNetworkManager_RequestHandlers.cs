@@ -14,7 +14,7 @@ namespace MultiplayerARPG.MMO
             string userId = Database.ValidateUserLogin(request.Username, request.Password);
             if (string.IsNullOrEmpty(userId))
             {
-                result.Invoke(AckResponseCode.Success, new ValidateUserLoginResp());
+                result.Invoke(AckResponseCode.Error, new ValidateUserLoginResp());
                 return;
             }
             result.Invoke(AckResponseCode.Success, new ValidateUserLoginResp()
@@ -194,14 +194,13 @@ namespace MultiplayerARPG.MMO
             PlayerCharacterData character = request.CharacterData;
             // Cache the data, it will be used later
             cachedUserCharacter[character.Id] = character;
-            // Response success immediately
+            // Update data to database
+            Database.UpdateCharacter(character);
             result.Invoke(AckResponseCode.Success, new CharacterResp()
             {
                 CharacterData = character
             });
             await UniTask.Yield();
-            // Update data to database
-            Database.UpdateCharacter(character);
 #endif
         }
 
@@ -215,10 +214,10 @@ namespace MultiplayerARPG.MMO
                 cachedCharacterNames.TryRemove(characterName);
                 cachedUserCharacter.TryRemove(request.CharacterId, out _);
             }
-            result.Invoke(AckResponseCode.Success, EmptyMessage.Value);
-            await UniTask.Yield();
             // Delete data from database
             Database.DeleteCharacter(request.UserId, request.CharacterId);
+            result.Invoke(AckResponseCode.Success, EmptyMessage.Value);
+            await UniTask.Yield();
 #endif
         }
 
