@@ -623,180 +623,183 @@ namespace MultiplayerARPG.MMO
                 if (LogError)
                     Logging.LogError(LogTag, "Cannot find select character: " + selectCharacterId + " for user: " + userId);
                 ServerTransport.ServerDisconnect(connectionId);
+                return;
             }
-            else
+            BasePlayerCharacterEntity entityPrefab = playerCharacterData.GetEntityPrefab() as BasePlayerCharacterEntity;
+            // If it is not allow this character data, disconnect user
+            if (entityPrefab == null)
             {
-                BasePlayerCharacterEntity entityPrefab = playerCharacterData.GetEntityPrefab() as BasePlayerCharacterEntity;
-                // If it is not allow this character data, disconnect user
-                if (entityPrefab == null)
+                if (LogError)
+                    Logging.LogError(LogTag, "Cannot find player character with entity Id: " + playerCharacterData.EntityId);
+                ServerTransport.ServerDisconnect(connectionId);
+                return;
+            }
+            // Prepare saving location for this character
+            string savingCurrentMapName = playerCharacterData.CurrentMapName;
+            Vector3 savingCurrentPosition = playerCharacterData.CurrentPosition;
+
+            if (IsInstanceMap())
+            {
+                playerCharacterData.CurrentPosition = MapInstanceWarpToPosition;
+                if (MapInstanceWarpOverrideRotation)
+                    playerCharacterData.CurrentRotation = MapInstanceWarpToRotation;
+            }
+
+            // Spawn character entity and set its data
+            Quaternion characterRotation = Quaternion.identity;
+            if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
+                characterRotation = Quaternion.Euler(playerCharacterData.CurrentRotation);
+            LiteNetLibIdentity spawnObj = Assets.GetObjectInstance(
+                entityPrefab.Identity.HashAssetId,
+                playerCharacterData.CurrentPosition,
+                characterRotation);
+            BasePlayerCharacterEntity playerCharacterEntity = spawnObj.GetComponent<BasePlayerCharacterEntity>();
+            playerCharacterData.CloneTo(playerCharacterEntity);
+
+            // Set currencies
+            // Gold
+            AsyncResponseData<GoldResp> getGoldResp = await DbServiceClient.GetGoldAsync(new GetGoldReq()
+            {
+                UserId = userId,
+            });
+            if (!getGoldResp.IsSuccess)
+            {
+                Destroy(spawnObj.gameObject);
+                ServerTransport.ServerDisconnect(connectionId);
+                return;
+            }
+            playerCharacterEntity.UserGold = getGoldResp.Response.Gold;
+            // Cash
+            AsyncResponseData<CashResp> getCashResp = await DbServiceClient.GetCashAsync(new GetCashReq()
+            {
+                UserId = userId,
+            });
+            if (!getCashResp.IsSuccess)
+            {
+                Destroy(spawnObj.gameObject);
+                ServerTransport.ServerDisconnect(connectionId);
+                return;
+            }
+            playerCharacterEntity.UserCash = getCashResp.Response.Cash;
+
+            // Set user Id
+            playerCharacterEntity.UserId = userId;
+
+            // Load user level
+            AsyncResponseData<GetUserLevelResp> getUserLevelResp = await DbServiceClient.GetUserLevelAsync(new GetUserLevelReq()
+            {
+                UserId = userId,
+                AccessToken = accessToken,
+            });
+            if (!getUserLevelResp.IsSuccess)
+            {
+                Destroy(spawnObj.gameObject);
+                ServerTransport.ServerDisconnect(connectionId);
+                return;
+            }
+            playerCharacterEntity.UserLevel = getUserLevelResp.Response.UserLevel;
+
+            // Load party data, if this map-server does not have party data
+            if (playerCharacterEntity.PartyId > 0)
+            {
+                if (!ServerPartyHandlers.ContainsParty(playerCharacterEntity.PartyId))
+                    await LoadPartyRoutine(playerCharacterEntity.PartyId);
+                if (ServerPartyHandlers.TryGetParty(playerCharacterEntity.PartyId, out PartyData party))
                 {
-                    if (LogError)
-                        Logging.LogError(LogTag, "Cannot find player character with entity Id: " + playerCharacterData.EntityId);
-                    ServerTransport.ServerDisconnect(connectionId);
+                    ServerGameMessageHandlers.SendSetFullPartyData(connectionId, party);
                 }
                 else
                 {
-                    // Prepare saving location for this character
-                    string savingCurrentMapName = playerCharacterData.CurrentMapName;
-                    Vector3 savingCurrentPosition = playerCharacterData.CurrentPosition;
-
-                    if (IsInstanceMap())
-                    {
-                        playerCharacterData.CurrentPosition = MapInstanceWarpToPosition;
-                        if (MapInstanceWarpOverrideRotation)
-                            playerCharacterData.CurrentRotation = MapInstanceWarpToRotation;
-                    }
-
-                    // Spawn character entity and set its data
-                    Quaternion characterRotation = Quaternion.identity;
-                    if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
-                        characterRotation = Quaternion.Euler(playerCharacterData.CurrentRotation);
-                    LiteNetLibIdentity spawnObj = Assets.GetObjectInstance(
-                        entityPrefab.Identity.HashAssetId,
-                        playerCharacterData.CurrentPosition,
-                        characterRotation);
-                    BasePlayerCharacterEntity playerCharacterEntity = spawnObj.GetComponent<BasePlayerCharacterEntity>();
-                    playerCharacterData.CloneTo(playerCharacterEntity);
-
-                    // Set currencies
-                    // Gold
-                    AsyncResponseData<GoldResp> getGoldResp = await DbServiceClient.GetGoldAsync(new GetGoldReq()
-                    {
-                        UserId = userId,
-                    });
-                    if (!getGoldResp.IsSuccess)
-                    {
-                        Destroy(spawnObj.gameObject);
-                        ServerTransport.ServerDisconnect(connectionId);
-                        return;
-                    }
-                    playerCharacterEntity.UserGold = getGoldResp.Response.Gold;
-                    // Cash
-                    AsyncResponseData<CashResp> getCashResp = await DbServiceClient.GetCashAsync(new GetCashReq()
-                    {
-                        UserId = userId,
-                    });
-                    if (!getCashResp.IsSuccess)
-                    {
-                        Destroy(spawnObj.gameObject);
-                        ServerTransport.ServerDisconnect(connectionId);
-                        return;
-                    }
-                    playerCharacterEntity.UserCash = getCashResp.Response.Cash;
-
-                    // Set user Id
-                    playerCharacterEntity.UserId = userId;
-
-                    // Load user level
-                    AsyncResponseData<GetUserLevelResp> getUserLevelResp = await DbServiceClient.GetUserLevelAsync(new GetUserLevelReq()
-                    {
-                        UserId = userId,
-                        AccessToken = accessToken,
-                    });
-                    if (!getUserLevelResp.IsSuccess)
-                    {
-                        Destroy(spawnObj.gameObject);
-                        ServerTransport.ServerDisconnect(connectionId);
-                        return;
-                    }
-                    playerCharacterEntity.UserLevel = getUserLevelResp.Response.UserLevel;
-
-                    // Load party data, if this map-server does not have party data
-                    if (playerCharacterEntity.PartyId > 0)
-                    {
-                        if (!ServerPartyHandlers.ContainsParty(playerCharacterEntity.PartyId))
-                            await LoadPartyRoutine(playerCharacterEntity.PartyId);
-                        PartyData party;
-                        if (ServerPartyHandlers.TryGetParty(playerCharacterEntity.PartyId, out party))
-                        {
-                            ServerGameMessageHandlers.SendSetFullPartyData(connectionId, party);
-                        }
-                        else
-                        {
-                            playerCharacterEntity.ClearParty();
-                        }
-                    }
-
-                    // Load guild data, if this map-server does not have guild data
-                    if (playerCharacterEntity.GuildId > 0)
-                    {
-                        if (!ServerGuildHandlers.ContainsGuild(playerCharacterEntity.GuildId))
-                            await LoadGuildRoutine(playerCharacterEntity.GuildId);
-                        GuildData guild;
-                        if (ServerGuildHandlers.TryGetGuild(playerCharacterEntity.GuildId, out guild))
-                        {
-                            playerCharacterEntity.GuildRole = guild.GetMemberRole(playerCharacterEntity.Id);
-                            ServerGameMessageHandlers.SendSetFullGuildData(connectionId, guild);
-                        }
-                        else
-                        {
-                            playerCharacterEntity.ClearGuild();
-                        }
-                    }
-
-                    // Spawn the character
-                    Assets.NetworkSpawn(spawnObj, 0, connectionId);
-
-                    // Force make caches, to calculate current stats to fill empty slots items
-                    playerCharacterEntity.ForceMakeCaches();
-                    playerCharacterEntity.FillEmptySlots();
-
-                    // Notify clients that this character is spawn or dead
-                    if (!playerCharacterEntity.IsDead())
-                    {
-                        // Summon saved summons
-                        AsyncResponseData<GetSummonBuffsResp> summonBuffsResp = await DbServiceClient.GetSummonBuffsAsync(new GetSummonBuffsReq()
-                        {
-                            CharacterId = playerCharacterEntity.Id,
-                        });
-                        if (!summonBuffsResp.IsSuccess)
-                        {
-                            Destroy(spawnObj.gameObject);
-                            ServerTransport.ServerDisconnect(connectionId);
-                            return;
-                        }
-                        List<CharacterBuff> summonBuffs = summonBuffsResp.Response.SummonBuffs;
-                        for (int i = 0; i < playerCharacterEntity.Summons.Count; ++i)
-                        {
-                            CharacterSummon summon = playerCharacterEntity.Summons[i];
-                            summon.Summon(playerCharacterEntity, summon.Level, summon.summonRemainsDuration, summon.Exp, summon.CurrentHp, summon.CurrentMp);
-                            for (int j = 0; j < summonBuffs.Count; ++j)
-                            {
-                                if (summonBuffs[j].id.StartsWith(i.ToString()))
-                                {
-                                    summon.CacheEntity.Buffs.Add(summonBuffs[j]);
-                                    summonBuffs.RemoveAt(j);
-                                    j--;
-                                }
-                            }
-                            playerCharacterEntity.Summons[i] = summon;
-                        }
-
-                        // Summon saved mount entity
-                        if (GameInstance.VehicleEntities.ContainsKey(playerCharacterData.MountDataId))
-                            playerCharacterEntity.Mount(GameInstance.VehicleEntities[playerCharacterData.MountDataId]);
-
-                        playerCharacterEntity.CallAllOnRespawn();
-                    }
-                    else
-                    {
-                        playerCharacterEntity.CallAllOnDead();
-                    }
-
-                    // Make sure that player does not exit before character data loaded
-                    if (ContainsConnectionId(connectionId))
-                    {
-                        // Register player character entity to the server
-                        RegisterPlayerCharacter(connectionId, playerCharacterEntity);
-
-                        // Don't destroy player character entity when disconnect
-                        playerCharacterEntity.Identity.DoNotDestroyWhenDisconnect = true;
-                    }
-
-                    // Prepare saving location for this character
-                    if (IsInstanceMap())
-                        instanceMapCurrentLocations.TryAdd(playerCharacterEntity.ObjectId, new KeyValuePair<string, Vector3>(savingCurrentMapName, savingCurrentPosition));
+                    playerCharacterEntity.ClearParty();
                 }
+            }
+
+            // Load guild data, if this map-server does not have guild data
+            if (playerCharacterEntity.GuildId > 0)
+            {
+                if (!ServerGuildHandlers.ContainsGuild(playerCharacterEntity.GuildId))
+                    await LoadGuildRoutine(playerCharacterEntity.GuildId);
+                if (ServerGuildHandlers.TryGetGuild(playerCharacterEntity.GuildId, out GuildData guild))
+                {
+                    playerCharacterEntity.GuildRole = guild.GetMemberRole(playerCharacterEntity.Id);
+                    ServerGameMessageHandlers.SendSetFullGuildData(connectionId, guild);
+                }
+                else
+                {
+                    playerCharacterEntity.ClearGuild();
+                }
+            }
+
+            // Force make caches, to calculate current stats to fill empty slots items
+            playerCharacterEntity.ForceMakeCaches();
+            playerCharacterEntity.FillEmptySlots();
+
+            if (!playerCharacterEntity.IsDead())
+            {
+                // Summon saved summons
+                AsyncResponseData<GetSummonBuffsResp> summonBuffsResp = await DbServiceClient.GetSummonBuffsAsync(new GetSummonBuffsReq()
+                {
+                    CharacterId = playerCharacterEntity.Id,
+                });
+                if (!summonBuffsResp.IsSuccess)
+                {
+                    Destroy(spawnObj.gameObject);
+                    ServerTransport.ServerDisconnect(connectionId);
+                    return;
+                }
+
+                List<CharacterBuff> summonBuffs = summonBuffsResp.Response.SummonBuffs;
+                for (int i = 0; i < playerCharacterEntity.Summons.Count; ++i)
+                {
+                    CharacterSummon summon = playerCharacterEntity.Summons[i];
+                    summon.Summon(playerCharacterEntity, summon.Level, summon.summonRemainsDuration, summon.Exp, summon.CurrentHp, summon.CurrentMp);
+                    for (int j = 0; j < summonBuffs.Count; ++j)
+                    {
+                        if (summonBuffs[j].id.StartsWith(i.ToString()))
+                        {
+                            summon.CacheEntity.Buffs.Add(summonBuffs[j]);
+                            summonBuffs.RemoveAt(j);
+                            j--;
+                        }
+                    }
+                    playerCharacterEntity.Summons[i] = summon;
+                }
+            }
+
+            // Make sure that player does not exit before character data loaded
+            if (!ContainsConnectionId(connectionId))
+            {
+                Destroy(spawnObj.gameObject);
+                ServerTransport.ServerDisconnect(connectionId);
+                return;
+            }
+
+            // Spawn the character
+            Assets.NetworkSpawn(spawnObj, 0, connectionId);
+
+            // Register player character entity to the server
+            RegisterPlayerCharacter(connectionId, playerCharacterEntity);
+
+            // Don't destroy player character entity when disconnect
+            playerCharacterEntity.Identity.DoNotDestroyWhenDisconnect = true;
+
+            // Notify clients that this character is spawn or dead
+            if (!playerCharacterEntity.IsDead())
+            {
+                playerCharacterEntity.CallAllOnRespawn();
+                // Summon saved mount entity
+                if (GameInstance.VehicleEntities.ContainsKey(playerCharacterData.MountDataId))
+                    playerCharacterEntity.Mount(GameInstance.VehicleEntities[playerCharacterData.MountDataId]);
+            }
+            else
+            {
+                playerCharacterEntity.CallAllOnDead();
+            }
+
+            // Prepare saving location for this character
+            if (IsInstanceMap())
+            {
+                instanceMapCurrentLocations.TryAdd(playerCharacterEntity.ObjectId, new KeyValuePair<string, Vector3>(savingCurrentMapName, savingCurrentPosition));
             }
         }
 #endif
