@@ -106,8 +106,8 @@ namespace MultiplayerARPG.MMO
         private readonly HashSet<StorageId> loadingStorageIds = new HashSet<StorageId>();
         private readonly HashSet<int> loadingPartyIds = new HashSet<int>();
         private readonly HashSet<int> loadingGuildIds = new HashSet<int>();
-        private readonly HashSet<string> savingCharacters = new HashSet<string>();
-        private readonly HashSet<string> savingBuildings = new HashSet<string>();
+        internal readonly HashSet<string> savingCharacters = new HashSet<string>();
+        internal readonly HashSet<string> savingBuildings = new HashSet<string>();
 #endif
 
         protected override void Awake()
@@ -181,11 +181,11 @@ namespace MultiplayerARPG.MMO
                 if (tempTime - lastSaveTime > autoSaveDuration)
                 {
                     lastSaveTime = tempTime;
-                    SaveCharactersRoutine().Forget();
+                    SaveAllCharacters().Forget();
                     if (!IsInstanceMap())
                     {
                         // Don't save building if it's instance map
-                        SaveBuildingsRoutine().Forget();
+                        SaveAllBuildings().Forget();
                     }
                 }
 

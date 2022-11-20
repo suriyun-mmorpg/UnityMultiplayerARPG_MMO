@@ -96,7 +96,7 @@ namespace MultiplayerARPG.MMO
             }
             // Check that the character can move items or not
             BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
-            if (playerCharacterEntity != null && !playerCharacterEntity.CanMoveItem())
+            if (playerCharacterEntity != null && !playerCharacterEntity.CanMoveItem() && !CharacterIsSaving(playerCharacterEntity))
             {
                 result.InvokeError(new ResponseMoveItemFromStorageMessage());
                 return;
@@ -193,7 +193,7 @@ namespace MultiplayerARPG.MMO
             }
             // Check that the character can move items or not
             BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
-            if (playerCharacterEntity != null && !playerCharacterEntity.CanMoveItem())
+            if (playerCharacterEntity != null && !playerCharacterEntity.CanMoveItem() && !CharacterIsSaving(playerCharacterEntity))
             {
                 result.InvokeError(new ResponseMoveItemToStorageMessage());
                 return;
@@ -292,7 +292,7 @@ namespace MultiplayerARPG.MMO
             }
             // Check that the character can move items or not
             BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
-            if (playerCharacterEntity != null && !playerCharacterEntity.CanMoveItem())
+            if (playerCharacterEntity != null && !playerCharacterEntity.CanMoveItem() && !CharacterIsSaving(playerCharacterEntity))
             {
                 result.InvokeError(new ResponseSwapOrMergeStorageItemMessage());
                 return;
@@ -387,8 +387,20 @@ namespace MultiplayerARPG.MMO
         private void SetStorageBusy(StorageId storageId, BasePlayerCharacterEntity playerCharacterEntity, bool isBusy)
         {
             if (playerCharacterEntity != null)
+            {
                 playerCharacterEntity.IsUpdatingStorage = isBusy;
+                // Don't allow to save character while working with storage
+                if (isBusy)
+                    MMOServerInstance.Singleton.MapNetworkManager.savingCharacters.Add(playerCharacterEntity.Id);
+                else
+                    MMOServerInstance.Singleton.MapNetworkManager.savingCharacters.Remove(playerCharacterEntity.Id);
+            }
             GameInstance.ServerStorageHandlers.SetStorageBusy(storageId, isBusy);
+        }
+
+        private bool CharacterIsSaving(BasePlayerCharacterEntity playerCharacterEntity)
+        {
+            return playerCharacterEntity != null && MMOServerInstance.Singleton.MapNetworkManager.savingCharacters.Contains(playerCharacterEntity.Id);
         }
     }
 }

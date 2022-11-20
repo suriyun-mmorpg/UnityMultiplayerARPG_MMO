@@ -70,10 +70,12 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if UNITY_EDITOR || UNITY_SERVER
-        private async UniTask SaveCharacter(BasePlayerCharacterEntity playerCharacterEntity,
+        private async UniTask<bool> SaveCharacter(BasePlayerCharacterEntity playerCharacterEntity,
             bool changeMap = false, string mapName = "",
             Vector3 position = new Vector3(), bool overrideRotation = false, Vector3 rotation = new Vector3())
         {
+            if (savingCharacters.Contains(playerCharacterEntity.Id))
+                return false;
             PlayerCharacterData savingCharacterData = playerCharacterEntity.CloneTo(new PlayerCharacterData());
             if (changeMap)
             {
@@ -102,89 +104,78 @@ namespace MultiplayerARPG.MMO
                     });
                 }
             }
-            await SaveCharacterRoutine(savingCharacterData, summonBuffs);
-        }
-#endif
-
-#if UNITY_EDITOR || UNITY_SERVER
-        private async UniTask SaveCharacterRoutine(PlayerCharacterData playerCharacterData, List<CharacterBuff> summonBuffs)
-        {
-            if (playerCharacterData != null && !savingCharacters.Contains(playerCharacterData.Id))
+            savingCharacters.Add(savingCharacterData.Id);
+            // Update character
+            await DbServiceClient.UpdateCharacterAsync(new UpdateCharacterReq()
             {
-                savingCharacters.Add(playerCharacterData.Id);
-                // Update character
-                await DbServiceClient.UpdateCharacterAsync(new UpdateCharacterReq()
-                {
-                    CharacterData = playerCharacterData,
-                });
-                await DbServiceClient.SetSummonBuffsAsync(new SetSummonBuffsReq()
-                {
-                    CharacterId = playerCharacterData.Id,
-                    SummonBuffs = summonBuffs,
-                });
-                savingCharacters.Remove(playerCharacterData.Id);
-                if (LogInfo)
-                    Logging.Log(LogTag, "Character [" + playerCharacterData.Id + "] Saved");
-            }
-        }
-#endif
-
-#if UNITY_EDITOR || UNITY_SERVER
-        private async UniTaskVoid SaveCharactersRoutine()
-        {
-            if (savingCharacters.Count == 0)
+                CharacterData = savingCharacterData,
+            });
+            await DbServiceClient.SetSummonBuffsAsync(new SetSummonBuffsReq()
             {
-                int i = 0;
-                List<UniTask> tasks = new List<UniTask>();
-                foreach (BasePlayerCharacterEntity playerCharacterEntity in ServerUserHandlers.GetPlayerCharacters())
-                {
-                    if (playerCharacterEntity == null) continue;
-                    tasks.Add(SaveCharacter(playerCharacterEntity));
-                    ++i;
-                }
-                await UniTask.WhenAll(tasks);
-                if (LogInfo)
-                    Logging.Log(LogTag, "Saved " + i + " character(s)");
-            }
+                CharacterId = savingCharacterData.Id,
+                SummonBuffs = summonBuffs,
+            });
+            savingCharacters.Remove(savingCharacterData.Id);
+            if (LogInfo)
+                Logging.Log(LogTag, "Character [" + savingCharacterData.Id + "] Saved");
+            return true;
         }
 #endif
 
 #if UNITY_EDITOR || UNITY_SERVER
-        private async UniTask SaveBuildingRoutine(BuildingSaveData buildingSaveData)
+        private async UniTaskVoid SaveAllCharacters()
         {
-            if (!savingBuildings.Contains(buildingSaveData.Id))
+            if (savingCharacters.Count > 0)
+                return;
+            int i = 0;
+            List<UniTask> tasks = new List<UniTask>();
+            foreach (BasePlayerCharacterEntity playerCharacterEntity in ServerUserHandlers.GetPlayerCharacters())
             {
-                savingBuildings.Add(buildingSaveData.Id);
-                // Update building
-                await DbServiceClient.UpdateBuildingAsync(new UpdateBuildingReq()
-                {
-                    MapName = CurrentMapInfo.Id,
-                    BuildingData = buildingSaveData,
-                });
-                savingBuildings.Remove(buildingSaveData.Id);
-                if (LogInfo)
-                    Logging.Log(LogTag, "Building [" + buildingSaveData.Id + "] Saved");
+                if (playerCharacterEntity == null) continue;
+                tasks.Add(SaveCharacter(playerCharacterEntity));
+                ++i;
             }
+            await UniTask.WhenAll(tasks);
+            if (LogInfo)
+                Logging.Log(LogTag, "Saved " + i + " character(s)");
         }
 #endif
 
 #if UNITY_EDITOR || UNITY_SERVER
-        private async UniTaskVoid SaveBuildingsRoutine()
+        private async UniTask<bool> SaveBuilding(BuildingSaveData buildingSaveData)
+        {
+            if (savingBuildings.Contains(buildingSaveData.Id))
+                return false;
+            savingBuildings.Add(buildingSaveData.Id);
+            // Update building
+            await DbServiceClient.UpdateBuildingAsync(new UpdateBuildingReq()
+            {
+                MapName = CurrentMapInfo.Id,
+                BuildingData = buildingSaveData,
+            });
+            savingBuildings.Remove(buildingSaveData.Id);
+            if (LogInfo)
+                Logging.Log(LogTag, "Building [" + buildingSaveData.Id + "] Saved");
+            return true;
+        }
+#endif
+
+#if UNITY_EDITOR || UNITY_SERVER
+        private async UniTaskVoid SaveAllBuildings()
         {
             if (savingBuildings.Count == 0)
+                return;
+            int i = 0;
+            List<UniTask> tasks = new List<UniTask>();
+            foreach (BuildingEntity buildingEntity in ServerBuildingHandlers.GetBuildings())
             {
-                int i = 0;
-                List<UniTask> tasks = new List<UniTask>();
-                foreach (BuildingEntity buildingEntity in ServerBuildingHandlers.GetBuildings())
-                {
-                    if (buildingEntity == null) continue;
-                    tasks.Add(SaveBuildingRoutine(buildingEntity.CloneTo(new BuildingSaveData())));
-                    ++i;
-                }
-                await UniTask.WhenAll(tasks);
-                if (LogInfo)
-                    Logging.Log(LogTag, "Saved " + i + " building(s)");
+                if (buildingEntity == null) continue;
+                tasks.Add(SaveBuilding(buildingEntity.CloneTo(new BuildingSaveData())));
+                ++i;
             }
+            await UniTask.WhenAll(tasks);
+            if (LogInfo)
+                Logging.Log(LogTag, "Saved " + i + " building(s)");
         }
 #endif
 
