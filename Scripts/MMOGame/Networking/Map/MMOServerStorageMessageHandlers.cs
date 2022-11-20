@@ -94,6 +94,14 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
+            // Check that the character can move items or not
+            BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
+            if (playerCharacterEntity != null && !playerCharacterEntity.CanMoveItem())
+            {
+                result.InvokeError(new ResponseMoveItemFromStorageMessage());
+                return;
+            }
+            SetStorageBusy(storageId, playerCharacterEntity, true);
             // Refresh storage item from database
             AsyncResponseData<ReadStorageItemsResp> readResp = await DbServiceClient.ReadStorageItemsAsync(new ReadStorageItemsReq()
             {
@@ -103,6 +111,7 @@ namespace MultiplayerARPG.MMO
             });
             if (!readResp.IsSuccess)
             {
+                SetStorageBusy(storageId, playerCharacterEntity, false);
                 result.InvokeError(new ResponseMoveItemFromStorageMessage()
                 {
                     message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
@@ -110,16 +119,6 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             List<CharacterItem> storageItems = readResp.Response.StorageCharacterItems;
-            // Check that the character can move items or not
-            BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
-            if (playerCharacterEntity != null && !playerCharacterEntity.CanMoveItem())
-            {
-                result.InvokeError(new ResponseMoveItemFromStorageMessage());
-                return;
-            }
-            if (playerCharacterEntity != null)
-                playerCharacterEntity.IsUpdatingStorage = true;
-            GameInstance.ServerStorageHandlers.SetStorageBusy(storageId, true);
             // Prepare storage data
             Storage storage = GameInstance.ServerStorageHandlers.GetStorage(storageId, out _);
             bool isLimitSlot = storage.slotLimit > 0;
@@ -130,9 +129,7 @@ namespace MultiplayerARPG.MMO
             applyingPlayerCharacter = playerCharacter.CloneTo(applyingPlayerCharacter);
             if (!applyingPlayerCharacter.MoveItemFromStorage(isLimitSlot, slotLimit, storageItems, request.storageItemIndex, request.storageItemAmount, request.inventoryType, request.inventoryItemIndex, request.equipSlotIndexOrWeaponSet, out gameMessage))
             {
-                if (playerCharacterEntity != null)
-                    playerCharacterEntity.IsUpdatingStorage = false;
-                GameInstance.ServerStorageHandlers.SetStorageBusy(storageId, false);
+                SetStorageBusy(storageId, playerCharacterEntity, false);
                 result.InvokeError(new ResponseMoveItemFromStorageMessage()
                 {
                     message = gameMessage,
@@ -150,24 +147,20 @@ namespace MultiplayerARPG.MMO
             });
             if (!updateResp.IsSuccess)
             {
-                if (playerCharacterEntity != null)
-                    playerCharacterEntity.IsUpdatingStorage = false;
-                GameInstance.ServerStorageHandlers.SetStorageBusy(storageId, false);
+                SetStorageBusy(storageId, playerCharacterEntity, false);
                 result.InvokeError(new ResponseMoveItemFromStorageMessage()
                 {
                     message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
                 });
                 return;
             }
-            if (playerCharacterEntity != null)
-                playerCharacterEntity.IsUpdatingStorage = false;
-            GameInstance.ServerStorageHandlers.SetStorageBusy(storageId, false);
-            GameInstance.ServerStorageHandlers.SetStorageItems(storageId, storageItems);
-            GameInstance.ServerStorageHandlers.NotifyStorageItemsUpdated(request.storageType, request.storageOwnerId);
             // Apply updated data
             playerCharacter.NonEquipItems = applyingPlayerCharacter.NonEquipItems;
             playerCharacter.EquipItems = applyingPlayerCharacter.EquipItems;
             playerCharacter.SelectableWeaponSets = applyingPlayerCharacter.SelectableWeaponSets;
+            GameInstance.ServerStorageHandlers.SetStorageItems(storageId, storageItems);
+            GameInstance.ServerStorageHandlers.NotifyStorageItemsUpdated(request.storageType, request.storageOwnerId);
+            SetStorageBusy(storageId, playerCharacterEntity, false);
             result.Invoke(AckResponseCode.Success, new ResponseMoveItemFromStorageMessage());
 #endif
         }
@@ -198,6 +191,14 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
+            // Check that the character can move items or not
+            BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
+            if (playerCharacterEntity != null && !playerCharacterEntity.CanMoveItem())
+            {
+                result.InvokeError(new ResponseMoveItemToStorageMessage());
+                return;
+            }
+            SetStorageBusy(storageId, playerCharacterEntity, true);
             // Refresh storage item from database
             AsyncResponseData<ReadStorageItemsResp> readResp = await DbServiceClient.ReadStorageItemsAsync(new ReadStorageItemsReq()
             {
@@ -207,6 +208,7 @@ namespace MultiplayerARPG.MMO
             });
             if (!readResp.IsSuccess)
             {
+                SetStorageBusy(storageId, playerCharacterEntity, false);
                 result.InvokeError(new ResponseMoveItemToStorageMessage()
                 {
                     message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
@@ -214,16 +216,6 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             List<CharacterItem> storageItems = readResp.Response.StorageCharacterItems;
-            // Check that the character can move items or not
-            BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
-            if (playerCharacterEntity != null && !playerCharacterEntity.CanMoveItem())
-            {
-                result.InvokeError(new ResponseMoveItemToStorageMessage());
-                return;
-            }
-            if (playerCharacterEntity != null)
-                playerCharacterEntity.IsUpdatingStorage = true;
-            GameInstance.ServerStorageHandlers.SetStorageBusy(storageId, true);
             // Prepare storage data
             Storage storage = GameInstance.ServerStorageHandlers.GetStorage(storageId, out _);
             bool isLimitWeight = storage.weightLimit > 0;
@@ -236,9 +228,7 @@ namespace MultiplayerARPG.MMO
             applyingPlayerCharacter = playerCharacter.CloneTo(applyingPlayerCharacter);
             if (!applyingPlayerCharacter.MoveItemToStorage(isLimitWeight, weightLimit, isLimitSlot, slotLimit, storageItems, request.storageItemIndex, request.inventoryType, request.inventoryItemIndex, request.inventoryItemAmount, request.equipSlotIndexOrWeaponSet, out gameMessage))
             {
-                if (playerCharacterEntity != null)
-                    playerCharacterEntity.IsUpdatingStorage = false;
-                GameInstance.ServerStorageHandlers.SetStorageBusy(storageId, false);
+                SetStorageBusy(storageId, playerCharacterEntity, false);
                 result.Invoke(AckResponseCode.Error, new ResponseMoveItemToStorageMessage()
                 {
                     message = gameMessage,
@@ -256,24 +246,20 @@ namespace MultiplayerARPG.MMO
             });
             if (!updateResp.IsSuccess)
             {
-                if (playerCharacterEntity != null)
-                    playerCharacterEntity.IsUpdatingStorage = false;
-                GameInstance.ServerStorageHandlers.SetStorageBusy(storageId, false);
+                SetStorageBusy(storageId, playerCharacterEntity, false);
                 result.InvokeError(new ResponseMoveItemToStorageMessage()
                 {
                     message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
                 });
                 return;
             }
-            if (playerCharacterEntity != null)
-                playerCharacterEntity.IsUpdatingStorage = false;
-            GameInstance.ServerStorageHandlers.SetStorageBusy(storageId, false);
-            GameInstance.ServerStorageHandlers.SetStorageItems(storageId, storageItems);
-            GameInstance.ServerStorageHandlers.NotifyStorageItemsUpdated(request.storageType, request.storageOwnerId);
             // Apply updated data
             playerCharacter.NonEquipItems = applyingPlayerCharacter.NonEquipItems;
             playerCharacter.EquipItems = applyingPlayerCharacter.EquipItems;
             playerCharacter.SelectableWeaponSets = applyingPlayerCharacter.SelectableWeaponSets;
+            GameInstance.ServerStorageHandlers.SetStorageItems(storageId, storageItems);
+            GameInstance.ServerStorageHandlers.NotifyStorageItemsUpdated(request.storageType, request.storageOwnerId);
+            SetStorageBusy(storageId, playerCharacterEntity, false);
             result.Invoke(AckResponseCode.Success, new ResponseMoveItemToStorageMessage());
 #endif
         }
@@ -304,6 +290,15 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
+            // Check that the character can move items or not
+            BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
+            if (playerCharacterEntity != null && !playerCharacterEntity.CanMoveItem())
+            {
+                result.InvokeError(new ResponseSwapOrMergeStorageItemMessage());
+                return;
+            }
+            // Mark as busy to not allow storage to be changed
+            SetStorageBusy(storageId, playerCharacterEntity, true);
             // Refresh storage item from database
             AsyncResponseData<ReadStorageItemsResp> readResp = await DbServiceClient.ReadStorageItemsAsync(new ReadStorageItemsReq()
             {
@@ -313,6 +308,7 @@ namespace MultiplayerARPG.MMO
             });
             if (!readResp.IsSuccess)
             {
+                SetStorageBusy(storageId, playerCharacterEntity, false);
                 result.InvokeError(new ResponseSwapOrMergeStorageItemMessage()
                 {
                     message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
@@ -324,22 +320,13 @@ namespace MultiplayerARPG.MMO
             if (request.fromIndex >= storageItems.Count ||
                 request.toIndex >= storageItems.Count)
             {
+                SetStorageBusy(storageId, playerCharacterEntity, false);
                 result.InvokeError(new ResponseSwapOrMergeStorageItemMessage()
                 {
                     message = UITextKeys.UI_ERROR_INVALID_ITEM_INDEX,
                 });
                 return;
             }
-            // Check that the character can move items or not
-            BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
-            if (playerCharacterEntity != null && !playerCharacterEntity.CanMoveItem())
-            {
-                result.InvokeError(new ResponseSwapOrMergeStorageItemMessage());
-                return;
-            }
-            if (playerCharacterEntity != null)
-                playerCharacterEntity.IsUpdatingStorage = true;
-            GameInstance.ServerStorageHandlers.SetStorageBusy(storageId, true);
             // Perform swap or merge items
             Storage storage = GameInstance.ServerStorageHandlers.GetStorage(storageId, out _);
             bool isLimitSlot = storage.slotLimit > 0;
@@ -383,22 +370,25 @@ namespace MultiplayerARPG.MMO
             });
             if (!updateResp.IsSuccess)
             {
-                if (playerCharacterEntity != null)
-                    playerCharacterEntity.IsUpdatingStorage = false;
-                GameInstance.ServerStorageHandlers.SetStorageBusy(storageId, false);
+                SetStorageBusy(storageId, playerCharacterEntity, false);
                 result.InvokeError(new ResponseSwapOrMergeStorageItemMessage()
                 {
                     message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
                 });
                 return;
             }
-            if (playerCharacterEntity != null)
-                playerCharacterEntity.IsUpdatingStorage = false;
-            GameInstance.ServerStorageHandlers.SetStorageBusy(storageId, false);
             GameInstance.ServerStorageHandlers.SetStorageItems(storageId, storageItems);
             GameInstance.ServerStorageHandlers.NotifyStorageItemsUpdated(request.storageType, request.storageOwnerId);
+            SetStorageBusy(storageId, playerCharacterEntity, false);
             result.Invoke(AckResponseCode.Success, new ResponseSwapOrMergeStorageItemMessage());
 #endif
+        }
+
+        private void SetStorageBusy(StorageId storageId, BasePlayerCharacterEntity playerCharacterEntity, bool isBusy)
+        {
+            if (playerCharacterEntity != null)
+                playerCharacterEntity.IsUpdatingStorage = isBusy;
+            GameInstance.ServerStorageHandlers.SetStorageBusy(storageId, isBusy);
         }
     }
 }

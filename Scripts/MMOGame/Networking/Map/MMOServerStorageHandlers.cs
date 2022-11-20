@@ -147,9 +147,9 @@ namespace MultiplayerARPG.MMO
                 SetStorageBusy(storageId, false);
                 return null;
             }
-            SetStorageBusy(storageId, false);
             SetStorageItems(storageId, storageItems);
             NotifyStorageItemsUpdated(storageId.storageType, storageId.storageOwnerId);
+            SetStorageBusy(storageId, false);
             return droppingItems;
 #else
             return null;
