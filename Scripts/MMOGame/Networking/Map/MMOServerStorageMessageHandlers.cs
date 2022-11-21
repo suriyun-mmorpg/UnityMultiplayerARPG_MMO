@@ -386,6 +386,7 @@ namespace MultiplayerARPG.MMO
 
         private void SetStorageBusy(StorageId storageId, BasePlayerCharacterEntity playerCharacterEntity, bool isBusy)
         {
+#if UNITY_EDITOR || UNITY_SERVER
             if (playerCharacterEntity != null)
             {
                 playerCharacterEntity.IsUpdatingStorage = isBusy;
@@ -396,11 +397,16 @@ namespace MultiplayerARPG.MMO
                     MMOServerInstance.Singleton.MapNetworkManager.savingCharacters.Remove(playerCharacterEntity.Id);
             }
             GameInstance.ServerStorageHandlers.SetStorageBusy(storageId, isBusy);
+#endif
         }
 
         private bool CharacterIsSaving(BasePlayerCharacterEntity playerCharacterEntity)
         {
+#if UNITY_EDITOR || UNITY_SERVER
             return playerCharacterEntity != null && MMOServerInstance.Singleton.MapNetworkManager.savingCharacters.Contains(playerCharacterEntity.Id);
+#else
+            return false;
+#endif
         }
     }
 }
