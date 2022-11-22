@@ -7,7 +7,7 @@ namespace MultiplayerARPG.MMO
 {
     public partial class MMOServerStorageMessageHandlers : MonoBehaviour, IServerStorageMessageHandlers
     {
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         public IDatabaseClient DbServiceClient
         {
             get { return MMOServerInstance.Singleton.DatabaseNetworkManager; }
@@ -16,7 +16,7 @@ namespace MultiplayerARPG.MMO
 
         public async UniTaskVoid HandleRequestOpenStorage(RequestHandlerData requestHandler, RequestOpenStorageMessage request, RequestProceedResultDelegate<ResponseOpenStorageMessage> result)
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             if (request.storageType != StorageType.Player &&
                 request.storageType != StorageType.Guild)
             {
@@ -52,7 +52,7 @@ namespace MultiplayerARPG.MMO
 
         public async UniTaskVoid HandleRequestCloseStorage(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<ResponseCloseStorageMessage> result)
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
@@ -70,7 +70,7 @@ namespace MultiplayerARPG.MMO
 
         public async UniTaskVoid HandleRequestMoveItemFromStorage(RequestHandlerData requestHandler, RequestMoveItemFromStorageMessage request, RequestProceedResultDelegate<ResponseMoveItemFromStorageMessage> result)
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             // Validate user and storage accessibility
             StorageId storageId = new StorageId(request.storageType, request.storageOwnerId);
             if (GameInstance.ServerStorageHandlers.IsStorageBusy(storageId))
@@ -167,7 +167,7 @@ namespace MultiplayerARPG.MMO
 
         public async UniTaskVoid HandleRequestMoveItemToStorage(RequestHandlerData requestHandler, RequestMoveItemToStorageMessage request, RequestProceedResultDelegate<ResponseMoveItemToStorageMessage> result)
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             // Validate user and storage accessibility
             StorageId storageId = new StorageId(request.storageType, request.storageOwnerId);
             if (GameInstance.ServerStorageHandlers.IsStorageBusy(storageId))
@@ -266,7 +266,7 @@ namespace MultiplayerARPG.MMO
 
         public async UniTaskVoid HandleRequestSwapOrMergeStorageItem(RequestHandlerData requestHandler, RequestSwapOrMergeStorageItemMessage request, RequestProceedResultDelegate<ResponseSwapOrMergeStorageItemMessage> result)
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             // Validate user and storage accessibility
             StorageId storageId = new StorageId(request.storageType, request.storageOwnerId);
             if (GameInstance.ServerStorageHandlers.IsStorageBusy(storageId))
@@ -386,7 +386,7 @@ namespace MultiplayerARPG.MMO
 
         private void SetStorageBusy(StorageId storageId, BasePlayerCharacterEntity playerCharacterEntity, bool isBusy)
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             if (playerCharacterEntity != null)
             {
                 playerCharacterEntity.IsUpdatingStorage = isBusy;
@@ -402,7 +402,7 @@ namespace MultiplayerARPG.MMO
 
         private bool CharacterIsSaving(BasePlayerCharacterEntity playerCharacterEntity)
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             return playerCharacterEntity != null && MMOServerInstance.Singleton.MapNetworkManager.savingCharacters.Contains(playerCharacterEntity.Id);
 #else
             return false;

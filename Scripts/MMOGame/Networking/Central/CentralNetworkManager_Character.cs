@@ -48,7 +48,7 @@ namespace MultiplayerARPG.MMO
             EmptyMessage request,
             RequestProceedResultDelegate<ResponseCharactersMessage> result)
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             long connectionId = requestHandler.ConnectionId;
             CentralUserPeerInfo userPeerInfo;
             if (!userPeers.TryGetValue(connectionId, out userPeerInfo))
@@ -85,7 +85,7 @@ namespace MultiplayerARPG.MMO
             RequestCreateCharacterMessage request,
             RequestProceedResultDelegate<ResponseCreateCharacterMessage> result)
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             long connectionId = requestHandler.ConnectionId;
             NetDataReader reader = requestHandler.Reader;
             string characterName = request.characterName.Trim();
@@ -183,7 +183,7 @@ namespace MultiplayerARPG.MMO
 
         private void DeserializeCreateCharacterExtra(PlayerCharacterData characterData, NetDataReader reader)
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             this.InvokeInstanceDevExtMethods("DeserializeCreateCharacterExtra", characterData, reader);
 #endif
         }
@@ -193,7 +193,7 @@ namespace MultiplayerARPG.MMO
             RequestDeleteCharacterMessage request,
             RequestProceedResultDelegate<ResponseDeleteCharacterMessage> result)
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             long connectionId = requestHandler.ConnectionId;
             CentralUserPeerInfo userPeerInfo;
             if (!userPeers.TryGetValue(connectionId, out userPeerInfo))
@@ -227,7 +227,7 @@ namespace MultiplayerARPG.MMO
             RequestSelectCharacterMessage request,
             RequestProceedResultDelegate<ResponseSelectCharacterMessage> result)
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             long connectionId = requestHandler.ConnectionId;
             CentralServerPeerInfo mapServerPeerInfo = default;
             CentralUserPeerInfo userPeerInfo;

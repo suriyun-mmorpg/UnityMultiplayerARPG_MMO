@@ -150,7 +150,7 @@ namespace MultiplayerARPG.MMO
         public int databaseOptionIndex;
         public bool databaseDisableCacheReading;
 
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         private List<string> spawningMapIds;
         private string startingMapId;
         private bool startingCentralServer;
@@ -179,7 +179,7 @@ namespace MultiplayerARPG.MMO
             customDatabaseClient = customDatabaseClientSource.GetComponent<IDatabaseClient>();
 
             CacheLogGUI.enabled = false;
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             GameInstance gameInstance = FindObjectOfType<GameInstance>();
             gameInstance.onGameDataLoaded = OnGameDataLoaded;
 
@@ -589,7 +589,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         private void OnGameDataLoaded()
         {
             if (startingDatabaseServer)
@@ -647,7 +647,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         #region Server functions
         public void StartCentralServer()
         {

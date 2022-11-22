@@ -1,4 +1,4 @@
-﻿#if UNITY_EDITOR || UNITY_SERVER
+﻿#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
 using Mono.Data.Sqlite;
 using System;
 using System.Collections.Generic;

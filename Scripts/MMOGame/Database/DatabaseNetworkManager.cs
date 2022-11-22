@@ -41,7 +41,7 @@ namespace MultiplayerARPG.MMO
                 database = databaseOptions[index];
         }
 
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         // TODO: I'm going to make in-memory database without Redis for now
         // In the future it may implements Redis
         // It's going to get some data from all tables but not every records
@@ -74,7 +74,7 @@ namespace MultiplayerARPG.MMO
         public override void OnStartServer()
         {
             base.OnStartServer();
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             Database.Initialize();
 #endif
         }

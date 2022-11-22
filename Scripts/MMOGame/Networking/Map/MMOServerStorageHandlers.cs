@@ -9,14 +9,14 @@ namespace MultiplayerARPG.MMO
 {
     public partial class MMOServerStorageHandlers : MonoBehaviour, IServerStorageHandlers
     {
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         private readonly ConcurrentDictionary<StorageId, List<CharacterItem>> storageItems = new ConcurrentDictionary<StorageId, List<CharacterItem>>();
         private readonly ConcurrentDictionary<StorageId, HashSet<long>> usingStorageClients = new ConcurrentDictionary<StorageId, HashSet<long>>();
         private readonly ConcurrentDictionary<long, StorageId> usingStorageIds = new ConcurrentDictionary<long, StorageId>();
         private readonly ConcurrentHashSet<StorageId> busyStorages = new ConcurrentHashSet<StorageId>();
 #endif
 
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         public IDatabaseClient DbServiceClient
         {
             get { return MMOServerInstance.Singleton.DatabaseNetworkManager; }
@@ -25,7 +25,7 @@ namespace MultiplayerARPG.MMO
 
         public async UniTaskVoid OpenStorage(long connectionId, IPlayerCharacterData playerCharacter, StorageId storageId)
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             if (!CanAccessStorage(playerCharacter, storageId))
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(connectionId, UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE);
@@ -60,7 +60,7 @@ namespace MultiplayerARPG.MMO
 
         public async UniTaskVoid CloseStorage(long connectionId)
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             StorageId storageId;
             if (usingStorageIds.TryGetValue(connectionId, out storageId) && usingStorageClients.ContainsKey(storageId))
             {
@@ -74,7 +74,7 @@ namespace MultiplayerARPG.MMO
 
         public bool TryGetOpenedStorageId(long connectionId, out StorageId storageId)
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             return usingStorageIds.TryGetValue(connectionId, out storageId);
 #else
             storageId = default;
@@ -84,7 +84,7 @@ namespace MultiplayerARPG.MMO
 
         public async UniTask<List<CharacterItem>> ConvertStorageItems(StorageId storageId, List<StorageConvertItemsEntry> convertItems)
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             SetStorageBusy(storageId, true);
             // Prepare storage data
             StorageType storageType = storageId.storageType;
@@ -158,7 +158,7 @@ namespace MultiplayerARPG.MMO
 
         public List<CharacterItem> GetStorageItems(StorageId storageId)
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             if (!storageItems.ContainsKey(storageId))
                 storageItems.TryAdd(storageId, new List<CharacterItem>());
             return storageItems[storageId];
@@ -169,7 +169,7 @@ namespace MultiplayerARPG.MMO
 
         public void SetStorageItems(StorageId storageId, List<CharacterItem> items)
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             if (!storageItems.ContainsKey(storageId))
                 storageItems.TryAdd(storageId, new List<CharacterItem>());
             storageItems[storageId] = items;
@@ -225,7 +225,7 @@ namespace MultiplayerARPG.MMO
 
         public bool IsStorageEntityOpen(StorageEntity storageEntity)
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             if (storageEntity == null)
                 return false;
             StorageId id = new StorageId(StorageType.Building, storageEntity.Id);
@@ -237,7 +237,7 @@ namespace MultiplayerARPG.MMO
 
         public List<CharacterItem> GetStorageEntityItems(StorageEntity storageEntity)
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             if (storageEntity == null)
                 return new List<CharacterItem>();
             return GetStorageItems(new StorageId(StorageType.Building, storageEntity.Id));
@@ -248,7 +248,7 @@ namespace MultiplayerARPG.MMO
 
         public void ClearStorage()
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             storageItems.Clear();
             usingStorageClients.Clear();
             usingStorageIds.Clear();
@@ -258,7 +258,7 @@ namespace MultiplayerARPG.MMO
 
         public void NotifyStorageItemsUpdated(StorageType storageType, string storageOwnerId)
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             StorageId storageId = new StorageId(storageType, storageOwnerId);
             GameInstance.ServerGameMessageHandlers.NotifyStorageItemsToClients(usingStorageClients[storageId], GetStorageItems(storageId));
 #endif
@@ -266,7 +266,7 @@ namespace MultiplayerARPG.MMO
 
         public IDictionary<StorageId, List<CharacterItem>> GetAllStorageItems()
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             return storageItems;
 #else
             return new ConcurrentDictionary<StorageId, List<CharacterItem>>();
@@ -275,7 +275,7 @@ namespace MultiplayerARPG.MMO
 
         public void SetStorageBusy(StorageId storageId, bool isBusy)
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             if (isBusy)
                 busyStorages.Add(storageId);
             else
@@ -285,7 +285,7 @@ namespace MultiplayerARPG.MMO
 
         public bool IsStorageBusy(StorageId storageId)
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             return busyStorages.Contains(storageId);
 #else
             return false;

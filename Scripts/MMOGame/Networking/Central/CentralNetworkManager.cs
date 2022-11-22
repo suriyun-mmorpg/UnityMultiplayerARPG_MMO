@@ -8,7 +8,7 @@ namespace MultiplayerARPG.MMO
     [DefaultExecutionOrder(-897)]
     public partial class CentralNetworkManager : LiteNetLibManager.LiteNetLibManager
     {
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         // User peers (Login / Register / Manager characters)
         protected readonly Dictionary<long, CentralUserPeerInfo> userPeers = new Dictionary<long, CentralUserPeerInfo>();
         protected readonly Dictionary<string, CentralUserPeerInfo> userPeersByUserId = new Dictionary<string, CentralUserPeerInfo>();
@@ -38,18 +38,18 @@ namespace MultiplayerARPG.MMO
 
         private float lastUserCountUpdateTime = float.MinValue;
 
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         public ClusterServer ClusterServer { get; private set; }
 #endif
 
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         public IDatabaseClient DbServiceClient
         {
             get { return MMOServerInstance.Singleton.DatabaseNetworkManager; }
         }
 #endif
 
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         protected override void Start()
         {
             base.Start();
@@ -57,7 +57,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         protected override void FixedUpdate()
         {
             base.FixedUpdate();
@@ -99,13 +99,13 @@ namespace MultiplayerARPG.MMO
         protected virtual void Clean()
         {
             this.InvokeInstanceDevExtMethods("Clean");
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             userPeers.Clear();
             userPeersByUserId.Clear();
 #endif
         }
 
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         public override void OnStartServer()
         {
             this.InvokeInstanceDevExtMethods("OnStartServer");
@@ -114,7 +114,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         public override void OnStopServer()
         {
             Clean();
@@ -155,7 +155,7 @@ namespace MultiplayerARPG.MMO
         public override void OnPeerDisconnected(long connectionId, DisconnectInfo disconnectInfo)
         {
             base.OnPeerDisconnected(connectionId, disconnectInfo);
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             // Remove disconnect user
             CentralUserPeerInfo userPeerInfo;
             if (userPeers.TryGetValue(connectionId, out userPeerInfo))
@@ -168,7 +168,7 @@ namespace MultiplayerARPG.MMO
 
         public bool MapContainsUser(string userId)
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             return ClusterServer.MapContainsUser(userId);
 #else
             return false;

@@ -8,7 +8,7 @@ namespace MultiplayerARPG.MMO
 {
     public partial class MMOServerMailMessageHandlers : MonoBehaviour, IServerMailMessageHandlers
     {
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         public IDatabaseClient DbServiceClient
         {
             get { return MMOServerInstance.Singleton.DatabaseNetworkManager; }
@@ -19,7 +19,7 @@ namespace MultiplayerARPG.MMO
 
         public async UniTaskVoid HandleRequestMailList(RequestHandlerData requestHandler, RequestMailListMessage request, RequestProceedResultDelegate<ResponseMailListMessage> result)
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             List<MailListEntry> mails = new List<MailListEntry>();
             string userId;
             if (GameInstance.ServerUserHandlers.TryGetUserId(requestHandler.ConnectionId, out userId))
@@ -42,7 +42,7 @@ namespace MultiplayerARPG.MMO
 
         public async UniTaskVoid HandleRequestReadMail(RequestHandlerData requestHandler, RequestReadMailMessage request, RequestProceedResultDelegate<ResponseReadMailMessage> result)
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             string userId;
             if (GameInstance.ServerUserHandlers.TryGetUserId(requestHandler.ConnectionId, out userId))
             {
@@ -80,7 +80,7 @@ namespace MultiplayerARPG.MMO
 
         private async UniTask<UITextKeys> ClaimMailItems(string mailId, IPlayerCharacterData playerCharacter)
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             AsyncResponseData<GetMailResp> mailResp = await DbServiceClient.GetMailAsync(new GetMailReq()
             {
                 MailId = mailId,
@@ -139,7 +139,7 @@ namespace MultiplayerARPG.MMO
 
         public async UniTaskVoid HandleRequestClaimMailItems(RequestHandlerData requestHandler, RequestClaimMailItemsMessage request, RequestProceedResultDelegate<ResponseClaimMailItemsMessage> result)
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             if (busyMailBoxes.Contains(request.id))
             {
                 result.Invoke(AckResponseCode.Error, new ResponseClaimMailItemsMessage());
@@ -171,7 +171,7 @@ namespace MultiplayerARPG.MMO
 
         private async UniTask<UITextKeys> DeleteMail(string mailId, string userId)
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             AsyncResponseData<UpdateDeleteMailStateResp> resp = await DbServiceClient.UpdateDeleteMailStateAsync(new UpdateDeleteMailStateReq()
             {
                 MailId = mailId,
@@ -187,7 +187,7 @@ namespace MultiplayerARPG.MMO
 
         public async UniTaskVoid HandleRequestDeleteMail(RequestHandlerData requestHandler, RequestDeleteMailMessage request, RequestProceedResultDelegate<ResponseDeleteMailMessage> result)
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             string userId;
             if (!GameInstance.ServerUserHandlers.TryGetUserId(requestHandler.ConnectionId, out userId))
             {
@@ -212,7 +212,7 @@ namespace MultiplayerARPG.MMO
 
         public async UniTaskVoid HandleRequestSendMail(RequestHandlerData requestHandler, RequestSendMailMessage request, RequestProceedResultDelegate<ResponseSendMailMessage> result)
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             IPlayerCharacterData playerCharacter;
             if (GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
@@ -294,7 +294,7 @@ namespace MultiplayerARPG.MMO
 
         public async UniTaskVoid HandleRequestMailNotification(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<ResponseMailNotificationMessage> result)
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             int notificationCount = 0;
             string userId;
             if (GameInstance.ServerUserHandlers.TryGetUserId(requestHandler.ConnectionId, out userId))
@@ -315,7 +315,7 @@ namespace MultiplayerARPG.MMO
 
         public async UniTaskVoid HandleRequestClaimAllMailsItems(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<ResponseClaimAllMailsItemsMessage> result)
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {
@@ -348,7 +348,7 @@ namespace MultiplayerARPG.MMO
 
         public async UniTaskVoid HandleRequestDeleteAllMails(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<ResponseDeleteAllMailsMessage> result)
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             string userId;
             if (!GameInstance.ServerUserHandlers.TryGetUserId(requestHandler.ConnectionId, out userId))
             {

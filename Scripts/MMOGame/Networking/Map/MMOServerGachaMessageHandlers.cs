@@ -7,7 +7,7 @@ namespace MultiplayerARPG.MMO
 {
     public partial class MMOServerGachaMessageHandlers : MonoBehaviour, IServerGachaMessageHandlers
     {
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         public IDatabaseClient DbServiceClient
         {
             get { return MMOServerInstance.Singleton.DatabaseNetworkManager; }
@@ -23,7 +23,7 @@ namespace MultiplayerARPG.MMO
             RequestHandlerData requestHandler, EmptyMessage request,
             RequestProceedResultDelegate<ResponseGachaInfoMessage> result)
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             string userId;
             if (!GameInstance.ServerUserHandlers.TryGetUserId(requestHandler.ConnectionId, out userId))
             {
@@ -57,7 +57,7 @@ namespace MultiplayerARPG.MMO
 
         public async UniTaskVoid HandleRequestOpenGacha(RequestHandlerData requestHandler, RequestOpenGachaMessage request, RequestProceedResultDelegate<ResponseOpenGachaMessage> result)
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             IPlayerCharacterData playerCharacter;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
             {

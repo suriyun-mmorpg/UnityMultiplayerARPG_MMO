@@ -7,7 +7,7 @@ namespace MultiplayerARPG.MMO
 {
     public partial class MapNetworkManager
     {
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         private async UniTask LoadStorageRoutine(StorageId storageId)
         {
             if (!loadingStorageIds.Contains(storageId))
@@ -29,7 +29,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         private async UniTask LoadPartyRoutine(int id)
         {
             if (id > 0 && !loadingPartyIds.Contains(id))
@@ -49,7 +49,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         private async UniTask LoadGuildRoutine(int id)
         {
             if (id > 0 && !loadingGuildIds.Contains(id))
@@ -69,7 +69,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         private async UniTask<bool> SaveCharacter(BasePlayerCharacterEntity playerCharacterEntity,
             bool changeMap = false, string mapName = "",
             Vector3 position = new Vector3(), bool overrideRotation = false, Vector3 rotation = new Vector3())
@@ -122,7 +122,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         private async UniTaskVoid SaveAllCharacters()
         {
             if (savingCharacters.Count > 0)
@@ -141,7 +141,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         private async UniTask<bool> SaveBuilding(BuildingSaveData buildingSaveData)
         {
             if (savingBuildings.Contains(buildingSaveData.Id))
@@ -160,7 +160,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         private async UniTaskVoid SaveAllBuildings()
         {
             if (savingBuildings.Count == 0)
@@ -179,7 +179,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         public override BuildingEntity CreateBuildingEntity(BuildingSaveData saveData, bool initialize)
         {
             CreateBuildingEntityRoutine(saveData, initialize).Forget();
@@ -199,7 +199,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if UNITY_EDITOR || UNITY_SERVER
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         public override void DestroyBuildingEntity(string id)
         {
             base.DestroyBuildingEntity(id);
