@@ -14,7 +14,7 @@ namespace MultiplayerARPG.MMO
             string userId = Database.ValidateUserLogin(request.Username, request.Password);
             if (string.IsNullOrEmpty(userId))
             {
-                result.Invoke(AckResponseCode.Error, new ValidateUserLoginResp());
+                result.Invoke(AckResponseCode.Success, new ValidateUserLoginResp());
                 return;
             }
             result.Invoke(AckResponseCode.Success, new ValidateUserLoginResp()
