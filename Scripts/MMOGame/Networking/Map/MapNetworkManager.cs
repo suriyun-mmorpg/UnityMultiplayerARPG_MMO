@@ -375,16 +375,16 @@ namespace MultiplayerARPG.MMO
                 CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
                 despawningPlayerCharacterCancellations.TryAdd(id, cancellationTokenSource);
                 despawningPlayerCharacterEntities.TryAdd(id, playerCharacterEntity);
+                // Unregister player character
+                UnregisterPlayerCharacter(connectionId);
+                UnregisterUserId(connectionId);
+                accessTokensByConnectionId.TryRemove(connectionId, out _);
                 // Save character immediately when player disconnect
                 while (savingCharacters.Contains(id))
                 {
                     await UniTask.Yield();
                 }
                 await SaveCharacter(playerCharacterEntity);
-                // Saved, so can unregister character and user
-                UnregisterPlayerCharacter(connectionId);
-                UnregisterUserId(connectionId);
-                accessTokensByConnectionId.TryRemove(connectionId, out _);
                 try
                 {
                     if (!IsInstanceMap())
