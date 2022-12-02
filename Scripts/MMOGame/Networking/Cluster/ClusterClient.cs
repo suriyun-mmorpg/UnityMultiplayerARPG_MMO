@@ -198,8 +198,8 @@ namespace MultiplayerARPG.MMO
         private void HandleKickUser(MessageHandlerData messageHandler)
         {
             string kickUserId = messageHandler.Reader.GetString();
-            if (appServer is MapNetworkManager)
-                (appServer as MapNetworkManager).KickUserById(kickUserId);
+            if (appServer is MapNetworkManager mapNetworkManager)
+                mapNetworkManager.KickUserById(kickUserId);
         }
 #endif
     }
