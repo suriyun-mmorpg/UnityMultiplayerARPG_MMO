@@ -91,7 +91,6 @@ namespace MultiplayerARPG.MMO
         private float lastSaveTime;
         // Listing
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-        private readonly List<PendingSpawnPlayerCharacter> pendingSpawnPlayerCharacters = new List<PendingSpawnPlayerCharacter>();
         private readonly ConcurrentDictionary<uint, KeyValuePair<string, Vector3>> instanceMapCurrentLocations = new ConcurrentDictionary<uint, KeyValuePair<string, Vector3>>();
         private readonly ConcurrentDictionary<string, CentralServerPeerInfo> mapServerConnectionIdsBySceneName = new ConcurrentDictionary<string, CentralServerPeerInfo>();
         private readonly ConcurrentDictionary<string, CentralServerPeerInfo> instanceMapServerConnectionIdsByInstanceId = new ConcurrentDictionary<string, CentralServerPeerInfo>();
@@ -101,7 +100,7 @@ namespace MultiplayerARPG.MMO
         private readonly ConcurrentDictionary<string, CancellationTokenSource> despawningPlayerCharacterCancellations = new ConcurrentDictionary<string, CancellationTokenSource>();
         private readonly ConcurrentDictionary<string, BasePlayerCharacterEntity> despawningPlayerCharacterEntities = new ConcurrentDictionary<string, BasePlayerCharacterEntity>();
         private readonly ConcurrentDictionary<string, long> connectionsByUserId = new ConcurrentDictionary<string, long>();
-        private readonly ConcurrentDictionary<long, string> accessTokensByConnectionId = new ConcurrentDictionary<long, string>();
+        private readonly ConcurrentDictionary<string, string> accessTokensByUserId = new ConcurrentDictionary<string, string>();
         // Database operations
         private readonly HashSet<StorageId> loadingStorageIds = new HashSet<StorageId>();
         private readonly HashSet<int> loadingPartyIds = new HashSet<int>();
@@ -197,20 +196,6 @@ namespace MultiplayerARPG.MMO
                     else if (tempTime - terminatingTime >= TERMINATE_INSTANCE_DELAY)
                         Application.Quit();
                 }
-
-                if (pendingSpawnPlayerCharacters.Count > 0 && IsReadyToInstantiateObjects())
-                {
-                    // Spawn pending player characters
-                    LiteNetLibPlayer player;
-                    foreach (PendingSpawnPlayerCharacter spawnPlayerCharacter in pendingSpawnPlayerCharacters)
-                    {
-                        if (!Players.TryGetValue(spawnPlayerCharacter.connectionId, out player))
-                            continue;
-                        player.IsReady = true;
-                        SetPlayerReadyRoutine(spawnPlayerCharacter.connectionId, spawnPlayerCharacter.userId, spawnPlayerCharacter.accessToken, spawnPlayerCharacter.selectCharacterId).Forget();
-                    }
-                    pendingSpawnPlayerCharacters.Clear();
-                }
             }
 #endif
         }
@@ -231,7 +216,7 @@ namespace MultiplayerARPG.MMO
             savingCharacters.Clear();
             savingBuildings.Clear();
             connectionsByUserId.Clear();
-            accessTokensByConnectionId.Clear();
+            accessTokensByUserId.Clear();
 #endif
         }
 
@@ -338,11 +323,23 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+        public void RegisterUserIdAndAccessToken(long connectionId, string userId, string accessToken)
+        {
+            RegisterUserId(connectionId, userId);
+            accessTokensByUserId.TryRemove(userId, out _);
+            accessTokensByUserId.TryAdd(userId, accessToken);
+        }
+#endif
+
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         public override void UnregisterUserId(long connectionId)
         {
             string userId;
             if (ServerUserHandlers.TryGetUserId(connectionId, out userId))
+            {
                 connectionsByUserId.TryRemove(userId, out _);
+                accessTokensByUserId.TryRemove(userId, out _);
+            }
             base.UnregisterUserId(connectionId);
         }
 #endif
@@ -378,7 +375,6 @@ namespace MultiplayerARPG.MMO
                 // Unregister player character
                 UnregisterPlayerCharacter(connectionId);
                 UnregisterUserId(connectionId);
-                accessTokensByConnectionId.TryRemove(connectionId, out _);
                 // Save character immediately when player disconnect
                 while (savingCharacters.Contains(id))
                 {
@@ -420,7 +416,6 @@ namespace MultiplayerARPG.MMO
             {
                 UnregisterPlayerCharacter(connectionId);
                 UnregisterUserId(connectionId);
-                accessTokensByConnectionId.TryRemove(connectionId, out _);
             }
         }
 #endif
@@ -545,32 +540,9 @@ namespace MultiplayerARPG.MMO
             string accessToken = reader.GetString();
             string selectCharacterId = reader.GetString();
             if (!await ValidatePlayerConnection(connectionId, userId, accessToken, selectCharacterId))
-            {
-                ServerTransport.ServerDisconnect(connectionId);
-                return false;
-            }
-
-            if (!IsReadyToInstantiateObjects())
-            {
-                if (LogWarn)
-                    Logging.LogWarning(LogTag, "Not ready to spawn player: " + userId);
-                // Add to pending list to spawn player later when map server is ready to instantiate object
-                pendingSpawnPlayerCharacters.Add(new PendingSpawnPlayerCharacter()
-                {
-                    connectionId = connectionId,
-                    userId = userId,
-                    accessToken = accessToken,
-                    selectCharacterId = selectCharacterId,
-                });
-                return false;
-            }
-
-            if (connectionsByUserId.ContainsKey(userId))
                 return false;
 
-            accessTokensByConnectionId.TryRemove(connectionId, out _);
-            accessTokensByConnectionId.TryAdd(connectionId, accessToken);
-            RegisterUserId(connectionId, userId);
+            RegisterUserIdAndAccessToken(connectionId, userId, accessToken);
             SetPlayerReadyRoutine(connectionId, userId, accessToken, selectCharacterId).Forget();
             return true;
         }
@@ -579,10 +551,24 @@ namespace MultiplayerARPG.MMO
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         private async UniTask<bool> ValidatePlayerConnection(long connectionId, string userId, string accessToken, string selectCharacterId)
         {
+            if (!IsReadyToInstantiateObjects())
+            {
+                if (LogError)
+                    Logging.LogError(LogTag, "Not ready to spawn player: " + userId + ", user must see map server is not ready, how can this guy reach here? :P.");
+                return false;
+            }
+
+            if (connectionsByUserId.ContainsKey(userId))
+            {
+                if (LogError)
+                    Logging.LogError(LogTag, "User trying to hack?: " + userId + ", connection already registered.");
+                return false;
+            }
+
             if (ServerUserHandlers.TryGetPlayerCharacter(connectionId, out _))
             {
                 if (LogError)
-                    Logging.LogError(LogTag, "User trying to hack: " + userId);
+                    Logging.LogError(LogTag, "User trying to hack?: " + userId + ", character already registered.");
                 return false;
             }
 
@@ -820,30 +806,35 @@ namespace MultiplayerARPG.MMO
             ChatMessage message = messageHandler.ReadMessage<ChatMessage>().FillChannelId();
             string userId = string.Empty;
             string accessToken = string.Empty;
-            IPlayerCharacterData playerCharacter;
             if (messageHandler.ConnectionId >= 0 && message.sendByServer)
             {
                 // This message should be sent by server but its connection >= 0, which means it is not a server ;)
                 return;
             }
+            // Get character
+            IPlayerCharacterData playerCharacter;
+            if (!message.sendByServer && !ServerUserHandlers.TryGetPlayerCharacter(messageHandler.ConnectionId, out playerCharacter))
+            {
+                // Not allow to enter chat
+                return;
+            }
             else
             {
-                // Get character
-                if (!ServerUserHandlers.TryGetPlayerCharacter(messageHandler.ConnectionId, out playerCharacter))
-                {
-                    // Not allow to enter chat
-                    return;
-                }
+                // Try to get character by sender name because this chat was sent by server, don't use connection ID to get character
+                // But still continue to enter chat if there is no character found (because it is server)
+                ServerUserHandlers.TryGetPlayerCharacterByName(message.senderName, out playerCharacter);
+            }
+            // Setup some data if it can find a character
+            if (playerCharacter != null)
+            {
                 message.senderId = playerCharacter.Id;
                 message.senderUserId = playerCharacter.UserId;
                 message.senderName = playerCharacter.CharacterName;
+                // Set user ID and access token, they will be used by cluster server to validate player
                 userId = playerCharacter.UserId;
-                if (!accessTokensByConnectionId.TryGetValue(messageHandler.ConnectionId, out accessToken))
+                if (!accessTokensByUserId.TryGetValue(userId, out accessToken))
                     accessToken = string.Empty;
-            }
-            // Set guild data
-            if (playerCharacter != null)
-            {
+                // Set guild data
                 if (ServerGuildHandlers.TryGetGuild(playerCharacter.GuildId, out GuildData guildData))
                 {
                     message.guildId = playerCharacter.GuildId;
@@ -860,7 +851,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            // Local chat will processes immediately, not have to be sent to cluster server
+            // Local chat will processes immediately, not have to be sent to cluster server except some GM commands
             if (message.channel == ChatChannel.Local)
             {
                 bool sentGmCommand = false;
@@ -888,11 +879,11 @@ namespace MultiplayerARPG.MMO
                     ServerChatHandlers.OnChatMessage(message);
                 return;
             }
+            // Chat messages for other chat channels will be sent to cluster server, then cluster server will pass it to other map-servers to send to clients
             if (message.channel == ChatChannel.System)
             {
                 if (ServerChatHandlers.CanSendSystemAnnounce(message.senderName))
                 {
-                    // Send chat message to cluster server, for MMO mode chat message handling by cluster server
                     if (ClusterClient.IsNetworkActive)
                     {
                         ClusterClient.SendPacket(0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.Chat, (writer) =>
@@ -905,7 +896,6 @@ namespace MultiplayerARPG.MMO
                 }
                 return;
             }
-            // Send chat message to chat server, for MMO mode chat message handling by chat server
             if (ClusterClient.IsNetworkActive)
             {
                 ClusterClient.SendPacket(0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.Chat, (writer) =>
@@ -997,7 +987,6 @@ namespace MultiplayerARPG.MMO
                     // User not able to use this command
                     return;
                 }
-
                 // Response enter GM command message
                 if (!ServerUserHandlers.TryGetPlayerCharacterByName(message.senderName, out BasePlayerCharacterEntity playerCharacterEntity))
                     playerCharacterEntity = null;
