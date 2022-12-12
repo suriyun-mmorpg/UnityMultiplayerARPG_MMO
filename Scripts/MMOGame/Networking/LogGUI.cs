@@ -27,10 +27,12 @@ public class LogGUI : MonoBehaviour
     [Tooltip("Amount of logs to show")]
     public int showLogSize = 20;
 
+#if !UNITY_SERVER || DEVELOPMENT_BUILD
     private Vector2 scrollPosition;
     private readonly ConcurrentQueue<LogData> PrintingLogs = new ConcurrentQueue<LogData>();
     private bool logScrollingToBottom;
     private bool loggingEnabled = false;
+#endif
 
     public void SetupLogger(string logName)
     {
@@ -47,7 +49,9 @@ public class LogGUI : MonoBehaviour
                 options.PrefixFormatter = LogManager.PrefixFormatterConfigure;
             });
         });
+#if !UNITY_SERVER || DEVELOPMENT_BUILD
         loggingEnabled = true;
+#endif
     }
 
     private void OnEnable()
