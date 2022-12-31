@@ -738,7 +738,7 @@ namespace MultiplayerARPG.MMO
                 for (int i = 0; i < playerCharacterEntity.Summons.Count; ++i)
                 {
                     CharacterSummon summon = playerCharacterEntity.Summons[i];
-                    summon.Summon(playerCharacterEntity, summon.Level, summon.summonRemainsDuration, summon.Exp, summon.CurrentHp, summon.CurrentMp);
+                    summon.Summon(playerCharacterEntity, summon.level, summon.summonRemainsDuration, summon.exp, summon.currentHp, summon.currentMp);
                     for (int j = 0; j < summonBuffs.Count; ++j)
                     {
                         if (summonBuffs[j].id.StartsWith(i.ToString()))
