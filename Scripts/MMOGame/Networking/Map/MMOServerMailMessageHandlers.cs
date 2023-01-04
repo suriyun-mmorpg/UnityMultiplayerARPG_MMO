@@ -340,7 +340,11 @@ namespace MultiplayerARPG.MMO
             }
             foreach (MailListEntry entry in resp.Response.List)
             {
+                if (busyMailBoxes.Contains(entry.Id))
+                    continue;
+                busyMailBoxes.Add(entry.Id);
                 await ClaimMailItems(entry.Id, playerCharacter);
+                busyMailBoxes.TryRemove(entry.Id);
             }
             result.Invoke(AckResponseCode.Success, new ResponseClaimAllMailsItemsMessage());
 #endif
