@@ -22,8 +22,7 @@ namespace MultiplayerARPG.MMO
         public override void MuteCharacterByName(string characterName, int minutes)
         {
             long time = System.DateTimeOffset.UtcNow.ToUnixTimeSeconds() + (60 * minutes);
-            IPlayerCharacterData playerCharacter;
-            if (TryGetPlayerCharacterByName(characterName, out playerCharacter))
+            if (TryGetPlayerCharacterByName(characterName, out IPlayerCharacterData playerCharacter))
                 playerCharacter.UnmuteTime = time;
             DbServiceClient.SetCharacterUnmuteTimeByNameAsync(new SetCharacterUnmuteTimeByNameReq()
             {
@@ -36,8 +35,7 @@ namespace MultiplayerARPG.MMO
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         public override void UnmuteCharacterByName(string characterName)
         {
-            IPlayerCharacterData playerCharacter;
-            if (TryGetPlayerCharacterByName(characterName, out playerCharacter))
+            if (TryGetPlayerCharacterByName(characterName, out IPlayerCharacterData playerCharacter))
                 playerCharacter.UnmuteTime = 0;
             DbServiceClient.SetCharacterUnmuteTimeByNameAsync(new SetCharacterUnmuteTimeByNameReq()
             {
@@ -51,9 +49,7 @@ namespace MultiplayerARPG.MMO
         public override void BanUserByCharacterName(string characterName, int days)
         {
             long time = System.DateTimeOffset.UtcNow.ToUnixTimeSeconds() + (60 * 60 * 24 * days);
-            IPlayerCharacterData playerCharacter;
-            long connectionId;
-            if (TryGetPlayerCharacterByName(characterName, out playerCharacter) && TryGetConnectionId(playerCharacter.Id, out connectionId))
+            if (TryGetPlayerCharacterByName(characterName, out IPlayerCharacterData playerCharacter) && TryGetConnectionId(playerCharacter.Id, out long connectionId))
                 Manager.ServerTransport.ServerDisconnect(connectionId);
             DbServiceClient.SetUserUnbanTimeByCharacterNameAsync(new SetUserUnbanTimeByCharacterNameReq()
             {
