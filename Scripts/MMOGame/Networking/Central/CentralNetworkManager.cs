@@ -155,14 +155,32 @@ namespace MultiplayerARPG.MMO
         public override void OnPeerDisconnected(long connectionId, DisconnectInfo disconnectInfo)
         {
             base.OnPeerDisconnected(connectionId, disconnectInfo);
+            RemoveUserPeerByConnectionId(connectionId, out _);
+        }
+
+        public bool RemoveUserPeerByConnectionId(long connectionId, out CentralUserPeerInfo userPeerInfo)
+        {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-            // Remove disconnect user
-            CentralUserPeerInfo userPeerInfo;
             if (userPeers.TryGetValue(connectionId, out userPeerInfo))
             {
                 userPeersByUserId.Remove(userPeerInfo.userId);
                 userPeers.Remove(connectionId);
+                return true;
             }
+            return false;
+#endif
+        }
+
+        public bool RemoveUserPeerByUserId(string userId, out CentralUserPeerInfo userPeerInfo)
+        {
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+            if (userPeersByUserId.TryGetValue(userId, out userPeerInfo))
+            {
+                userPeersByUserId.Remove(userPeerInfo.userId);
+                userPeers.Remove(userPeerInfo.connectionId);
+                return true;
+            }
+            return false;
 #endif
         }
 

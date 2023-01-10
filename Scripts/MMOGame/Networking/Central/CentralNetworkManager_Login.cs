@@ -86,6 +86,7 @@ namespace MultiplayerARPG.MMO
                 if (userPeersByUserId.ContainsKey(userId))
                     ServerTransport.ServerDisconnect(userPeersByUserId[userId].connectionId);
                 ClusterServer.KickUser(userId);
+                RemoveUserPeerByUserId(userId, out _);
                 result.InvokeError(new ResponseUserLoginMessage()
                 {
                     message = UITextKeys.UI_ERROR_ALREADY_LOGGED_IN,
@@ -292,12 +293,9 @@ namespace MultiplayerARPG.MMO
             RequestProceedResultDelegate<EmptyMessage> result)
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-            long connectionId = requestHandler.ConnectionId;
-            CentralUserPeerInfo userPeerInfo;
-            if (userPeers.TryGetValue(connectionId, out userPeerInfo))
+            if (RemoveUserPeerByConnectionId(requestHandler.ConnectionId, out CentralUserPeerInfo userPeerInfo))
             {
-                userPeersByUserId.Remove(userPeerInfo.userId);
-                userPeers.Remove(connectionId);
+                // Clear access token
                 AsyncResponseData<EmptyMessage> updateAccessTokenResp = await DbServiceClient.UpdateAccessTokenAsync(new UpdateAccessTokenReq()
                 {
                     UserId = userPeerInfo.userId,
@@ -366,16 +364,13 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            CentralUserPeerInfo userPeerInfo;
-            if (userPeersByUserId.TryGetValue(userId, out userPeerInfo))
+            RemoveUserPeerByUserId(userId, out _);
+            CentralUserPeerInfo userPeerInfo = new CentralUserPeerInfo()
             {
-                userPeersByUserId.Remove(userPeerInfo.userId);
-                userPeers.Remove(userPeerInfo.connectionId);
-            }
-            userPeerInfo = new CentralUserPeerInfo();
-            userPeerInfo.connectionId = connectionId;
-            userPeerInfo.userId = userId;
-            userPeerInfo.accessToken = accessToken = Regex.Replace(System.Convert.ToBase64String(System.Guid.NewGuid().ToByteArray()), "[/+=]", "");
+                connectionId = connectionId,
+                userId = userId,
+                accessToken = accessToken = Regex.Replace(System.Convert.ToBase64String(System.Guid.NewGuid().ToByteArray()), "[/+=]", ""),
+            };
             userPeersByUserId[userId] = userPeerInfo;
             userPeers[connectionId] = userPeerInfo;
             AsyncResponseData<EmptyMessage> updateAccessTokenResp = await DbServiceClient.UpdateAccessTokenAsync(new UpdateAccessTokenReq()
