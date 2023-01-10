@@ -434,11 +434,15 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-        public void KickUser(string userId)
+        public void KickUser(string userId, UITextKeys message)
         {
             foreach (long connectionId in MapServerPeers.Keys)
             {
-                SendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.KickUser, (writer) => writer.Put(userId));
+                SendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.KickUser, (writer) =>
+                {
+                    writer.Put(userId);
+                    writer.PutPackedUShort((ushort)message);
+                });
             }
         }
 #endif

@@ -1,10 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Events;
 using LiteNetLib;
-using LiteNetLibManager;
 using LiteNetLib.Utils;
+using LiteNetLibManager;
+using System.Net.Sockets;
 
 namespace MultiplayerARPG.MMO
 {
@@ -37,9 +36,9 @@ namespace MultiplayerARPG.MMO
                 MMOClientInstance.Singleton.RequestValidateAccessToken(GameInstance.UserId, GameInstance.UserToken, OnValidateAccessToken);
         }
 
-        public void OnCentralServerDisconnected(DisconnectInfo disconnectInfo)
+        public void OnCentralServerDisconnected(DisconnectReason reason, SocketError socketError, UITextKeys message)
         {
-            UISceneGlobal.Singleton.ShowDisconnectDialog(disconnectInfo);
+            UISceneGlobal.Singleton.ShowDisconnectDialog(reason, socketError, message);
             ClearHistory();
         }
 

@@ -1,7 +1,10 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using LiteNetLib;
+using LiteNetLib.Utils;
 using LiteNetLibManager;
+using Cysharp.Threading.Tasks;
+using System.Net.Sockets;
 
 namespace MultiplayerARPG.MMO
 {
@@ -33,7 +36,7 @@ namespace MultiplayerARPG.MMO
         public float updateUserCountInterval = 5f;
 
         public System.Action onClientConnected;
-        public System.Action<DisconnectInfo> onClientDisconnected;
+        public System.Action<DisconnectReason, SocketError, UITextKeys> onClientDisconnected;
         public System.Action onClientStopped;
 
         private float lastUserCountUpdateTime = float.MinValue;
@@ -79,7 +82,6 @@ namespace MultiplayerARPG.MMO
 
         protected override void RegisterMessages()
         {
-            base.RegisterMessages();
             EnableRequestResponse(MMOMessageTypes.Request, MMOMessageTypes.Response);
             // Requests
             RegisterRequestToServer<RequestUserLoginMessage, ResponseUserLoginMessage>(MMORequestTypes.RequestUserLogin, HandleRequestUserLogin);
@@ -90,10 +92,35 @@ namespace MultiplayerARPG.MMO
             RegisterRequestToServer<RequestDeleteCharacterMessage, ResponseDeleteCharacterMessage>(MMORequestTypes.RequestDeleteCharacter, HandleRequestDeleteCharacter);
             RegisterRequestToServer<RequestSelectCharacterMessage, ResponseSelectCharacterMessage>(MMORequestTypes.RequestSelectCharacter, HandleRequestSelectCharacter);
             RegisterRequestToServer<RequestValidateAccessTokenMessage, ResponseValidateAccessTokenMessage>(MMORequestTypes.RequestValidateAccessToken, HandleRequestValidateAccessToken);
+            // Client messages
+            RegisterClientMessage(GameMsgTypes.Disconnect, HandleServerDisconnect);
             // Keeping `RegisterClientMessages` and `RegisterServerMessages` for backward compatibility, can use any of below dev extension methods
             this.InvokeInstanceDevExtMethods("RegisterClientMessages");
             this.InvokeInstanceDevExtMethods("RegisterServerMessages");
             this.InvokeInstanceDevExtMethods("RegisterMessages");
+        }
+
+        public async void KickClient(long connectionId, byte[] data)
+        {
+            if (!IsServer)
+                return;
+            ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameMsgTypes.Disconnect, (writer) => writer.PutBytesWithLength(data));
+            await UniTask.Delay(500);
+            ServerTransport.ServerDisconnect(connectionId);
+        }
+
+        public void KickClient(long connectionId, UITextKeys message)
+        {
+            if (!IsServer)
+                return;
+            NetDataWriter writer = new NetDataWriter();
+            writer.PutPackedUShort((ushort)message);
+            KickClient(connectionId, writer.Data);
+        }
+
+        protected void HandleServerDisconnect(MessageHandlerData messageHandler)
+        {
+            Client.SetDisconnectData(messageHandler.Reader.GetBytesWithLength());
         }
 
         protected virtual void Clean()
@@ -145,16 +172,21 @@ namespace MultiplayerARPG.MMO
                 onClientConnected.Invoke();
         }
 
-        public override void OnClientDisconnected(DisconnectInfo disconnectInfo)
+        public override void OnClientDisconnected(DisconnectReason reason, SocketError socketError, byte[] data)
         {
-            base.OnClientDisconnected(disconnectInfo);
+            UITextKeys message = UITextKeys.NONE;
+            if (data != null && data.Length > 0)
+            {
+                NetDataReader reader = new NetDataReader(data);
+                message = (UITextKeys)reader.GetPackedUShort();
+            }
             if (onClientDisconnected != null)
-                onClientDisconnected.Invoke(disconnectInfo);
+                onClientDisconnected.Invoke(reason, socketError, message);
         }
 
-        public override void OnPeerDisconnected(long connectionId, DisconnectInfo disconnectInfo)
+        public override void OnPeerDisconnected(long connectionId, DisconnectReason reason, SocketError socketError)
         {
-            base.OnPeerDisconnected(connectionId, disconnectInfo);
+            base.OnPeerDisconnected(connectionId, reason, socketError);
             RemoveUserPeerByConnectionId(connectionId, out _);
         }
 

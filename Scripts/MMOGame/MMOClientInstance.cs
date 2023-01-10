@@ -1,11 +1,11 @@
-﻿using System.Net;
-using System.Net.Security;
-using System.Security.Authentication;
-using UnityEngine;
+﻿using UnityEngine;
 using LiteNetLib;
-using LiteNetLibManager;
 using LiteNetLib.Utils;
+using LiteNetLibManager;
 using Cysharp.Threading.Tasks;
+using System.Net;
+using System.Net.Security;
+using System.Net.Sockets;
 
 namespace MultiplayerARPG.MMO
 {
@@ -38,11 +38,11 @@ namespace MultiplayerARPG.MMO
         public MmoNetworkSetting[] NetworkSettings { get { return networkSettings; } }
 
         public System.Action onCentralClientConnected;
-        public System.Action<DisconnectInfo> onCentralClientDisconnected;
+        public System.Action<DisconnectReason, SocketError, UITextKeys> onCentralClientDisconnected;
         public System.Action onCentralClientStopped;
 
         public System.Action onMapClientConnected;
-        public System.Action<DisconnectInfo> onMapClientDisconnected;
+        public System.Action<DisconnectReason, SocketError, UITextKeys> onMapClientDisconnected;
         public System.Action onMapClientStopped;
 
         private void Awake()
@@ -85,10 +85,10 @@ namespace MultiplayerARPG.MMO
                 onCentralClientConnected.Invoke();
         }
 
-        public void OnCentralDisconnected(DisconnectInfo disconnectInfo)
+        public void OnCentralDisconnected(DisconnectReason reason, SocketError socketError, UITextKeys message)
         {
             if (onCentralClientDisconnected != null)
-                onCentralClientDisconnected.Invoke(disconnectInfo);
+                onCentralClientDisconnected.Invoke(reason, socketError, message);
             ClearClientData();
         }
 
@@ -104,10 +104,10 @@ namespace MultiplayerARPG.MMO
                 onMapClientConnected.Invoke();
         }
 
-        public void OnMapDisconnected(DisconnectInfo disconnectInfo)
+        public void OnMapDisconnected(DisconnectReason reason, SocketError socketError, UITextKeys message)
         {
             if (onMapClientDisconnected != null)
-                onMapClientDisconnected.Invoke(disconnectInfo);
+                onMapClientDisconnected.Invoke(reason, socketError, message);
         }
 
         public void OnMapStopped()

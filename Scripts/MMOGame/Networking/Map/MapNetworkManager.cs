@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using LiteNetLib;
 using LiteNetLib.Utils;
 using LiteNetLibManager;
 using Cysharp.Threading.Tasks;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Threading;
+using System.Net.Sockets;
 
 namespace MultiplayerARPG.MMO
 {
@@ -332,6 +333,15 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+        public override void OnClientDisconnected(DisconnectReason reason, SocketError socketError, byte[] data)
+        {
+            GameInstance.UserId = string.Empty;
+            GameInstance.UserToken = string.Empty;
+            base.OnClientDisconnected(reason, socketError, data);
+        }
+#endif
+
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         public override void UnregisterUserId(long connectionId)
         {
             string userId;
@@ -345,15 +355,15 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-        public override void OnPeerDisconnected(long connectionId, DisconnectInfo disconnectInfo)
+        public override void OnPeerDisconnected(long connectionId, DisconnectReason reason, SocketError socketError)
         {
-            base.OnPeerDisconnected(connectionId, disconnectInfo);
-            OnPeerDisconnectedRoutine(connectionId, disconnectInfo).Forget();
+            base.OnPeerDisconnected(connectionId, reason, socketError);
+            OnPeerDisconnectedRoutine(connectionId).Forget();
         }
 #endif
 
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-        private async UniTaskVoid OnPeerDisconnectedRoutine(long connectionId, DisconnectInfo disconnectInfo)
+        private async UniTaskVoid OnPeerDisconnectedRoutine(long connectionId)
         {
             // Save player character data
             if (ServerUserHandlers.TryGetPlayerCharacter(connectionId, out BasePlayerCharacterEntity playerCharacterEntity))
@@ -598,7 +608,7 @@ namespace MultiplayerARPG.MMO
             });
             if (!characterResp.IsSuccess)
             {
-                ServerTransport.ServerDisconnect(connectionId);
+                KickClient(connectionId, UITextKeys.UI_ERROR_KICKED_FROM_SERVER);
                 return;
             }
             PlayerCharacterData playerCharacterData = characterResp.Response.CharacterData;
@@ -607,7 +617,7 @@ namespace MultiplayerARPG.MMO
             {
                 if (LogError)
                     Logging.LogError(LogTag, "Cannot find select character: " + selectCharacterId + " for user: " + userId);
-                ServerTransport.ServerDisconnect(connectionId);
+                KickClient(connectionId, UITextKeys.UI_ERROR_KICKED_FROM_SERVER);
                 return;
             }
             BasePlayerCharacterEntity entityPrefab = playerCharacterData.GetEntityPrefab() as BasePlayerCharacterEntity;
@@ -616,7 +626,7 @@ namespace MultiplayerARPG.MMO
             {
                 if (LogError)
                     Logging.LogError(LogTag, "Cannot find player character with entity Id: " + playerCharacterData.EntityId);
-                ServerTransport.ServerDisconnect(connectionId);
+                KickClient(connectionId, UITextKeys.UI_ERROR_KICKED_FROM_SERVER);
                 return;
             }
             // Prepare saving location for this character
@@ -650,7 +660,7 @@ namespace MultiplayerARPG.MMO
             if (!getGoldResp.IsSuccess)
             {
                 Destroy(spawnObj.gameObject);
-                ServerTransport.ServerDisconnect(connectionId);
+                KickClient(connectionId, UITextKeys.UI_ERROR_KICKED_FROM_SERVER);
                 return;
             }
             playerCharacterEntity.UserGold = getGoldResp.Response.Gold;
@@ -662,7 +672,7 @@ namespace MultiplayerARPG.MMO
             if (!getCashResp.IsSuccess)
             {
                 Destroy(spawnObj.gameObject);
-                ServerTransport.ServerDisconnect(connectionId);
+                KickClient(connectionId, UITextKeys.UI_ERROR_KICKED_FROM_SERVER);
                 return;
             }
             playerCharacterEntity.UserCash = getCashResp.Response.Cash;
@@ -679,7 +689,7 @@ namespace MultiplayerARPG.MMO
             if (!getUserLevelResp.IsSuccess)
             {
                 Destroy(spawnObj.gameObject);
-                ServerTransport.ServerDisconnect(connectionId);
+                KickClient(connectionId, UITextKeys.UI_ERROR_KICKED_FROM_SERVER);
                 return;
             }
             playerCharacterEntity.UserLevel = getUserLevelResp.Response.UserLevel;
@@ -729,7 +739,7 @@ namespace MultiplayerARPG.MMO
                 if (!summonBuffsResp.IsSuccess)
                 {
                     Destroy(spawnObj.gameObject);
-                    ServerTransport.ServerDisconnect(connectionId);
+                    KickClient(connectionId, UITextKeys.UI_ERROR_KICKED_FROM_SERVER);
                     return;
                 }
 
@@ -755,7 +765,7 @@ namespace MultiplayerARPG.MMO
             if (!ContainsConnectionId(connectionId))
             {
                 Destroy(spawnObj.gameObject);
-                ServerTransport.ServerDisconnect(connectionId);
+                KickClient(connectionId, UITextKeys.UI_ERROR_KICKED_FROM_SERVER);
                 return;
             }
 
@@ -1266,11 +1276,11 @@ namespace MultiplayerARPG.MMO
         }
         #endregion
 
-        public void KickUserById(string userId)
+        public void KickUser(string userId, UITextKeys message)
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             if (connectionsByUserId.TryGetValue(userId, out long connectionId))
-                ServerTransport.ServerDisconnect(connectionId);
+                KickClient(connectionId, message);
 #endif
         }
     }

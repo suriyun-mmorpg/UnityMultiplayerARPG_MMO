@@ -1,4 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
+using LiteNetLib.Utils;
 using LiteNetLibManager;
 
 namespace MultiplayerARPG.MMO
@@ -198,8 +199,9 @@ namespace MultiplayerARPG.MMO
         private void HandleKickUser(MessageHandlerData messageHandler)
         {
             string kickUserId = messageHandler.Reader.GetString();
+            UITextKeys message = (UITextKeys)messageHandler.Reader.GetPackedUShort();
             if (appServer is MapNetworkManager mapNetworkManager)
-                mapNetworkManager.KickUserById(kickUserId);
+                mapNetworkManager.KickUser(kickUserId, message);
         }
 #endif
     }
