@@ -356,8 +356,7 @@ namespace MultiplayerARPG.MMO
         private async UniTaskVoid OnPeerDisconnectedRoutine(long connectionId, DisconnectInfo disconnectInfo)
         {
             // Save player character data
-            BasePlayerCharacterEntity playerCharacterEntity;
-            if (ServerUserHandlers.TryGetPlayerCharacter(connectionId, out playerCharacterEntity))
+            if (ServerUserHandlers.TryGetPlayerCharacter(connectionId, out BasePlayerCharacterEntity playerCharacterEntity))
             {
                 playerCharacterEntity.SetOwnerClient(-1);
                 playerCharacterEntity.StopMove();
@@ -1270,8 +1269,7 @@ namespace MultiplayerARPG.MMO
         public void KickUserById(string userId)
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-            long connectionId;
-            if (connectionsByUserId.TryGetValue(userId, out connectionId))
+            if (connectionsByUserId.TryGetValue(userId, out long connectionId))
                 ServerTransport.ServerDisconnect(connectionId);
 #endif
         }
