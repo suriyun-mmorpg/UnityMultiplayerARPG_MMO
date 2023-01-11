@@ -225,8 +225,7 @@ namespace MultiplayerARPG.MMO
         {
             base.UpdateOnlineCharacter(playerCharacterEntity);
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-            SocialCharacterData tempUserData;
-            if (ClusterClient.IsNetworkActive && usersById.TryGetValue(playerCharacterEntity.Id, out tempUserData))
+            if (ClusterClient.IsNetworkActive && usersById.TryGetValue(playerCharacterEntity.Id, out SocialCharacterData tempUserData))
             {
                 tempUserData.dataId = playerCharacterEntity.DataId;
                 tempUserData.level = playerCharacterEntity.Level;
@@ -300,10 +299,8 @@ namespace MultiplayerARPG.MMO
         public override void UnregisterPlayerCharacter(long connectionId)
         {
             // Send remove character from map server
-            BasePlayerCharacterEntity playerCharacter;
-            SocialCharacterData userData;
-            if (ServerUserHandlers.TryGetPlayerCharacter(connectionId, out playerCharacter) &&
-                usersById.TryGetValue(playerCharacter.Id, out userData))
+            if (ServerUserHandlers.TryGetPlayerCharacter(connectionId, out IPlayerCharacterData playerCharacter) &&
+                usersById.TryGetValue(playerCharacter.Id, out SocialCharacterData userData))
             {
                 usersById.TryRemove(playerCharacter.Id, out _);
                 // Remove map user from cluster server
@@ -344,8 +341,7 @@ namespace MultiplayerARPG.MMO
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         public override void UnregisterUserId(long connectionId)
         {
-            string userId;
-            if (ServerUserHandlers.TryGetUserId(connectionId, out userId))
+            if (ServerUserHandlers.TryGetUserId(connectionId, out string userId))
             {
                 connectionsByUserId.TryRemove(userId, out _);
                 accessTokensByUserId.TryRemove(userId, out _);
@@ -355,16 +351,9 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-        public override void OnPeerDisconnected(long connectionId, DisconnectReason reason, SocketError socketError)
+        public override async void OnPeerDisconnected(long connectionId, DisconnectReason reason, SocketError socketError)
         {
             base.OnPeerDisconnected(connectionId, reason, socketError);
-            OnPeerDisconnectedRoutine(connectionId).Forget();
-        }
-#endif
-
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-        private async UniTaskVoid OnPeerDisconnectedRoutine(long connectionId)
-        {
             // Save player character data
             if (ServerUserHandlers.TryGetPlayerCharacter(connectionId, out BasePlayerCharacterEntity playerCharacterEntity))
             {
@@ -501,10 +490,8 @@ namespace MultiplayerARPG.MMO
                 return false;
             }
 
-            CancellationTokenSource cancellationTokenSource;
-            BasePlayerCharacterEntity playerCharacterEntity;
-            if (despawningPlayerCharacterCancellations.TryGetValue(selectCharacterId, out cancellationTokenSource) &&
-                despawningPlayerCharacterEntities.TryGetValue(selectCharacterId, out playerCharacterEntity) &&
+            if (despawningPlayerCharacterCancellations.TryGetValue(selectCharacterId, out CancellationTokenSource cancellationTokenSource) &&
+                despawningPlayerCharacterEntities.TryGetValue(selectCharacterId, out BasePlayerCharacterEntity playerCharacterEntity) &&
                 !cancellationTokenSource.IsCancellationRequested)
             {
                 // Cancel character despawning to despawning immediately
@@ -948,8 +935,7 @@ namespace MultiplayerARPG.MMO
                             Logging.Log(LogTag, "Register instance map server: " + peerInfo.extra);
                         instanceMapServerConnectionIdsByInstanceId[peerInfo.extra] = peerInfo;
                         // Warp characters
-                        HashSet<uint> warpingCharacters;
-                        if (instanceMapWarpingCharactersByInstanceId.TryGetValue(peerInfo.extra, out warpingCharacters))
+                        if (instanceMapWarpingCharactersByInstanceId.TryGetValue(peerInfo.extra, out HashSet<uint> warpingCharacters))
                         {
                             BasePlayerCharacterEntity warpingCharacterEntity;
                             foreach (uint warpingCharacter in warpingCharacters)
@@ -1020,9 +1006,6 @@ namespace MultiplayerARPG.MMO
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             UpdateUserCharacterMessage message = messageHandler.ReadMessage<UpdateUserCharacterMessage>();
-            int socialId;
-            PartyData party;
-            GuildData guild;
             switch (message.type)
             {
                 case UpdateUserCharacterMessage.UpdateType.Add:
@@ -1035,15 +1018,16 @@ namespace MultiplayerARPG.MMO
                 case UpdateUserCharacterMessage.UpdateType.Online:
                     if (usersById.ContainsKey(message.character.id))
                     {
+                        int socialId;
                         ServerCharacterHandlers.MarkOnlineCharacter(message.character.id);
                         socialId = message.character.partyId;
-                        if (socialId > 0 && ServerPartyHandlers.TryGetParty(socialId, out party))
+                        if (socialId > 0 && ServerPartyHandlers.TryGetParty(socialId, out PartyData party))
                         {
                             party.UpdateMember(message.character);
                             ServerPartyHandlers.SetParty(socialId, party);
                         }
                         socialId = message.character.guildId;
-                        if (socialId > 0 && ServerGuildHandlers.TryGetGuild(socialId, out guild))
+                        if (socialId > 0 && ServerGuildHandlers.TryGetGuild(socialId, out GuildData guild))
                         {
                             guild.UpdateMember(message.character);
                             ServerGuildHandlers.SetGuild(socialId, guild);
@@ -1059,9 +1043,8 @@ namespace MultiplayerARPG.MMO
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             UpdateSocialMemberMessage message = messageHandler.ReadMessage<UpdateSocialMemberMessage>();
-            PartyData party;
             BasePlayerCharacterEntity playerCharacterEntity;
-            if (ServerPartyHandlers.TryGetParty(message.socialId, out party) && party.UpdateSocialGroupMember(message))
+            if (ServerPartyHandlers.TryGetParty(message.socialId, out PartyData party) && party.UpdateSocialGroupMember(message))
             {
                 switch (message.type)
                 {
@@ -1092,8 +1075,7 @@ namespace MultiplayerARPG.MMO
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             UpdatePartyMessage message = messageHandler.ReadMessage<UpdatePartyMessage>();
             BasePlayerCharacterEntity playerCharacterEntity;
-            PartyData party;
-            if (ServerPartyHandlers.TryGetParty(message.id, out party))
+            if (ServerPartyHandlers.TryGetParty(message.id, out PartyData party))
             {
                 switch (message.type)
                 {
@@ -1127,9 +1109,8 @@ namespace MultiplayerARPG.MMO
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             UpdateSocialMemberMessage message = messageHandler.ReadMessage<UpdateSocialMemberMessage>();
-            GuildData guild;
             BasePlayerCharacterEntity playerCharacterEntity;
-            if (ServerGuildHandlers.TryGetGuild(message.socialId, out guild) && guild.UpdateSocialGroupMember(message))
+            if (ServerGuildHandlers.TryGetGuild(message.socialId, out GuildData guild) && guild.UpdateSocialGroupMember(message))
             {
                 switch (message.type)
                 {
@@ -1161,8 +1142,7 @@ namespace MultiplayerARPG.MMO
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             UpdateGuildMessage message = messageHandler.ReadMessage<UpdateGuildMessage>();
             BasePlayerCharacterEntity playerCharacterEntity;
-            GuildData guild;
-            if (ServerGuildHandlers.TryGetGuild(message.id, out guild))
+            if (ServerGuildHandlers.TryGetGuild(message.id, out GuildData guild))
             {
                 switch (message.type)
                 {
@@ -1268,9 +1248,11 @@ namespace MultiplayerARPG.MMO
         private void UpdateMapUser(LiteNetLibClient transportHandler, UpdateUserCharacterMessage.UpdateType updateType, SocialCharacterData userData)
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-            UpdateUserCharacterMessage updateMapUserMessage = new UpdateUserCharacterMessage();
-            updateMapUserMessage.type = updateType;
-            updateMapUserMessage.character = userData;
+            UpdateUserCharacterMessage updateMapUserMessage = new UpdateUserCharacterMessage()
+            {
+                type = updateType,
+                character = userData,
+            };
             transportHandler.SendPacket(0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.UpdateMapUser, updateMapUserMessage.Serialize);
 #endif
         }
