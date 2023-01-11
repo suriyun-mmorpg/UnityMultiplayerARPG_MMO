@@ -436,13 +436,19 @@ namespace MultiplayerARPG.MMO
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         public void KickUser(string userId, UITextKeys message)
         {
-            foreach (long connectionId in MapServerPeers.Keys)
+            List<long> mapServerPeerConnectionIds = new List<long>(MapServerPeers.Keys);
+            foreach (long connectionId in mapServerPeerConnectionIds)
             {
                 SendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.KickUser, (writer) =>
                 {
                     writer.Put(userId);
                     writer.PutPackedUShort((ushort)message);
                 });
+            }
+            List<SocialCharacterData> mapUsers = new List<SocialCharacterData>(MapUsersByCharacterId.Values);
+            foreach (SocialCharacterData mapUser in mapUsers)
+            {
+                MapUsersByCharacterId.Remove(userId);
             }
         }
 #endif
