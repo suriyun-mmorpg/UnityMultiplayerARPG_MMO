@@ -200,6 +200,9 @@ namespace MultiplayerARPG.MMO
                 return true;
             }
             return false;
+#else
+            userPeerInfo = default;
+            return false;
 #endif
         }
 
@@ -212,6 +215,9 @@ namespace MultiplayerARPG.MMO
                 userPeers.Remove(userPeerInfo.connectionId);
                 return true;
             }
+            return false;
+#else
+            userPeerInfo = default;
             return false;
 #endif
         }
