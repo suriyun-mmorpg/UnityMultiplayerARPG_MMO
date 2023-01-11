@@ -24,9 +24,8 @@ namespace MultiplayerARPG.MMO
 
         public void CreateCharacterQuest(MySqlConnection connection, MySqlTransaction transaction, int idx, string characterId, CharacterQuest characterQuest)
         {
-            ExecuteNonQuerySync(connection, transaction, "INSERT INTO characterquest (id, idx, characterId, dataId, isComplete, isTracking, killedMonsters, completedTasks) VALUES (@id, @idx, @characterId, @dataId, @isComplete, @isTracking, @killedMonsters, @completedTasks)",
+            ExecuteNonQuerySync(connection, transaction, "INSERT INTO characterquest (id, characterId, dataId, isComplete, isTracking, killedMonsters, completedTasks) VALUES (@id, @characterId, @dataId, @isComplete, @isTracking, @killedMonsters, @completedTasks)",
                 new MySqlParameter("@id", characterId + "_" + idx),
-                new MySqlParameter("@idx", idx),
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@dataId", characterQuest.dataId),
                 new MySqlParameter("@isComplete", characterQuest.isComplete),
@@ -46,7 +45,7 @@ namespace MultiplayerARPG.MMO
                 {
                     result.Add(tempQuest);
                 }
-            }, "SELECT dataId, isComplete, isTracking, killedMonsters, completedTasks FROM characterquest WHERE characterId=@characterId ORDER BY idx ASC",
+            }, "SELECT dataId, isComplete, isTracking, killedMonsters, completedTasks FROM characterquest WHERE characterId=@characterId ORDER BY id ASC",
                 new MySqlParameter("@characterId", characterId));
             return result;
         }

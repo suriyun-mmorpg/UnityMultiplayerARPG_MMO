@@ -21,9 +21,8 @@ namespace MultiplayerARPG.MMO
 
         public void CreateCharacterSkill(SqliteTransaction transaction, int idx, string characterId, CharacterSkill characterSkill)
         {
-            ExecuteNonQuery(transaction, "INSERT INTO characterskill (id, idx, characterId, dataId, level, coolDownRemainsDuration) VALUES (@id, @idx, @characterId, @dataId, @level, 0)",
+            ExecuteNonQuery(transaction, "INSERT INTO characterskill (id, characterId, dataId, level, coolDownRemainsDuration) VALUES (@id, @characterId, @dataId, @level, 0)",
                 new SqliteParameter("@id", characterId + "_" + idx),
-                new SqliteParameter("@idx", idx),
                 new SqliteParameter("@characterId", characterId),
                 new SqliteParameter("@dataId", characterSkill.dataId),
                 new SqliteParameter("@level", characterSkill.level));
@@ -39,7 +38,7 @@ namespace MultiplayerARPG.MMO
                 {
                     result.Add(tempSkill);
                 }
-            }, "SELECT dataId, level FROM characterskill WHERE characterId=@characterId ORDER BY idx ASC",
+            }, "SELECT dataId, level FROM characterskill WHERE characterId=@characterId ORDER BY id ASC",
                 new SqliteParameter("@characterId", characterId));
             return result;
         }

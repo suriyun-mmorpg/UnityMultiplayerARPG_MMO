@@ -42,7 +42,6 @@ CREATE TABLE `buildings` (
 
 CREATE TABLE `characterattribute` (
   `id` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `idx` int NOT NULL,
   `characterId` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   `dataId` int NOT NULL DEFAULT '0',
   `amount` int NOT NULL DEFAULT '0',
@@ -75,7 +74,6 @@ CREATE TABLE `characterbuff` (
 
 CREATE TABLE `charactercurrency` (
   `id` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `idx` int NOT NULL,
   `characterId` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   `dataId` int NOT NULL DEFAULT '0',
   `amount` int NOT NULL DEFAULT '0',
@@ -133,7 +131,6 @@ CREATE TABLE `characteritem` (
 
 CREATE TABLE `characterquest` (
   `id` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `idx` int NOT NULL,
   `characterId` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   `dataId` int NOT NULL DEFAULT '0',
   `isComplete` tinyint(1) NOT NULL DEFAULT '0',
@@ -201,7 +198,6 @@ CREATE TABLE `characters` (
 
 CREATE TABLE `characterskill` (
   `id` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `idx` int NOT NULL,
   `characterId` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   `dataId` int NOT NULL DEFAULT '0',
   `level` int NOT NULL DEFAULT '1',
@@ -359,6 +355,7 @@ CREATE TABLE `party` (
 --
 
 CREATE TABLE `statistic` (
+  `id` int NOT NULL,
   `userCount` INT NOT NULL DEFAULT '0' 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
@@ -478,7 +475,6 @@ ALTER TABLE `buildings`
 --
 ALTER TABLE `characterattribute`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `idx` (`idx`),
   ADD KEY `characterId` (`characterId`);
 
 --
@@ -493,7 +489,6 @@ ALTER TABLE `characterbuff`
 --
 ALTER TABLE `charactercurrency`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `idx` (`idx`),
   ADD KEY `characterId` (`characterId`);
 
 --
@@ -518,7 +513,6 @@ ALTER TABLE `characteritem`
 --
 ALTER TABLE `characterquest`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `idx` (`idx`),
   ADD KEY `characterId` (`characterId`);
 
 --
@@ -536,7 +530,6 @@ ALTER TABLE `characters`
 --
 ALTER TABLE `characterskill`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `idx` (`idx`),
   ADD KEY `characterId` (`characterId`);
 
 --
@@ -601,6 +594,12 @@ ALTER TABLE `party`
   ADD KEY `leaderId` (`leaderId`);
 
 --
+-- Indexes for table `statistic`
+--
+ALTER TABLE `statistic`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `storageitem`
 --
 ALTER TABLE `storageitem`
@@ -656,5 +655,11 @@ ALTER TABLE `mail`
 -- AUTO_INCREMENT for table `party`
 --
 ALTER TABLE `party`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `statistic`
+--
+ALTER TABLE `statistic`
   MODIFY `id` int NOT NULL AUTO_INCREMENT;
 COMMIT;

@@ -21,9 +21,8 @@ namespace MultiplayerARPG.MMO
 
         public void CreateCharacterSkill(MySqlConnection connection, MySqlTransaction transaction, int idx, string characterId, CharacterSkill characterSkill)
         {
-            ExecuteNonQuerySync(connection, transaction, "INSERT INTO characterskill (id, idx, characterId, dataId, level) VALUES (@id, @idx, @characterId, @dataId, @level)",
+            ExecuteNonQuerySync(connection, transaction, "INSERT INTO characterskill (id, characterId, dataId, level) VALUES (@id, @characterId, @dataId, @level)",
                 new MySqlParameter("@id", characterId + "_" + idx),
-                new MySqlParameter("@idx", idx),
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@dataId", characterSkill.dataId),
                 new MySqlParameter("@level", characterSkill.level));
@@ -40,7 +39,7 @@ namespace MultiplayerARPG.MMO
                 {
                     result.Add(tempSkill);
                 }
-            }, "SELECT dataId, level FROM characterskill WHERE characterId=@characterId ORDER BY idx ASC",
+            }, "SELECT dataId, level FROM characterskill WHERE characterId=@characterId ORDER BY id ASC",
                 new MySqlParameter("@characterId", characterId));
             return result;
         }

@@ -345,7 +345,7 @@ namespace MultiplayerARPG.MMO
                 InsertMigrationId(migrationId);
                 Logging.Log($"Migrated to {migrationId}");
             }
-            migrationId = " 1.77";
+            migrationId = "1.77";
             if (!HasMigrationId(migrationId))
             {
                 Logging.Log($"Migrating up to {migrationId}");
@@ -354,7 +354,7 @@ namespace MultiplayerARPG.MMO
                 InsertMigrationId(migrationId);
                 Logging.Log($"Migrated to {migrationId}");
             }
-            migrationId = " 1.78";
+            migrationId = "1.78";
             if (!HasMigrationId(migrationId))
             {
                 Logging.Log($"Migrating up to {migrationId}");
@@ -363,7 +363,7 @@ namespace MultiplayerARPG.MMO
                 InsertMigrationId(migrationId);
                 Logging.Log($"Migrated to {migrationId}");
             }
-            migrationId = " 1.78b";
+            migrationId = "1.78b";
             if (!HasMigrationId(migrationId))
             {
                 Logging.Log($"Migrating up to {migrationId}");
@@ -372,6 +372,20 @@ namespace MultiplayerARPG.MMO
                 InsertMigrationId(migrationId);
                 Logging.Log($"Migrated to {migrationId}");
             }
+            migrationId = "1.79";
+            if (!HasMigrationId(migrationId))
+            {
+                Logging.Log($"Migrating up to {migrationId}");
+                ExecuteNonQuerySync("ALTER TABLE `characterattribute` DROP `idx`;");
+                ExecuteNonQuerySync("ALTER TABLE `charactercurrency` DROP `idx`;");
+                ExecuteNonQuerySync("ALTER TABLE `characterquest` DROP `idx`;");
+                ExecuteNonQuerySync("ALTER TABLE `characterskill` DROP `idx`;");
+                ExecuteNonQuerySync("ALTER TABLE `statistic` ADD `id` INT NOT NULL FIRST, ADD PRIMARY KEY(`id`);");
+                // Insert migrate history
+                InsertMigrationId(migrationId);
+                Logging.Log($"Migrated to {migrationId}");
+            }
+
         }
         private bool HasMigrationId(string migrationId)
         {
