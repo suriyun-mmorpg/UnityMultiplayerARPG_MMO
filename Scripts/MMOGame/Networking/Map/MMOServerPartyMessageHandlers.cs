@@ -22,8 +22,7 @@ namespace MultiplayerARPG.MMO
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             await UniTask.Yield();
-            BasePlayerCharacterEntity playerCharacter;
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out BasePlayerCharacterEntity playerCharacter))
             {
                 result.InvokeError(new ResponseAcceptPartyInvitationMessage()
                 {
@@ -80,8 +79,7 @@ namespace MultiplayerARPG.MMO
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             await UniTask.Yield();
-            BasePlayerCharacterEntity playerCharacter;
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out BasePlayerCharacterEntity playerCharacter))
             {
                 result.InvokeError(new ResponseDeclinePartyInvitationMessage()
                 {
@@ -113,8 +111,7 @@ namespace MultiplayerARPG.MMO
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             await UniTask.Yield();
-            BasePlayerCharacterEntity playerCharacter;
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out BasePlayerCharacterEntity playerCharacter))
             {
                 result.InvokeError(new ResponseSendPartyInvitationMessage()
                 {
@@ -122,8 +119,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            BasePlayerCharacterEntity inviteeCharacter;
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(request.inviteeId, out inviteeCharacter))
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(request.inviteeId, out BasePlayerCharacterEntity inviteeCharacter))
             {
                 result.InvokeError(new ResponseSendPartyInvitationMessage()
                 {
@@ -158,8 +154,7 @@ namespace MultiplayerARPG.MMO
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             await UniTask.Yield();
-            IPlayerCharacterData playerCharacter;
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
                 result.InvokeError(new ResponseCreatePartyMessage()
                 {
@@ -210,8 +205,7 @@ namespace MultiplayerARPG.MMO
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             await UniTask.Yield();
-            IPlayerCharacterData playerCharacter;
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
                 result.InvokeError(new ResponseChangePartyLeaderMessage()
                 {
@@ -259,8 +253,7 @@ namespace MultiplayerARPG.MMO
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             await UniTask.Yield();
-            IPlayerCharacterData playerCharacter;
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
                 result.InvokeError(new ResponseChangePartySettingMessage()
                 {
@@ -309,8 +302,7 @@ namespace MultiplayerARPG.MMO
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             await UniTask.Yield();
-            IPlayerCharacterData playerCharacter;
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
                 result.InvokeError(new ResponseKickMemberFromPartyMessage()
                 {
@@ -341,10 +333,8 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             // Delete from cache
-            IPlayerCharacterData memberCharacter;
-            long memberConnectionId;
-            if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(request.memberId, out memberCharacter) &&
-                GameInstance.ServerUserHandlers.TryGetConnectionId(request.memberId, out memberConnectionId))
+            if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(request.memberId, out IPlayerCharacterData memberCharacter) &&
+                GameInstance.ServerUserHandlers.TryGetConnectionId(request.memberId, out long memberConnectionId))
             {
                 memberCharacter.ClearParty();
                 GameInstance.ServerGameMessageHandlers.SendClearPartyData(memberConnectionId, validateResult.PartyId);
@@ -365,8 +355,7 @@ namespace MultiplayerARPG.MMO
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             await UniTask.Yield();
-            IPlayerCharacterData playerCharacter;
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
                 result.InvokeError(new ResponseLeavePartyMessage()
                 {
