@@ -200,6 +200,7 @@ namespace MultiplayerARPG.MMO
             RequestSpawnMapMessage request,
             RequestProceedResultDelegate<ResponseSpawnMapMessage> result)
         {
+            await UniTask.Yield();
             UITextKeys message = UITextKeys.NONE;
             if (!ClusterClient.IsAppRegistered)
                 message = UITextKeys.UI_ERROR_APP_NOT_READY;
@@ -208,7 +209,7 @@ namespace MultiplayerARPG.MMO
 
             if (message != UITextKeys.NONE)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseSpawnMapMessage()
+                result.InvokeError(new ResponseSpawnMapMessage()
                 {
                     message = message
                 });
@@ -217,7 +218,6 @@ namespace MultiplayerARPG.MMO
             {
                 SpawnMap(request, result, false);
             }
-            await UniTask.Yield();
         }
 #endif
 
@@ -340,7 +340,7 @@ namespace MultiplayerARPG.MMO
                                 // Notify server that it's successfully handled the request
                                 if (request.HasValue && result != null)
                                 {
-                                    result.Invoke(AckResponseCode.Success, new ResponseSpawnMapMessage()
+                                    result.InvokeSuccess(new ResponseSpawnMapMessage()
                                     {
                                         message = UITextKeys.NONE,
                                         instanceId = request.Value.instanceId,
@@ -366,7 +366,7 @@ namespace MultiplayerARPG.MMO
                                 // Notify server that it failed to spawn map scene handled the request
                                 if (request.HasValue && result != null)
                                 {
-                                    result.Invoke(AckResponseCode.Error, new ResponseSpawnMapMessage()
+                                    result.InvokeError(new ResponseSpawnMapMessage()
                                     {
                                         message = UITextKeys.UI_ERROR_CANNOT_EXCUTE_MAP_SERVER,
                                         instanceId = request.Value.instanceId,
@@ -401,7 +401,7 @@ namespace MultiplayerARPG.MMO
             {
                 if (request.HasValue && result != null)
                 {
-                    result.Invoke(AckResponseCode.Error, new ResponseSpawnMapMessage()
+                    result.InvokeError(new ResponseSpawnMapMessage()
                     {
                         message = UITextKeys.UI_ERROR_UNKNOW,
                         instanceId = request.Value.instanceId,
