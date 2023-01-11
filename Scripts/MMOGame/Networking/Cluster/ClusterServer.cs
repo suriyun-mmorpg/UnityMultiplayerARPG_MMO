@@ -134,6 +134,7 @@ namespace MultiplayerARPG.MMO
             RequestAppServerRegisterMessage request,
             RequestProceedResultDelegate<ResponseAppServerRegisterMessage> result)
         {
+            await UniTask.Yield();
             long connectionId = requestHandler.ConnectionId;
             UITextKeys message = UITextKeys.NONE;
             if (request.ValidateHash())
@@ -192,7 +193,6 @@ namespace MultiplayerARPG.MMO
                 {
                     message = message,
                 });
-            await UniTask.Yield();
         }
 #endif
 
@@ -229,6 +229,7 @@ namespace MultiplayerARPG.MMO
             RequestAppServerAddressMessage request,
             RequestProceedResultDelegate<ResponseAppServerAddressMessage> result)
         {
+            await UniTask.Yield();
             long connectionId = requestHandler.ConnectionId;
             UITextKeys message = UITextKeys.NONE;
             CentralServerPeerInfo peerInfo = new CentralServerPeerInfo();
@@ -272,7 +273,6 @@ namespace MultiplayerARPG.MMO
                     message = message,
                     peerInfo = peerInfo,
                 });
-            await UniTask.Yield();
         }
 #endif
 
@@ -522,7 +522,7 @@ namespace MultiplayerARPG.MMO
             RequestProceedResultDelegate<ResponseUserCountMessage> result)
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-            result.Invoke(AckResponseCode.Success, new ResponseUserCountMessage()
+            result.InvokeSuccess(new ResponseUserCountMessage()
             {
                 userCount = MapUsersByCharacterId.Count,
             });
