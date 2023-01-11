@@ -19,8 +19,7 @@ namespace MultiplayerARPG.MMO
             RequestProceedResultDelegate<ResponseCashShopInfoMessage> result)
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-            string userId;
-            if (!GameInstance.ServerUserHandlers.TryGetUserId(requestHandler.ConnectionId, out userId))
+            if (!GameInstance.ServerUserHandlers.TryGetUserId(requestHandler.ConnectionId, out string userId))
             {
                 result.InvokeError(new ResponseCashShopInfoMessage()
                 {
@@ -55,8 +54,7 @@ namespace MultiplayerARPG.MMO
             RequestProceedResultDelegate<ResponseCashShopBuyMessage> result)
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-            IPlayerCharacterData playerCharacter;
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
                 result.InvokeError(new ResponseCashShopBuyMessage()
                 {
@@ -74,8 +72,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
 
-            CashShopItem cashShopItem;
-            if (!GameInstance.CashShopItems.TryGetValue(request.dataId, out cashShopItem))
+            if (!GameInstance.CashShopItems.TryGetValue(request.dataId, out CashShopItem cashShopItem))
             {
                 result.InvokeError(new ResponseCashShopBuyMessage()
                 {
@@ -217,8 +214,7 @@ namespace MultiplayerARPG.MMO
             RequestProceedResultDelegate<ResponseCashPackageInfoMessage> result)
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-            string userId;
-            if (!GameInstance.ServerUserHandlers.TryGetUserId(requestHandler.ConnectionId, out userId))
+            if (!GameInstance.ServerUserHandlers.TryGetUserId(requestHandler.ConnectionId, out string userId))
             {
                 result.InvokeError(new ResponseCashPackageInfoMessage()
                 {
@@ -254,8 +250,7 @@ namespace MultiplayerARPG.MMO
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             // TODO: Validate purchasing at server side
-            IPlayerCharacterData playerCharacter;
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
                 result.InvokeError(new ResponseCashPackageBuyValidationMessage()
                 {
@@ -264,8 +259,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
 
-            CashPackage cashPackage;
-            if (!GameInstance.CashPackages.TryGetValue(request.dataId, out cashPackage))
+            if (!GameInstance.CashPackages.TryGetValue(request.dataId, out CashPackage cashPackage))
             {
                 result.InvokeError(new ResponseCashPackageBuyValidationMessage()
                 {
