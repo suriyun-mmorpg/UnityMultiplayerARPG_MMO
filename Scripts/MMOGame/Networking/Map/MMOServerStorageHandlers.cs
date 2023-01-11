@@ -50,8 +50,7 @@ namespace MultiplayerARPG.MMO
             List<CharacterItem> storageItems = resp.Response.StorageCharacterItems;
             SetStorageItems(storageId, storageItems);
             // Notify storage items to client
-            uint storageObjectId;
-            Storage storage = GetStorage(storageId, out storageObjectId);
+            Storage storage = GetStorage(storageId, out uint storageObjectId);
             GameInstance.ServerGameMessageHandlers.NotifyStorageOpened(connectionId, storageId.storageType, storageId.storageOwnerId, storageObjectId, storage.weightLimit, storage.slotLimit);
             storageItems.FillEmptySlots(storage.slotLimit > 0, storage.slotLimit);
             GameInstance.ServerGameMessageHandlers.NotifyStorageItems(connectionId, storageItems);
@@ -60,16 +59,15 @@ namespace MultiplayerARPG.MMO
 
         public async UniTaskVoid CloseStorage(long connectionId)
         {
+            await UniTask.Yield();
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-            StorageId storageId;
-            if (usingStorageIds.TryGetValue(connectionId, out storageId) && usingStorageClients.ContainsKey(storageId))
+            if (usingStorageIds.TryGetValue(connectionId, out StorageId storageId) && usingStorageClients.ContainsKey(storageId))
             {
                 usingStorageClients[storageId].Remove(connectionId);
                 usingStorageIds.TryRemove(connectionId, out _);
                 GameInstance.ServerGameMessageHandlers.NotifyStorageClosed(connectionId);
             }
 #endif
-            await UniTask.Yield();
         }
 
         public bool TryGetOpenedStorageId(long connectionId, out StorageId storageId)
@@ -189,8 +187,7 @@ namespace MultiplayerARPG.MMO
                     storage = GameInstance.Singleton.guildStorage;
                     break;
                 case StorageType.Building:
-                    StorageEntity buildingEntity;
-                    if (GameInstance.ServerBuildingHandlers.TryGetBuilding(storageId.storageOwnerId, out buildingEntity))
+                    if (GameInstance.ServerBuildingHandlers.TryGetBuilding(storageId.storageOwnerId, out StorageEntity buildingEntity))
                     {
                         objectId = buildingEntity.ObjectId;
                         storage = buildingEntity.Storage;
@@ -214,8 +211,7 @@ namespace MultiplayerARPG.MMO
                         return false;
                     break;
                 case StorageType.Building:
-                    StorageEntity buildingEntity;
-                    if (!GameInstance.ServerBuildingHandlers.TryGetBuilding(storageId.storageOwnerId, out buildingEntity) ||
+                    if (!GameInstance.ServerBuildingHandlers.TryGetBuilding(storageId.storageOwnerId, out StorageEntity buildingEntity) ||
                         !(buildingEntity.IsCreator(playerCharacter.Id) || buildingEntity.CanUseByEveryone))
                         return false;
                     break;
