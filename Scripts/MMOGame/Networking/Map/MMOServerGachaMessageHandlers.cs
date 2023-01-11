@@ -24,10 +24,9 @@ namespace MultiplayerARPG.MMO
             RequestProceedResultDelegate<ResponseGachaInfoMessage> result)
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-            string userId;
-            if (!GameInstance.ServerUserHandlers.TryGetUserId(requestHandler.ConnectionId, out userId))
+            if (!GameInstance.ServerUserHandlers.TryGetUserId(requestHandler.ConnectionId, out string userId))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseGachaInfoMessage()
+                result.InvokeError(new ResponseGachaInfoMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
@@ -47,7 +46,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
 
-            result.Invoke(AckResponseCode.Success, new ResponseGachaInfoMessage()
+            result.InvokeSuccess(new ResponseGachaInfoMessage()
             {
                 cash = getCashResp.Response.Cash,
                 gachaIds = new List<int>(GameInstance.Gachas.Keys),
@@ -58,20 +57,18 @@ namespace MultiplayerARPG.MMO
         public async UniTaskVoid HandleRequestOpenGacha(RequestHandlerData requestHandler, RequestOpenGachaMessage request, RequestProceedResultDelegate<ResponseOpenGachaMessage> result)
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-            IPlayerCharacterData playerCharacter;
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out playerCharacter))
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseOpenGachaMessage()
+                result.InvokeError(new ResponseOpenGachaMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
                 return;
             }
 
-            Gacha gacha;
-            if (!GameInstance.Gachas.TryGetValue(request.dataId, out gacha))
+            if (!GameInstance.Gachas.TryGetValue(request.dataId, out Gacha gacha))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseOpenGachaMessage()
+                result.InvokeError(new ResponseOpenGachaMessage()
                 {
                     message = UITextKeys.UI_ERROR_INVALID_DATA,
                 });
@@ -95,7 +92,7 @@ namespace MultiplayerARPG.MMO
             int cash = getCashResp.Response.Cash;
             if (cash < price)
             {
-                result.Invoke(AckResponseCode.Error, new ResponseOpenGachaMessage()
+                result.InvokeError(new ResponseOpenGachaMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_ENOUGH_CASH,
                 });
@@ -106,7 +103,7 @@ namespace MultiplayerARPG.MMO
             List<RewardedItem> rewardItems = gacha.GetRandomedItems(openCount);
             if (playerCharacter.IncreasingItemsWillOverwhelming(rewardItems))
             {
-                result.Invoke(AckResponseCode.Error, new ResponseOpenGachaMessage()
+                result.InvokeError(new ResponseOpenGachaMessage()
                 {
                     message = UITextKeys.UI_ERROR_WILL_OVERWHELMING,
                 });
@@ -131,7 +128,7 @@ namespace MultiplayerARPG.MMO
             playerCharacter.IncreaseItems(rewardItems);
             playerCharacter.FillEmptySlots();
             // Send response message
-            result.Invoke(AckResponseCode.Success, new ResponseOpenGachaMessage()
+            result.InvokeSuccess(new ResponseOpenGachaMessage()
             {
                 dataId = request.dataId,
                 rewardItems = rewardItems,
