@@ -306,7 +306,7 @@ namespace MultiplayerARPG.MMO
                 result.EntityId = reader.GetInt32(3);
                 result.FactionId = reader.GetInt32(4);
                 result.CharacterName = reader.GetString(5);
-                result.Level = reader.GetInt16(6);
+                result.Level = reader.GetInt32(6);
                 result.Exp = reader.GetInt32(7);
                 result.CurrentHp = reader.GetInt32(8);
                 result.CurrentMp = reader.GetInt32(9);
@@ -626,7 +626,7 @@ namespace MultiplayerARPG.MMO
                     socialCharacterData.id = reader.GetString(0);
                     socialCharacterData.dataId = reader.GetInt32(1);
                     socialCharacterData.characterName = reader.GetString(2);
-                    socialCharacterData.level = reader.GetInt16(3);
+                    socialCharacterData.level = reader.GetInt32(3);
                     result.Add(socialCharacterData);
                 }
             }, "SELECT id, dataId, characterName, level FROM characters WHERE characterName LIKE @characterName AND " + excludeIdsQuery + " ORDER BY RAND() LIMIT " + skip + ", " + limit,
@@ -692,7 +692,7 @@ namespace MultiplayerARPG.MMO
                         socialCharacterData.id = reader.GetString(0);
                         socialCharacterData.dataId = reader.GetInt32(1);
                         socialCharacterData.characterName = reader.GetString(2);
-                        socialCharacterData.level = reader.GetInt16(3);
+                        socialCharacterData.level = reader.GetInt32(3);
                         result.Add(socialCharacterData);
                     }
                 }, "SELECT id, dataId, characterName, level FROM characters WHERE BINARY id = @id",

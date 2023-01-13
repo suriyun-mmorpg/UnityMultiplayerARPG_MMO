@@ -37,9 +37,9 @@ namespace MultiplayerARPG.MMO
                         reader.GetString(0),
                         reader.GetString(1),
                         defaultGuildRoles);
-                    result.level = reader.GetInt16(2);
+                    result.level = reader.GetInt32(2);
                     result.exp = reader.GetInt32(3);
-                    result.skillPoint = reader.GetInt16(4);
+                    result.skillPoint = reader.GetInt32(4);
                     result.guildMessage = reader.GetString(5);
                     result.guildMessage2 = reader.GetString(6);
                     result.gold = reader.GetInt32(7);
@@ -81,7 +81,7 @@ namespace MultiplayerARPG.MMO
                         guildMemberData.id = reader.GetString(0);
                         guildMemberData.dataId = reader.GetInt32(1);
                         guildMemberData.characterName = reader.GetString(2);
-                        guildMemberData.level = reader.GetInt16(3);
+                        guildMemberData.level = reader.GetInt32(3);
                         result.AddMember(guildMemberData, reader.GetByte(4));
                     }
                 }, "SELECT id, dataId, characterName, level, guildRole FROM characters WHERE guildId=@id",
@@ -91,7 +91,7 @@ namespace MultiplayerARPG.MMO
                 {
                     while (reader.Read())
                     {
-                        result.SetSkillLevel(reader.GetInt32(0), reader.GetInt16(1));
+                        result.SetSkillLevel(reader.GetInt32(0), reader.GetInt32(1));
                     }
                 }, "SELECT dataId, level FROM guildskill WHERE guildId=@id",
                     new MySqlParameter("@id", id));
@@ -99,7 +99,7 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public override void UpdateGuildLevel(int id, short level, int exp, short skillPoint)
+        public override void UpdateGuildLevel(int id, int level, int exp, int skillPoint)
         {
             ExecuteNonQuerySync("UPDATE guild SET level=@level, exp=@exp, skillPoint=@skillPoint WHERE id=@id",
                 new MySqlParameter("@level", level),
@@ -179,7 +179,7 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@guildRole", guildRole));
         }
 
-        public override void UpdateGuildSkillLevel(int id, int dataId, short level, short skillPoint)
+        public override void UpdateGuildSkillLevel(int id, int dataId, int level, int skillPoint)
         {
             ExecuteNonQuerySync("DELETE FROM guildskill WHERE guildId=@guildId AND dataId=@dataId",
                 new MySqlParameter("@guildId", id),

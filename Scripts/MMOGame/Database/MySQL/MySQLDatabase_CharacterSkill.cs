@@ -12,7 +12,7 @@ namespace MultiplayerARPG.MMO
             {
                 result = new CharacterSkill();
                 result.dataId = reader.GetInt32(0);
-                result.level = reader.GetInt16(1);
+                result.level = reader.GetInt32(1);
                 return true;
             }
             result = CharacterSkill.Empty;

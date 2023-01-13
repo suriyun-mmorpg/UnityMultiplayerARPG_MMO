@@ -119,7 +119,7 @@ namespace MultiplayerARPG.MMO
             // Prepare storage data
             Storage storage = GameInstance.ServerStorageHandlers.GetStorage(storageId, out _);
             bool isLimitSlot = storage.slotLimit > 0;
-            short slotLimit = storage.slotLimit;
+            int slotLimit = storage.slotLimit;
             UITextKeys gameMessage;
             // Don't apply data to player character immediately, it should be saved properly before apply the data
             PlayerCharacterData applyingPlayerCharacter = new PlayerCharacterData();
@@ -217,8 +217,8 @@ namespace MultiplayerARPG.MMO
             Storage storage = GameInstance.ServerStorageHandlers.GetStorage(storageId, out _);
             bool isLimitWeight = storage.weightLimit > 0;
             bool isLimitSlot = storage.slotLimit > 0;
-            short weightLimit = storage.weightLimit;
-            short slotLimit = storage.slotLimit;
+            int weightLimit = storage.weightLimit;
+            int slotLimit = storage.slotLimit;
             UITextKeys gameMessage;
             // Don't apply data to player character immediately, it should be saved properly before apply the data
             PlayerCharacterData applyingPlayerCharacter = new PlayerCharacterData();
@@ -327,14 +327,14 @@ namespace MultiplayerARPG.MMO
             // Perform swap or merge items
             Storage storage = GameInstance.ServerStorageHandlers.GetStorage(storageId, out _);
             bool isLimitSlot = storage.slotLimit > 0;
-            short slotLimit = storage.slotLimit;
+            int slotLimit = storage.slotLimit;
             // Prepare item data
             CharacterItem fromItem = storageItems[request.fromIndex].Clone(true);
             CharacterItem toItem = storageItems[request.toIndex].Clone(true);
             if (fromItem.dataId.Equals(toItem.dataId) && !fromItem.IsFull() && !toItem.IsFull())
             {
                 // Merge if same id and not full
-                short maxStack = toItem.GetMaxStack();
+                int maxStack = toItem.GetMaxStack();
                 if (toItem.amount + fromItem.amount <= maxStack)
                 {
                     toItem.amount += fromItem.amount;
@@ -343,7 +343,7 @@ namespace MultiplayerARPG.MMO
                 }
                 else
                 {
-                    short remains = (short)(toItem.amount + fromItem.amount - maxStack);
+                    int remains = toItem.amount + fromItem.amount - maxStack;
                     toItem.amount = maxStack;
                     fromItem.amount = remains;
                     storageItems[request.fromIndex] = fromItem;

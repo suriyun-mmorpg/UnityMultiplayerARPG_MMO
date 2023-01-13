@@ -5,18 +5,18 @@ namespace MultiplayerARPG.MMO
     public struct ItemIndexAmountMap : INetSerializable
     {
         public int Index { get; set; }
-        public short Amount { get; set; }
+        public int Amount { get; set; }
 
         public void Serialize(NetDataWriter writer)
         {
-            writer.Put(Index);
-            writer.Put(Amount);
+            writer.PutPackedInt(Index);
+            writer.PutPackedInt(Amount);
         }
 
         public void Deserialize(NetDataReader reader)
         {
-            Index = reader.GetInt();
-            Amount = reader.GetShort();
+            Index = reader.GetPackedInt();
+            Amount = reader.GetPackedInt();
         }
     }
 }

@@ -90,8 +90,8 @@ namespace MultiplayerARPG.MMO
             Storage storage = GetStorage(storageId, out _);
             bool isLimitWeight = storage.weightLimit > 0;
             bool isLimitSlot = storage.slotLimit > 0;
-            short weightLimit = storage.weightLimit;
-            short slotLimit = storage.slotLimit;
+            int weightLimit = storage.weightLimit;
+            int slotLimit = storage.slotLimit;
             // Refresh storage item from database
             AsyncResponseData<ReadStorageItemsResp> readResp = await DbServiceClient.ReadStorageItemsAsync(new ReadStorageItemsReq()
             {
@@ -109,9 +109,9 @@ namespace MultiplayerARPG.MMO
             for (int i = 0; i < convertItems.Count; ++i)
             {
                 int dataId = convertItems[i].dataId;
-                short amount = convertItems[i].amount;
+                int amount = convertItems[i].amount;
                 int convertedDataId = convertItems[i].convertedDataId;
-                short convertedAmount = convertItems[i].convertedAmount;
+                int convertedAmount = convertItems[i].convertedAmount;
                 // Decrease item from storage
                 if (!storageItems.DecreaseItems(dataId, amount, isLimitSlot, out _))
                     continue;

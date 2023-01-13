@@ -36,14 +36,14 @@ namespace MultiplayerARPG.MMO
                 result = new CharacterItem();
                 result.id = reader.GetString(0);
                 result.dataId = reader.GetInt32(1);
-                result.level = reader.GetInt16(2);
-                result.amount = reader.GetInt16(3);
+                result.level = reader.GetInt32(2);
+                result.amount = reader.GetInt32(3);
                 result.durability = reader.GetFloat(4);
                 result.exp = reader.GetInt32(5);
                 result.lockRemainsDuration = reader.GetFloat(6);
                 result.expireTime = reader.GetInt64(7);
-                result.randomSeed = reader.GetInt16(8);
-                result.ammo = reader.GetInt16(9);
+                result.randomSeed = reader.GetInt32(8);
+                result.ammo = reader.GetInt32(9);
                 result.ReadSockets(reader.GetString(10));
                 return true;
             }

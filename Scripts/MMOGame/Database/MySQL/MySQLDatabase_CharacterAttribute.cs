@@ -12,7 +12,7 @@ namespace MultiplayerARPG.MMO
             {
                 result = new CharacterAttribute();
                 result.dataId = reader.GetInt32(0);
-                result.amount = reader.GetInt16(1);
+                result.amount = reader.GetInt32(1);
                 return true;
             }
             result = CharacterAttribute.Empty;

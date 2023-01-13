@@ -54,7 +54,7 @@ namespace MultiplayerARPG.MMO
                         partyMemberData.id = reader.GetString(0);
                         partyMemberData.dataId = reader.GetInt32(1);
                         partyMemberData.characterName = reader.GetString(2);
-                        partyMemberData.level = reader.GetInt16(3);
+                        partyMemberData.level = reader.GetInt32(3);
                         result.AddMember(partyMemberData);
                     }
                 }, "SELECT id, dataId, characterName, level FROM characters WHERE partyId=@id",

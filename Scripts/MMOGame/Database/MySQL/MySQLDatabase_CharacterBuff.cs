@@ -14,7 +14,7 @@ namespace MultiplayerARPG.MMO
                 result.id = reader.GetString(0);
                 result.type = (BuffType)reader.GetByte(1);
                 result.dataId = reader.GetInt32(2);
-                result.level = reader.GetInt16(3);
+                result.level = reader.GetInt32(3);
                 result.buffRemainsDuration = reader.GetFloat(4);
                 return true;
             }
