@@ -21,8 +21,9 @@ namespace MultiplayerARPG.MMO
 
         public void CreateCharacterAttribute(SqliteTransaction transaction, int idx, string characterId, CharacterAttribute characterAttribute)
         {
-            ExecuteNonQuery(transaction, "INSERT INTO characterattribute (id, characterId, dataId, amount) VALUES (@id, @characterId, @dataId, @amount)",
+            ExecuteNonQuery(transaction, "INSERT INTO characterattribute (id, idx, characterId, dataId, amount) VALUES (@id, @idx, @characterId, @dataId, @amount)",
                 new SqliteParameter("@id", characterId + "_" + idx),
+                new SqliteParameter("@idx", idx),
                 new SqliteParameter("@characterId", characterId),
                 new SqliteParameter("@dataId", characterAttribute.dataId),
                 new SqliteParameter("@amount", characterAttribute.amount));

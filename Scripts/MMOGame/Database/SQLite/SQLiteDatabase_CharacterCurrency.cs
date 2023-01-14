@@ -21,8 +21,9 @@ namespace MultiplayerARPG.MMO
 
         public void CreateCharacterCurrency(SqliteTransaction transaction, int idx, string characterId, CharacterCurrency characterCurrency)
         {
-            ExecuteNonQuery(transaction, "INSERT INTO charactercurrency (id, characterId, dataId, amount) VALUES (@id, @characterId, @dataId, @amount)",
+            ExecuteNonQuery(transaction, "INSERT INTO charactercurrency (id, idx, characterId, dataId, amount) VALUES (@id, @idx, @characterId, @dataId, @amount)",
                 new SqliteParameter("@id", characterId + "_" + idx),
+                new SqliteParameter("@idx", idx),
                 new SqliteParameter("@characterId", characterId),
                 new SqliteParameter("@dataId", characterCurrency.dataId),
                 new SqliteParameter("@amount", characterCurrency.amount));
