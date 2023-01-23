@@ -99,6 +99,27 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
+            
+            int minCharacterNameLength = GameInstance.Singleton.minCharacterNameLength;
+            int maxCharacterNameLength = GameInstance.Singleton.maxCharacterNameLength;
+            if (characterName.Length < minCharacterNameLength)
+            {
+                result.InvokeError(new ResponseCreateCharacterMessage()
+                {
+                    message = UITextKeys.UI_ERROR_CHARACTER_NAME_TOO_SHORT
+                });
+                return;
+            }
+
+            if (characterName.Length > maxCharacterNameLength)
+            {
+                result.InvokeError(new ResponseCreateCharacterMessage()
+                {
+                    message = UITextKeys.UI_ERROR_CHARACTER_NAME_TOO_LONG
+                });
+                return;
+            }
+
             // Validate character name
             AsyncResponseData<FindCharacterNameResp> findCharacterNameResp = await DbServiceClient.FindCharacterNameAsync(new FindCharacterNameReq()
             {
