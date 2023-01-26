@@ -83,9 +83,7 @@ namespace MultiplayerARPG.MMO
 
         protected override void Start()
         {
-            // Force use TcpTransport for server-to-server connections.
             useWebSocket = false;
-            TransportFactory = gameObject.GetOrAddComponent<TcpTransportFactory>();
             maxConnections = int.MaxValue;
             base.Start();
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE

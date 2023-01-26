@@ -29,7 +29,7 @@ namespace MultiplayerARPG.MMO
         internal Dictionary<string, RequestProceedResultDelegate<ResponseSpawnMapMessage>> RequestSpawnMapHandlers = new Dictionary<string, RequestProceedResultDelegate<ResponseSpawnMapMessage>>();
 #endif
 
-        public ClusterServer(CentralNetworkManager centralNetworkManager) : base(new TcpTransport())
+        public ClusterServer(CentralNetworkManager centralNetworkManager) : base(new LiteNetLibTransport("CLUSTER", 16, 16))
         {
             this.centralNetworkManager = centralNetworkManager;
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE

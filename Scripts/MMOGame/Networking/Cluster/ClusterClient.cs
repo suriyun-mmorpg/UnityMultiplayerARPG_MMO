@@ -15,7 +15,7 @@ namespace MultiplayerARPG.MMO
 #endif
         private readonly IAppServer appServer;
 
-        public ClusterClient(IAppServer appServer) : base(new TcpTransport())
+        public ClusterClient(IAppServer appServer) : base(new LiteNetLibTransport("CLUSTER", 16, 16))
         {
             this.appServer = appServer;
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
