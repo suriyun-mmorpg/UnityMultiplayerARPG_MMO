@@ -507,6 +507,9 @@ namespace MultiplayerARPG.MMO
                 await SaveCharacter(playerCharacterEntity);
                 // Despawn the character
                 playerCharacterEntity.NetworkDestroy();
+                // Unregister player
+                UnregisterPlayerCharacter(connectionId);
+                UnregisterUserId(connectionId);
             }
             return true;
         }
