@@ -215,6 +215,8 @@ namespace MultiplayerARPG.MMO
                         !(buildingEntity.IsCreator(playerCharacter.Id) || buildingEntity.CanUseByEveryone))
                         return false;
                     break;
+                default:
+                    return false;
             }
             return true;
         }
