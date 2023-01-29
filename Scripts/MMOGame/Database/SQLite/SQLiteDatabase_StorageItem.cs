@@ -81,8 +81,8 @@ namespace MultiplayerARPG.MMO
             }
             catch (System.Exception ex)
             {
-                Logging.LogError(ToString(), "Transaction, Error occurs while replacing storage items");
-                Logging.LogException(ToString(), ex);
+                Logging.LogError(LogTag, "Transaction, Error occurs while replacing storage items");
+                Logging.LogException(LogTag, ex);
                 transaction.Rollback();
             }
             transaction.Dispose();

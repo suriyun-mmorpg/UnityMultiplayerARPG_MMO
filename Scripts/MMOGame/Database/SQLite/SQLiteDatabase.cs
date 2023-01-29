@@ -12,6 +12,8 @@ namespace MultiplayerARPG.MMO
 {
     public partial class SQLiteDatabase : BaseDatabase
     {
+        public static readonly string LogTag = nameof(SQLiteDatabase);
+
         [SerializeField]
         private string dbPath = "./mmorpgtemplate.sqlite3";
 
@@ -29,10 +31,10 @@ namespace MultiplayerARPG.MMO
             string configFolder = "./config";
             string configFilePath = configFolder + "/sqliteConfig.json";
             Dictionary<string, object> jsonConfig = new Dictionary<string, object>();
-            Logging.Log("Reading config file from " + configFilePath);
+            Logging.Log(LogTag, "Reading config file from " + configFilePath);
             if (File.Exists(configFilePath))
             {
-                Logging.Log("Found config file");
+                Logging.Log(LogTag, "Found config file");
                 string dataAsJson = File.ReadAllText(configFilePath);
                 jsonConfig = Json.Deserialize(dataAsJson) as Dictionary<string, object>;
                 configFileFound = true;
@@ -44,7 +46,7 @@ namespace MultiplayerARPG.MMO
             if (!configFileFound)
             {
                 // Write config file
-                Logging.Log("Not found config file, creating a new one");
+                Logging.Log(LogTag, "Not found config file, creating a new one");
                 if (!Directory.Exists(configFolder))
                     Directory.CreateDirectory(configFolder);
                 File.WriteAllText(configFilePath, Json.Serialize(jsonConfig));
@@ -694,7 +696,7 @@ namespace MultiplayerARPG.MMO
                 }
                 catch (SqliteException ex)
                 {
-                    Logging.LogException(ex);
+                    Logging.LogException(LogTag, ex);
                 }
             }
             return numRows;
@@ -722,7 +724,7 @@ namespace MultiplayerARPG.MMO
                 }
                 catch (SqliteException ex)
                 {
-                    Logging.LogException(ex);
+                    Logging.LogException(LogTag, ex);
                 }
             }
             return result;
@@ -751,7 +753,7 @@ namespace MultiplayerARPG.MMO
                 }
                 catch (SqliteException ex)
                 {
-                    Logging.LogException(ex);
+                    Logging.LogException(LogTag, ex);
                 }
             }
         }

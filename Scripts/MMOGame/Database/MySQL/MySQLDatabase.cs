@@ -13,6 +13,8 @@ namespace MultiplayerARPG.MMO
 {
     public partial class MySQLDatabase : BaseDatabase
     {
+        public static readonly string LogTag = nameof(MySQLDatabase);
+
         [SerializeField]
         private string address = "127.0.0.1";
         [SerializeField]
@@ -32,10 +34,10 @@ namespace MultiplayerARPG.MMO
             string configFolder = "./config";
             string configFilePath = configFolder + "/mySqlConfig.json";
             Dictionary<string, object> jsonConfig = new Dictionary<string, object>();
-            Logging.Log("Reading config file from " + configFilePath);
+            Logging.Log(LogTag, "Reading config file from " + configFilePath);
             if (File.Exists(configFilePath))
             {
-                Logging.Log("Found config file");
+                Logging.Log(LogTag, "Found config file");
                 string dataAsJson = File.ReadAllText(configFilePath);
                 jsonConfig = Json.Deserialize(dataAsJson) as Dictionary<string, object>;
                 configFileFound = true;
@@ -59,7 +61,7 @@ namespace MultiplayerARPG.MMO
             if (!configFileFound)
             {
                 // Write config file
-                Logging.Log("Not found config file, creating a new one");
+                Logging.Log(LogTag, "Not found config file, creating a new one");
                 if (!Directory.Exists(configFolder))
                     Directory.CreateDirectory(configFolder);
                 File.WriteAllText(configFilePath, Json.Serialize(jsonConfig));
@@ -75,7 +77,7 @@ namespace MultiplayerARPG.MMO
             string migrationId = "1.57b";
             if (!HasMigrationId(migrationId))
             {
-                Logging.Log($"Migrating up to {migrationId}");
+                Logging.Log(LogTag, $"Migrating up to {migrationId}");
                 // Migrate data
                 try
                 {
@@ -97,12 +99,12 @@ namespace MultiplayerARPG.MMO
                 catch { }
                 // Insert migrate history
                 InsertMigrationId(migrationId);
-                Logging.Log($"Migrated to {migrationId}");
+                Logging.Log(LogTag, $"Migrated to {migrationId}");
             }
             migrationId = "1.58";
             if (!HasMigrationId(migrationId))
             {
-                Logging.Log($"Migrating up to {migrationId}");
+                Logging.Log(LogTag, $"Migrating up to {migrationId}");
                 ExecuteNonQuerySync("ALTER TABLE `characterbuff` CHANGE `type` `type` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0';");
                 ExecuteNonQuerySync("ALTER TABLE `characterhotkey` CHANGE `type` `type` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0';");
                 ExecuteNonQuerySync("ALTER TABLE `characteritem` CHANGE `inventoryType` `inventoryType` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0';");
@@ -116,21 +118,21 @@ namespace MultiplayerARPG.MMO
                 ExecuteNonQuerySync("ALTER TABLE `characters` ADD `currentRotationZ` FLOAT NOT NULL DEFAULT '0' AFTER `currentRotationY`;");
                 // Insert migrate history
                 InsertMigrationId(migrationId);
-                Logging.Log($"Migrated to {migrationId}");
+                Logging.Log(LogTag, $"Migrated to {migrationId}");
             }
             migrationId = "1.60c";
             if (!HasMigrationId(migrationId))
             {
-                Logging.Log($"Migrating up to {migrationId}");
+                Logging.Log(LogTag, $"Migrating up to {migrationId}");
                 ExecuteNonQuerySync("ALTER TABLE `characterquest` ADD `completedTasks` TEXT NOT NULL AFTER `killedMonsters`;");
                 // Insert migrate history
                 InsertMigrationId(migrationId);
-                Logging.Log($"Migrated to {migrationId}");
+                Logging.Log(LogTag, $"Migrated to {migrationId}");
             }
             migrationId = "1.61";
             if (!HasMigrationId(migrationId))
             {
-                Logging.Log($"Migrating up to {migrationId}");
+                Logging.Log(LogTag, $"Migrating up to {migrationId}");
                 ExecuteNonQuerySync("CREATE TABLE `charactercurrency` ("
                     + "`id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,"
                     + "`idx` int(11) NOT NULL,"
@@ -159,21 +161,21 @@ namespace MultiplayerARPG.MMO
                     + "PRIMARY KEY(`id`)) ENGINE = InnoDB DEFAULT CHARSET = utf8 COLLATE utf8_unicode_ci;");
                 // Insert migrate history
                 InsertMigrationId(migrationId);
-                Logging.Log($"Migrated to {migrationId}");
+                Logging.Log(LogTag, $"Migrated to {migrationId}");
             }
             migrationId = "1.61b";
             if (!HasMigrationId(migrationId))
             {
-                Logging.Log($"Migrating up to {migrationId}");
+                Logging.Log(LogTag, $"Migrating up to {migrationId}");
                 ExecuteNonQuerySync("ALTER TABLE `mail` ADD `isClaim` tinyint(1) NOT NULL DEFAULT 0 AFTER `readTimestamp`, ADD `claimTimestamp` timestamp NULL DEFAULT NULL AFTER `isClaim`;");
                 // Insert migrate history
                 InsertMigrationId(migrationId);
-                Logging.Log($"Migrated to {migrationId}");
+                Logging.Log(LogTag, $"Migrated to {migrationId}");
             }
             migrationId = "1.62e";
             if (!HasMigrationId(migrationId))
             {
-                Logging.Log($"Migrating up to {migrationId}");
+                Logging.Log(LogTag, $"Migrating up to {migrationId}");
                 ExecuteNonQuerySync("ALTER TABLE `characterattribute` ADD INDEX(`idx`);");
                 ExecuteNonQuerySync("ALTER TABLE `characterattribute` ADD INDEX(`characterId`);");
                 ExecuteNonQuerySync("ALTER TABLE `characterbuff` ADD INDEX(`characterId`);");
@@ -210,30 +212,30 @@ namespace MultiplayerARPG.MMO
                 ExecuteNonQuerySync("ALTER TABLE `storageitem` ADD INDEX(`storageOwnerId`);");
                 // Insert migrate history
                 InsertMigrationId(migrationId);
-                Logging.Log($"Migrated to {migrationId}");
+                Logging.Log(LogTag, $"Migrated to {migrationId}");
             }
             migrationId = "1.63b";
             if (!HasMigrationId(migrationId))
             {
-                Logging.Log($"Migrating up to {migrationId}");
+                Logging.Log(LogTag, $"Migrating up to {migrationId}");
                 ExecuteNonQuerySync("ALTER TABLE `characters` ADD `lastDeadTime` INT NOT NULL DEFAULT '0' AFTER `mountDataId`;");
                 // Insert migrate history
                 InsertMigrationId(migrationId);
-                Logging.Log($"Migrated to {migrationId}");
+                Logging.Log(LogTag, $"Migrated to {migrationId}");
             }
             migrationId = "1.65d";
             if (!HasMigrationId(migrationId))
             {
-                Logging.Log($"Migrating up to {migrationId}");
+                Logging.Log(LogTag, $"Migrating up to {migrationId}");
                 ExecuteNonQuerySync("ALTER TABLE `characters` CHANGE `statPoint` `statPoint` FLOAT NOT NULL DEFAULT '0', CHANGE `skillPoint` `skillPoint` FLOAT NOT NULL DEFAULT '0';");
                 // Insert migrate history
                 InsertMigrationId(migrationId);
-                Logging.Log($"Migrated to {migrationId}");
+                Logging.Log(LogTag, $"Migrated to {migrationId}");
             }
             migrationId = "1.67";
             if (!HasMigrationId(migrationId))
             {
-                Logging.Log($"Migrating up to {migrationId}");
+                Logging.Log(LogTag, $"Migrating up to {migrationId}");
                 ExecuteNonQuerySync("ALTER TABLE `guild` ADD `guildMessage2` VARCHAR(160) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL AFTER `guildMessage`;");
                 ExecuteNonQuerySync("ALTER TABLE `guild` ADD `score` INT(11) NOT NULL DEFAULT '0' AFTER `gold`;");
                 ExecuteNonQuerySync("ALTER TABLE `guild` ADD `optionId1` INT(11) NOT NULL DEFAULT '0' AFTER `score`;");
@@ -247,33 +249,33 @@ namespace MultiplayerARPG.MMO
                 ExecuteNonQuerySync("ALTER TABLE `guild` ADD `maxMembers` INT(11) NOT NULL DEFAULT '0' AFTER `currentMembers`;");
                 // Insert migrate history
                 InsertMigrationId(migrationId);
-                Logging.Log($"Migrated to {migrationId}");
+                Logging.Log(LogTag, $"Migrated to {migrationId}");
             }
             migrationId = "1.67b";
             if (!HasMigrationId(migrationId))
             {
-                Logging.Log($"Migrating up to {migrationId}");
+                Logging.Log(LogTag, $"Migrating up to {migrationId}");
                 ExecuteNonQuerySync("ALTER TABLE `mail` CHANGE `gold` `gold` INT(11) NOT NULL DEFAULT '0';");
                 ExecuteNonQuerySync("ALTER TABLE `mail` ADD `cash` INT(11) NOT NULL DEFAULT '0' AFTER `gold`;");
                 ExecuteNonQuerySync("ALTER TABLE `guild` DROP `optionId1`, DROP `optionId2`, DROP `optionId3`, DROP `optionId4`, DROP `optionId5`;");
                 ExecuteNonQuerySync("ALTER TABLE `guild` ADD `options` TEXT CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL AFTER `score`;");
                 // Insert migrate history
                 InsertMigrationId(migrationId);
-                Logging.Log($"Migrated to {migrationId}");
+                Logging.Log(LogTag, $"Migrated to {migrationId}");
             }
             migrationId = "1.69";
             if (!HasMigrationId(migrationId))
             {
-                Logging.Log($"Migrating up to {migrationId}");
+                Logging.Log(LogTag, $"Migrating up to {migrationId}");
                 ExecuteNonQuerySync("ALTER TABLE `characterquest` ADD `isTracking` TINYINT(1) NOT NULL DEFAULT '0' AFTER `isComplete`;");
                 // Insert migrate history
                 InsertMigrationId(migrationId);
-                Logging.Log($"Migrated to {migrationId}");
+                Logging.Log(LogTag, $"Migrated to {migrationId}");
             }
             migrationId = "1.70";
             if (!HasMigrationId(migrationId))
             {
-                Logging.Log($"Migrating up to {migrationId}");
+                Logging.Log(LogTag, $"Migrating up to {migrationId}");
                 ExecuteNonQuerySync("ALTER TABLE `characters` CHANGE `lastDeadTime` `lastDeadTime` BIGINT NOT NULL DEFAULT '0';");
                 ExecuteNonQuerySync("ALTER TABLE `characters` ADD `unmuteTime` BIGINT NOT NULL DEFAULT '0' AFTER `lastDeadTime`;");
                 ExecuteNonQuerySync("ALTER TABLE `characteritem` ADD `expireTime` BIGINT NOT NULL DEFAULT '0' AFTER `lockRemainsDuration`;");
@@ -284,12 +286,12 @@ namespace MultiplayerARPG.MMO
                 ExecuteNonQuerySync("ALTER TABLE `userlogin` CHANGE `password` `password` VARCHAR(72) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL;");
                 // Insert migrate history
                 InsertMigrationId(migrationId);
-                Logging.Log($"Migrated to {migrationId}");
+                Logging.Log(LogTag, $"Migrated to {migrationId}");
             }
             migrationId = "1.71";
             if (!HasMigrationId(migrationId))
             {
-                Logging.Log($"Migrating up to {migrationId}");
+                Logging.Log(LogTag, $"Migrating up to {migrationId}");
                 ExecuteNonQuerySync("ALTER TABLE `buildings` ADD `extraData` TEXT CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL AFTER `creatorName`;");
                 ExecuteNonQuerySync("CREATE TABLE `summonbuffs` (" +
                     "`id` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL," +
@@ -307,75 +309,75 @@ namespace MultiplayerARPG.MMO
                 ExecuteNonQuerySync("ALTER TABLE `summonbuffs` ADD KEY (`buffId`);");
                 // Insert migrate history
                 InsertMigrationId(migrationId);
-                Logging.Log($"Migrated to {migrationId}");
+                Logging.Log(LogTag, $"Migrated to {migrationId}");
             }
             migrationId = "1.71b";
             if (!HasMigrationId(migrationId))
             {
-                Logging.Log($"Migrating up to {migrationId}");
+                Logging.Log(LogTag, $"Migrating up to {migrationId}");
                 ExecuteNonQuerySync("ALTER TABLE `userlogin` ADD `isEmailVerified` tinyint(1) NOT NULL DEFAULT '0' AFTER `email`;");
                 // Insert migrate history
                 InsertMigrationId(migrationId);
-                Logging.Log($"Migrated to {migrationId}");
+                Logging.Log(LogTag, $"Migrated to {migrationId}");
             }
             migrationId = "1.72d";
             if (!HasMigrationId(migrationId))
             {
-                Logging.Log($"Migrating up to {migrationId}");
+                Logging.Log(LogTag, $"Migrating up to {migrationId}");
                 ExecuteNonQuerySync("ALTER TABLE `characteritem` CHANGE `randomSeed` `randomSeed` INT NOT NULL DEFAULT '0';");
                 // Insert migrate history
                 InsertMigrationId(migrationId);
-                Logging.Log($"Migrated to {migrationId}");
+                Logging.Log(LogTag, $"Migrated to {migrationId}");
             }
             migrationId = "1.73";
             if (!HasMigrationId(migrationId))
             {
-                Logging.Log($"Migrating up to {migrationId}");
+                Logging.Log(LogTag, $"Migrating up to {migrationId}");
                 ExecuteNonQuerySync("ALTER TABLE `storageitem` CHANGE `randomSeed` `randomSeed` INT NOT NULL DEFAULT '0';");
                 // Insert migrate history
                 InsertMigrationId(migrationId);
-                Logging.Log($"Migrated to {migrationId}");
+                Logging.Log(LogTag, $"Migrated to {migrationId}");
             }
             migrationId = "1.76";
             if (!HasMigrationId(migrationId))
             {
-                Logging.Log($"Migrating up to {migrationId}");
+                Logging.Log(LogTag, $"Migrating up to {migrationId}");
                 ExecuteNonQuerySync("ALTER TABLE `friend` ADD `state` tinyint(1) NOT NULL DEFAULT '0' AFTER `characterId2`;");
                 // Insert migrate history
                 InsertMigrationId(migrationId);
-                Logging.Log($"Migrated to {migrationId}");
+                Logging.Log(LogTag, $"Migrated to {migrationId}");
             }
             migrationId = "1.77";
             if (!HasMigrationId(migrationId))
             {
-                Logging.Log($"Migrating up to {migrationId}");
+                Logging.Log(LogTag, $"Migrating up to {migrationId}");
                 ExecuteNonQuerySync("CREATE TABLE `statistic` (`userCount` INT NOT NULL DEFAULT '0' ) ENGINE = InnoDB DEFAULT CHARSET = utf8 COLLATE = utf8_unicode_ci");
                 // Insert migrate history
                 InsertMigrationId(migrationId);
-                Logging.Log($"Migrated to {migrationId}");
+                Logging.Log(LogTag, $"Migrated to {migrationId}");
             }
             migrationId = "1.78";
             if (!HasMigrationId(migrationId))
             {
-                Logging.Log($"Migrating up to {migrationId}");
+                Logging.Log(LogTag, $"Migrating up to {migrationId}");
                 ExecuteNonQuerySync("ALTER TABLE `characters` ADD `iconDataId` INT NOT NULL DEFAULT '0' AFTER `mountDataId`, ADD `frameDataId` INT NOT NULL DEFAULT '0' AFTER `iconDataId`, ADD `titleDataId` INT NOT NULL DEFAULT '0' AFTER `frameDataId`;");
                 // Insert migrate history
                 InsertMigrationId(migrationId);
-                Logging.Log($"Migrated to {migrationId}");
+                Logging.Log(LogTag, $"Migrated to {migrationId}");
             }
             migrationId = "1.78b";
             if (!HasMigrationId(migrationId))
             {
-                Logging.Log($"Migrating up to {migrationId}");
+                Logging.Log(LogTag, $"Migrating up to {migrationId}");
                 ExecuteNonQuerySync("ALTER TABLE `storageitem` CHANGE `randomSeed` `randomSeed` INT(11) NOT NULL DEFAULT '0';");
                 // Insert migrate history
                 InsertMigrationId(migrationId);
-                Logging.Log($"Migrated to {migrationId}");
+                Logging.Log(LogTag, $"Migrated to {migrationId}");
             }
             migrationId = "1.79";
             if (!HasMigrationId(migrationId))
             {
-                Logging.Log($"Migrating up to {migrationId}");
+                Logging.Log(LogTag, $"Migrating up to {migrationId}");
                 ExecuteNonQuerySync("ALTER TABLE `characterattribute` DROP `idx`;");
                 ExecuteNonQuerySync("ALTER TABLE `charactercurrency` DROP `idx`;");
                 ExecuteNonQuerySync("ALTER TABLE `characterquest` DROP `idx`;");
@@ -383,7 +385,7 @@ namespace MultiplayerARPG.MMO
                 ExecuteNonQuerySync("ALTER TABLE `statistic` ADD `id` INT NOT NULL FIRST, ADD PRIMARY KEY(`id`);");
                 // Insert migrate history
                 InsertMigrationId(migrationId);
-                Logging.Log($"Migrated to {migrationId}");
+                Logging.Log(LogTag, $"Migrated to {migrationId}");
             }
 
         }
@@ -421,7 +423,7 @@ namespace MultiplayerARPG.MMO
             }
             catch (MySqlException ex)
             {
-                Logging.LogException(ex);
+                Logging.LogException(LogTag, ex);
             }
         }
 
@@ -433,7 +435,7 @@ namespace MultiplayerARPG.MMO
             }
             catch (MySqlException ex)
             {
-                Logging.LogException(ex);
+                Logging.LogException(LogTag, ex);
             }
         }
 
@@ -472,7 +474,7 @@ namespace MultiplayerARPG.MMO
                 }
                 catch (MySqlException ex)
                 {
-                    Logging.LogException(ex);
+                    Logging.LogException(LogTag, ex);
                 }
             }
             if (createLocalConnection)
@@ -515,7 +517,7 @@ namespace MultiplayerARPG.MMO
                 }
                 catch (MySqlException ex)
                 {
-                    Logging.LogException(ex);
+                    Logging.LogException(LogTag, ex);
                 }
             }
             if (createLocalConnection)
@@ -557,7 +559,7 @@ namespace MultiplayerARPG.MMO
                 }
                 catch (MySqlException ex)
                 {
-                    Logging.LogException(ex);
+                    Logging.LogException(LogTag, ex);
                 }
             }
             if (createLocalConnection)
@@ -599,7 +601,7 @@ namespace MultiplayerARPG.MMO
                 }
                 catch (MySqlException ex)
                 {
-                    Logging.LogException(ex);
+                    Logging.LogException(LogTag, ex);
                 }
             }
             if (createLocalConnection)
@@ -641,7 +643,7 @@ namespace MultiplayerARPG.MMO
                 }
                 catch (MySqlException ex)
                 {
-                    Logging.LogException(ex);
+                    Logging.LogException(LogTag, ex);
                 }
             }
             if (createLocalConnection)
@@ -683,7 +685,7 @@ namespace MultiplayerARPG.MMO
                 }
                 catch (MySqlException ex)
                 {
-                    Logging.LogException(ex);
+                    Logging.LogException(LogTag, ex);
                 }
             }
             if (createLocalConnection)
@@ -725,7 +727,7 @@ namespace MultiplayerARPG.MMO
                 }
                 catch (MySqlException ex)
                 {
-                    Logging.LogException(ex);
+                    Logging.LogException(LogTag, ex);
                 }
             }
             if (createLocalConnection)
@@ -766,7 +768,7 @@ namespace MultiplayerARPG.MMO
                 }
                 catch (MySqlException ex)
                 {
-                    Logging.LogException(ex);
+                    Logging.LogException(LogTag, ex);
                 }
             }
             if (createLocalConnection)

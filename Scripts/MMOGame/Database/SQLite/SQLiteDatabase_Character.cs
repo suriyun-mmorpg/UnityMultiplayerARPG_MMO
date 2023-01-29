@@ -74,8 +74,8 @@ namespace MultiplayerARPG.MMO
             }
             catch (System.Exception ex)
             {
-                Logging.LogError(ToString(), "Transaction, Error occurs while filling character relates data");
-                Logging.LogException(ToString(), ex);
+                Logging.LogError(LogTag, "Transaction, Error occurs while filling character relates data");
+                Logging.LogException(LogTag, ex);
                 transaction.Rollback();
             }
             transaction.Dispose();
@@ -361,8 +361,8 @@ namespace MultiplayerARPG.MMO
                 }
                 catch (System.Exception ex)
                 {
-                    Logging.LogError(ToString(), "Transaction, Error occurs while deleting character: " + id);
-                    Logging.LogException(ToString(), ex);
+                    Logging.LogError(LogTag, "Transaction, Error occurs while deleting character: " + id);
+                    Logging.LogException(LogTag, ex);
                     transaction.Rollback();
                 }
                 transaction.Dispose();
