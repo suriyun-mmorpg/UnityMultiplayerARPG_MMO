@@ -1,16 +1,10 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using UnityEngine;
+﻿using UnityEngine;
 using LiteNetLibManager;
 using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
 using ZLogger;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Logging.Configuration;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.DependencyInjection;
 
 public class LogGUI : MonoBehaviour
 {
@@ -50,9 +44,10 @@ public class LogGUI : MonoBehaviour
         {
             builder.SetMinimumLevel(LogLevel.Trace);
 #if !UNITY_SERVER || DEVELOPMENT_BUILD
-            builder.AddConfiguration();
-            builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<ILoggerProvider, LogGUIProvider>(x => new LogGUIProvider(this, x.GetService<IOptions<ZLoggerOptions>>())));
-            LoggerProviderOptions.RegisterProviderOptions<ZLoggerOptions, LogGUIProvider>(builder.Services);
+            builder.AddZLoggerUnityDebug(options =>
+            {
+                options.PrefixFormatter = LogManager.PrefixFormatterConfigure;
+            });
 #endif
             builder.AddZLoggerFile($"{logFolder}/{fileName}.{logExtension}", options =>
             {
@@ -63,16 +58,12 @@ public class LogGUI : MonoBehaviour
 
     private void OnEnable()
     {
-#if !UNITY_SERVER || DEVELOPMENT_BUILD
         Application.logMessageReceivedThreaded += HandleLog;
-#endif
     }
 
     private void OnDisable()
     {
-#if !UNITY_SERVER || DEVELOPMENT_BUILD
         Application.logMessageReceivedThreaded -= HandleLog;
-#endif
     }
 
     private void HandleLog(LogType type, string logString)
@@ -107,6 +98,25 @@ public class LogGUI : MonoBehaviour
     public void HandleLog(string condition, string stackTrace, LogType type)
     {
         HandleLog(type, condition);
+        switch (type)
+        {
+            case LogType.Log:
+                if (!LogManager.IsLoggerDisposed)
+                    Logging.Log(condition);
+                break;
+            case LogType.Exception:
+                if (!LogManager.IsErrorLoggerDisposed)
+                    Logging.LogError(condition + "\n" + stackTrace);
+                break;
+            case LogType.Error:
+                if (!LogManager.IsErrorLoggerDisposed)
+                    Logging.LogError(condition + "\n" + stackTrace);
+                break;
+            case LogType.Warning:
+                if (!LogManager.IsWarningLoggerDisposed)
+                    Logging.LogWarning(condition);
+                break;
+        }
     }
 
 #if !UNITY_SERVER || DEVELOPMENT_BUILD
