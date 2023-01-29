@@ -34,9 +34,19 @@ public class LogGUI : MonoBehaviour
     private bool loggingEnabled = false;
 #endif
 
-    public void SetupLogger(string logName)
+    public void SetupLogger(string fileName)
     {
-        LogManager.LoggerFactory = UnityLoggerFactory.Create(builder =>
+        LogManager.DefaultLoggerManager = CreateLoggerManager($"{fileName}.info");
+        LogManager.ErrorLoggerManager = CreateLoggerManager($"{fileName}.err");
+        LogManager.WarningLoggerManager = CreateLoggerManager($"{fileName}.warn");
+#if !UNITY_SERVER || DEVELOPMENT_BUILD
+        loggingEnabled = true;
+#endif
+    }
+
+    private LoggerManager CreateLoggerManager(string fileName)
+    {
+        return new LoggerManager(UnityLoggerFactory.Create(builder =>
         {
             builder.SetMinimumLevel(LogLevel.Trace);
 #if !UNITY_SERVER || DEVELOPMENT_BUILD
@@ -44,14 +54,11 @@ public class LogGUI : MonoBehaviour
             builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<ILoggerProvider, LogGUIProvider>(x => new LogGUIProvider(this, x.GetService<IOptions<ZLoggerOptions>>())));
             LoggerProviderOptions.RegisterProviderOptions<ZLoggerOptions, LogGUIProvider>(builder.Services);
 #endif
-            builder.AddZLoggerFile($"{logFolder}/{logName}.{logExtension}", options =>
+            builder.AddZLoggerFile($"{logFolder}/{fileName}.{logExtension}", options =>
             {
                 options.PrefixFormatter = LogManager.PrefixFormatterConfigure;
             });
-        });
-#if !UNITY_SERVER || DEVELOPMENT_BUILD
-        loggingEnabled = true;
-#endif
+        }));
     }
 
     private void OnEnable()
