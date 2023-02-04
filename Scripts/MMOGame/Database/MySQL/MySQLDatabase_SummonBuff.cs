@@ -7,6 +7,25 @@ namespace MultiplayerARPG.MMO
 {
     public partial class MySQLDatabase
     {
+        private void CreateSummonBuff(MySqlConnection connection, MySqlTransaction transaction, HashSet<string> insertedIds, string characterId, CharacterBuff summonBuff)
+        {
+            string id = summonBuff.id;
+            if (insertedIds.Contains(id))
+            {
+                Logging.LogWarning($"Summon buff {id}, for character {characterId}, already inserted");
+                return;
+            }
+            insertedIds.Add(id);
+            ExecuteNonQuerySync(connection, transaction, "INSERT INTO summonbuffs (id, characterId, buffId, type, dataId, level, buffRemainsDuration) VALUES (@id, @characterId, @buffId, @type, @dataId, @level, @buffRemainsDuration)",
+                new MySqlParameter("@id", id),
+                new MySqlParameter("@characterId", characterId),
+                new MySqlParameter("@buffId", summonBuff.id),
+                new MySqlParameter("@type", (byte)summonBuff.type),
+                new MySqlParameter("@dataId", summonBuff.dataId),
+                new MySqlParameter("@level", summonBuff.level),
+                new MySqlParameter("@buffRemainsDuration", summonBuff.buffRemainsDuration));
+        }
+
         private bool ReadSummonBuff(MySqlDataReader reader, out CharacterBuff result)
         {
             if (reader.Read())
@@ -21,6 +40,11 @@ namespace MultiplayerARPG.MMO
             }
             result = CharacterBuff.Empty;
             return false;
+        }
+
+        public void DeleteSummonBuff(MySqlConnection connection, MySqlTransaction transaction, string characterId)
+        {
+            ExecuteNonQuerySync(connection, transaction, "DELETE FROM summonbuffs WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
         }
 
         public override List<CharacterBuff> GetSummonBuffs(string characterId)
@@ -45,17 +69,12 @@ namespace MultiplayerARPG.MMO
             MySqlTransaction transaction = connection.BeginTransaction();
             try
             {
-                ExecuteNonQuerySync(connection, transaction, "DELETE FROM summonbuffs WHERE characterId=@characterId", new MySqlParameter("@characterId", characterId));
-                foreach (CharacterBuff summonBuff in summonBuffs)
+                DeleteSummonBuff(connection, transaction, characterId);
+                HashSet<string> insertedIds = new HashSet<string>();
+                int i;
+                for (i = 0; i < summonBuffs.Count; ++i)
                 {
-                    ExecuteNonQuerySync(connection, transaction, "INSERT INTO summonbuffs (id, characterId, buffId, type, dataId, level, buffRemainsDuration) VALUES (@id, @characterId, @buffId, @type, @dataId, @level, @buffRemainsDuration)",
-                        new MySqlParameter("@id", characterId + "_" + summonBuff.id),
-                        new MySqlParameter("@characterId", characterId),
-                        new MySqlParameter("@buffId", summonBuff.id),
-                        new MySqlParameter("@type", (byte)summonBuff.type),
-                        new MySqlParameter("@dataId", summonBuff.dataId),
-                        new MySqlParameter("@level", summonBuff.level),
-                        new MySqlParameter("@buffRemainsDuration", summonBuff.buffRemainsDuration));
+                    CreateSummonBuff(connection, transaction, insertedIds, characterId, summonBuffs[i]);
                 }
                 transaction.Commit();
             }

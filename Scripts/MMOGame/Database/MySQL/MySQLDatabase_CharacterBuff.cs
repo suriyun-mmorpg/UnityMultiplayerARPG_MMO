@@ -1,5 +1,7 @@
 ﻿#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
 using System.Collections.Generic;
+using Cysharp.Text;
+using LiteNetLibManager;
 using MySqlConnector;
 
 namespace MultiplayerARPG.MMO
@@ -22,10 +24,17 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public void CreateCharacterBuff(MySqlConnection connection, MySqlTransaction transaction, string characterId, CharacterBuff characterBuff)
+        public void CreateCharacterBuff(MySqlConnection connection, MySqlTransaction transaction, HashSet<string> insertedIds, string characterId, CharacterBuff characterBuff)
         {
+            string id = characterBuff.id;
+            if (insertedIds.Contains(id))
+            {
+                Logging.LogWarning($"Buff {id}, for character {characterId}, already inserted");
+                return;
+            }
+            insertedIds.Add(id);
             ExecuteNonQuerySync(connection, transaction, "INSERT INTO characterbuff (id, characterId, type, dataId, level, buffRemainsDuration) VALUES (@id, @characterId, @type, @dataId, @level, @buffRemainsDuration)",
-                new MySqlParameter("@id", characterBuff.id),
+                new MySqlParameter("@id", id),
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@type", (byte)characterBuff.type),
                 new MySqlParameter("@dataId", characterBuff.dataId),

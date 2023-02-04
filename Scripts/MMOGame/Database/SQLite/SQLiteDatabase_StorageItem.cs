@@ -7,11 +7,17 @@ namespace MultiplayerARPG.MMO
 {
     public partial class SQLiteDatabase
     {
-        private void CreateStorageItem(SqliteTransaction transaction, int idx, StorageType storageType, string storageOwnerId, CharacterItem characterItem)
+        private void CreateStorageItem(SqliteTransaction transaction, HashSet<string> insertedIds, int idx, StorageType storageType, string storageOwnerId, CharacterItem characterItem)
         {
+            string id = characterItem.id;
+            if (insertedIds.Contains(id))
+            {
+                Logging.LogWarning($"Storage item {id}, storage type {storageType}, owner {storageOwnerId}, already inserted");
+                return;
+            }
             if (string.IsNullOrEmpty(characterItem.id))
                 return;
-
+            insertedIds.Add(id);
             ExecuteNonQuery(transaction, "INSERT INTO storageitem (id, idx, storageType, storageOwnerId, dataId, level, amount, durability, exp, lockRemainsDuration, expireTime, randomSeed, ammo, sockets) VALUES (@id, @idx, @storageType, @storageOwnerId, @dataId, @level, @amount, @durability, @exp, @lockRemainsDuration, @expireTime, @randomSeed, @ammo, @sockets)",
                 new SqliteParameter("@id", characterItem.id),
                 new SqliteParameter("@idx", idx),
@@ -73,9 +79,11 @@ namespace MultiplayerARPG.MMO
             try
             {
                 DeleteStorageItems(transaction, storageType, storageOwnerId);
-                for (int i = 0; i < characterItems.Count; ++i)
+                HashSet<string> insertedIds = new HashSet<string>();
+                int i;
+                for (i = 0; i < characterItems.Count; ++i)
                 {
-                    CreateStorageItem(transaction, i, storageType, storageOwnerId, characterItems[i]);
+                    CreateStorageItem(transaction, insertedIds, i, storageType, storageOwnerId, characterItems[i]);
                 }
                 transaction.Commit();
             }

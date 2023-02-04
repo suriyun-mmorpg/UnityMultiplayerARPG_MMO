@@ -1,5 +1,7 @@
 ﻿#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
 using System.Collections.Generic;
+using Cysharp.Text;
+using LiteNetLibManager;
 using MySqlConnector;
 
 namespace MultiplayerARPG.MMO
@@ -19,10 +21,17 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public void CreateCharacterSkill(MySqlConnection connection, MySqlTransaction transaction, int idx, string characterId, CharacterSkill characterSkill)
+        public void CreateCharacterSkill(MySqlConnection connection, MySqlTransaction transaction, HashSet<string> insertedIds, string characterId, CharacterSkill characterSkill)
         {
+            string id = ZString.Concat(characterId, "_", characterSkill.dataId);
+            if (insertedIds.Contains(id))
+            {
+                Logging.LogWarning($"Skill {id}, for character {characterId}, already inserted");
+                return;
+            }
+            insertedIds.Add(id);
             ExecuteNonQuerySync(connection, transaction, "INSERT INTO characterskill (id, characterId, dataId, level) VALUES (@id, @characterId, @dataId, @level)",
-                new MySqlParameter("@id", characterId + "_" + idx),
+                new MySqlParameter("@id", id),
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@dataId", characterSkill.dataId),
                 new MySqlParameter("@level", characterSkill.level));

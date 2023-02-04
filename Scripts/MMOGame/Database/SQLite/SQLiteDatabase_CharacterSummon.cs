@@ -1,5 +1,7 @@
 ﻿#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
 using System.Collections.Generic;
+using Cysharp.Text;
+using LiteNetLibManager;
 using Mono.Data.Sqlite;
 
 namespace MultiplayerARPG.MMO
@@ -24,10 +26,17 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public void CreateCharacterSummon(SqliteTransaction transaction, int idx, string characterId, CharacterSummon characterSummon)
+        public void CreateCharacterSummon(SqliteTransaction transaction, HashSet<string> insertedIds, int idx, string characterId, CharacterSummon characterSummon)
         {
+            string id = ZString.Concat(characterId, "_", idx);
+            if (insertedIds.Contains(id))
+            {
+                Logging.LogWarning($"Summon {id}, for character {characterId}, already inserted");
+                return;
+            }
+            insertedIds.Add(id);
             ExecuteNonQuery(transaction, "INSERT INTO charactersummon (id, characterId, type, dataId, summonRemainsDuration, level, exp, currentHp, currentMp) VALUES (@id, @characterId, @type, @dataId, @summonRemainsDuration, @level, @exp, @currentHp, @currentMp)",
-                new SqliteParameter("@id", characterId + "_" + characterSummon.type + "_" + idx),
+                new SqliteParameter("@id", id),
                 new SqliteParameter("@characterId", characterId),
                 new SqliteParameter("@type", (byte)characterSummon.type),
                 new SqliteParameter("@dataId", characterSummon.dataId),

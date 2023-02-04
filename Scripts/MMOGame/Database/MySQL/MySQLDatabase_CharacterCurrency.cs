@@ -1,5 +1,7 @@
 ﻿#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
 using System.Collections.Generic;
+using Cysharp.Text;
+using LiteNetLibManager;
 using MySqlConnector;
 
 namespace MultiplayerARPG.MMO
@@ -19,10 +21,17 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public void CreateCharacterCurrency(MySqlConnection connection, MySqlTransaction transaction, int idx, string characterId, CharacterCurrency characterCurrency)
+        public void CreateCharacterCurrency(MySqlConnection connection, MySqlTransaction transaction, HashSet<string> insertedIds, string characterId, CharacterCurrency characterCurrency)
         {
+            string id = ZString.Concat(characterId, "_", characterCurrency.dataId);
+            if (insertedIds.Contains(id))
+            {
+                Logging.LogWarning($"Currency {id}, for character {characterId}, already inserted");
+                return;
+            }
+            insertedIds.Add(id);
             ExecuteNonQuerySync(connection, transaction, "INSERT INTO charactercurrency (id, characterId, dataId, amount) VALUES (@id, @characterId, @dataId, @amount)",
-                new MySqlParameter("@id", characterId + "_" + idx),
+                new MySqlParameter("@id", id),
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@dataId", characterCurrency.dataId),
                 new MySqlParameter("@amount", characterCurrency.amount));

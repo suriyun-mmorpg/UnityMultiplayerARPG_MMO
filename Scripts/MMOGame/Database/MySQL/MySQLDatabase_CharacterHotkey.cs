@@ -1,5 +1,7 @@
 ﻿#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
 using System.Collections.Generic;
+using Cysharp.Text;
+using LiteNetLibManager;
 using MySqlConnector;
 
 namespace MultiplayerARPG.MMO
@@ -20,10 +22,17 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public void CreateCharacterHotkey(MySqlConnection connection, MySqlTransaction transaction, string characterId, CharacterHotkey characterHotkey)
+        public void CreateCharacterHotkey(MySqlConnection connection, MySqlTransaction transaction, HashSet<string> insertedIds, string characterId, CharacterHotkey characterHotkey)
         {
+            string id = ZString.Concat(characterId, "_", characterHotkey.hotkeyId);
+            if (insertedIds.Contains(id))
+            {
+                Logging.LogWarning($"Hotkey {id}, for character {characterId}, already inserted");
+                return;
+            }
+            insertedIds.Add(id);
             ExecuteNonQuerySync(connection, transaction, "INSERT INTO characterhotkey (id, characterId, hotkeyId, type, relateId) VALUES (@id, @characterId, @hotkeyId, @type, @relateId)",
-                new MySqlParameter("@id", characterId + "_" + characterHotkey.hotkeyId),
+                new MySqlParameter("@id", id),
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@hotkeyId", characterHotkey.hotkeyId),
                 new MySqlParameter("@type", characterHotkey.type),

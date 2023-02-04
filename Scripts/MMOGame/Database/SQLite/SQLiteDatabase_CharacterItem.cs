@@ -1,16 +1,23 @@
 ﻿#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
 using System.Collections.Generic;
+using LiteNetLibManager;
 using Mono.Data.Sqlite;
 
 namespace MultiplayerARPG.MMO
 {
     public partial class SQLiteDatabase
     {
-        private void CreateCharacterItem(SqliteTransaction transaction, int idx, string characterId, InventoryType inventoryType, CharacterItem characterItem)
+        private void CreateCharacterItem(SqliteTransaction transaction, HashSet<string> insertedIds, int idx, string characterId, InventoryType inventoryType, CharacterItem characterItem)
         {
+            string id = characterItem.id;
+            if (insertedIds.Contains(id))
+            {
+                Logging.LogWarning($"Item {id}, inventory type {inventoryType}, for character {characterId}, already inserted");
+                return;
+            }
             if (string.IsNullOrEmpty(characterItem.id))
                 return;
-
+            insertedIds.Add(id);
             ExecuteNonQuery(transaction, "INSERT INTO characteritem (id, idx, inventoryType, characterId, dataId, level, amount, equipSlotIndex, durability, exp, lockRemainsDuration, expireTime, randomSeed, ammo, sockets) VALUES (@id, @idx, @inventoryType, @characterId, @dataId, @level, @amount, @equipSlotIndex, @durability, @exp, @lockRemainsDuration, @expireTime, @randomSeed, @ammo, @sockets)",
                 new SqliteParameter("@id", characterItem.id),
                 new SqliteParameter("@idx", idx),
@@ -96,15 +103,15 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public void CreateCharacterEquipWeapons(SqliteTransaction transaction, byte equipWeaponSet, string characterId, EquipWeapons equipWeapons)
+        public void CreateCharacterEquipWeapons(SqliteTransaction transaction, HashSet<string> insertedIds, int equipWeaponSet, string characterId, EquipWeapons equipWeapons)
         {
-            CreateCharacterItem(transaction, equipWeaponSet, characterId, InventoryType.EquipWeaponRight, equipWeapons.rightHand);
-            CreateCharacterItem(transaction, equipWeaponSet, characterId, InventoryType.EquipWeaponLeft, equipWeapons.leftHand);
+            CreateCharacterItem(transaction, insertedIds, equipWeaponSet, characterId, InventoryType.EquipWeaponRight, equipWeapons.rightHand);
+            CreateCharacterItem(transaction, insertedIds, equipWeaponSet, characterId, InventoryType.EquipWeaponLeft, equipWeapons.leftHand);
         }
 
-        public void CreateCharacterEquipItem(SqliteTransaction transaction, int idx, string characterId, CharacterItem characterItem)
+        public void CreateCharacterEquipItem(SqliteTransaction transaction, HashSet<string> insertedIds, int idx, string characterId, CharacterItem characterItem)
         {
-            CreateCharacterItem(transaction, idx, characterId, InventoryType.EquipItems, characterItem);
+            CreateCharacterItem(transaction, insertedIds, idx, characterId, InventoryType.EquipItems, characterItem);
         }
 
         public List<CharacterItem> ReadCharacterEquipItems(string characterId)
@@ -112,9 +119,9 @@ namespace MultiplayerARPG.MMO
             return ReadCharacterItems(characterId, InventoryType.EquipItems);
         }
 
-        public void CreateCharacterNonEquipItem(SqliteTransaction transaction, int idx, string characterId, CharacterItem characterItem)
+        public void CreateCharacterNonEquipItem(SqliteTransaction transaction, HashSet<string> insertedIds, int idx, string characterId, CharacterItem characterItem)
         {
-            CreateCharacterItem(transaction, idx, characterId, InventoryType.NonEquipItems, characterItem);
+            CreateCharacterItem(transaction, insertedIds, idx, characterId, InventoryType.NonEquipItems, characterItem);
         }
 
         public List<CharacterItem> ReadCharacterNonEquipItems(string characterId)

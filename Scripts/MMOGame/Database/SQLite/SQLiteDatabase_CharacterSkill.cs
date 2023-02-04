@@ -1,5 +1,7 @@
 ﻿#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
 using System.Collections.Generic;
+using Cysharp.Text;
+using LiteNetLibManager;
 using Mono.Data.Sqlite;
 
 namespace MultiplayerARPG.MMO
@@ -19,10 +21,17 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public void CreateCharacterSkill(SqliteTransaction transaction, int idx, string characterId, CharacterSkill characterSkill)
+        public void CreateCharacterSkill(SqliteTransaction transaction, HashSet<string> insertedIds, int idx, string characterId, CharacterSkill characterSkill)
         {
+            string id = ZString.Concat(characterId, "_", characterSkill.dataId);
+            if (insertedIds.Contains(id))
+            {
+                Logging.LogWarning($"Skill {id}, for character {characterId}, already inserted");
+                return;
+            }
+            insertedIds.Add(id);
             ExecuteNonQuery(transaction, "INSERT INTO characterskill (id, idx, characterId, dataId, level, coolDownRemainsDuration) VALUES (@id, @idx, @characterId, @dataId, @level, 0)",
-                new SqliteParameter("@id", characterId + "_" + idx),
+                new SqliteParameter("@id", id),
                 new SqliteParameter("@idx", idx),
                 new SqliteParameter("@characterId", characterId),
                 new SqliteParameter("@dataId", characterSkill.dataId),

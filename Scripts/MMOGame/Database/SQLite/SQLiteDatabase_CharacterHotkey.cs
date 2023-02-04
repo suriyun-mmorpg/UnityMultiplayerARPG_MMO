@@ -1,5 +1,7 @@
 ﻿#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
 using System.Collections.Generic;
+using Cysharp.Text;
+using LiteNetLibManager;
 using Mono.Data.Sqlite;
 
 namespace MultiplayerARPG.MMO
@@ -20,10 +22,17 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public void CreateCharacterHotkey(SqliteTransaction transaction, string characterId, CharacterHotkey characterHotkey)
+        public void CreateCharacterHotkey(SqliteTransaction transaction, HashSet<string> insertedIds, string characterId, CharacterHotkey characterHotkey)
         {
+            string id = ZString.Concat(characterId, "_", characterHotkey.hotkeyId);
+            if (insertedIds.Contains(id))
+            {
+                Logging.LogWarning($"Hotkey {id}, for character {characterId}, already inserted");
+                return;
+            }
+            insertedIds.Add(id);
             ExecuteNonQuery(transaction, "INSERT INTO characterhotkey (id, characterId, hotkeyId, type, relateId) VALUES (@id, @characterId, @hotkeyId, @type, @relateId)",
-                new SqliteParameter("@id", characterId + "_" + characterHotkey.hotkeyId),
+                new SqliteParameter("@id", id),
                 new SqliteParameter("@characterId", characterId),
                 new SqliteParameter("@hotkeyId", characterHotkey.hotkeyId),
                 new SqliteParameter("@type", characterHotkey.type),

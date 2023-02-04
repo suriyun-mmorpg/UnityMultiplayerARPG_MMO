@@ -7,6 +7,25 @@ namespace MultiplayerARPG.MMO
 {
     public partial class SQLiteDatabase
     {
+        private void CreateSummonBuff(SqliteTransaction transaction, HashSet<string> insertedIds, string characterId, CharacterBuff summonBuff)
+        {
+            string id = summonBuff.id;
+            if (insertedIds.Contains(id))
+            {
+                Logging.LogWarning($"Summon buff {id}, for character {characterId}, already inserted");
+                return;
+            }
+            insertedIds.Add(id);
+            ExecuteNonQuery(transaction, "INSERT INTO summonbuffs (id, characterId, buffId, type, dataId, level, buffRemainsDuration) VALUES (@id, @characterId, @buffId, @type, @dataId, @level, @buffRemainsDuration)",
+                new SqliteParameter("@id", id),
+                new SqliteParameter("@characterId", characterId),
+                new SqliteParameter("@buffId", summonBuff.id),
+                new SqliteParameter("@type", (byte)summonBuff.type),
+                new SqliteParameter("@dataId", summonBuff.dataId),
+                new SqliteParameter("@level", summonBuff.level),
+                new SqliteParameter("@buffRemainsDuration", summonBuff.buffRemainsDuration));
+        }
+
         private bool ReadSummonBuff(SqliteDataReader reader, out CharacterBuff result)
         {
             if (reader.Read())
@@ -21,6 +40,11 @@ namespace MultiplayerARPG.MMO
             }
             result = CharacterBuff.Empty;
             return false;
+        }
+
+        public void DeleteSummonBuff(SqliteTransaction transaction, string characterId)
+        {
+            ExecuteNonQuery(transaction, "DELETE FROM summonbuffs WHERE characterId=@characterId", new SqliteParameter("@characterId", characterId));
         }
 
         public override List<CharacterBuff> GetSummonBuffs(string characterId)
@@ -43,17 +67,12 @@ namespace MultiplayerARPG.MMO
             SqliteTransaction transaction = connection.BeginTransaction();
             try
             {
-                ExecuteNonQuery(transaction, "DELETE FROM summonbuffs WHERE characterId=@characterId", new SqliteParameter("@characterId", characterId));
-                foreach (CharacterBuff summonBuff in summonBuffs)
+                DeleteSummonBuff(transaction, characterId);
+                HashSet<string> insertedIds = new HashSet<string>();
+                int i;
+                for (i = 0; i < summonBuffs.Count; ++i)
                 {
-                    ExecuteNonQuery(transaction, "INSERT INTO summonbuffs (id, characterId, buffId, type, dataId, level, buffRemainsDuration) VALUES (@id, @characterId, @buffId, @type, @dataId, @level, @buffRemainsDuration)",
-                        new SqliteParameter("@id", characterId + "_" + summonBuff.id),
-                        new SqliteParameter("@characterId", characterId),
-                        new SqliteParameter("@buffId", summonBuff.id),
-                        new SqliteParameter("@type", (byte)summonBuff.type),
-                        new SqliteParameter("@dataId", summonBuff.dataId),
-                        new SqliteParameter("@level", summonBuff.level),
-                        new SqliteParameter("@buffRemainsDuration", summonBuff.buffRemainsDuration));
+                    CreateSummonBuff(transaction, insertedIds, characterId, summonBuffs[i]);
                 }
                 transaction.Commit();
             }

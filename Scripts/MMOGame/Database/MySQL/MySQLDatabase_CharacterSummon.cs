@@ -1,5 +1,7 @@
 ﻿#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
 using System.Collections.Generic;
+using Cysharp.Text;
+using LiteNetLibManager;
 using MySqlConnector;
 
 namespace MultiplayerARPG.MMO
@@ -24,8 +26,15 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public void CreateCharacterSummon(MySqlConnection connection, MySqlTransaction transaction, int idx, string characterId, CharacterSummon characterSummon)
+        public void CreateCharacterSummon(MySqlConnection connection, MySqlTransaction transaction, HashSet<string> insertedIds, int idx, string characterId, CharacterSummon characterSummon)
         {
+            string id = ZString.Concat(characterId, "_", idx);
+            if (insertedIds.Contains(id))
+            {
+                Logging.LogWarning($"Summon {id}, for character {characterId}, already inserted");
+                return;
+            }
+            insertedIds.Add(id);
             ExecuteNonQuerySync(connection, transaction, "INSERT INTO charactersummon (id, characterId, type, dataId, summonRemainsDuration, level, exp, currentHp, currentMp) VALUES (@id, @characterId, @type, @dataId, @summonRemainsDuration, @level, @exp, @currentHp, @currentMp)",
                 new MySqlParameter("@id", characterId + "_" + characterSummon.type + "_" + idx),
                 new MySqlParameter("@characterId", characterId),

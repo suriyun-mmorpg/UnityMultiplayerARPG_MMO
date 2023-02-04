@@ -1,5 +1,7 @@
 ﻿#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
 using System.Collections.Generic;
+using Cysharp.Text;
+using LiteNetLibManager;
 using MySqlConnector;
 
 namespace MultiplayerARPG.MMO
@@ -22,10 +24,17 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public void CreateCharacterQuest(MySqlConnection connection, MySqlTransaction transaction, int idx, string characterId, CharacterQuest characterQuest)
+        public void CreateCharacterQuest(MySqlConnection connection, MySqlTransaction transaction, HashSet<string> insertedIds, string characterId, CharacterQuest characterQuest)
         {
+            string id = ZString.Concat(characterId, "_", characterQuest.dataId);
+            if (insertedIds.Contains(id))
+            {
+                Logging.LogWarning($"Quest {id}, for character {characterId}, already inserted");
+                return;
+            }
+            insertedIds.Add(id);
             ExecuteNonQuerySync(connection, transaction, "INSERT INTO characterquest (id, characterId, dataId, isComplete, isTracking, killedMonsters, completedTasks) VALUES (@id, @characterId, @dataId, @isComplete, @isTracking, @killedMonsters, @completedTasks)",
-                new MySqlParameter("@id", characterId + "_" + idx),
+                new MySqlParameter("@id", id),
                 new MySqlParameter("@characterId", characterId),
                 new MySqlParameter("@dataId", characterQuest.dataId),
                 new MySqlParameter("@isComplete", characterQuest.isComplete),

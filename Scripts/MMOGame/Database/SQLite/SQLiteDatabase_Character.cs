@@ -25,50 +25,68 @@ namespace MultiplayerARPG.MMO
                 DeleteCharacterSkillUsages(transaction, characterId);
                 DeleteCharacterSummons(transaction, characterId);
 
+                HashSet<string> insertedIds = new HashSet<string>();
                 int i;
+                insertedIds.Clear();
                 for (i = 0; i < characterData.SelectableWeaponSets.Count; ++i)
                 {
-                    CreateCharacterEquipWeapons(transaction, (byte)i, characterData.Id, characterData.SelectableWeaponSets[i]);
+                    CreateCharacterEquipWeapons(transaction, insertedIds, i, characterData.Id, characterData.SelectableWeaponSets[i]);
                 }
                 for (i = 0; i < characterData.EquipItems.Count; ++i)
                 {
-                    CreateCharacterEquipItem(transaction, i, characterData.Id, characterData.EquipItems[i]);
+                    CreateCharacterEquipItem(transaction, insertedIds, i, characterData.Id, characterData.EquipItems[i]);
                 }
                 for (i = 0; i < characterData.NonEquipItems.Count; ++i)
                 {
-                    CreateCharacterNonEquipItem(transaction, i, characterData.Id, characterData.NonEquipItems[i]);
+                    CreateCharacterNonEquipItem(transaction, insertedIds, i, characterData.Id, characterData.NonEquipItems[i]);
                 }
+
+                insertedIds.Clear();
                 for (i = 0; i < characterData.Attributes.Count; ++i)
                 {
-                    CreateCharacterAttribute(transaction, i, characterData.Id, characterData.Attributes[i]);
+                    CreateCharacterAttribute(transaction, insertedIds, i, characterData.Id, characterData.Attributes[i]);
                 }
+
+                insertedIds.Clear();
                 for (i = 0; i < characterData.Currencies.Count; ++i)
                 {
-                    CreateCharacterCurrency(transaction, i, characterData.Id, characterData.Currencies[i]);
+                    CreateCharacterCurrency(transaction, insertedIds, i, characterData.Id, characterData.Currencies[i]);
                 }
+
+                insertedIds.Clear();
                 for (i = 0; i < characterData.Skills.Count; ++i)
                 {
-                    CreateCharacterSkill(transaction, i, characterData.Id, characterData.Skills[i]);
+                    CreateCharacterSkill(transaction, insertedIds, i, characterData.Id, characterData.Skills[i]);
                 }
+
+                insertedIds.Clear();
                 for (i = 0; i < characterData.SkillUsages.Count; ++i)
                 {
-                    CreateCharacterSkillUsage(transaction, characterData.Id, characterData.SkillUsages[i]);
+                    CreateCharacterSkillUsage(transaction, insertedIds, characterData.Id, characterData.SkillUsages[i]);
                 }
+
+                insertedIds.Clear();
                 for (i = 0; i < characterData.Summons.Count; ++i)
                 {
-                    CreateCharacterSummon(transaction, i, characterData.Id, characterData.Summons[i]);
+                    CreateCharacterSummon(transaction, insertedIds, i, characterData.Id, characterData.Summons[i]);
                 }
+
+                insertedIds.Clear();
                 for (i = 0; i < characterData.Quests.Count; ++i)
                 {
-                    CreateCharacterQuest(transaction, i, characterData.Id, characterData.Quests[i]);
+                    CreateCharacterQuest(transaction, insertedIds, i, characterData.Id, characterData.Quests[i]);
                 }
+
+                insertedIds.Clear();
                 for (i = 0; i < characterData.Buffs.Count; ++i)
                 {
-                    CreateCharacterBuff(transaction, characterData.Id, characterData.Buffs[i]);
+                    CreateCharacterBuff(transaction, insertedIds, characterData.Id, characterData.Buffs[i]);
                 }
+
+                insertedIds.Clear();
                 for (i = 0; i < characterData.Hotkeys.Count; ++i)
                 {
-                    CreateCharacterHotkey(transaction, characterData.Id, characterData.Hotkeys[i]);
+                    CreateCharacterHotkey(transaction, insertedIds, characterData.Id, characterData.Hotkeys[i]);
                 }
                 transaction.Commit();
             }

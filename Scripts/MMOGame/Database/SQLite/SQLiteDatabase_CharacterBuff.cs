@@ -1,5 +1,6 @@
 ﻿#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
 using System.Collections.Generic;
+using LiteNetLibManager;
 using Mono.Data.Sqlite;
 
 namespace MultiplayerARPG.MMO
@@ -22,10 +23,17 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public void CreateCharacterBuff(SqliteTransaction transaction, string characterId, CharacterBuff characterBuff)
+        public void CreateCharacterBuff(SqliteTransaction transaction, HashSet<string> insertedIds, string characterId, CharacterBuff characterBuff)
         {
+            string id = characterBuff.id;
+            if (insertedIds.Contains(id))
+            {
+                Logging.LogWarning($"Buff {id}, for character {characterId}, already inserted");
+                return;
+            }
+            insertedIds.Add(id);
             ExecuteNonQuery(transaction, "INSERT INTO characterbuff (id, characterId, type, dataId, level, buffRemainsDuration) VALUES (@id, @characterId, @type, @dataId, @level, @buffRemainsDuration)",
-                new SqliteParameter("@id", characterBuff.id),
+                new SqliteParameter("@id", id),
                 new SqliteParameter("@characterId", characterId),
                 new SqliteParameter("@type", (byte)characterBuff.type),
                 new SqliteParameter("@dataId", characterBuff.dataId),

@@ -1,16 +1,23 @@
 ﻿#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
 using System.Collections.Generic;
+using LiteNetLibManager;
 using MySqlConnector;
 
 namespace MultiplayerARPG.MMO
 {
     public partial class MySQLDatabase
     {
-        private void CreateCharacterItem(MySqlConnection connection, MySqlTransaction transaction, int idx, string characterId, InventoryType inventoryType, CharacterItem characterItem)
+        private void CreateCharacterItem(MySqlConnection connection, MySqlTransaction transaction, HashSet<string> insertedIds, int idx, string characterId, InventoryType inventoryType, CharacterItem characterItem)
         {
+            string id = characterItem.id;
+            if (insertedIds.Contains(id))
+            {
+                Logging.LogWarning($"Item {id}, inventory type {inventoryType}, for character {characterId}, already inserted");
+                return;
+            }
             if (string.IsNullOrEmpty(characterItem.id))
                 return;
-
+            insertedIds.Add(id);
             ExecuteNonQuerySync(connection, transaction, "INSERT INTO characteritem (id, idx, inventoryType, characterId, dataId, level, amount, equipSlotIndex, durability, exp, lockRemainsDuration, expireTime, randomSeed, ammo, sockets) VALUES (@id, @idx, @inventoryType, @characterId, @dataId, @level, @amount, @equipSlotIndex, @durability, @exp, @lockRemainsDuration, @expireTime, @randomSeed, @ammo, @sockets)",
                 new MySqlParameter("@id", characterItem.id),
                 new MySqlParameter("@idx", idx),
@@ -98,15 +105,15 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public void CreateCharacterEquipWeapons(MySqlConnection connection, MySqlTransaction transaction, byte equipWeaponSet, string characterId, EquipWeapons equipWeapons)
+        public void CreateCharacterEquipWeapons(MySqlConnection connection, MySqlTransaction transaction, HashSet<string> insertedIds, int equipWeaponSet, string characterId, EquipWeapons equipWeapons)
         {
-            CreateCharacterItem(connection, transaction, equipWeaponSet, characterId, InventoryType.EquipWeaponRight, equipWeapons.rightHand);
-            CreateCharacterItem(connection, transaction, equipWeaponSet, characterId, InventoryType.EquipWeaponLeft, equipWeapons.leftHand);
+            CreateCharacterItem(connection, transaction, insertedIds, equipWeaponSet, characterId, InventoryType.EquipWeaponRight, equipWeapons.rightHand);
+            CreateCharacterItem(connection, transaction, insertedIds, equipWeaponSet, characterId, InventoryType.EquipWeaponLeft, equipWeapons.leftHand);
         }
 
-        public void CreateCharacterEquipItem(MySqlConnection connection, MySqlTransaction transaction, int idx, string characterId, CharacterItem characterItem)
+        public void CreateCharacterEquipItem(MySqlConnection connection, MySqlTransaction transaction, HashSet<string> insertedIds, int idx, string characterId, CharacterItem characterItem)
         {
-            CreateCharacterItem(connection, transaction, idx, characterId, InventoryType.EquipItems, characterItem);
+            CreateCharacterItem(connection, transaction, insertedIds, idx, characterId, InventoryType.EquipItems, characterItem);
         }
 
         public List<CharacterItem> ReadCharacterEquipItems(string characterId, List<CharacterItem> result = null)
@@ -114,9 +121,9 @@ namespace MultiplayerARPG.MMO
             return ReadCharacterItems(characterId, InventoryType.EquipItems, result);
         }
 
-        public void CreateCharacterNonEquipItem(MySqlConnection connection, MySqlTransaction transaction, int idx, string characterId, CharacterItem characterItem)
+        public void CreateCharacterNonEquipItem(MySqlConnection connection, MySqlTransaction transaction, HashSet<string> insertedIds, int idx, string characterId, CharacterItem characterItem)
         {
-            CreateCharacterItem(connection, transaction, idx, characterId, InventoryType.NonEquipItems, characterItem);
+            CreateCharacterItem(connection, transaction, insertedIds, idx, characterId, InventoryType.NonEquipItems, characterItem);
         }
 
         public List<CharacterItem> ReadCharacterNonEquipItems(string characterId, List<CharacterItem> result = null)

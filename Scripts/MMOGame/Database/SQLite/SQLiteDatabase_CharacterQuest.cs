@@ -1,5 +1,7 @@
 ﻿#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
 using System.Collections.Generic;
+using Cysharp.Text;
+using LiteNetLibManager;
 using Mono.Data.Sqlite;
 
 namespace MultiplayerARPG.MMO
@@ -22,10 +24,17 @@ namespace MultiplayerARPG.MMO
             return false;
         }
 
-        public void CreateCharacterQuest(SqliteTransaction transaction, int idx, string characterId, CharacterQuest characterQuest)
+        public void CreateCharacterQuest(SqliteTransaction transaction, HashSet<string> insertedIds, int idx, string characterId, CharacterQuest characterQuest)
         {
+            string id = ZString.Concat(characterId, "_", characterQuest.dataId);
+            if (insertedIds.Contains(id))
+            {
+                Logging.LogWarning($"Quest {id}, for character {characterId}, already inserted");
+                return;
+            }
+            insertedIds.Add(id);
             ExecuteNonQuery(transaction, "INSERT INTO characterquest (id, idx, characterId, dataId, isComplete, isTracking, killedMonsters, completedTasks) VALUES (@id, @idx, @characterId, @dataId, @isComplete, @isTracking, @killedMonsters, @completedTasks)",
-                new SqliteParameter("@id", characterId + "_" + idx),
+                new SqliteParameter("@id", id),
                 new SqliteParameter("@idx", idx),
                 new SqliteParameter("@characterId", characterId),
                 new SqliteParameter("@dataId", characterQuest.dataId),
