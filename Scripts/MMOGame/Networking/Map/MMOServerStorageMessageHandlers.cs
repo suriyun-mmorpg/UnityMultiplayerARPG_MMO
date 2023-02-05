@@ -145,6 +145,7 @@ namespace MultiplayerARPG.MMO
             if (!updateResp.IsSuccess)
             {
                 SetStorageBusy(storageId, playerCharacterEntity, false);
+                Logging.LogError("Unable to update storage items when move item from storage");
                 result.InvokeError(new ResponseMoveItemFromStorageMessage()
                 {
                     message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
@@ -244,6 +245,7 @@ namespace MultiplayerARPG.MMO
             if (!updateResp.IsSuccess)
             {
                 SetStorageBusy(storageId, playerCharacterEntity, false);
+                Logging.LogError("Unable to update storage items when move item to storage");
                 result.InvokeError(new ResponseMoveItemToStorageMessage()
                 {
                     message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
@@ -368,6 +370,7 @@ namespace MultiplayerARPG.MMO
             if (!updateResp.IsSuccess)
             {
                 SetStorageBusy(storageId, playerCharacterEntity, false);
+                Logging.LogError("Unable to update storage items when swap or merge storage item");
                 result.InvokeError(new ResponseSwapOrMergeStorageItemMessage()
                 {
                     message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
