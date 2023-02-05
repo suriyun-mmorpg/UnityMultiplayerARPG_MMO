@@ -43,7 +43,7 @@ RenderSettings:
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 11
+  serializedVersion: 12
   m_GIWorkflowMode: 0
   m_GISettings:
     serializedVersion: 2
@@ -98,7 +98,8 @@ LightmapSettings:
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
-  m_UseShadowmask: 1
+  m_LightingSettings: {fileID: 4890085278179872738, guid: a888d112eafd61c4681f7095b2035eae,
+    type: 2}
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -118,6 +119,8 @@ NavMeshSettings:
     manualTileSize: 0
     tileSize: 256
     accuratePlacement: 0
+    maxJobWorkers: 0
+    preserveTilesOutsideBounds: 0
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
@@ -133,6 +136,10 @@ PrefabInstance:
       value: MMOServerInstance
       objectReference: {fileID: 0}
     - target: {fileID: 4009622383931608, guid: d2c274d504629844ba9d4993edf72817, type: 3}
+      propertyPath: m_RootOrder
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4009622383931608, guid: d2c274d504629844ba9d4993edf72817, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
@@ -145,6 +152,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4009622383931608, guid: d2c274d504629844ba9d4993edf72817, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4009622383931608, guid: d2c274d504629844ba9d4993edf72817, type: 3}
       propertyPath: m_LocalRotation.x
       value: 0
       objectReference: {fileID: 0}
@@ -155,14 +166,6 @@ PrefabInstance:
     - target: {fileID: 4009622383931608, guid: d2c274d504629844ba9d4993edf72817, type: 3}
       propertyPath: m_LocalRotation.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4009622383931608, guid: d2c274d504629844ba9d4993edf72817, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4009622383931608, guid: d2c274d504629844ba9d4993edf72817, type: 3}
-      propertyPath: m_RootOrder
-      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 4009622383931608, guid: d2c274d504629844ba9d4993edf72817, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -191,6 +194,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 4063033428646606, guid: aea5f7c25eab33041b253c93bea7b0fd, type: 3}
+      propertyPath: m_RootOrder
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 4063033428646606, guid: aea5f7c25eab33041b253c93bea7b0fd, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
@@ -203,6 +210,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4063033428646606, guid: aea5f7c25eab33041b253c93bea7b0fd, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4063033428646606, guid: aea5f7c25eab33041b253c93bea7b0fd, type: 3}
       propertyPath: m_LocalRotation.x
       value: 0
       objectReference: {fileID: 0}
@@ -213,14 +224,6 @@ PrefabInstance:
     - target: {fileID: 4063033428646606, guid: aea5f7c25eab33041b253c93bea7b0fd, type: 3}
       propertyPath: m_LocalRotation.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4063033428646606, guid: aea5f7c25eab33041b253c93bea7b0fd, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4063033428646606, guid: aea5f7c25eab33041b253c93bea7b0fd, type: 3}
-      propertyPath: m_RootOrder
-      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 114218027599039394, guid: aea5f7c25eab33041b253c93bea7b0fd,
         type: 3}
@@ -304,6 +307,51 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 224184583011018542, guid: 16b2c0544b2d04c4c94eb1e5d854b997,
         type: 3}
+      propertyPath: m_Pivot.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224184583011018542, guid: 16b2c0544b2d04c4c94eb1e5d854b997,
+        type: 3}
+      propertyPath: m_Pivot.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224184583011018542, guid: 16b2c0544b2d04c4c94eb1e5d854b997,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 224184583011018542, guid: 16b2c0544b2d04c4c94eb1e5d854b997,
+        type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224184583011018542, guid: 16b2c0544b2d04c4c94eb1e5d854b997,
+        type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224184583011018542, guid: 16b2c0544b2d04c4c94eb1e5d854b997,
+        type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224184583011018542, guid: 16b2c0544b2d04c4c94eb1e5d854b997,
+        type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224184583011018542, guid: 16b2c0544b2d04c4c94eb1e5d854b997,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224184583011018542, guid: 16b2c0544b2d04c4c94eb1e5d854b997,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224184583011018542, guid: 16b2c0544b2d04c4c94eb1e5d854b997,
+        type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
@@ -316,6 +364,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalPosition.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224184583011018542, guid: 16b2c0544b2d04c4c94eb1e5d854b997,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 224184583011018542, guid: 16b2c0544b2d04c4c94eb1e5d854b997,
         type: 3}
@@ -334,62 +387,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 224184583011018542, guid: 16b2c0544b2d04c4c94eb1e5d854b997,
         type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 224184583011018542, guid: 16b2c0544b2d04c4c94eb1e5d854b997,
-        type: 3}
-      propertyPath: m_RootOrder
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 224184583011018542, guid: 16b2c0544b2d04c4c94eb1e5d854b997,
-        type: 3}
       propertyPath: m_AnchoredPosition.x
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 224184583011018542, guid: 16b2c0544b2d04c4c94eb1e5d854b997,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 224184583011018542, guid: 16b2c0544b2d04c4c94eb1e5d854b997,
-        type: 3}
-      propertyPath: m_SizeDelta.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 224184583011018542, guid: 16b2c0544b2d04c4c94eb1e5d854b997,
-        type: 3}
-      propertyPath: m_SizeDelta.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 224184583011018542, guid: 16b2c0544b2d04c4c94eb1e5d854b997,
-        type: 3}
-      propertyPath: m_AnchorMin.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 224184583011018542, guid: 16b2c0544b2d04c4c94eb1e5d854b997,
-        type: 3}
-      propertyPath: m_AnchorMin.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 224184583011018542, guid: 16b2c0544b2d04c4c94eb1e5d854b997,
-        type: 3}
-      propertyPath: m_AnchorMax.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 224184583011018542, guid: 16b2c0544b2d04c4c94eb1e5d854b997,
-        type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 224184583011018542, guid: 16b2c0544b2d04c4c94eb1e5d854b997,
-        type: 3}
-      propertyPath: m_Pivot.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 224184583011018542, guid: 16b2c0544b2d04c4c94eb1e5d854b997,
-        type: 3}
-      propertyPath: m_Pivot.y
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -470,6 +473,7 @@ Light:
   m_UseColorTemperature: 0
   m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
   m_UseBoundingSphereOverride: 0
+  m_UseViewFrustumForShadowCasterCull: 1
   m_ShadowRadius: 0
   m_ShadowAngle: 0
 --- !u!4 &694651799
@@ -526,12 +530,19 @@ MonoBehaviour:
   webSocketCertificatePassword: 
   maxConnections: 1100
   transportFactory: {fileID: 0}
+  packetVersion: 1
   pingDuration: 1
   doNotEnterGameOnConnect: 0
   doNotDestroyOnSceneChanges: 0
   hitToSomeoneNotifyMessageId: 2001
+  hitToSomeoneNotifyDataChannel: 0
+  hitToSomeoneNotifyDeliveryMethod: 4
   hitFromSomeoneNotifyMessageId: 2002
+  hitFromSomeoneNotifyDataChannel: 0
+  hitFromSomeoneNotifyDeliveryMethod: 4
   killNotifyMessageId: 2000
+  killNotifyDataChannel: 0
+  killNotifyDeliveryMethod: 1
   onSpawnEntitiesStart:
     m_PersistentCalls:
       m_Calls: []
@@ -549,6 +560,7 @@ MonoBehaviour:
     createAuctionRequestType: 1300
     bidRequestType: 1301
     buyoutRequestType: 1302
+    cancelAuctionRequestType: 1304
     getClientConfigRequestType: 1303
   auctionHouseServiceUrl: http://localhost:9800/auction-house
   auctionHouseSecretKey: secret
@@ -571,10 +583,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   defaultVisibleRange: 80
-  generateGridByRenderers: 1
-  generateGridByCollider3D: 0
-  generateGridByCollider2D: 0
-  generateGridByTerrain: 1
   axisMode: 0
   includeInactiveComponents: 1
   cellSize: 100
@@ -621,6 +629,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1650493581}
+        m_TargetAssemblyTypeName: 
         m_MethodName: OnLoadSceneStart
         m_Mode: 0
         m_Arguments:
@@ -635,6 +644,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1650493581}
+        m_TargetAssemblyTypeName: 
         m_MethodName: OnLoadSceneProgress
         m_Mode: 0
         m_Arguments:
@@ -649,6 +659,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1650493581}
+        m_TargetAssemblyTypeName: 
         m_MethodName: OnLoadSceneFinish
         m_Mode: 0
         m_Arguments:
@@ -809,6 +820,7 @@ MonoBehaviour:
     type: 3}
   uiSceneGameplayMobilePrefab: {fileID: 114630585920460692, guid: 70474cf4f9f686c45b0305621722205f,
     type: 3}
+  uiSceneGameplayConsolePrefab: {fileID: 0}
   defaultControllerPrefab: {fileID: 114096437919969166, guid: 147be1283e4eb834d94ad1c905a031e7,
     type: 3}
   serverCharacterPrefab: {fileID: 114427175623056218, guid: 5d1fef0b895ca2a43899fb0236936a59,
@@ -863,6 +875,8 @@ MonoBehaviour:
     tag: HarvestableTag
   playerLayer:
     layerIndex: 17
+  playingLayer:
+    layerIndex: 17
   monsterLayer:
     layerIndex: 18
   npcLayer:
@@ -875,17 +889,22 @@ MonoBehaviour:
     layerIndex: 13
   harvestableLayer:
     layerIndex: 14
+  attackObstacleLayers:
+  - layerIndex: 0
   ignoreRaycastLayers:
   - layerIndex: 11
   itemAppearDuration: 60
   itemLootLockDuration: 5
   canPickupItemsWhichDropsByPlayersImmediately: 0
   dealingRequestDuration: 5
+  disableDealing: 0
   pickUpItemDistance: 2
   dropDistance: 1
   conversationDistance: 3
   localChatDistance: 10
   combatTextDistance: 20
+  partyShareExpDistance: 0
+  partyShareItemDistance: 0
   maxEquipWeaponSet: 2
   currentPositionSaveMode: 0
   playerDropItemMode: 0
@@ -896,6 +915,7 @@ MonoBehaviour:
   returnMoveSpeedDelayAfterAction: 0.1
   mountDelay: 1
   useItemDelay: 0.25
+  clearSkillCooldownOnDead: 1
   dismantleFilter:
     includeJunk: 0
     includeArmor: 1
@@ -917,12 +937,14 @@ MonoBehaviour:
   baseSlotLimit: 60
   playerStorage:
     weightLimit: 0
-    slotLimit: 0
+    slotLimit: 40
   guildStorage:
     weightLimit: 0
-    slotLimit: 0
+    slotLimit: 40
   enhancerRemoval:
     returnEnhancerItem: 0
+    requireItems: []
+    requireCurrencies: []
     requireGold: 0
   minSummonDistance: 2
   maxSummonDistance: 3
@@ -941,6 +963,9 @@ MonoBehaviour:
   homeMobileScene:
     sceneAsset: {fileID: 0}
     sceneName: 
+  homeConsoleScene:
+    sceneAsset: {fileID: 0}
+    sceneName: 
   minCharacterNameLength: 2
   maxCharacterNameLength: 16
   maxCharacterSaves: 5
@@ -949,6 +974,8 @@ MonoBehaviour:
   standaloneTargetFrameRate: 60
   mobileVSyncCount: 0
   mobileTargetFrameRate: 30
+  consoleVSyncCount: 0
+  consoleTargetFrameRate: 60
   testInEditorMode: 0
   cashShopDatabase: {fileID: 11400000, guid: 677c37c598e6c1045b66de68f1f546f6, type: 2}
 --- !u!4 &1379718503
