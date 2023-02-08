@@ -226,8 +226,8 @@ namespace MultiplayerARPG.MMO
             }
             AsyncResponseData<EmptyMessage> resp = await DbServiceClient.DeleteFriendAsync(new DeleteFriendReq()
             {
-                Character1Id = playerCharacter.Id,
-                Character2Id = request.requesterId,
+                Character1Id = request.requesterId,
+                Character2Id = playerCharacter.Id,
             });
             if (!resp.IsSuccess)
             {

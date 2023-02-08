@@ -623,7 +623,6 @@ namespace MultiplayerARPG.MMO
                 }
             }, "SELECT characterId2 FROM friend WHERE characterId1='" + finderId + "'");
             excludeIdsQuery += ")";
-            Logging.LogError(excludeIdsQuery);
             List<SocialCharacterData> result = new List<SocialCharacterData>();
             ExecuteReaderSync((reader) =>
             {
@@ -712,7 +711,7 @@ namespace MultiplayerARPG.MMO
 
         public override int GetFriendRequestNotification(string characterId)
         {
-            object result = ExecuteScalar("SELECT COUNT(*) FROM friend WHERE characterId2=@characterId AND state=1",
+            object result = ExecuteScalarSync("SELECT COUNT(*) FROM friend WHERE characterId2=@characterId AND state=1",
                 new MySqlParameter("@characterId", characterId));
             return (int)(long)result;
         }
