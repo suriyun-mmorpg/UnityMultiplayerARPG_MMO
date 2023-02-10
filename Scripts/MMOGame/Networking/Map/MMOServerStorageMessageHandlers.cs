@@ -124,12 +124,25 @@ namespace MultiplayerARPG.MMO
             // Don't apply data to player character immediately, it should be saved properly before apply the data
             PlayerCharacterData applyingPlayerCharacter = new PlayerCharacterData();
             applyingPlayerCharacter = playerCharacter.CloneTo(applyingPlayerCharacter);
-            if (!applyingPlayerCharacter.MoveItemFromStorage(isLimitSlot, slotLimit, storageItems, request.storageItemIndex, request.storageItemAmount, request.inventoryType, request.inventoryItemIndex, request.equipSlotIndexOrWeaponSet, out gameMessage))
+            try
+            {
+                if (!applyingPlayerCharacter.MoveItemFromStorage(isLimitSlot, slotLimit, storageItems, request.storageItemIndex, request.storageItemAmount, request.inventoryType, request.inventoryItemIndex, request.equipSlotIndexOrWeaponSet, out gameMessage))
+                {
+                    SetStorageBusy(storageId, playerCharacterEntity, false);
+                    result.InvokeError(new ResponseMoveItemFromStorageMessage()
+                    {
+                        message = gameMessage,
+                    });
+                    return;
+                }
+            }
+            catch (System.Exception ex)
             {
                 SetStorageBusy(storageId, playerCharacterEntity, false);
+                Logging.LogError("Unable to move item from storage: " + ex.StackTrace);
                 result.InvokeError(new ResponseMoveItemFromStorageMessage()
                 {
-                    message = gameMessage,
+                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
                 });
                 return;
             }
@@ -224,12 +237,25 @@ namespace MultiplayerARPG.MMO
             // Don't apply data to player character immediately, it should be saved properly before apply the data
             PlayerCharacterData applyingPlayerCharacter = new PlayerCharacterData();
             applyingPlayerCharacter = playerCharacter.CloneTo(applyingPlayerCharacter);
-            if (!applyingPlayerCharacter.MoveItemToStorage(isLimitWeight, weightLimit, isLimitSlot, slotLimit, storageItems, request.storageItemIndex, request.inventoryType, request.inventoryItemIndex, request.inventoryItemAmount, request.equipSlotIndexOrWeaponSet, out gameMessage))
+            try
+            {
+                if (!applyingPlayerCharacter.MoveItemToStorage(isLimitWeight, weightLimit, isLimitSlot, slotLimit, storageItems, request.storageItemIndex, request.inventoryType, request.inventoryItemIndex, request.inventoryItemAmount, request.equipSlotIndexOrWeaponSet, out gameMessage))
+                {
+                    SetStorageBusy(storageId, playerCharacterEntity, false);
+                    result.InvokeError(new ResponseMoveItemToStorageMessage()
+                    {
+                        message = gameMessage,
+                    });
+                    return;
+                }
+            }
+            catch (System.Exception ex)
             {
                 SetStorageBusy(storageId, playerCharacterEntity, false);
+                Logging.LogError("Unable to move item to storage: " + ex.StackTrace);
                 result.InvokeError(new ResponseMoveItemToStorageMessage()
                 {
-                    message = gameMessage,
+                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
                 });
                 return;
             }
