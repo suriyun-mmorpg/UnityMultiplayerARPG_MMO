@@ -70,7 +70,7 @@ namespace MultiplayerARPG.MMO
                     if (characterModel != null)
                     {
                         CharacterModelById[characterData.Id] = characterModel;
-                        characterModel.SetEquipWeapons(characterData.EquipWeapons);
+                        characterModel.SetEquipWeapons(characterData.SelectableWeaponSets, characterData.EquipWeaponSet, false);
                         characterModel.SetEquipItems(characterData.EquipItems);
                         characterModel.gameObject.SetActive(false);
                         CacheCharacterSelectionManager.Add(uiCharacter);
