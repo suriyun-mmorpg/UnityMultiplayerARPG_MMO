@@ -235,6 +235,8 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
+            // Kick from servers
+            ClusterServer.PlayerCharacterRemoved(userPeerInfo.userId, request.characterId);
             // Response
             result.InvokeSuccess(new ResponseDeleteCharacterMessage());
 #endif

@@ -434,6 +434,26 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+        public void PlayerCharacterRemoved(string userId, string characterId)
+        {
+            List<long> mapServerPeerConnectionIds = new List<long>(MapServerPeers.Keys);
+            foreach (long connectionId in mapServerPeerConnectionIds)
+            {
+                SendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.PlayerCharacterRemoved, (writer) =>
+                {
+                    writer.Put(userId);
+                    writer.Put(characterId);
+                });
+            }
+            List<SocialCharacterData> mapUsers = new List<SocialCharacterData>(MapUsersByCharacterId.Values);
+            foreach (SocialCharacterData mapUser in mapUsers)
+            {
+                MapUsersByCharacterId.Remove(userId);
+            }
+        }
+#endif
+
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         public void KickUser(string userId, UITextKeys message)
         {
             List<long> mapServerPeerConnectionIds = new List<long>(MapServerPeers.Keys);

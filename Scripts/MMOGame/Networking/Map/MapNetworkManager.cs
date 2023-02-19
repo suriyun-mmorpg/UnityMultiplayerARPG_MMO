@@ -159,6 +159,8 @@ namespace MultiplayerARPG.MMO
             ClusterClient = new ClusterClient(this);
             ClusterClient.onResponseAppServerRegister = OnResponseAppServerRegister;
             ClusterClient.onResponseAppServerAddress = OnResponseAppServerAddress;
+            ClusterClient.onPlayerCharacterRemoved = OnPlayerCharacterRemoved;
+            ClusterClient.onKickUser = KickUser;
             ClusterClient.RegisterResponseHandler<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.RequestSpawnMap);
             ClusterClient.RegisterMessageHandler(MMOMessageTypes.Chat, HandleChat);
             ClusterClient.RegisterMessageHandler(MMOMessageTypes.UpdateMapUser, HandleUpdateMapUser);
@@ -308,6 +310,31 @@ namespace MultiplayerARPG.MMO
                     UpdateMapUser(ClusterClient, UpdateUserCharacterMessage.UpdateType.Remove, userData);
             }
             base.UnregisterPlayerCharacter(connectionId);
+        }
+#endif
+
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+        public async UniTask SaveAndDestroyDespawningPlayerCharacter(string characterId)
+        {
+            // Find despawning character
+            if (despawningPlayerCharacterCancellations.TryGetValue(characterId, out CancellationTokenSource cancellationTokenSource) &&
+                despawningPlayerCharacterEntities.TryGetValue(characterId, out BasePlayerCharacterEntity playerCharacterEntity) &&
+                !cancellationTokenSource.IsCancellationRequested)
+            {
+                // Cancel character despawning to despawning immediately
+                despawningPlayerCharacterCancellations.TryRemove(characterId, out _);
+                despawningPlayerCharacterEntities.TryRemove(characterId, out _);
+                cancellationTokenSource.Cancel();
+                cancellationTokenSource.Dispose();
+                // Save character before despawned
+                while (savingCharacters.Contains(characterId))
+                {
+                    await UniTask.Yield();
+                }
+                await SaveCharacter(playerCharacterEntity);
+                // Despawn the character
+                playerCharacterEntity.NetworkDestroy();
+            }
         }
 #endif
 
@@ -490,27 +517,11 @@ namespace MultiplayerARPG.MMO
                 return false;
             }
 
-            if (despawningPlayerCharacterCancellations.TryGetValue(selectCharacterId, out CancellationTokenSource cancellationTokenSource) &&
-                despawningPlayerCharacterEntities.TryGetValue(selectCharacterId, out BasePlayerCharacterEntity playerCharacterEntity) &&
-                !cancellationTokenSource.IsCancellationRequested)
-            {
-                // Cancel character despawning to despawning immediately
-                despawningPlayerCharacterCancellations.TryRemove(selectCharacterId, out _);
-                despawningPlayerCharacterEntities.TryRemove(selectCharacterId, out _);
-                cancellationTokenSource.Cancel();
-                cancellationTokenSource.Dispose();
-                // Save character before despawned
-                while (savingCharacters.Contains(selectCharacterId))
-                {
-                    await UniTask.Yield();
-                }
-                await SaveCharacter(playerCharacterEntity);
-                // Despawn the character
-                playerCharacterEntity.NetworkDestroy();
-                // Unregister player
-                UnregisterPlayerCharacter(connectionId);
-                UnregisterUserId(connectionId);
-            }
+            await SaveAndDestroyDespawningPlayerCharacter(selectCharacterId);
+            // Unregister player
+            UnregisterPlayerCharacter(connectionId);
+            UnregisterUserId(connectionId);
+
             return true;
         }
 #endif
@@ -951,6 +962,13 @@ namespace MultiplayerARPG.MMO
                     }
                     break;
             }
+        }
+#endif
+
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+        private async void OnPlayerCharacterRemoved(string userId, string characterId)
+        {
+            await SaveAndDestroyDespawningPlayerCharacter(characterId);
         }
 #endif
         #endregion

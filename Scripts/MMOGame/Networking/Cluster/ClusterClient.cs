@@ -10,6 +10,8 @@ namespace MultiplayerARPG.MMO
         public System.Action<AckResponseCode> onResponseAppServerRegister;
         public System.Action<AckResponseCode, CentralServerPeerInfo> onResponseAppServerAddress;
         public System.Action<AckResponseCode, int> onResponseUserCount;
+        public System.Action<string, UITextKeys> onKickUser;
+        public System.Action<string, string> onPlayerCharacterRemoved;
         public bool IsAppRegistered { get; private set; }
         public override string LogTag { get { return nameof(ClusterClient) + ":" + appServer.PeerType; } }
 #endif
@@ -25,6 +27,7 @@ namespace MultiplayerARPG.MMO
             RegisterResponseHandler<EmptyMessage, ResponseUserCountMessage>(MMORequestTypes.RequestUserCount, HandleResponseUserCount);
             RegisterMessageHandler(MMOMessageTypes.AppServerAddress, HandleAppServerAddress);
             RegisterMessageHandler(MMOMessageTypes.KickUser, HandleKickUser);
+            RegisterMessageHandler(MMOMessageTypes.PlayerCharacterRemoved, HandlePlayerCharacterRemoved);
 #endif
         }
 
@@ -196,12 +199,22 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+        private void HandlePlayerCharacterRemoved(MessageHandlerData messageHandler)
+        {
+            string userId = messageHandler.Reader.GetString();
+            string characterId = messageHandler.Reader.GetString();
+            if (onPlayerCharacterRemoved != null)
+                onPlayerCharacterRemoved.Invoke(userId, characterId);
+        }
+#endif
+
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         private void HandleKickUser(MessageHandlerData messageHandler)
         {
             string kickUserId = messageHandler.Reader.GetString();
             UITextKeys message = (UITextKeys)messageHandler.Reader.GetPackedUShort();
-            if (appServer is MapNetworkManager mapNetworkManager)
-                mapNetworkManager.KickUser(kickUserId, message);
+            if (onKickUser != null)
+                onKickUser.Invoke(kickUserId, message);
         }
 #endif
     }

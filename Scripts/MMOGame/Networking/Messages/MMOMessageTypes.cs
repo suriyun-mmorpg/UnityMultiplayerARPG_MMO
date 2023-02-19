@@ -12,5 +12,6 @@
         public const ushort UpdateGuildMember = 8;
         public const ushort UpdateGuild = 9;
         public const ushort KickUser = 10;
+        public const ushort PlayerCharacterRemoved = 11;
     }
 }
