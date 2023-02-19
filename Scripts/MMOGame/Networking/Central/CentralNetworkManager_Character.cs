@@ -179,8 +179,7 @@ namespace MultiplayerARPG.MMO
             string characterId = GenericUtils.GetUniqueId();
             PlayerCharacterData characterData = new PlayerCharacterData();
             characterData.Id = characterId;
-            characterData.SetNewPlayerCharacterData(characterName, dataId, entityId);
-            characterData.FactionId = factionId;
+            characterData.SetNewPlayerCharacterData(characterName, dataId, entityId, factionId);
             DeserializeCreateCharacterExtra(characterData, reader);
             AsyncResponseData<CharacterResp> createResp = await DbServiceClient.CreateCharacterAsync(new CreateCharacterReq()
             {
