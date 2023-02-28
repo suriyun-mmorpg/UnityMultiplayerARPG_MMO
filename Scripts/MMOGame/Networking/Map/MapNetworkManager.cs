@@ -730,6 +730,7 @@ namespace MultiplayerARPG.MMO
             playerCharacterEntity.ForceMakeCaches();
             playerCharacterEntity.FillEmptySlots();
 
+            List<CharacterBuff> summonBuffs = new List<CharacterBuff>();
             if (!playerCharacterEntity.IsDead())
             {
                 // Summon saved summons
@@ -743,23 +744,7 @@ namespace MultiplayerARPG.MMO
                     KickClient(connectionId, UITextKeys.UI_ERROR_KICKED_FROM_SERVER);
                     return;
                 }
-
-                List<CharacterBuff> summonBuffs = summonBuffsResp.Response.SummonBuffs;
-                for (int i = 0; i < playerCharacterEntity.Summons.Count; ++i)
-                {
-                    CharacterSummon summon = playerCharacterEntity.Summons[i];
-                    summon.Summon(playerCharacterEntity, summon.level, summon.summonRemainsDuration, summon.exp, summon.currentHp, summon.currentMp);
-                    for (int j = 0; j < summonBuffs.Count; ++j)
-                    {
-                        if (summonBuffs[j].id.StartsWith(i.ToString()))
-                        {
-                            summon.CacheEntity.Buffs.Add(summonBuffs[j]);
-                            summonBuffs.RemoveAt(j);
-                            j--;
-                        }
-                    }
-                    playerCharacterEntity.Summons[i] = summon;
-                }
+                summonBuffs.AddRange(summonBuffsResp.Response.SummonBuffs);
             }
 
             // Make sure that player does not exit before character data loaded
@@ -786,6 +771,22 @@ namespace MultiplayerARPG.MMO
                 // Summon saved mount entity
                 if (GameInstance.VehicleEntities.ContainsKey(playerCharacterData.MountDataId))
                     playerCharacterEntity.Mount(GameInstance.VehicleEntities[playerCharacterData.MountDataId]);
+                // Summon monsters
+                for (int i = 0; i < playerCharacterEntity.Summons.Count; ++i)
+                {
+                    CharacterSummon summon = playerCharacterEntity.Summons[i];
+                    summon.Summon(playerCharacterEntity, summon.level, summon.summonRemainsDuration, summon.exp, summon.currentHp, summon.currentMp);
+                    for (int j = 0; j < summonBuffs.Count; ++j)
+                    {
+                        if (summonBuffs[j].id.StartsWith(i.ToString()))
+                        {
+                            summon.CacheEntity.Buffs.Add(summonBuffs[j]);
+                            summonBuffs.RemoveAt(j);
+                            j--;
+                        }
+                    }
+                    playerCharacterEntity.Summons[i] = summon;
+                }
             }
             else
             {
