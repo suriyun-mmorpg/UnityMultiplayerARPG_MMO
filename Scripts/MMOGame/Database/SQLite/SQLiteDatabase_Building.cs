@@ -1,6 +1,5 @@
 ﻿#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
 using System.Collections.Generic;
-using UnityEngine;
 using Mono.Data.Sqlite;
 
 namespace MultiplayerARPG.MMO
@@ -22,8 +21,12 @@ namespace MultiplayerARPG.MMO
                 result.CreatorId = reader.GetString(7);
                 result.CreatorName = reader.GetString(8);
                 result.ExtraData = reader.GetString(9);
-                result.Position = new Vector3(reader.GetFloat(10), reader.GetFloat(11), reader.GetFloat(12));
-                result.Rotation = Quaternion.Euler(reader.GetFloat(13), reader.GetFloat(14), reader.GetFloat(15));
+                result.PositionX = reader.GetFloat(10);
+                result.PositionY = reader.GetFloat(11);
+                result.PositionZ = reader.GetFloat(12);
+                result.RotationX = reader.GetFloat(13);
+                result.RotationY = reader.GetFloat(14);
+                result.RotationZ = reader.GetFloat(15);
                 return true;
             }
             result = new BuildingSaveData();
@@ -39,12 +42,12 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@currentHp", saveData.CurrentHp),
                 new SqliteParameter("@remainsLifeTime", saveData.RemainsLifeTime),
                 new SqliteParameter("@mapName", mapName),
-                new SqliteParameter("@positionX", saveData.Position.x),
-                new SqliteParameter("@positionY", saveData.Position.y),
-                new SqliteParameter("@positionZ", saveData.Position.z),
-                new SqliteParameter("@rotationX", saveData.Rotation.eulerAngles.x),
-                new SqliteParameter("@rotationY", saveData.Rotation.eulerAngles.y),
-                new SqliteParameter("@rotationZ", saveData.Rotation.eulerAngles.z),
+                new SqliteParameter("@positionX", saveData.PositionX),
+                new SqliteParameter("@positionY", saveData.PositionY),
+                new SqliteParameter("@positionZ", saveData.PositionZ),
+                new SqliteParameter("@rotationX", saveData.RotationX),
+                new SqliteParameter("@rotationY", saveData.RotationY),
+                new SqliteParameter("@rotationZ", saveData.RotationZ),
                 new SqliteParameter("@creatorId", saveData.CreatorId),
                 new SqliteParameter("@creatorName", saveData.CreatorName),
                 new SqliteParameter("@extraData", saveData.ExtraData));
@@ -93,12 +96,12 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@creatorId", building.CreatorId),
                 new SqliteParameter("@creatorName", building.CreatorName),
                 new SqliteParameter("@extraData", building.ExtraData),
-                new SqliteParameter("@positionX", building.Position.x),
-                new SqliteParameter("@positionY", building.Position.y),
-                new SqliteParameter("@positionZ", building.Position.z),
-                new SqliteParameter("@rotationX", building.Rotation.eulerAngles.x),
-                new SqliteParameter("@rotationY", building.Rotation.eulerAngles.y),
-                new SqliteParameter("@rotationZ", building.Rotation.eulerAngles.z),
+                new SqliteParameter("@positionX", building.PositionX),
+                new SqliteParameter("@positionY", building.PositionY),
+                new SqliteParameter("@positionZ", building.PositionZ),
+                new SqliteParameter("@rotationX", building.RotationX),
+                new SqliteParameter("@rotationY", building.RotationY),
+                new SqliteParameter("@rotationZ", building.RotationZ),
                 new SqliteParameter("@mapName", mapName));
         }
 

@@ -632,22 +632,28 @@ namespace MultiplayerARPG.MMO
             }
             // Prepare saving location for this character
             string savingCurrentMapName = playerCharacterData.CurrentMapName;
-            Vector3 savingCurrentPosition = playerCharacterData.CurrentPosition;
+            Vector3 savingCurrentPosition = new Vector3(playerCharacterData.CurrentPositionX, playerCharacterData.CurrentPositionY, playerCharacterData.CurrentPositionZ);
 
             if (IsInstanceMap())
             {
-                playerCharacterData.CurrentPosition = MapInstanceWarpToPosition;
+                playerCharacterData.CurrentPositionX = MapInstanceWarpToPosition.x;
+                playerCharacterData.CurrentPositionY = MapInstanceWarpToPosition.y;
+                playerCharacterData.CurrentPositionZ = MapInstanceWarpToPosition.z;
                 if (MapInstanceWarpOverrideRotation)
-                    playerCharacterData.CurrentRotation = MapInstanceWarpToRotation;
+                {
+                    playerCharacterData.CurrentRotationX = MapInstanceWarpToRotation.x;
+                    playerCharacterData.CurrentRotationY = MapInstanceWarpToRotation.y;
+                    playerCharacterData.CurrentRotationZ = MapInstanceWarpToRotation.z;
+                }
             }
 
             // Spawn character entity and set its data
             Quaternion characterRotation = Quaternion.identity;
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
-                characterRotation = Quaternion.Euler(playerCharacterData.CurrentRotation);
+                characterRotation = Quaternion.Euler(playerCharacterData.CurrentRotationX, playerCharacterData.CurrentRotationY, playerCharacterData.CurrentRotationZ);
             LiteNetLibIdentity spawnObj = Assets.GetObjectInstance(
                 entityPrefab.Identity.HashAssetId,
-                playerCharacterData.CurrentPosition,
+                new Vector3(playerCharacterData.CurrentPositionX, playerCharacterData.CurrentPositionY, playerCharacterData.CurrentPositionZ),
                 characterRotation);
             BasePlayerCharacterEntity playerCharacterEntity = spawnObj.GetComponent<BasePlayerCharacterEntity>();
             playerCharacterData.CloneTo(playerCharacterEntity);

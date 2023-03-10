@@ -1,6 +1,5 @@
 ﻿#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
 using System.Collections.Generic;
-using UnityEngine;
 using Mono.Data.Sqlite;
 using LiteNetLibManager;
 
@@ -99,45 +98,45 @@ namespace MultiplayerARPG.MMO
             transaction.Dispose();
         }
 
-        public override void CreateCharacter(string userId, IPlayerCharacterData characterData)
+        public override void CreateCharacter(string userId, IPlayerCharacterData character)
         {
             ExecuteNonQuery("INSERT INTO characters " +
                 "(id, userId, dataId, entityId, factionId, characterName, level, exp, currentHp, currentMp, currentStamina, currentFood, currentWater, equipWeaponSet, statPoint, skillPoint, gold, currentMapName, currentPositionX, currentPositionY, currentPositionZ, currentRotationX, currentRotationY, currentRotationZ, respawnMapName, respawnPositionX, respawnPositionY, respawnPositionZ, mountDataId, iconDataId, frameDataId, titleDataId) VALUES " +
                 "(@id, @userId, @dataId, @entityId, @factionId, @characterName, @level, @exp, @currentHp, @currentMp, @currentStamina, @currentFood, @currentWater, @equipWeaponSet, @statPoint, @skillPoint, @gold, @currentMapName, @currentPositionX, @currentPositionY, @currentPositionZ, @currentRotationX, @currentRotationY, @currentRotationZ, @respawnMapName, @respawnPositionX, @respawnPositionY, @respawnPositionZ, @mountDataId, @iconDataId, @frameDataId, @titleDataId)",
-                new SqliteParameter("@id", characterData.Id),
+                new SqliteParameter("@id", character.Id),
                 new SqliteParameter("@userId", userId),
-                new SqliteParameter("@dataId", characterData.DataId),
-                new SqliteParameter("@entityId", characterData.EntityId),
-                new SqliteParameter("@factionId", characterData.FactionId),
-                new SqliteParameter("@characterName", characterData.CharacterName),
-                new SqliteParameter("@level", characterData.Level),
-                new SqliteParameter("@exp", characterData.Exp),
-                new SqliteParameter("@currentHp", characterData.CurrentHp),
-                new SqliteParameter("@currentMp", characterData.CurrentMp),
-                new SqliteParameter("@currentStamina", characterData.CurrentStamina),
-                new SqliteParameter("@currentFood", characterData.CurrentFood),
-                new SqliteParameter("@currentWater", characterData.CurrentWater),
-                new SqliteParameter("@equipWeaponSet", characterData.EquipWeaponSet),
-                new SqliteParameter("@statPoint", characterData.StatPoint),
-                new SqliteParameter("@skillPoint", characterData.SkillPoint),
-                new SqliteParameter("@gold", characterData.Gold),
-                new SqliteParameter("@currentMapName", characterData.CurrentMapName),
-                new SqliteParameter("@currentPositionX", characterData.CurrentPosition.x),
-                new SqliteParameter("@currentPositionY", characterData.CurrentPosition.y),
-                new SqliteParameter("@currentPositionZ", characterData.CurrentPosition.z),
-                new SqliteParameter("@currentRotationX", characterData.CurrentRotation.x),
-                new SqliteParameter("@currentRotationY", characterData.CurrentRotation.y),
-                new SqliteParameter("@currentRotationZ", characterData.CurrentRotation.z),
-                new SqliteParameter("@respawnMapName", characterData.RespawnMapName),
-                new SqliteParameter("@respawnPositionX", characterData.RespawnPosition.x),
-                new SqliteParameter("@respawnPositionY", characterData.RespawnPosition.y),
-                new SqliteParameter("@respawnPositionZ", characterData.RespawnPosition.z),
-                new SqliteParameter("@mountDataId", characterData.MountDataId),
-                new SqliteParameter("@iconDataId", characterData.IconDataId),
-                new SqliteParameter("@frameDataId", characterData.FrameDataId),
-                new SqliteParameter("@titleDataId", characterData.TitleDataId));
-            FillCharacterRelatesData(characterData);
-            this.InvokeInstanceDevExtMethods("CreateCharacter", userId, characterData);
+                new SqliteParameter("@dataId", character.DataId),
+                new SqliteParameter("@entityId", character.EntityId),
+                new SqliteParameter("@factionId", character.FactionId),
+                new SqliteParameter("@characterName", character.CharacterName),
+                new SqliteParameter("@level", character.Level),
+                new SqliteParameter("@exp", character.Exp),
+                new SqliteParameter("@currentHp", character.CurrentHp),
+                new SqliteParameter("@currentMp", character.CurrentMp),
+                new SqliteParameter("@currentStamina", character.CurrentStamina),
+                new SqliteParameter("@currentFood", character.CurrentFood),
+                new SqliteParameter("@currentWater", character.CurrentWater),
+                new SqliteParameter("@equipWeaponSet", character.EquipWeaponSet),
+                new SqliteParameter("@statPoint", character.StatPoint),
+                new SqliteParameter("@skillPoint", character.SkillPoint),
+                new SqliteParameter("@gold", character.Gold),
+                new SqliteParameter("@currentMapName", character.CurrentMapName),
+                new SqliteParameter("@currentPositionX", character.CurrentPositionX),
+                new SqliteParameter("@currentPositionY", character.CurrentPositionY),
+                new SqliteParameter("@currentPositionZ", character.CurrentPositionZ),
+                new SqliteParameter("@currentRotationX", character.CurrentRotationX),
+                new SqliteParameter("@currentRotationY", character.CurrentRotationY),
+                new SqliteParameter("@currentRotationZ", character.CurrentRotationZ),
+                new SqliteParameter("@respawnMapName", character.RespawnMapName),
+                new SqliteParameter("@respawnPositionX", character.RespawnPositionX),
+                new SqliteParameter("@respawnPositionY", character.RespawnPositionY),
+                new SqliteParameter("@respawnPositionZ", character.RespawnPositionZ),
+                new SqliteParameter("@mountDataId", character.MountDataId),
+                new SqliteParameter("@iconDataId", character.IconDataId),
+                new SqliteParameter("@frameDataId", character.FrameDataId),
+                new SqliteParameter("@titleDataId", character.TitleDataId));
+            FillCharacterRelatesData(character);
+            this.InvokeInstanceDevExtMethods("CreateCharacter", userId, character);
         }
 
         private bool ReadCharacter(SqliteDataReader reader, out PlayerCharacterData result)
@@ -167,19 +166,16 @@ namespace MultiplayerARPG.MMO
                 result.GuildRole = reader.GetByte(19);
                 result.SharedGuildExp = reader.GetInt32(20);
                 result.CurrentMapName = reader.GetString(21);
-                result.CurrentPosition = new Vector3(
-                    reader.GetFloat(22),
-                    reader.GetFloat(23),
-                    reader.GetFloat(24));
-                result.CurrentRotation = new Vector3(
-                    reader.GetFloat(25),
-                    reader.GetFloat(26),
-                    reader.GetFloat(27));
+                result.CurrentPositionX = reader.GetFloat(22);
+                result.CurrentPositionY = reader.GetFloat(23);
+                result.CurrentPositionZ = reader.GetFloat(24);
+                result.CurrentRotationX = reader.GetFloat(25);
+                result.CurrentRotationY = reader.GetFloat(26);
+                result.CurrentRotationZ = reader.GetFloat(27);
                 result.RespawnMapName = reader.GetString(28);
-                result.RespawnPosition = new Vector3(
-                    reader.GetFloat(29),
-                    reader.GetFloat(30),
-                    reader.GetFloat(31));
+                result.RespawnPositionX = reader.GetFloat(29);
+                result.RespawnPositionY = reader.GetFloat(30);
+                result.RespawnPositionZ = reader.GetFloat(31);
                 result.MountDataId = reader.GetInt32(32);
                 result.IconDataId = reader.GetInt32(33);
                 result.FrameDataId = reader.GetInt32(34);
@@ -332,16 +328,16 @@ namespace MultiplayerARPG.MMO
                 new SqliteParameter("@skillPoint", character.SkillPoint),
                 new SqliteParameter("@gold", character.Gold),
                 new SqliteParameter("@currentMapName", character.CurrentMapName),
-                new SqliteParameter("@currentPositionX", character.CurrentPosition.x),
-                new SqliteParameter("@currentPositionY", character.CurrentPosition.y),
-                new SqliteParameter("@currentPositionZ", character.CurrentPosition.z),
-                new SqliteParameter("@currentRotationX", character.CurrentRotation.x),
-                new SqliteParameter("@currentRotationY", character.CurrentRotation.y),
-                new SqliteParameter("@currentRotationZ", character.CurrentRotation.z),
+                new SqliteParameter("@currentPositionX", character.CurrentPositionX),
+                new SqliteParameter("@currentPositionY", character.CurrentPositionY),
+                new SqliteParameter("@currentPositionZ", character.CurrentPositionZ),
+                new SqliteParameter("@currentRotationX", character.CurrentRotationX),
+                new SqliteParameter("@currentRotationY", character.CurrentRotationY),
+                new SqliteParameter("@currentRotationZ", character.CurrentRotationZ),
                 new SqliteParameter("@respawnMapName", character.RespawnMapName),
-                new SqliteParameter("@respawnPositionX", character.RespawnPosition.x),
-                new SqliteParameter("@respawnPositionY", character.RespawnPosition.y),
-                new SqliteParameter("@respawnPositionZ", character.RespawnPosition.z),
+                new SqliteParameter("@respawnPositionX", character.RespawnPositionX),
+                new SqliteParameter("@respawnPositionY", character.RespawnPositionY),
+                new SqliteParameter("@respawnPositionZ", character.RespawnPositionZ),
                 new SqliteParameter("@mountDataId", character.MountDataId),
                 new SqliteParameter("@iconDataId", character.IconDataId),
                 new SqliteParameter("@frameDataId", character.FrameDataId),

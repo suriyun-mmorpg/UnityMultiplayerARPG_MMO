@@ -46,8 +46,12 @@ namespace MultiplayerARPG.MMO
             if (string.IsNullOrEmpty(mapName) || (mapName.Equals(CurrentMapInfo.Id) && !IsInstanceMap()))
             {
                 if (overrideRotation)
-                    playerCharacterEntity.CurrentRotation = rotation;
-                playerCharacterEntity.Teleport(position, Quaternion.Euler(playerCharacterEntity.CurrentRotation));
+                {
+                    playerCharacterEntity.CurrentRotationX = rotation.x;
+                    playerCharacterEntity.CurrentRotationY = rotation.y;
+                    playerCharacterEntity.CurrentRotationZ = rotation.z;
+                }
+                playerCharacterEntity.Teleport(position, Quaternion.Euler(playerCharacterEntity.CurrentRotationX, playerCharacterEntity.CurrentRotationY, playerCharacterEntity.CurrentRotationZ));
                 return;
             }
 

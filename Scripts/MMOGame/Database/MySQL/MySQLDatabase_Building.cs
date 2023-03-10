@@ -1,6 +1,5 @@
 ﻿#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
 using System.Collections.Generic;
-using UnityEngine;
 using MySqlConnector;
 
 namespace MultiplayerARPG.MMO
@@ -22,8 +21,12 @@ namespace MultiplayerARPG.MMO
                 result.CreatorId = reader.GetString(7);
                 result.CreatorName = reader.GetString(8);
                 result.ExtraData = reader.GetString(9);
-                result.Position = new Vector3(reader.GetFloat(10), reader.GetFloat(11), reader.GetFloat(12));
-                result.Rotation = Quaternion.Euler(reader.GetFloat(13), reader.GetFloat(14), reader.GetFloat(15));
+                result.PositionX = reader.GetFloat(10);
+                result.PositionY = reader.GetFloat(11);
+                result.PositionZ = reader.GetFloat(12);
+                result.RotationX = reader.GetFloat(13);
+                result.RotationY = reader.GetFloat(14);
+                result.RotationZ = reader.GetFloat(15);
                 return true;
             }
             result = new BuildingSaveData();
@@ -41,12 +44,12 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@currentHp", saveData.CurrentHp),
                 new MySqlParameter("@remainsLifeTime", saveData.RemainsLifeTime),
                 new MySqlParameter("@mapName", mapName),
-                new MySqlParameter("@positionX", saveData.Position.x),
-                new MySqlParameter("@positionY", saveData.Position.y),
-                new MySqlParameter("@positionZ", saveData.Position.z),
-                new MySqlParameter("@rotationX", saveData.Rotation.eulerAngles.x),
-                new MySqlParameter("@rotationY", saveData.Rotation.eulerAngles.y),
-                new MySqlParameter("@rotationZ", saveData.Rotation.eulerAngles.z),
+                new MySqlParameter("@positionX", saveData.PositionX),
+                new MySqlParameter("@positionY", saveData.PositionY),
+                new MySqlParameter("@positionZ", saveData.PositionZ),
+                new MySqlParameter("@rotationX", saveData.RotationX),
+                new MySqlParameter("@rotationY", saveData.RotationY),
+                new MySqlParameter("@rotationZ", saveData.RotationZ),
                 new MySqlParameter("@creatorId", saveData.CreatorId),
                 new MySqlParameter("@creatorName", saveData.CreatorName),
                 new MySqlParameter("@extraData", saveData.ExtraData));
@@ -93,18 +96,18 @@ namespace MultiplayerARPG.MMO
                 new MySqlParameter("@entityId", building.EntityId),
                 new MySqlParameter("@currentHp", building.CurrentHp),
                 new MySqlParameter("@remainsLifeTime", building.RemainsLifeTime),
-                new MySqlParameter("@mapName", mapName),
                 new MySqlParameter("@isLocked", building.IsLocked),
                 new MySqlParameter("@lockPassword", building.LockPassword),
                 new MySqlParameter("@creatorId", building.CreatorId),
                 new MySqlParameter("@creatorName", building.CreatorName),
                 new MySqlParameter("@extraData", building.ExtraData),
-                new MySqlParameter("@positionX", building.Position.x),
-                new MySqlParameter("@positionY", building.Position.y),
-                new MySqlParameter("@positionZ", building.Position.z),
-                new MySqlParameter("@rotationX", building.Rotation.eulerAngles.x),
-                new MySqlParameter("@rotationY", building.Rotation.eulerAngles.y),
-                new MySqlParameter("@rotationZ", building.Rotation.eulerAngles.z));
+                new MySqlParameter("@positionX", building.PositionX),
+                new MySqlParameter("@positionY", building.PositionY),
+                new MySqlParameter("@positionZ", building.PositionZ),
+                new MySqlParameter("@rotationX", building.RotationX),
+                new MySqlParameter("@rotationY", building.RotationY),
+                new MySqlParameter("@rotationZ", building.RotationZ),
+                new MySqlParameter("@mapName", mapName));
             connection.Close();
         }
 
