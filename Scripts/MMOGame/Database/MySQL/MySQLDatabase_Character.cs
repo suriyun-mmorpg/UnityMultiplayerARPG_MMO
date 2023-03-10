@@ -1,7 +1,6 @@
 ﻿#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
 using System.Collections.Generic;
 using LiteNetLibManager;
-using UnityEngine;
 using MySqlConnector;
 
 namespace MultiplayerARPG.MMO
