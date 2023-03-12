@@ -1,4 +1,5 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using Cysharp.Text;
+using Cysharp.Threading.Tasks;
 using LiteNetLibManager;
 using System.Collections.Generic;
 using UnityEngine;
@@ -102,7 +103,7 @@ namespace MultiplayerARPG.MMO
                     tempBuff = tempSummon.CacheEntity.Buffs[j];
                     summonBuffs.Add(new CharacterBuff()
                     {
-                        id = i + "_" + j,
+                        id = ZString.Concat(savingCharacterData.Id, "_", i, "_", j),
                         type = tempBuff.type,
                         dataId = tempBuff.dataId,
                         level = tempBuff.level,
