@@ -1,4 +1,4 @@
-﻿#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+﻿#if NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
 using MySqlConnector;
 
 namespace MultiplayerARPG.MMO

@@ -1,4 +1,4 @@
-﻿#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+﻿#if NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
 using System.Collections.Generic;
 #endif
 using UnityEngine;
@@ -7,7 +7,7 @@ namespace MultiplayerARPG.MMO
 {
     public abstract partial class BaseDatabase : MonoBehaviour
     {
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
         public const byte AUTH_TYPE_NORMAL = 1;
 
         public virtual void Initialize() { }
