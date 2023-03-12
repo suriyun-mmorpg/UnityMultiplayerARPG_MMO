@@ -1,8 +1,7 @@
 ﻿#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
 using MySqlConnector;
-using System.Collections.Generic;
 using LiteNetLibManager;
-using MiniJSON;
+using Newtonsoft.Json;
 using System;
 using System.IO;
 using Cysharp.Threading.Tasks;
@@ -33,30 +32,38 @@ namespace MultiplayerARPG.MMO
             bool configFileFound = false;
             string configFolder = "./config";
             string configFilePath = configFolder + "/mySqlConfig.json";
-            Dictionary<string, object> jsonConfig = new Dictionary<string, object>();
+            MySQLConfig config = new MySQLConfig()
+            {
+                mySqlAddress = address,
+                mySqlPort = port,
+                mySqlUsername = username,
+                mySqlPassword = password,
+                mySqlDbName = dbName,
+            };
             Logging.Log(LogTag, "Reading config file from " + configFilePath);
             if (File.Exists(configFilePath))
             {
                 Logging.Log(LogTag, "Found config file");
                 string dataAsJson = File.ReadAllText(configFilePath);
-                jsonConfig = Json.Deserialize(dataAsJson) as Dictionary<string, object>;
+                MySQLConfig replacingConfig = JsonConvert.DeserializeObject<MySQLConfig>(dataAsJson);
+                if (!string.IsNullOrWhiteSpace(replacingConfig.mySqlAddress))
+                    config.mySqlAddress = replacingConfig.mySqlAddress;
+                if (replacingConfig.mySqlPort.HasValue)
+                    config.mySqlPort = replacingConfig.mySqlPort.Value;
+                if (!string.IsNullOrWhiteSpace(replacingConfig.mySqlUsername))
+                    config.mySqlUsername = replacingConfig.mySqlUsername;
+                if (!string.IsNullOrWhiteSpace(replacingConfig.mySqlPassword))
+                    config.mySqlPassword = replacingConfig.mySqlPassword;
+                if (!string.IsNullOrWhiteSpace(replacingConfig.mySqlDbName))
+                    config.mySqlDbName = replacingConfig.mySqlDbName;
                 configFileFound = true;
             }
 
-            ConfigReader.ReadConfigs(jsonConfig, "mySqlAddress", out address, address);
-            jsonConfig["mySqlAddress"] = address;
-
-            ConfigReader.ReadConfigs(jsonConfig, "mySqlPort", out port, port);
-            jsonConfig["mySqlPort"] = port;
-
-            ConfigReader.ReadConfigs(jsonConfig, "mySqlUsername", out username, username);
-            jsonConfig["mySqlUsername"] = username;
-
-            ConfigReader.ReadConfigs(jsonConfig, "mySqlPassword", out password, password);
-            jsonConfig["mySqlPassword"] = password;
-
-            ConfigReader.ReadConfigs(jsonConfig, "mySqlDbName", out dbName, dbName);
-            jsonConfig["mySqlDbName"] = dbName;
+            address = config.mySqlAddress;
+            port = config.mySqlPort.Value;
+            username = config.mySqlUsername;
+            password = config.mySqlPassword;
+            dbName = config.mySqlDbName;
 
             if (!configFileFound)
             {
@@ -64,7 +71,7 @@ namespace MultiplayerARPG.MMO
                 Logging.Log(LogTag, "Not found config file, creating a new one");
                 if (!Directory.Exists(configFolder))
                     Directory.CreateDirectory(configFolder);
-                File.WriteAllText(configFilePath, Json.Serialize(jsonConfig));
+                File.WriteAllText(configFilePath, JsonConvert.SerializeObject(config));
             }
 
             Migration();

@@ -3,7 +3,7 @@ using Mono.Data.Sqlite;
 using System.Collections.Generic;
 using System.IO;
 using LiteNetLibManager;
-using MiniJSON;
+using Newtonsoft.Json;
 using System;
 #endif
 using UnityEngine;
@@ -31,17 +31,22 @@ namespace MultiplayerARPG.MMO
             string configFolder = "./config";
             string configFilePath = configFolder + "/sqliteConfig.json";
             Dictionary<string, object> jsonConfig = new Dictionary<string, object>();
+            SQLiteConfig config = new SQLiteConfig()
+            {
+                sqliteDbPath = dbPath,
+            };
             Logging.Log(LogTag, "Reading config file from " + configFilePath);
             if (File.Exists(configFilePath))
             {
                 Logging.Log(LogTag, "Found config file");
                 string dataAsJson = File.ReadAllText(configFilePath);
-                jsonConfig = Json.Deserialize(dataAsJson) as Dictionary<string, object>;
+                SQLiteConfig replacingConfig = JsonConvert.DeserializeObject<SQLiteConfig>(dataAsJson);
+                if (!string.IsNullOrWhiteSpace(replacingConfig.sqliteDbPath))
+                    config.sqliteDbPath = replacingConfig.sqliteDbPath;
                 configFileFound = true;
             }
 
-            ConfigReader.ReadConfigs(jsonConfig, "sqliteDbPath", out dbPath, dbPath);
-            jsonConfig["sqliteDbPath"] = dbPath;
+            dbPath = config.sqliteDbPath;
 
             if (!configFileFound)
             {
@@ -49,7 +54,7 @@ namespace MultiplayerARPG.MMO
                 Logging.Log(LogTag, "Not found config file, creating a new one");
                 if (!Directory.Exists(configFolder))
                     Directory.CreateDirectory(configFolder);
-                File.WriteAllText(configFilePath, Json.Serialize(jsonConfig));
+                File.WriteAllText(configFilePath, JsonConvert.SerializeObject(config));
             }
 
             connection = NewConnection();
