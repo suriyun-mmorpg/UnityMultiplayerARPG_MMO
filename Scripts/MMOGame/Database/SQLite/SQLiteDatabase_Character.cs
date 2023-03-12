@@ -1,7 +1,6 @@
 ﻿#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
 using System.Collections.Generic;
 using Mono.Data.Sqlite;
-using LiteNetLibManager;
 
 namespace MultiplayerARPG.MMO
 {
@@ -91,8 +90,8 @@ namespace MultiplayerARPG.MMO
             }
             catch (System.Exception ex)
             {
-                Logging.LogError(LogTag, "Transaction, Error occurs while filling character relates data");
-                Logging.LogException(LogTag, ex);
+                LogError(LogTag, "Transaction, Error occurs while filling character relates data");
+                LogException(LogTag, ex);
                 transaction.Rollback();
             }
             transaction.Dispose();
@@ -375,8 +374,8 @@ namespace MultiplayerARPG.MMO
                 }
                 catch (System.Exception ex)
                 {
-                    Logging.LogError(LogTag, "Transaction, Error occurs while deleting character: " + id);
-                    Logging.LogException(LogTag, ex);
+                    LogError(LogTag, "Transaction, Error occurs while deleting character: " + id);
+                    LogException(LogTag, ex);
                     transaction.Rollback();
                 }
                 transaction.Dispose();

@@ -1,6 +1,5 @@
 ﻿#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
 using System.Collections.Generic;
-using LiteNetLibManager;
 using Mono.Data.Sqlite;
 
 namespace MultiplayerARPG.MMO
@@ -12,7 +11,7 @@ namespace MultiplayerARPG.MMO
             string id = characterItem.id;
             if (insertedIds.Contains(id))
             {
-                Logging.LogWarning($"Item {id}, inventory type {inventoryType}, for character {characterId}, already inserted");
+                LogWarning(LogTag, $"Item {id}, inventory type {inventoryType}, for character {characterId}, already inserted");
                 return;
             }
             if (string.IsNullOrEmpty(characterItem.id))

@@ -1,5 +1,4 @@
 ﻿#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
-using LiteNetLibManager;
 using Mono.Data.Sqlite;
 using System.Collections.Generic;
 
@@ -12,7 +11,7 @@ namespace MultiplayerARPG.MMO
             string id = characterItem.id;
             if (insertedIds.Contains(id))
             {
-                Logging.LogWarning($"Storage item {id}, storage type {storageType}, owner {storageOwnerId}, already inserted");
+                LogWarning(LogTag, $"Storage item {id}, storage type {storageType}, owner {storageOwnerId}, already inserted");
                 return;
             }
             if (string.IsNullOrEmpty(characterItem.id))
@@ -89,8 +88,8 @@ namespace MultiplayerARPG.MMO
             }
             catch (System.Exception ex)
             {
-                Logging.LogError(LogTag, "Transaction, Error occurs while replacing storage items");
-                Logging.LogException(LogTag, ex);
+                LogError(LogTag, "Transaction, Error occurs while replacing storage items");
+                LogException(LogTag, ex);
                 transaction.Rollback();
             }
             transaction.Dispose();

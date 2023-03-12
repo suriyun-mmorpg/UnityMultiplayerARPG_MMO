@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG.MMO
 {
-    public abstract partial class BaseDatabase : MonoBehaviour
+    public abstract partial class BaseDatabase : MonoBehaviour, IDatabaseManagerLogging
     {
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
         public const byte AUTH_TYPE_NORMAL = 1;

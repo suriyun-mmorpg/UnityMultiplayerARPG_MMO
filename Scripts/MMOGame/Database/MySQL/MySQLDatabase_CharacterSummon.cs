@@ -1,7 +1,6 @@
 ﻿#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
 using System.Collections.Generic;
 using Cysharp.Text;
-using LiteNetLibManager;
 using MySqlConnector;
 
 namespace MultiplayerARPG.MMO
@@ -31,7 +30,7 @@ namespace MultiplayerARPG.MMO
             string id = ZString.Concat(characterId, "_", idx);
             if (insertedIds.Contains(id))
             {
-                Logging.LogWarning($"Summon {id}, for character {characterId}, already inserted");
+                LogWarning(LogTag, $"Summon {id}, for character {characterId}, already inserted");
                 return;
             }
             insertedIds.Add(id);

@@ -1,7 +1,6 @@
 ﻿#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
 using System.Collections.Generic;
 using Cysharp.Text;
-using LiteNetLibManager;
 using Mono.Data.Sqlite;
 
 namespace MultiplayerARPG.MMO
@@ -26,7 +25,7 @@ namespace MultiplayerARPG.MMO
             string id = ZString.Concat(characterId, "_", characterSkill.dataId);
             if (insertedIds.Contains(id))
             {
-                Logging.LogWarning($"Skill {id}, for character {characterId}, already inserted");
+                LogWarning(LogTag, $"Skill {id}, for character {characterId}, already inserted");
                 return;
             }
             insertedIds.Add(id);

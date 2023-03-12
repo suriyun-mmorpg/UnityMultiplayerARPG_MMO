@@ -2,7 +2,6 @@
 using Mono.Data.Sqlite;
 using System.Collections.Generic;
 using System.IO;
-using LiteNetLibManager;
 using Newtonsoft.Json;
 using System;
 #endif
@@ -35,10 +34,10 @@ namespace MultiplayerARPG.MMO
             {
                 sqliteDbPath = dbPath,
             };
-            Logging.Log(LogTag, "Reading config file from " + configFilePath);
+            LogInformation(LogTag, "Reading config file from " + configFilePath);
             if (File.Exists(configFilePath))
             {
-                Logging.Log(LogTag, "Found config file");
+                LogInformation(LogTag, "Found config file");
                 string dataAsJson = File.ReadAllText(configFilePath);
                 SQLiteConfig replacingConfig = JsonConvert.DeserializeObject<SQLiteConfig>(dataAsJson);
                 if (!string.IsNullOrWhiteSpace(replacingConfig.sqliteDbPath))
@@ -51,7 +50,7 @@ namespace MultiplayerARPG.MMO
             if (!configFileFound)
             {
                 // Write config file
-                Logging.Log(LogTag, "Not found config file, creating a new one");
+                LogInformation(LogTag, "Not found config file, creating a new one");
                 if (!Directory.Exists(configFolder))
                     Directory.CreateDirectory(configFolder);
                 File.WriteAllText(configFilePath, JsonConvert.SerializeObject(config));
@@ -701,7 +700,7 @@ namespace MultiplayerARPG.MMO
                 }
                 catch (SqliteException ex)
                 {
-                    Logging.LogException(LogTag, ex);
+                    LogException(LogTag, ex);
                 }
             }
             return numRows;
@@ -729,7 +728,7 @@ namespace MultiplayerARPG.MMO
                 }
                 catch (SqliteException ex)
                 {
-                    Logging.LogException(LogTag, ex);
+                    LogException(LogTag, ex);
                 }
             }
             return result;
@@ -758,7 +757,7 @@ namespace MultiplayerARPG.MMO
                 }
                 catch (SqliteException ex)
                 {
-                    Logging.LogException(LogTag, ex);
+                    LogException(LogTag, ex);
                 }
             }
         }
