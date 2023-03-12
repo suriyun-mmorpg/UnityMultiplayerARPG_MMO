@@ -1,4 +1,4 @@
-﻿#if NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+﻿#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
 using Mono.Data.Sqlite;
 using System.Collections.Generic;
 using System.IO;
@@ -21,7 +21,7 @@ namespace MultiplayerARPG.MMO
         [SerializeField]
         [Tooltip("You should set this to where you build app to make database path as same as map server")]
         private string editorDbPath = "./mmorpgtemplate.sqlite3";
-#if NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
         private SqliteConnection connection;
 
         public override void Initialize()

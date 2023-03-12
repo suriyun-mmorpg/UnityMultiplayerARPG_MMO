@@ -1,4 +1,4 @@
-﻿#if NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+﻿#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
 using Mono.Data.Sqlite;
 
 namespace MultiplayerARPG.MMO
