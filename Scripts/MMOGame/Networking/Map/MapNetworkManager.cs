@@ -656,6 +656,7 @@ namespace MultiplayerARPG.MMO
                 new Vector3(playerCharacterData.CurrentPositionX, playerCharacterData.CurrentPositionY, playerCharacterData.CurrentPositionZ),
                 characterRotation);
             BasePlayerCharacterEntity playerCharacterEntity = spawnObj.GetComponent<BasePlayerCharacterEntity>();
+            SetInstanceMapCurrentLocation(playerCharacterEntity.ObjectId, savingCurrentMapName, savingCurrentPosition);
             playerCharacterData.CloneTo(playerCharacterEntity);
 
             // Set currencies
@@ -798,14 +799,17 @@ namespace MultiplayerARPG.MMO
             {
                 playerCharacterEntity.CallAllOnDead();
             }
-
-            // Prepare saving location for this character
-            if (IsInstanceMap())
-            {
-                instanceMapCurrentLocations.TryAdd(playerCharacterEntity.ObjectId, new KeyValuePair<string, Vector3>(savingCurrentMapName, savingCurrentPosition));
-            }
         }
 #endif
+
+        public void SetInstanceMapCurrentLocation(uint objectId, string currentMapName, Vector3 currentPosition)
+        {
+            if (!IsInstanceMap())
+                return;
+            instanceMapCurrentLocations.TryRemove(objectId, out _);
+            instanceMapCurrentLocations.TryAdd(objectId, new KeyValuePair<string, Vector3>(currentMapName, currentPosition));
+        }
+
         #endregion
 
         #region Network message handlers
