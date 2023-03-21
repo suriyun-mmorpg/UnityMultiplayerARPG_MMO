@@ -81,15 +81,9 @@ namespace MultiplayerARPG.MMO
             if (changeMap)
             {
                 savingCharacterData.CurrentMapName = mapName;
-                savingCharacterData.CurrentPositionX = position.x;
-                savingCharacterData.CurrentPositionY = position.y;
-                savingCharacterData.CurrentPositionZ = position.z;
+                savingCharacterData.CurrentPosition = position;
                 if (overrideRotation)
-                {
-                    savingCharacterData.CurrentRotationX = rotation.x;
-                    savingCharacterData.CurrentRotationY = rotation.y;
-                    savingCharacterData.CurrentRotationZ = rotation.z;
-                }
+                    savingCharacterData.CurrentRotation = rotation;
             }
             List<CharacterBuff> summonBuffs = new List<CharacterBuff>();
             CharacterSummon tempSummon;
