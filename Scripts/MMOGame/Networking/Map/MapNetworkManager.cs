@@ -92,7 +92,7 @@ namespace MultiplayerARPG.MMO
         private float lastSaveTime;
         // Listing
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-        private readonly ConcurrentDictionary<string, KeyValuePair<string, Vector3>> instanceMapCurrentLocations = new ConcurrentDictionary<string, KeyValuePair<string, Vector3>>();
+        private readonly ConcurrentDictionary<string, KeyValuePair<string, Vector3>> locationsBeforeEnterInstance = new ConcurrentDictionary<string, KeyValuePair<string, Vector3>>();
         private readonly ConcurrentDictionary<string, CentralServerPeerInfo> mapServerConnectionIdsBySceneName = new ConcurrentDictionary<string, CentralServerPeerInfo>();
         private readonly ConcurrentDictionary<string, CentralServerPeerInfo> instanceMapServerConnectionIdsByInstanceId = new ConcurrentDictionary<string, CentralServerPeerInfo>();
         private readonly ConcurrentDictionary<string, HashSet<uint>> instanceMapWarpingCharactersByInstanceId = new ConcurrentDictionary<string, HashSet<uint>>();
@@ -207,7 +207,7 @@ namespace MultiplayerARPG.MMO
         {
             base.Clean();
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-            instanceMapCurrentLocations.Clear();
+            locationsBeforeEnterInstance.Clear();
             mapServerConnectionIdsBySceneName.Clear();
             instanceMapServerConnectionIdsByInstanceId.Clear();
             instanceMapWarpingCharactersByInstanceId.Clear();
@@ -656,7 +656,7 @@ namespace MultiplayerARPG.MMO
                 new Vector3(playerCharacterData.CurrentPositionX, playerCharacterData.CurrentPositionY, playerCharacterData.CurrentPositionZ),
                 characterRotation);
             BasePlayerCharacterEntity playerCharacterEntity = spawnObj.GetComponent<BasePlayerCharacterEntity>();
-            SetInstanceMapCurrentLocation(playerCharacterData.Id, savingCurrentMapName, savingCurrentPosition);
+            SetLocationBeforeEnterInstance(playerCharacterData.Id, savingCurrentMapName, savingCurrentPosition);
             playerCharacterData.CloneTo(playerCharacterEntity);
 
             // Set currencies
@@ -803,12 +803,12 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-        public void SetInstanceMapCurrentLocation(string id, string currentMapName, Vector3 currentPosition)
+        public void SetLocationBeforeEnterInstance(string id, string currentMapName, Vector3 currentPosition)
         {
             if (!IsInstanceMap())
                 return;
-            instanceMapCurrentLocations.TryRemove(id, out _);
-            instanceMapCurrentLocations.TryAdd(id, new KeyValuePair<string, Vector3>(currentMapName, currentPosition));
+            locationsBeforeEnterInstance.TryRemove(id, out _);
+            locationsBeforeEnterInstance.TryAdd(id, new KeyValuePair<string, Vector3>(currentMapName, currentPosition));
         }
 #endif
 
