@@ -115,7 +115,7 @@ namespace MultiplayerARPG.MMO
         public CentralNetworkManager CentralNetworkManager { get { return centralNetworkManager; } }
         public MapSpawnNetworkManager MapSpawnNetworkManager { get { return mapSpawnNetworkManager; } }
         public MapNetworkManager MapNetworkManager { get { return mapNetworkManager; } }
-        public IDatabaseClient DatabaseNetworkManager
+        public IDatabaseClient DatabaseClient
         {
             get
             {

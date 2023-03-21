@@ -11,7 +11,7 @@ namespace MultiplayerARPG.MMO
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         public IDatabaseClient DbServiceClient
         {
-            get { return MMOServerInstance.Singleton.DatabaseNetworkManager; }
+            get { return MMOServerInstance.Singleton.DatabaseClient; }
         }
 
         private ConcurrentHashSet<string> busyMailBoxes = new ConcurrentHashSet<string>();
