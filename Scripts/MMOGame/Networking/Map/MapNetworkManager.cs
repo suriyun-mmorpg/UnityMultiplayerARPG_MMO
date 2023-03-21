@@ -92,7 +92,7 @@ namespace MultiplayerARPG.MMO
         private float lastSaveTime;
         // Listing
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-        private readonly ConcurrentDictionary<uint, KeyValuePair<string, Vector3>> instanceMapCurrentLocations = new ConcurrentDictionary<uint, KeyValuePair<string, Vector3>>();
+        private readonly ConcurrentDictionary<string, KeyValuePair<string, Vector3>> instanceMapCurrentLocations = new ConcurrentDictionary<string, KeyValuePair<string, Vector3>>();
         private readonly ConcurrentDictionary<string, CentralServerPeerInfo> mapServerConnectionIdsBySceneName = new ConcurrentDictionary<string, CentralServerPeerInfo>();
         private readonly ConcurrentDictionary<string, CentralServerPeerInfo> instanceMapServerConnectionIdsByInstanceId = new ConcurrentDictionary<string, CentralServerPeerInfo>();
         private readonly ConcurrentDictionary<string, HashSet<uint>> instanceMapWarpingCharactersByInstanceId = new ConcurrentDictionary<string, HashSet<uint>>();
@@ -656,7 +656,7 @@ namespace MultiplayerARPG.MMO
                 new Vector3(playerCharacterData.CurrentPositionX, playerCharacterData.CurrentPositionY, playerCharacterData.CurrentPositionZ),
                 characterRotation);
             BasePlayerCharacterEntity playerCharacterEntity = spawnObj.GetComponent<BasePlayerCharacterEntity>();
-            SetInstanceMapCurrentLocation(playerCharacterEntity.ObjectId, savingCurrentMapName, savingCurrentPosition);
+            SetInstanceMapCurrentLocation(playerCharacterData.Id, savingCurrentMapName, savingCurrentPosition);
             playerCharacterData.CloneTo(playerCharacterEntity);
 
             // Set currencies
@@ -802,15 +802,17 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-        public void SetInstanceMapCurrentLocation(uint objectId, string currentMapName, Vector3 currentPosition)
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+        public void SetInstanceMapCurrentLocation(string id, string currentMapName, Vector3 currentPosition)
         {
             if (!IsInstanceMap())
                 return;
-            instanceMapCurrentLocations.TryRemove(objectId, out _);
-            instanceMapCurrentLocations.TryAdd(objectId, new KeyValuePair<string, Vector3>(currentMapName, currentPosition));
+            instanceMapCurrentLocations.TryRemove(id, out _);
+            instanceMapCurrentLocations.TryAdd(id, new KeyValuePair<string, Vector3>(currentMapName, currentPosition));
         }
+#endif
 
-        #endregion
+#endregion
 
         #region Network message handlers
         protected override void HandleWarpAtClient(MessageHandlerData messageHandler)

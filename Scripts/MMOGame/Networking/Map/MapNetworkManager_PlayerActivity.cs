@@ -14,7 +14,7 @@ namespace MultiplayerARPG.MMO
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             if (!IsInstanceMap())
                 return base.GetCurrentMapId(playerCharacterEntity);
-            return instanceMapCurrentLocations[playerCharacterEntity.ObjectId].Key;
+            return instanceMapCurrentLocations[playerCharacterEntity.Id].Key;
 #else
             return string.Empty;
 #endif
@@ -25,7 +25,7 @@ namespace MultiplayerARPG.MMO
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             if (!IsInstanceMap())
                 return base.GetCurrentPosition(playerCharacterEntity);
-            return instanceMapCurrentLocations[playerCharacterEntity.ObjectId].Value;
+            return instanceMapCurrentLocations[playerCharacterEntity.Id].Value;
 #else
             return Vector3.zero;
 #endif
