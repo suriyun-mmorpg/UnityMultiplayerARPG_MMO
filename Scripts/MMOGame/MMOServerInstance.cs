@@ -127,8 +127,8 @@ namespace MultiplayerARPG.MMO
         }
         public bool UseWebSocket { get { return useWebSocket; } }
         public bool WebSocketSecure { get { return webSocketSecure; } }
-        public string WebScoketCertificateFilePath { get { return webSocketCertPath; } }
-        public string WebScoketCertificatePassword { get { return webSocketCertPassword; } }
+        public string WebSocketCertificateFilePath { get { return webSocketCertPath; } }
+        public string WebSocketCertificatePassword { get { return webSocketCertPassword; } }
 
         private LogGUI cacheLogGUI;
         public LogGUI CacheLogGUI
@@ -653,8 +653,8 @@ namespace MultiplayerARPG.MMO
         {
             CentralNetworkManager.useWebSocket = UseWebSocket;
             CentralNetworkManager.webSocketSecure = WebSocketSecure;
-            CentralNetworkManager.webSocketCertificateFilePath = WebScoketCertificateFilePath;
-            CentralNetworkManager.webSocketCertificatePassword = WebScoketCertificatePassword;
+            CentralNetworkManager.webSocketCertificateFilePath = WebSocketCertificateFilePath;
+            CentralNetworkManager.webSocketCertificatePassword = WebSocketCertificatePassword;
             CentralNetworkManager.StartServer();
         }
 
@@ -667,8 +667,8 @@ namespace MultiplayerARPG.MMO
         {
             MapNetworkManager.useWebSocket = UseWebSocket;
             MapNetworkManager.webSocketSecure = WebSocketSecure;
-            MapNetworkManager.webSocketCertificateFilePath = WebScoketCertificateFilePath;
-            MapNetworkManager.webSocketCertificatePassword = WebScoketCertificatePassword;
+            MapNetworkManager.webSocketCertificateFilePath = WebSocketCertificateFilePath;
+            MapNetworkManager.webSocketCertificatePassword = WebSocketCertificatePassword;
             MapNetworkManager.StartServer();
         }
 
