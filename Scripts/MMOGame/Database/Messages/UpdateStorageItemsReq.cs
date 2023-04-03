@@ -18,7 +18,7 @@ namespace MultiplayerARPG.MMO
             StorageItems = reader.GetList<CharacterItem>();
             UpdateCharacterData = reader.GetBool();
             if (UpdateCharacterData)
-                CharacterData = reader.GetValue<PlayerCharacterData>();
+                CharacterData = reader.Get(() => new PlayerCharacterData());
         }
 
         public void Serialize(NetDataWriter writer)
@@ -28,7 +28,7 @@ namespace MultiplayerARPG.MMO
             writer.PutList(StorageItems);
             writer.Put(UpdateCharacterData);
             if (UpdateCharacterData)
-                writer.PutValue(CharacterData);
+                writer.Put(CharacterData);
         }
     }
 }

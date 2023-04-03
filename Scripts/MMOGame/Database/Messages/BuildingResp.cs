@@ -8,12 +8,12 @@ namespace MultiplayerARPG.MMO
 
         public void Deserialize(NetDataReader reader)
         {
-            BuildingData = reader.GetValue<BuildingSaveData>();
+            BuildingData = reader.Get<BuildingSaveData>();
         }
 
         public void Serialize(NetDataWriter writer)
         {
-            writer.PutValue(BuildingData);
+            writer.Put(BuildingData);
         }
     }
 }

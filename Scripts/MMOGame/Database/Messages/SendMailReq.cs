@@ -10,13 +10,13 @@ namespace MultiplayerARPG.MMO
         public void Deserialize(NetDataReader reader)
         {
             ReceiverId = reader.GetString();
-            Mail = reader.GetValue<Mail>();
+            Mail = reader.Get(() => new Mail());
         }
 
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(ReceiverId);
-            writer.PutValue(Mail);
+            writer.Put(Mail);
         }
     }
 }

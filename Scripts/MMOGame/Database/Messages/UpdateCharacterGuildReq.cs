@@ -12,14 +12,14 @@ namespace MultiplayerARPG.MMO
         {
             GuildId = reader.GetInt();
             GuildRole = reader.GetByte();
-            SocialCharacterData = reader.GetValue<SocialCharacterData>();
+            SocialCharacterData = reader.Get<SocialCharacterData>();
         }
 
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(GuildId);
             writer.Put(GuildRole);
-            writer.PutValue(SocialCharacterData);
+            writer.Put(SocialCharacterData);
         }
     }
 }

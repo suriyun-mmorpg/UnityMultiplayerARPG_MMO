@@ -10,13 +10,13 @@ namespace MultiplayerARPG.MMO
         public void Deserialize(NetDataReader reader)
         {
             MapName = reader.GetString();
-            BuildingData = reader.GetValue<BuildingSaveData>();
+            BuildingData = reader.Get<BuildingSaveData>();
         }
 
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(MapName);
-            writer.PutValue(BuildingData);
+            writer.Put(BuildingData);
         }
     }
 }
