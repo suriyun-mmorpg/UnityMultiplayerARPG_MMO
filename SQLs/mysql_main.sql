@@ -291,9 +291,10 @@ CREATE TABLE `guildrole` (
   `guildId` int NOT NULL,
   `guildRole` int NOT NULL,
   `name` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `canInvite` tinyint(1) NOT NULL,
-  `canKick` tinyint(1) NOT NULL,
-  `shareExpPercentage` int NOT NULL
+  `canInvite` tinyint(1) NOT NULL DEFAULT '0',
+  `canKick` tinyint(1) NOT NULL DEFAULT '0',
+  `canUseStorage` tinyint(1) NOT NULL DEFAULT '0',
+  `shareExpPercentage` int NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -458,7 +459,9 @@ INSERT INTO `__migrations` (`migrationId`) VALUES
 ('1.76'),
 ('1.77'),
 ('1.78'),
-('1.78b');
+('1.78b'),
+('1.79'),
+('1.82');
 
 --
 -- Indexes for dumped tables
