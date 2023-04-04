@@ -687,10 +687,10 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             // Update to cache
-            guild.SetRole(request.GuildRole, request.RoleName, request.CanInvite, request.CanKick, request.ShareExpPercentage);
+            guild.SetRole(request.GuildRole, request.GuildRoleData);
             cachedGuild[request.GuildId] = guild;
             // Update to
-            Database.UpdateGuildRole(request.GuildId, request.GuildRole, request.RoleName, request.CanInvite, request.CanKick, request.ShareExpPercentage);
+            Database.UpdateGuildRole(request.GuildId, request.GuildRole, request.GuildRoleData);
             result.InvokeSuccess(new GuildResp()
             {
                 GuildData = guild

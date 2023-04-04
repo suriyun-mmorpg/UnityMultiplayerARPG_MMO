@@ -1192,14 +1192,14 @@ namespace MultiplayerARPG.MMO
                         ServerGameMessageHandlers.SendSetGuildMessageToMembers(guild);
                         break;
                     case UpdateGuildMessage.UpdateType.SetGuildRole:
-                        guild.SetRole(message.guildRole, message.roleName, message.canInvite, message.canKick, message.shareExpPercentage);
+                        guild.SetRole(message.guildRole, message.guildRoleData);
                         ServerGuildHandlers.SetGuild(message.id, guild);
                         foreach (string memberId in guild.GetMemberIds())
                         {
                             if (ServerUserHandlers.TryGetPlayerCharacterById(memberId, out playerCharacterEntity))
                                 playerCharacterEntity.GuildRole = guild.GetMemberRole(playerCharacterEntity.Id);
                         }
-                        ServerGameMessageHandlers.SendSetGuildRoleToMembers(guild, message.guildRole, message.roleName, message.canInvite, message.canKick, message.shareExpPercentage);
+                        ServerGameMessageHandlers.SendSetGuildRoleToMembers(guild, message.guildRole, message.guildRoleData);
                         break;
                     case UpdateGuildMessage.UpdateType.SetGuildMemberRole:
                         guild.SetMemberRole(message.characterId, message.guildRole);

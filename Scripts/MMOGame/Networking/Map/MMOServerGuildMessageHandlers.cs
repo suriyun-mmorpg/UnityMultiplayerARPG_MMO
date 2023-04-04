@@ -652,7 +652,9 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanChangeGuildRole(playerCharacter, request.guildRole, request.name);
+            if (request.guildRoleData.shareExpPercentage > GameInstance.Singleton.SocialSystemSetting.MaxShareExpPercentage)
+                request.guildRoleData.shareExpPercentage = GameInstance.Singleton.SocialSystemSetting.MaxShareExpPercentage;
+            ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanChangeGuildRole(playerCharacter, request.guildRole, request.guildRoleData.roleName);
             if (!validateResult.IsSuccess)
             {
                 result.InvokeError(new ResponseChangeGuildRoleMessage()
@@ -666,10 +668,7 @@ namespace MultiplayerARPG.MMO
             {
                 GuildId = validateResult.GuildId,
                 GuildRole = request.guildRole,
-                RoleName = request.name,
-                CanInvite = request.canInvite,
-                CanKick = request.canKick,
-                ShareExpPercentage = request.shareExpPercentage
+                GuildRoleData = request.guildRoleData,
             });
             if (!updateResp.IsSuccess)
             {
@@ -680,7 +679,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             // Update cache
-            validateResult.Guild.SetRole(request.guildRole, request.name, request.canInvite, request.canKick, request.shareExpPercentage);
+            validateResult.Guild.SetRole(request.guildRole, request.guildRoleData);
             GameInstance.ServerGuildHandlers.SetGuild(validateResult.GuildId, validateResult.Guild);
             // Change characters guild role
             IPlayerCharacterData memberCharacter;
@@ -689,15 +688,15 @@ namespace MultiplayerARPG.MMO
                 if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(memberId, out memberCharacter))
                 {
                     if (validateResult.Guild.GetMemberRole(memberCharacter.Id) == request.guildRole)
-                        memberCharacter.SharedGuildExp = request.shareExpPercentage;
+                        memberCharacter.SharedGuildExp = request.guildRoleData.shareExpPercentage;
                 }
             }
             // Broadcast via chat server
             if (ClusterClient.IsNetworkActive)
             {
-                ClusterClient.SendSetGuildRole(MMOMessageTypes.UpdateGuild, validateResult.GuildId, request.guildRole, request.name, request.canInvite, request.canKick, request.shareExpPercentage);
+                ClusterClient.SendSetGuildRole(MMOMessageTypes.UpdateGuild, validateResult.GuildId, request.guildRole, request.guildRoleData);
             }
-            GameInstance.ServerGameMessageHandlers.SendSetGuildRoleToMembers(validateResult.Guild, request.guildRole, request.name, request.canInvite, request.canKick, request.shareExpPercentage);
+            GameInstance.ServerGameMessageHandlers.SendSetGuildRoleToMembers(validateResult.Guild, request.guildRole, request.guildRoleData);
             result.InvokeSuccess(new ResponseChangeGuildRoleMessage());
 #endif
         }
