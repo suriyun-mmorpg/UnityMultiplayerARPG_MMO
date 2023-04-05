@@ -1,10 +1,6 @@
 ﻿using System.Linq;
 using UnityEngine;
 using LiteNetLibManager;
-using ConcurrentCollections;
-using System.Collections.Concurrent;
-using System;
-using System.Collections.Generic;
 
 namespace MultiplayerARPG.MMO
 {
@@ -40,27 +36,6 @@ namespace MultiplayerARPG.MMO
                 index < databaseOptions.Length)
                 database = databaseOptions[index];
         }
-
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-        // TODO: I'm going to make in-memory database without Redis for now
-        // In the future it may implements Redis
-        // It's going to get some data from all tables but not every records
-        // Just some records that players were requested
-        private ConcurrentHashSet<string> cachedUsernames = new ConcurrentHashSet<string>(StringComparer.OrdinalIgnoreCase);
-        private ConcurrentHashSet<string> cachedEmails = new ConcurrentHashSet<string>(StringComparer.OrdinalIgnoreCase);
-        private ConcurrentHashSet<string> cachedCharacterNames = new ConcurrentHashSet<string>(StringComparer.OrdinalIgnoreCase);
-        private ConcurrentHashSet<string> cachedGuildNames = new ConcurrentHashSet<string>(StringComparer.OrdinalIgnoreCase);
-        private ConcurrentDictionary<string, string> cachedUserAccessToken = new ConcurrentDictionary<string, string>();
-        private ConcurrentDictionary<string, int> cachedUserGold = new ConcurrentDictionary<string, int>();
-        private ConcurrentDictionary<string, int> cachedUserCash = new ConcurrentDictionary<string, int>();
-        private ConcurrentDictionary<string, PlayerCharacterData> cachedUserCharacter = new ConcurrentDictionary<string, PlayerCharacterData>();
-        private ConcurrentDictionary<string, SocialCharacterData> cachedSocialCharacter = new ConcurrentDictionary<string, SocialCharacterData>();
-        private ConcurrentDictionary<string, ConcurrentDictionary<string, BuildingSaveData>> cachedBuilding = new ConcurrentDictionary<string, ConcurrentDictionary<string, BuildingSaveData>>();
-        private ConcurrentDictionary<int, PartyData> cachedParty = new ConcurrentDictionary<int, PartyData>();
-        private ConcurrentDictionary<int, GuildData> cachedGuild = new ConcurrentDictionary<int, GuildData>();
-        private ConcurrentDictionary<StorageId, List<CharacterItem>> cachedStorageItems = new ConcurrentDictionary<StorageId, List<CharacterItem>>();
-        private ConcurrentDictionary<StorageId, float> updatingStorages = new ConcurrentDictionary<StorageId, float>();
-#endif
 
         protected override void Start()
         {
