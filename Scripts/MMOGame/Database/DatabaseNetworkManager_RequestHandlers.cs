@@ -861,7 +861,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             await UniTask.SwitchToMainThread();
-            guild = GameInstance.Singleton.SocialSystemSetting.IncreaseGuildExp(guild, request.Exp);
+            guild.IncreaseGuildExp(GameInstance.Singleton.SocialSystemSetting.GuildExpTree, request.Exp);
             // Update to cache
             cachedGuild.TryAdd(guild.id, guild);
             // Update to database
