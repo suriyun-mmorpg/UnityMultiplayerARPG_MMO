@@ -29,7 +29,7 @@ namespace MultiplayerARPG.MMO
         private ConcurrentDictionary<int, PartyData> cachedParty = new ConcurrentDictionary<int, PartyData>();
         private ConcurrentDictionary<int, GuildData> cachedGuild = new ConcurrentDictionary<int, GuildData>();
         private ConcurrentDictionary<StorageId, List<CharacterItem>> cachedStorageItems = new ConcurrentDictionary<StorageId, List<CharacterItem>>();
-        private ConcurrentDictionary<StorageId, float> updatingStorages = new ConcurrentDictionary<StorageId, float>();
+        private ConcurrentDictionary<StorageId, long> updatingStorages = new ConcurrentDictionary<StorageId, long>();
 #endif
 
         protected async UniTaskVoid ValidateUserLogin(RequestHandlerData requestHandler, ValidateUserLoginReq request, RequestProceedResultDelegate<ValidateUserLoginResp> result)
@@ -955,8 +955,8 @@ namespace MultiplayerARPG.MMO
             StorageId storageId = new StorageId(request.StorageType, request.StorageOwnerId);
             if (request.ReadForUpdate)
             {
-                float time = Time.unscaledTime;
-                if (updatingStorages.TryGetValue(storageId, out float oldTime) && time - oldTime < 0.5f)
+                long time = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+                if (updatingStorages.TryGetValue(storageId, out long oldTime) && time - oldTime < 500)
                 {
                     // Not allow to update yet
                     result.InvokeError(new ReadStorageItemsResp());
@@ -977,8 +977,8 @@ namespace MultiplayerARPG.MMO
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             StorageId storageId = new StorageId(request.StorageType, request.StorageOwnerId);
-            float time = Time.unscaledTime;
-            if (updatingStorages.TryGetValue(storageId, out float oldTime) && time - oldTime >= 0.5f)
+            long time = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+            if (updatingStorages.TryGetValue(storageId, out long oldTime) && time - oldTime >= 500)
             {
                 // Timeout
                 result.InvokeError(EmptyMessage.Value);
