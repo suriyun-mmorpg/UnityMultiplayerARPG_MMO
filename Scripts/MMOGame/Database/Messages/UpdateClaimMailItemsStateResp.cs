@@ -4,9 +4,6 @@ namespace MultiplayerARPG.MMO
 {
     public partial struct UpdateClaimMailItemsStateResp : INetSerializable
     {
-        public UITextKeys Error { get; set; }
-        public Mail Mail { get; set; }
-
         public void Deserialize(NetDataReader reader)
         {
             Error = (UITextKeys)reader.GetByte();

@@ -4,8 +4,6 @@ namespace MultiplayerARPG.MMO
 {
     public partial struct ReadBuildingsReq : INetSerializable
     {
-        public string MapName { get; set; }
-
         public void Deserialize(NetDataReader reader)
         {
             MapName = reader.GetString();

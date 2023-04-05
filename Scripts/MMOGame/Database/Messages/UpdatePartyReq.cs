@@ -4,10 +4,6 @@ namespace MultiplayerARPG.MMO
 {
     public partial struct UpdatePartyReq : INetSerializable
     {
-        public int PartyId { get; set; }
-        public bool ShareExp { get; set; }
-        public bool ShareItem { get; set; }
-
         public void Deserialize(NetDataReader reader)
         {
             PartyId = reader.GetInt();

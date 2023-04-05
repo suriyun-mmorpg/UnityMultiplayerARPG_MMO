@@ -4,9 +4,6 @@ namespace MultiplayerARPG.MMO
 {
     public partial struct SendMailReq : INetSerializable
     {
-        public string ReceiverId { get; set; }
-        public Mail Mail { get; set; }
-
         public void Deserialize(NetDataReader reader)
         {
             ReceiverId = reader.GetString();

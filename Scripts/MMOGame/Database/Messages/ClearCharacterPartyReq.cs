@@ -4,9 +4,6 @@ namespace MultiplayerARPG.MMO
 {
     public partial struct ClearCharacterPartyReq : INetSerializable
     {
-        public string CharacterId { get; set; }
-        public int PartyId { get; set; }
-
         public void Deserialize(NetDataReader reader)
         {
             CharacterId = reader.GetString();

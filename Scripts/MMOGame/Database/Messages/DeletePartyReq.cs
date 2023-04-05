@@ -4,8 +4,6 @@ namespace MultiplayerARPG.MMO
 {
     public partial struct DeletePartyReq : INetSerializable
     {
-        public int PartyId { get; set; }
-
         public void Deserialize(NetDataReader reader)
         {
             PartyId = reader.GetInt();

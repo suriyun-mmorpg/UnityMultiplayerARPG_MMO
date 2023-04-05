@@ -4,8 +4,6 @@ namespace MultiplayerARPG.MMO
 {
     public partial struct GuildResp : INetSerializable
     {
-        public GuildData GuildData { get; set; }
-
         public void Deserialize(NetDataReader reader)
         {
             GuildData = reader.Get(() => new GuildData());

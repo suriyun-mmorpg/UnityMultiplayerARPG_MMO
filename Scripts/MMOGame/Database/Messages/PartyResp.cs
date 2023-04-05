@@ -4,8 +4,6 @@ namespace MultiplayerARPG.MMO
 {
     public partial struct PartyResp : INetSerializable
     {
-        public PartyData PartyData { get; set; }
-
         public void Deserialize(NetDataReader reader)
         {
             PartyData = reader.Get(() => new PartyData());

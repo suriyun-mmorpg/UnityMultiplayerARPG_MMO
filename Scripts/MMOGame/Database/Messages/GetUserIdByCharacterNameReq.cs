@@ -4,8 +4,6 @@ namespace MultiplayerARPG.MMO
 {
     public partial struct GetUserIdByCharacterNameReq : INetSerializable
     {
-        public string CharacterName { get; set; }
-
         public void Deserialize(NetDataReader reader)
         {
             CharacterName = reader.GetString();

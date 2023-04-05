@@ -4,8 +4,6 @@ namespace MultiplayerARPG.MMO
 {
     public partial struct GetFriendRequestNotificationReq : INetSerializable
     {
-        public string CharacterId { get; set; }
-
         public void Deserialize(NetDataReader reader)
         {
             CharacterId = reader.GetString();

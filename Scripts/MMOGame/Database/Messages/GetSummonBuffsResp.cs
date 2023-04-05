@@ -1,12 +1,9 @@
 ﻿using LiteNetLib.Utils;
-using System.Collections.Generic;
 
 namespace MultiplayerARPG.MMO
 {
     public partial struct GetSummonBuffsResp : INetSerializable
     {
-        public List<CharacterBuff> SummonBuffs { get; set; }
-
         public void Deserialize(NetDataReader reader)
         {
             SummonBuffs = reader.GetList<CharacterBuff>();

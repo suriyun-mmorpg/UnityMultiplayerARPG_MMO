@@ -4,9 +4,6 @@ namespace MultiplayerARPG.MMO
 {
     public partial struct ValidateAccessTokenReq : INetSerializable
     {
-        public string UserId { get; set; }
-        public string AccessToken { get; set; }
-
         public void Deserialize(NetDataReader reader)
         {
             UserId = reader.GetString();

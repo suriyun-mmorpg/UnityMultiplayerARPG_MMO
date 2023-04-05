@@ -1,12 +1,9 @@
 ﻿using LiteNetLib.Utils;
-using System.Collections.Generic;
 
 namespace MultiplayerARPG.MMO
 {
     public partial struct SocialCharactersResp : INetSerializable
     {
-        public List<SocialCharacterData> List { get; set; }
-
         public void Deserialize(NetDataReader reader)
         {
             List = reader.GetList<SocialCharacterData>();

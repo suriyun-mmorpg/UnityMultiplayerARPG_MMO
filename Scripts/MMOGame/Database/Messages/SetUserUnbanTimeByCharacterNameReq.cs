@@ -4,9 +4,6 @@ namespace MultiplayerARPG.MMO
 {
     public partial struct SetUserUnbanTimeByCharacterNameReq : INetSerializable
     {
-        public string CharacterName { get; set; }
-        public long UnbanTime { get; set; }
-
         public void Deserialize(NetDataReader reader)
         {
             CharacterName = reader.GetString();

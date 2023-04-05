@@ -4,8 +4,6 @@ namespace MultiplayerARPG.MMO
 {
     public partial struct FindEmailReq : INetSerializable
     {
-        public string Email { get; set; }
-
         public void Deserialize(NetDataReader reader)
         {
             Email = reader.GetString();
