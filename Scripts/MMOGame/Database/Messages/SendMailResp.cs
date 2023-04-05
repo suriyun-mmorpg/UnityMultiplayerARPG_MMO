@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG.MMO
 {
-    public struct SendMailResp : INetSerializable
+    public partial struct SendMailResp : INetSerializable
     {
         public UITextKeys Error { get; set; }
 

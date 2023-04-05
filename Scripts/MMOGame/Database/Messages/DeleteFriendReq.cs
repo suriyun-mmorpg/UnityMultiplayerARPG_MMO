@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG.MMO
 {
-    public struct DeleteFriendReq : INetSerializable
+    public partial struct DeleteFriendReq : INetSerializable
     {
         public string Character1Id { get; set; }
         public string Character2Id { get; set; }

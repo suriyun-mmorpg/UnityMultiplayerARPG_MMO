@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace MultiplayerARPG.MMO
 {
-    public struct SocialCharactersResp : INetSerializable
+    public partial struct SocialCharactersResp : INetSerializable
     {
         public List<SocialCharacterData> List { get; set; }
 

@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG.MMO
 {
-    public struct CreateCharacterReq : INetSerializable
+    public partial struct CreateCharacterReq : INetSerializable
     {
         public string UserId { get; set; }
         public PlayerCharacterData CharacterData { get; set; }

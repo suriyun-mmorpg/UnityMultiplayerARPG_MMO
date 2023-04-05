@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG.MMO
 {
-    public struct ReadStorageItemsReq : INetSerializable
+    public partial struct ReadStorageItemsReq : INetSerializable
     {
         public StorageType StorageType { get; set; }
         public string StorageOwnerId { get; set; }

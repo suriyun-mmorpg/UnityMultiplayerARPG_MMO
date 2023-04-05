@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG.MMO
 {
-    public struct GetCashReq : INetSerializable
+    public partial struct GetCashReq : INetSerializable
     {
         public string UserId { get; set; }
 

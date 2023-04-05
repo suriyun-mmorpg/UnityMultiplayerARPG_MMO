@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG.MMO
 {
-    public struct UpdateAccessTokenReq : INetSerializable
+    public partial struct UpdateAccessTokenReq : INetSerializable
     {
         public string UserId { get; set; }
         public string AccessToken { get; set; }

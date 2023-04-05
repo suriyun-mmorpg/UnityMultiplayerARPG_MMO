@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG.MMO
 {
-    public struct UpdateUserCountReq : INetSerializable
+    public partial struct UpdateUserCountReq : INetSerializable
     {
         public int UserCount { get; set; }
 

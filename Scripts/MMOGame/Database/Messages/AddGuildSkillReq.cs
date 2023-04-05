@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG.MMO
 {
-    public struct AddGuildSkillReq : INetSerializable
+    public partial struct AddGuildSkillReq : INetSerializable
     {
         public int GuildId { get; set; }
         public int SkillId { get; set; }

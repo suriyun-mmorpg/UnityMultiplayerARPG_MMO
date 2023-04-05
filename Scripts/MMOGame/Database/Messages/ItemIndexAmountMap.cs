@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG.MMO
 {
-    public struct ItemIndexAmountMap : INetSerializable
+    public partial struct ItemIndexAmountMap : INetSerializable
     {
         public int Index { get; set; }
         public int Amount { get; set; }

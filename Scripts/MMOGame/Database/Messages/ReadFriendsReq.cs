@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG.MMO
 {
-    public struct ReadFriendsReq : INetSerializable
+    public partial struct ReadFriendsReq : INetSerializable
     {
         public string CharacterId { get; set; }
         public bool ReadById2 { get; set; }

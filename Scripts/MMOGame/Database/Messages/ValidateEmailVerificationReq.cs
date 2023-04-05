@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG.MMO
 {
-    public struct ValidateEmailVerificationReq : INetSerializable
+    public partial struct ValidateEmailVerificationReq : INetSerializable
     {
         public string UserId { get; set; }
 

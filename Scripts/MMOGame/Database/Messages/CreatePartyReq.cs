@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG.MMO
 {
-    public struct CreatePartyReq : INetSerializable
+    public partial struct CreatePartyReq : INetSerializable
     {
         public bool ShareExp { get; set; }
         public bool ShareItem { get; set; }

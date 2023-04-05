@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG.MMO
 {
-    public struct CreateBuildingReq : INetSerializable
+    public partial struct CreateBuildingReq : INetSerializable
     {
         public string MapName { get; set; }
         public BuildingSaveData BuildingData { get; set; }

@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG.MMO
 {
-    public struct SetCharacterUnmuteTimeByNameReq : INetSerializable
+    public partial struct SetCharacterUnmuteTimeByNameReq : INetSerializable
     {
         public string CharacterName { get; set; }
         public long UnmuteTime { get; set; }

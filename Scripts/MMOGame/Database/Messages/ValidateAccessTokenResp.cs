@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG.MMO
 {
-    public struct ValidateAccessTokenResp : INetSerializable
+    public partial struct ValidateAccessTokenResp : INetSerializable
     {
         public bool IsPass { get; set; }
 

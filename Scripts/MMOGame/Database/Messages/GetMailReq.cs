@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG.MMO
 {
-    public struct GetMailReq : INetSerializable
+    public partial struct GetMailReq : INetSerializable
     {
         public string MailId { get; set; }
         public string UserId { get; set; }

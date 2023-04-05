@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace MultiplayerARPG.MMO
 {
-    public struct UpdateStorageItemsReq : INetSerializable
+    public partial struct UpdateStorageItemsReq : INetSerializable
     {
         public StorageType StorageType { get; set; }
         public string StorageOwnerId { get; set; }

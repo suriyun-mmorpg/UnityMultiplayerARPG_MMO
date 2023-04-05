@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG.MMO
 {
-    public struct GetUserLevelResp : INetSerializable
+    public partial struct GetUserLevelResp : INetSerializable
     {
         public byte UserLevel { get; set; }
 

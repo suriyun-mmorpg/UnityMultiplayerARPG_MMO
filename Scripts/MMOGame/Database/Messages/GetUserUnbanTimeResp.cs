@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG.MMO
 {
-    public struct GetUserUnbanTimeResp : INetSerializable
+    public partial struct GetUserUnbanTimeResp : INetSerializable
     {
         public long UnbanTime { get; set; }
 

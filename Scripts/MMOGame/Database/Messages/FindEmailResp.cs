@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG.MMO
 {
-    public struct FindEmailResp : INetSerializable
+    public partial struct FindEmailResp : INetSerializable
     {
         public long FoundAmount { get; set; }
 
