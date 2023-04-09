@@ -48,6 +48,7 @@ MonoBehaviour:
   username: root
   password: password
   dbName: mmorpg_kit
+  connectionString: 
 --- !u!1 &1250662783992638
 GameObject:
   m_ObjectHideFlags: 0
@@ -192,6 +193,7 @@ Transform:
   - {fileID: 4765183370109292}
   - {fileID: 4889244740642296}
   - {fileID: 4049227467700674}
+  - {fileID: 869722981334508554}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -228,7 +230,7 @@ MonoBehaviour:
   mapNetworkManager: {fileID: 0}
   databaseNetworkManager: {fileID: 114035231915985668}
   useCustomDatabaseClient: 0
-  customDatabaseClientSource: {fileID: 0}
+  customDatabaseClientSource: {fileID: 9006753358993515565}
   useWebSocket: 0
   webSocketSecure: 0
   webSocketCertPath: 
@@ -239,6 +241,7 @@ MonoBehaviour:
   startMapOnAwake: 0
   startingMap: {fileID: 11400000, guid: de8b0e4099f8d444692e88f92309e90d, type: 2}
   databaseOptionIndex: 0
+  databaseDisableCacheReading: 0
 --- !u!1 &1773992668051484
 GameObject:
   m_ObjectHideFlags: 0
@@ -360,3 +363,48 @@ MonoBehaviour:
   databaseOptions:
   - {fileID: 114715813743394434}
   - {fileID: 114414512406587944}
+  disableCacheReading: 0
+--- !u!1 &9006753358993515565
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 869722981334508554}
+  - component: {fileID: 346102967232166504}
+  m_Layer: 0
+  m_Name: RestDatabaseClient
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &869722981334508554
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9006753358993515565}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 4009622383931608}
+  m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &346102967232166504
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9006753358993515565}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b33263496a720a94cafb69cf2615fc6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  apiUrl: http://localhost:5757/
