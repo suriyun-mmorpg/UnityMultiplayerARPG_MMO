@@ -14,8 +14,7 @@ namespace MultiplayerARPG.MMO
             if (!loadingStorageIds.Contains(storageId))
             {
                 loadingStorageIds.Add(storageId);
-
-                AsyncResponseData<ReadStorageItemsResp> resp;
+                DatabaseApiResult<ReadStorageItemsResp> resp;
                 do
                 {
                     resp = await DbServiceClient.ReadStorageItemsAsync(new ReadStorageItemsReq()
@@ -36,7 +35,7 @@ namespace MultiplayerARPG.MMO
             if (id > 0 && !loadingPartyIds.Contains(id))
             {
                 loadingPartyIds.Add(id);
-                AsyncResponseData<PartyResp> resp;
+                DatabaseApiResult<PartyResp> resp;
                 do
                 {
                     resp = await DbServiceClient.ReadPartyAsync(new ReadPartyReq()
@@ -56,7 +55,7 @@ namespace MultiplayerARPG.MMO
             if (id > 0 && !loadingGuildIds.Contains(id))
             {
                 loadingGuildIds.Add(id);
-                AsyncResponseData<GuildResp> resp;
+                DatabaseApiResult<GuildResp> resp;
                 do
                 {
                     resp = await DbServiceClient.ReadGuildAsync(new ReadGuildReq()

@@ -111,7 +111,7 @@ namespace MultiplayerARPG.MMO
             }
             SetStorageBusy(storageId, playerCharacterEntity, true);
             // Refresh storage item from database
-            AsyncResponseData<ReadStorageItemsResp> readResp = await DbServiceClient.ReadStorageItemsAsync(new ReadStorageItemsReq()
+            DatabaseApiResult<ReadStorageItemsResp> readResp = await DbServiceClient.ReadStorageItemsAsync(new ReadStorageItemsReq()
             {
                 StorageType = request.storageType,
                 StorageOwnerId = request.storageOwnerId,
@@ -158,7 +158,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             // Update storage items to database
-            AsyncResponseData<EmptyMessage> updateResp = await DbServiceClient.UpdateStorageItemsAsync(new UpdateStorageItemsReq()
+            DatabaseApiResult updateResp = await DbServiceClient.UpdateStorageItemsAsync(new UpdateStorageItemsReq()
             {
                 StorageType = request.storageType,
                 StorageOwnerId = request.storageOwnerId,
@@ -222,7 +222,7 @@ namespace MultiplayerARPG.MMO
             }
             SetStorageBusy(storageId, playerCharacterEntity, true);
             // Refresh storage item from database
-            AsyncResponseData<ReadStorageItemsResp> readResp = await DbServiceClient.ReadStorageItemsAsync(new ReadStorageItemsReq()
+            DatabaseApiResult<ReadStorageItemsResp> readResp = await DbServiceClient.ReadStorageItemsAsync(new ReadStorageItemsReq()
             {
                 StorageType = request.storageType,
                 StorageOwnerId = request.storageOwnerId,
@@ -271,7 +271,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             // Update storage items to database
-            AsyncResponseData<EmptyMessage> updateResp = await DbServiceClient.UpdateStorageItemsAsync(new UpdateStorageItemsReq()
+            DatabaseApiResult updateResp = await DbServiceClient.UpdateStorageItemsAsync(new UpdateStorageItemsReq()
             {
                 StorageType = request.storageType,
                 StorageOwnerId = request.storageOwnerId,
@@ -336,7 +336,7 @@ namespace MultiplayerARPG.MMO
             // Mark as busy to not allow storage to be changed
             SetStorageBusy(storageId, playerCharacterEntity, true);
             // Refresh storage item from database
-            AsyncResponseData<ReadStorageItemsResp> readResp = await DbServiceClient.ReadStorageItemsAsync(new ReadStorageItemsReq()
+            DatabaseApiResult<ReadStorageItemsResp> readResp = await DbServiceClient.ReadStorageItemsAsync(new ReadStorageItemsReq()
             {
                 StorageType = request.storageType,
                 StorageOwnerId = request.storageOwnerId,
@@ -397,7 +397,7 @@ namespace MultiplayerARPG.MMO
             }
             storageItems.FillEmptySlots(isLimitSlot, slotLimit);
             // Update storage items to database
-            AsyncResponseData<EmptyMessage> updateResp = await DbServiceClient.UpdateStorageItemsAsync(new UpdateStorageItemsReq()
+            DatabaseApiResult updateResp = await DbServiceClient.UpdateStorageItemsAsync(new UpdateStorageItemsReq()
             {
                 StorageType = request.storageType,
                 StorageOwnerId = request.storageOwnerId,

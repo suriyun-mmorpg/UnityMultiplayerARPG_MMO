@@ -80,7 +80,7 @@ namespace MultiplayerARPG.MMO
             ValidateGuildRequestResult validateResult = this.CanIncreaseGuildExp(playerCharacter, exp);
             if (!validateResult.IsSuccess)
                 return;
-            AsyncResponseData<GuildResp> resp = await DbServiceClient.IncreaseGuildExpAsync(new IncreaseGuildExpReq()
+            DatabaseApiResult<GuildResp> resp = await DbServiceClient.IncreaseGuildExpAsync(new IncreaseGuildExpReq()
             {
                 GuildId = validateResult.GuildId,
                 Exp = exp,

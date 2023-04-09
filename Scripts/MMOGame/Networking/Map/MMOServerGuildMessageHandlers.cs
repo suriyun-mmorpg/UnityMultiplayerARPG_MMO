@@ -44,7 +44,7 @@ namespace MultiplayerARPG.MMO
             GameInstance.ServerGuildHandlers.SetGuild(request.guildId, validateResult.Guild);
             GameInstance.ServerGuildHandlers.RemoveGuildInvitation(request.guildId, playerCharacter.Id);
             // Save to database
-            AsyncResponseData<GuildResp> updateResp = await DbServiceClient.UpdateCharacterGuildAsync(new UpdateCharacterGuildReq()
+            DatabaseApiResult<GuildResp> updateResp = await DbServiceClient.UpdateCharacterGuildAsync(new UpdateCharacterGuildReq()
             {
                 SocialCharacterData = SocialCharacterData.Create(playerCharacter),
                 GuildId = request.guildId,
@@ -181,7 +181,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            AsyncResponseData<FindGuildNameResp> findGuildNameResp = await DbServiceClient.FindGuildNameAsync(new FindGuildNameReq()
+            DatabaseApiResult<FindGuildNameResp> findGuildNameResp = await DbServiceClient.FindGuildNameAsync(new FindGuildNameReq()
             {
                 GuildName = guildName,
             });
@@ -201,7 +201,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            AsyncResponseData<GuildResp> createGuildResp = await DbServiceClient.CreateGuildAsync(new CreateGuildReq()
+            DatabaseApiResult<GuildResp> createGuildResp = await DbServiceClient.CreateGuildAsync(new CreateGuildReq()
             {
                 LeaderCharacterId = playerCharacter.Id,
                 GuildName = guildName,
@@ -255,7 +255,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             // Save to database
-            AsyncResponseData<GuildResp> updateResp = await DbServiceClient.UpdateGuildLeaderAsync(new UpdateGuildLeaderReq()
+            DatabaseApiResult<GuildResp> updateResp = await DbServiceClient.UpdateGuildLeaderAsync(new UpdateGuildLeaderReq()
             {
                 GuildId = validateResult.GuildId,
                 LeaderCharacterId = request.memberId
@@ -268,7 +268,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            AsyncResponseData<GuildResp> updateRoleResp = await DbServiceClient.UpdateGuildMemberRoleAsync(new UpdateGuildMemberRoleReq()
+            DatabaseApiResult<GuildResp> updateRoleResp = await DbServiceClient.UpdateGuildMemberRoleAsync(new UpdateGuildMemberRoleReq()
             {
                 GuildId = validateResult.GuildId,
                 MemberCharacterId = request.memberId,
@@ -321,7 +321,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             // Save to database
-            AsyncResponseData<EmptyMessage> updateResp = await DbServiceClient.ClearCharacterGuildAsync(new ClearCharacterGuildReq()
+            DatabaseApiResult updateResp = await DbServiceClient.ClearCharacterGuildAsync(new ClearCharacterGuildReq()
             {
                 CharacterId = request.memberId
             });
@@ -376,7 +376,7 @@ namespace MultiplayerARPG.MMO
             if (validateResult.Guild.IsLeader(playerCharacter.Id))
             {
                 // Delete from database
-                AsyncResponseData<EmptyMessage> deleteResp = await DbServiceClient.DeleteGuildAsync(new DeleteGuildReq()
+                DatabaseApiResult deleteResp = await DbServiceClient.DeleteGuildAsync(new DeleteGuildReq()
                 {
                     GuildId = validateResult.GuildId
                 });
@@ -420,7 +420,7 @@ namespace MultiplayerARPG.MMO
             else
             {
                 // Save to database
-                AsyncResponseData<EmptyMessage> updateResp = await DbServiceClient.ClearCharacterGuildAsync(new ClearCharacterGuildReq()
+                DatabaseApiResult updateResp = await DbServiceClient.ClearCharacterGuildAsync(new ClearCharacterGuildReq()
                 {
                     CharacterId = playerCharacter.Id
                 });
@@ -470,7 +470,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             // Save to database
-            AsyncResponseData<GuildResp> updateResp = await DbServiceClient.UpdateGuildMessageAsync(new UpdateGuildMessageReq()
+            DatabaseApiResult<GuildResp> updateResp = await DbServiceClient.UpdateGuildMessageAsync(new UpdateGuildMessageReq()
             {
                 GuildId = validateResult.GuildId,
                 GuildMessage = request.message
@@ -518,7 +518,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             // Save to database
-            AsyncResponseData<GuildResp> updateResp = await DbServiceClient.UpdateGuildMessage2Async(new UpdateGuildMessageReq()
+            DatabaseApiResult<GuildResp> updateResp = await DbServiceClient.UpdateGuildMessage2Async(new UpdateGuildMessageReq()
             {
                 GuildId = validateResult.GuildId,
                 GuildMessage = request.message
@@ -566,7 +566,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             // Save to database
-            AsyncResponseData<GuildResp> updateResp = await DbServiceClient.UpdateGuildOptionsAsync(new UpdateGuildOptionsReq()
+            DatabaseApiResult<GuildResp> updateResp = await DbServiceClient.UpdateGuildOptionsAsync(new UpdateGuildOptionsReq()
             {
                 GuildId = validateResult.GuildId,
                 Options = request.options
@@ -614,7 +614,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             // Save to database
-            AsyncResponseData<GuildResp> updateResp = await DbServiceClient.UpdateGuildAutoAcceptRequestsAsync(new UpdateGuildAutoAcceptRequestsReq()
+            DatabaseApiResult<GuildResp> updateResp = await DbServiceClient.UpdateGuildAutoAcceptRequestsAsync(new UpdateGuildAutoAcceptRequestsReq()
             {
                 GuildId = validateResult.GuildId,
                 AutoAcceptRequests = request.autoAcceptRequests
@@ -664,7 +664,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             // Save to database
-            AsyncResponseData<GuildResp> updateResp = await DbServiceClient.UpdateGuildRoleAsync(new UpdateGuildRoleReq()
+            DatabaseApiResult<GuildResp> updateResp = await DbServiceClient.UpdateGuildRoleAsync(new UpdateGuildRoleReq()
             {
                 GuildId = validateResult.GuildId,
                 GuildRole = request.guildRole,
@@ -723,7 +723,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             // Save to database
-            AsyncResponseData<GuildResp> updateResp = await DbServiceClient.UpdateGuildMemberRoleAsync(new UpdateGuildMemberRoleReq()
+            DatabaseApiResult<GuildResp> updateResp = await DbServiceClient.UpdateGuildMemberRoleAsync(new UpdateGuildMemberRoleReq()
             {
                 GuildId = validateResult.GuildId,
                 MemberCharacterId = request.memberId,
@@ -777,7 +777,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             // Save to database
-            AsyncResponseData<GuildResp> updateResp = await DbServiceClient.AddGuildSkillAsync(new AddGuildSkillReq()
+            DatabaseApiResult<GuildResp> updateResp = await DbServiceClient.AddGuildSkillAsync(new AddGuildSkillReq()
             {
                 GuildId = validateResult.GuildId,
                 SkillId = request.dataId,

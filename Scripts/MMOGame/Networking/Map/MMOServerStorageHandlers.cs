@@ -38,7 +38,7 @@ namespace MultiplayerARPG.MMO
             usingStorageIds.TryRemove(connectionId, out _);
             usingStorageIds.TryAdd(connectionId, storageId);
             // Load storage items from database
-            AsyncResponseData<ReadStorageItemsResp> resp = await DbServiceClient.ReadStorageItemsAsync(new ReadStorageItemsReq()
+            DatabaseApiResult<ReadStorageItemsResp> resp = await DbServiceClient.ReadStorageItemsAsync(new ReadStorageItemsReq()
             {
                 StorageType = storageId.storageType,
                 StorageOwnerId = storageId.storageOwnerId,
@@ -93,7 +93,7 @@ namespace MultiplayerARPG.MMO
             int weightLimit = storage.weightLimit;
             int slotLimit = storage.slotLimit;
             // Refresh storage item from database
-            AsyncResponseData<ReadStorageItemsResp> readResp = await DbServiceClient.ReadStorageItemsAsync(new ReadStorageItemsReq()
+            DatabaseApiResult<ReadStorageItemsResp> readResp = await DbServiceClient.ReadStorageItemsAsync(new ReadStorageItemsReq()
             {
                 StorageType = storageType,
                 StorageOwnerId = storageOwnerId,
@@ -133,7 +133,7 @@ namespace MultiplayerARPG.MMO
             // Update slots
             storageItems.FillEmptySlots(isLimitSlot, slotLimit);
             // Update storage items to database
-            AsyncResponseData<EmptyMessage> updateResp = await DbServiceClient.UpdateStorageItemsAsync(new UpdateStorageItemsReq()
+            DatabaseApiResult updateResp = await DbServiceClient.UpdateStorageItemsAsync(new UpdateStorageItemsReq()
             {
                 StorageType = storageType,
                 StorageOwnerId = storageOwnerId,

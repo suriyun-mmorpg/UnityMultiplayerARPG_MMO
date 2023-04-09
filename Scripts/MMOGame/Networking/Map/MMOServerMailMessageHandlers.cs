@@ -23,7 +23,7 @@ namespace MultiplayerARPG.MMO
             List<MailListEntry> mails = new List<MailListEntry>();
             if (GameInstance.ServerUserHandlers.TryGetUserId(requestHandler.ConnectionId, out string userId))
             {
-                AsyncResponseData<MailListResp> resp = await DbServiceClient.MailListAsync(new MailListReq()
+                DatabaseApiResult<MailListResp> resp = await DbServiceClient.MailListAsync(new MailListReq()
                 {
                     UserId = userId,
                     OnlyNewMails = request.onlyNewMails,
@@ -44,7 +44,7 @@ namespace MultiplayerARPG.MMO
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             if (GameInstance.ServerUserHandlers.TryGetUserId(requestHandler.ConnectionId, out string userId))
             {
-                AsyncResponseData<UpdateReadMailStateResp> resp = await DbServiceClient.UpdateReadMailStateAsync(new UpdateReadMailStateReq()
+                DatabaseApiResult<UpdateReadMailStateResp> resp = await DbServiceClient.UpdateReadMailStateAsync(new UpdateReadMailStateReq()
                 {
                     MailId = request.id,
                     UserId = userId,
@@ -79,7 +79,7 @@ namespace MultiplayerARPG.MMO
         private async UniTask<UITextKeys> ClaimMailItems(string mailId, IPlayerCharacterData playerCharacter)
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-            AsyncResponseData<GetMailResp> mailResp = await DbServiceClient.GetMailAsync(new GetMailReq()
+            DatabaseApiResult<GetMailResp> mailResp = await DbServiceClient.GetMailAsync(new GetMailReq()
             {
                 MailId = mailId,
                 UserId = playerCharacter.UserId,
@@ -114,7 +114,7 @@ namespace MultiplayerARPG.MMO
                 }
                 if (mail.Cash > 0)
                 {
-                    AsyncResponseData<CashResp> changeCashResp = await DbServiceClient.ChangeCashAsync(new ChangeCashReq()
+                    DatabaseApiResult<CashResp> changeCashResp = await DbServiceClient.ChangeCashAsync(new ChangeCashReq()
                     {
                         UserId = playerCharacter.UserId,
                         ChangeAmount = mail.Cash
@@ -124,7 +124,7 @@ namespace MultiplayerARPG.MMO
                     playerCharacter.UserCash = changeCashResp.Response.Cash;
                 }
             }
-            AsyncResponseData<UpdateClaimMailItemsStateResp> resp = await DbServiceClient.UpdateClaimMailItemsStateAsync(new UpdateClaimMailItemsStateReq()
+            DatabaseApiResult<UpdateClaimMailItemsStateResp> resp = await DbServiceClient.UpdateClaimMailItemsStateAsync(new UpdateClaimMailItemsStateReq()
             {
                 MailId = mailId,
                 UserId = playerCharacter.UserId,
@@ -169,7 +169,7 @@ namespace MultiplayerARPG.MMO
         private async UniTask<UITextKeys> DeleteMail(string mailId, string userId)
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-            AsyncResponseData<UpdateDeleteMailStateResp> resp = await DbServiceClient.UpdateDeleteMailStateAsync(new UpdateDeleteMailStateReq()
+            DatabaseApiResult<UpdateDeleteMailStateResp> resp = await DbServiceClient.UpdateDeleteMailStateAsync(new UpdateDeleteMailStateReq()
             {
                 MailId = mailId,
                 UserId = userId,
@@ -233,7 +233,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             // Find receiver
-            AsyncResponseData<GetUserIdByCharacterNameResp> userIdResp = await DbServiceClient.GetUserIdByCharacterNameAsync(new GetUserIdByCharacterNameReq()
+            DatabaseApiResult<GetUserIdByCharacterNameResp> userIdResp = await DbServiceClient.GetUserIdByCharacterNameAsync(new GetUserIdByCharacterNameReq()
             {
                 CharacterName = request.receiverName,
             });
@@ -263,7 +263,7 @@ namespace MultiplayerARPG.MMO
                 Content = request.content,
                 Gold = request.gold,
             };
-            AsyncResponseData<SendMailResp> resp = await DbServiceClient.SendMailAsync(new SendMailReq()
+            DatabaseApiResult<SendMailResp> resp = await DbServiceClient.SendMailAsync(new SendMailReq()
             {
                 Mail = mail,
             });
@@ -291,7 +291,7 @@ namespace MultiplayerARPG.MMO
             int notificationCount = 0;
             if (GameInstance.ServerUserHandlers.TryGetUserId(requestHandler.ConnectionId, out string userId))
             {
-                AsyncResponseData<GetMailNotificationResp> resp = await DbServiceClient.GetMailNotificationAsync(new GetMailNotificationReq()
+                DatabaseApiResult<GetMailNotificationResp> resp = await DbServiceClient.GetMailNotificationAsync(new GetMailNotificationReq()
                 {
                     UserId = userId,
                 });
@@ -316,7 +316,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            AsyncResponseData<MailListResp> resp = await DbServiceClient.MailListAsync(new MailListReq()
+            DatabaseApiResult<MailListResp> resp = await DbServiceClient.MailListAsync(new MailListReq()
             {
                 UserId = playerCharacter.UserId,
                 OnlyNewMails = true,
@@ -351,7 +351,7 @@ namespace MultiplayerARPG.MMO
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
             }
-            AsyncResponseData<MailListResp> resp = await DbServiceClient.MailListAsync(new MailListReq()
+            DatabaseApiResult<MailListResp> resp = await DbServiceClient.MailListAsync(new MailListReq()
             {
                 UserId = userId,
                 OnlyNewMails = false,

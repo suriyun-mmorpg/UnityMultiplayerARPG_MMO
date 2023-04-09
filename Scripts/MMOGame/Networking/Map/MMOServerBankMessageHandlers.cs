@@ -46,7 +46,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             // Update gold
-            AsyncResponseData<GuildGoldResp> changeGoldResp = await DbServiceClient.ChangeGuildGoldAsync(new ChangeGuildGoldReq()
+            DatabaseApiResult<GuildGoldResp> changeGoldResp = await DbServiceClient.ChangeGuildGoldAsync(new ChangeGuildGoldReq()
             {
                 GuildId = playerCharacter.GuildId,
                 ChangeAmount = request.gold
@@ -92,7 +92,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             // Update gold
-            AsyncResponseData<GoldResp> changeGoldResp = await DbServiceClient.ChangeGoldAsync(new ChangeGoldReq()
+            DatabaseApiResult<GoldResp> changeGoldResp = await DbServiceClient.ChangeGoldAsync(new ChangeGoldReq()
             {
                 UserId = playerCharacter.UserId,
                 ChangeAmount = request.gold
@@ -131,7 +131,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             // Get gold
-            AsyncResponseData<GuildGoldResp> goldResp = await DbServiceClient.GetGuildGoldAsync(new GetGuildGoldReq()
+            DatabaseApiResult<GuildGoldResp> goldResp = await DbServiceClient.GetGuildGoldAsync(new GetGuildGoldReq()
             {
                 GuildId = playerCharacter.GuildId
             });
@@ -152,7 +152,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             // Update gold
-            AsyncResponseData<GuildGoldResp> changeGoldResp = await DbServiceClient.ChangeGuildGoldAsync(new ChangeGuildGoldReq()
+            DatabaseApiResult<GuildGoldResp> changeGoldResp = await DbServiceClient.ChangeGuildGoldAsync(new ChangeGuildGoldReq()
             {
                 GuildId = playerCharacter.GuildId,
                 ChangeAmount = -request.gold
@@ -190,7 +190,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             // Get gold
-            AsyncResponseData<GoldResp> goldResp = await DbServiceClient.GetGoldAsync(new GetGoldReq()
+            DatabaseApiResult<GoldResp> goldResp = await DbServiceClient.GetGoldAsync(new GetGoldReq()
             {
                 UserId = playerCharacter.UserId
             });
@@ -211,7 +211,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             // Update gold
-            AsyncResponseData<GoldResp> changeGoldResp = await DbServiceClient.ChangeGoldAsync(new ChangeGoldReq()
+            DatabaseApiResult<GoldResp> changeGoldResp = await DbServiceClient.ChangeGoldAsync(new ChangeGoldReq()
             {
                 UserId = playerCharacter.UserId,
                 ChangeAmount = -request.gold

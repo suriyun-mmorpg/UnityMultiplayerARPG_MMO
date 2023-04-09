@@ -16,11 +16,11 @@ namespace MultiplayerARPG.MMO
         public async UniTask<bool> SendMail(Mail mail)
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-            AsyncResponseData<SendMailResp> resp = await DbServiceClient.SendMailAsync(new SendMailReq()
+            DatabaseApiResult<SendMailResp> resp = await DbServiceClient.SendMailAsync(new SendMailReq()
             {
                 Mail = mail,
             });
-            if (resp.IsSuccess && resp.Response.Error == 0)
+            if (resp.IsSuccess && resp.Response.Error == UITextKeys.NONE)
                 return true;
 #endif
             return false;

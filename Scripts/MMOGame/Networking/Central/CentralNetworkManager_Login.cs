@@ -56,7 +56,7 @@ namespace MultiplayerARPG.MMO
             }
 
             long connectionId = requestHandler.ConnectionId;
-            AsyncResponseData<ValidateUserLoginResp> validateUserLoginResp = await DbServiceClient.ValidateUserLoginAsync(new ValidateUserLoginReq()
+            DatabaseApiResult<ValidateUserLoginResp> validateUserLoginResp = await DbServiceClient.ValidateUserLoginAsync(new ValidateUserLoginReq()
             {
                 Username = request.username,
                 Password = request.password
@@ -96,7 +96,7 @@ namespace MultiplayerARPG.MMO
             bool emailVerified = true;
             if (requireEmailVerification)
             {
-                AsyncResponseData<ValidateEmailVerificationResp> validateEmailVerificationResp = await DbServiceClient.ValidateEmailVerificationAsync(new ValidateEmailVerificationReq()
+                DatabaseApiResult<ValidateEmailVerificationResp> validateEmailVerificationResp = await DbServiceClient.ValidateEmailVerificationAsync(new ValidateEmailVerificationReq()
                 {
                     UserId = userId
                 });
@@ -110,7 +110,7 @@ namespace MultiplayerARPG.MMO
                 }
                 emailVerified = validateEmailVerificationResp.Response.IsPass;
             }
-            AsyncResponseData<GetUserUnbanTimeResp> unbanTimeResp = await DbServiceClient.GetUserUnbanTimeAsync(new GetUserUnbanTimeReq()
+            DatabaseApiResult<GetUserUnbanTimeResp> unbanTimeResp = await DbServiceClient.GetUserUnbanTimeAsync(new GetUserUnbanTimeReq()
             {
                 UserId = userId
             });
@@ -145,7 +145,7 @@ namespace MultiplayerARPG.MMO
             userPeerInfo.accessToken = accessToken = Regex.Replace(System.Convert.ToBase64String(System.Guid.NewGuid().ToByteArray()), "[/+=]", "");
             userPeersByUserId[userId] = userPeerInfo;
             userPeers[connectionId] = userPeerInfo;
-            AsyncResponseData<EmptyMessage> updateAccessTokenResp = await DbServiceClient.UpdateAccessTokenAsync(new UpdateAccessTokenReq()
+            DatabaseApiResult updateAccessTokenResp = await DbServiceClient.UpdateAccessTokenAsync(new UpdateAccessTokenReq()
             {
                 UserId = userId,
                 AccessToken = accessToken
@@ -203,7 +203,7 @@ namespace MultiplayerARPG.MMO
                     });
                     return;
                 }
-                AsyncResponseData<FindEmailResp> findEmailResp = await DbServiceClient.FindEmailAsync(new FindEmailReq()
+                DatabaseApiResult<FindEmailResp> findEmailResp = await DbServiceClient.FindEmailAsync(new FindEmailReq()
                 {
                     Email = email
                 });
@@ -224,7 +224,7 @@ namespace MultiplayerARPG.MMO
                     return;
                 }
             }
-            AsyncResponseData<FindUsernameResp> findUsernameResp = await DbServiceClient.FindUsernameAsync(new FindUsernameReq()
+            DatabaseApiResult<FindUsernameResp> findUsernameResp = await DbServiceClient.FindUsernameAsync(new FindUsernameReq()
             {
                 Username = username
             });
@@ -268,7 +268,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            AsyncResponseData<EmptyMessage> createResp = await DbServiceClient.CreateUserLoginAsync(new CreateUserLoginReq()
+            DatabaseApiResult createResp = await DbServiceClient.CreateUserLoginAsync(new CreateUserLoginReq()
             {
                 Username = username,
                 Password = password,
@@ -296,7 +296,7 @@ namespace MultiplayerARPG.MMO
             if (RemoveUserPeerByConnectionId(requestHandler.ConnectionId, out CentralUserPeerInfo userPeerInfo))
             {
                 // Clear access token
-                AsyncResponseData<EmptyMessage> updateAccessTokenResp = await DbServiceClient.UpdateAccessTokenAsync(new UpdateAccessTokenReq()
+                DatabaseApiResult updateAccessTokenResp = await DbServiceClient.UpdateAccessTokenAsync(new UpdateAccessTokenReq()
                 {
                     UserId = userPeerInfo.userId,
                     AccessToken = string.Empty
@@ -322,7 +322,7 @@ namespace MultiplayerARPG.MMO
             string userId = request.userId;
             string accessToken = request.accessToken;
             long unbanTime = 0;
-            AsyncResponseData<ValidateAccessTokenResp> validateAccessTokenResp = await DbServiceClient.ValidateAccessTokenAsync(new ValidateAccessTokenReq()
+            DatabaseApiResult<ValidateAccessTokenResp> validateAccessTokenResp = await DbServiceClient.ValidateAccessTokenAsync(new ValidateAccessTokenReq()
             {
                 UserId = userId,
                 AccessToken = accessToken
@@ -343,7 +343,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            AsyncResponseData<GetUserUnbanTimeResp> unbanTimeResp = await DbServiceClient.GetUserUnbanTimeAsync(new GetUserUnbanTimeReq()
+            DatabaseApiResult<GetUserUnbanTimeResp> unbanTimeResp = await DbServiceClient.GetUserUnbanTimeAsync(new GetUserUnbanTimeReq()
             {
                 UserId = userId
             });
@@ -373,7 +373,7 @@ namespace MultiplayerARPG.MMO
             };
             userPeersByUserId[userId] = userPeerInfo;
             userPeers[connectionId] = userPeerInfo;
-            AsyncResponseData<EmptyMessage> updateAccessTokenResp = await DbServiceClient.UpdateAccessTokenAsync(new UpdateAccessTokenReq()
+            DatabaseApiResult updateAccessTokenResp = await DbServiceClient.UpdateAccessTokenAsync(new UpdateAccessTokenReq()
             {
                 UserId = userPeerInfo.userId,
                 AccessToken = accessToken

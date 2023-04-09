@@ -461,7 +461,7 @@ namespace MultiplayerARPG.MMO
             {
                 // Load buildings
                 // Don't load buildings if it's instance map
-                AsyncResponseData<BuildingsResp> buildingsResp;
+                DatabaseApiResult<BuildingsResp> buildingsResp;
                 do
                 {
                     buildingsResp = await DbServiceClient.ReadBuildingsAsync(new ReadBuildingsReq()
@@ -582,7 +582,7 @@ namespace MultiplayerARPG.MMO
                 return false;
             }
 
-            AsyncResponseData<ValidateAccessTokenResp> validateAccessTokenResp = await DbServiceClient.ValidateAccessTokenAsync(new ValidateAccessTokenReq()
+            DatabaseApiResult<ValidateAccessTokenResp> validateAccessTokenResp = await DbServiceClient.ValidateAccessTokenAsync(new ValidateAccessTokenReq()
             {
                 UserId = userId,
                 AccessToken = accessToken,
@@ -602,7 +602,7 @@ namespace MultiplayerARPG.MMO
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         private async UniTaskVoid SetPlayerReadyRoutine(long connectionId, string userId, string accessToken, string selectCharacterId)
         {
-            AsyncResponseData<CharacterResp> characterResp = await DbServiceClient.ReadCharacterAsync(new ReadCharacterReq()
+            DatabaseApiResult<CharacterResp> characterResp = await DbServiceClient.ReadCharacterAsync(new ReadCharacterReq()
             {
                 UserId = userId,
                 CharacterId = selectCharacterId
@@ -655,7 +655,7 @@ namespace MultiplayerARPG.MMO
 
             // Set currencies
             // Gold
-            AsyncResponseData<GoldResp> getGoldResp = await DbServiceClient.GetGoldAsync(new GetGoldReq()
+            DatabaseApiResult<GoldResp> getGoldResp = await DbServiceClient.GetGoldAsync(new GetGoldReq()
             {
                 UserId = userId,
             });
@@ -667,7 +667,7 @@ namespace MultiplayerARPG.MMO
             }
             playerCharacterEntity.UserGold = getGoldResp.Response.Gold;
             // Cash
-            AsyncResponseData<CashResp> getCashResp = await DbServiceClient.GetCashAsync(new GetCashReq()
+            DatabaseApiResult<CashResp> getCashResp = await DbServiceClient.GetCashAsync(new GetCashReq()
             {
                 UserId = userId,
             });
@@ -683,7 +683,7 @@ namespace MultiplayerARPG.MMO
             playerCharacterEntity.UserId = userId;
 
             // Load user level
-            AsyncResponseData<GetUserLevelResp> getUserLevelResp = await DbServiceClient.GetUserLevelAsync(new GetUserLevelReq()
+            DatabaseApiResult<GetUserLevelResp> getUserLevelResp = await DbServiceClient.GetUserLevelAsync(new GetUserLevelReq()
             {
                 UserId = userId,
                 AccessToken = accessToken,
@@ -735,7 +735,7 @@ namespace MultiplayerARPG.MMO
             if (!playerCharacterEntity.IsDead())
             {
                 // Summon saved summons
-                AsyncResponseData<GetSummonBuffsResp> summonBuffsResp = await DbServiceClient.GetSummonBuffsAsync(new GetSummonBuffsReq()
+                DatabaseApiResult<GetSummonBuffsResp> summonBuffsResp = await DbServiceClient.GetSummonBuffsAsync(new GetSummonBuffsReq()
                 {
                     CharacterId = playerCharacterEntity.Id,
                 });
@@ -995,7 +995,7 @@ namespace MultiplayerARPG.MMO
                 }
 
                 // Get user level from server to validate user level
-                AsyncResponseData<GetUserLevelResp> resp = await DbServiceClient.GetUserLevelAsync(new GetUserLevelReq()
+                DatabaseApiResult<GetUserLevelResp> resp = await DbServiceClient.GetUserLevelAsync(new GetUserLevelReq()
                 {
                     UserId = messageHandler.Reader.GetString(),
                     AccessToken = messageHandler.Reader.GetString(),

@@ -28,7 +28,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
 
-            AsyncResponseData<CashResp> getCashResp = await DbServiceClient.GetCashAsync(new GetCashReq()
+            DatabaseApiResult<CashResp> getCashResp = await DbServiceClient.GetCashAsync(new GetCashReq()
             {
                 UserId = userId
             });
@@ -178,7 +178,7 @@ namespace MultiplayerARPG.MMO
             characterGold += changeCharacterGold;
             if (request.currencyType == CashShopItemCurrencyType.CASH)
             {
-                AsyncResponseData<CashResp> changeCashResp = await DbServiceClient.ChangeCashAsync(new ChangeCashReq()
+                DatabaseApiResult<CashResp> changeCashResp = await DbServiceClient.ChangeCashAsync(new ChangeCashReq()
                 {
                     UserId = playerCharacter.UserId,
                     ChangeAmount = -priceCash
@@ -223,7 +223,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
 
-            AsyncResponseData<CashResp> getCashResp = await DbServiceClient.GetCashAsync(new GetCashReq()
+            DatabaseApiResult<CashResp> getCashResp = await DbServiceClient.GetCashAsync(new GetCashReq()
             {
                 UserId = userId
             });
@@ -268,7 +268,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
 
-            AsyncResponseData<CashResp> changeCashResp = await DbServiceClient.ChangeCashAsync(new ChangeCashReq()
+            DatabaseApiResult<CashResp> changeCashResp = await DbServiceClient.ChangeCashAsync(new ChangeCashReq()
             {
                 UserId = playerCharacter.UserId,
                 ChangeAmount = cashPackage.CashAmount

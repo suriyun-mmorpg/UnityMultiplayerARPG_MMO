@@ -33,7 +33,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
 
-            AsyncResponseData<CashResp> getCashResp = await DbServiceClient.GetCashAsync(new GetCashReq()
+            DatabaseApiResult<CashResp> getCashResp = await DbServiceClient.GetCashAsync(new GetCashReq()
             {
                 UserId = userId
             });
@@ -77,7 +77,7 @@ namespace MultiplayerARPG.MMO
 
             int price = request.openMode == GachaOpenMode.Multiple ? gacha.MultipleModeOpenPrice : gacha.SingleModeOpenPrice;
             // Get user cash amount
-            AsyncResponseData<CashResp> getCashResp = await DbServiceClient.GetCashAsync(new GetCashReq()
+            DatabaseApiResult<CashResp> getCashResp = await DbServiceClient.GetCashAsync(new GetCashReq()
             {
                 UserId = playerCharacter.UserId
             });
@@ -110,7 +110,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             // Decrease cash amount
-            AsyncResponseData<CashResp> changeCashResp = await DbServiceClient.ChangeCashAsync(new ChangeCashReq()
+            DatabaseApiResult<CashResp> changeCashResp = await DbServiceClient.ChangeCashAsync(new ChangeCashReq()
             {
                 UserId = playerCharacter.UserId,
                 ChangeAmount = -price

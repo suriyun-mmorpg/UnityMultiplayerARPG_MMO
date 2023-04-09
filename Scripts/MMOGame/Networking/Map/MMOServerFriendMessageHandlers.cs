@@ -24,7 +24,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            AsyncResponseData<SocialCharactersResp> resp = await DbServiceClient.FindCharactersAsync(new FindCharacterNameReq()
+            DatabaseApiResult<SocialCharactersResp> resp = await DbServiceClient.FindCharactersAsync(new FindCharacterNameReq()
             {
                 FinderId = playerCharacter.Id,
                 CharacterName = request.characterName,
@@ -57,7 +57,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            AsyncResponseData<SocialCharactersResp> resp = await DbServiceClient.ReadFriendsAsync(new ReadFriendsReq()
+            DatabaseApiResult<SocialCharactersResp> resp = await DbServiceClient.ReadFriendsAsync(new ReadFriendsReq()
             {
                 CharacterId = playerCharacter.Id,
                 ReadById2 = false,
@@ -91,7 +91,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            AsyncResponseData<EmptyMessage> resp = await DbServiceClient.CreateFriendAsync(new CreateFriendReq()
+            DatabaseApiResult resp = await DbServiceClient.CreateFriendAsync(new CreateFriendReq()
             {
                 Character1Id = playerCharacter.Id,
                 Character2Id = request.friendId,
@@ -123,7 +123,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            AsyncResponseData<EmptyMessage> resp = await DbServiceClient.DeleteFriendAsync(new DeleteFriendReq()
+            DatabaseApiResult resp = await DbServiceClient.DeleteFriendAsync(new DeleteFriendReq()
             {
                 Character1Id = playerCharacter.Id,
                 Character2Id = request.friendId,
@@ -154,7 +154,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            AsyncResponseData<EmptyMessage> resp = await DbServiceClient.CreateFriendAsync(new CreateFriendReq()
+            DatabaseApiResult resp = await DbServiceClient.CreateFriendAsync(new CreateFriendReq()
             {
                 Character1Id = playerCharacter.Id,
                 Character2Id = request.requesteeId,
@@ -186,13 +186,13 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            AsyncResponseData<EmptyMessage> resp1 = await DbServiceClient.CreateFriendAsync(new CreateFriendReq()
+            DatabaseApiResult resp1 = await DbServiceClient.CreateFriendAsync(new CreateFriendReq()
             {
                 Character1Id = playerCharacter.Id,
                 Character2Id = request.requesterId,
                 State = 0,
             });
-            AsyncResponseData<EmptyMessage> resp2 = await DbServiceClient.CreateFriendAsync(new CreateFriendReq()
+            DatabaseApiResult resp2 = await DbServiceClient.CreateFriendAsync(new CreateFriendReq()
             {
                 Character1Id = request.requesterId,
                 Character2Id = playerCharacter.Id,
@@ -224,7 +224,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            AsyncResponseData<EmptyMessage> resp = await DbServiceClient.DeleteFriendAsync(new DeleteFriendReq()
+            DatabaseApiResult resp = await DbServiceClient.DeleteFriendAsync(new DeleteFriendReq()
             {
                 Character1Id = request.requesterId,
                 Character2Id = playerCharacter.Id,
@@ -255,7 +255,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            AsyncResponseData<SocialCharactersResp> resp = await DbServiceClient.ReadFriendsAsync(new ReadFriendsReq()
+            DatabaseApiResult<SocialCharactersResp> resp = await DbServiceClient.ReadFriendsAsync(new ReadFriendsReq()
             {
                 CharacterId = playerCharacter.Id,
                 ReadById2 = true,
@@ -284,7 +284,7 @@ namespace MultiplayerARPG.MMO
             int notificationCount = 0;
             if (GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
-                AsyncResponseData<GetFriendRequestNotificationResp> resp = await DbServiceClient.GetFriendRequestNotificationAsync(new GetFriendRequestNotificationReq()
+                DatabaseApiResult<GetFriendRequestNotificationResp> resp = await DbServiceClient.GetFriendRequestNotificationAsync(new GetFriendRequestNotificationReq()
                 {
                     CharacterId = playerCharacter.Id,
                 });
