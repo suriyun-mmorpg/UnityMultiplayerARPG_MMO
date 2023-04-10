@@ -984,7 +984,7 @@ namespace MultiplayerARPG.MMO
                 result.InvokeError(EmptyMessage.Value);
                 return;
             }
-            if (request.UpdateCharacterData)
+            if (request.CharacterData != null)
             {
                 PlayerCharacterData character = request.CharacterData;
                 // Cache the data, it will be used later

@@ -138,7 +138,6 @@ namespace MultiplayerARPG.MMO
                 StorageType = storageType,
                 StorageOwnerId = storageOwnerId,
                 StorageItems = storageItems,
-                UpdateCharacterData = false,
             });
             if (!updateResp.IsSuccess)
             {

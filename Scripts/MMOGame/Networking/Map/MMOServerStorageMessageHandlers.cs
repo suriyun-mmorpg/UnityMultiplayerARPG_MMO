@@ -163,7 +163,6 @@ namespace MultiplayerARPG.MMO
                 StorageType = request.storageType,
                 StorageOwnerId = request.storageOwnerId,
                 StorageItems = storageItems,
-                UpdateCharacterData = true,
                 CharacterData = applyingPlayerCharacter,
             });
             if (!updateResp.IsSuccess)
@@ -276,7 +275,6 @@ namespace MultiplayerARPG.MMO
                 StorageType = request.storageType,
                 StorageOwnerId = request.storageOwnerId,
                 StorageItems = storageItems,
-                UpdateCharacterData = true,
                 CharacterData = applyingPlayerCharacter,
             });
             if (!updateResp.IsSuccess)
@@ -402,7 +400,6 @@ namespace MultiplayerARPG.MMO
                 StorageType = request.storageType,
                 StorageOwnerId = request.storageOwnerId,
                 StorageItems = storageItems,
-                UpdateCharacterData = false,
             });
             if (!updateResp.IsSuccess)
             {
