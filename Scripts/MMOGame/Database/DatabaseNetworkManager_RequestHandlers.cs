@@ -38,7 +38,7 @@ namespace MultiplayerARPG.MMO
             string userId = Database.ValidateUserLogin(request.Username, request.Password);
             if (string.IsNullOrEmpty(userId))
             {
-                result.InvokeSuccess(new ValidateUserLoginResp());
+                result.InvokeError(new ValidateUserLoginResp());
                 return;
             }
             result.InvokeSuccess(new ValidateUserLoginResp()
@@ -1041,7 +1041,7 @@ namespace MultiplayerARPG.MMO
             {
                 result.InvokeError(new UpdateClaimMailItemsStateResp()
                 {
-                    Error = UITextKeys.UI_ERROR_MAIL_READ_NOT_ALLOWED
+                    Error = UITextKeys.UI_ERROR_MAIL_CLAIM_NOT_ALLOWED
                 });
                 return;
             }
@@ -1061,7 +1061,7 @@ namespace MultiplayerARPG.MMO
             {
                 result.InvokeError(new UpdateDeleteMailStateResp()
                 {
-                    Error = UITextKeys.UI_ERROR_MAIL_READ_NOT_ALLOWED
+                    Error = UITextKeys.UI_ERROR_MAIL_DELETE_NOT_ALLOWED
                 });
                 return;
             }
