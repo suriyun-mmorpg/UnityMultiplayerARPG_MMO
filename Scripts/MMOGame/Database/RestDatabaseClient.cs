@@ -18,6 +18,7 @@ namespace MultiplayerARPG.MMO
                 {
                     IsError = true,
                     Error = resp.Error,
+                    Response = resp.Content,
                 };
             }
             return new DatabaseApiResult<TResp>()
