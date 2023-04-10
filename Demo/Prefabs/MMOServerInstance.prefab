@@ -407,4 +407,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b33263496a720a94cafb69cf2615fc6a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  apiUrl: http://localhost:5757/
+  apiUrl: http://localhost:5757/api/
