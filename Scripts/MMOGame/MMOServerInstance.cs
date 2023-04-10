@@ -15,6 +15,8 @@ namespace MultiplayerARPG.MMO
     {
         public static MMOServerInstance Singleton { get; protected set; }
 
+        public const string CONFIG_USE_CUSTOM_DATABASE_CLIENT = "useCustomDatabaseClient";
+        public const string ARG_USE_CUSTOM_DATABASE_CLIENT = "-" + CONFIG_USE_CUSTOM_DATABASE_CLIENT;
         public const string CONFIG_DATABASE_OPTION_INDEX = "databaseOptionIndex";
         public const string ARG_DATABASE_OPTION_INDEX = "-" + CONFIG_DATABASE_OPTION_INDEX;
         public const string CONFIG_DATABASE_DISABLE_CACHE_READING = "databaseDisableCacheReading";
@@ -208,6 +210,20 @@ namespace MultiplayerARPG.MMO
                     args = new string[0];
 
                 // Database option index
+                bool useCustomDatabaseClient = this.useCustomDatabaseClient = false;
+                if (customDatabaseClient != null && customDatabaseClient as UnityEngine.Object != null)
+                {
+                    if (ConfigReader.ReadConfigs(jsonConfig, CONFIG_USE_CUSTOM_DATABASE_CLIENT, out useCustomDatabaseClient, this.useCustomDatabaseClient))
+                    {
+                        this.useCustomDatabaseClient = useCustomDatabaseClient;
+                        jsonConfig[CONFIG_USE_CUSTOM_DATABASE_CLIENT] = useCustomDatabaseClient;
+                    }
+                    else if (ConfigReader.IsArgsProvided(args, CONFIG_USE_CUSTOM_DATABASE_CLIENT))
+                    {
+                        this.useCustomDatabaseClient = true;
+                    }
+                }
+
                 int dbOptionIndex;
                 if (ConfigReader.ReadArgs(args, ARG_DATABASE_OPTION_INDEX, out dbOptionIndex, 0) ||
                     ConfigReader.ReadConfigs(jsonConfig, CONFIG_DATABASE_OPTION_INDEX, out dbOptionIndex, 0))
