@@ -13,8 +13,8 @@ namespace MultiplayerARPG.MMO
     {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         // User peers (Login / Register / Manager characters)
-        protected readonly Dictionary<long, CentralUserPeerInfo> userPeers = new Dictionary<long, CentralUserPeerInfo>();
-        protected readonly Dictionary<string, CentralUserPeerInfo> userPeersByUserId = new Dictionary<string, CentralUserPeerInfo>();
+        protected readonly Dictionary<long, CentralUserPeerInfo> _userPeers = new Dictionary<long, CentralUserPeerInfo>();
+        protected readonly Dictionary<string, CentralUserPeerInfo> _userPeersByUserId = new Dictionary<string, CentralUserPeerInfo>();
 #endif
         [Header("Cluster")]
         public int clusterServerPort = 6010;
@@ -39,7 +39,7 @@ namespace MultiplayerARPG.MMO
         public System.Action<DisconnectReason, SocketError, UITextKeys> onClientDisconnected;
         public System.Action onClientStopped;
 
-        private float lastUserCountUpdateTime = float.MinValue;
+        private float _lastUserCountUpdateTime = float.MinValue;
 
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         public ClusterServer ClusterServer { get; private set; }
@@ -67,9 +67,9 @@ namespace MultiplayerARPG.MMO
             if (IsServer)
             {
                 ClusterServer.Update();
-                if (Time.unscaledTime - lastUserCountUpdateTime > updateUserCountInterval)
+                if (Time.unscaledTime - _lastUserCountUpdateTime > updateUserCountInterval)
                 {
-                    lastUserCountUpdateTime = Time.unscaledTime;
+                    _lastUserCountUpdateTime = Time.unscaledTime;
                     // Update user count
                     DbServiceClient.UpdateUserCount(new UpdateUserCountReq()
                     {
@@ -127,8 +127,8 @@ namespace MultiplayerARPG.MMO
         {
             this.InvokeInstanceDevExtMethods("Clean");
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-            userPeers.Clear();
-            userPeersByUserId.Clear();
+            _userPeers.Clear();
+            _userPeersByUserId.Clear();
 #endif
         }
 
@@ -193,10 +193,10 @@ namespace MultiplayerARPG.MMO
         public bool RemoveUserPeerByConnectionId(long connectionId, out CentralUserPeerInfo userPeerInfo)
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-            if (userPeers.TryGetValue(connectionId, out userPeerInfo))
+            if (_userPeers.TryGetValue(connectionId, out userPeerInfo))
             {
-                userPeersByUserId.Remove(userPeerInfo.userId);
-                userPeers.Remove(connectionId);
+                _userPeersByUserId.Remove(userPeerInfo.userId);
+                _userPeers.Remove(connectionId);
                 return true;
             }
             return false;
@@ -209,10 +209,10 @@ namespace MultiplayerARPG.MMO
         public bool RemoveUserPeerByUserId(string userId, out CentralUserPeerInfo userPeerInfo)
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-            if (userPeersByUserId.TryGetValue(userId, out userPeerInfo))
+            if (_userPeersByUserId.TryGetValue(userId, out userPeerInfo))
             {
-                userPeersByUserId.Remove(userPeerInfo.userId);
-                userPeers.Remove(userPeerInfo.connectionId);
+                _userPeersByUserId.Remove(userPeerInfo.userId);
+                _userPeers.Remove(userPeerInfo.connectionId);
                 return true;
             }
             return false;

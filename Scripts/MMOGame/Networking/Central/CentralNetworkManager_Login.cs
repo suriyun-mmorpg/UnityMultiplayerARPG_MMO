@@ -80,11 +80,11 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            if (userPeersByUserId.ContainsKey(userId) || MapContainsUser(userId))
+            if (_userPeersByUserId.ContainsKey(userId) || MapContainsUser(userId))
             {
                 // Kick the user from game
-                if (userPeersByUserId.ContainsKey(userId))
-                    KickClient(userPeersByUserId[userId].connectionId, UITextKeys.UI_ERROR_ACCOUNT_LOGGED_IN_BY_OTHER);
+                if (_userPeersByUserId.ContainsKey(userId))
+                    KickClient(_userPeersByUserId[userId].connectionId, UITextKeys.UI_ERROR_ACCOUNT_LOGGED_IN_BY_OTHER);
                 ClusterServer.KickUser(userId, UITextKeys.UI_ERROR_ACCOUNT_LOGGED_IN_BY_OTHER);
                 RemoveUserPeerByUserId(userId, out _);
                 result.InvokeError(new ResponseUserLoginMessage()
@@ -143,8 +143,8 @@ namespace MultiplayerARPG.MMO
             userPeerInfo.connectionId = connectionId;
             userPeerInfo.userId = userId;
             userPeerInfo.accessToken = accessToken = Regex.Replace(System.Convert.ToBase64String(System.Guid.NewGuid().ToByteArray()), "[/+=]", "");
-            userPeersByUserId[userId] = userPeerInfo;
-            userPeers[connectionId] = userPeerInfo;
+            _userPeersByUserId[userId] = userPeerInfo;
+            _userPeers[connectionId] = userPeerInfo;
             DatabaseApiResult updateAccessTokenResp = await DbServiceClient.UpdateAccessTokenAsync(new UpdateAccessTokenReq()
             {
                 UserId = userId,
@@ -371,8 +371,8 @@ namespace MultiplayerARPG.MMO
                 userId = userId,
                 accessToken = accessToken = Regex.Replace(System.Convert.ToBase64String(System.Guid.NewGuid().ToByteArray()), "[/+=]", ""),
             };
-            userPeersByUserId[userId] = userPeerInfo;
-            userPeers[connectionId] = userPeerInfo;
+            _userPeersByUserId[userId] = userPeerInfo;
+            _userPeers[connectionId] = userPeerInfo;
             DatabaseApiResult updateAccessTokenResp = await DbServiceClient.UpdateAccessTokenAsync(new UpdateAccessTokenReq()
             {
                 UserId = userPeerInfo.userId,

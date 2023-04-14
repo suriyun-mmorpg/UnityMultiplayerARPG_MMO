@@ -50,7 +50,7 @@ namespace MultiplayerARPG.MMO
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             long connectionId = requestHandler.ConnectionId;
-            if (!userPeers.TryGetValue(connectionId, out CentralUserPeerInfo userPeerInfo))
+            if (!_userPeers.TryGetValue(connectionId, out CentralUserPeerInfo userPeerInfo))
             {
                 result.InvokeError(new ResponseCharactersMessage()
                 {
@@ -141,7 +141,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            if (!userPeers.TryGetValue(connectionId, out CentralUserPeerInfo userPeerInfo))
+            if (!_userPeers.TryGetValue(connectionId, out CentralUserPeerInfo userPeerInfo))
             {
                 result.InvokeError(new ResponseCreateCharacterMessage()
                 {
@@ -213,7 +213,7 @@ namespace MultiplayerARPG.MMO
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             long connectionId = requestHandler.ConnectionId;
-            if (!userPeers.TryGetValue(connectionId, out CentralUserPeerInfo userPeerInfo))
+            if (!_userPeers.TryGetValue(connectionId, out CentralUserPeerInfo userPeerInfo))
             {
                 result.InvokeError(new ResponseDeleteCharacterMessage()
                 {
@@ -248,7 +248,7 @@ namespace MultiplayerARPG.MMO
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             long connectionId = requestHandler.ConnectionId;
-            if (!userPeers.TryGetValue(connectionId, out CentralUserPeerInfo userPeerInfo))
+            if (!_userPeers.TryGetValue(connectionId, out CentralUserPeerInfo userPeerInfo))
             {
                 result.InvokeError(new ResponseSelectCharacterMessage()
                 {
