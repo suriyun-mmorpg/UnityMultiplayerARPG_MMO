@@ -11,9 +11,9 @@ namespace MultiplayerARPG.MMO
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         private async UniTask LoadStorageRoutine(StorageId storageId)
         {
-            if (!loadingStorageIds.Contains(storageId))
+            if (!_loadingStorageIds.Contains(storageId))
             {
-                loadingStorageIds.Add(storageId);
+                _loadingStorageIds.Add(storageId);
                 DatabaseApiResult<ReadStorageItemsResp> resp;
                 do
                 {
@@ -24,7 +24,7 @@ namespace MultiplayerARPG.MMO
                     });
                 } while (!resp.IsSuccess);
                 ServerStorageHandlers.SetStorageItems(storageId, resp.Response.StorageCharacterItems);
-                loadingStorageIds.Remove(storageId);
+                _loadingStorageIds.Remove(storageId);
             }
         }
 #endif
@@ -32,9 +32,9 @@ namespace MultiplayerARPG.MMO
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         private async UniTask LoadPartyRoutine(int id)
         {
-            if (id > 0 && !loadingPartyIds.Contains(id))
+            if (id > 0 && !_loadingPartyIds.Contains(id))
             {
-                loadingPartyIds.Add(id);
+                _loadingPartyIds.Add(id);
                 DatabaseApiResult<PartyResp> resp;
                 do
                 {
@@ -44,7 +44,7 @@ namespace MultiplayerARPG.MMO
                     });
                 } while (!resp.IsSuccess);
                 ServerPartyHandlers.SetParty(id, resp.Response.PartyData);
-                loadingPartyIds.Remove(id);
+                _loadingPartyIds.Remove(id);
             }
         }
 #endif
@@ -52,9 +52,9 @@ namespace MultiplayerARPG.MMO
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         private async UniTask LoadGuildRoutine(int id)
         {
-            if (id > 0 && !loadingGuildIds.Contains(id))
+            if (id > 0 && !_loadingGuildIds.Contains(id))
             {
-                loadingGuildIds.Add(id);
+                _loadingGuildIds.Add(id);
                 DatabaseApiResult<GuildResp> resp;
                 do
                 {
@@ -64,7 +64,7 @@ namespace MultiplayerARPG.MMO
                     });
                 } while (!resp.IsSuccess);
                 ServerGuildHandlers.SetGuild(id, resp.Response.GuildData);
-                loadingGuildIds.Remove(id);
+                _loadingGuildIds.Remove(id);
             }
         }
 #endif

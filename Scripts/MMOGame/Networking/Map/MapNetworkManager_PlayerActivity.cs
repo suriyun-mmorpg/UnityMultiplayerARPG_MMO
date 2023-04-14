@@ -14,7 +14,7 @@ namespace MultiplayerARPG.MMO
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             if (!IsInstanceMap())
                 return base.GetCurrentMapId(playerCharacterEntity);
-            return locationsBeforeEnterInstance[playerCharacterEntity.Id].Key;
+            return _locationsBeforeEnterInstance[playerCharacterEntity.Id].Key;
 #else
             return string.Empty;
 #endif
@@ -25,7 +25,7 @@ namespace MultiplayerARPG.MMO
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             if (!IsInstanceMap())
                 return base.GetCurrentPosition(playerCharacterEntity);
-            return locationsBeforeEnterInstance[playerCharacterEntity.Id].Value;
+            return _locationsBeforeEnterInstance[playerCharacterEntity.Id].Value;
 #else
             return Vector3.zero;
 #endif
@@ -73,7 +73,7 @@ namespace MultiplayerARPG.MMO
             BaseMapInfo mapInfo;
             if (!string.IsNullOrEmpty(mapName) &&
                 ServerUserHandlers.TryGetPlayerCharacter(connectionId, out _) &&
-                mapServerConnectionIdsBySceneName.TryGetValue(mapName, out peerInfo) &&
+                _mapServerConnectionIdsBySceneName.TryGetValue(mapName, out peerInfo) &&
                 GameInstance.MapInfos.TryGetValue(mapName, out mapInfo) &&
                 mapInfo.IsSceneSet())
             {
@@ -140,8 +140,8 @@ namespace MultiplayerARPG.MMO
                 instanceMapWarpingCharacters.Add(playerCharacterEntity.ObjectId);
                 playerCharacterEntity.IsWarping = true;
             }
-            instanceMapWarpingCharactersByInstanceId.TryAdd(instanceId, instanceMapWarpingCharacters);
-            instanceMapWarpingLocations.TryAdd(instanceId, new InstanceMapWarpingLocation()
+            _instanceMapWarpingCharactersByInstanceId.TryAdd(instanceId, instanceMapWarpingCharacters);
+            _instanceMapWarpingLocations.TryAdd(instanceId, new InstanceMapWarpingLocation()
             {
                 mapName = mapName,
                 position = position,
@@ -168,8 +168,8 @@ namespace MultiplayerARPG.MMO
             InstanceMapWarpingLocation warpingLocation;
             BaseMapInfo mapInfo;
             if (ServerUserHandlers.TryGetPlayerCharacter(connectionId, out _) &&
-                instanceMapWarpingLocations.TryGetValue(instanceId, out warpingLocation) &&
-                instanceMapServerConnectionIdsByInstanceId.TryGetValue(instanceId, out peerInfo) &&
+                _instanceMapWarpingLocations.TryGetValue(instanceId, out warpingLocation) &&
+                _instanceMapServerConnectionIdsByInstanceId.TryGetValue(instanceId, out peerInfo) &&
                 GameInstance.MapInfos.TryGetValue(warpingLocation.mapName, out mapInfo) &&
                 mapInfo.IsSceneSet())
             {
@@ -206,7 +206,7 @@ namespace MultiplayerARPG.MMO
             {
                 // Remove warping characters who warping to instance map
                 HashSet<uint> instanceMapWarpingCharacters;
-                if (instanceMapWarpingCharactersByInstanceId.TryGetValue(instanceId, out instanceMapWarpingCharacters))
+                if (_instanceMapWarpingCharactersByInstanceId.TryGetValue(instanceId, out instanceMapWarpingCharacters))
                 {
                     BasePlayerCharacterEntity playerCharacterEntity;
                     foreach (uint warpingCharacter in instanceMapWarpingCharacters)
@@ -217,9 +217,9 @@ namespace MultiplayerARPG.MMO
                             ServerGameMessageHandlers.SendGameMessage(playerCharacterEntity.ConnectionId, UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE);
                         }
                     }
-                    instanceMapWarpingCharactersByInstanceId.TryRemove(instanceId, out _);
+                    _instanceMapWarpingCharactersByInstanceId.TryRemove(instanceId, out _);
                 }
-                instanceMapWarpingLocations.TryRemove(instanceId, out _);
+                _instanceMapWarpingLocations.TryRemove(instanceId, out _);
             }
         }
 #endif
