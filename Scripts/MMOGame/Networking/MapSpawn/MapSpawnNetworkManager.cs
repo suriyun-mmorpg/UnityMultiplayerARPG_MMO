@@ -30,24 +30,24 @@ namespace MultiplayerARPG.MMO
         public string overrideExePath = "./Build.exe";
         public bool editorNotSpawnInBatchMode;
 
-        private int spawningPort = -1;
-        private int portCounter = -1;
+        private int _spawningPort = -1;
+        private int _portCounter = -1;
         /// <summary>
         /// Free ports which can use for start map server
         /// </summary>
-        private readonly ConcurrentQueue<int> freePorts = new ConcurrentQueue<int>();
+        private readonly ConcurrentQueue<int> _freePorts = new ConcurrentQueue<int>();
         /// <summary>
         /// Actions which will invokes in main thread
         /// </summary>
-        private readonly ConcurrentQueue<Action> mainThreadActions = new ConcurrentQueue<Action>();
+        private readonly ConcurrentQueue<Action> _mainThreadActions = new ConcurrentQueue<Action>();
         /// <summary>
         /// Map servers processes id
         /// </summary>
-        private readonly ConcurrentHashSet<int> processes = new ConcurrentHashSet<int>();
+        private readonly ConcurrentHashSet<int> _processes = new ConcurrentHashSet<int>();
         /// <summary>
         /// List of Map servers that restarting in update loop
         /// </summary>
-        private readonly ConcurrentQueue<string> restartingScenes = new ConcurrentQueue<string>();
+        private readonly ConcurrentQueue<string> _restartingScenes = new ConcurrentQueue<string>();
 
         public string ExePath
         {
@@ -96,27 +96,27 @@ namespace MultiplayerARPG.MMO
         protected virtual void Clean()
         {
             this.InvokeInstanceDevExtMethods("Clean");
-            spawningPort = -1;
-            portCounter = -1;
+            _spawningPort = -1;
+            _portCounter = -1;
             // Clear free ports
-            while (freePorts.TryDequeue(out _))
+            while (_freePorts.TryDequeue(out _))
             {
                 // Do nothing
             }
             // Clear main thread actions
-            while (mainThreadActions.TryDequeue(out _))
+            while (_mainThreadActions.TryDequeue(out _))
             {
                 // Do nothing
             }
             // Clear processes
-            List<int> processIds = new List<int>(processes);
+            List<int> processIds = new List<int>(_processes);
             foreach (int processId in processIds)
             {
                 Process.GetProcessById(processId).Kill();
-                processes.TryRemove(processId);
+                _processes.TryRemove(processId);
             }
             // Clear restarting scenes
-            while (restartingScenes.TryDequeue(out _))
+            while (_restartingScenes.TryDequeue(out _))
             {
                 // Do nothing
             }
@@ -127,8 +127,8 @@ namespace MultiplayerARPG.MMO
         {
             this.InvokeInstanceDevExtMethods("OnStartServer");
             ClusterClient.OnAppStart();
-            spawningPort = startPort;
-            portCounter = startPort;
+            _spawningPort = startPort;
+            _portCounter = startPort;
             base.OnStartServer();
         }
 #endif
@@ -164,19 +164,19 @@ namespace MultiplayerARPG.MMO
                 ClusterClient.Update();
                 if (ClusterClient.IsAppRegistered)
                 {
-                    if (restartingScenes.Count > 0)
+                    if (_restartingScenes.Count > 0)
                     {
                         string tempRestartingScenes;
-                        while (restartingScenes.TryDequeue(out tempRestartingScenes))
+                        while (_restartingScenes.TryDequeue(out tempRestartingScenes))
                         {
                             SpawnMap(tempRestartingScenes, true);
                         }
                     }
                 }
-                if (mainThreadActions.Count > 0)
+                if (_mainThreadActions.Count > 0)
                 {
                     Action tempMainThreadAction;
-                    while (mainThreadActions.TryDequeue(out tempMainThreadAction))
+                    while (_mainThreadActions.TryDequeue(out tempMainThreadAction))
                     {
                         if (tempMainThreadAction != null)
                             tempMainThreadAction.Invoke();
@@ -247,7 +247,7 @@ namespace MultiplayerARPG.MMO
 
         private void FreePort(int port)
         {
-            freePorts.Enqueue(port);
+            _freePorts.Enqueue(port);
         }
 
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
@@ -267,15 +267,15 @@ namespace MultiplayerARPG.MMO
             RequestProceedResultDelegate<ResponseSpawnMapMessage> result = null)
         {
             // Port to run map server
-            if (freePorts.Count > 0)
+            if (_freePorts.Count > 0)
             {
-                freePorts.TryDequeue(out spawningPort);
+                _freePorts.TryDequeue(out _spawningPort);
             }
             else
             {
-                spawningPort = portCounter++;
+                _spawningPort = _portCounter++;
             }
-            int port = spawningPort;
+            int port = _spawningPort;
 
             // Path to executable
             string path = ExePath;
@@ -327,11 +327,11 @@ namespace MultiplayerARPG.MMO
                         using (Process process = Process.Start(startProcessInfo))
                         {
                             processId = process.Id;
-                            processes.Add(processId);
+                            _processes.Add(processId);
 
                             processStarted = true;
 
-                            mainThreadActions.Enqueue(() =>
+                            _mainThreadActions.Enqueue(() =>
                             {
                                 if (LogInfo)
                                     Logging.Log(LogTag, "Process started. Id: " + processId);
@@ -353,7 +353,7 @@ namespace MultiplayerARPG.MMO
                     {
                         if (!processStarted)
                         {
-                            mainThreadActions.Enqueue(() =>
+                            _mainThreadActions.Enqueue(() =>
                             {
                                 if (LogFatal)
                                 {
@@ -377,13 +377,13 @@ namespace MultiplayerARPG.MMO
                     finally
                     {
                         // Remove the process
-                        processes.TryRemove(processId);
+                        _processes.TryRemove(processId);
 
                         // Restarting scene
                         if (autoRestart)
-                            restartingScenes.Enqueue(mapId);
+                            _restartingScenes.Enqueue(mapId);
 
-                        mainThreadActions.Enqueue(() =>
+                        _mainThreadActions.Enqueue(() =>
                         {
                             // Release the port number
                             FreePort(port);
@@ -409,7 +409,7 @@ namespace MultiplayerARPG.MMO
 
                 // Restarting scene
                 if (autoRestart)
-                    restartingScenes.Enqueue(mapId);
+                    _restartingScenes.Enqueue(mapId);
 
                 if (LogFatal)
                     Logging.LogException(LogTag, e);
