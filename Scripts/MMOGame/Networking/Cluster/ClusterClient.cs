@@ -13,13 +13,13 @@ namespace MultiplayerARPG.MMO
         public System.Action<string, UITextKeys> onKickUser;
         public System.Action<string, string> onPlayerCharacterRemoved;
         public bool IsAppRegistered { get; private set; }
-        public override string LogTag { get { return nameof(ClusterClient) + ":" + appServer.PeerType; } }
+        public override string LogTag { get { return nameof(ClusterClient) + ":" + _appServer.PeerType; } }
 #endif
-        private readonly IAppServer appServer;
+        private readonly IAppServer _appServer;
 
         public ClusterClient(IAppServer appServer) : base(new LiteNetLibTransport("CLUSTER", 16, 16))
         {
-            this.appServer = appServer;
+            this._appServer = appServer;
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             EnableRequestResponse(MMOMessageTypes.Request, MMOMessageTypes.Response);
             RegisterResponseHandler<RequestAppServerRegisterMessage, ResponseAppServerRegisterMessage>(MMORequestTypes.RequestAppServerRegister, HandleResponseAppServerRegister);
@@ -81,8 +81,8 @@ namespace MultiplayerARPG.MMO
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         private void ConnectToClusterServer()
         {
-            Logging.Log(LogTag, "Connecting to Cluster Server: " + appServer.ClusterServerAddress + ":" + appServer.ClusterServerPort);
-            StartClient(appServer.ClusterServerAddress, appServer.ClusterServerPort);
+            Logging.Log(LogTag, "Connecting to Cluster Server: " + _appServer.ClusterServerAddress + ":" + _appServer.ClusterServerPort);
+            StartClient(_appServer.ClusterServerAddress, _appServer.ClusterServerPort);
         }
 #endif
 
@@ -101,10 +101,10 @@ namespace MultiplayerARPG.MMO
             // Send Request
             RequestAppServerRegister(new CentralServerPeerInfo()
             {
-                peerType = appServer.PeerType,
-                networkAddress = appServer.AppAddress,
-                networkPort = appServer.AppPort,
-                extra = appServer.AppExtra,
+                peerType = _appServer.PeerType,
+                networkAddress = _appServer.AppAddress,
+                networkPort = _appServer.AppPort,
+                extra = _appServer.AppExtra,
             });
         }
 #endif
