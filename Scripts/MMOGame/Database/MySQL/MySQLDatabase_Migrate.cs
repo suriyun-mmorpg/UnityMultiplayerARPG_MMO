@@ -1,3 +1,4 @@
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
 using MySqlConnector;
 
 namespace MultiplayerARPG.MMO
@@ -249,3 +250,4 @@ namespace MultiplayerARPG.MMO
         }
     }
 }
+#endif

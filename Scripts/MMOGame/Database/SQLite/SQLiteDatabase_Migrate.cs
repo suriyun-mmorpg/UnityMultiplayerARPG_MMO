@@ -4,6 +4,7 @@ using Microsoft.Data.Sqlite;
 using Mono.Data.Sqlite;
 #endif
 
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
 namespace MultiplayerARPG.MMO
 {
     public partial class SQLiteDatabase
@@ -271,3 +272,4 @@ namespace MultiplayerARPG.MMO
         }
     }
 }
+#endif
