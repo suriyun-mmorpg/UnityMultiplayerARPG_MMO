@@ -2,6 +2,9 @@
 using LiteNetLibManager;
 using System.Collections.Generic;
 using UnityEngine;
+#if ENABLE_PURCHASING && UNITY_PURCHASING
+using UnityEngine.Purchasing.Security;
+#endif
 
 namespace MultiplayerARPG.MMO
 {
@@ -249,7 +252,6 @@ namespace MultiplayerARPG.MMO
             RequestProceedResultDelegate<ResponseCashPackageBuyValidationMessage> result)
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-            // TODO: Validate purchasing at server side
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
                 result.InvokeError(new ResponseCashPackageBuyValidationMessage()
@@ -267,6 +269,27 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
+
+#if ENABLE_PURCHASING && UNITY_PURCHASING
+            // NOTE: If error occuring and it lead you here, you must learn and use IAP obfuscating dialog (https://docs.unity3d.com/Manual/UnityIAPValidatingReceipts.html)
+            CrossPlatformValidator validator = new CrossPlatformValidator(GooglePlayTangle.Data(), AppleTangle.Data(), Application.identifier);
+            validator.Validate(request.receipt);
+            try
+            {
+                // On Google Play, result has a single product ID.
+                // On Apple stores, receipts contain multiple products.
+                IPurchaseReceipt[] validateResult = validator.Validate(request.receipt);
+                // TODO: May store receipt to database
+            }
+            catch (IAPSecurityException)
+            {
+                result.InvokeError(new ResponseCashPackageBuyValidationMessage()
+                {
+                    message = UITextKeys.UI_ERROR_NOT_ALLOWED,
+                });
+                return;
+            }
+#endif
 
             DatabaseApiResult<CashResp> changeCashResp = await DbServiceClient.ChangeCashAsync(new ChangeCashReq()
             {
