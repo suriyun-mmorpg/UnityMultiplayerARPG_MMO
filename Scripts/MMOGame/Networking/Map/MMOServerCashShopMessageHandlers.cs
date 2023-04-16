@@ -270,7 +270,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
 
-            if (!ValidateIAPReceipt(cashPackage, request.receipt))
+            if (!ValidateIAPReceipt(request.receipt, out List<CashPackage> cashPackages))
             {
                 result.InvokeError(new ResponseCashPackageBuyValidationMessage()
                 {
@@ -279,33 +279,40 @@ namespace MultiplayerARPG.MMO
                 return;
             }
 
-            DatabaseApiResult<CashResp> changeCashResp = await DbServiceClient.ChangeCashAsync(new ChangeCashReq()
+            int resultUserCash = 0;
+            for (int i = 0; i < cashPackages.Count; ++i)
             {
-                UserId = playerCharacter.UserId,
-                ChangeAmount = cashPackage.CashAmount
-            });
-            if (!changeCashResp.IsSuccess)
-            {
-                result.InvokeError(new ResponseCashPackageBuyValidationMessage()
+                // TODO: Money thing is very important, it should have better data handling
+                DatabaseApiResult<CashResp> changeCashResp = await DbServiceClient.ChangeCashAsync(new ChangeCashReq()
                 {
-                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                    UserId = playerCharacter.UserId,
+                    ChangeAmount = cashPackage.CashAmount
                 });
-                return;
+                if (!changeCashResp.IsSuccess)
+                {
+                    result.InvokeError(new ResponseCashPackageBuyValidationMessage()
+                    {
+                        message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                    });
+                    return;
+                }
+                resultUserCash = changeCashResp.Response.Cash;
             }
 
             // Sync cash to game clients
-            playerCharacter.UserCash = changeCashResp.Response.Cash;
+            playerCharacter.UserCash = resultUserCash;
 
             result.InvokeSuccess(new ResponseCashPackageBuyValidationMessage()
             {
                 dataId = request.dataId,
-                cash = changeCashResp.Response.Cash,
+                cash = resultUserCash,
             });
 #endif
         }
 
-        private bool ValidateIAPReceipt(CashPackage cashPackage, string receipt)
+        private bool ValidateIAPReceipt(string receipt, out List<CashPackage> cashPackages)
         {
+            cashPackages = new List<CashPackage>();
 #if ENABLE_PURCHASING && UNITY_PURCHASING
             // NOTE: If error occuring and it lead you here, you must learn and use IAP obfuscating dialog (https://docs.unity3d.com/Manual/UnityIAPValidatingReceipts.html)
             CrossPlatformValidator validator = new CrossPlatformValidator(GooglePlayTangle.Data(), AppleTangle.Data(), Application.identifier);
@@ -315,16 +322,14 @@ namespace MultiplayerARPG.MMO
                 // On Apple stores, receipts contain multiple products.
                 IPurchaseReceipt[] validateResult = validator.Validate(receipt);
                 // TODO: May store receipt to database
-                bool valid = false;
                 for (int i = 0; i < validateResult.Length; ++i)
                 {
-                    if (validateResult[i].productID.Equals(cashPackage.ProductId))
+                    if (GameInstance.CashPackages.TryGetValue(BaseGameData.MakeDataId(validateResult[i].productID), out CashPackage cashPackage))
                     {
-                        valid = true;
-                        break;
+                        cashPackages.Add(cashPackage);
                     }
                 }
-                return valid;
+                return true;
             }
             catch (IAPSecurityException)
             {
