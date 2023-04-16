@@ -285,7 +285,7 @@ namespace MultiplayerARPG.MMO
             {
                 result.InvokeError(new ResponseCashPackageBuyValidationMessage()
                 {
-                    message = UITextKeys.UI_ERROR_NOT_ALLOWED,
+                    message = UITextKeys.UI_ERROR_CANNOT_GET_CASH_PACKAGE_INFO,
                 });
                 return;
             }
