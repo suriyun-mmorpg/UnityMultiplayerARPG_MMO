@@ -270,18 +270,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
 
-#if ENABLE_PURCHASING && UNITY_PURCHASING
-            // NOTE: If error occuring and it lead you here, you must learn and use IAP obfuscating dialog (https://docs.unity3d.com/Manual/UnityIAPValidatingReceipts.html)
-            CrossPlatformValidator validator = new CrossPlatformValidator(GooglePlayTangle.Data(), AppleTangle.Data(), Application.identifier);
-            validator.Validate(request.receipt);
-            try
-            {
-                // On Google Play, result has a single product ID.
-                // On Apple stores, receipts contain multiple products.
-                IPurchaseReceipt[] validateResult = validator.Validate(request.receipt);
-                // TODO: May store receipt to database
-            }
-            catch (IAPSecurityException)
+            if (!ValidateIAPReceipt(cashPackage, request.receipt))
             {
                 result.InvokeError(new ResponseCashPackageBuyValidationMessage()
                 {
@@ -289,7 +278,6 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-#endif
 
             DatabaseApiResult<CashResp> changeCashResp = await DbServiceClient.ChangeCashAsync(new ChangeCashReq()
             {
@@ -313,6 +301,37 @@ namespace MultiplayerARPG.MMO
                 dataId = request.dataId,
                 cash = changeCashResp.Response.Cash,
             });
+#endif
+        }
+
+        private bool ValidateIAPReceipt(CashPackage cashPackage, string receipt)
+        {
+#if ENABLE_PURCHASING && UNITY_PURCHASING
+            // NOTE: If error occuring and it lead you here, you must learn and use IAP obfuscating dialog (https://docs.unity3d.com/Manual/UnityIAPValidatingReceipts.html)
+            CrossPlatformValidator validator = new CrossPlatformValidator(GooglePlayTangle.Data(), AppleTangle.Data(), Application.identifier);
+            try
+            {
+                // On Google Play, result has a single product ID.
+                // On Apple stores, receipts contain multiple products.
+                IPurchaseReceipt[] validateResult = validator.Validate(receipt);
+                // TODO: May store receipt to database
+                bool valid = false;
+                for (int i = 0; i < validateResult.Length; ++i)
+                {
+                    if (validateResult[i].productID.Equals(cashPackage.ProductId))
+                    {
+                        valid = true;
+                        break;
+                    }
+                }
+                return valid;
+            }
+            catch (IAPSecurityException)
+            {
+                return false;
+            }
+#else
+            return true;
 #endif
         }
     }
