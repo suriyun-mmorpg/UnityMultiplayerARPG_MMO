@@ -5,6 +5,7 @@ namespace MultiplayerARPG.MMO
     [DisallowMultipleComponent]
     public class DatabaseUserLoginSetup : MonoBehaviour
     {
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
         public static readonly string LogTag = nameof(DatabaseUserLoginSetup);
 
         private class OldDatabaseUserLogin : IDatabaseUserLogin
@@ -39,5 +40,6 @@ namespace MultiplayerARPG.MMO
                 database.UserLoginManager = new OldDatabaseUserLogin();
             }
         }
+#endif
     }
 }
