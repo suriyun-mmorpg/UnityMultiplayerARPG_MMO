@@ -6,11 +6,12 @@ namespace MultiplayerARPG.MMO
 {
     public partial class RestDatabaseClient : RestClient, IDatabaseClient
     {
-        public string apiUrl;
+        public string apiUrl = "http://localhost:5757/api/";
+        public string secretKey = "secret";
 
         private async UniTask<DatabaseApiResult<TResp>> SendRequest<TReq, TResp>(TReq request, string url, string functionName)
         {
-            var resp = await Post<TReq, TResp>(url, request);
+            var resp = await Post<TReq, TResp>(url, request, secretKey);
             if (resp.IsError())
             {
                 Logging.LogError(nameof(RestDatabaseClient), $"Cannot {functionName} status: {resp.ResponseCode}");
@@ -29,7 +30,7 @@ namespace MultiplayerARPG.MMO
 
         private async UniTask<DatabaseApiResult> SendRequest<TReq>(TReq request, string url, string functionName)
         {
-            var resp = await Post(url, request);
+            var resp = await Post(url, request, secretKey);
             if (resp.IsError())
             {
                 Logging.LogError(nameof(RestDatabaseClient), $"Cannot {functionName} status: {resp.ResponseCode}");
