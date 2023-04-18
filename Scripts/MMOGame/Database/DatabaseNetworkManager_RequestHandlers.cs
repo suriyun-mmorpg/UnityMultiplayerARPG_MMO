@@ -513,7 +513,7 @@ namespace MultiplayerARPG.MMO
             // Insert to database
             int guildId = Database.CreateGuild(request.GuildName, request.LeaderCharacterId);
             // Cached the data
-            GuildData guild = new GuildData(guildId, request.GuildName, request.LeaderCharacterId);
+            GuildData guild = new GuildData(guildId, request.GuildName, request.LeaderCharacterId, GameInstance.Singleton.SocialSystemSetting.GuildMemberRoles);
             cachedGuild[guildId] = guild;
             result.InvokeSuccess(new GuildResp()
             {
