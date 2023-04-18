@@ -35,15 +35,9 @@ namespace MultiplayerARPG.MMO
         protected async UniTaskVoid ValidateUserLogin(RequestHandlerData requestHandler, ValidateUserLoginReq request, RequestProceedResultDelegate<ValidateUserLoginResp> result)
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-            string userId = Database.ValidateUserLogin(request.Username, request.Password);
-            if (string.IsNullOrEmpty(userId))
-            {
-                result.InvokeError(new ValidateUserLoginResp());
-                return;
-            }
             result.InvokeSuccess(new ValidateUserLoginResp()
             {
-                UserId = userId,
+                UserId = Database.ValidateUserLogin(request.Username, request.Password),
             });
             await UniTask.Yield();
 #endif
@@ -63,11 +57,6 @@ namespace MultiplayerARPG.MMO
         protected async UniTaskVoid GetUserLevel(RequestHandlerData requestHandler, GetUserLevelReq request, RequestProceedResultDelegate<GetUserLevelResp> result)
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-            if (!Database.ValidateAccessToken(request.UserId, request.AccessToken))
-            {
-                result.InvokeError(new GetUserLevelResp());
-                return;
-            }
             result.InvokeSuccess(new GetUserLevelResp()
             {
                 UserLevel = Database.GetUserLevel(request.UserId),
