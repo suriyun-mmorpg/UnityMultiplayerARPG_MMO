@@ -1,13 +1,42 @@
 using Cysharp.Threading.Tasks;
 using LiteNetLibManager;
+using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.IO;
 using UnityRestClient;
 
 namespace MultiplayerARPG.MMO
 {
     public partial class RestDatabaseClient : RestClient, IDatabaseClient
     {
+        [System.Serializable]
+        public struct Config
+        {
+            public string dbApiUrl;
+            public string dbSecretKey;
+        }
+
         public string apiUrl = "http://localhost:5757/api/";
         public string secretKey = "secret";
+
+        void Awake()
+        {
+            string configFolder = "./config";
+            string configFilePath = configFolder + "/serverConfig.json";
+            Dictionary<string, object> jsonConfig = new Dictionary<string, object>();
+            Logging.Log(nameof(RestDatabaseClient), "Reading config file from " + configFilePath);
+            if (File.Exists(configFilePath))
+            {
+                // Read config file
+                Logging.Log(nameof(RestDatabaseClient), "Found config file");
+                string dataAsJson = File.ReadAllText(configFilePath);
+                Config newConfig = JsonConvert.DeserializeObject<Config>(dataAsJson);
+                if (newConfig.dbApiUrl != null)
+                    apiUrl = newConfig.dbApiUrl;
+                if (newConfig.dbSecretKey != null)
+                    secretKey = newConfig.dbSecretKey;
+            }
+        }
 
         private async UniTask<DatabaseApiResult<TResp>> SendRequest<TReq, TResp>(TReq request, string url, string functionName)
         {
