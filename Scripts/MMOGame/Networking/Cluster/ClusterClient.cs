@@ -19,7 +19,7 @@ namespace MultiplayerARPG.MMO
 
         public ClusterClient(IAppServer appServer) : base(new LiteNetLibTransport("CLUSTER", 16, 16))
         {
-            this._appServer = appServer;
+            _appServer = appServer;
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             EnableRequestResponse(MMOMessageTypes.Request, MMOMessageTypes.Response);
             RegisterResponseHandler<RequestAppServerRegisterMessage, ResponseAppServerRegisterMessage>(MMORequestTypes.RequestAppServerRegister, HandleResponseAppServerRegister);
