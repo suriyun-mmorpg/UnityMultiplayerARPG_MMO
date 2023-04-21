@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
 
 namespace MultiplayerARPG.MMO
 {
@@ -45,10 +46,10 @@ namespace MultiplayerARPG.MMO
                 return false;
 
             result = new List<string>();
-            List<object> objResults = (List<object>)config[configName];
-            foreach (object objResult in objResults)
+            JArray objResults = (JArray)config[configName];
+            foreach (var objResult in objResults)
             {
-                result.Add((string)objResult);
+                result.Add(objResult.Value<string>());
             }
             return true;
         }
