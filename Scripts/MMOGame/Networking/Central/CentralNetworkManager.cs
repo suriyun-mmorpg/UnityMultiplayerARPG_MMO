@@ -70,13 +70,18 @@ namespace MultiplayerARPG.MMO
                 if (Time.unscaledTime - _lastUserCountUpdateTime > updateUserCountInterval)
                 {
                     _lastUserCountUpdateTime = Time.unscaledTime;
-                    // Update user count
-                    DbServiceClient.UpdateUserCount(new UpdateUserCountReq()
-                    {
-                        UserCount = ClusterServer.MapUsersByCharacterId.Count,
-                    });
+                    UpdateCountUsers().Forget();
                 }
             }
+        }
+
+        protected async UniTaskVoid UpdateCountUsers()
+        {
+            // Update user count
+            await DbServiceClient.UpdateUserCount(new UpdateUserCountReq()
+            {
+                UserCount = await ClusterServer.CountUsers(),
+            });
         }
 #endif
 
