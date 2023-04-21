@@ -5,7 +5,7 @@ using System.Net.Security;
 using System.IO;
 using LiteNetLibManager;
 using UnityEngine;
-using MiniJSON;
+using Newtonsoft.Json;
 
 namespace MultiplayerARPG.MMO
 {
@@ -198,7 +198,7 @@ namespace MultiplayerARPG.MMO
                     // Read config file
                     Logging.Log(ToString(), "Found config file");
                     string dataAsJson = File.ReadAllText(configFilePath);
-                    jsonConfig = Json.Deserialize(dataAsJson) as Dictionary<string, object>;
+                    jsonConfig = JsonConvert.DeserializeObject<Dictionary<string, object>>(dataAsJson);
                     configFileFound = true;
                 }
 
@@ -216,13 +216,13 @@ namespace MultiplayerARPG.MMO
                     if (ConfigReader.ReadConfigs(jsonConfig, CONFIG_USE_CUSTOM_DATABASE_CLIENT, out useCustomDatabaseClient, this.useCustomDatabaseClient))
                     {
                         this.useCustomDatabaseClient = useCustomDatabaseClient;
-                        jsonConfig[CONFIG_USE_CUSTOM_DATABASE_CLIENT] = useCustomDatabaseClient;
                     }
                     else if (ConfigReader.IsArgsProvided(args, CONFIG_USE_CUSTOM_DATABASE_CLIENT))
                     {
                         this.useCustomDatabaseClient = true;
                     }
                 }
+                jsonConfig[CONFIG_USE_CUSTOM_DATABASE_CLIENT] = useCustomDatabaseClient;
 
                 int dbOptionIndex;
                 if (ConfigReader.ReadArgs(args, ARG_DATABASE_OPTION_INDEX, out dbOptionIndex, 0) ||
@@ -230,7 +230,6 @@ namespace MultiplayerARPG.MMO
                 {
                     if (!useCustomDatabaseClient)
                         databaseNetworkManager.SetDatabaseByOptionIndex(dbOptionIndex);
-                    jsonConfig[CONFIG_DATABASE_OPTION_INDEX] = dbOptionIndex;
                 }
                 jsonConfig[CONFIG_DATABASE_OPTION_INDEX] = dbOptionIndex;
 
@@ -239,7 +238,6 @@ namespace MultiplayerARPG.MMO
                 if (ConfigReader.ReadConfigs(jsonConfig, CONFIG_DATABASE_DISABLE_CACHE_READING, out databaseDisableCacheReading, this.databaseDisableCacheReading))
                 {
                     this.databaseDisableCacheReading = databaseDisableCacheReading;
-                    jsonConfig[CONFIG_DATABASE_DISABLE_CACHE_READING] = databaseDisableCacheReading;
                 }
                 else if (ConfigReader.IsArgsProvided(args, ARG_DATABASE_DISABLE_CACHE_READING))
                 {
@@ -252,7 +250,6 @@ namespace MultiplayerARPG.MMO
                 if (ConfigReader.ReadConfigs(jsonConfig, CONFIG_USE_WEB_SOCKET, out useWebSocket, this.useWebSocket))
                 {
                     this.useWebSocket = useWebSocket;
-                    jsonConfig[CONFIG_USE_WEB_SOCKET] = useWebSocket;
                 }
                 else if (ConfigReader.IsArgsProvided(args, ARG_USE_WEB_SOCKET))
                 {
@@ -265,7 +262,6 @@ namespace MultiplayerARPG.MMO
                 if (ConfigReader.ReadConfigs(jsonConfig, CONFIG_WEB_SOCKET_SECURE, out webSocketSecure, this.webSocketSecure))
                 {
                     this.webSocketSecure = webSocketSecure;
-                    jsonConfig[CONFIG_WEB_SOCKET_SECURE] = webSocketSecure;
                 }
                 else if (ConfigReader.IsArgsProvided(args, ARG_WEB_SOCKET_SECURE))
                 {
@@ -279,7 +275,6 @@ namespace MultiplayerARPG.MMO
                     ConfigReader.ReadConfigs(jsonConfig, CONFIG_WEB_SOCKET_CERT_PATH, out webSocketCertPath, this.webSocketCertPath))
                 {
                     this.webSocketCertPath = webSocketCertPath;
-                    jsonConfig[CONFIG_WEB_SOCKET_CERT_PATH] = webSocketCertPath;
                 }
                 jsonConfig[CONFIG_WEB_SOCKET_CERT_PATH] = webSocketCertPath;
 
@@ -289,7 +284,6 @@ namespace MultiplayerARPG.MMO
                     ConfigReader.ReadConfigs(jsonConfig, CONFIG_WEB_SOCKET_CERT_PASSWORD, out webSocketCertPassword, this.webSocketCertPassword))
                 {
                     this.webSocketCertPassword = webSocketCertPassword;
-                    jsonConfig[CONFIG_WEB_SOCKET_CERT_PASSWORD] = webSocketCertPassword;
                 }
                 jsonConfig[CONFIG_WEB_SOCKET_CERT_PASSWORD] = webSocketCertPassword;
 
@@ -300,7 +294,6 @@ namespace MultiplayerARPG.MMO
                 {
                     mapSpawnNetworkManager.clusterServerAddress = centralNetworkAddress;
                     mapNetworkManager.clusterServerAddress = centralNetworkAddress;
-                    jsonConfig[CONFIG_CENTRAL_ADDRESS] = centralNetworkAddress;
                 }
                 jsonConfig[CONFIG_CENTRAL_ADDRESS] = centralNetworkAddress;
 
@@ -310,7 +303,6 @@ namespace MultiplayerARPG.MMO
                     ConfigReader.ReadConfigs(jsonConfig, CONFIG_CENTRAL_PORT, out centralNetworkPort, centralNetworkManager.networkPort))
                 {
                     centralNetworkManager.networkPort = centralNetworkPort;
-                    jsonConfig[CONFIG_CENTRAL_PORT] = centralNetworkPort;
                 }
                 jsonConfig[CONFIG_CENTRAL_PORT] = centralNetworkPort;
 
@@ -320,7 +312,6 @@ namespace MultiplayerARPG.MMO
                     ConfigReader.ReadConfigs(jsonConfig, CONFIG_CENTRAL_MAX_CONNECTIONS, out centralMaxConnections, centralNetworkManager.maxConnections))
                 {
                     centralNetworkManager.maxConnections = centralMaxConnections;
-                    jsonConfig[CONFIG_CENTRAL_MAX_CONNECTIONS] = centralMaxConnections;
                 }
                 jsonConfig[CONFIG_CENTRAL_MAX_CONNECTIONS] = centralMaxConnections;
 
@@ -332,7 +323,6 @@ namespace MultiplayerARPG.MMO
                     centralNetworkManager.clusterServerPort = clusterNetworkPort;
                     mapSpawnNetworkManager.clusterServerPort = clusterNetworkPort;
                     mapNetworkManager.clusterServerPort = clusterNetworkPort;
-                    jsonConfig[CONFIG_CLUSTER_PORT] = clusterNetworkPort;
                 }
                 jsonConfig[CONFIG_CLUSTER_PORT] = clusterNetworkPort;
 
@@ -343,7 +333,6 @@ namespace MultiplayerARPG.MMO
                 {
                     mapSpawnNetworkManager.machineAddress = machineNetworkAddress;
                     mapNetworkManager.machineAddress = machineNetworkAddress;
-                    jsonConfig[CONFIG_MACHINE_ADDRESS] = machineNetworkAddress;
                 }
                 jsonConfig[CONFIG_MACHINE_ADDRESS] = machineNetworkAddress;
 
@@ -353,7 +342,6 @@ namespace MultiplayerARPG.MMO
                     ConfigReader.ReadConfigs(jsonConfig, CONFIG_MAP_SPAWN_PORT, out mapSpawnNetworkPort, mapSpawnNetworkManager.networkPort))
                 {
                     mapSpawnNetworkManager.networkPort = mapSpawnNetworkPort;
-                    jsonConfig[CONFIG_MAP_SPAWN_PORT] = mapSpawnNetworkPort;
                 }
                 jsonConfig[CONFIG_MAP_SPAWN_PORT] = mapSpawnNetworkPort;
 
@@ -363,7 +351,11 @@ namespace MultiplayerARPG.MMO
                     ConfigReader.ReadConfigs(jsonConfig, CONFIG_SPAWN_EXE_PATH, out spawnExePath, mapSpawnNetworkManager.exePath))
                 {
                     mapSpawnNetworkManager.exePath = spawnExePath;
-                    jsonConfig[CONFIG_SPAWN_EXE_PATH] = spawnExePath;
+                }
+                if (!File.Exists(spawnExePath))
+                {
+                    spawnExePath = System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName;
+                    mapSpawnNetworkManager.exePath = spawnExePath;
                 }
                 jsonConfig[CONFIG_SPAWN_EXE_PATH] = spawnExePath;
 
@@ -372,7 +364,6 @@ namespace MultiplayerARPG.MMO
                 if (ConfigReader.ReadConfigs(jsonConfig, CONFIG_NOT_SPAWN_IN_BATCH_MODE, out notSpawnInBatchMode, mapSpawnNetworkManager.notSpawnInBatchMode))
                 {
                     mapSpawnNetworkManager.notSpawnInBatchMode = notSpawnInBatchMode;
-                    jsonConfig[CONFIG_NOT_SPAWN_IN_BATCH_MODE] = notSpawnInBatchMode;
                 }
                 else if (ConfigReader.IsArgsProvided(args, ARG_NOT_SPAWN_IN_BATCH_MODE))
                 {
@@ -386,7 +377,6 @@ namespace MultiplayerARPG.MMO
                     ConfigReader.ReadConfigs(jsonConfig, CONFIG_SPAWN_START_PORT, out spawnStartPort, mapSpawnNetworkManager.startPort))
                 {
                     mapSpawnNetworkManager.startPort = spawnStartPort;
-                    jsonConfig[CONFIG_SPAWN_START_PORT] = spawnStartPort;
                 }
                 jsonConfig[CONFIG_SPAWN_START_PORT] = spawnStartPort;
 
@@ -402,7 +392,6 @@ namespace MultiplayerARPG.MMO
                     ConfigReader.ReadConfigs(jsonConfig, CONFIG_SPAWN_MAPS, out spawnMapIds, defaultSpawnMapIds))
                 {
                     spawningMapIds = spawnMapIds;
-                    jsonConfig[CONFIG_SPAWN_MAPS] = spawnMapIds;
                 }
                 jsonConfig[CONFIG_SPAWN_MAPS] = spawnMapIds;
 
@@ -412,7 +401,6 @@ namespace MultiplayerARPG.MMO
                     ConfigReader.ReadConfigs(jsonConfig, CONFIG_MAP_PORT, out mapNetworkPort, mapNetworkManager.networkPort))
                 {
                     mapNetworkManager.networkPort = mapNetworkPort;
-                    jsonConfig[CONFIG_MAP_PORT] = mapNetworkPort;
                 }
                 jsonConfig[CONFIG_MAP_PORT] = mapNetworkPort;
 
@@ -422,7 +410,6 @@ namespace MultiplayerARPG.MMO
                     ConfigReader.ReadConfigs(jsonConfig, CONFIG_MAP_MAX_CONNECTIONS, out mapMaxConnections, mapNetworkManager.maxConnections))
                 {
                     mapNetworkManager.maxConnections = mapMaxConnections;
-                    jsonConfig[CONFIG_MAP_MAX_CONNECTIONS] = mapMaxConnections;
                 }
                 jsonConfig[CONFIG_MAP_MAX_CONNECTIONS] = mapMaxConnections;
 
@@ -468,7 +455,6 @@ namespace MultiplayerARPG.MMO
                         ConfigReader.ReadConfigs(jsonConfig, CONFIG_DATABASE_ADDRESS, out databaseNetworkAddress, databaseNetworkManager.networkAddress))
                     {
                         databaseNetworkManager.networkAddress = databaseNetworkAddress;
-                        jsonConfig[CONFIG_DATABASE_ADDRESS] = databaseNetworkAddress;
                     }
                     jsonConfig[CONFIG_DATABASE_ADDRESS] = databaseNetworkAddress;
 
@@ -479,7 +465,6 @@ namespace MultiplayerARPG.MMO
                     {
                         if (!useCustomDatabaseClient)
                             databaseNetworkManager.networkPort = databaseNetworkPort;
-                        jsonConfig[CONFIG_DATABASE_PORT] = databaseNetworkPort;
                     }
                     jsonConfig[CONFIG_DATABASE_PORT] = databaseNetworkPort;
                 }
@@ -531,44 +516,7 @@ namespace MultiplayerARPG.MMO
                         Logging.Log(ToString(), "Not found config file, creating a new one");
                         if (!Directory.Exists(configFolder))
                             Directory.CreateDirectory(configFolder);
-                        string jsonContent = string.Empty;
-                        foreach (KeyValuePair<string, object> kv in jsonConfig)
-                        {
-                            if (!string.IsNullOrEmpty(jsonContent))
-                            {
-                                jsonContent += ",\n";
-                            }
-                            if (kv.Value is string)
-                            {
-                                jsonContent += $" \"{kv.Key}\": \"{kv.Value}\"";
-                            }
-                            if (kv.Value is byte || kv.Value is ushort || kv.Value is uint || kv.Value is ulong ||
-                                kv.Value is sbyte || kv.Value is short || kv.Value is int || kv.Value is long)
-                            {
-                                jsonContent += $" \"{kv.Key}\": {kv.Value}";
-                            }
-                            if (kv.Value is bool)
-                            {
-                                jsonContent += $" \"{kv.Key}\": {kv.Value.ToString().ToLower()}";
-                            }
-                            if (kv.Value is List<string>)
-                            {
-                                jsonContent += $" \"{kv.Key}\": ";
-                                string arrayContent = string.Empty;
-                                foreach (string entry in (List<string>)kv.Value)
-                                {
-                                    if (!string.IsNullOrEmpty(arrayContent))
-                                    {
-                                        arrayContent += ",";
-                                    }
-                                    arrayContent += $"\"{entry}\"";
-                                }
-                                arrayContent = $"[{arrayContent}]";
-                                jsonContent += arrayContent;
-                            }
-                        }
-                        jsonContent = "{\n" + jsonContent + "\n}";
-                        File.WriteAllText(configFilePath, jsonContent);
+                        File.WriteAllText(configFilePath, JsonConvert.SerializeObject(jsonConfig, Formatting.Indented));
                     }
                 }
 
