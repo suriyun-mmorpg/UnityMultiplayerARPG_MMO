@@ -562,7 +562,7 @@ MonoBehaviour:
     buyoutRequestType: 1302
     cancelAuctionRequestType: 1304
     getClientConfigRequestType: 1303
-  auctionHouseServiceUrl: http://localhost:9800/auction-house
+  auctionHouseServiceUrl: http://localhost:9800
   auctionHouseSecretKey: secret
   clusterServerAddress: 127.0.0.1
   clusterServerPort: 6010
@@ -783,6 +783,7 @@ GameObject:
   - component: {fileID: 1379718507}
   - component: {fileID: 1379718504}
   - component: {fileID: 1379718508}
+  - component: {fileID: 1379718509}
   m_Layer: 0
   m_Name: GameInstance
   m_TagString: Untagged
@@ -977,6 +978,7 @@ MonoBehaviour:
   consoleVSyncCount: 0
   consoleTargetFrameRate: 60
   testInEditorMode: 0
+  exportSocialSystemSetting: 0
   cashShopDatabase: {fileID: 11400000, guid: 677c37c598e6c1045b66de68f1f546f6, type: 2}
 --- !u!4 &1379718503
 Transform:
@@ -2223,6 +2225,18 @@ MonoBehaviour:
   setMessageKey: 
   setMessageValue: 
   setMessage: 0
+--- !u!114 &1379718509
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1379718501}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c89ff02ae1303546aaa8e11bad1aa42, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &1650493581 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 114462229916829746, guid: 16b2c0544b2d04c4c94eb1e5d854b997,
