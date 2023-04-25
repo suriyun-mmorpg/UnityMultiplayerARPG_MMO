@@ -278,8 +278,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            CentralServerPeerInfo? mapServerPeerInfo = await ClusterServer.GetMapServer(character.CurrentMapName);
-            if (!mapServerPeerInfo.HasValue)
+            if (!ClusterServer.MapServerPeersByMapId.TryGetValue(character.CurrentMapName, out CentralServerPeerInfo mapServerPeerInfo))
             {
                 result.InvokeError(new ResponseSelectCharacterMessage()
                 {
@@ -290,9 +289,9 @@ namespace MultiplayerARPG.MMO
             // Response
             result.InvokeSuccess(new ResponseSelectCharacterMessage()
             {
-                sceneName = mapServerPeerInfo.Value.extra,
-                networkAddress = mapServerPeerInfo.Value.networkAddress,
-                networkPort = mapServerPeerInfo.Value.networkPort,
+                sceneName = mapServerPeerInfo.extra,
+                networkAddress = mapServerPeerInfo.networkAddress,
+                networkPort = mapServerPeerInfo.networkPort,
             });
 #endif
         }

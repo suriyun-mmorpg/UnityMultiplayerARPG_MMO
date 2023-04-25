@@ -80,7 +80,7 @@ namespace MultiplayerARPG.MMO
             // Update user count
             await DbServiceClient.UpdateUserCount(new UpdateUserCountReq()
             {
-                UserCount = await ClusterServer.CountUsers(),
+                UserCount = ClusterServer.MapUsersByCharacterId.Count,
             });
         }
 #endif

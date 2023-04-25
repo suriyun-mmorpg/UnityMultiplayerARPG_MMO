@@ -17,16 +17,32 @@ namespace MultiplayerARPG.MMO
         private readonly CentralNetworkManager _centralNetworkManager;
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         private Dictionary<string, SocialCharacterData> _mapUsersByCharacterId = new Dictionary<string, SocialCharacterData>();
+        public IReadOnlyDictionary<string, SocialCharacterData> MapUsersByCharacterId => _mapUsersByCharacterId;
+
+
         private Dictionary<string, long> _connectionIdsByCharacterId = new Dictionary<string, long>();
+        public IReadOnlyDictionary<string, long> ConnectionIdsByCharacterId => _connectionIdsByCharacterId;
+
         private Dictionary<string, long> _connectionIdsByCharacterName = new Dictionary<string, long>();
+        public IReadOnlyDictionary<string, long> ConnectionIdsByCharacterName => _connectionIdsByCharacterName;
+
         // Map spawn server peers
         private Dictionary<long, CentralServerPeerInfo> _mapSpawnServerPeers = new Dictionary<long, CentralServerPeerInfo>();
+        public IReadOnlyDictionary<long, CentralServerPeerInfo> MapSpawnServerPeers => _mapSpawnServerPeers;
+
         // Map server peers
         private Dictionary<long, CentralServerPeerInfo> _mapServerPeers = new Dictionary<long, CentralServerPeerInfo>();
+        public IReadOnlyDictionary<long, CentralServerPeerInfo> MapServerPeers => _mapServerPeers;
+
         private Dictionary<string, CentralServerPeerInfo> _mapServerPeersByMapId = new Dictionary<string, CentralServerPeerInfo>();
+        public IReadOnlyDictionary<string, CentralServerPeerInfo> MapServerPeersByMapId => _mapServerPeersByMapId;
+
         private Dictionary<string, CentralServerPeerInfo> _mapServerPeersByInstanceId = new Dictionary<string, CentralServerPeerInfo>();
+        public IReadOnlyDictionary<string, CentralServerPeerInfo> MapServerPeersByInstanceId => _mapServerPeersByInstanceId;
+
         // <Request Id, Response Handler> dictionary
         private Dictionary<string, RequestProceedResultDelegate<ResponseSpawnMapMessage>> _requestSpawnMapHandlers = new Dictionary<string, RequestProceedResultDelegate<ResponseSpawnMapMessage>>();
+        public IReadOnlyDictionary<string, RequestProceedResultDelegate<ResponseSpawnMapMessage>> RequestSpawnMapHandlers => _requestSpawnMapHandlers;
 #endif
 
         public ClusterServer(CentralNetworkManager centralNetworkManager) : base(new LiteNetLibTransport("CLUSTER", 16, 16))
