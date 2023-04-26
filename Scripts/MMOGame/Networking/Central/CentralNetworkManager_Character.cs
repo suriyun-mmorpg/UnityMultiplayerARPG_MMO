@@ -100,8 +100,6 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             
-            int minCharacterNameLength = GameInstance.Singleton.minCharacterNameLength;
-            int maxCharacterNameLength = GameInstance.Singleton.maxCharacterNameLength;
             if (characterName.Length < minCharacterNameLength)
             {
                 result.InvokeError(new ResponseCreateCharacterMessage()
@@ -165,9 +163,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            if (!GameInstance.PlayerCharacters.ContainsKey(dataId) ||
-                !GameInstance.PlayerCharacterEntities.ContainsKey(entityId) ||
-                (GameInstance.Factions.Count > 0 && !GameInstance.Factions.ContainsKey(factionId)))
+            if (!DataManager.CanCreateCharacter(dataId, entityId, factionId))
             {
                 // If there is factions, it must have faction with the id stored in faction dictionary
                 result.InvokeError(new ResponseCreateCharacterMessage()
@@ -176,10 +172,10 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            string characterId = GenericUtils.GetUniqueId();
+            string characterId = DataManager.GenerateCharacterId();
             PlayerCharacterData characterData = new PlayerCharacterData();
             characterData.Id = characterId;
-            characterData.SetNewPlayerCharacterData(characterName, dataId, entityId, factionId);
+            DataManager.SetNewPlayerCharacterData(characterData, characterName, dataId, entityId, factionId);
             DeserializeCreateCharacterExtra(characterData, reader);
             DatabaseApiResult<CharacterResp> createResp = await DbServiceClient.CreateCharacterAsync(new CreateCharacterReq()
             {

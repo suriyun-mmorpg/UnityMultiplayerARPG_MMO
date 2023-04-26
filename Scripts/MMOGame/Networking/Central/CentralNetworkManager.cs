@@ -53,27 +53,40 @@ namespace MultiplayerARPG.MMO
 
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
         public ClusterServer ClusterServer { get; private set; }
+        public IDatabaseClient DbServiceClient { get; set; }
+        public ICentralServerDataManager DataManager { get; set; }
 #endif
 
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
-        public IDatabaseClient DbServiceClient
+
+#if NET || NETCOREAPP
+        public CentralNetworkManager() : base()
         {
-            get { return MMOServerInstance.Singleton.DatabaseClient; }
+            Initialize();
         }
-#endif
-
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#else
         protected override void Start()
         {
+            Initialize();
             base.Start();
-            ClusterServer = new ClusterServer(this);
         }
 #endif
 
+        protected virtual void Initialize()
+        {
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+            minCharacterNameLength = GameInstance.Singleton.minCharacterNameLength;
+            maxCharacterNameLength = GameInstance.Singleton.maxCharacterNameLength;
+#endif
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+            ClusterServer = new ClusterServer(this);
+#endif
+        }
+
         protected override void FixedUpdate()
         {
             base.FixedUpdate();
+
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
             if (IsServer)
             {
                 ClusterServer.Update();
@@ -83,8 +96,10 @@ namespace MultiplayerARPG.MMO
                     UpdateCountUsers().Forget();
                 }
             }
+#endif
         }
 
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
         protected async UniTaskVoid UpdateCountUsers()
         {
             // Update user count

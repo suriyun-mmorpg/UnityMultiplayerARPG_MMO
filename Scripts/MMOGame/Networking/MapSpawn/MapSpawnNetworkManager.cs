@@ -91,13 +91,21 @@ namespace MultiplayerARPG.MMO
 
 #if NET || NETCOREAPP
         public MapSpawnNetworkManager() : base()
+        {
+            Initialize();
+        }
 #else
         protected override void Start()
+        {
+            Initialize();
+            base.Start();
+        }
 #endif
+
+        protected virtual void Initialize()
         {
             useWebSocket = false;
             maxConnections = int.MaxValue;
-            base.Start();
 #if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
             ClusterClient = new ClusterClient(this);
             ClusterClient.onResponseAppServerRegister = OnResponseAppServerRegister;
