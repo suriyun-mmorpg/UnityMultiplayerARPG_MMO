@@ -7,6 +7,11 @@ namespace MultiplayerARPG.MMO
             return GenericUtils.GetUniqueId();
         }
 
+        public string GenerateMapSpawnRequestId()
+        {
+            return GenericUtils.GetUniqueId();
+        }
+
         public bool CanCreateCharacter(int dataId, int entityId, int factionId)
         {
             return GameInstance.PlayerCharacters.ContainsKey(dataId) && GameInstance.PlayerCharacterEntities.ContainsKey(entityId) && (GameInstance.Factions.Count <= 0 || GameInstance.Factions.ContainsKey(factionId));
