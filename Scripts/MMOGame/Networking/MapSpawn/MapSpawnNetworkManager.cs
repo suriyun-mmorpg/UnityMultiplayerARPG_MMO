@@ -11,21 +11,29 @@ using ConcurrentCollections;
 
 namespace MultiplayerARPG.MMO
 {
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
     [DefaultExecutionOrder(-895)]
+#endif
     public partial class MapSpawnNetworkManager : LiteNetLibManager.LiteNetLibManager, IAppServer
     {
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         [Header("Central Network Connection")]
+#endif
         public string clusterServerAddress = "127.0.0.1";
         public int clusterServerPort = 6010;
         public string machineAddress = "127.0.0.1";
 
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         [Header("Map Spawn Settings")]
+#endif
         public string exePath = "./Build.exe";
         public bool notSpawnInBatchMode = false;
         public int startPort = 8000;
         public List<BaseMapInfo> spawningMaps;
 
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         [Header("Running In Editor")]
+#endif
         public bool isOverrideExePath;
         public string overrideExePath = "./Build.exe";
         public bool editorNotSpawnInBatchMode;
@@ -71,7 +79,7 @@ namespace MultiplayerARPG.MMO
             }
         }
 
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
         public ClusterClient ClusterClient { get; private set; }
 #endif
         public string ClusterServerAddress { get { return clusterServerAddress; } }
@@ -81,12 +89,16 @@ namespace MultiplayerARPG.MMO
         public string AppExtra { get { return string.Empty; } }
         public CentralServerPeerType PeerType { get { return CentralServerPeerType.MapSpawnServer; } }
 
+#if NET || NETCOREAPP
+        public MapSpawnNetworkManager() : base()
+#else
         protected override void Start()
+#endif
         {
             useWebSocket = false;
             maxConnections = int.MaxValue;
             base.Start();
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
             ClusterClient = new ClusterClient(this);
             ClusterClient.onResponseAppServerRegister = OnResponseAppServerRegister;
             ClusterClient.RegisterRequestHandler<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.RequestSpawnMap, HandleRequestSpawnMap);
@@ -122,7 +134,7 @@ namespace MultiplayerARPG.MMO
             }
         }
 
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
         public override void OnStartServer()
         {
             this.InvokeInstanceDevExtMethods("OnStartServer");
@@ -133,7 +145,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
         public override void OnStopServer()
         {
             ClusterClient.OnAppStop();
@@ -155,7 +167,7 @@ namespace MultiplayerARPG.MMO
             base.OnStopClient();
         }
 
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
         protected override void FixedUpdate()
         {
             base.FixedUpdate();
@@ -192,7 +204,7 @@ namespace MultiplayerARPG.MMO
             base.OnDestroy();
         }
 
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
         internal async UniTaskVoid HandleRequestSpawnMap(
             RequestHandlerData requestHandler,
             RequestSpawnMapMessage request,
@@ -219,7 +231,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
         private void OnResponseAppServerRegister(AckResponseCode responseCode)
         {
             if (responseCode != AckResponseCode.Success)
@@ -233,7 +245,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
         private async UniTaskVoid SpawnMaps(List<BaseMapInfo> spawningMaps)
         {
             foreach (BaseMapInfo map in spawningMaps)
@@ -250,7 +262,7 @@ namespace MultiplayerARPG.MMO
             _freePorts.Enqueue(port);
         }
 
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
         private void SpawnMap(
             RequestSpawnMapMessage message,
             RequestProceedResultDelegate<ResponseSpawnMapMessage> result,
@@ -260,7 +272,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
         private void SpawnMap(
             string mapId, bool autoRestart,
             RequestSpawnMapMessage? request = null,
