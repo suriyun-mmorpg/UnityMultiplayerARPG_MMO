@@ -8,21 +8,29 @@ using System.Net.Sockets;
 
 namespace MultiplayerARPG.MMO
 {
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
     [DefaultExecutionOrder(-897)]
+#endif
     public partial class CentralNetworkManager : LiteNetLibManager.LiteNetLibManager
     {
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
         // User peers (Login / Register / Manager characters)
         protected readonly Dictionary<long, CentralUserPeerInfo> _userPeers = new Dictionary<long, CentralUserPeerInfo>();
         protected readonly Dictionary<string, CentralUserPeerInfo> _userPeersByUserId = new Dictionary<string, CentralUserPeerInfo>();
 #endif
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         [Header("Cluster")]
+#endif
         public int clusterServerPort = 6010;
 
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         [Header("Map Spawn")]
+#endif
         public int mapSpawnMillisecondsTimeout = 0;
 
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         [Header("User Account")]
+#endif
         public bool disableDefaultLogin = false;
         public int minUsernameLength = 2;
         public int maxUsernameLength = 24;
@@ -32,7 +40,9 @@ namespace MultiplayerARPG.MMO
         public bool requireEmail = false;
         public bool requireEmailVerification = false;
 
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         [Header("Statistic")]
+#endif
         public float updateUserCountInterval = 5f;
 
         public System.Action onClientConnected;
@@ -41,18 +51,18 @@ namespace MultiplayerARPG.MMO
 
         private float _lastUserCountUpdateTime = float.MinValue;
 
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
         public ClusterServer ClusterServer { get; private set; }
 #endif
 
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
         public IDatabaseClient DbServiceClient
         {
             get { return MMOServerInstance.Singleton.DatabaseClient; }
         }
 #endif
 
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
         protected override void Start()
         {
             base.Start();
@@ -60,7 +70,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
         protected override void FixedUpdate()
         {
             base.FixedUpdate();
@@ -131,13 +141,13 @@ namespace MultiplayerARPG.MMO
         protected virtual void Clean()
         {
             this.InvokeInstanceDevExtMethods("Clean");
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
             _userPeers.Clear();
             _userPeersByUserId.Clear();
 #endif
         }
 
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
         public override void OnStartServer()
         {
             this.InvokeInstanceDevExtMethods("OnStartServer");
@@ -146,7 +156,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
         public override void OnStopServer()
         {
             Clean();
@@ -197,7 +207,7 @@ namespace MultiplayerARPG.MMO
 
         public bool RemoveUserPeerByConnectionId(long connectionId, out CentralUserPeerInfo userPeerInfo)
         {
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
             if (_userPeers.TryGetValue(connectionId, out userPeerInfo))
             {
                 _userPeersByUserId.Remove(userPeerInfo.userId);
@@ -213,7 +223,7 @@ namespace MultiplayerARPG.MMO
 
         public bool RemoveUserPeerByUserId(string userId, out CentralUserPeerInfo userPeerInfo)
         {
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
             if (_userPeersByUserId.TryGetValue(userId, out userPeerInfo))
             {
                 _userPeersByUserId.Remove(userPeerInfo.userId);
@@ -229,7 +239,7 @@ namespace MultiplayerARPG.MMO
 
         public bool MapContainsUser(string userId)
         {
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
             return ClusterServer.MapContainsUser(userId);
 #else
             return false;
