@@ -173,7 +173,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             string guildName = request.guildName.Trim();
-            if (!NameValidating.ValidateGuildName(guildName))
+            if (!NameExtensions.IsValidGuildName(guildName))
             {
                 result.InvokeError(new ResponseCreateGuildMessage()
                 {
