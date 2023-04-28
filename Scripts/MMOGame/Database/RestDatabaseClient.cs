@@ -21,7 +21,7 @@ namespace MultiplayerARPG.MMO
 
         void Awake()
         {
-            string configFolder = "./config";
+            string configFolder = "./Config";
             string configFilePath = configFolder + "/serverConfig.json";
             Dictionary<string, object> jsonConfig = new Dictionary<string, object>();
             Logging.Log(nameof(RestDatabaseClient), "Reading config file from " + configFilePath);
