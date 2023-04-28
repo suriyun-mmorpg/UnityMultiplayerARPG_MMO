@@ -1,6 +1,3 @@
-[submodule "Scripts/MMOGame/Database/Src"]
-	path = Scripts/MMOGame/Database/Src
-	url = https://github.com/insthync/UnityMultiplayerARPG_DatabaseManagerSource.git
 [submodule "Scripts/MMOGame/CentralServer/Src"]
 	path = Scripts/MMOGame/CentralServer/Src
 	url = https://github.com/insthync/UnityMultiplayerARPG_CentralServerSource.git
