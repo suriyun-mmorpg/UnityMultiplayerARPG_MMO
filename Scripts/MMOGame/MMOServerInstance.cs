@@ -483,6 +483,10 @@ namespace MultiplayerARPG.MMO
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         private void OnGameDataLoaded()
         {
+            databaseNetworkManager.DatabaseCache = new LocalDatabaseCache();
+            DatabaseNetworkManager.GuildMemberRoles = GameInstance.Singleton.SocialSystemSetting.GuildMemberRoles;
+            DatabaseNetworkManager.GuildExpTree = GameInstance.Singleton.SocialSystemSetting.GuildExpTree;
+
             if (startingDatabaseServer)
             {
                 // Start database manager server
