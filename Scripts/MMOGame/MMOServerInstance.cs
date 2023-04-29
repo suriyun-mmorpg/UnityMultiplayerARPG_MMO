@@ -390,8 +390,7 @@ namespace MultiplayerARPG.MMO
                     if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_DATABASE_PORT, out databaseNetworkPort, databaseNetworkManager.networkPort) ||
                         ConfigReader.ReadConfigs(jsonConfig, ProcessArguments.CONFIG_DATABASE_PORT, out databaseNetworkPort, databaseNetworkManager.networkPort))
                     {
-                        if (!useCustomDatabaseClient)
-                            databaseNetworkManager.networkPort = databaseNetworkPort;
+                        databaseNetworkManager.networkPort = databaseNetworkPort;
                     }
                     jsonConfig[ProcessArguments.CONFIG_DATABASE_PORT] = databaseNetworkPort;
                 }
