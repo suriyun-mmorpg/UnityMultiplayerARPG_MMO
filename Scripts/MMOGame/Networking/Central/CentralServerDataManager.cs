@@ -14,7 +14,7 @@ namespace MultiplayerARPG.MMO
 
         public bool CanCreateCharacter(int dataId, int entityId, int factionId)
         {
-            return GameInstance.PlayerCharacters.ContainsKey(dataId) && GameInstance.PlayerCharacterEntities.ContainsKey(entityId) && (GameInstance.Factions.Count <= 0 || GameInstance.Factions.ContainsKey(factionId));
+            return GameInstance.PlayerCharacters.ContainsKey(dataId) && GameInstance.PlayerCharacterEntities.ContainsKey(entityId) && (GameInstance.Factions.Count <= 0 || (GameInstance.Factions.ContainsKey(factionId) && !GameInstance.Factions[factionId].IsLocked));
         }
 
         public void SetNewPlayerCharacterData(PlayerCharacterData playerCharacterData, string characterName, int dataId, int entityId, int factionId)
