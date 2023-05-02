@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4765183370109292}
   - component: {fileID: 114414512406587944}
+  - component: {fileID: 541648980431647223}
   m_Layer: 0
   m_Name: MySQLDatabase
   m_TagString: Untagged
@@ -49,6 +50,18 @@ MonoBehaviour:
   password: password
   dbName: mmorpg_kit
   connectionString: 
+--- !u!114 &541648980431647223
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1136011111669194}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c73f22159ea9274c9d7a7f3f149bd59, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1250662783992638
 GameObject:
   m_ObjectHideFlags: 0
@@ -124,6 +137,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4889244740642296}
   - component: {fileID: 114715813743394434}
+  - component: {fileID: 2981249621759927023}
   m_Layer: 0
   m_Name: SQLiteDatabase
   m_TagString: Untagged
@@ -159,6 +173,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dbPath: ./mmorpgtemplate.sqlite3
   editorDbPath: C:\Users\ITTIPON\Desktop\UnityBuilds\MultiplayerARPG\mmorpgtemplate.sqlite3
+--- !u!114 &2981249621759927023
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1454126604845530}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c73f22159ea9274c9d7a7f3f149bd59, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1650234716345238
 GameObject:
   m_ObjectHideFlags: 0
@@ -300,6 +326,7 @@ MonoBehaviour:
   exePath: ./Build.exe
   notSpawnInBatchMode: 0
   startPort: 8000
+  batchModeArguments: -batchmode -nographics
   spawningMaps:
   - {fileID: 11400000, guid: de8b0e4099f8d444692e88f92309e90d, type: 2}
   - {fileID: 11400000, guid: fbe2a93dfafee544cbeaf175d3491e33, type: 2}
@@ -408,3 +435,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   apiUrl: http://localhost:5757/api/
+  secretKey: secret
