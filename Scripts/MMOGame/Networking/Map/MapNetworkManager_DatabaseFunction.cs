@@ -116,7 +116,7 @@ namespace MultiplayerARPG.MMO
                 SummonBuffs = summonBuffs,
             });
             savingCharacters.Remove(savingCharacterData.Id);
-            if (LogInfo)
+            if (LogDebug)
                 Logging.Log(LogTag, "Character [" + savingCharacterData.Id + "] Saved");
             return true;
         }
@@ -136,7 +136,7 @@ namespace MultiplayerARPG.MMO
                 ++i;
             }
             await UniTask.WhenAll(tasks);
-            if (LogInfo)
+            if (LogDebug)
                 Logging.Log(LogTag, "Saved " + i + " character(s)");
         }
 #endif
@@ -154,7 +154,7 @@ namespace MultiplayerARPG.MMO
                 BuildingData = buildingSaveData,
             });
             savingBuildings.Remove(buildingSaveData.Id);
-            if (LogInfo)
+            if (LogDebug)
                 Logging.Log(LogTag, "Building [" + buildingSaveData.Id + "] Saved");
             return true;
         }
@@ -174,7 +174,7 @@ namespace MultiplayerARPG.MMO
                 ++i;
             }
             await UniTask.WhenAll(tasks);
-            if (LogInfo)
+            if (LogDebug)
                 Logging.Log(LogTag, "Saved " + i + " building(s)");
         }
 #endif
