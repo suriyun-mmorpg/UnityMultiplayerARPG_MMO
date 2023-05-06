@@ -171,11 +171,12 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        protected override void FixedUpdate()
+        protected override void Update()
         {
-            base.FixedUpdate();
+            base.Update();
+
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-            float tempTime = Time.fixedTime;
+            float tempTime = Time.unscaledTime;
             if (IsServer)
             {
                 ClusterClient.Update();

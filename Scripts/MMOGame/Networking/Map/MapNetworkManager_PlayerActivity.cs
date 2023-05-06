@@ -117,7 +117,7 @@ namespace MultiplayerARPG.MMO
                 // If character is party leader, will bring party member to join instance
                 if (party.IsLeader(playerCharacterEntity.Id))
                 {
-                    List<BasePlayerCharacterEntity> aliveAllies = playerCharacterEntity.FindAliveCharacters<BasePlayerCharacterEntity>(CurrentGameInstance.joinInstanceMapDistance, true, false, false);
+                    List<BasePlayerCharacterEntity> aliveAllies = playerCharacterEntity.FindAliveEntities<BasePlayerCharacterEntity>(CurrentGameInstance.joinInstanceMapDistance, true, false, false, CurrentGameInstance.playerLayer.Mask | CurrentGameInstance.playingLayer.Mask);
                     foreach (BasePlayerCharacterEntity aliveAlly in aliveAllies)
                     {
                         if (!party.IsMember(aliveAlly.Id))
