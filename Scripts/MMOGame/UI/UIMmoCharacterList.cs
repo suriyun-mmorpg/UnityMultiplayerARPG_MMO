@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using LiteNetLibManager;
-using Cysharp.Threading.Tasks;
 
 namespace MultiplayerARPG.MMO
 {
@@ -23,9 +22,9 @@ namespace MultiplayerARPG.MMO
             buttonDelete.gameObject.SetActive(false);
             // Remove all models
             characterModelContainer.RemoveChildren();
-            CharacterModelById.Clear();
+            _characterModelById.Clear();
             // Remove all cached data
-            PlayerCharacterDataById.Clear();
+            _playerCharacterDataById.Clear();
             // Proceed response
             List<PlayerCharacterData> selectableCharacters = new List<PlayerCharacterData>();
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message))
@@ -52,7 +51,7 @@ namespace MultiplayerARPG.MMO
                 eventOnAbleToCreateCharacter.Invoke();
 
             // Clear selected character data, will select first in list if available
-            selectedPlayerCharacterData = null;
+            _selectedPlayerCharacterData = null;
 
             // Generate list entry by saved characters
             if (selectableCharacters.Count > 0)
@@ -61,7 +60,7 @@ namespace MultiplayerARPG.MMO
                 CacheCharacterList.Generate(selectableCharacters, (index, characterData, ui) =>
                 {
                     // Cache player character to dictionary, we will use it later
-                    PlayerCharacterDataById[characterData.Id] = characterData;
+                    _playerCharacterDataById[characterData.Id] = characterData;
                     // Setup UIs
                     UICharacter uiCharacter = ui.GetComponent<UICharacter>();
                     uiCharacter.Data = characterData;
@@ -69,7 +68,7 @@ namespace MultiplayerARPG.MMO
                     BaseCharacterModel characterModel = characterData.InstantiateModel(characterModelContainer);
                     if (characterModel != null)
                     {
-                        CharacterModelById[characterData.Id] = characterModel;
+                        _characterModelById[characterData.Id] = characterModel;
                         characterModel.SetEquipWeapons(characterData.SelectableWeaponSets, characterData.EquipWeaponSet, false);
                         characterModel.SetEquipItems(characterData.EquipItems);
                         characterModel.gameObject.SetActive(false);
