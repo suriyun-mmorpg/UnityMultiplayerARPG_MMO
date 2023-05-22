@@ -528,12 +528,22 @@ MonoBehaviour:
   webSocketSecure: 0
   webSocketCertificateFilePath: 
   webSocketCertificatePassword: 
+  updateFps: 20
   maxConnections: 1100
   transportFactory: {fileID: 0}
   packetVersion: 1
   pingDuration: 1
   doNotEnterGameOnConnect: 0
   doNotDestroyOnSceneChanges: 0
+  auctionHouseMessageTypes:
+    createAuctionRequestType: 1300
+    bidRequestType: 1301
+    buyoutRequestType: 1302
+    cancelAuctionRequestType: 1304
+    getClientConfigRequestType: 1303
+  auctionHouseServiceUrl: http://localhost:9800
+  auctionHouseServiceUrlForClient: http://localhost:9800
+  auctionHouseSecretKey: secret
   hitToSomeoneNotifyMessageId: 2001
   hitToSomeoneNotifyDataChannel: 0
   hitToSomeoneNotifyDeliveryMethod: 4
@@ -552,18 +562,15 @@ MonoBehaviour:
   onSpawnEntitiesFinish:
     m_PersistentCalls:
       m_Calls: []
-  guildWarStatusMsgType: 200
+  guildWarMessageTypes:
+    statusMsgType: 1001
+    getClientConfigRequestType: 1400
   recoverMonstersWhenRoundEnd: 1
   guildWarMailSenderId: GUILDWAR
   guildWarMailSenderName: Guild War Manager
-  auctionHouseMessageTypes:
-    createAuctionRequestType: 1300
-    bidRequestType: 1301
-    buyoutRequestType: 1302
-    cancelAuctionRequestType: 1304
-    getClientConfigRequestType: 1303
-  auctionHouseServiceUrl: http://localhost:9800
-  auctionHouseSecretKey: secret
+  guildWarServiceUrl: http://localhost:9801
+  guildWarServiceUrlForClient: http://localhost:9801
+  guildWarSecretKey: secret
   clusterServerAddress: 127.0.0.1
   clusterServerPort: 6010
   machineAddress: 127.0.0.1
@@ -828,12 +835,17 @@ MonoBehaviour:
     type: 3}
   owningCharacterObjects:
   - {fileID: 1555851488130254, guid: 90f99869b96e2df4bae83e1f870b68ec, type: 3}
+  - {fileID: 5914040168613522836, guid: a854feb116427e540a5620c7d0d13661, type: 3}
   owningCharacterMiniMapObjects:
   - {fileID: 1620662158371272, guid: f94b43a3f251a6a41849b19fe0aa4fa5, type: 3}
+  nonOwningCharacterObjects:
+  - {fileID: 5914040168613522836, guid: a854feb116427e540a5620c7d0d13661, type: 3}
   nonOwningCharacterMiniMapObjects:
   - {fileID: 1338488141702386, guid: ce40a263e27c9034fa4ef0fc9e069eaf, type: 3}
+  monsterCharacterObjects: []
   monsterCharacterMiniMapObjects:
   - {fileID: 1237499379163380, guid: 2d0368f81f8351144a6b29dc200981b4, type: 3}
+  npcObjects: []
   npcMiniMapObjects:
   - {fileID: 1971649022222436, guid: 3ad746095a8b209429a1b9e27fab61aa, type: 3}
   owningCharacterUI: {fileID: 114899762762614018, guid: 8447ca51d1886764e99f26df8033c4c5,
@@ -967,18 +979,15 @@ MonoBehaviour:
   homeConsoleScene:
     sceneAsset: {fileID: 0}
     sceneName: 
+  updateAnimationAtServer: 1
   minCharacterNameLength: 2
   maxCharacterNameLength: 16
   maxCharacterSaves: 5
   serverTargetFrameRate: 30
-  standaloneVSyncCount: 0
-  standaloneTargetFrameRate: 60
-  mobileVSyncCount: 0
-  mobileTargetFrameRate: 30
-  consoleVSyncCount: 0
-  consoleTargetFrameRate: 60
   testInEditorMode: 0
-  exportSocialSystemSetting: 0
+  exportSocialSystemSettingAsJson: 0
+  exportMinimalItemsAsJson: 0
+  exportCharacterCreationDataAsJson: 0
   cashShopDatabase: {fileID: 11400000, guid: 677c37c598e6c1045b66de68f1f546f6, type: 2}
 --- !u!4 &1379718503
 Transform:
