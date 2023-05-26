@@ -435,7 +435,21 @@ namespace MultiplayerARPG.MMO
                 finally
                 {
                     if (_despawningPlayerCharacterCancellations.TryRemove(id, out cancellationTokenSource))
-                        cancellationTokenSource.Dispose();
+                    {
+                        try
+                        {
+                            cancellationTokenSource.Dispose();
+                        }
+                        catch (System.ObjectDisposedException)
+                        {
+                            // Already disposed
+                        }
+                        catch (System.Exception ex)
+                        {
+                            // Other errors
+                            Logging.LogException(LogTag, ex);
+                        }
+                    }
                 }
             }
             else
