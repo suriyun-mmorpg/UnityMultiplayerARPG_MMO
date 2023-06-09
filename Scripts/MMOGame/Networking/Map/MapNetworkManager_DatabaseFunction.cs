@@ -11,61 +11,83 @@ namespace MultiplayerARPG.MMO
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         private async UniTask LoadStorageRoutine(StorageId storageId)
         {
-            if (!_loadingStorageIds.Contains(storageId))
+            if (_loadingStorageIds.Contains(storageId))
             {
-                _loadingStorageIds.Add(storageId);
-                DatabaseApiResult<ReadStorageItemsResp> resp;
                 do
                 {
-                    resp = await DbServiceClient.ReadStorageItemsAsync(new ReadStorageItemsReq()
-                    {
-                        StorageType = storageId.storageType,
-                        StorageOwnerId = storageId.storageOwnerId,
-                    });
-                } while (!resp.IsSuccess);
-                ServerStorageHandlers.SetStorageItems(storageId, resp.Response.StorageCharacterItems);
-                _loadingStorageIds.Remove(storageId);
+                    await UniTask.Yield();
+                }
+                while (_loadingStorageIds.Contains(storageId));
+                return;
             }
+            _loadingStorageIds.Add(storageId);
+            DatabaseApiResult<ReadStorageItemsResp> resp;
+            do
+            {
+                resp = await DbServiceClient.ReadStorageItemsAsync(new ReadStorageItemsReq()
+                {
+                    StorageType = storageId.storageType,
+                    StorageOwnerId = storageId.storageOwnerId,
+                });
+            } while (!resp.IsSuccess);
+            ServerStorageHandlers.SetStorageItems(storageId, resp.Response.StorageCharacterItems);
+            _loadingStorageIds.Remove(storageId);
         }
 #endif
 
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         private async UniTask LoadPartyRoutine(int id)
         {
-            if (id > 0 && !_loadingPartyIds.Contains(id))
+            if (id <= 0)
+                return;
+            if (_loadingPartyIds.Contains(id))
             {
-                _loadingPartyIds.Add(id);
-                DatabaseApiResult<PartyResp> resp;
                 do
                 {
-                    resp = await DbServiceClient.ReadPartyAsync(new ReadPartyReq()
-                    {
-                        PartyId = id,
-                    });
-                } while (!resp.IsSuccess);
-                ServerPartyHandlers.SetParty(id, resp.Response.PartyData);
-                _loadingPartyIds.Remove(id);
+                    await UniTask.Yield();
+                }
+                while (_loadingPartyIds.Contains(id));
+                return;
             }
+            _loadingPartyIds.Add(id);
+            DatabaseApiResult<PartyResp> resp;
+            do
+            {
+                resp = await DbServiceClient.ReadPartyAsync(new ReadPartyReq()
+                {
+                    PartyId = id,
+                });
+            } while (!resp.IsSuccess);
+            ServerPartyHandlers.SetParty(id, resp.Response.PartyData);
+            _loadingPartyIds.Remove(id);
         }
 #endif
 
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         private async UniTask LoadGuildRoutine(int id)
         {
-            if (id > 0 && !_loadingGuildIds.Contains(id))
+            if (id <= 0)
+                return;
+            if (_loadingGuildIds.Contains(id))
             {
-                _loadingGuildIds.Add(id);
-                DatabaseApiResult<GuildResp> resp;
                 do
                 {
-                    resp = await DbServiceClient.ReadGuildAsync(new ReadGuildReq()
-                    {
-                        GuildId = id,
-                    });
-                } while (!resp.IsSuccess);
-                ServerGuildHandlers.SetGuild(id, resp.Response.GuildData);
-                _loadingGuildIds.Remove(id);
+                    await UniTask.Yield();
+                }
+                while (_loadingGuildIds.Contains(id));
+                return;
             }
+            _loadingGuildIds.Add(id);
+            DatabaseApiResult<GuildResp> resp;
+            do
+            {
+                resp = await DbServiceClient.ReadGuildAsync(new ReadGuildReq()
+                {
+                    GuildId = id,
+                });
+            } while (!resp.IsSuccess);
+            ServerGuildHandlers.SetGuild(id, resp.Response.GuildData);
+            _loadingGuildIds.Remove(id);
         }
 #endif
 
