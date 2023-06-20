@@ -224,6 +224,66 @@ namespace MultiplayerARPG.MMO
                 ExecuteNonQuerySync("ALTER TABLE `guildrole` CHANGE `canUseStorage` `canUseStorage` TINYINT(1) NOT NULL DEFAULT '0';");
                 ExecuteNonQuerySync("ALTER TABLE `guildrole` CHANGE `shareExpPercentage` `shareExpPercentage` INT(11) NOT NULL DEFAULT '0';");
             });
+            DoMigration("1.84", () =>
+            {
+                // Server custom data
+                ExecuteNonQuerySync("CREATE TABLE `character_server_boolean` ("
+                    + "`id` VARCHAR(50) COLLATE utf8_unicode_ci NOT NULL,"
+                    + "`characterId` VARCHAR(50) COLLATE utf8_unicode_ci NOT NULL,"
+                    + "`hashedKey` INT(11) NOT NULL,"
+                    + "`value` TINYINT(1) NOT NULL DEFAULT '0',"
+                    + "PRIMARY KEY (`id`), INDEX (`characterId`)) ENGINE = InnoDB DEFAULT CHARSET = utf8 COLLATE = utf8_unicode_ci;");
+                ExecuteNonQuerySync("CREATE TABLE `character_server_int32` ("
+                    + "`id` VARCHAR(50) COLLATE utf8_unicode_ci NOT NULL,"
+                    + "`characterId` VARCHAR(50) COLLATE utf8_unicode_ci NOT NULL,"
+                    + "`hashedKey` INT(11) NOT NULL,"
+                    + "`value` INT(11) NOT NULL DEFAULT '0',"
+                    + "PRIMARY KEY (`id`), INDEX (`characterId`)) ENGINE = InnoDB DEFAULT CHARSET = utf8 COLLATE = utf8_unicode_ci;");
+                ExecuteNonQuerySync("CREATE TABLE `character_server_float32` ("
+                    + "`id` VARCHAR(50) COLLATE utf8_unicode_ci NOT NULL,"
+                    + "`characterId` VARCHAR(50) COLLATE utf8_unicode_ci NOT NULL,"
+                    + "`hashedKey` INT(11) NOT NULL,"
+                    + "`value` FLOAT NOT NULL DEFAULT '0',"
+                    + "PRIMARY KEY (`id`), INDEX (`characterId`)) ENGINE = InnoDB DEFAULT CHARSET = utf8 COLLATE = utf8_unicode_ci;");
+                // Private custom data
+                ExecuteNonQuerySync("CREATE TABLE `character_private_boolean` ("
+                    + "`id` VARCHAR(50) COLLATE utf8_unicode_ci NOT NULL,"
+                    + "`characterId` VARCHAR(50) COLLATE utf8_unicode_ci NOT NULL,"
+                    + "`hashedKey` INT(11) NOT NULL,"
+                    + "`value` TINYINT(1) NOT NULL DEFAULT '0',"
+                    + "PRIMARY KEY (`id`), INDEX (`characterId`)) ENGINE = InnoDB DEFAULT CHARSET = utf8 COLLATE = utf8_unicode_ci;");
+                ExecuteNonQuerySync("CREATE TABLE `character_private_int32` ("
+                    + "`id` VARCHAR(50) COLLATE utf8_unicode_ci NOT NULL,"
+                    + "`characterId` VARCHAR(50) COLLATE utf8_unicode_ci NOT NULL,"
+                    + "`hashedKey` INT(11) NOT NULL,"
+                    + "`value` INT(11) NOT NULL DEFAULT '0',"
+                    + "PRIMARY KEY (`id`), INDEX (`characterId`)) ENGINE = InnoDB DEFAULT CHARSET = utf8 COLLATE = utf8_unicode_ci;");
+                ExecuteNonQuerySync("CREATE TABLE `character_private_float32` ("
+                    + "`id` VARCHAR(50) COLLATE utf8_unicode_ci NOT NULL,"
+                    + "`characterId` VARCHAR(50) COLLATE utf8_unicode_ci NOT NULL,"
+                    + "`hashedKey` INT(11) NOT NULL,"
+                    + "`value` FLOAT NOT NULL DEFAULT '0',"
+                    + "PRIMARY KEY (`id`), INDEX (`characterId`)) ENGINE = InnoDB DEFAULT CHARSET = utf8 COLLATE = utf8_unicode_ci;");
+                // Public custom data
+                ExecuteNonQuerySync("CREATE TABLE `character_public_boolean` ("
+                    + "`id` VARCHAR(50) COLLATE utf8_unicode_ci NOT NULL,"
+                    + "`characterId` VARCHAR(50) COLLATE utf8_unicode_ci NOT NULL,"
+                    + "`hashedKey` INT(11) NOT NULL,"
+                    + "`value` TINYINT(1) NOT NULL DEFAULT '0',"
+                    + "PRIMARY KEY (`id`), INDEX (`characterId`)) ENGINE = InnoDB DEFAULT CHARSET = utf8 COLLATE = utf8_unicode_ci;");
+                ExecuteNonQuerySync("CREATE TABLE `character_public_int32` ("
+                    + "`id` VARCHAR(50) COLLATE utf8_unicode_ci NOT NULL,"
+                    + "`characterId` VARCHAR(50) COLLATE utf8_unicode_ci NOT NULL,"
+                    + "`hashedKey` INT(11) NOT NULL,"
+                    + "`value` INT(11) NOT NULL DEFAULT '0',"
+                    + "PRIMARY KEY (`id`), INDEX (`characterId`)) ENGINE = InnoDB DEFAULT CHARSET = utf8 COLLATE = utf8_unicode_ci;");
+                ExecuteNonQuerySync("CREATE TABLE `character_public_float32` ("
+                    + "`id` VARCHAR(50) COLLATE utf8_unicode_ci NOT NULL,"
+                    + "`characterId` VARCHAR(50) COLLATE utf8_unicode_ci NOT NULL,"
+                    + "`hashedKey` INT(11) NOT NULL,"
+                    + "`value` FLOAT NOT NULL DEFAULT '0',"
+                    + "PRIMARY KEY (`id`), INDEX (`characterId`)) ENGINE = InnoDB DEFAULT CHARSET = utf8 COLLATE = utf8_unicode_ci;");
+            });
         }
 
         private bool DoMigration(string migrationId, System.Action migrateAction)

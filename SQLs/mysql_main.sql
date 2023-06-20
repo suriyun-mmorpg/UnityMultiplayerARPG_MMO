@@ -2,6 +2,12 @@ SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
 
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
 --
 -- Database: `mmorpg_kit`
 --
@@ -13,25 +19,25 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `buildings` (
-  `id` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `parentId` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `entityId` int NOT NULL DEFAULT '0',
-  `currentHp` int NOT NULL DEFAULT '0',
-  `remainsLifeTime` float NOT NULL DEFAULT '0',
-  `mapName` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `positionX` float NOT NULL DEFAULT '0',
-  `positionY` float NOT NULL DEFAULT '0',
-  `positionZ` float NOT NULL DEFAULT '0',
-  `rotationX` float NOT NULL DEFAULT '0',
-  `rotationY` float NOT NULL DEFAULT '0',
-  `rotationZ` float NOT NULL DEFAULT '0',
-  `isLocked` tinyint(1) NOT NULL DEFAULT '0',
-  `lockPassword` varchar(6) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `creatorId` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `creatorName` varchar(32) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `extraData` text CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `parentId` varchar(50) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  `entityId` int(11) NOT NULL DEFAULT 0,
+  `currentHp` int(11) NOT NULL DEFAULT 0,
+  `remainsLifeTime` float NOT NULL DEFAULT 0,
+  `mapName` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `positionX` float NOT NULL DEFAULT 0,
+  `positionY` float NOT NULL DEFAULT 0,
+  `positionZ` float NOT NULL DEFAULT 0,
+  `rotationX` float NOT NULL DEFAULT 0,
+  `rotationY` float NOT NULL DEFAULT 0,
+  `rotationZ` float NOT NULL DEFAULT 0,
+  `isLocked` tinyint(1) NOT NULL DEFAULT 0,
+  `lockPassword` varchar(6) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  `creatorId` varchar(50) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  `creatorName` varchar(32) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  `extraData` text COLLATE utf8_unicode_ci NOT NULL,
+  `createAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updateAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -41,12 +47,12 @@ CREATE TABLE `buildings` (
 --
 
 CREATE TABLE `characterattribute` (
-  `id` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `characterId` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `dataId` int NOT NULL DEFAULT '0',
-  `amount` int NOT NULL DEFAULT '0',
-  `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `characterId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `dataId` int(11) NOT NULL DEFAULT 0,
+  `amount` int(11) NOT NULL DEFAULT 0,
+  `createAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updateAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -56,14 +62,14 @@ CREATE TABLE `characterattribute` (
 --
 
 CREATE TABLE `characterbuff` (
-  `id` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `characterId` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `type` tinyint UNSIGNED NOT NULL DEFAULT '0',
-  `dataId` int NOT NULL DEFAULT '0',
-  `level` int NOT NULL DEFAULT '1',
-  `buffRemainsDuration` float NOT NULL DEFAULT '0',
-  `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `characterId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `type` tinyint(3) UNSIGNED NOT NULL DEFAULT 0,
+  `dataId` int(11) NOT NULL DEFAULT 0,
+  `level` int(11) NOT NULL DEFAULT 1,
+  `buffRemainsDuration` float NOT NULL DEFAULT 0,
+  `createAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updateAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -73,12 +79,12 @@ CREATE TABLE `characterbuff` (
 --
 
 CREATE TABLE `charactercurrency` (
-  `id` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `characterId` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `dataId` int NOT NULL DEFAULT '0',
-  `amount` int NOT NULL DEFAULT '0',
-  `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `characterId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `dataId` int(11) NOT NULL DEFAULT 0,
+  `amount` int(11) NOT NULL DEFAULT 0,
+  `createAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updateAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -88,13 +94,13 @@ CREATE TABLE `charactercurrency` (
 --
 
 CREATE TABLE `characterhotkey` (
-  `id` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `characterId` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `hotkeyId` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `type` tinyint UNSIGNED NOT NULL DEFAULT '0',
-  `relateId` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `characterId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `hotkeyId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `type` tinyint(3) UNSIGNED NOT NULL DEFAULT 0,
+  `relateId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `createAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updateAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -104,23 +110,23 @@ CREATE TABLE `characterhotkey` (
 --
 
 CREATE TABLE `characteritem` (
-  `id` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `idx` int NOT NULL,
-  `inventoryType` tinyint UNSIGNED NOT NULL DEFAULT '0',
-  `characterId` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `dataId` int NOT NULL DEFAULT '0',
-  `level` int NOT NULL DEFAULT '1',
-  `amount` int NOT NULL DEFAULT '0',
-  `equipSlotIndex` tinyint UNSIGNED NOT NULL DEFAULT '0',
-  `durability` float NOT NULL DEFAULT '0',
-  `exp` int NOT NULL DEFAULT '0',
-  `lockRemainsDuration` float NOT NULL DEFAULT '0',
-  `expireTime` bigint NOT NULL DEFAULT '0',
-  `randomSeed` int NOT NULL DEFAULT '0',
-  `ammo` int NOT NULL DEFAULT '0',
-  `sockets` text CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `idx` int(11) NOT NULL,
+  `inventoryType` tinyint(3) UNSIGNED NOT NULL DEFAULT 0,
+  `characterId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `dataId` int(11) NOT NULL DEFAULT 0,
+  `level` int(11) NOT NULL DEFAULT 1,
+  `amount` int(11) NOT NULL DEFAULT 0,
+  `equipSlotIndex` tinyint(3) UNSIGNED NOT NULL DEFAULT 0,
+  `durability` float NOT NULL DEFAULT 0,
+  `exp` int(11) NOT NULL DEFAULT 0,
+  `lockRemainsDuration` float NOT NULL DEFAULT 0,
+  `expireTime` bigint(20) NOT NULL DEFAULT 0,
+  `randomSeed` int(11) NOT NULL DEFAULT 0,
+  `ammo` int(11) NOT NULL DEFAULT 0,
+  `sockets` text COLLATE utf8_unicode_ci NOT NULL,
+  `createAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updateAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -130,15 +136,15 @@ CREATE TABLE `characteritem` (
 --
 
 CREATE TABLE `characterquest` (
-  `id` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `characterId` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `dataId` int NOT NULL DEFAULT '0',
-  `isComplete` tinyint(1) NOT NULL DEFAULT '0',
-  `isTracking` tinyint(1) NOT NULL DEFAULT '0',
-  `killedMonsters` text CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `completedTasks` text CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `characterId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `dataId` int(11) NOT NULL DEFAULT 0,
+  `isComplete` tinyint(1) NOT NULL DEFAULT 0,
+  `isTracking` tinyint(1) NOT NULL DEFAULT 0,
+  `killedMonsters` text COLLATE utf8_unicode_ci NOT NULL,
+  `completedTasks` text COLLATE utf8_unicode_ci NOT NULL,
+  `createAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updateAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -148,46 +154,46 @@ CREATE TABLE `characterquest` (
 --
 
 CREATE TABLE `characters` (
-  `id` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `userId` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `dataId` int NOT NULL DEFAULT '0',
-  `entityId` int NOT NULL DEFAULT '0',
-  `factionId` int NOT NULL DEFAULT '0',
-  `characterName` varchar(32) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `level` int NOT NULL DEFAULT '1',
-  `exp` int NOT NULL DEFAULT '0',
-  `currentHp` int NOT NULL DEFAULT '0',
-  `currentMp` int NOT NULL DEFAULT '0',
-  `currentStamina` int NOT NULL DEFAULT '0',
-  `currentFood` int NOT NULL DEFAULT '0',
-  `currentWater` int NOT NULL DEFAULT '0',
-  `equipWeaponSet` tinyint UNSIGNED NOT NULL DEFAULT '0',
-  `statPoint` float NOT NULL DEFAULT '0',
-  `skillPoint` float NOT NULL DEFAULT '0',
-  `gold` int NOT NULL DEFAULT '0',
-  `partyId` int NOT NULL DEFAULT '0',
-  `guildId` int NOT NULL DEFAULT '0',
-  `guildRole` int NOT NULL DEFAULT '0',
-  `sharedGuildExp` int NOT NULL DEFAULT '0',
-  `currentMapName` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `currentPositionX` float NOT NULL DEFAULT '0',
-  `currentPositionY` float NOT NULL DEFAULT '0',
-  `currentPositionZ` float NOT NULL DEFAULT '0',
-  `currentRotationX` float NOT NULL DEFAULT '0',
-  `currentRotationY` float NOT NULL DEFAULT '0',
-  `currentRotationZ` float NOT NULL DEFAULT '0',
-  `respawnMapName` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `respawnPositionX` float NOT NULL DEFAULT '0',
-  `respawnPositionY` float NOT NULL DEFAULT '0',
-  `respawnPositionZ` float NOT NULL DEFAULT '0',
-  `mountDataId` int NOT NULL DEFAULT '0',
-  `iconDataId` int NOT NULL DEFAULT '0',
-  `frameDataId` int NOT NULL DEFAULT '0',
-  `titleDataId` int NOT NULL DEFAULT '0',
-  `lastDeadTime` bigint NOT NULL DEFAULT '0',
-  `unmuteTime` bigint NOT NULL DEFAULT '0',
-  `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `userId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `dataId` int(11) NOT NULL DEFAULT 0,
+  `entityId` int(11) NOT NULL DEFAULT 0,
+  `factionId` int(11) NOT NULL DEFAULT 0,
+  `characterName` varchar(32) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  `level` int(11) NOT NULL DEFAULT 1,
+  `exp` int(11) NOT NULL DEFAULT 0,
+  `currentHp` int(11) NOT NULL DEFAULT 0,
+  `currentMp` int(11) NOT NULL DEFAULT 0,
+  `currentStamina` int(11) NOT NULL DEFAULT 0,
+  `currentFood` int(11) NOT NULL DEFAULT 0,
+  `currentWater` int(11) NOT NULL DEFAULT 0,
+  `equipWeaponSet` tinyint(3) UNSIGNED NOT NULL DEFAULT 0,
+  `statPoint` float NOT NULL DEFAULT 0,
+  `skillPoint` float NOT NULL DEFAULT 0,
+  `gold` int(11) NOT NULL DEFAULT 0,
+  `partyId` int(11) NOT NULL DEFAULT 0,
+  `guildId` int(11) NOT NULL DEFAULT 0,
+  `guildRole` int(11) NOT NULL DEFAULT 0,
+  `sharedGuildExp` int(11) NOT NULL DEFAULT 0,
+  `currentMapName` varchar(50) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  `currentPositionX` float NOT NULL DEFAULT 0,
+  `currentPositionY` float NOT NULL DEFAULT 0,
+  `currentPositionZ` float NOT NULL DEFAULT 0,
+  `currentRotationX` float NOT NULL DEFAULT 0,
+  `currentRotationY` float NOT NULL DEFAULT 0,
+  `currentRotationZ` float NOT NULL DEFAULT 0,
+  `respawnMapName` varchar(50) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  `respawnPositionX` float NOT NULL DEFAULT 0,
+  `respawnPositionY` float NOT NULL DEFAULT 0,
+  `respawnPositionZ` float NOT NULL DEFAULT 0,
+  `mountDataId` int(11) NOT NULL DEFAULT 0,
+  `iconDataId` int(11) NOT NULL DEFAULT 0,
+  `frameDataId` int(11) NOT NULL DEFAULT 0,
+  `titleDataId` int(11) NOT NULL DEFAULT 0,
+  `lastDeadTime` bigint(20) NOT NULL DEFAULT 0,
+  `unmuteTime` bigint(20) NOT NULL DEFAULT 0,
+  `createAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updateAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -197,12 +203,12 @@ CREATE TABLE `characters` (
 --
 
 CREATE TABLE `characterskill` (
-  `id` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `characterId` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `dataId` int NOT NULL DEFAULT '0',
-  `level` int NOT NULL DEFAULT '1',
-  `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `characterId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `dataId` int(11) NOT NULL DEFAULT 0,
+  `level` int(11) NOT NULL DEFAULT 1,
+  `createAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updateAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -212,14 +218,14 @@ CREATE TABLE `characterskill` (
 --
 
 CREATE TABLE `characterskillusage` (
-  `id` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `characterId` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `type` tinyint UNSIGNED NOT NULL DEFAULT '0',
-  `dataId` int NOT NULL DEFAULT '0',
-  `level` int NOT NULL DEFAULT '1',
-  `coolDownRemainsDuration` float NOT NULL DEFAULT '0',
-  `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `characterId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `type` tinyint(3) UNSIGNED NOT NULL DEFAULT 0,
+  `dataId` int(11) NOT NULL DEFAULT 0,
+  `level` int(11) NOT NULL DEFAULT 1,
+  `coolDownRemainsDuration` float NOT NULL DEFAULT 0,
+  `createAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updateAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -229,17 +235,134 @@ CREATE TABLE `characterskillusage` (
 --
 
 CREATE TABLE `charactersummon` (
-  `id` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `characterId` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `type` tinyint UNSIGNED NOT NULL DEFAULT '0',
-  `dataId` int NOT NULL DEFAULT '0',
-  `summonRemainsDuration` float NOT NULL DEFAULT '0',
-  `level` int NOT NULL DEFAULT '0',
-  `exp` int NOT NULL DEFAULT '0',
-  `currentHp` int NOT NULL DEFAULT '0',
-  `currentMp` int NOT NULL DEFAULT '0',
-  `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `characterId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `type` tinyint(3) UNSIGNED NOT NULL DEFAULT 0,
+  `dataId` int(11) NOT NULL DEFAULT 0,
+  `summonRemainsDuration` float NOT NULL DEFAULT 0,
+  `level` int(11) NOT NULL DEFAULT 0,
+  `exp` int(11) NOT NULL DEFAULT 0,
+  `currentHp` int(11) NOT NULL DEFAULT 0,
+  `currentMp` int(11) NOT NULL DEFAULT 0,
+  `createAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updateAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `character_private_boolean`
+--
+
+CREATE TABLE `character_private_boolean` (
+  `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `characterId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `hashedKey` int(11) NOT NULL,
+  `value` tinyint(1) NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `character_private_float32`
+--
+
+CREATE TABLE `character_private_float32` (
+  `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `characterId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `hashedKey` int(11) NOT NULL,
+  `value` float NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `character_private_int32`
+--
+
+CREATE TABLE `character_private_int32` (
+  `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `characterId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `hashedKey` int(11) NOT NULL,
+  `value` int(11) NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `character_public_boolean`
+--
+
+CREATE TABLE `character_public_boolean` (
+  `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `characterId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `hashedKey` int(11) NOT NULL,
+  `value` tinyint(1) NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `character_public_float32`
+--
+
+CREATE TABLE `character_public_float32` (
+  `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `characterId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `hashedKey` int(11) NOT NULL,
+  `value` float NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `character_public_int32`
+--
+
+CREATE TABLE `character_public_int32` (
+  `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `characterId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `hashedKey` int(11) NOT NULL,
+  `value` int(11) NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `character_server_boolean`
+--
+
+CREATE TABLE `character_server_boolean` (
+  `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `characterId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `hashedKey` int(11) NOT NULL,
+  `value` tinyint(1) NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `character_server_float32`
+--
+
+CREATE TABLE `character_server_float32` (
+  `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `characterId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `hashedKey` int(11) NOT NULL,
+  `value` float NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `character_server_int32`
+--
+
+CREATE TABLE `character_server_int32` (
+  `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `characterId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `hashedKey` int(11) NOT NULL,
+  `value` int(11) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -249,12 +372,12 @@ CREATE TABLE `charactersummon` (
 --
 
 CREATE TABLE `friend` (
-  `id` int NOT NULL,
-  `characterId1` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `characterId2` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `state` tinyint(1) NOT NULL DEFAULT '0',
-  `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `id` int(11) NOT NULL,
+  `characterId1` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `characterId2` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `state` tinyint(1) NOT NULL DEFAULT 0,
+  `createAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updateAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -264,21 +387,21 @@ CREATE TABLE `friend` (
 --
 
 CREATE TABLE `guild` (
-  `id` int NOT NULL,
-  `guildName` varchar(32) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `leaderId` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `level` int NOT NULL DEFAULT '1',
-  `exp` int NOT NULL DEFAULT '0',
-  `skillPoint` int NOT NULL DEFAULT '0',
-  `guildMessage` varchar(160) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `guildMessage2` varchar(160) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `gold` int NOT NULL DEFAULT '0',
-  `score` int NOT NULL DEFAULT '0',
-  `options` text CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `autoAcceptRequests` tinyint(1) NOT NULL DEFAULT '0',
-  `rank` int NOT NULL DEFAULT '0',
-  `currentMembers` int NOT NULL DEFAULT '0',
-  `maxMembers` int NOT NULL DEFAULT '0'
+  `id` int(11) NOT NULL,
+  `guildName` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
+  `leaderId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `level` int(11) NOT NULL DEFAULT 1,
+  `exp` int(11) NOT NULL DEFAULT 0,
+  `skillPoint` int(11) NOT NULL DEFAULT 0,
+  `guildMessage` varchar(160) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  `guildMessage2` varchar(160) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  `gold` int(11) NOT NULL DEFAULT 0,
+  `score` int(11) NOT NULL DEFAULT 0,
+  `options` text COLLATE utf8_unicode_ci NOT NULL,
+  `autoAcceptRequests` tinyint(1) NOT NULL DEFAULT 0,
+  `rank` int(11) NOT NULL DEFAULT 0,
+  `currentMembers` int(11) NOT NULL DEFAULT 0,
+  `maxMembers` int(11) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -288,13 +411,13 @@ CREATE TABLE `guild` (
 --
 
 CREATE TABLE `guildrole` (
-  `guildId` int NOT NULL,
-  `guildRole` int NOT NULL,
-  `name` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `canInvite` tinyint(1) NOT NULL DEFAULT '0',
-  `canKick` tinyint(1) NOT NULL DEFAULT '0',
-  `canUseStorage` tinyint(1) NOT NULL DEFAULT '0',
-  `shareExpPercentage` int NOT NULL DEFAULT '0'
+  `guildId` int(11) NOT NULL,
+  `guildRole` int(11) NOT NULL,
+  `name` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `canInvite` tinyint(1) NOT NULL DEFAULT 0,
+  `canKick` tinyint(1) NOT NULL DEFAULT 0,
+  `canUseStorage` tinyint(1) NOT NULL DEFAULT 0,
+  `shareExpPercentage` int(11) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -304,9 +427,9 @@ CREATE TABLE `guildrole` (
 --
 
 CREATE TABLE `guildskill` (
-  `guildId` int NOT NULL,
-  `dataId` int NOT NULL,
-  `level` int NOT NULL
+  `guildId` int(11) NOT NULL,
+  `dataId` int(11) NOT NULL,
+  `level` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -316,24 +439,24 @@ CREATE TABLE `guildskill` (
 --
 
 CREATE TABLE `mail` (
-  `id` bigint NOT NULL,
-  `eventId` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `senderId` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `senderName` varchar(32) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `receiverId` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `title` varchar(160) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `content` text CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `gold` int NOT NULL DEFAULT '0',
-  `cash` int NOT NULL DEFAULT '0',
-  `currencies` text CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `items` text CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `isRead` tinyint(1) NOT NULL DEFAULT '0',
+  `id` bigint(20) NOT NULL,
+  `eventId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `senderId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `senderName` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
+  `receiverId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `title` varchar(160) COLLATE utf8_unicode_ci NOT NULL,
+  `content` text COLLATE utf8_unicode_ci NOT NULL,
+  `gold` int(11) NOT NULL DEFAULT 0,
+  `cash` int(11) NOT NULL DEFAULT 0,
+  `currencies` text COLLATE utf8_unicode_ci NOT NULL,
+  `items` text COLLATE utf8_unicode_ci NOT NULL,
+  `isRead` tinyint(1) NOT NULL DEFAULT 0,
   `readTimestamp` timestamp NULL DEFAULT NULL,
-  `isClaim` tinyint(1) NOT NULL DEFAULT '0',
+  `isClaim` tinyint(1) NOT NULL DEFAULT 0,
   `claimTimestamp` timestamp NULL DEFAULT NULL,
-  `isDelete` tinyint(1) NOT NULL DEFAULT '0',
+  `isDelete` tinyint(1) NOT NULL DEFAULT 0,
   `deleteTimestamp` timestamp NULL DEFAULT NULL,
-  `sentTimestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+  `sentTimestamp` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -343,10 +466,10 @@ CREATE TABLE `mail` (
 --
 
 CREATE TABLE `party` (
-  `id` int NOT NULL,
+  `id` int(11) NOT NULL,
   `shareExp` tinyint(1) NOT NULL,
   `shareItem` tinyint(1) NOT NULL,
-  `leaderId` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL
+  `leaderId` varchar(50) COLLATE utf8_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -356,8 +479,8 @@ CREATE TABLE `party` (
 --
 
 CREATE TABLE `statistic` (
-  `id` int NOT NULL,
-  `userCount` INT NOT NULL DEFAULT '0' 
+  `id` int(11) NOT NULL,
+  `userCount` int(11) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -367,22 +490,22 @@ CREATE TABLE `statistic` (
 --
 
 CREATE TABLE `storageitem` (
-  `id` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `idx` int NOT NULL,
-  `storageType` tinyint UNSIGNED NOT NULL DEFAULT '0',
-  `storageOwnerId` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `dataId` int NOT NULL DEFAULT '0',
-  `level` int NOT NULL DEFAULT '1',
-  `amount` int NOT NULL DEFAULT '0',
-  `durability` float NOT NULL DEFAULT '0',
-  `exp` int NOT NULL DEFAULT '0',
-  `lockRemainsDuration` float NOT NULL DEFAULT '0',
-  `expireTime` bigint NOT NULL DEFAULT '0',
-  `randomSeed` int NOT NULL DEFAULT '0',
-  `ammo` int NOT NULL DEFAULT '0',
-  `sockets` text CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `idx` int(11) NOT NULL,
+  `storageType` tinyint(3) UNSIGNED NOT NULL DEFAULT 0,
+  `storageOwnerId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `dataId` int(11) NOT NULL DEFAULT 0,
+  `level` int(11) NOT NULL DEFAULT 1,
+  `amount` int(11) NOT NULL DEFAULT 0,
+  `durability` float NOT NULL DEFAULT 0,
+  `exp` int(11) NOT NULL DEFAULT 0,
+  `lockRemainsDuration` float NOT NULL DEFAULT 0,
+  `expireTime` bigint(20) NOT NULL DEFAULT 0,
+  `randomSeed` int(11) NOT NULL DEFAULT 0,
+  `ammo` int(11) NOT NULL DEFAULT 0,
+  `sockets` text COLLATE utf8_unicode_ci NOT NULL,
+  `createAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updateAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -392,15 +515,15 @@ CREATE TABLE `storageitem` (
 --
 
 CREATE TABLE `summonbuffs` (
-  `id` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `characterId` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `buffId` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `type` tinyint UNSIGNED NOT NULL DEFAULT '0',
-  `dataId` int NOT NULL DEFAULT '0',
-  `level` int NOT NULL DEFAULT '1',
-  `buffRemainsDuration` float NOT NULL DEFAULT '0',
-  `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `characterId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `buffId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `type` tinyint(3) UNSIGNED NOT NULL DEFAULT 0,
+  `dataId` int(11) NOT NULL DEFAULT 0,
+  `level` int(11) NOT NULL DEFAULT 1,
+  `buffRemainsDuration` float NOT NULL DEFAULT 0,
+  `createAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updateAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -410,19 +533,19 @@ CREATE TABLE `summonbuffs` (
 --
 
 CREATE TABLE `userlogin` (
-  `id` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `username` varchar(32) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `password` varchar(72) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `gold` int NOT NULL DEFAULT '0',
-  `cash` int NOT NULL DEFAULT '0',
-  `email` varchar(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `isEmailVerified` tinyint(1) NOT NULL DEFAULT '0',
-  `authType` tinyint UNSIGNED NOT NULL DEFAULT '1',
-  `accessToken` varchar(36) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `userLevel` tinyint UNSIGNED NOT NULL DEFAULT '0',
-  `unbanTime` bigint NOT NULL DEFAULT '0',
-  `createAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updateAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `username` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
+  `password` varchar(72) COLLATE utf8_unicode_ci NOT NULL,
+  `gold` int(11) NOT NULL DEFAULT 0,
+  `cash` int(11) NOT NULL DEFAULT 0,
+  `email` varchar(50) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  `isEmailVerified` tinyint(1) NOT NULL DEFAULT 0,
+  `authType` tinyint(3) UNSIGNED NOT NULL DEFAULT 1,
+  `accessToken` varchar(36) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  `userLevel` tinyint(3) UNSIGNED NOT NULL DEFAULT 0,
+  `unbanTime` bigint(20) NOT NULL DEFAULT 0,
+  `createAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updateAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -461,7 +584,8 @@ INSERT INTO `__migrations` (`migrationId`) VALUES
 ('1.78'),
 ('1.78b'),
 ('1.79'),
-('1.82');
+('1.82'),
+('1.84');
 
 --
 -- Indexes for dumped tables
@@ -546,6 +670,69 @@ ALTER TABLE `characterskillusage`
 -- Indexes for table `charactersummon`
 --
 ALTER TABLE `charactersummon`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `characterId` (`characterId`);
+
+--
+-- Indexes for table `character_private_boolean`
+--
+ALTER TABLE `character_private_boolean`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `characterId` (`characterId`);
+
+--
+-- Indexes for table `character_private_float32`
+--
+ALTER TABLE `character_private_float32`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `characterId` (`characterId`);
+
+--
+-- Indexes for table `character_private_int32`
+--
+ALTER TABLE `character_private_int32`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `characterId` (`characterId`);
+
+--
+-- Indexes for table `character_public_boolean`
+--
+ALTER TABLE `character_public_boolean`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `characterId` (`characterId`);
+
+--
+-- Indexes for table `character_public_float32`
+--
+ALTER TABLE `character_public_float32`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `characterId` (`characterId`);
+
+--
+-- Indexes for table `character_public_int32`
+--
+ALTER TABLE `character_public_int32`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `characterId` (`characterId`);
+
+--
+-- Indexes for table `character_server_boolean`
+--
+ALTER TABLE `character_server_boolean`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `characterId` (`characterId`);
+
+--
+-- Indexes for table `character_server_float32`
+--
+ALTER TABLE `character_server_float32`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `characterId` (`characterId`);
+
+--
+-- Indexes for table `character_server_int32`
+--
+ALTER TABLE `character_server_int32`
   ADD PRIMARY KEY (`id`),
   ADD KEY `characterId` (`characterId`);
 
@@ -640,29 +827,33 @@ ALTER TABLE `__migrations`
 -- AUTO_INCREMENT for table `friend`
 --
 ALTER TABLE `friend`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `guild`
 --
 ALTER TABLE `guild`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `mail`
 --
 ALTER TABLE `mail`
-  MODIFY `id` bigint NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `party`
 --
 ALTER TABLE `party`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `statistic`
 --
 ALTER TABLE `statistic`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
