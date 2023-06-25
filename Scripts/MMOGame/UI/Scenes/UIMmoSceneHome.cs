@@ -16,6 +16,7 @@ namespace MultiplayerARPG.MMO
         {
             MMOClientInstance.Singleton.onCentralClientConnected += OnCentralServerConnected;
             MMOClientInstance.Singleton.onCentralClientDisconnected += OnCentralServerDisconnected;
+            MMOClientInstance.Singleton.onCentralClientStopped += OnCentralClientStopped;
             if (MMOClientInstance.Singleton.IsConnectedToCentralServer())
                 OnCentralServerConnected();
             else if (!string.IsNullOrEmpty(MMOClientInstance.SelectedCentralAddress) && MMOClientInstance.SelectedCentralPort > 0)
@@ -26,6 +27,7 @@ namespace MultiplayerARPG.MMO
         {
             MMOClientInstance.Singleton.onCentralClientConnected -= OnCentralServerConnected;
             MMOClientInstance.Singleton.onCentralClientDisconnected -= OnCentralServerDisconnected;
+            MMOClientInstance.Singleton.onCentralClientStopped -= OnCentralClientStopped;
         }
 
         public void OnCentralServerConnected()
@@ -39,6 +41,11 @@ namespace MultiplayerARPG.MMO
         public void OnCentralServerDisconnected(DisconnectReason reason, SocketError socketError, UITextKeys message)
         {
             UISceneGlobal.Singleton.ShowDisconnectDialog(reason, socketError, message);
+            ClearHistory();
+        }
+
+        public void OnCentralClientStopped()
+        {
             ClearHistory();
         }
 
