@@ -15,8 +15,8 @@ namespace MultiplayerARPG.MMO
         private void OnRequestedCharacters(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseCharactersMessage response)
         {
             // Clear character list
-            CacheCharacterSelectionManager.Clear();
-            CacheCharacterList.HideAll();
+            CharacterSelectionManager.Clear();
+            CharacterList.HideAll();
             // Unable buttons
             buttonStart.gameObject.SetActive(false);
             buttonDelete.gameObject.SetActive(false);
@@ -57,7 +57,7 @@ namespace MultiplayerARPG.MMO
             if (selectableCharacters.Count > 0)
             {
                 selectableCharacters.Sort(new PlayerCharacterDataLastUpdateComparer().Desc());
-                CacheCharacterList.Generate(selectableCharacters, (index, characterData, ui) =>
+                CharacterList.Generate(selectableCharacters, (index, characterData, ui) =>
                 {
                     // Cache player character to dictionary, we will use it later
                     _playerCharacterDataById[characterData.Id] = characterData;
@@ -71,7 +71,7 @@ namespace MultiplayerARPG.MMO
                         _characterModelById[characterData.Id] = characterModel;
                         characterModel.SetEquipItems(characterData.EquipItems, characterData.SelectableWeaponSets, characterData.EquipWeaponSet, false);
                         characterModel.gameObject.SetActive(false);
-                        CacheCharacterSelectionManager.Add(uiCharacter);
+                        CharacterSelectionManager.Add(uiCharacter);
                     }
                 });
             }
@@ -88,7 +88,7 @@ namespace MultiplayerARPG.MMO
 
         public override void OnClickStart()
         {
-            UICharacter selectedUI = CacheCharacterSelectionManager.SelectedUI;
+            UICharacter selectedUI = CharacterSelectionManager.SelectedUI;
             if (selectedUI == null)
             {
                 UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_NO_CHOSEN_CHARACTER_TO_START.ToString()));
@@ -109,7 +109,7 @@ namespace MultiplayerARPG.MMO
 
         public override void OnClickDelete()
         {
-            UICharacter selectedUI = CacheCharacterSelectionManager.SelectedUI;
+            UICharacter selectedUI = CharacterSelectionManager.SelectedUI;
             if (selectedUI == null)
             {
                 UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_NO_CHOSEN_CHARACTER_TO_DELETE.ToString()));
