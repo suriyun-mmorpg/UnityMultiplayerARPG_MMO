@@ -283,6 +283,14 @@ namespace MultiplayerARPG.MMO
                     + "`hashedKey` INT(11) NOT NULL,"
                     + "`value` FLOAT NOT NULL DEFAULT '0',"
                     + "PRIMARY KEY (`id`), INDEX (`characterId`)) ENGINE = InnoDB DEFAULT CHARSET = utf8 COLLATE = utf8_unicode_ci;");
+                // PK
+                ExecuteNonQuerySync("CREATE TABLE `character_pk` (" +
+                    "`id` VARCHAR(50) NOT NULL," +
+                    "`isPkOn` BOOLEAN NOT NULL DEFAULT '0'," +
+                    "`lastPkOnTime` BIGINT NOT NULL DEFAULT '0'," +
+                    "`pkPoint` INT NOT NULL DEFAULT '0'," +
+                    "`consecutivePkKills` INT NOT NULL DEFAULT '0'," +
+                    "PRIMARY KEY (`id`)) ENGINE = InnoDB DEFAULT CHARSET = utf8 COLLATE = utf8_unicode_ci;");
             });
         }
 
