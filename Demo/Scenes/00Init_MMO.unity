@@ -811,10 +811,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dimensionType: 0
+  messageManager: {fileID: 0}
   saveSystem: {fileID: 0}
   gameplayRule: {fileID: 11400000, guid: 3bfe680a81b27ce4ba9642ddff7baa17, type: 2}
   dayNightTimeUpdater: {fileID: 0}
   gmCommands: {fileID: 0}
+  equipmentModelBonesSetupManager: {fileID: 0}
   networkSetting: {fileID: 11400000, guid: c0825e8ee894749459ab4c8dda26dfe6, type: 2}
   itemDropEntityPrefab: {fileID: 114247390284341630, guid: 611b907cf80c87a4eb9e0d5d4a8688f5,
     type: 3}
@@ -836,10 +838,12 @@ MonoBehaviour:
   owningCharacterObjects:
   - {fileID: 1555851488130254, guid: 90f99869b96e2df4bae83e1f870b68ec, type: 3}
   - {fileID: 5914040168613522836, guid: a854feb116427e540a5620c7d0d13661, type: 3}
+  - {fileID: 2870411455910755895, guid: 4bfdd12dbc214a64097d9b5117044be8, type: 3}
   owningCharacterMiniMapObjects:
   - {fileID: 1620662158371272, guid: f94b43a3f251a6a41849b19fe0aa4fa5, type: 3}
   nonOwningCharacterObjects:
   - {fileID: 5914040168613522836, guid: a854feb116427e540a5620c7d0d13661, type: 3}
+  - {fileID: 2870411455910755895, guid: 4bfdd12dbc214a64097d9b5117044be8, type: 3}
   nonOwningCharacterMiniMapObjects:
   - {fileID: 1338488141702386, guid: ce40a263e27c9034fa4ef0fc9e069eaf, type: 3}
   monsterCharacterObjects: []
@@ -911,6 +915,11 @@ MonoBehaviour:
   canPickupItemsWhichDropsByPlayersImmediately: 0
   dealingRequestDuration: 5
   disableDealing: 0
+  disableVending: 0
+  duelingRequestDuration: 5
+  duelingCountDownDuration: 3
+  duelingDuration: 180
+  disableDueling: 0
   pickUpItemDistance: 2
   dropDistance: 1
   conversationDistance: 3
