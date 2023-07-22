@@ -31,6 +31,7 @@ namespace MultiplayerARPG.MMO
             public Vector3 rotation;
         }
 
+        public string ChannelId { get; set; }
         /// <summary>
         /// If this is not empty it mean this is temporary instance map
         /// So it won't have to save current map, current position to database

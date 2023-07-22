@@ -351,7 +351,7 @@ namespace MultiplayerARPG.MMO
                 string channelId = string.Empty;
                 if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_CHANNEL_ID, out channelId, string.Empty))
                 {
-                    mapNetworkManager.MapInstanceId = channelId;
+                    mapNetworkManager.ChannelId = channelId;
                 }
 
                 // Instance Id
