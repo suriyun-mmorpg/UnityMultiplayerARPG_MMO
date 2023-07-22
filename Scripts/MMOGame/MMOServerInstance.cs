@@ -341,10 +341,10 @@ namespace MultiplayerARPG.MMO
                 jsonConfig[ProcessArguments.CONFIG_MAP_MAX_CONNECTIONS] = mapMaxConnections;
 
                 // Map scene name
-                string mapId = string.Empty;
-                if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_MAP_ID, out mapId, string.Empty))
+                string mapName = string.Empty;
+                if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_MAP_NAME, out mapName, string.Empty))
                 {
-                    _startingMapId = mapId;
+                    _startingMapId = mapName;
                 }
 
                 // Channel Id
@@ -436,7 +436,7 @@ namespace MultiplayerARPG.MMO
                 {
                     if (!string.IsNullOrEmpty(logFileName))
                         logFileName += "_";
-                    logFileName += "Map(" + mapId + ") Instance(" + instanceId + ")";
+                    logFileName += "Map(" + mapName + ") Instance(" + instanceId + ")";
                     startLog = true;
                     _startingMapServer = true;
                 }

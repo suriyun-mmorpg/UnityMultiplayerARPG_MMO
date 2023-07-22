@@ -31,7 +31,6 @@ namespace MultiplayerARPG.MMO
             public Vector3 rotation;
         }
 
-        public string ChannelId { get; set; }
         /// <summary>
         /// If this is not empty it mean this is temporary instance map
         /// So it won't have to save current map, current position to database
@@ -72,7 +71,8 @@ namespace MultiplayerARPG.MMO
         public int ClusterServerPort { get { return clusterServerPort; } }
         public string AppAddress { get { return machineAddress; } }
         public int AppPort { get { return networkPort; } }
-        public string AppExtra
+        public string ChannelId { get; set; }
+        public string RefId
         {
             get
             {
@@ -90,10 +90,10 @@ namespace MultiplayerARPG.MMO
                 return CentralServerPeerType.MapServer;
             }
         }
-        private float lastSaveTime;
+        private float _lastSaveTime;
         // Listing
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-        private readonly ConcurrentDictionary<string, KeyValuePair<string, Vector3>> _locationsBeforeEnterInstance = new ConcurrentDictionary<string, KeyValuePair<string, Vector3>>();
+        private readonly ConcurrentDictionary<string, InstanceMapWarpingLocation> _locationsBeforeEnterInstance = new ConcurrentDictionary<string, InstanceMapWarpingLocation>();
         private readonly ConcurrentDictionary<string, CentralServerPeerInfo> _mapServerConnectionIdsBySceneName = new ConcurrentDictionary<string, CentralServerPeerInfo>();
         private readonly ConcurrentDictionary<string, CentralServerPeerInfo> _instanceMapServerConnectionIdsByInstanceId = new ConcurrentDictionary<string, CentralServerPeerInfo>();
         private readonly ConcurrentDictionary<string, HashSet<uint>> _instanceMapWarpingCharactersByInstanceId = new ConcurrentDictionary<string, HashSet<uint>>();
@@ -182,9 +182,9 @@ namespace MultiplayerARPG.MMO
             {
                 ClusterClient.Update();
 
-                if (tempTime - lastSaveTime > autoSaveDuration)
+                if (tempTime - _lastSaveTime > autoSaveDuration)
                 {
-                    lastSaveTime = tempTime;
+                    _lastSaveTime = tempTime;
                     SaveAllCharacters().Forget();
                     if (!IsInstanceMap())
                     {
@@ -646,9 +646,11 @@ namespace MultiplayerARPG.MMO
                 KickClient(connectionId, UITextKeys.UI_ERROR_KICKED_FROM_SERVER);
                 return;
             }
+
             // Prepare saving location for this character
             string savingCurrentMapName = playerCharacterData.CurrentMapName;
             Vector3 savingCurrentPosition = playerCharacterData.CurrentPosition;
+            Vector3 savingCurrentRotation = playerCharacterData.CurrentRotation;
 
             if (IsInstanceMap())
             {
@@ -665,8 +667,10 @@ namespace MultiplayerARPG.MMO
                 entityPrefab.Identity.HashAssetId,
                 playerCharacterData.CurrentPosition,
                 characterRotation);
+
+            // Set current character data
             BasePlayerCharacterEntity playerCharacterEntity = spawnObj.GetComponent<BasePlayerCharacterEntity>();
-            SetLocationBeforeEnterInstance(playerCharacterData.Id, savingCurrentMapName, savingCurrentPosition);
+            SetLocationBeforeEnterInstance(playerCharacterData.Id, savingCurrentMapName, savingCurrentPosition, savingCurrentRotation);
             playerCharacterData.CloneTo(playerCharacterEntity);
 
             // Set currencies
@@ -813,12 +817,18 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-        public void SetLocationBeforeEnterInstance(string id, string currentMapName, Vector3 currentPosition)
+        public void SetLocationBeforeEnterInstance(string id, string currentMapName, Vector3 currentPosition, Vector3 currentRotation)
         {
             if (!IsInstanceMap())
                 return;
             _locationsBeforeEnterInstance.TryRemove(id, out _);
-            _locationsBeforeEnterInstance.TryAdd(id, new KeyValuePair<string, Vector3>(currentMapName, currentPosition));
+            _locationsBeforeEnterInstance.TryAdd(id, new InstanceMapWarpingLocation()
+            {
+                mapName = currentMapName,
+                position = currentPosition,
+                overrideRotation = true,
+                rotation = currentRotation,
+            });
         }
 #endif
 
@@ -958,28 +968,30 @@ namespace MultiplayerARPG.MMO
             switch (peerInfo.peerType)
             {
                 case CentralServerPeerType.MapServer:
-                    if (!string.IsNullOrEmpty(peerInfo.instanceId))
+                    if (!string.IsNullOrEmpty(peerInfo.channelId) && !string.IsNullOrEmpty(peerInfo.refId))
                     {
+                        string key = peerInfo.GetPeerInfoKey();
                         if (LogInfo)
-                            Logging.Log(LogTag, "Register map server: " + peerInfo.instanceId);
-                        _mapServerConnectionIdsBySceneName[peerInfo.instanceId] = peerInfo;
+                            Logging.Log(LogTag, "Register map server: " + key);
+                        _mapServerConnectionIdsBySceneName[key] = peerInfo;
                     }
                     break;
                 case CentralServerPeerType.InstanceMapServer:
-                    if (!string.IsNullOrEmpty(peerInfo.instanceId))
+                    if (!string.IsNullOrEmpty(peerInfo.channelId) && !string.IsNullOrEmpty(peerInfo.refId))
                     {
+                        string key = peerInfo.GetPeerInfoKey();
                         if (LogInfo)
-                            Logging.Log(LogTag, "Register instance map server: " + peerInfo.instanceId);
-                        _instanceMapServerConnectionIdsByInstanceId[peerInfo.instanceId] = peerInfo;
+                            Logging.Log(LogTag, "Register instance map server: " + key);
+                        _instanceMapServerConnectionIdsByInstanceId[key] = peerInfo;
                         // Warp characters
-                        if (_instanceMapWarpingCharactersByInstanceId.TryGetValue(peerInfo.instanceId, out HashSet<uint> warpingCharacters))
+                        if (_instanceMapWarpingCharactersByInstanceId.TryGetValue(key, out HashSet<uint> warpingCharacters))
                         {
                             BasePlayerCharacterEntity warpingCharacterEntity;
                             foreach (uint warpingCharacter in warpingCharacters)
                             {
                                 if (!Assets.TryGetSpawnedObject(warpingCharacter, out warpingCharacterEntity))
                                     continue;
-                                WarpCharacterToInstanceRoutine(warpingCharacterEntity, peerInfo.instanceId).Forget();
+                                WarpCharacterToInstanceRoutine(warpingCharacterEntity, key).Forget();
                             }
                         }
                     }
