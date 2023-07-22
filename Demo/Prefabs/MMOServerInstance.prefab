@@ -112,12 +112,21 @@ MonoBehaviour:
   webSocketSecure: 0
   webSocketCertificateFilePath: 
   webSocketCertificatePassword: 
+  updateFps: 20
   maxConnections: 1100
   transportFactory: {fileID: 0}
   facebookLoginRequestType: 210
   googlePlayLoginRequestType: 211
   clusterServerPort: 6010
   mapSpawnMillisecondsTimeout: 0
+  defaultChannelMaxConnections: 500
+  channels:
+  - id: 1
+    title: Channel 1
+    maxConnections: 200
+  - id: 2
+    title: Channel 2
+    maxConnections: 0
   disableDefaultLogin: 0
   minUsernameLength: 2
   maxUsernameLength: 24
@@ -318,6 +327,7 @@ MonoBehaviour:
   webSocketSecure: 0
   webSocketCertificateFilePath: 
   webSocketCertificatePassword: 
+  updateFps: 20
   maxConnections: 1100
   transportFactory: {fileID: 0}
   clusterServerAddress: 127.0.0.1
@@ -327,6 +337,7 @@ MonoBehaviour:
   notSpawnInBatchMode: 0
   startPort: 8000
   batchModeArguments: -batchmode -nographics
+  spawningChannelIds: []
   spawningMaps:
   - {fileID: 11400000, guid: de8b0e4099f8d444692e88f92309e90d, type: 2}
   - {fileID: 11400000, guid: fbe2a93dfafee544cbeaf175d3491e33, type: 2}
@@ -384,6 +395,7 @@ MonoBehaviour:
   webSocketSecure: 0
   webSocketCertificateFilePath: 
   webSocketCertificatePassword: 
+  updateFps: 20
   maxConnections: 200
   transportFactory: {fileID: 0}
   database: {fileID: 114414512406587944}
