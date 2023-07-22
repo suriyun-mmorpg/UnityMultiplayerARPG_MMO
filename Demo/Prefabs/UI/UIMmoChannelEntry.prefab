@@ -167,7 +167,7 @@ MonoBehaviour:
   textTitle: {fileID: 6694175724838055709}
   gageConnections:
     displayType: 0
-    textValue: {fileID: 0}
+    textValue: {fileID: 4397989425870690731}
     imageGage: {fileID: 0}
     sliderGage: {fileID: 0}
     formatCurrentByMax:
@@ -423,6 +423,7 @@ GameObject:
   - component: {fileID: 8430020858184491947}
   - component: {fileID: 6078142250169558575}
   - component: {fileID: 5538873486091820829}
+  - component: {fileID: 4397989425870690731}
   m_Layer: 5
   m_Name: Text--Connections
   m_TagString: Untagged
@@ -491,3 +492,17 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: 0/0
+--- !u!114 &4397989425870690731
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7447775591915041386}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8355763b7cda344c9d206aa977ec27f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  unityText: {fileID: 5538873486091820829}
+  textMeshText: {fileID: 0}
