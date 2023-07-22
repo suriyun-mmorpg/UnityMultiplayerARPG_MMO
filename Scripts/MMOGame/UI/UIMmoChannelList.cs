@@ -1,3 +1,4 @@
+using LiteNetLibManager;
 using UnityEngine;
 
 namespace MultiplayerARPG.MMO
@@ -33,6 +34,31 @@ namespace MultiplayerARPG.MMO
                 _selectionManager.selectionMode = UISelectionMode.Toggle;
                 return _selectionManager;
             }
+        }
+
+        private void OnEnable()
+        {
+            LoadChannels();
+        }
+
+        public void LoadChannels()
+        {
+            MMOClientInstance.Singleton.RequestChannels(OnRequestedChannels);
+        }
+
+        private void OnRequestedChannels(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseChannelsMessage response)
+        {
+            // Clear channel list
+            SelectionManager.Clear();
+            List.HideAll();
+            // Put channels
+            List.Generate(response.channels, (index, data, ui) =>
+            {
+                // Setup UIs
+                UIMmoChannelEntry uiChannelEntry = ui.GetComponent<UIMmoChannelEntry>();
+                uiChannelEntry.Data = data;
+                SelectionManager.Add(uiChannelEntry);
+            });
         }
 
         public void OnClickSelectChannel()
