@@ -187,6 +187,11 @@ namespace MultiplayerARPG.MMO
             CentralNetworkManager.RequestValidateAccessToken(userId, accessToken, (responseHandler, responseCode, response) => OnRequestValidateAccessToken(responseHandler, responseCode, response, callback).Forget());
         }
 
+        public void RequestChannels(ResponseDelegate<ResponseChannelsMessage> callback)
+        {
+            CentralNetworkManager.RequestChannels(callback);
+        }
+
         public void RequestCharacters(ResponseDelegate<ResponseCharactersMessage> callback)
         {
             CentralNetworkManager.RequestCharacters(callback);
