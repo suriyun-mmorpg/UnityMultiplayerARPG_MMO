@@ -242,7 +242,33 @@ namespace MultiplayerARPG.MMO
                 }
                 jsonConfig[ProcessArguments.CONFIG_CENTRAL_MAX_CONNECTIONS] = centralMaxConnections;
 
-                // Central network port
+                // Central map spawn timeout (milliseconds)
+                int mapSpawnMillisecondsTimeout;
+                if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_MAP_SPAWN_MILLISECONDS_TIMEOUT, out mapSpawnMillisecondsTimeout, centralNetworkManager.mapSpawnMillisecondsTimeout) ||
+                    ConfigReader.ReadConfigs(jsonConfig, ProcessArguments.CONFIG_MAP_SPAWN_MILLISECONDS_TIMEOUT, out mapSpawnMillisecondsTimeout, centralNetworkManager.mapSpawnMillisecondsTimeout))
+                {
+                    centralNetworkManager.mapSpawnMillisecondsTimeout = mapSpawnMillisecondsTimeout;
+                }
+                jsonConfig[ProcessArguments.CONFIG_MAP_SPAWN_MILLISECONDS_TIMEOUT] = mapSpawnMillisecondsTimeout;
+
+                // Central - default channels max connections
+                int defaultChannelMaxConnections;
+                if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_DEFAULT_CHANNEL_MAX_CONNECTIONS, out defaultChannelMaxConnections, centralNetworkManager.defaultChannelMaxConnections) ||
+                    ConfigReader.ReadConfigs(jsonConfig, ProcessArguments.CONFIG_DEFAULT_CHANNEL_MAX_CONNECTIONS, out defaultChannelMaxConnections, centralNetworkManager.defaultChannelMaxConnections))
+                {
+                    centralNetworkManager.defaultChannelMaxConnections = defaultChannelMaxConnections;
+                }
+                jsonConfig[ProcessArguments.CONFIG_DEFAULT_CHANNEL_MAX_CONNECTIONS] = defaultChannelMaxConnections;
+
+                // Central - channels
+                List<ChannelData> channels;
+                if (ConfigReader.ReadConfigs(jsonConfig, ProcessArguments.CONFIG_CHANNELS, out channels, centralNetworkManager.channels))
+                {
+                    centralNetworkManager.channels = channels;
+                }
+                jsonConfig[ProcessArguments.CONFIG_CHANNELS] = channels;
+
+                // Central->Cluster network port
                 int clusterNetworkPort;
                 if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_CLUSTER_PORT, out clusterNetworkPort, centralNetworkManager.clusterServerPort) ||
                     ConfigReader.ReadConfigs(jsonConfig, ProcessArguments.CONFIG_CLUSTER_PORT, out clusterNetworkPort, centralNetworkManager.clusterServerPort))
