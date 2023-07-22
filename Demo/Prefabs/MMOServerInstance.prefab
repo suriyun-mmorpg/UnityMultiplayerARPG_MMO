@@ -337,7 +337,9 @@ MonoBehaviour:
   notSpawnInBatchMode: 0
   startPort: 8000
   batchModeArguments: -batchmode -nographics
-  spawningChannelIds: []
+  spawningChannelIds:
+  - 1
+  - 2
   spawningMaps:
   - {fileID: 11400000, guid: de8b0e4099f8d444692e88f92309e90d, type: 2}
   - {fileID: 11400000, guid: fbe2a93dfafee544cbeaf175d3491e33, type: 2}
