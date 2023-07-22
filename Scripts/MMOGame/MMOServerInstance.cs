@@ -347,6 +347,13 @@ namespace MultiplayerARPG.MMO
                     startingMapId = mapId;
                 }
 
+                // Channel Id
+                string channelId = string.Empty;
+                if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_CHANNEL_ID, out channelId, string.Empty))
+                {
+                    mapNetworkManager.MapInstanceId = channelId;
+                }
+
                 // Instance Id
                 string instanceId = string.Empty;
                 if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_INSTANCE_ID, out instanceId, string.Empty))

@@ -957,28 +957,28 @@ namespace MultiplayerARPG.MMO
             switch (peerInfo.peerType)
             {
                 case CentralServerPeerType.MapServer:
-                    if (!string.IsNullOrEmpty(peerInfo.extra))
+                    if (!string.IsNullOrEmpty(peerInfo.instanceId))
                     {
                         if (LogInfo)
-                            Logging.Log(LogTag, "Register map server: " + peerInfo.extra);
-                        _mapServerConnectionIdsBySceneName[peerInfo.extra] = peerInfo;
+                            Logging.Log(LogTag, "Register map server: " + peerInfo.instanceId);
+                        _mapServerConnectionIdsBySceneName[peerInfo.instanceId] = peerInfo;
                     }
                     break;
                 case CentralServerPeerType.InstanceMapServer:
-                    if (!string.IsNullOrEmpty(peerInfo.extra))
+                    if (!string.IsNullOrEmpty(peerInfo.instanceId))
                     {
                         if (LogInfo)
-                            Logging.Log(LogTag, "Register instance map server: " + peerInfo.extra);
-                        _instanceMapServerConnectionIdsByInstanceId[peerInfo.extra] = peerInfo;
+                            Logging.Log(LogTag, "Register instance map server: " + peerInfo.instanceId);
+                        _instanceMapServerConnectionIdsByInstanceId[peerInfo.instanceId] = peerInfo;
                         // Warp characters
-                        if (_instanceMapWarpingCharactersByInstanceId.TryGetValue(peerInfo.extra, out HashSet<uint> warpingCharacters))
+                        if (_instanceMapWarpingCharactersByInstanceId.TryGetValue(peerInfo.instanceId, out HashSet<uint> warpingCharacters))
                         {
                             BasePlayerCharacterEntity warpingCharacterEntity;
                             foreach (uint warpingCharacter in warpingCharacters)
                             {
                                 if (!Assets.TryGetSpawnedObject(warpingCharacter, out warpingCharacterEntity))
                                     continue;
-                                WarpCharacterToInstanceRoutine(warpingCharacterEntity, peerInfo.extra).Forget();
+                                WarpCharacterToInstanceRoutine(warpingCharacterEntity, peerInfo.instanceId).Forget();
                             }
                         }
                     }
