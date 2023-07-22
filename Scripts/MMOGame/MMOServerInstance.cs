@@ -80,7 +80,7 @@ namespace MultiplayerARPG.MMO
         public bool databaseDisableCacheReading;
 
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-        private List<string> _spawningMapIds;
+        private List<string> _spawningMaps;
         private string _startingMapId;
         private bool _startingCentralServer;
         private bool _startingMapSpawnServer;
@@ -307,20 +307,29 @@ namespace MultiplayerARPG.MMO
                 }
                 jsonConfig[ProcessArguments.CONFIG_SPAWN_START_PORT] = spawnStartPort;
 
+                // Spawn channels
+                List<string> spawnChannels;
+                if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_SPAWN_CHANNELS, out spawnChannels, mapSpawnNetworkManager.spawningChannelIds) ||
+                    ConfigReader.ReadConfigs(jsonConfig, ProcessArguments.CONFIG_SPAWN_CHANNELS, out spawnChannels, mapSpawnNetworkManager.spawningChannelIds))
+                {
+                    mapSpawnNetworkManager.spawningChannelIds = spawnChannels;
+                }
+                jsonConfig[ProcessArguments.CONFIG_SPAWN_CHANNELS] = spawnChannels;
+
                 // Spawn maps
-                List<string> defaultSpawnMapIds = new List<string>();
+                List<string> defaultSpawnMaps = new List<string>();
                 foreach (BaseMapInfo mapInfo in mapSpawnNetworkManager.spawningMaps)
                 {
                     if (mapInfo != null)
-                        defaultSpawnMapIds.Add(mapInfo.Id);
+                        defaultSpawnMaps.Add(mapInfo.Id);
                 }
-                List<string> spawnMapIds;
-                if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_SPAWN_MAPS, out spawnMapIds, defaultSpawnMapIds) ||
-                    ConfigReader.ReadConfigs(jsonConfig, ProcessArguments.CONFIG_SPAWN_MAPS, out spawnMapIds, defaultSpawnMapIds))
+                List<string> spawnMaps;
+                if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_SPAWN_MAPS, out spawnMaps, defaultSpawnMaps) ||
+                    ConfigReader.ReadConfigs(jsonConfig, ProcessArguments.CONFIG_SPAWN_MAPS, out spawnMaps, defaultSpawnMaps))
                 {
-                    _spawningMapIds = spawnMapIds;
+                    _spawningMaps = spawnMaps;
                 }
-                jsonConfig[ProcessArguments.CONFIG_SPAWN_MAPS] = spawnMapIds;
+                jsonConfig[ProcessArguments.CONFIG_SPAWN_MAPS] = spawnMaps;
 
                 // Map network port
                 int mapNetworkPort;
@@ -508,11 +517,11 @@ namespace MultiplayerARPG.MMO
             if (_startingMapSpawnServer)
             {
                 // Start map spawn server
-                if (_spawningMapIds != null && _spawningMapIds.Count > 0)
+                if (_spawningMaps != null && _spawningMaps.Count > 0)
                 {
                     mapSpawnNetworkManager.spawningMaps = new List<BaseMapInfo>();
                     BaseMapInfo tempMapInfo;
-                    foreach (string spawningMapId in _spawningMapIds)
+                    foreach (string spawningMapId in _spawningMaps)
                     {
                         if (GameInstance.MapInfos.TryGetValue(spawningMapId, out tempMapInfo))
                             mapSpawnNetworkManager.spawningMaps.Add(tempMapInfo);
