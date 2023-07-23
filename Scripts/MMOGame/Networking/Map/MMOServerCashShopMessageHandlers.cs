@@ -2,7 +2,7 @@
 using LiteNetLibManager;
 using System.Collections.Generic;
 using UnityEngine;
-#if ENABLE_PURCHASING && UNITY_PURCHASING
+#if ENABLE_PURCHASING
 using UnityEngine.Purchasing.Security;
 #endif
 

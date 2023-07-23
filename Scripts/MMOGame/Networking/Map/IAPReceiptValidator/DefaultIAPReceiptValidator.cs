@@ -2,7 +2,7 @@ using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
 using UnityEngine;
 using LiteNetLibManager;
-#if ENABLE_PURCHASING && UNITY_PURCHASING
+#if ENABLE_PURCHASING
 using UnityEngine.Purchasing.Security;
 #endif
 using Validator = MultiplayerARPG.MMO.CrossPlatformValidator;
@@ -14,7 +14,7 @@ namespace MultiplayerARPG.MMO
         public async UniTask<IAPReceiptValidateResult> ValidateIAPReceipt(string unityIAPReceipt)
         {
             await UniTask.Yield();
-#if ENABLE_PURCHASING && UNITY_PURCHASING
+#if ENABLE_PURCHASING
             List<CashPackage> cashPackages = new List<CashPackage>();
             // NOTE: If error occuring and it lead you here, you must learn and use IAP obfuscating dialog (https://docs.unity3d.com/Manual/UnityIAPValidatingReceipts.html)
             Validator validator = new Validator(GooglePlayTangle.Data(), AppleTangle.Data(), Application.identifier);
