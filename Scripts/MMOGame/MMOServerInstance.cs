@@ -51,7 +51,7 @@ namespace MultiplayerARPG.MMO
                 if (!useCustomDatabaseClient)
                     return databaseNetworkManager;
                 else
-                    return customDatabaseClient;
+                    return _customDatabaseClient;
             }
         }
         public bool UseWebSocket { get { return useWebSocket; } }
@@ -59,14 +59,14 @@ namespace MultiplayerARPG.MMO
         public string WebSocketCertificateFilePath { get { return webSocketCertPath; } }
         public string WebSocketCertificatePassword { get { return webSocketCertPassword; } }
 
-        private LogGUI cacheLogGUI;
+        private LogGUI _cacheLogGUI;
         public LogGUI CacheLogGUI
         {
             get
             {
-                if (cacheLogGUI == null)
-                    cacheLogGUI = GetComponent<LogGUI>();
-                return cacheLogGUI;
+                if (_cacheLogGUI == null)
+                    _cacheLogGUI = GetComponent<LogGUI>();
+                return _cacheLogGUI;
             }
         }
 
@@ -80,14 +80,14 @@ namespace MultiplayerARPG.MMO
         public bool databaseDisableCacheReading;
 
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-        private List<string> spawningMapIds;
-        private string startingMapId;
-        private bool startingCentralServer;
-        private bool startingMapSpawnServer;
-        private bool startingMapServer;
-        private bool startingDatabaseServer;
+        private List<string> _spawningMaps;
+        private string _startingMapId;
+        private bool _startingCentralServer;
+        private bool _startingMapSpawnServer;
+        private bool _startingMapServer;
+        private bool _startingDatabaseServer;
 #endif
-        private IDatabaseClient customDatabaseClient;
+        private IDatabaseClient _customDatabaseClient;
 
         private void Awake()
         {
@@ -105,7 +105,7 @@ namespace MultiplayerARPG.MMO
             // Setup custom database client
             if (customDatabaseClientSource == null)
                 customDatabaseClientSource = gameObject;
-            customDatabaseClient = customDatabaseClientSource.GetComponent<IDatabaseClient>();
+            _customDatabaseClient = customDatabaseClientSource.GetComponent<IDatabaseClient>();
 
             CacheLogGUI.enabled = false;
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
@@ -138,7 +138,7 @@ namespace MultiplayerARPG.MMO
 
                 // Database option index
                 bool useCustomDatabaseClient = this.useCustomDatabaseClient = false;
-                if (customDatabaseClient != null && customDatabaseClient as UnityEngine.Object != null)
+                if (_customDatabaseClient != null && _customDatabaseClient as UnityEngine.Object != null)
                 {
                     if (ConfigReader.ReadConfigs(jsonConfig, ProcessArguments.CONFIG_USE_CUSTOM_DATABASE_CLIENT, out useCustomDatabaseClient, this.useCustomDatabaseClient))
                     {
@@ -242,7 +242,33 @@ namespace MultiplayerARPG.MMO
                 }
                 jsonConfig[ProcessArguments.CONFIG_CENTRAL_MAX_CONNECTIONS] = centralMaxConnections;
 
-                // Central network port
+                // Central map spawn timeout (milliseconds)
+                int mapSpawnMillisecondsTimeout;
+                if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_MAP_SPAWN_MILLISECONDS_TIMEOUT, out mapSpawnMillisecondsTimeout, centralNetworkManager.mapSpawnMillisecondsTimeout) ||
+                    ConfigReader.ReadConfigs(jsonConfig, ProcessArguments.CONFIG_MAP_SPAWN_MILLISECONDS_TIMEOUT, out mapSpawnMillisecondsTimeout, centralNetworkManager.mapSpawnMillisecondsTimeout))
+                {
+                    centralNetworkManager.mapSpawnMillisecondsTimeout = mapSpawnMillisecondsTimeout;
+                }
+                jsonConfig[ProcessArguments.CONFIG_MAP_SPAWN_MILLISECONDS_TIMEOUT] = mapSpawnMillisecondsTimeout;
+
+                // Central - default channels max connections
+                int defaultChannelMaxConnections;
+                if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_DEFAULT_CHANNEL_MAX_CONNECTIONS, out defaultChannelMaxConnections, centralNetworkManager.defaultChannelMaxConnections) ||
+                    ConfigReader.ReadConfigs(jsonConfig, ProcessArguments.CONFIG_DEFAULT_CHANNEL_MAX_CONNECTIONS, out defaultChannelMaxConnections, centralNetworkManager.defaultChannelMaxConnections))
+                {
+                    centralNetworkManager.defaultChannelMaxConnections = defaultChannelMaxConnections;
+                }
+                jsonConfig[ProcessArguments.CONFIG_DEFAULT_CHANNEL_MAX_CONNECTIONS] = defaultChannelMaxConnections;
+
+                // Central - channels
+                List<ChannelData> channels;
+                if (ConfigReader.ReadConfigs(jsonConfig, ProcessArguments.CONFIG_CHANNELS, out channels, centralNetworkManager.channels))
+                {
+                    centralNetworkManager.channels = channels;
+                }
+                jsonConfig[ProcessArguments.CONFIG_CHANNELS] = channels;
+
+                // Central->Cluster network port
                 int clusterNetworkPort;
                 if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_CLUSTER_PORT, out clusterNetworkPort, centralNetworkManager.clusterServerPort) ||
                     ConfigReader.ReadConfigs(jsonConfig, ProcessArguments.CONFIG_CLUSTER_PORT, out clusterNetworkPort, centralNetworkManager.clusterServerPort))
@@ -307,20 +333,29 @@ namespace MultiplayerARPG.MMO
                 }
                 jsonConfig[ProcessArguments.CONFIG_SPAWN_START_PORT] = spawnStartPort;
 
+                // Spawn channels
+                List<string> spawnChannels;
+                if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_SPAWN_CHANNELS, out spawnChannels, mapSpawnNetworkManager.spawningChannelIds) ||
+                    ConfigReader.ReadConfigs(jsonConfig, ProcessArguments.CONFIG_SPAWN_CHANNELS, out spawnChannels, mapSpawnNetworkManager.spawningChannelIds))
+                {
+                    mapSpawnNetworkManager.spawningChannelIds = spawnChannels;
+                }
+                jsonConfig[ProcessArguments.CONFIG_SPAWN_CHANNELS] = spawnChannels;
+
                 // Spawn maps
-                List<string> defaultSpawnMapIds = new List<string>();
+                List<string> defaultSpawnMaps = new List<string>();
                 foreach (BaseMapInfo mapInfo in mapSpawnNetworkManager.spawningMaps)
                 {
                     if (mapInfo != null)
-                        defaultSpawnMapIds.Add(mapInfo.Id);
+                        defaultSpawnMaps.Add(mapInfo.Id);
                 }
-                List<string> spawnMapIds;
-                if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_SPAWN_MAPS, out spawnMapIds, defaultSpawnMapIds) ||
-                    ConfigReader.ReadConfigs(jsonConfig, ProcessArguments.CONFIG_SPAWN_MAPS, out spawnMapIds, defaultSpawnMapIds))
+                List<string> spawnMaps;
+                if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_SPAWN_MAPS, out spawnMaps, defaultSpawnMaps) ||
+                    ConfigReader.ReadConfigs(jsonConfig, ProcessArguments.CONFIG_SPAWN_MAPS, out spawnMaps, defaultSpawnMaps))
                 {
-                    spawningMapIds = spawnMapIds;
+                    _spawningMaps = spawnMaps;
                 }
-                jsonConfig[ProcessArguments.CONFIG_SPAWN_MAPS] = spawnMapIds;
+                jsonConfig[ProcessArguments.CONFIG_SPAWN_MAPS] = spawnMaps;
 
                 // Map network port
                 int mapNetworkPort;
@@ -341,10 +376,17 @@ namespace MultiplayerARPG.MMO
                 jsonConfig[ProcessArguments.CONFIG_MAP_MAX_CONNECTIONS] = mapMaxConnections;
 
                 // Map scene name
-                string mapId = string.Empty;
-                if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_MAP_ID, out mapId, string.Empty))
+                string mapName = string.Empty;
+                if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_MAP_NAME, out mapName, string.Empty))
                 {
-                    startingMapId = mapId;
+                    _startingMapId = mapName;
+                }
+
+                // Channel Id
+                string channelId = string.Empty;
+                if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_CHANNEL_ID, out channelId, string.Empty))
+                {
+                    mapNetworkManager.ChannelId = channelId;
                 }
 
                 // Instance Id
@@ -404,7 +446,7 @@ namespace MultiplayerARPG.MMO
                         logFileName += "_";
                     logFileName += "Database";
                     startLog = true;
-                    startingDatabaseServer = true;
+                    _startingDatabaseServer = true;
                 }
 
                 if (ConfigReader.IsArgsProvided(args, ProcessArguments.ARG_START_CENTRAL_SERVER))
@@ -413,7 +455,7 @@ namespace MultiplayerARPG.MMO
                         logFileName += "_";
                     logFileName += "Central";
                     startLog = true;
-                    startingCentralServer = true;
+                    _startingCentralServer = true;
                 }
 
                 if (ConfigReader.IsArgsProvided(args, ProcessArguments.ARG_START_MAP_SPAWN_SERVER))
@@ -422,19 +464,19 @@ namespace MultiplayerARPG.MMO
                         logFileName += "_";
                     logFileName += "MapSpawn";
                     startLog = true;
-                    startingMapSpawnServer = true;
+                    _startingMapSpawnServer = true;
                 }
 
                 if (ConfigReader.IsArgsProvided(args, ProcessArguments.ARG_START_MAP_SERVER))
                 {
                     if (!string.IsNullOrEmpty(logFileName))
                         logFileName += "_";
-                    logFileName += "Map(" + mapId + ") Instance(" + instanceId + ")";
+                    logFileName += "Map(" + mapName + ") Instance(" + instanceId + ")";
                     startLog = true;
-                    startingMapServer = true;
+                    _startingMapServer = true;
                 }
 
-                if (startingDatabaseServer || startingCentralServer || startingMapSpawnServer || startingMapServer)
+                if (_startingDatabaseServer || _startingCentralServer || _startingMapSpawnServer || _startingMapServer)
                 {
                     if (!configFileFound)
                     {
@@ -461,19 +503,19 @@ namespace MultiplayerARPG.MMO
                 }
 
                 if (startDatabaseOnAwake)
-                    startingDatabaseServer = true;
+                    _startingDatabaseServer = true;
 
                 if (startCentralOnAwake)
-                    startingCentralServer = true;
+                    _startingCentralServer = true;
 
                 if (startMapSpawnOnAwake)
-                    startingMapSpawnServer = true;
+                    _startingMapSpawnServer = true;
 
                 if (startMapOnAwake)
                 {
                     // If run map-server, don't load home scene (home scene load in `Game Instance`)
-                    startingMapId = startingMap.Id;
-                    startingMapServer = true;
+                    _startingMapId = startingMap.Id;
+                    _startingMapServer = true;
                 }
             }
 #endif
@@ -486,26 +528,26 @@ namespace MultiplayerARPG.MMO
             DatabaseNetworkManager.GuildMemberRoles = GameInstance.Singleton.SocialSystemSetting.GuildMemberRoles;
             DatabaseNetworkManager.GuildExpTree = GameInstance.Singleton.SocialSystemSetting.GuildExpTree;
 
-            if (startingDatabaseServer)
+            if (_startingDatabaseServer)
             {
                 // Start database manager server
                 StartDatabaseManagerServer();
             }
 
-            if (startingCentralServer)
+            if (_startingCentralServer)
             {
                 // Start central server
                 StartCentralServer();
             }
 
-            if (startingMapSpawnServer)
+            if (_startingMapSpawnServer)
             {
                 // Start map spawn server
-                if (spawningMapIds != null && spawningMapIds.Count > 0)
+                if (_spawningMaps != null && _spawningMaps.Count > 0)
                 {
                     mapSpawnNetworkManager.spawningMaps = new List<BaseMapInfo>();
                     BaseMapInfo tempMapInfo;
-                    foreach (string spawningMapId in spawningMapIds)
+                    foreach (string spawningMapId in _spawningMaps)
                     {
                         if (GameInstance.MapInfos.TryGetValue(spawningMapId, out tempMapInfo))
                             mapSpawnNetworkManager.spawningMaps.Add(tempMapInfo);
@@ -514,11 +556,11 @@ namespace MultiplayerARPG.MMO
                 StartMapSpawnServer();
             }
 
-            if (startingMapServer)
+            if (_startingMapServer)
             {
                 // Start map server
                 BaseMapInfo tempMapInfo;
-                if (!string.IsNullOrEmpty(startingMapId) && GameInstance.MapInfos.TryGetValue(startingMapId, out tempMapInfo))
+                if (!string.IsNullOrEmpty(_startingMapId) && GameInstance.MapInfos.TryGetValue(_startingMapId, out tempMapInfo))
                 {
                     mapNetworkManager.Assets.onlineScene.SceneName = tempMapInfo.Scene.SceneName;
                     mapNetworkManager.SetMapInfo(tempMapInfo);
@@ -529,13 +571,13 @@ namespace MultiplayerARPG.MMO
             GameInstance gameInstance = FindObjectOfType<GameInstance>();
             gameInstance.LoadHomeScenePreventions[nameof(MMOServerInstance)] = false;
 
-            if (startingCentralServer ||
-                startingMapSpawnServer ||
-                startingMapServer)
+            if (_startingCentralServer ||
+                _startingMapSpawnServer ||
+                _startingMapServer)
             {
                 // Start database manager client, it will connect to database manager server
                 // To request database functions
-                gameInstance.LoadHomeScenePreventions[nameof(MMOServerInstance)] = !Application.isEditor || startingMapServer;
+                gameInstance.LoadHomeScenePreventions[nameof(MMOServerInstance)] = !Application.isEditor || _startingMapServer;
                 StartDatabaseManagerClient();
             }
         }

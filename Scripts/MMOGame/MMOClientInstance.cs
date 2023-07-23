@@ -36,6 +36,7 @@ namespace MultiplayerARPG.MMO
         public bool UseWebSocket { get { return useWebSocket; } }
         public bool WebSocketSecure { get { return webSocketSecure; } }
         public MmoNetworkSetting[] NetworkSettings { get { return networkSettings; } }
+        public string SelectedChannelId { get; set; } = string.Empty;
 
         public System.Action onCentralClientConnected;
         public System.Action<DisconnectReason, SocketError, UITextKeys> onCentralClientDisconnected;
@@ -186,6 +187,11 @@ namespace MultiplayerARPG.MMO
             CentralNetworkManager.RequestValidateAccessToken(userId, accessToken, (responseHandler, responseCode, response) => OnRequestValidateAccessToken(responseHandler, responseCode, response, callback).Forget());
         }
 
+        public void RequestChannels(ResponseDelegate<ResponseChannelsMessage> callback)
+        {
+            CentralNetworkManager.RequestChannels(callback);
+        }
+
         public void RequestCharacters(ResponseDelegate<ResponseCharactersMessage> callback)
         {
             CentralNetworkManager.RequestCharacters(callback);
@@ -203,7 +209,12 @@ namespace MultiplayerARPG.MMO
 
         public void RequestSelectCharacter(string characterId, ResponseDelegate<ResponseSelectCharacterMessage> callback)
         {
-            CentralNetworkManager.RequestSelectCharacter(characterId, (responseHandler, responseCode, response) => OnRequestSelectCharacter(responseHandler, responseCode, response, characterId, callback).Forget());
+            RequestSelectCharacter(SelectedChannelId, characterId, callback);
+        }
+
+        public void RequestSelectCharacter(string channelId, string characterId, ResponseDelegate<ResponseSelectCharacterMessage> callback)
+        {
+            CentralNetworkManager.RequestSelectCharacter(channelId, characterId, (responseHandler, responseCode, response) => OnRequestSelectCharacter(responseHandler, responseCode, response, characterId, callback).Forget());
         }
 
         private async UniTaskVoid OnRequestUserLogin(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseUserLoginMessage response, ResponseDelegate<ResponseUserLoginMessage> callback)

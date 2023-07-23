@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace MultiplayerARPG.MMO
 {
@@ -10,30 +8,30 @@ namespace MultiplayerARPG.MMO
         public UIMmoServerEntry uiServerEntryPrefab;
         public Transform uiServerEntryContainer;
 
-        private UIList cacheList;
-        public UIList CacheList
+        private UIList _list;
+        public UIList List
         {
             get
             {
-                if (cacheList == null)
+                if (_list == null)
                 {
-                    cacheList = gameObject.AddComponent<UIList>();
-                    cacheList.uiPrefab = uiServerEntryPrefab.gameObject;
-                    cacheList.uiContainer = uiServerEntryContainer;
+                    _list = gameObject.AddComponent<UIList>();
+                    _list.uiPrefab = uiServerEntryPrefab.gameObject;
+                    _list.uiContainer = uiServerEntryContainer;
                 }
-                return cacheList;
+                return _list;
             }
         }
 
-        private UIMmoServerEntrySelectionManager selectionManager;
+        private UIMmoServerEntrySelectionManager _selectionManager;
         public UIMmoServerEntrySelectionManager SelectionManager
         {
             get
             {
-                if (selectionManager == null)
-                    selectionManager = GetComponent<UIMmoServerEntrySelectionManager>();
-                selectionManager.selectionMode = UISelectionMode.Toggle;
-                return selectionManager;
+                if (_selectionManager == null)
+                    _selectionManager = GetComponent<UIMmoServerEntrySelectionManager>();
+                _selectionManager.selectionMode = UISelectionMode.Toggle;
+                return _selectionManager;
             }
         }
 
@@ -49,7 +47,7 @@ namespace MultiplayerARPG.MMO
             SelectionManager.Clear();
 
             MmoNetworkSetting[] networkSettings = MMOClientInstance.Singleton.NetworkSettings;
-            CacheList.Generate(networkSettings, (index, networkSetting, ui) =>
+            List.Generate(networkSettings, (index, networkSetting, ui) =>
             {
                 UIMmoServerEntry uiServerEntry = ui.GetComponent<UIMmoServerEntry>();
                 uiServerEntry.Data = networkSetting;

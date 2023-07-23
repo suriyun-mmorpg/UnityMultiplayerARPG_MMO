@@ -71,7 +71,8 @@ namespace MultiplayerARPG.MMO
         public int ClusterServerPort { get { return clusterServerPort; } }
         public string AppAddress { get { return machineAddress; } }
         public int AppPort { get { return networkPort; } }
-        public string AppExtra
+        public string ChannelId { get; set; }
+        public string RefId
         {
             get
             {
@@ -89,10 +90,10 @@ namespace MultiplayerARPG.MMO
                 return CentralServerPeerType.MapServer;
             }
         }
-        private float lastSaveTime;
+        private float _lastSaveTime;
         // Listing
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-        private readonly ConcurrentDictionary<string, KeyValuePair<string, Vector3>> _locationsBeforeEnterInstance = new ConcurrentDictionary<string, KeyValuePair<string, Vector3>>();
+        private readonly ConcurrentDictionary<string, InstanceMapWarpingLocation> _locationsBeforeEnterInstance = new ConcurrentDictionary<string, InstanceMapWarpingLocation>();
         private readonly ConcurrentDictionary<string, CentralServerPeerInfo> _mapServerConnectionIdsBySceneName = new ConcurrentDictionary<string, CentralServerPeerInfo>();
         private readonly ConcurrentDictionary<string, CentralServerPeerInfo> _instanceMapServerConnectionIdsByInstanceId = new ConcurrentDictionary<string, CentralServerPeerInfo>();
         private readonly ConcurrentDictionary<string, HashSet<uint>> _instanceMapWarpingCharactersByInstanceId = new ConcurrentDictionary<string, HashSet<uint>>();
@@ -162,6 +163,7 @@ namespace MultiplayerARPG.MMO
             ClusterClient.onPlayerCharacterRemoved = OnPlayerCharacterRemoved;
             ClusterClient.onKickUser = KickUser;
             ClusterClient.RegisterResponseHandler<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.RequestSpawnMap);
+            ClusterClient.RegisterRequestHandler<RequestForceDespawnCharacterMessage, EmptyMessage>(MMORequestTypes.RequestForceDespawnCharacter, HandleRequestForceDespawnCharacter);
             ClusterClient.RegisterMessageHandler(MMOMessageTypes.Chat, HandleChat);
             ClusterClient.RegisterMessageHandler(MMOMessageTypes.UpdateMapUser, HandleUpdateMapUser);
             ClusterClient.RegisterMessageHandler(MMOMessageTypes.UpdatePartyMember, HandleUpdatePartyMember);
@@ -181,9 +183,9 @@ namespace MultiplayerARPG.MMO
             {
                 ClusterClient.Update();
 
-                if (tempTime - lastSaveTime > autoSaveDuration)
+                if (tempTime - _lastSaveTime > autoSaveDuration)
                 {
-                    lastSaveTime = tempTime;
+                    _lastSaveTime = tempTime;
                     SaveAllCharacters().Forget();
                     if (!IsInstanceMap())
                     {
@@ -645,9 +647,11 @@ namespace MultiplayerARPG.MMO
                 KickClient(connectionId, UITextKeys.UI_ERROR_KICKED_FROM_SERVER);
                 return;
             }
+
             // Prepare saving location for this character
             string savingCurrentMapName = playerCharacterData.CurrentMapName;
             Vector3 savingCurrentPosition = playerCharacterData.CurrentPosition;
+            Vector3 savingCurrentRotation = playerCharacterData.CurrentRotation;
 
             if (IsInstanceMap())
             {
@@ -664,8 +668,10 @@ namespace MultiplayerARPG.MMO
                 entityPrefab.Identity.HashAssetId,
                 playerCharacterData.CurrentPosition,
                 characterRotation);
+
+            // Set current character data
             BasePlayerCharacterEntity playerCharacterEntity = spawnObj.GetComponent<BasePlayerCharacterEntity>();
-            SetLocationBeforeEnterInstance(playerCharacterData.Id, savingCurrentMapName, savingCurrentPosition);
+            SetLocationBeforeEnterInstance(playerCharacterData.Id, savingCurrentMapName, savingCurrentPosition, savingCurrentRotation);
             playerCharacterData.CloneTo(playerCharacterEntity);
 
             // Set currencies
@@ -812,12 +818,18 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-        public void SetLocationBeforeEnterInstance(string id, string currentMapName, Vector3 currentPosition)
+        public void SetLocationBeforeEnterInstance(string id, string currentMapName, Vector3 currentPosition, Vector3 currentRotation)
         {
             if (!IsInstanceMap())
                 return;
             _locationsBeforeEnterInstance.TryRemove(id, out _);
-            _locationsBeforeEnterInstance.TryAdd(id, new KeyValuePair<string, Vector3>(currentMapName, currentPosition));
+            _locationsBeforeEnterInstance.TryAdd(id, new InstanceMapWarpingLocation()
+            {
+                mapName = currentMapName,
+                position = currentPosition,
+                overrideRotation = true,
+                rotation = currentRotation,
+            });
         }
 #endif
 
@@ -957,28 +969,30 @@ namespace MultiplayerARPG.MMO
             switch (peerInfo.peerType)
             {
                 case CentralServerPeerType.MapServer:
-                    if (!string.IsNullOrEmpty(peerInfo.extra))
+                    if (!string.IsNullOrEmpty(peerInfo.channelId) && !string.IsNullOrEmpty(peerInfo.refId))
                     {
+                        string key = peerInfo.GetPeerInfoKey();
                         if (LogInfo)
-                            Logging.Log(LogTag, "Register map server: " + peerInfo.extra);
-                        _mapServerConnectionIdsBySceneName[peerInfo.extra] = peerInfo;
+                            Logging.Log(LogTag, "Register map server: " + key);
+                        _mapServerConnectionIdsBySceneName[key] = peerInfo;
                     }
                     break;
                 case CentralServerPeerType.InstanceMapServer:
-                    if (!string.IsNullOrEmpty(peerInfo.extra))
+                    if (!string.IsNullOrEmpty(peerInfo.channelId) && !string.IsNullOrEmpty(peerInfo.refId))
                     {
+                        string key = peerInfo.GetPeerInfoKey();
                         if (LogInfo)
-                            Logging.Log(LogTag, "Register instance map server: " + peerInfo.extra);
-                        _instanceMapServerConnectionIdsByInstanceId[peerInfo.extra] = peerInfo;
+                            Logging.Log(LogTag, "Register instance map server: " + key);
+                        _instanceMapServerConnectionIdsByInstanceId[key] = peerInfo;
                         // Warp characters
-                        if (_instanceMapWarpingCharactersByInstanceId.TryGetValue(peerInfo.extra, out HashSet<uint> warpingCharacters))
+                        if (_instanceMapWarpingCharactersByInstanceId.TryGetValue(key, out HashSet<uint> warpingCharacters))
                         {
                             BasePlayerCharacterEntity warpingCharacterEntity;
                             foreach (uint warpingCharacter in warpingCharacters)
                             {
                                 if (!Assets.TryGetSpawnedObject(warpingCharacter, out warpingCharacterEntity))
                                     continue;
-                                WarpCharacterToInstanceRoutine(warpingCharacterEntity, peerInfo.extra).Forget();
+                                WarpCharacterToInstanceRoutine(warpingCharacterEntity, key).Forget();
                             }
                         }
                     }
@@ -993,6 +1007,19 @@ namespace MultiplayerARPG.MMO
             await SaveAndDestroyDespawningPlayerCharacter(characterId);
         }
 #endif
+        #endregion
+
+        #region Request from central server handlers
+        internal async UniTaskVoid HandleRequestForceDespawnCharacter(
+            RequestHandlerData requestHandler,
+            RequestForceDespawnCharacterMessage request,
+            RequestProceedResultDelegate<EmptyMessage> result)
+        {
+            if (!string.IsNullOrEmpty(request.characterId))
+                await SaveAndDestroyDespawningPlayerCharacter(request.characterId);
+            // Always success, because it is just despawning player character, if it not found then it still can be determined that it was despawned
+            result.InvokeSuccess(EmptyMessage.Value);
+        }
         #endregion
 
         #region Social message handlers
