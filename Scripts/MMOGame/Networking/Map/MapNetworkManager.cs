@@ -163,6 +163,7 @@ namespace MultiplayerARPG.MMO
             ClusterClient.onPlayerCharacterRemoved = OnPlayerCharacterRemoved;
             ClusterClient.onKickUser = KickUser;
             ClusterClient.RegisterResponseHandler<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.RequestSpawnMap);
+            ClusterClient.RegisterRequestHandler<RequestForceDespawnCharacterMessage, EmptyMessage>(MMORequestTypes.RequestForceDespawnCharacter, HandleRequestForceDespawnCharacter);
             ClusterClient.RegisterMessageHandler(MMOMessageTypes.Chat, HandleChat);
             ClusterClient.RegisterMessageHandler(MMOMessageTypes.UpdateMapUser, HandleUpdateMapUser);
             ClusterClient.RegisterMessageHandler(MMOMessageTypes.UpdatePartyMember, HandleUpdatePartyMember);
@@ -1006,6 +1007,19 @@ namespace MultiplayerARPG.MMO
             await SaveAndDestroyDespawningPlayerCharacter(characterId);
         }
 #endif
+        #endregion
+
+        #region Request from central server handlers
+        internal async UniTaskVoid HandleRequestForceDespawnCharacter(
+            RequestHandlerData requestHandler,
+            RequestForceDespawnCharacterMessage request,
+            RequestProceedResultDelegate<EmptyMessage> result)
+        {
+            if (!string.IsNullOrEmpty(request.characterId))
+                await SaveAndDestroyDespawningPlayerCharacter(request.characterId);
+            // Always success, because it is just despawning player character, if it not found then it still can be determined that it was despawned
+            result.InvokeSuccess(EmptyMessage.Value);
+        }
         #endregion
 
         #region Social message handlers
