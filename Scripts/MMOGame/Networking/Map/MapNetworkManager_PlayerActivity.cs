@@ -33,7 +33,7 @@ namespace MultiplayerARPG.MMO
 
         protected override bool IsInstanceMap()
         {
-            return !string.IsNullOrEmpty(MapInstanceId);
+            return !IsAllocate && !string.IsNullOrEmpty(MapInstanceId);
         }
 
         public override void WarpCharacter(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position, bool overrideRotation, Vector3 rotation)

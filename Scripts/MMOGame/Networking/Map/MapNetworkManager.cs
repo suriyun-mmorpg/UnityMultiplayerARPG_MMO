@@ -66,7 +66,7 @@ namespace MultiplayerARPG.MMO
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         public ClusterClient ClusterClient { get; private set; }
 #endif
-
+        public bool IsAllocate { get; set; } = false;
         public string ClusterServerAddress { get { return clusterServerAddress; } }
         public int ClusterServerPort { get { return clusterServerPort; } }
         public string AppAddress { get { return machineAddress; } }
@@ -87,6 +87,8 @@ namespace MultiplayerARPG.MMO
             {
                 if (IsInstanceMap())
                     return CentralServerPeerType.InstanceMapServer;
+                if (IsAllocate)
+                    return CentralServerPeerType.AllocateMapServer;
                 return CentralServerPeerType.MapServer;
             }
         }
@@ -522,6 +524,11 @@ namespace MultiplayerARPG.MMO
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         public override async UniTask<bool> DeserializeEnterGameData(long connectionId, NetDataReader reader)
         {
+            if (IsAllocate)
+            {
+                return false;
+            }
+
             string userId = reader.GetString();
             string accessToken = reader.GetString();
             string selectCharacterId = reader.GetString();
@@ -559,11 +566,18 @@ namespace MultiplayerARPG.MMO
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         public override async UniTask<bool> DeserializeClientReadyData(LiteNetLibIdentity playerIdentity, long connectionId, NetDataReader reader)
         {
+            if (IsAllocate)
+            {
+                return false;
+            }
+
             string userId = reader.GetString();
             string accessToken = reader.GetString();
             string selectCharacterId = reader.GetString();
             if (!await ValidatePlayerConnection(connectionId, userId, accessToken, selectCharacterId))
+            {
                 return false;
+            }
 
             RegisterUserIdAndAccessToken(connectionId, userId, accessToken);
             SetPlayerReadyRoutine(connectionId, userId, accessToken, selectCharacterId).Forget();
