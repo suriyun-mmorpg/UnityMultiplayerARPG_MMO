@@ -94,7 +94,7 @@ namespace MultiplayerARPG.MMO
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         private async UniTask<bool> SaveCharacter(BasePlayerCharacterEntity playerCharacterEntity,
             bool changeMap = false, string mapName = "",
-            Vector3 position = new Vector3(), bool overrideRotation = false, Vector3 rotation = new Vector3())
+            Vector3 position = default, bool overrideRotation = false, Vector3 rotation = default)
         {
             if (savingCharacters.Contains(playerCharacterEntity.Id))
                 return false;

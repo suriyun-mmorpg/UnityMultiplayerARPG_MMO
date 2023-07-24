@@ -9,7 +9,7 @@ namespace MultiplayerARPG.MMO
             return GenericUtils.GetUniqueId();
         }
 
-        public string GenerateMapSpawnRequestId()
+        public string GenerateMapSpawnInstanceId()
         {
             return GenericUtils.GetUniqueId();
         }

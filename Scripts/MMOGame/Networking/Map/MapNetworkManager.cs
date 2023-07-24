@@ -96,8 +96,6 @@ namespace MultiplayerARPG.MMO
         private readonly ConcurrentDictionary<string, InstanceMapWarpingLocation> _locationsBeforeEnterInstance = new ConcurrentDictionary<string, InstanceMapWarpingLocation>();
         private readonly ConcurrentDictionary<string, CentralServerPeerInfo> _mapServerConnectionIdsBySceneName = new ConcurrentDictionary<string, CentralServerPeerInfo>();
         private readonly ConcurrentDictionary<string, CentralServerPeerInfo> _instanceMapServerConnectionIdsByInstanceId = new ConcurrentDictionary<string, CentralServerPeerInfo>();
-        private readonly ConcurrentDictionary<string, HashSet<uint>> _instanceMapWarpingCharactersByInstanceId = new ConcurrentDictionary<string, HashSet<uint>>();
-        private readonly ConcurrentDictionary<string, InstanceMapWarpingLocation> _instanceMapWarpingLocations = new ConcurrentDictionary<string, InstanceMapWarpingLocation>();
         private readonly ConcurrentDictionary<string, SocialCharacterData> _usersById = new ConcurrentDictionary<string, SocialCharacterData>();
         private readonly ConcurrentDictionary<string, CancellationTokenSource> _despawningPlayerCharacterCancellations = new ConcurrentDictionary<string, CancellationTokenSource>();
         private readonly ConcurrentDictionary<string, BasePlayerCharacterEntity> _despawningPlayerCharacterEntities = new ConcurrentDictionary<string, BasePlayerCharacterEntity>();
@@ -213,8 +211,6 @@ namespace MultiplayerARPG.MMO
             _locationsBeforeEnterInstance.Clear();
             _mapServerConnectionIdsBySceneName.Clear();
             _instanceMapServerConnectionIdsByInstanceId.Clear();
-            _instanceMapWarpingCharactersByInstanceId.Clear();
-            _instanceMapWarpingLocations.Clear();
             _usersById.Clear();
             _loadingStorageIds.Clear();
             _loadingPartyIds.Clear();
@@ -984,17 +980,6 @@ namespace MultiplayerARPG.MMO
                         if (LogInfo)
                             Logging.Log(LogTag, "Register instance map server: " + key);
                         _instanceMapServerConnectionIdsByInstanceId[key] = peerInfo;
-                        // Warp characters
-                        if (_instanceMapWarpingCharactersByInstanceId.TryGetValue(key, out HashSet<uint> warpingCharacters))
-                        {
-                            BasePlayerCharacterEntity warpingCharacterEntity;
-                            foreach (uint warpingCharacter in warpingCharacters)
-                            {
-                                if (!Assets.TryGetSpawnedObject(warpingCharacter, out warpingCharacterEntity))
-                                    continue;
-                                WarpCharacterToInstanceRoutine(warpingCharacterEntity, key).Forget();
-                            }
-                        }
                     }
                     break;
             }
