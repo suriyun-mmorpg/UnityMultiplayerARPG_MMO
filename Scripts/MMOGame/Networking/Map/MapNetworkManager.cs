@@ -54,8 +54,6 @@ namespace MultiplayerARPG.MMO
         [Header("Player Disconnection")]
         public int playerCharacterDespawnMillisecondsDelay = 5000;
 
-        private float terminatingTime;
-
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         public IDatabaseClient DbServiceClient
         {
@@ -95,6 +93,7 @@ namespace MultiplayerARPG.MMO
             }
         }
         private float _lastSaveTime;
+        private float _terminatingTime;
         // Listing
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         private readonly ConcurrentDictionary<string, InstanceMapWarpingLocation> _locationsBeforeEnterInstance = new ConcurrentDictionary<string, InstanceMapWarpingLocation>();
@@ -207,8 +206,8 @@ namespace MultiplayerARPG.MMO
                 {
                     // Quitting application when no players
                     if (Players.Count > 0)
-                        terminatingTime = tempTime;
-                    else if (tempTime - terminatingTime >= TERMINATE_INSTANCE_DELAY)
+                        _terminatingTime = tempTime;
+                    else if (tempTime - _terminatingTime >= TERMINATE_INSTANCE_DELAY)
                         Application.Quit();
                 }
             }
@@ -1063,6 +1062,7 @@ namespace MultiplayerARPG.MMO
             MapInstanceWarpToPosition = request.instanceWarpPosition;
             MapInstanceWarpOverrideRotation = request.instanceWarpOverrideRotation;
             MapInstanceWarpToRotation = request.instanceWarpRotation;
+            _terminatingTime = Time.unscaledTime;
 
             CentralServerPeerInfo peerInfo = new CentralServerPeerInfo()
             {
