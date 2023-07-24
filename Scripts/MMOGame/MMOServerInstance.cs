@@ -70,6 +70,8 @@ namespace MultiplayerARPG.MMO
             }
         }
 
+        public string LogFileName { get; set; }
+
         [Header("Running In Editor")]
         public bool startCentralOnAwake;
         public bool startMapSpawnOnAwake;
@@ -81,6 +83,7 @@ namespace MultiplayerARPG.MMO
 
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         private List<string> _spawningMaps;
+        private List<SpawnAllocateMapByNameData> _spawningAllocateMaps;
         private string _startingMapId;
         private bool _startingCentralServer;
         private bool _startingMapSpawnServer;
@@ -357,6 +360,26 @@ namespace MultiplayerARPG.MMO
                 }
                 jsonConfig[ProcessArguments.CONFIG_SPAWN_MAPS] = spawnMaps;
 
+                // Spawn allocate maps
+                List<SpawnAllocateMapByNameData> defaultSpawnAllocateMaps = new List<SpawnAllocateMapByNameData>();
+                foreach (SpawnAllocateMapData spawnAllocateMap in mapSpawnNetworkManager.spawningAllocateMaps)
+                {
+                    if (spawnAllocateMap.mapInfo != null)
+                    {
+                        defaultSpawnAllocateMaps.Add(new SpawnAllocateMapByNameData()
+                        {
+                            mapName = spawnAllocateMap.mapInfo.Id,
+                            allocateAmount = spawnAllocateMap.allocateAmount,
+                        });
+                    }
+                }
+                List<SpawnAllocateMapByNameData> spawnAllocateMaps;
+                if (ConfigReader.ReadConfigs(jsonConfig, ProcessArguments.CONFIG_SPAWN_ALLOCATE_MAPS, out spawnAllocateMaps, defaultSpawnAllocateMaps))
+                {
+                    _spawningAllocateMaps = spawnAllocateMaps;
+                }
+                jsonConfig[ProcessArguments.CONFIG_SPAWN_ALLOCATE_MAPS] = spawnAllocateMaps;
+
                 // Map network port
                 int mapNetworkPort;
                 if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_MAP_PORT, out mapNetworkPort, mapNetworkManager.networkPort) ||
@@ -416,6 +439,14 @@ namespace MultiplayerARPG.MMO
                     mapNetworkManager.MapInstanceWarpToRotation = new Vector3(instanceRotX, instanceRotY, instanceRotZ);
                 }
 
+                // Allocate map server
+                bool isAllocate = false;
+                if (ConfigReader.IsArgsProvided(args, ProcessArguments.ARG_ALLOCATE))
+                {
+                    mapNetworkManager.IsAllocate = true;
+                    isAllocate = true;
+                }
+
                 if (!useCustomDatabaseClient)
                 {
                     // Database network address
@@ -437,41 +468,41 @@ namespace MultiplayerARPG.MMO
                     jsonConfig[ProcessArguments.CONFIG_DATABASE_PORT] = databaseNetworkPort;
                 }
 
-                string logFileName = "Log";
+                LogFileName = "Log";
                 bool startLog = false;
 
                 if (ConfigReader.IsArgsProvided(args, ProcessArguments.ARG_START_DATABASE_SERVER))
                 {
-                    if (!string.IsNullOrEmpty(logFileName))
-                        logFileName += "_";
-                    logFileName += "Database";
+                    if (!string.IsNullOrEmpty(LogFileName))
+                        LogFileName += "_";
+                    LogFileName += "Database";
                     startLog = true;
                     _startingDatabaseServer = true;
                 }
 
                 if (ConfigReader.IsArgsProvided(args, ProcessArguments.ARG_START_CENTRAL_SERVER))
                 {
-                    if (!string.IsNullOrEmpty(logFileName))
-                        logFileName += "_";
-                    logFileName += "Central";
+                    if (!string.IsNullOrEmpty(LogFileName))
+                        LogFileName += "_";
+                    LogFileName += "Central";
                     startLog = true;
                     _startingCentralServer = true;
                 }
 
                 if (ConfigReader.IsArgsProvided(args, ProcessArguments.ARG_START_MAP_SPAWN_SERVER))
                 {
-                    if (!string.IsNullOrEmpty(logFileName))
-                        logFileName += "_";
-                    logFileName += "MapSpawn";
+                    if (!string.IsNullOrEmpty(LogFileName))
+                        LogFileName += "_";
+                    LogFileName += "MapSpawn";
                     startLog = true;
                     _startingMapSpawnServer = true;
                 }
 
                 if (ConfigReader.IsArgsProvided(args, ProcessArguments.ARG_START_MAP_SERVER))
                 {
-                    if (!string.IsNullOrEmpty(logFileName))
-                        logFileName += "_";
-                    logFileName += "Map(" + mapName + ") Instance(" + instanceId + ")";
+                    if (!string.IsNullOrEmpty(LogFileName))
+                        LogFileName += "_";
+                    LogFileName += $"Map({mapName})-Channel({channelId})-Allocate({isAllocate})-Instance({instanceId})";
                     startLog = true;
                     _startingMapServer = true;
                 }
@@ -489,10 +520,7 @@ namespace MultiplayerARPG.MMO
                 }
 
                 if (startLog)
-                {
-                    CacheLogGUI.SetupLogger(logFileName);
-                    CacheLogGUI.enabled = true;
-                }
+                    EnableLogger(LogFileName);
             }
             else
             {
@@ -521,6 +549,14 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
+        public void EnableLogger(string fileName)
+        {
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+            CacheLogGUI.SetupLogger(fileName);
+            CacheLogGUI.enabled = true;
+#endif
+        }
+
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         private void OnGameDataLoaded()
         {
@@ -546,11 +582,25 @@ namespace MultiplayerARPG.MMO
                 if (_spawningMaps != null && _spawningMaps.Count > 0)
                 {
                     mapSpawnNetworkManager.spawningMaps = new List<BaseMapInfo>();
-                    BaseMapInfo tempMapInfo;
                     foreach (string spawningMapId in _spawningMaps)
                     {
-                        if (GameInstance.MapInfos.TryGetValue(spawningMapId, out tempMapInfo))
-                            mapSpawnNetworkManager.spawningMaps.Add(tempMapInfo);
+                        if (!GameInstance.MapInfos.TryGetValue(spawningMapId, out BaseMapInfo tempMapInfo))
+                            continue;
+                        mapSpawnNetworkManager.spawningMaps.Add(tempMapInfo);
+                    }
+                }
+                if (_spawningAllocateMaps != null && _spawningAllocateMaps.Count > 0)
+                {
+                    mapSpawnNetworkManager.spawningAllocateMaps = new List<SpawnAllocateMapData>();
+                    foreach (SpawnAllocateMapByNameData spawningMap in _spawningAllocateMaps)
+                    {
+                        if (!GameInstance.MapInfos.TryGetValue(spawningMap.mapName, out BaseMapInfo tempMapInfo))
+                            continue;
+                        mapSpawnNetworkManager.spawningAllocateMaps.Add(new SpawnAllocateMapData()
+                        {
+                            mapInfo = tempMapInfo,
+                            allocateAmount = spawningMap.allocateAmount,
+                        });
                     }
                 }
                 StartMapSpawnServer();

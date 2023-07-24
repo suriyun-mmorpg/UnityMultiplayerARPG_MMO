@@ -344,6 +344,11 @@ MonoBehaviour:
   - {fileID: 11400000, guid: de8b0e4099f8d444692e88f92309e90d, type: 2}
   - {fileID: 11400000, guid: fbe2a93dfafee544cbeaf175d3491e33, type: 2}
   - {fileID: 11400000, guid: 7d05446271b4d8f459650ee3e2489a34, type: 2}
+  spawningAllocateMaps:
+  - mapInfo: {fileID: 11400000, guid: de8b0e4099f8d444692e88f92309e90d, type: 2}
+    allocatingAmount: 5
+  - mapInfo: {fileID: 11400000, guid: fbe2a93dfafee544cbeaf175d3491e33, type: 2}
+    allocatingAmount: 5
   isOverrideExePath: 1
   overrideExePath: C:\Users\Ittipon\Desktop\UnityBuilds\MMORPG_KIT\UnityMultiplayerARPG.exe
   editorNotSpawnInBatchMode: 1

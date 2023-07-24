@@ -54,8 +54,6 @@ namespace MultiplayerARPG.MMO
         [Header("Player Disconnection")]
         public int playerCharacterDespawnMillisecondsDelay = 5000;
 
-        private float terminatingTime;
-
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         public IDatabaseClient DbServiceClient
         {
@@ -66,7 +64,7 @@ namespace MultiplayerARPG.MMO
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         public ClusterClient ClusterClient { get; private set; }
 #endif
-
+        public bool IsAllocate { get; set; } = false;
         public string ClusterServerAddress { get { return clusterServerAddress; } }
         public int ClusterServerPort { get { return clusterServerPort; } }
         public string AppAddress { get { return machineAddress; } }
@@ -76,6 +74,8 @@ namespace MultiplayerARPG.MMO
         {
             get
             {
+                if (IsAllocate)
+                    return CurrentMapInfo.Id;
                 if (IsInstanceMap())
                     return MapInstanceId;
                 return CurrentMapInfo.Id;
@@ -85,19 +85,20 @@ namespace MultiplayerARPG.MMO
         {
             get
             {
+                if (IsAllocate)
+                    return CentralServerPeerType.AllocateMapServer;
                 if (IsInstanceMap())
                     return CentralServerPeerType.InstanceMapServer;
                 return CentralServerPeerType.MapServer;
             }
         }
         private float _lastSaveTime;
+        private float _terminatingTime;
         // Listing
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         private readonly ConcurrentDictionary<string, InstanceMapWarpingLocation> _locationsBeforeEnterInstance = new ConcurrentDictionary<string, InstanceMapWarpingLocation>();
         private readonly ConcurrentDictionary<string, CentralServerPeerInfo> _mapServerConnectionIdsBySceneName = new ConcurrentDictionary<string, CentralServerPeerInfo>();
         private readonly ConcurrentDictionary<string, CentralServerPeerInfo> _instanceMapServerConnectionIdsByInstanceId = new ConcurrentDictionary<string, CentralServerPeerInfo>();
-        private readonly ConcurrentDictionary<string, HashSet<uint>> _instanceMapWarpingCharactersByInstanceId = new ConcurrentDictionary<string, HashSet<uint>>();
-        private readonly ConcurrentDictionary<string, InstanceMapWarpingLocation> _instanceMapWarpingLocations = new ConcurrentDictionary<string, InstanceMapWarpingLocation>();
         private readonly ConcurrentDictionary<string, SocialCharacterData> _usersById = new ConcurrentDictionary<string, SocialCharacterData>();
         private readonly ConcurrentDictionary<string, CancellationTokenSource> _despawningPlayerCharacterCancellations = new ConcurrentDictionary<string, CancellationTokenSource>();
         private readonly ConcurrentDictionary<string, BasePlayerCharacterEntity> _despawningPlayerCharacterEntities = new ConcurrentDictionary<string, BasePlayerCharacterEntity>();
@@ -164,6 +165,7 @@ namespace MultiplayerARPG.MMO
             ClusterClient.onKickUser = KickUser;
             ClusterClient.RegisterResponseHandler<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.RequestSpawnMap);
             ClusterClient.RegisterRequestHandler<RequestForceDespawnCharacterMessage, EmptyMessage>(MMORequestTypes.RequestForceDespawnCharacter, HandleRequestForceDespawnCharacter);
+            ClusterClient.RegisterRequestHandler<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.RequestRunMap, HandleRequesRunMap);
             ClusterClient.RegisterMessageHandler(MMOMessageTypes.Chat, HandleChat);
             ClusterClient.RegisterMessageHandler(MMOMessageTypes.UpdateMapUser, HandleUpdateMapUser);
             ClusterClient.RegisterMessageHandler(MMOMessageTypes.UpdatePartyMember, HandleUpdatePartyMember);
@@ -183,6 +185,12 @@ namespace MultiplayerARPG.MMO
             {
                 ClusterClient.Update();
 
+                if (IsAllocate)
+                {
+                    // Stll not running yet, so it won't allow anyone to enter this map-server, so it won't save any data too
+                    return;
+                }
+
                 if (tempTime - _lastSaveTime > autoSaveDuration)
                 {
                     _lastSaveTime = tempTime;
@@ -198,8 +206,8 @@ namespace MultiplayerARPG.MMO
                 {
                     // Quitting application when no players
                     if (Players.Count > 0)
-                        terminatingTime = tempTime;
-                    else if (tempTime - terminatingTime >= TERMINATE_INSTANCE_DELAY)
+                        _terminatingTime = tempTime;
+                    else if (tempTime - _terminatingTime >= TERMINATE_INSTANCE_DELAY)
                         Application.Quit();
                 }
             }
@@ -213,8 +221,6 @@ namespace MultiplayerARPG.MMO
             _locationsBeforeEnterInstance.Clear();
             _mapServerConnectionIdsBySceneName.Clear();
             _instanceMapServerConnectionIdsByInstanceId.Clear();
-            _instanceMapWarpingCharactersByInstanceId.Clear();
-            _instanceMapWarpingLocations.Clear();
             _usersById.Clear();
             _loadingStorageIds.Clear();
             _loadingPartyIds.Clear();
@@ -474,7 +480,7 @@ namespace MultiplayerARPG.MMO
         protected override async UniTask PreSpawnEntities()
         {
             // Spawn buildings
-            if (!IsInstanceMap())
+            if (!IsAllocate && !IsInstanceMap())
             {
                 // Load buildings
                 // Don't load buildings if it's instance map
@@ -526,6 +532,11 @@ namespace MultiplayerARPG.MMO
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         public override async UniTask<bool> DeserializeEnterGameData(long connectionId, NetDataReader reader)
         {
+            if (IsAllocate)
+            {
+                return false;
+            }
+
             string userId = reader.GetString();
             string accessToken = reader.GetString();
             string selectCharacterId = reader.GetString();
@@ -563,11 +574,18 @@ namespace MultiplayerARPG.MMO
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         public override async UniTask<bool> DeserializeClientReadyData(LiteNetLibIdentity playerIdentity, long connectionId, NetDataReader reader)
         {
+            if (IsAllocate)
+            {
+                return false;
+            }
+
             string userId = reader.GetString();
             string accessToken = reader.GetString();
             string selectCharacterId = reader.GetString();
             if (!await ValidatePlayerConnection(connectionId, userId, accessToken, selectCharacterId))
+            {
                 return false;
+            }
 
             RegisterUserIdAndAccessToken(connectionId, userId, accessToken);
             SetPlayerReadyRoutine(connectionId, userId, accessToken, selectCharacterId).Forget();
@@ -984,17 +1002,6 @@ namespace MultiplayerARPG.MMO
                         if (LogInfo)
                             Logging.Log(LogTag, "Register instance map server: " + key);
                         _instanceMapServerConnectionIdsByInstanceId[key] = peerInfo;
-                        // Warp characters
-                        if (_instanceMapWarpingCharactersByInstanceId.TryGetValue(key, out HashSet<uint> warpingCharacters))
-                        {
-                            BasePlayerCharacterEntity warpingCharacterEntity;
-                            foreach (uint warpingCharacter in warpingCharacters)
-                            {
-                                if (!Assets.TryGetSpawnedObject(warpingCharacter, out warpingCharacterEntity))
-                                    continue;
-                                WarpCharacterToInstanceRoutine(warpingCharacterEntity, key).Forget();
-                            }
-                        }
                     }
                     break;
             }
@@ -1015,10 +1022,62 @@ namespace MultiplayerARPG.MMO
             RequestForceDespawnCharacterMessage request,
             RequestProceedResultDelegate<EmptyMessage> result)
         {
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             if (!string.IsNullOrEmpty(request.characterId))
                 await SaveAndDestroyDespawningPlayerCharacter(request.characterId);
             // Always success, because it is just despawning player character, if it not found then it still can be determined that it was despawned
             result.InvokeSuccess(EmptyMessage.Value);
+#endif
+        }
+
+        internal async UniTaskVoid HandleRequesRunMap(
+            RequestHandlerData requestHandler,
+            RequestSpawnMapMessage request,
+            RequestProceedResultDelegate<ResponseSpawnMapMessage> result)
+        {
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+            await UniTask.Yield();
+
+            if (!IsAllocate)
+            {
+                result.InvokeError(new ResponseSpawnMapMessage()
+                {
+                    message = UITextKeys.UI_ERROR_APP_NOT_READY,
+                });
+                return;
+            }
+
+            if (CurrentMapInfo == null || !string.Equals(CurrentMapInfo.Id, request.mapName))
+            {
+                result.InvokeError(new ResponseSpawnMapMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INVALID_DATA,
+                });
+                return;
+            }
+
+            IsAllocate = false;
+            ChannelId = request.channelId;
+            MapInstanceId = request.instanceId;
+            MapInstanceWarpToPosition = request.instanceWarpPosition;
+            MapInstanceWarpOverrideRotation = request.instanceWarpOverrideRotation;
+            MapInstanceWarpToRotation = request.instanceWarpRotation;
+            _terminatingTime = Time.unscaledTime;
+
+            CentralServerPeerInfo peerInfo = new CentralServerPeerInfo()
+            {
+                peerType = PeerType,
+                networkAddress = AppAddress,
+                networkPort = AppPort,
+                channelId = ChannelId,
+                refId = RefId,
+            };
+            ClusterClient.RequestAppServerRegister(peerInfo);
+            result.InvokeSuccess(new ResponseSpawnMapMessage()
+            {
+                peerInfo = peerInfo,
+            });
+#endif
         }
         #endregion
 

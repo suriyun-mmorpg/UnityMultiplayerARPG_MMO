@@ -1,6 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
 using LiteNetLib;
-using LiteNetLib.Utils;
 using LiteNetLibManager;
 using System.Collections.Generic;
 using UnityEngine;
@@ -33,7 +32,7 @@ namespace MultiplayerARPG.MMO
 
         protected override bool IsInstanceMap()
         {
-            return !string.IsNullOrEmpty(MapInstanceId);
+            return !IsAllocate && !string.IsNullOrEmpty(MapInstanceId);
         }
 
         public override void WarpCharacter(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position, bool overrideRotation, Vector3 rotation)
@@ -67,52 +66,27 @@ namespace MultiplayerARPG.MMO
         /// <returns></returns>
         private async UniTaskVoid WarpCharacterRoutine(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position, bool overrideRotation, Vector3 rotation)
         {
-            // If warping to different map
-            long connectionId = playerCharacterEntity.ConnectionId;
-            CentralServerPeerInfo peerInfo;
-            BaseMapInfo mapInfo;
-            if (!string.IsNullOrEmpty(mapName) &&
-                ServerUserHandlers.TryGetPlayerCharacter(connectionId, out _) &&
-                _mapServerConnectionIdsBySceneName.TryGetValue(PeerInfoExtensions.GetPeerInfoKey(ChannelId, mapName), out peerInfo) &&
-                GameInstance.MapInfos.TryGetValue(mapName, out mapInfo) &&
-                mapInfo.IsSceneSet())
-            {
-                // Add this character to warping list
-                playerCharacterEntity.IsWarping = true;
-                // Unregister player character
-                UnregisterPlayerCharacter(connectionId);
-                // Clone character data to save
-                while (savingCharacters.Contains(playerCharacterEntity.Id))
-                {
-                    await UniTask.Yield();
-                }
-                await SaveCharacter(playerCharacterEntity, true, mapName, position, overrideRotation, rotation);
-                // Remove this character from warping list
-                playerCharacterEntity.IsWarping = false;
-                // Destroy character from server
-                playerCharacterEntity.NetworkDestroy();
-                // Unregister character to tell central server that the user is disconnecting from this server
-                UnregisterPlayerCharacter(connectionId);
-                // Send message to client to warp
-                MMOWarpMessage message = new MMOWarpMessage();
-                message.networkAddress = peerInfo.networkAddress;
-                message.networkPort = peerInfo.networkPort;
-                ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Warp, message);
-            }
+            if (string.IsNullOrEmpty(mapName))
+                return;
+
+            if (!_mapServerConnectionIdsBySceneName.TryGetValue(PeerInfoExtensions.GetPeerInfoKey(ChannelId, mapName), out CentralServerPeerInfo peerInfo))
+                return;
+
+            if (!GameInstance.MapInfos.TryGetValue(mapName, out BaseMapInfo mapInfo) || !mapInfo.IsSceneSet())
+                return;
+
+            await SaveAndWarpCharacterByPeerInfo(playerCharacterEntity, peerInfo, true, mapName, position, overrideRotation, rotation);
         }
 #endif
 
-        public override void WarpCharacterToInstance(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position, bool overrideRotation, Vector3 rotation)
+        public override async void WarpCharacterToInstance(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position, bool overrideRotation, Vector3 rotation)
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             if (!CanWarpCharacter(playerCharacterEntity))
                 return;
-            // Generate instance id
-            string instanceId = GenericUtils.GetUniqueId();
             // Prepare data for warp character later when instance map server registered to this map server
-            HashSet<uint> instanceMapWarpingCharacters = new HashSet<uint>();
-            PartyData party;
-            if (ServerPartyHandlers.TryGetParty(playerCharacterEntity.PartyId, out party))
+            List<BasePlayerCharacterEntity> instanceMapWarpingCharacters = new List<BasePlayerCharacterEntity>();
+            if (ServerPartyHandlers.TryGetParty(playerCharacterEntity.PartyId, out PartyData party))
             {
                 // If character is party leader, will bring party member to join instance
                 if (party.IsLeader(playerCharacterEntity.Id))
@@ -122,10 +96,10 @@ namespace MultiplayerARPG.MMO
                     {
                         if (!party.IsMember(aliveAlly.Id))
                             continue;
-                        instanceMapWarpingCharacters.Add(aliveAlly.ObjectId);
+                        instanceMapWarpingCharacters.Add(aliveAlly);
                         aliveAlly.IsWarping = true;
                     }
-                    instanceMapWarpingCharacters.Add(playerCharacterEntity.ObjectId);
+                    instanceMapWarpingCharacters.Add(playerCharacterEntity);
                     playerCharacterEntity.IsWarping = true;
                 }
                 else
@@ -137,91 +111,82 @@ namespace MultiplayerARPG.MMO
             else
             {
                 // If no party enter instance alone
-                instanceMapWarpingCharacters.Add(playerCharacterEntity.ObjectId);
+                instanceMapWarpingCharacters.Add(playerCharacterEntity);
                 playerCharacterEntity.IsWarping = true;
             }
-            string key = PeerInfoExtensions.GetPeerInfoKey(ChannelId, instanceId);
-            _instanceMapWarpingCharactersByInstanceId.TryAdd(key, instanceMapWarpingCharacters);
-            _instanceMapWarpingLocations.TryAdd(key, new InstanceMapWarpingLocation()
-            {
-                mapName = mapName,
-                position = position,
-                overrideRotation = overrideRotation,
-                rotation = rotation,
-            });
-            ClusterClient.SendRequest(MMORequestTypes.RequestSpawnMap, new RequestSpawnMapMessage()
+
+            // Generate instance id
+            AsyncResponseData<ResponseSpawnMapMessage> result = await ClusterClient.SendRequestAsync<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.RequestSpawnMap, new RequestSpawnMapMessage()
             {
                 channelId = ChannelId,
                 mapName = mapName,
-                instanceId = instanceId,
+                instanceId = "__GENERATING__",
                 instanceWarpPosition = position,
                 instanceWarpOverrideRotation = overrideRotation,
                 instanceWarpRotation = rotation,
-            }, responseDelegate: (responseHandler, responseCode, response) => OnRequestSpawnMap(responseHandler, responseCode, response, key), millisecondsTimeout: mapSpawnMillisecondsTimeout);
+            }, mapSpawnMillisecondsTimeout);
+
+            // Failed to start a new instance
+            if (!result.IsSuccess)
+            {
+                // Reset teleporting state
+                foreach (BasePlayerCharacterEntity instanceMapWarpingCharacter in instanceMapWarpingCharacters)
+                {
+                    if (instanceMapWarpingCharacter == null)
+                        continue;
+                    instanceMapWarpingCharacter.IsWarping = false;
+                    ServerGameMessageHandlers.SendGameMessage(instanceMapWarpingCharacter.ConnectionId, UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE);
+                }
+                return;
+            }
+
+            // Move characters to the instance
+            List<UniTask> saveAndWarpTasks = new List<UniTask>();
+            foreach (BasePlayerCharacterEntity instanceMapWarpingCharacter in instanceMapWarpingCharacters)
+            {
+                saveAndWarpTasks.Add(SaveAndWarpCharacterByPeerInfo(instanceMapWarpingCharacter, result.Response.peerInfo));
+            }
+            await UniTask.WhenAll(saveAndWarpTasks);
 #endif
         }
 
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-        private async UniTaskVoid WarpCharacterToInstanceRoutine(BasePlayerCharacterEntity playerCharacterEntity, string key)
+        private async UniTask SaveAndWarpCharacterByPeerInfo(BasePlayerCharacterEntity playerCharacterEntity, CentralServerPeerInfo peerInfo,
+            bool changeMap = false, string mapName = "",
+            Vector3 position = default, bool overrideRotation = false, Vector3 rotation = default)
         {
-            // If warping to different map
+            if (playerCharacterEntity == null)
+                return;
+
             long connectionId = playerCharacterEntity.ConnectionId;
-            CentralServerPeerInfo peerInfo;
-            InstanceMapWarpingLocation warpingLocation;
-            BaseMapInfo mapInfo;
-            if (ServerUserHandlers.TryGetPlayerCharacter(connectionId, out _) &&
-                _instanceMapWarpingLocations.TryGetValue(key, out warpingLocation) &&
-                _instanceMapServerConnectionIdsByInstanceId.TryGetValue(key, out peerInfo) &&
-                GameInstance.MapInfos.TryGetValue(warpingLocation.mapName, out mapInfo) &&
-                mapInfo.IsSceneSet())
-            {
-                // Add this character to warping list
-                playerCharacterEntity.IsWarping = true;
-                // Unregister player character
-                UnregisterPlayerCharacter(connectionId);
-                // Wait to save character before move to instance map
-                while (savingCharacters.Contains(playerCharacterEntity.Id))
-                {
-                    await UniTask.Yield();
-                }
-                await SaveCharacter(playerCharacterEntity);
-                // Remove this character from warping list
-                playerCharacterEntity.IsWarping = false;
-                // Destroy character from server
-                playerCharacterEntity.NetworkDestroy();
-                // Unregister character to tell central server that the user is disconnecting from this server
-                UnregisterPlayerCharacter(connectionId);
-                // Send message to client to warp
-                MMOWarpMessage message = new MMOWarpMessage();
-                message.networkAddress = peerInfo.networkAddress;
-                message.networkPort = peerInfo.networkPort;
-                ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Warp, message);
-            }
-        }
-#endif
+            // Player's character is already unregistered?
+            if (!ServerUserHandlers.TryGetPlayerCharacter(connectionId, out _))
+                return;
 
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-        private void OnRequestSpawnMap(ResponseHandlerData requestHandler, AckResponseCode responseCode, INetSerializable response, string key)
-        {
-            if (responseCode == AckResponseCode.Error ||
-                responseCode == AckResponseCode.Timeout)
+            // Tell player that the character is warping
+            playerCharacterEntity.IsWarping = true;
+
+            // Unregister player character
+            UnregisterPlayerCharacter(connectionId);
+
+            // Clone character data to save
+            while (savingCharacters.Contains(playerCharacterEntity.Id))
             {
-                // Remove warping characters who warping to instance map
-                if (_instanceMapWarpingCharactersByInstanceId.TryGetValue(key, out HashSet<uint> instanceMapWarpingCharacters))
-                {
-                    BasePlayerCharacterEntity playerCharacterEntity;
-                    foreach (uint warpingCharacter in instanceMapWarpingCharacters)
-                    {
-                        if (Assets.TryGetSpawnedObject(warpingCharacter, out playerCharacterEntity))
-                        {
-                            playerCharacterEntity.IsWarping = false;
-                            ServerGameMessageHandlers.SendGameMessage(playerCharacterEntity.ConnectionId, UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE);
-                        }
-                    }
-                    _instanceMapWarpingCharactersByInstanceId.TryRemove(key, out _);
-                }
-                _instanceMapWarpingLocations.TryRemove(key, out _);
+                await UniTask.Yield();
             }
+            await SaveCharacter(playerCharacterEntity, changeMap, mapName, position, overrideRotation, rotation);
+
+            // Remove this character from warping list
+            playerCharacterEntity.IsWarping = false;
+
+            // Destroy character from server
+            playerCharacterEntity.NetworkDestroy();
+
+            // Send message to client to warp
+            MMOWarpMessage message = new MMOWarpMessage();
+            message.networkAddress = peerInfo.networkAddress;
+            message.networkPort = peerInfo.networkPort;
+            ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Warp, message);
         }
 #endif
     }
