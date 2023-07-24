@@ -181,16 +181,16 @@ namespace MultiplayerARPG.MMO
             base.Update();
 
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-            if (IsAllocate)
-            {
-                // Stll not running yet, so it won't allow anyone to enter this map-server, so it won't save any data too
-                return;
-            }
-
             float tempTime = Time.unscaledTime;
             if (IsServer)
             {
                 ClusterClient.Update();
+
+                if (IsAllocate)
+                {
+                    // Stll not running yet, so it won't allow anyone to enter this map-server, so it won't save any data too
+                    return;
+                }
 
                 if (tempTime - _lastSaveTime > autoSaveDuration)
                 {
