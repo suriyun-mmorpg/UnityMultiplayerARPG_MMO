@@ -76,6 +76,8 @@ namespace MultiplayerARPG.MMO
         {
             get
             {
+                if (IsAllocate)
+                    return CurrentMapInfo.Id;
                 if (IsInstanceMap())
                     return MapInstanceId;
                 return CurrentMapInfo.Id;
@@ -85,10 +87,10 @@ namespace MultiplayerARPG.MMO
         {
             get
             {
-                if (IsInstanceMap())
-                    return CentralServerPeerType.InstanceMapServer;
                 if (IsAllocate)
                     return CentralServerPeerType.AllocateMapServer;
+                if (IsInstanceMap())
+                    return CentralServerPeerType.InstanceMapServer;
                 return CentralServerPeerType.MapServer;
             }
         }
@@ -179,6 +181,12 @@ namespace MultiplayerARPG.MMO
             base.Update();
 
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+            if (IsAllocate)
+            {
+                // Stll not running yet, so it won't allow anyone to enter this map-server, so it won't save any data too
+                return;
+            }
+
             float tempTime = Time.unscaledTime;
             if (IsServer)
             {
@@ -473,7 +481,7 @@ namespace MultiplayerARPG.MMO
         protected override async UniTask PreSpawnEntities()
         {
             // Spawn buildings
-            if (!IsInstanceMap())
+            if (!IsAllocate && !IsInstanceMap())
             {
                 // Load buildings
                 // Don't load buildings if it's instance map
