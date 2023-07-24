@@ -164,6 +164,7 @@ namespace MultiplayerARPG.MMO
             ClusterClient.onKickUser = KickUser;
             ClusterClient.RegisterResponseHandler<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.RequestSpawnMap);
             ClusterClient.RegisterRequestHandler<RequestForceDespawnCharacterMessage, EmptyMessage>(MMORequestTypes.RequestForceDespawnCharacter, HandleRequestForceDespawnCharacter);
+            ClusterClient.RegisterRequestHandler<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.RequestRunMap, HandleRequesRunMap);
             ClusterClient.RegisterMessageHandler(MMOMessageTypes.Chat, HandleChat);
             ClusterClient.RegisterMessageHandler(MMOMessageTypes.UpdateMapUser, HandleUpdateMapUser);
             ClusterClient.RegisterMessageHandler(MMOMessageTypes.UpdatePartyMember, HandleUpdatePartyMember);
@@ -1014,10 +1015,61 @@ namespace MultiplayerARPG.MMO
             RequestForceDespawnCharacterMessage request,
             RequestProceedResultDelegate<EmptyMessage> result)
         {
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             if (!string.IsNullOrEmpty(request.characterId))
                 await SaveAndDestroyDespawningPlayerCharacter(request.characterId);
             // Always success, because it is just despawning player character, if it not found then it still can be determined that it was despawned
             result.InvokeSuccess(EmptyMessage.Value);
+#endif
+        }
+
+        internal async UniTaskVoid HandleRequesRunMap(
+            RequestHandlerData requestHandler,
+            RequestSpawnMapMessage request,
+            RequestProceedResultDelegate<ResponseSpawnMapMessage> result)
+        {
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+            await UniTask.Yield();
+
+            if (!IsAllocate)
+            {
+                result.InvokeError(new ResponseSpawnMapMessage()
+                {
+                    message = UITextKeys.UI_ERROR_APP_NOT_READY,
+                });
+                return;
+            }
+
+            if (CurrentMapInfo == null || !string.Equals(CurrentMapInfo.Id, request.mapName))
+            {
+                result.InvokeError(new ResponseSpawnMapMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INVALID_DATA,
+                });
+                return;
+            }
+
+            IsAllocate = false;
+            ChannelId = request.channelId;
+            MapInstanceId = request.instanceId;
+            MapInstanceWarpToPosition = request.instanceWarpPosition;
+            MapInstanceWarpOverrideRotation = request.instanceWarpOverrideRotation;
+            MapInstanceWarpToRotation = request.instanceWarpRotation;
+
+            CentralServerPeerInfo peerInfo = new CentralServerPeerInfo()
+            {
+                peerType = PeerType,
+                networkAddress = AppAddress,
+                networkPort = AppPort,
+                channelId = ChannelId,
+                refId = RefId,
+            };
+            ClusterClient.RequestAppServerRegister(peerInfo);
+            result.InvokeSuccess(new ResponseSpawnMapMessage()
+            {
+                peerInfo = peerInfo,
+            });
+#endif
         }
         #endregion
 
