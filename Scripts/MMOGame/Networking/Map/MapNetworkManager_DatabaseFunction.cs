@@ -172,6 +172,7 @@ namespace MultiplayerARPG.MMO
             // Update building
             await DbServiceClient.UpdateBuildingAsync(new UpdateBuildingReq()
             {
+                ChannelId = ChannelId,
                 MapName = CurrentMapInfo.Id,
                 BuildingData = buildingSaveData,
             });
@@ -214,6 +215,7 @@ namespace MultiplayerARPG.MMO
             {
                 await DbServiceClient.CreateBuildingAsync(new CreateBuildingReq()
                 {
+                    ChannelId = ChannelId,
                     MapName = CurrentMapInfo.Id,
                     BuildingData = saveData,
                 });
@@ -232,6 +234,7 @@ namespace MultiplayerARPG.MMO
         {
             await DbServiceClient.DeleteBuildingAsync(new DeleteBuildingReq()
             {
+                ChannelId = ChannelId,
                 MapName = CurrentMapInfo.Id,
                 BuildingId = id
             });

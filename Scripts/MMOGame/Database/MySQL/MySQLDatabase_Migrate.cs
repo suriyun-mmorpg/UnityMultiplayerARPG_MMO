@@ -293,6 +293,8 @@ namespace MultiplayerARPG.MMO
                     + "`highestPkPoint` INT NOT NULL DEFAULT '0',"
                     + "`highestConsecutivePkKills` INT NOT NULL DEFAULT '0',"
                     + "PRIMARY KEY (`id`)) ENGINE = InnoDB DEFAULT CHARSET = utf8 COLLATE = utf8_unicode_ci;");
+                // Channel
+                ExecuteNonQuerySync("ALTER TABLE `buildings` ADD `channel` VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT 'default' AFTER `id`;");
             });
         }
 

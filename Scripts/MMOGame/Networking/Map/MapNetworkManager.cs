@@ -266,13 +266,13 @@ namespace MultiplayerARPG.MMO
                         CharacterData = playerCharacter.CloneTo(new PlayerCharacterData())
                     });
                 }
-                string mapName = CurrentMapInfo.Id;
                 foreach (BuildingEntity buildingEntity in ServerBuildingHandlers.GetBuildings())
                 {
                     if (buildingEntity == null) continue;
                     await DbServiceClient.UpdateBuildingAsync(new UpdateBuildingReq()
                     {
-                        MapName = mapName,
+                        ChannelId = ChannelId,
+                        MapName = CurrentMapInfo.Id,
                         BuildingData = buildingEntity.CloneTo(new BuildingSaveData())
                     });
                 }
@@ -489,6 +489,7 @@ namespace MultiplayerARPG.MMO
                 {
                     buildingsResp = await DbServiceClient.ReadBuildingsAsync(new ReadBuildingsReq()
                     {
+                        ChannelId = ChannelId,
                         MapName = CurrentMapInfo.Id,
                     });
                 } while (!buildingsResp.IsSuccess);

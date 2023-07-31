@@ -20,6 +20,7 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `buildings` (
   `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `channel` varchar(50) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'default',
   `parentId` varchar(50) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
   `entityId` int(11) NOT NULL DEFAULT 0,
   `currentHp` int(11) NOT NULL DEFAULT 0,
