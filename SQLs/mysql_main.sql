@@ -252,6 +252,22 @@ CREATE TABLE `charactersummon` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `character_pk`
+--
+
+CREATE TABLE `character_pk` (
+  `id` varchar(255) NOT NULL PRIMARY KEY,
+  `isPkOn` tinyint(1) NOT NULL DEFAULT 0,
+  `lastPkOnTime` int(11) NOT NULL DEFAULT 0,
+  `pkPoint` int(11) NOT NULL DEFAULT 0,
+  `consecutivePkKills` int(11) NOT NULL DEFAULT 0,
+  `highestPkPoint` int(11) NOT NULL DEFAULT 0,
+  `highestConsecutivePkKills` int(11) NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `character_private_boolean`
 --
 
