@@ -393,6 +393,8 @@ namespace MultiplayerARPG.MMO
             // Save player character data
             if (ServerUserHandlers.TryGetPlayerCharacter(connectionId, out BasePlayerCharacterEntity playerCharacterEntity))
             {
+                playerCharacterEntity.Dealing.StopDealing();
+                playerCharacterEntity.Vending.StopVending();
                 playerCharacterEntity.SetOwnerClient(-1);
                 playerCharacterEntity.StopMove();
                 MovementState movementState = playerCharacterEntity.MovementState;
