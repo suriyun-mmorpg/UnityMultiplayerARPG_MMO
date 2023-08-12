@@ -66,8 +66,20 @@ namespace MultiplayerARPG.MMO
                 return;
             }
 
+            BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
+            if (playerCharacterEntity.IsUpdatingItems)
+            {
+                result.InvokeError(new ResponseCashShopBuyMessage()
+                {
+                    message = UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE,
+                });
+                return;
+            }
+            playerCharacterEntity.IsUpdatingItems = true;
+
             if (request.amount <= 0)
             {
+                playerCharacterEntity.IsUpdatingItems = false;
                 result.InvokeError(new ResponseCashShopBuyMessage()
                 {
                     message = UITextKeys.UI_ERROR_INVALID_DATA,
@@ -77,6 +89,7 @@ namespace MultiplayerARPG.MMO
 
             if (!GameInstance.CashShopItems.TryGetValue(request.dataId, out CashShopItem cashShopItem))
             {
+                playerCharacterEntity.IsUpdatingItems = false;
                 result.InvokeError(new ResponseCashShopBuyMessage()
                 {
                     message = UITextKeys.UI_ERROR_ITEM_NOT_FOUND,
@@ -87,6 +100,7 @@ namespace MultiplayerARPG.MMO
             if ((request.currencyType == CashShopItemCurrencyType.CASH && cashShopItem.SellPriceCash <= 0) ||
                 (request.currencyType == CashShopItemCurrencyType.GOLD && cashShopItem.SellPriceGold <= 0))
             {
+                playerCharacterEntity.IsUpdatingItems = false;
                 result.InvokeError(new ResponseCashShopBuyMessage()
                 {
                     message = UITextKeys.UI_ERROR_INVALID_ITEM_DATA,
@@ -107,6 +121,7 @@ namespace MultiplayerARPG.MMO
                 priceCash = cashShopItem.SellPriceCash * request.amount;
                 if (userCash < priceCash)
                 {
+                    playerCharacterEntity.IsUpdatingItems = false;
                     result.InvokeError(new ResponseCashShopBuyMessage()
                     {
                         message = UITextKeys.UI_ERROR_NOT_ENOUGH_CASH,
@@ -122,6 +137,7 @@ namespace MultiplayerARPG.MMO
                 priceGold = cashShopItem.SellPriceGold * request.amount;
                 if (characterGold < priceGold)
                 {
+                    playerCharacterEntity.IsUpdatingItems = false;
                     result.InvokeError(new ResponseCashShopBuyMessage()
                     {
                         message = UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD,
@@ -155,6 +171,7 @@ namespace MultiplayerARPG.MMO
                 }
                 if (playerCharacter.IncreasingItemsWillOverwhelming(rewardItems))
                 {
+                    playerCharacterEntity.IsUpdatingItems = false;
                     result.InvokeError(new ResponseCashShopBuyMessage()
                     {
                         message = UITextKeys.UI_ERROR_WILL_OVERWHELMING,
@@ -188,6 +205,7 @@ namespace MultiplayerARPG.MMO
                 });
                 if (!changeCashResp.IsSuccess)
                 {
+                    playerCharacterEntity.IsUpdatingItems = false;
                     result.InvokeError(new ResponseCashShopBuyMessage()
                     {
                         message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
@@ -203,6 +221,7 @@ namespace MultiplayerARPG.MMO
             playerCharacter.FillEmptySlots();
 
             // Response to client
+            playerCharacterEntity.IsUpdatingItems = false;
             result.InvokeSuccess(new ResponseCashShopBuyMessage()
             {
                 dataId = request.dataId,
@@ -261,8 +280,20 @@ namespace MultiplayerARPG.MMO
                 return;
             }
 
+            BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
+            if (playerCharacterEntity.IsUpdatingItems)
+            {
+                result.InvokeError(new ResponseCashPackageBuyValidationMessage()
+                {
+                    message = UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE,
+                });
+                return;
+            }
+            playerCharacterEntity.IsUpdatingItems = true;
+
             if (!GameInstance.CashPackages.TryGetValue(request.dataId, out CashPackage cashPackage))
             {
+                playerCharacterEntity.IsUpdatingItems = false;
                 result.InvokeError(new ResponseCashPackageBuyValidationMessage()
                 {
                     message = UITextKeys.UI_ERROR_CASH_PACKAGE_NOT_FOUND,
@@ -276,6 +307,7 @@ namespace MultiplayerARPG.MMO
             IAPReceiptValidateResult validateResult = await receiptValidator.ValidateIAPReceipt(request.receipt);
             if (!validateResult.IsSuccess)
             {
+                playerCharacterEntity.IsUpdatingItems = false;
                 result.InvokeError(new ResponseCashPackageBuyValidationMessage()
                 {
                     message = UITextKeys.UI_ERROR_CANNOT_GET_CASH_PACKAGE_INFO,
@@ -294,6 +326,7 @@ namespace MultiplayerARPG.MMO
                 });
                 if (!changeCashResp.IsSuccess)
                 {
+                    playerCharacterEntity.IsUpdatingItems = false;
                     result.InvokeError(new ResponseCashPackageBuyValidationMessage()
                     {
                         message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
@@ -306,6 +339,8 @@ namespace MultiplayerARPG.MMO
             // Sync cash to game clients
             playerCharacter.UserCash = resultUserCash;
 
+            // Response to client
+            playerCharacterEntity.IsUpdatingItems = true;
             result.InvokeSuccess(new ResponseCashPackageBuyValidationMessage()
             {
                 dataId = request.dataId,
