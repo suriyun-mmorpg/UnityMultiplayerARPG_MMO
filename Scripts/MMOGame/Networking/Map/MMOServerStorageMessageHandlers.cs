@@ -131,13 +131,12 @@ namespace MultiplayerARPG.MMO
             Storage storage = GameInstance.ServerStorageHandlers.GetStorage(storageId, out _);
             bool isLimitSlot = storage.slotLimit > 0;
             int slotLimit = storage.slotLimit;
-            UITextKeys gameMessage;
             // Don't apply data to player character immediately, it should be saved properly before apply the data
             PlayerCharacterData applyingPlayerCharacter = new PlayerCharacterData();
             applyingPlayerCharacter = playerCharacter.CloneTo(applyingPlayerCharacter);
             try
             {
-                if (!applyingPlayerCharacter.MoveItemFromStorage(storageId, isLimitSlot, slotLimit, storageItems, request.storageItemIndex, request.storageItemAmount, request.inventoryType, request.inventoryItemIndex, request.equipSlotIndexOrWeaponSet, out gameMessage))
+                if (!applyingPlayerCharacter.MoveItemFromStorage(storageId, isLimitSlot, slotLimit, storageItems, request.storageItemIndex, request.storageItemAmount, request.inventoryType, request.inventoryItemIndex, request.equipSlotIndexOrWeaponSet, out UITextKeys gameMessage))
                 {
                     SetStorageBusy(storageId, playerCharacterEntity, false);
                     result.InvokeError(new ResponseMoveItemFromStorageMessage()
@@ -243,13 +242,12 @@ namespace MultiplayerARPG.MMO
             bool isLimitSlot = storage.slotLimit > 0;
             int weightLimit = storage.weightLimit;
             int slotLimit = storage.slotLimit;
-            UITextKeys gameMessage;
             // Don't apply data to player character immediately, it should be saved properly before apply the data
             PlayerCharacterData applyingPlayerCharacter = new PlayerCharacterData();
             applyingPlayerCharacter = playerCharacter.CloneTo(applyingPlayerCharacter);
             try
             {
-                if (!applyingPlayerCharacter.MoveItemToStorage(storageId, isLimitWeight, weightLimit, isLimitSlot, slotLimit, storageItems, request.storageItemIndex, request.inventoryType, request.inventoryItemIndex, request.inventoryItemAmount, request.equipSlotIndexOrWeaponSet, out gameMessage))
+                if (!applyingPlayerCharacter.MoveItemToStorage(storageId, isLimitWeight, weightLimit, isLimitSlot, slotLimit, storageItems, request.storageItemIndex, request.inventoryType, request.inventoryItemIndex, request.inventoryItemAmount, request.equipSlotIndexOrWeaponSet, out UITextKeys gameMessage))
                 {
                     SetStorageBusy(storageId, playerCharacterEntity, false);
                     result.InvokeError(new ResponseMoveItemToStorageMessage()
@@ -423,7 +421,7 @@ namespace MultiplayerARPG.MMO
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             if (playerCharacterEntity != null)
             {
-                playerCharacterEntity.IsUpdatingStorage = isBusy;
+                playerCharacterEntity.IsUpdatingItems = isBusy;
                 // Don't allow to save character while working with storage
                 if (isBusy)
                     MMOServerInstance.Singleton.MapNetworkManager.savingCharacters.Add(playerCharacterEntity.Id);
