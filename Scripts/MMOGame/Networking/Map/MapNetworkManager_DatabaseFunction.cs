@@ -9,6 +9,11 @@ namespace MultiplayerARPG.MMO
     public partial class MapNetworkManager
     {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+        /// <summary>
+        /// Load data repeatedly until it loaded
+        /// </summary>
+        /// <param name="storageId"></param>
+        /// <returns></returns>
         private async UniTask LoadStorageRoutine(StorageId storageId)
         {
             if (_loadingStorageIds.Contains(storageId))
@@ -36,6 +41,11 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+        /// <summary>
+        /// Load data repeatedly until it loaded
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         private async UniTask LoadPartyRoutine(int id)
         {
             if (id <= 0)
@@ -64,6 +74,11 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+        /// <summary>
+        /// Load data repeatedly until it loaded
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         private async UniTask LoadGuildRoutine(int id)
         {
             if (id <= 0)
