@@ -78,6 +78,7 @@ namespace MultiplayerARPG.MMO
 
         public async UniTaskVoid HandleRequestMoveItemFromStorage(RequestHandlerData requestHandler, RequestMoveItemFromStorageMessage request, RequestProceedResultDelegate<ResponseMoveItemFromStorageMessage> result)
         {
+            await UniTask.Yield();
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             // Validate user and storage accessibility
             StorageId storageId = new StorageId(request.storageType, request.storageOwnerId);
@@ -110,23 +111,8 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             SetStorageBusy(storageId, playerCharacterEntity, true);
-            // Refresh storage item from database
-            DatabaseApiResult<ReadStorageItemsResp> readResp = await DbServiceClient.ReadStorageItemsAsync(new ReadStorageItemsReq()
-            {
-                StorageType = request.storageType,
-                StorageOwnerId = request.storageOwnerId,
-                ReadForUpdate = true,
-            });
-            if (!readResp.IsSuccess)
-            {
-                SetStorageBusy(storageId, playerCharacterEntity, false);
-                result.InvokeError(new ResponseMoveItemFromStorageMessage()
-                {
-                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
-                });
-                return;
-            }
-            List<CharacterItem> storageItems = readResp.Response.StorageCharacterItems;
+            // TODO: Refresh storage item from database for guild
+            List<CharacterItem> storageItems = GameInstance.ServerStorageHandlers.GetStorageItems(storageId);
             // Prepare storage data
             Storage storage = GameInstance.ServerStorageHandlers.GetStorage(storageId, out _);
             bool isLimitSlot = storage.slotLimit > 0;
@@ -156,30 +142,13 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            // Update storage items to database
-            DatabaseApiResult updateResp = await DbServiceClient.UpdateStorageItemsAsync(new UpdateStorageItemsReq()
-            {
-                StorageType = request.storageType,
-                StorageOwnerId = request.storageOwnerId,
-                StorageItems = storageItems,
-                CharacterData = applyingPlayerCharacter,
-            });
-            if (!updateResp.IsSuccess)
-            {
-                SetStorageBusy(storageId, playerCharacterEntity, false);
-                Logging.LogError("Unable to update storage items when move item from storage");
-                result.InvokeError(new ResponseMoveItemFromStorageMessage()
-                {
-                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
-                });
-                return;
-            }
             // Apply updated data
             playerCharacter.NonEquipItems = applyingPlayerCharacter.NonEquipItems;
             playerCharacter.EquipItems = applyingPlayerCharacter.EquipItems;
             playerCharacter.SelectableWeaponSets = applyingPlayerCharacter.SelectableWeaponSets;
             GameInstance.ServerStorageHandlers.SetStorageItems(storageId, storageItems);
             GameInstance.ServerStorageHandlers.NotifyStorageItemsUpdated(request.storageType, request.storageOwnerId);
+            SetStorageSavePending(storageId, true);
             SetStorageBusy(storageId, playerCharacterEntity, false);
             result.InvokeSuccess(new ResponseMoveItemFromStorageMessage());
 #endif
@@ -187,6 +156,7 @@ namespace MultiplayerARPG.MMO
 
         public async UniTaskVoid HandleRequestMoveItemToStorage(RequestHandlerData requestHandler, RequestMoveItemToStorageMessage request, RequestProceedResultDelegate<ResponseMoveItemToStorageMessage> result)
         {
+            await UniTask.Yield();
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             // Validate user and storage accessibility
             StorageId storageId = new StorageId(request.storageType, request.storageOwnerId);
@@ -219,23 +189,8 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             SetStorageBusy(storageId, playerCharacterEntity, true);
-            // Refresh storage item from database
-            DatabaseApiResult<ReadStorageItemsResp> readResp = await DbServiceClient.ReadStorageItemsAsync(new ReadStorageItemsReq()
-            {
-                StorageType = request.storageType,
-                StorageOwnerId = request.storageOwnerId,
-                ReadForUpdate = true,
-            });
-            if (!readResp.IsSuccess)
-            {
-                SetStorageBusy(storageId, playerCharacterEntity, false);
-                result.InvokeError(new ResponseMoveItemToStorageMessage()
-                {
-                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
-                });
-                return;
-            }
-            List<CharacterItem> storageItems = readResp.Response.StorageCharacterItems;
+            // TODO: Refresh storage item from database for guild
+            List<CharacterItem> storageItems = GameInstance.ServerStorageHandlers.GetStorageItems(storageId);
             // Prepare storage data
             Storage storage = GameInstance.ServerStorageHandlers.GetStorage(storageId, out _);
             bool isLimitWeight = storage.weightLimit > 0;
@@ -267,30 +222,13 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            // Update storage items to database
-            DatabaseApiResult updateResp = await DbServiceClient.UpdateStorageItemsAsync(new UpdateStorageItemsReq()
-            {
-                StorageType = request.storageType,
-                StorageOwnerId = request.storageOwnerId,
-                StorageItems = storageItems,
-                CharacterData = applyingPlayerCharacter,
-            });
-            if (!updateResp.IsSuccess)
-            {
-                SetStorageBusy(storageId, playerCharacterEntity, false);
-                Logging.LogError("Unable to update storage items when move item to storage");
-                result.InvokeError(new ResponseMoveItemToStorageMessage()
-                {
-                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
-                });
-                return;
-            }
             // Apply updated data
             playerCharacter.NonEquipItems = applyingPlayerCharacter.NonEquipItems;
             playerCharacter.EquipItems = applyingPlayerCharacter.EquipItems;
             playerCharacter.SelectableWeaponSets = applyingPlayerCharacter.SelectableWeaponSets;
             GameInstance.ServerStorageHandlers.SetStorageItems(storageId, storageItems);
             GameInstance.ServerStorageHandlers.NotifyStorageItemsUpdated(request.storageType, request.storageOwnerId);
+            SetStorageSavePending(storageId, true);
             SetStorageBusy(storageId, playerCharacterEntity, false);
             result.InvokeSuccess(new ResponseMoveItemToStorageMessage());
 #endif
@@ -298,6 +236,7 @@ namespace MultiplayerARPG.MMO
 
         public async UniTaskVoid HandleRequestSwapOrMergeStorageItem(RequestHandlerData requestHandler, RequestSwapOrMergeStorageItemMessage request, RequestProceedResultDelegate<ResponseSwapOrMergeStorageItemMessage> result)
         {
+            await UniTask.Yield();
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             // Validate user and storage accessibility
             StorageId storageId = new StorageId(request.storageType, request.storageOwnerId);
@@ -331,23 +270,8 @@ namespace MultiplayerARPG.MMO
             }
             // Mark as busy to not allow storage to be changed
             SetStorageBusy(storageId, playerCharacterEntity, true);
-            // Refresh storage item from database
-            DatabaseApiResult<ReadStorageItemsResp> readResp = await DbServiceClient.ReadStorageItemsAsync(new ReadStorageItemsReq()
-            {
-                StorageType = request.storageType,
-                StorageOwnerId = request.storageOwnerId,
-                ReadForUpdate = true,
-            });
-            if (!readResp.IsSuccess)
-            {
-                SetStorageBusy(storageId, playerCharacterEntity, false);
-                result.InvokeError(new ResponseSwapOrMergeStorageItemMessage()
-                {
-                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
-                });
-                return;
-            }
-            List<CharacterItem> storageItems = readResp.Response.StorageCharacterItems;
+            // TODO: Refresh storage item from database for guild
+            List<CharacterItem> storageItems = GameInstance.ServerStorageHandlers.GetStorageItems(storageId);
             // Validate swap or merge indexes
             if (request.fromIndex >= storageItems.Count ||
                 request.toIndex >= storageItems.Count)
@@ -392,27 +316,18 @@ namespace MultiplayerARPG.MMO
                 storageItems[request.toIndex] = fromItem;
             }
             storageItems.FillEmptySlots(isLimitSlot, slotLimit);
-            // Update storage items to database
-            DatabaseApiResult updateResp = await DbServiceClient.UpdateStorageItemsAsync(new UpdateStorageItemsReq()
-            {
-                StorageType = request.storageType,
-                StorageOwnerId = request.storageOwnerId,
-                StorageItems = storageItems,
-            });
-            if (!updateResp.IsSuccess)
-            {
-                SetStorageBusy(storageId, playerCharacterEntity, false);
-                Logging.LogError("Unable to update storage items when swap or merge storage item");
-                result.InvokeError(new ResponseSwapOrMergeStorageItemMessage()
-                {
-                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
-                });
-                return;
-            }
             GameInstance.ServerStorageHandlers.SetStorageItems(storageId, storageItems);
             GameInstance.ServerStorageHandlers.NotifyStorageItemsUpdated(request.storageType, request.storageOwnerId);
+            SetStorageSavePending(storageId, true);
             SetStorageBusy(storageId, playerCharacterEntity, false);
             result.InvokeSuccess(new ResponseSwapOrMergeStorageItemMessage());
+#endif
+        }
+
+        private void SetStorageSavePending(StorageId storageId, bool isSavePending)
+        {
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+            GameInstance.ServerStorageHandlers.SetStorageSavePending(storageId, isSavePending);
 #endif
         }
 

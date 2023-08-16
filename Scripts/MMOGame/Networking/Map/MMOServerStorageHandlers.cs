@@ -25,6 +25,7 @@ namespace MultiplayerARPG.MMO
 
         public async UniTaskVoid OpenStorage(long connectionId, IPlayerCharacterData playerCharacter, StorageId storageId)
         {
+            await UniTask.Yield();
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             if (!CanAccessStorage(playerCharacter, storageId))
             {
@@ -37,18 +38,8 @@ namespace MultiplayerARPG.MMO
             usingStorageClients[storageId].Add(connectionId);
             usingStorageIds.TryRemove(connectionId, out _);
             usingStorageIds.TryAdd(connectionId, storageId);
-            // Load storage items from database
-            DatabaseApiResult<ReadStorageItemsResp> resp = await DbServiceClient.ReadStorageItemsAsync(new ReadStorageItemsReq()
-            {
-                StorageType = storageId.storageType,
-                StorageOwnerId = storageId.storageOwnerId,
-            });
-            if (!resp.IsSuccess)
-            {
-                return;
-            }
-            List<CharacterItem> storageItems = resp.Response.StorageCharacterItems;
-            SetStorageItems(storageId, storageItems);
+            // TODO: Load storage items for guild
+            List<CharacterItem> storageItems = GetStorageItems(storageId);
             // Notify storage items to client
             Storage storage = GetStorage(storageId, out uint storageObjectId);
             GameInstance.ServerGameMessageHandlers.NotifyStorageOpened(connectionId, storageId.storageType, storageId.storageOwnerId, storageObjectId, storage.weightLimit, storage.slotLimit);
@@ -82,6 +73,7 @@ namespace MultiplayerARPG.MMO
 
         public async UniTask<List<CharacterItem>> ConvertStorageItems(StorageId storageId, List<StorageConvertItemsEntry> convertItems)
         {
+            await UniTask.Yield();
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             SetStorageBusy(storageId, true);
             // Prepare storage data
@@ -92,19 +84,8 @@ namespace MultiplayerARPG.MMO
             bool isLimitSlot = storage.slotLimit > 0;
             int weightLimit = storage.weightLimit;
             int slotLimit = storage.slotLimit;
-            // Refresh storage item from database
-            DatabaseApiResult<ReadStorageItemsResp> readResp = await DbServiceClient.ReadStorageItemsAsync(new ReadStorageItemsReq()
-            {
-                StorageType = storageType,
-                StorageOwnerId = storageOwnerId,
-                ReadForUpdate = true,
-            });
-            if (!readResp.IsSuccess)
-            {
-                SetStorageBusy(storageId, false);
-                return null;
-            }
-            List<CharacterItem> storageItems = readResp.Response.StorageCharacterItems;
+            // TODO: Refresh storage item from database for guild
+            List<CharacterItem> storageItems = GetStorageItems(storageId);
             List<CharacterItem> droppingItems = new List<CharacterItem>();
             for (int i = 0; i < convertItems.Count; ++i)
             {
@@ -132,20 +113,9 @@ namespace MultiplayerARPG.MMO
             }
             // Update slots
             storageItems.FillEmptySlots(isLimitSlot, slotLimit);
-            // Update storage items to database
-            DatabaseApiResult updateResp = await DbServiceClient.UpdateStorageItemsAsync(new UpdateStorageItemsReq()
-            {
-                StorageType = storageType,
-                StorageOwnerId = storageOwnerId,
-                StorageItems = storageItems,
-            });
-            if (!updateResp.IsSuccess)
-            {
-                SetStorageBusy(storageId, false);
-                return null;
-            }
             SetStorageItems(storageId, storageItems);
             NotifyStorageItemsUpdated(storageId.storageType, storageId.storageOwnerId);
+            SetStorageSavePending(storageId, true);
             SetStorageBusy(storageId, false);
             return droppingItems;
 #else

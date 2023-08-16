@@ -769,6 +769,10 @@ namespace MultiplayerARPG.MMO
                 }
             }
 
+            // Load storage
+            StorageId storageId = new StorageId(StorageType.Player, userId);
+            await LoadStorageRoutine(storageId);
+
             // Force make caches, to calculate current stats to fill empty slots items
             playerCharacterEntity.ForceMakeCaches();
             playerCharacterEntity.FillEmptySlots();
