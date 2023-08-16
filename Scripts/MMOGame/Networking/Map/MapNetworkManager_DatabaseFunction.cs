@@ -98,6 +98,7 @@ namespace MultiplayerARPG.MMO
         {
             if (savingCharacters.Contains(playerCharacterEntity.Id))
                 return false;
+            // Prepare player character data
             PlayerCharacterData savingCharacterData = playerCharacterEntity.CloneTo(new PlayerCharacterData());
             if (changeMap)
             {
@@ -106,6 +107,12 @@ namespace MultiplayerARPG.MMO
                 if (overrideRotation)
                     savingCharacterData.CurrentRotation = rotation;
             }
+            // Prepare storage items
+            StorageId storageId = new StorageId(StorageType.Player, savingCharacterData.UserId);
+            List<CharacterItem> storageItems = new List<CharacterItem>();
+            if (ServerStorageHandlers.IsStorageSavePending(storageId))
+                storageItems.AddRange(ServerStorageHandlers.GetStorageItems(storageId));
+            // Prepare summon buffs
             List<CharacterBuff> summonBuffs = new List<CharacterBuff>();
             CharacterSummon tempSummon;
             CharacterBuff tempBuff;
@@ -118,7 +125,7 @@ namespace MultiplayerARPG.MMO
                     tempBuff = tempSummon.CacheEntity.Buffs[j];
                     summonBuffs.Add(new CharacterBuff()
                     {
-                        id = ZString.Concat(savingCharacterData.Id, "_", i, "_", j),
+                        id = ZString.Concat(savingCharacterData.Id, '_', i, '_', j),
                         type = tempBuff.type,
                         dataId = tempBuff.dataId,
                         level = tempBuff.level,
@@ -131,12 +138,14 @@ namespace MultiplayerARPG.MMO
             await DbServiceClient.UpdateCharacterAsync(new UpdateCharacterReq()
             {
                 CharacterData = savingCharacterData,
-            });
-            await DbServiceClient.SetSummonBuffsAsync(new SetSummonBuffsReq()
-            {
-                CharacterId = savingCharacterData.Id,
+                ExtraContent = (storageItems.Count > 0 ? UpdateCharacterReq.EExtraContent.StorageItems : UpdateCharacterReq.EExtraContent.None) | (summonBuffs.Count > 0 ? UpdateCharacterReq.EExtraContent.SummonBuffs : UpdateCharacterReq.EExtraContent.None),
+                StorageItems = storageItems,
                 SummonBuffs = summonBuffs,
             });
+            // Update done, clear pending status data
+            storageItems.Clear();
+            summonBuffs.Clear();
+            ServerStorageHandlers.SetStorageSavePending(storageId, false);
             savingCharacters.Remove(savingCharacterData.Id);
             if (LogDebug)
                 Logging.Log(LogTag, "Character [" + savingCharacterData.Id + "] Saved");
@@ -164,21 +173,33 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-        private async UniTask<bool> SaveBuilding(BuildingSaveData buildingSaveData)
+        private async UniTask<bool> SaveBuilding(BuildingEntity buildingEntity)
         {
-            if (savingBuildings.Contains(buildingSaveData.Id))
+            if (savingBuildings.Contains(buildingEntity.Id))
                 return false;
-            savingBuildings.Add(buildingSaveData.Id);
+            // Prepare building data
+            BuildingSaveData savingBuildingData = buildingEntity.CloneTo(new BuildingSaveData());
+            // Prepare storage items
+            StorageId storageId = new StorageId(StorageType.Building, savingBuildingData.Id);
+            List<CharacterItem> storageItems = new List<CharacterItem>();
+            if (ServerStorageHandlers.IsStorageSavePending(storageId))
+                storageItems.AddRange(ServerStorageHandlers.GetStorageItems(storageId));
+            savingBuildings.Add(savingBuildingData.Id);
             // Update building
             await DbServiceClient.UpdateBuildingAsync(new UpdateBuildingReq()
             {
                 ChannelId = ChannelId,
                 MapName = CurrentMapInfo.Id,
-                BuildingData = buildingSaveData,
+                BuildingData = savingBuildingData,
+                ExtraContent = storageItems.Count > 0 ? UpdateBuildingReq.EExtraContent.StorageItems : UpdateBuildingReq.EExtraContent.None,
+                StorageItems = storageItems,
             });
-            savingBuildings.Remove(buildingSaveData.Id);
+            // Update done, clear pending status data
+            storageItems.Clear();
+            ServerStorageHandlers.SetStorageSavePending(storageId, false);
+            savingBuildings.Remove(savingBuildingData.Id);
             if (LogDebug)
-                Logging.Log(LogTag, "Building [" + buildingSaveData.Id + "] Saved");
+                Logging.Log(LogTag, "Building [" + savingBuildingData.Id + "] Saved");
             return true;
         }
 #endif
@@ -193,7 +214,7 @@ namespace MultiplayerARPG.MMO
             foreach (BuildingEntity buildingEntity in ServerBuildingHandlers.GetBuildings())
             {
                 if (buildingEntity == null) continue;
-                tasks.Add(SaveBuilding(buildingEntity.CloneTo(new BuildingSaveData())));
+                tasks.Add(SaveBuilding(buildingEntity));
                 ++i;
             }
             await UniTask.WhenAll(tasks);

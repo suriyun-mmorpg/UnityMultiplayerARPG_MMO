@@ -13,6 +13,7 @@ namespace MultiplayerARPG.MMO
         private readonly ConcurrentDictionary<StorageId, HashSet<long>> usingStorageClients = new ConcurrentDictionary<StorageId, HashSet<long>>();
         private readonly ConcurrentDictionary<long, StorageId> usingStorageIds = new ConcurrentDictionary<long, StorageId>();
         private readonly ConcurrentHashSet<StorageId> busyStorages = new ConcurrentHashSet<StorageId>();
+        private readonly ConcurrentHashSet<StorageId> savePendingStorages = new ConcurrentHashSet<StorageId>();
 #endif
 
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
@@ -283,6 +284,25 @@ namespace MultiplayerARPG.MMO
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             return busyStorages.Contains(storageId);
+#else
+            return false;
+#endif
+        }
+
+        public void SetStorageSavePending(StorageId storageId, bool isSavePending)
+        {
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+            if (isSavePending)
+                savePendingStorages.Add(storageId);
+            else
+                savePendingStorages.TryRemove(storageId);
+#endif
+        }
+
+        public bool IsStorageSavePending(StorageId storageId)
+        {
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+            return savePendingStorages.Contains(storageId);
 #else
             return false;
 #endif
