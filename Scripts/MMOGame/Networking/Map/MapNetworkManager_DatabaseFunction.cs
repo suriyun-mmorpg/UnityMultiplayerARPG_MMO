@@ -35,7 +35,7 @@ namespace MultiplayerARPG.MMO
                     StorageOwnerId = storageId.storageOwnerId,
                 });
             } while (!resp.IsSuccess);
-            ServerStorageHandlers.SetStorageItems(storageId, resp.Response.StorageCharacterItems);
+            ServerStorageHandlers.SetStorageItems(storageId, resp.Response.StorageItems);
             _loadingStorageIds.Remove(storageId);
         }
 #endif
