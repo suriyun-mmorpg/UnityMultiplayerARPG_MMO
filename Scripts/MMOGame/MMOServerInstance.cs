@@ -6,6 +6,7 @@ using System.IO;
 using LiteNetLibManager;
 using UnityEngine;
 using Newtonsoft.Json;
+using UnityEngine.Serialization;
 
 namespace MultiplayerARPG.MMO
 {
@@ -79,7 +80,8 @@ namespace MultiplayerARPG.MMO
         public bool startMapOnAwake;
         public BaseMapInfo startingMap;
         public int databaseOptionIndex;
-        public bool databaseDisableCacheReading;
+        [FormerlySerializedAs("databaseDisableCacheReading")]
+        public bool disableDatabaseCaching;
 
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         private List<string> _spawningMaps;
@@ -164,16 +166,28 @@ namespace MultiplayerARPG.MMO
                 jsonConfig[ProcessArguments.CONFIG_DATABASE_OPTION_INDEX] = dbOptionIndex;
 
                 // Database disable cache reading or not?
-                bool databaseDisableCacheReading = this.databaseDisableCacheReading = false;
-                if (ConfigReader.ReadConfigs(jsonConfig, ProcessArguments.CONFIG_DATABASE_DISABLE_CACHE_READING, out databaseDisableCacheReading, this.databaseDisableCacheReading))
+                bool disableDatabaseCaching = this.disableDatabaseCaching = false;
+                // Old config key
+#pragma warning disable CS0618 // Type or member is obsolete
+                if (ConfigReader.ReadConfigs(jsonConfig, ProcessArguments.CONFIG_DATABASE_DISABLE_CACHE_READING, out disableDatabaseCaching, this.disableDatabaseCaching))
                 {
-                    this.databaseDisableCacheReading = databaseDisableCacheReading;
+                    this.disableDatabaseCaching = disableDatabaseCaching;
                 }
                 else if (ConfigReader.IsArgsProvided(args, ProcessArguments.ARG_DATABASE_DISABLE_CACHE_READING))
                 {
-                    this.databaseDisableCacheReading = true;
+                    this.disableDatabaseCaching = true;
                 }
-                jsonConfig[ProcessArguments.CONFIG_DATABASE_DISABLE_CACHE_READING] = databaseDisableCacheReading;
+#pragma warning restore CS0618 // Type or member is obsolete
+                // New config key
+                if (ConfigReader.ReadConfigs(jsonConfig, ProcessArguments.CONFIG_DISABLE_DATABASE_CACHING, out disableDatabaseCaching, this.disableDatabaseCaching))
+                {
+                    this.disableDatabaseCaching = disableDatabaseCaching;
+                }
+                else if (ConfigReader.IsArgsProvided(args, ProcessArguments.ARG_DISABLE_DATABASE_CACHING))
+                {
+                    this.disableDatabaseCaching = true;
+                }
+                jsonConfig[ProcessArguments.CONFIG_DISABLE_DATABASE_CACHING] = disableDatabaseCaching;
 
                 // Use Websocket or not?
                 bool useWebSocket = this.useWebSocket = false;
@@ -527,7 +541,7 @@ namespace MultiplayerARPG.MMO
                 if (!useCustomDatabaseClient)
                 {
                     databaseNetworkManager.SetDatabaseByOptionIndex(databaseOptionIndex);
-                    databaseNetworkManager.DisableCacheReading = databaseDisableCacheReading;
+                    databaseNetworkManager.DisableDatabaseCaching = disableDatabaseCaching;
                 }
 
                 if (startDatabaseOnAwake)
