@@ -306,7 +306,7 @@ namespace MultiplayerARPG.MMO
                     "`storageType` TINYINT(3) UNSIGNED NOT NULL," +
                     "`storageOwnerId` VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL," +
                     "`reserverId` VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL," +
-                    "PRIMARY KEY (`storageType`, `storageOwnerId`), INDEX (`reserverId`)) ENGINE = InnoDB; DEFAULT CHARSET = utf8 COLLATE = utf8_unicode_ci;");
+                    "PRIMARY KEY (`storageType`, `storageOwnerId`), INDEX (`reserverId`)) ENGINE = InnoDB DEFAULT CHARSET = utf8 COLLATE = utf8_unicode_ci;");
             });
         }
 
