@@ -105,7 +105,7 @@ namespace MultiplayerARPG.MMO
             }
             // Check that the character can move items or not
             BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
-            if (playerCharacterEntity != null && !playerCharacterEntity.CanMoveItem() && !CharacterIsSaving(playerCharacterEntity))
+            if (playerCharacterEntity != null && !playerCharacterEntity.CanMoveItem())
             {
                 result.InvokeError(new ResponseMoveItemFromStorageMessage());
                 return;
@@ -183,7 +183,7 @@ namespace MultiplayerARPG.MMO
             }
             // Check that the character can move items or not
             BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
-            if (playerCharacterEntity != null && !playerCharacterEntity.CanMoveItem() && !CharacterIsSaving(playerCharacterEntity))
+            if (playerCharacterEntity != null && !playerCharacterEntity.CanMoveItem())
             {
                 result.InvokeError(new ResponseMoveItemToStorageMessage());
                 return;
@@ -263,7 +263,7 @@ namespace MultiplayerARPG.MMO
             }
             // Check that the character can move items or not
             BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
-            if (playerCharacterEntity != null && !playerCharacterEntity.CanMoveItem() && !CharacterIsSaving(playerCharacterEntity))
+            if (playerCharacterEntity != null && !playerCharacterEntity.CanMoveItem())
             {
                 result.InvokeError(new ResponseSwapOrMergeStorageItemMessage());
                 return;
@@ -335,24 +335,8 @@ namespace MultiplayerARPG.MMO
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             if (playerCharacterEntity != null)
-            {
                 playerCharacterEntity.IsUpdatingItems = isBusy;
-                // Don't allow to save character while working with storage
-                if (isBusy)
-                    MMOServerInstance.Singleton.MapNetworkManager.savingCharacters.Add(playerCharacterEntity.Id);
-                else
-                    MMOServerInstance.Singleton.MapNetworkManager.savingCharacters.Remove(playerCharacterEntity.Id);
-            }
             GameInstance.ServerStorageHandlers.SetStorageBusy(storageId, isBusy);
-#endif
-        }
-
-        private bool CharacterIsSaving(BasePlayerCharacterEntity playerCharacterEntity)
-        {
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-            return playerCharacterEntity != null && MMOServerInstance.Singleton.MapNetworkManager.savingCharacters.Contains(playerCharacterEntity.Id);
-#else
-            return false;
 #endif
         }
     }
