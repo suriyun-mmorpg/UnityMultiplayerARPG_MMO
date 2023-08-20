@@ -110,6 +110,8 @@ namespace MultiplayerARPG.MMO
         private readonly HashSet<int> _loadingGuildIds = new HashSet<int>();
         internal readonly HashSet<string> savingCharacters = new HashSet<string>();
         internal readonly HashSet<string> savingBuildings = new HashSet<string>();
+        internal readonly HashSet<StorageId> pendingSaveStorageIds = new HashSet<StorageId>();
+        internal readonly HashSet<string> cancellingReserveStorageCharacterIds = new HashSet<string>();
 #endif
 
         protected override void Awake()
@@ -393,6 +395,7 @@ namespace MultiplayerARPG.MMO
             // Save player character data
             if (ServerUserHandlers.TryGetPlayerCharacter(connectionId, out BasePlayerCharacterEntity playerCharacterEntity))
             {
+                cancellingReserveStorageCharacterIds.Add(playerCharacterEntity.Id);
                 playerCharacterEntity.Dealing.StopDealing();
                 playerCharacterEntity.Vending.StopVending();
                 playerCharacterEntity.SetOwnerClient(-1);

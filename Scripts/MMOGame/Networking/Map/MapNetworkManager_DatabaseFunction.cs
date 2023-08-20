@@ -125,7 +125,7 @@ namespace MultiplayerARPG.MMO
             // Prepare storage items
             StorageId storageId = new StorageId(StorageType.Player, savingCharacterData.UserId);
             List<CharacterItem> storageItems = null;
-            if (ServerStorageHandlers.IsStorageSavePending(storageId))
+            if (pendingSaveStorageIds.Contains(storageId))
             {
                 storageItems = new List<CharacterItem>();
                 storageItems.AddRange(ServerStorageHandlers.GetStorageItems(storageId));
@@ -158,9 +158,11 @@ namespace MultiplayerARPG.MMO
                 CharacterData = savingCharacterData,
                 SummonBuffs = summonBuffs,
                 StorageItems = storageItems,
+                DeleteStorageReservation = cancellingReserveStorageCharacterIds.Contains(savingCharacterData.Id),
             });
             // Update done, clear pending status data
-            ServerStorageHandlers.SetStorageSavePending(storageId, false);
+            pendingSaveStorageIds.Remove(storageId);
+            cancellingReserveStorageCharacterIds.Remove(savingCharacterData.Id);
             savingCharacters.Remove(savingCharacterData.Id);
             if (LogDebug)
                 Logging.Log(LogTag, "Character [" + savingCharacterData.Id + "] Saved");
@@ -197,7 +199,7 @@ namespace MultiplayerARPG.MMO
             // Prepare storage items
             StorageId storageId = new StorageId(StorageType.Building, savingBuildingData.Id);
             List<CharacterItem> storageItems = null;
-            if (ServerStorageHandlers.IsStorageSavePending(storageId))
+            if (pendingSaveStorageIds.Contains(storageId))
             {
                 storageItems = new List<CharacterItem>();
                 storageItems.AddRange(ServerStorageHandlers.GetStorageItems(storageId));
@@ -212,7 +214,7 @@ namespace MultiplayerARPG.MMO
                 StorageItems = storageItems,
             });
             // Update done, clear pending status data
-            ServerStorageHandlers.SetStorageSavePending(storageId, false);
+            pendingSaveStorageIds.Remove(storageId);
             savingBuildings.Remove(savingBuildingData.Id);
             if (LogDebug)
                 Logging.Log(LogTag, "Building [" + savingBuildingData.Id + "] Saved");

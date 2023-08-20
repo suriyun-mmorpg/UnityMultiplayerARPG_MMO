@@ -12,8 +12,6 @@ namespace MultiplayerARPG.MMO
         private readonly ConcurrentDictionary<StorageId, List<CharacterItem>> storageItems = new ConcurrentDictionary<StorageId, List<CharacterItem>>();
         private readonly ConcurrentDictionary<StorageId, HashSet<long>> usingStorageClients = new ConcurrentDictionary<StorageId, HashSet<long>>();
         private readonly ConcurrentDictionary<long, StorageId> usingStorageIds = new ConcurrentDictionary<long, StorageId>();
-        private readonly ConcurrentHashSet<StorageId> busyStorages = new ConcurrentHashSet<StorageId>();
-        private readonly ConcurrentHashSet<StorageId> savePendingStorages = new ConcurrentHashSet<StorageId>();
 #endif
 
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
@@ -101,7 +99,6 @@ namespace MultiplayerARPG.MMO
         {
             await UniTask.Yield();
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-            SetStorageBusy(storageId, true);
             // Prepare storage data
             StorageType storageType = storageId.storageType;
             string storageOwnerId = storageId.storageOwnerId;
@@ -110,7 +107,6 @@ namespace MultiplayerARPG.MMO
             bool isLimitSlot = storage.slotLimit > 0;
             int weightLimit = storage.weightLimit;
             int slotLimit = storage.slotLimit;
-            // TODO: Refresh storage item from database for guild
             List<CharacterItem> storageItems = GetStorageItems(storageId);
             List<CharacterItem> droppingItems = new List<CharacterItem>();
             for (int i = 0; i < convertItems.Count; ++i)
@@ -142,7 +138,6 @@ namespace MultiplayerARPG.MMO
             SetStorageItems(storageId, storageItems);
             NotifyStorageItemsUpdated(storageId.storageType, storageId.storageOwnerId);
             SetStorageSavePending(storageId, true);
-            SetStorageBusy(storageId, false);
             return droppingItems;
 #else
             return null;
@@ -245,7 +240,6 @@ namespace MultiplayerARPG.MMO
             storageItems.Clear();
             usingStorageClients.Clear();
             usingStorageIds.Clear();
-            busyStorages.Clear();
 #endif
         }
 
@@ -266,41 +260,16 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public void SetStorageBusy(StorageId storageId, bool isBusy)
+        private void SetStorageSavePending(StorageId storageId, bool isSavePending)
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-            if (isBusy)
-                busyStorages.Add(storageId);
-            else
-                busyStorages.TryRemove(storageId);
-#endif
-        }
+            if (storageId.storageType == StorageType.Guild)
+                return;
 
-        public bool IsStorageBusy(StorageId storageId)
-        {
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-            return busyStorages.Contains(storageId);
-#else
-            return false;
-#endif
-        }
-
-        public void SetStorageSavePending(StorageId storageId, bool isSavePending)
-        {
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             if (isSavePending)
-                savePendingStorages.Add(storageId);
+                MMOServerInstance.Singleton.MapNetworkManager.pendingSaveStorageIds.Add(storageId);
             else
-                savePendingStorages.TryRemove(storageId);
-#endif
-        }
-
-        public bool IsStorageSavePending(StorageId storageId)
-        {
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-            return savePendingStorages.Contains(storageId);
-#else
-            return false;
+                MMOServerInstance.Singleton.MapNetworkManager.pendingSaveStorageIds.Remove(storageId);
 #endif
         }
     }
