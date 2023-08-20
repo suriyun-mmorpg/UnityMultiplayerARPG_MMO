@@ -655,7 +655,7 @@ namespace MultiplayerARPG.MMO
             CentralNetworkManager.webSocketSecure = WebSocketSecure;
             CentralNetworkManager.webSocketCertificateFilePath = WebSocketCertificateFilePath;
             CentralNetworkManager.webSocketCertificatePassword = WebSocketCertificatePassword;
-            centralNetworkManager.DbServiceClient = DatabaseClient;
+            centralNetworkManager.DatabaseClient = DatabaseClient;
             centralNetworkManager.DataManager = new CentralServerDataManager();
             CentralNetworkManager.StartServer();
         }
