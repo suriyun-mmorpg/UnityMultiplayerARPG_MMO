@@ -299,6 +299,15 @@ namespace MultiplayerARPG.MMO
                 // Channel
                 await ExecuteNonQuery("ALTER TABLE `buildings` ADD `channel` VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT 'default' AFTER `id`;");
             });
+            await DoMigration("1.85", async () =>
+            {
+                // Storage reservation
+                await ExecuteNonQuery("CREATE TABLE `storage_reservation` (" +
+                    "`storageType` TINYINT(3) UNSIGNED NOT NULL," +
+                    "`storageOwnerId` VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL," +
+                    "`reserverId` VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL," +
+                    "PRIMARY KEY (`storageType`, `storageOwnerId`), INDEX (`reserverId`)) ENGINE = InnoDB; DEFAULT CHARSET = utf8 COLLATE = utf8_unicode_ci;");
+            });
         }
 
         private async UniTask<bool> DoMigration(string migrationId, MigrateActionDelegate migrateAction)

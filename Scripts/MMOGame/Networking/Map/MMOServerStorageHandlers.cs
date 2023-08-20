@@ -25,12 +25,26 @@ namespace MultiplayerARPG.MMO
 
         public async UniTaskVoid OpenStorage(long connectionId, IPlayerCharacterData playerCharacter, StorageId storageId)
         {
-            await UniTask.Yield();
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             if (!CanAccessStorage(playerCharacter, storageId))
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(connectionId, UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE);
                 return;
+            }
+            if (storageId.storageType == StorageType.Guild)
+            {
+                DatabaseApiResult<ReadStorageItemsResp> storageItemsResult = await DbServiceClient.ReadStorageItemsAsync(new ReadStorageItemsReq()
+                {
+                    StorageType = storageId.storageType,
+                    StorageOwnerId = storageId.storageOwnerId,
+                    ReserverId = playerCharacter.Id,
+                });
+                if (!storageItemsResult.IsSuccess)
+                {
+                    GameInstance.ServerGameMessageHandlers.SendGameMessage(connectionId, storageItemsResult.Response.Error);
+                    return;
+                }
+                SetStorageItems(storageId, storageItemsResult.Response.StorageItems);
             }
             // Store storage usage states
             if (!usingStorageClients.ContainsKey(storageId))
@@ -38,7 +52,6 @@ namespace MultiplayerARPG.MMO
             usingStorageClients[storageId].Add(connectionId);
             usingStorageIds.TryRemove(connectionId, out _);
             usingStorageIds.TryAdd(connectionId, storageId);
-            // TODO: Load storage items for guild
             List<CharacterItem> storageItems = GetStorageItems(storageId);
             // Notify storage items to client
             Storage storage = GetStorage(storageId, out uint storageObjectId);
@@ -50,14 +63,26 @@ namespace MultiplayerARPG.MMO
 
         public async UniTaskVoid CloseStorage(long connectionId)
         {
-            await UniTask.Yield();
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-            if (usingStorageIds.TryGetValue(connectionId, out StorageId storageId) && usingStorageClients.ContainsKey(storageId))
+            if (!usingStorageIds.TryGetValue(connectionId, out StorageId storageId) || !usingStorageClients.ContainsKey(storageId))
+                return;
+            if (storageId.storageType == StorageType.Guild)
             {
-                usingStorageClients[storageId].Remove(connectionId);
-                usingStorageIds.TryRemove(connectionId, out _);
-                GameInstance.ServerGameMessageHandlers.NotifyStorageClosed(connectionId);
+                DatabaseApiResult storageItemsResult = await DbServiceClient.UpdateStorageItemsAsync(new UpdateStorageItemsReq()
+                {
+                    StorageType = storageId.storageType,
+                    StorageOwnerId = storageId.storageOwnerId,
+                    StorageItems = GetStorageItems(storageId),
+                });
+                if (!storageItemsResult.IsSuccess)
+                {
+                    GameInstance.ServerGameMessageHandlers.SendGameMessage(connectionId, UITextKeys.UI_ERROR_CANNOT_UPDATE_STORAGE_ITEMS);
+                    return;
+                }
             }
+            usingStorageClients[storageId].Remove(connectionId);
+            usingStorageIds.TryRemove(connectionId, out _);
+            GameInstance.ServerGameMessageHandlers.NotifyStorageClosed(connectionId);
 #endif
         }
 
