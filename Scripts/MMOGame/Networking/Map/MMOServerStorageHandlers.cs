@@ -73,6 +73,7 @@ namespace MultiplayerARPG.MMO
                     StorageType = storageId.storageType,
                     StorageOwnerId = storageId.storageOwnerId,
                     StorageItems = GetStorageItems(storageId),
+                    DeleteStorageReservation = true,
                 });
                 if (!storageItemsResult.IsSuccess)
                 {
