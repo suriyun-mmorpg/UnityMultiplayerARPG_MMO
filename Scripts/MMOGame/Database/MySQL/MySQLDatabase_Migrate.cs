@@ -307,6 +307,8 @@ namespace MultiplayerARPG.MMO
                     "`storageOwnerId` VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL," +
                     "`reserverId` VARCHAR(50) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL," +
                     "PRIMARY KEY (`storageType`, `storageOwnerId`), INDEX (`reserverId`)) ENGINE = InnoDB DEFAULT CHARSET = utf8 COLLATE = utf8_unicode_ci;");
+                // Add building's is scene object field
+                await ExecuteNonQuery("ALTER TABLE `buildings` ADD `isSceneObject` BOOLEAN NOT NULL DEFAULT FALSE AFTER `extraData`;");
             });
         }
 

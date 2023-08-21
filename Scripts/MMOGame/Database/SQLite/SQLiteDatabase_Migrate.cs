@@ -115,6 +115,9 @@ namespace MultiplayerARPG.MMO
             if (!IsColumnExist("buildings", "channel"))
                 ExecuteNonQuery("ALTER TABLE buildings ADD channel TEXT NOT NULL DEFAULT 'default';");
 
+            if (!IsColumnExist("buildings", "isSceneObject"))
+                ExecuteNonQuery("ALTER TABLE buildings ADD isSceneObject INTEGER NOT NULL DEFAULT 0;");
+
             if (!IsColumnExist("characters", "partyId"))
                 ExecuteNonQuery("ALTER TABLE characters ADD partyId INTEGER NOT NULL DEFAULT 0;");
 
