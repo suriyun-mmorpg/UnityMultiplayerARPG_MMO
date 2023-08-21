@@ -263,10 +263,11 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-        public override void DestroyBuildingEntity(string id)
+        public override void DestroyBuildingEntity(string id, bool isSceneObject)
         {
-            base.DestroyBuildingEntity(id);
-            DestroyBuildingEntityRoutine(id).Forget();
+            base.DestroyBuildingEntity(id, isSceneObject);
+            if (!isSceneObject)
+                DestroyBuildingEntityRoutine(id).Forget();
         }
 
         private async UniTask DestroyBuildingEntityRoutine(string id)
