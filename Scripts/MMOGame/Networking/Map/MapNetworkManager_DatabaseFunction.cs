@@ -36,7 +36,7 @@ namespace MultiplayerARPG.MMO
                 });
             } while (!resp.IsSuccess);
             ServerStorageHandlers.SetStorageItems(storageId, resp.Response.StorageItems);
-            _loadingStorageIds.Remove(storageId);
+            _loadingStorageIds.TryRemove(storageId);
         }
 #endif
 
@@ -69,7 +69,7 @@ namespace MultiplayerARPG.MMO
                 });
             } while (!resp.IsSuccess);
             ServerPartyHandlers.SetParty(id, resp.Response.PartyData);
-            _loadingPartyIds.Remove(id);
+            _loadingPartyIds.TryRemove(id);
         }
 #endif
 
@@ -102,7 +102,7 @@ namespace MultiplayerARPG.MMO
                 });
             } while (!resp.IsSuccess);
             ServerGuildHandlers.SetGuild(id, resp.Response.GuildData);
-            _loadingGuildIds.Remove(id);
+            _loadingGuildIds.TryRemove(id);
         }
 #endif
 
@@ -161,9 +161,9 @@ namespace MultiplayerARPG.MMO
                 DeleteStorageReservation = cancellingReserveStorageCharacterIds.Contains(savingCharacterData.Id),
             });
             // Update done, clear pending status data
-            pendingSaveStorageIds.Remove(storageId);
-            cancellingReserveStorageCharacterIds.Remove(savingCharacterData.Id);
-            savingCharacters.Remove(savingCharacterData.Id);
+            pendingSaveStorageIds.TryRemove(storageId);
+            cancellingReserveStorageCharacterIds.TryRemove(savingCharacterData.Id);
+            savingCharacters.TryRemove(savingCharacterData.Id);
             if (LogDebug)
                 Logging.Log(LogTag, "Character [" + savingCharacterData.Id + "] Saved");
             return true;
@@ -214,8 +214,8 @@ namespace MultiplayerARPG.MMO
                 StorageItems = storageItems,
             });
             // Update done, clear pending status data
-            pendingSaveStorageIds.Remove(storageId);
-            savingBuildings.Remove(savingBuildingData.Id);
+            pendingSaveStorageIds.TryRemove(storageId);
+            savingBuildings.TryRemove(savingBuildingData.Id);
             if (LogDebug)
                 Logging.Log(LogTag, "Building [" + savingBuildingData.Id + "] Saved");
             return true;

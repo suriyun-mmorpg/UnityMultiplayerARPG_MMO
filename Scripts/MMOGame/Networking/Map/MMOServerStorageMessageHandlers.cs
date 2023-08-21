@@ -303,7 +303,7 @@ namespace MultiplayerARPG.MMO
             if (isSavePending)
                 MMOServerInstance.Singleton.MapNetworkManager.pendingSaveStorageIds.Add(storageId);
             else
-                MMOServerInstance.Singleton.MapNetworkManager.pendingSaveStorageIds.Remove(storageId);
+                MMOServerInstance.Singleton.MapNetworkManager.pendingSaveStorageIds.TryRemove(storageId);
 #endif
         }
     }

@@ -7,6 +7,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using System.Net.Sockets;
+using ConcurrentCollections;
 
 namespace MultiplayerARPG.MMO
 {
@@ -105,13 +106,13 @@ namespace MultiplayerARPG.MMO
         private readonly ConcurrentDictionary<string, long> _connectionsByUserId = new ConcurrentDictionary<string, long>();
         private readonly ConcurrentDictionary<string, string> _accessTokensByUserId = new ConcurrentDictionary<string, string>();
         // Database operations
-        private readonly HashSet<StorageId> _loadingStorageIds = new HashSet<StorageId>();
-        private readonly HashSet<int> _loadingPartyIds = new HashSet<int>();
-        private readonly HashSet<int> _loadingGuildIds = new HashSet<int>();
-        internal readonly HashSet<string> savingCharacters = new HashSet<string>();
-        internal readonly HashSet<string> savingBuildings = new HashSet<string>();
-        internal readonly HashSet<StorageId> pendingSaveStorageIds = new HashSet<StorageId>();
-        internal readonly HashSet<string> cancellingReserveStorageCharacterIds = new HashSet<string>();
+        private readonly ConcurrentHashSet<StorageId> _loadingStorageIds = new ConcurrentHashSet<StorageId>();
+        private readonly ConcurrentHashSet<int> _loadingPartyIds = new ConcurrentHashSet<int>();
+        private readonly ConcurrentHashSet<int> _loadingGuildIds = new ConcurrentHashSet<int>();
+        internal readonly ConcurrentHashSet<string> savingCharacters = new ConcurrentHashSet<string>();
+        internal readonly ConcurrentHashSet<string> savingBuildings = new ConcurrentHashSet<string>();
+        internal readonly ConcurrentHashSet<StorageId> pendingSaveStorageIds = new ConcurrentHashSet<StorageId>();
+        internal readonly ConcurrentHashSet<string> cancellingReserveStorageCharacterIds = new ConcurrentHashSet<string>();
 #endif
 
         protected override void Awake()

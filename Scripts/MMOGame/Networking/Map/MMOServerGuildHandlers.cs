@@ -1,5 +1,5 @@
-﻿using Cysharp.Threading.Tasks;
-using LiteNetLibManager;
+﻿using ConcurrentCollections;
+using Cysharp.Threading.Tasks;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,7 +11,7 @@ namespace MultiplayerARPG.MMO
         public const int GuildInvitationDuration = 10000;
         public static readonly ConcurrentDictionary<int, GuildData> Guilds = new ConcurrentDictionary<int, GuildData>();
         public static readonly ConcurrentDictionary<long, GuildData> UpdatingGuildMembers = new ConcurrentDictionary<long, GuildData>();
-        public static readonly HashSet<string> GuildInvitations = new HashSet<string>();
+        public static readonly ConcurrentHashSet<string> GuildInvitations = new ConcurrentHashSet<string>();
 
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         public IDatabaseClient DbServiceClient
@@ -64,7 +64,7 @@ namespace MultiplayerARPG.MMO
 
         public void RemoveGuildInvitation(int guildId, string characterId)
         {
-            GuildInvitations.Remove(GetGuildInvitationId(guildId, characterId));
+            GuildInvitations.TryRemove(GetGuildInvitationId(guildId, characterId));
         }
 
         public void ClearGuild()
