@@ -188,26 +188,7 @@ namespace MultiplayerARPG.MMO
 
         public bool CanAccessStorage(IPlayerCharacterData playerCharacter, StorageId storageId)
         {
-            switch (storageId.storageType)
-            {
-                case StorageType.Player:
-                    if (!playerCharacter.UserId.Equals(storageId.storageOwnerId))
-                        return false;
-                    break;
-                case StorageType.Guild:
-                    if (!GameInstance.ServerGuildHandlers.TryGetGuild(playerCharacter.GuildId, out GuildData guild) ||
-                        !playerCharacter.GuildId.ToString().Equals(storageId.storageOwnerId) || !guild.CanUseStorage(playerCharacter.Id))
-                        return false;
-                    break;
-                case StorageType.Building:
-                    if (!GameInstance.ServerBuildingHandlers.TryGetBuilding(storageId.storageOwnerId, out StorageEntity buildingEntity) ||
-                        !(buildingEntity.IsCreator(playerCharacter.Id) || buildingEntity.CanUseByEveryone))
-                        return false;
-                    break;
-                default:
-                    return false;
-            }
-            return true;
+            return playerCharacter.CanAccessStorage(storageId);
         }
 
         public bool IsStorageEntityOpen(StorageEntity storageEntity)
