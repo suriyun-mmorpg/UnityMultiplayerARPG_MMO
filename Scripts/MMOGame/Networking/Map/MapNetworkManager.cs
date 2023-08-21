@@ -489,6 +489,12 @@ namespace MultiplayerARPG.MMO
             if (!IsAllocate && !IsInstanceMap())
             {
                 // Load buildings
+                BuildingEntity[] inSceneBuildings = FindObjectsByType<BuildingEntity>(FindObjectsSortMode.None);
+                Dictionary<string, BuildingEntity> inSceneBuildingDicts = new Dictionary<string, BuildingEntity>();
+                for (int i = 0; i < inSceneBuildings.Length; ++i)
+                {
+                    inSceneBuildingDicts.Add(inSceneBuildings[i].Id, inSceneBuildings[i]);
+                }
                 // Don't load buildings if it's instance map
                 DatabaseApiResult<BuildingsResp> buildingsResp;
                 do
@@ -501,12 +507,35 @@ namespace MultiplayerARPG.MMO
                 } while (!buildingsResp.IsSuccess);
                 HashSet<StorageId> storageIds = new HashSet<StorageId>();
                 List<BuildingSaveData> buildings = buildingsResp.Response.List;
-                BuildingEntity buildingEntity;
                 foreach (BuildingSaveData building in buildings)
                 {
-                    buildingEntity = CreateBuildingEntity(building, true);
-                    if (buildingEntity is StorageEntity)
-                        storageIds.Add(new StorageId(StorageType.Building, (buildingEntity as StorageEntity).Id));
+                    if (building.IsSceneObject && inSceneBuildingDicts.TryGetValue(building.Id, out BuildingEntity inSceneBuilding))
+                    {
+                        if (building.CurrentHp <= 0)
+                        {
+                            inSceneBuilding.NetworkDestroy();
+                            GameInstance.ServerBuildingHandlers.AddBuilding(building.Id, building);
+                            inSceneBuildingDicts.Remove(building.Id);
+                            continue;
+                        }
+                        inSceneBuilding.CurrentHp = building.CurrentHp;
+                        GameInstance.ServerBuildingHandlers.AddBuilding(inSceneBuilding.Id, inSceneBuilding);
+                        inSceneBuildingDicts.Remove(building.Id);
+                        if (inSceneBuilding is StorageEntity)
+                            storageIds.Add(new StorageId(StorageType.Building, inSceneBuilding.Id));
+                    }
+                    else
+                    {
+                        BuildingEntity buildingEntity = CreateBuildingEntity(building, true);
+                        if (buildingEntity is StorageEntity)
+                            storageIds.Add(new StorageId(StorageType.Building, buildingEntity.Id));
+                    }
+                }
+                // Setup building
+                foreach (BuildingEntity inSceneBuilding in inSceneBuildingDicts.Values)
+                {
+                    inSceneBuilding.InitSceneObject();
+                    GameInstance.ServerBuildingHandlers.AddBuilding(inSceneBuilding.Id, inSceneBuilding);
                 }
                 List<UniTask> tasks = new List<UniTask>();
                 // Load building storage
