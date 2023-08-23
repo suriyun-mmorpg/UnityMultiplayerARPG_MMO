@@ -2,6 +2,7 @@
 using Cysharp.Threading.Tasks;
 using LiteNetLibManager;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 
 namespace MultiplayerARPG.MMO
@@ -107,14 +108,14 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-        private async UniTask<bool> SaveCharacter(BasePlayerCharacterEntity playerCharacterEntity,
+        private async UniTask<bool> SaveCharacter(IPlayerCharacterData playerCharacterData,
             bool changeMap = false, string mapName = "",
             Vector3 position = default, bool overrideRotation = false, Vector3 rotation = default)
         {
-            if (savingCharacters.Contains(playerCharacterEntity.Id))
+            if (savingCharacters.Contains(playerCharacterData.Id))
                 return false;
             // Prepare player character data
-            PlayerCharacterData savingCharacterData = playerCharacterEntity.CloneTo(new PlayerCharacterData());
+            PlayerCharacterData savingCharacterData = playerCharacterData.CloneTo(new PlayerCharacterData());
             if (changeMap)
             {
                 savingCharacterData.CurrentMapName = mapName;
@@ -134,9 +135,9 @@ namespace MultiplayerARPG.MMO
             List<CharacterBuff> summonBuffs = new List<CharacterBuff>();
             CharacterSummon tempSummon;
             CharacterBuff tempBuff;
-            for (int i = 0; i < playerCharacterEntity.Summons.Count; ++i)
+            for (int i = 0; i < playerCharacterData.Summons.Count; ++i)
             {
-                tempSummon = playerCharacterEntity.Summons[i];
+                tempSummon = playerCharacterData.Summons[i];
                 if (tempSummon == null || tempSummon.CacheEntity == null || tempSummon.CacheEntity.Buffs == null || tempSummon.CacheEntity.Buffs.Count == 0) continue;
                 for (int j = 0; j < tempSummon.CacheEntity.Buffs.Count; ++j)
                 {
@@ -171,6 +172,30 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+        private async UniTask WaitAndSaveCharacter(IPlayerCharacterData playerCharacterData, CancellationToken cancellationToken,
+            bool changeMap = false, string mapName = "",
+            Vector3 position = default, bool overrideRotation = false, Vector3 rotation = default)
+        {
+            while (!await SaveCharacter(playerCharacterData, changeMap, mapName, position, overrideRotation, rotation))
+            {
+                await UniTask.Yield(cancellationToken);
+            }
+        }
+#endif
+
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+        private async UniTask WaitAndSaveCharacter(IPlayerCharacterData playerCharacterData,
+            bool changeMap = false, string mapName = "",
+            Vector3 position = default, bool overrideRotation = false, Vector3 rotation = default)
+        {
+            while (!await SaveCharacter(playerCharacterData, changeMap, mapName, position, overrideRotation, rotation))
+            {
+                await UniTask.Yield();
+            }
+        }
+#endif
+
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         private async UniTaskVoid SaveAllCharacters()
         {
             if (savingCharacters.Count > 0)
@@ -180,7 +205,7 @@ namespace MultiplayerARPG.MMO
             foreach (BasePlayerCharacterEntity playerCharacterEntity in ServerUserHandlers.GetPlayerCharacters())
             {
                 if (playerCharacterEntity == null) continue;
-                tasks.Add(SaveCharacter(playerCharacterEntity));
+                tasks.Add(WaitAndSaveCharacter(playerCharacterEntity));
                 ++i;
             }
             await UniTask.WhenAll(tasks);
@@ -190,12 +215,12 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-        private async UniTask<bool> SaveBuilding(BuildingEntity buildingEntity)
+        private async UniTask<bool> SaveBuilding(IBuildingSaveData buildingSaveData)
         {
-            if (savingBuildings.Contains(buildingEntity.Id))
+            if (savingBuildings.Contains(buildingSaveData.Id))
                 return false;
             // Prepare building data
-            BuildingSaveData savingBuildingData = buildingEntity.CloneTo(new BuildingSaveData());
+            BuildingSaveData savingBuildingData = buildingSaveData.CloneTo(new BuildingSaveData());
             // Prepare storage items
             StorageId storageId = new StorageId(StorageType.Building, savingBuildingData.Id);
             List<CharacterItem> storageItems = null;
@@ -223,6 +248,26 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+        private async UniTask WaitAndSaveBuilding(IBuildingSaveData buildingSaveData, CancellationToken cancellationToken)
+        {
+            while (!await SaveBuilding(buildingSaveData))
+            {
+                await UniTask.Yield(cancellationToken);
+            }
+        }
+#endif
+
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+        private async UniTask WaitAndSaveBuilding(IBuildingSaveData buildingSaveData)
+        {
+            while (!await SaveBuilding(buildingSaveData))
+            {
+                await UniTask.Yield();
+            }
+        }
+#endif
+
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         private async UniTaskVoid SaveAllBuildings()
         {
             if (savingBuildings.Count == 0)
@@ -232,7 +277,7 @@ namespace MultiplayerARPG.MMO
             foreach (BuildingEntity buildingEntity in ServerBuildingHandlers.GetBuildings())
             {
                 if (buildingEntity == null) continue;
-                tasks.Add(SaveBuilding(buildingEntity));
+                tasks.Add(WaitAndSaveBuilding(buildingEntity));
                 ++i;
             }
             await UniTask.WhenAll(tasks);
