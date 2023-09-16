@@ -2,12 +2,6 @@ SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
 
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
-
 --
 -- Database: `mmorpg_kit`
 --
@@ -37,6 +31,7 @@ CREATE TABLE `buildings` (
   `creatorId` varchar(50) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
   `creatorName` varchar(32) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
   `extraData` text COLLATE utf8_unicode_ci NOT NULL,
+  `isSceneObject` tinyint(1) NOT NULL DEFAULT 0,
   `createAt` timestamp NOT NULL DEFAULT current_timestamp(),
   `updateAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -126,6 +121,7 @@ CREATE TABLE `characteritem` (
   `randomSeed` int(11) NOT NULL DEFAULT 0,
   `ammo` int(11) NOT NULL DEFAULT 0,
   `sockets` text COLLATE utf8_unicode_ci NOT NULL,
+  `version` tinyint(3) UNSIGNED NOT NULL DEFAULT 0,
   `createAt` timestamp NOT NULL DEFAULT current_timestamp(),
   `updateAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -256,7 +252,7 @@ CREATE TABLE `charactersummon` (
 --
 
 CREATE TABLE `character_pk` (
-  `id` varchar(255) NOT NULL PRIMARY KEY,
+  `id` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `isPkOn` tinyint(1) NOT NULL DEFAULT 0,
   `lastPkOnTime` int(11) NOT NULL DEFAULT 0,
   `pkPoint` int(11) NOT NULL DEFAULT 0,
@@ -521,8 +517,21 @@ CREATE TABLE `storageitem` (
   `randomSeed` int(11) NOT NULL DEFAULT 0,
   `ammo` int(11) NOT NULL DEFAULT 0,
   `sockets` text COLLATE utf8_unicode_ci NOT NULL,
+  `version` tinyint(3) UNSIGNED NOT NULL DEFAULT 0,
   `createAt` timestamp NOT NULL DEFAULT current_timestamp(),
   `updateAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `storage_reservation`
+--
+
+CREATE TABLE `storage_reservation` (
+  `storageType` tinyint(3) UNSIGNED NOT NULL,
+  `storageOwnerId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `reserverId` varchar(50) COLLATE utf8_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -602,7 +611,8 @@ INSERT INTO `__migrations` (`migrationId`) VALUES
 ('1.78b'),
 ('1.79'),
 ('1.82'),
-('1.84');
+('1.84'),
+('1.85');
 
 --
 -- Indexes for dumped tables
@@ -689,6 +699,12 @@ ALTER TABLE `characterskillusage`
 ALTER TABLE `charactersummon`
   ADD PRIMARY KEY (`id`),
   ADD KEY `characterId` (`characterId`);
+
+--
+-- Indexes for table `character_pk`
+--
+ALTER TABLE `character_pk`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `character_private_boolean`
@@ -816,6 +832,13 @@ ALTER TABLE `storageitem`
   ADD KEY `storageOwnerId` (`storageOwnerId`);
 
 --
+-- Indexes for table `storage_reservation`
+--
+ALTER TABLE `storage_reservation`
+  ADD PRIMARY KEY (`storageType`,`storageOwnerId`),
+  ADD KEY `reserverId` (`reserverId`);
+
+--
 -- Indexes for table `summonbuffs`
 --
 ALTER TABLE `summonbuffs`
@@ -870,7 +893,3 @@ ALTER TABLE `party`
 ALTER TABLE `statistic`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 COMMIT;
-
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
