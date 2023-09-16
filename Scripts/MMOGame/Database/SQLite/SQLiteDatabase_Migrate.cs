@@ -55,6 +55,9 @@ namespace MultiplayerARPG.MMO
             if (!IsColumnExist("characteritem", "sockets"))
                 ExecuteNonQuery("ALTER TABLE characteritem ADD sockets TEXT NOT NULL DEFAULT '';");
 
+            if (!IsColumnExist("characteritem", "version"))
+                ExecuteNonQuery("ALTER TABLE characteritem ADD version INTEGER NOT NULL DEFAULT 0;");
+
             if (!IsColumnExist("storageitem", "durability"))
                 ExecuteNonQuery("ALTER TABLE storageitem ADD durability REAL NOT NULL DEFAULT 0;");
 
@@ -75,6 +78,9 @@ namespace MultiplayerARPG.MMO
 
             if (!IsColumnExist("storageitem", "sockets"))
                 ExecuteNonQuery("ALTER TABLE storageitem ADD sockets TEXT NOT NULL DEFAULT '';");
+
+            if (!IsColumnExist("storageitem", "version"))
+                ExecuteNonQuery("ALTER TABLE storageitem ADD version INTEGER NOT NULL DEFAULT 0;");
 
             if (!IsColumnExist("characterquest", "isTracking"))
                 ExecuteNonQuery("ALTER TABLE characterquest ADD isTracking INTEGER NOT NULL DEFAULT 0;");

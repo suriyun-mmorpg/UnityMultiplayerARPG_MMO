@@ -309,6 +309,10 @@ namespace MultiplayerARPG.MMO
                     "PRIMARY KEY (`storageType`, `storageOwnerId`), INDEX (`reserverId`)) ENGINE = InnoDB DEFAULT CHARSET = utf8 COLLATE = utf8_unicode_ci;");
                 // Add building's is scene object field
                 await ExecuteNonQuery("ALTER TABLE `buildings` ADD `isSceneObject` BOOLEAN NOT NULL DEFAULT FALSE AFTER `extraData`;");
+                // Add character item's version
+                await ExecuteNonQuery("ALTER TABLE `characteritem` ADD `version` TINYINT UNSIGNED NOT NULL DEFAULT '0' AFTER `sockets`;");
+                // Add storage item's version
+                await ExecuteNonQuery("ALTER TABLE `storageitem` ADD `version` TINYINT UNSIGNED NOT NULL DEFAULT '0' AFTER `sockets`;");
             });
         }
 
