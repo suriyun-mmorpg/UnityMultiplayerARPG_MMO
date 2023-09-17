@@ -82,6 +82,12 @@ namespace MultiplayerARPG.MMO
             if (!IsColumnExist("storageitem", "version"))
                 ExecuteNonQuery("ALTER TABLE storageitem ADD version INTEGER NOT NULL DEFAULT 0;");
 
+            if (!IsColumnExist("characterquest", "randomTasksIndex"))
+                ExecuteNonQuery("ALTER TABLE characterquest ADD randomTasksIndex INTEGER NOT NULL DEFAULT 0;");
+
+            if (!IsColumnExist("characterquest", "completeTime"))
+                ExecuteNonQuery("ALTER TABLE characterquest ADD completeTime INTEGER NOT NULL DEFAULT 0;");
+
             if (!IsColumnExist("characterquest", "isTracking"))
                 ExecuteNonQuery("ALTER TABLE characterquest ADD isTracking INTEGER NOT NULL DEFAULT 0;");
 
