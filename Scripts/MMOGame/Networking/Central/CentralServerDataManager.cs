@@ -14,7 +14,7 @@ namespace MultiplayerARPG.MMO
             return GenericUtils.GetUniqueId();
         }
 
-        public bool CanCreateCharacter(ref int dataId, ref int entityId, ref int factionId, IList<CharacterDataBoolean> publicBools, IList<CharacterDataInt32> publicInts, IList<CharacterDataFloat32> publicFloat, out UITextKeys errorMessage)
+        public bool CanCreateCharacter(ref int dataId, ref int entityId, ref int factionId, IList<CharacterDataBoolean> publicBools, IList<CharacterDataInt32> publicInts, IList<CharacterDataFloat32> publicFloats, out UITextKeys errorMessage)
         {
             errorMessage = UITextKeys.NONE;
 
