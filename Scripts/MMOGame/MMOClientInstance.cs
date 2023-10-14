@@ -9,7 +9,7 @@ using System.Net.Sockets;
 
 namespace MultiplayerARPG.MMO
 {
-    [DefaultExecutionOrder(-898)]
+    [DefaultExecutionOrder(DefaultExecutionOrders.MMO_CLIENT_INSTANCE)]
     public partial class MMOClientInstance : MonoBehaviour
     {
         public static MMOClientInstance Singleton { get; protected set; }

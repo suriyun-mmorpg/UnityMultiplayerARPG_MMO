@@ -11,7 +11,7 @@ using UnityEngine.Serialization;
 namespace MultiplayerARPG.MMO
 {
     [RequireComponent(typeof(LogGUI))]
-    [DefaultExecutionOrder(-899)]
+    [DefaultExecutionOrder(DefaultExecutionOrders.MMO_SERVER_INSTANCE)]
     public class MMOServerInstance : MonoBehaviour
     {
         public static MMOServerInstance Singleton { get; protected set; }

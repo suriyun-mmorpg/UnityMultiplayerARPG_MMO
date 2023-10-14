@@ -11,7 +11,7 @@ using ConcurrentCollections;
 
 namespace MultiplayerARPG.MMO
 {
-    [DefaultExecutionOrder(-894)]
+    [DefaultExecutionOrder(DefaultExecutionOrders.MAP_NETWORK_MANAGER)]
     public partial class MapNetworkManager : BaseGameNetworkManager, IAppServer
     {
         public const float TERMINATE_INSTANCE_DELAY = 30f;  // Close instance when no clients connected within 30 seconds
