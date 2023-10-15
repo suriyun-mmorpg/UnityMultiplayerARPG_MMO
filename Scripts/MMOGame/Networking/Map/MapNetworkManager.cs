@@ -850,7 +850,7 @@ namespace MultiplayerARPG.MMO
             // Notify clients that this character is spawn or dead
             if (!playerCharacterEntity.IsDead())
             {
-                playerCharacterEntity.CallAllOnRespawn();
+                playerCharacterEntity.CallRpcOnRespawn();
                 // Summon saved mount entity
                 if (GameInstance.VehicleEntities.ContainsKey(playerCharacterData.MountDataId))
                     playerCharacterEntity.Mount(GameInstance.VehicleEntities[playerCharacterData.MountDataId]);
@@ -873,7 +873,7 @@ namespace MultiplayerARPG.MMO
             }
             else
             {
-                playerCharacterEntity.CallAllOnDead();
+                playerCharacterEntity.CallRpcOnDead();
             }
         }
 #endif
