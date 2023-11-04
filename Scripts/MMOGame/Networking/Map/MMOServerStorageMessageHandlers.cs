@@ -261,7 +261,7 @@ namespace MultiplayerARPG.MMO
             // Prepare item data
             CharacterItem fromItem = storageItems[request.fromIndex].Clone(true);
             CharacterItem toItem = storageItems[request.toIndex].Clone(true);
-            if (fromItem.dataId.Equals(toItem.dataId) && !fromItem.IsFull() && !toItem.IsFull() && fromItem.level == toItem.level)
+            if (fromItem.dataId == toItem.dataId && !fromItem.IsFull() && !toItem.IsFull() && fromItem.level == toItem.level)
             {
                 // Merge if same id and not full
                 int maxStack = toItem.GetMaxStack();
