@@ -54,7 +54,7 @@ namespace MultiplayerARPG.MMO
                 uiServerEntry.Show();
                 SelectionManager.Add(uiServerEntry);
                 if (index == 0)
-                    uiServerEntry.OnClickSelect();
+                    uiServerEntry.SelectByManager();
             });
         }
     }
