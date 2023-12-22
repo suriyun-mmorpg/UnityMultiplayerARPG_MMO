@@ -340,7 +340,7 @@ namespace MultiplayerARPG.MMO
             playerCharacter.UserCash = resultUserCash;
 
             // Response to client
-            playerCharacterEntity.IsUpdatingItems = true;
+            playerCharacterEntity.IsUpdatingItems = false;
             result.InvokeSuccess(new ResponseCashPackageBuyValidationMessage()
             {
                 dataId = request.dataId,
