@@ -304,7 +304,7 @@ namespace MultiplayerARPG.MMO
             IIAPReceiptValidator receiptValidator = GetComponentInChildren<IIAPReceiptValidator>();
             if (receiptValidator == null)
                 receiptValidator = gameObject.AddComponent<DefaultIAPReceiptValidator>();
-            IAPReceiptValidateResult validateResult = await receiptValidator.ValidateIAPReceipt(request.receipt);
+            IAPReceiptValidateResult validateResult = await receiptValidator.ValidateIAPReceipt(playerCharacterEntity.UserId, playerCharacterEntity.Id, request.receipt);
             if (!validateResult.IsSuccess)
             {
                 playerCharacterEntity.IsUpdatingItems = false;
