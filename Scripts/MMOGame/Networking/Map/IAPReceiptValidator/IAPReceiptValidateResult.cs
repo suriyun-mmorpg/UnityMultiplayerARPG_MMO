@@ -6,6 +6,6 @@ namespace MultiplayerARPG.MMO
     public class IAPReceiptValidateResult
     {
         public bool IsSuccess { get; set; }
-        public List<CashPackage> CashPackages { get; set; } = new List<CashPackage>();
+        public int ChangeCash { get; set; }
     }
 }

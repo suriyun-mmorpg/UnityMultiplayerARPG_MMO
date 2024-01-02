@@ -316,25 +316,22 @@ namespace MultiplayerARPG.MMO
             }
 
             int resultUserCash = 0;
-            for (int i = 0; i < validateResult.CashPackages.Count; ++i)
+            DatabaseApiResult<CashResp> changeCashResp = await DbServiceClient.ChangeCashAsync(new ChangeCashReq()
             {
-                // TODO: Money thing is very important, it should have better data handling
-                DatabaseApiResult<CashResp> changeCashResp = await DbServiceClient.ChangeCashAsync(new ChangeCashReq()
+                UserId = playerCharacter.UserId,
+                ChangeAmount = validateResult.ChangeCash,
+            });
+            // TODO: Money thing is very important, it should have better data handling
+            if (!changeCashResp.IsSuccess)
+            {
+                playerCharacterEntity.IsUpdatingItems = false;
+                result.InvokeError(new ResponseCashPackageBuyValidationMessage()
                 {
-                    UserId = playerCharacter.UserId,
-                    ChangeAmount = cashPackage.CashAmount
+                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
                 });
-                if (!changeCashResp.IsSuccess)
-                {
-                    playerCharacterEntity.IsUpdatingItems = false;
-                    result.InvokeError(new ResponseCashPackageBuyValidationMessage()
-                    {
-                        message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
-                    });
-                    return;
-                }
-                resultUserCash = changeCashResp.Response.Cash;
+                return;
             }
+            resultUserCash = changeCashResp.Response.Cash;
 
             // Sync cash to game clients
             playerCharacter.UserCash = resultUserCash;

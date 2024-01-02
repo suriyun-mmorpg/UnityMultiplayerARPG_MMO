@@ -12,6 +12,7 @@ namespace MultiplayerARPG.MMO
             return new IAPReceiptValidateResult()
             {
                 IsSuccess = true,
+                ChangeCash = cashPackage.CashAmount,
             };
         }
     }

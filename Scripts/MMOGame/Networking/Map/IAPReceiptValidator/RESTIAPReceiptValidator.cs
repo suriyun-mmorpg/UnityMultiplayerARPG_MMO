@@ -23,6 +23,10 @@ namespace MultiplayerARPG.MMO
             return new IAPReceiptValidateResult()
             {
                 IsSuccess = !result.IsError(),
+                CashPackages = new List<CashPackage>()
+                {
+                    cashPackage,
+                },
             };
         }
     }
