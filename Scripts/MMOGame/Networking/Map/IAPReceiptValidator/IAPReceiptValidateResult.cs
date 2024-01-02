@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace MultiplayerARPG.MMO
 {
     [System.Serializable]
