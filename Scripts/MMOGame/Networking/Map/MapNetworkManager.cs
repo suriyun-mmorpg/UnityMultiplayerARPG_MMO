@@ -982,7 +982,10 @@ namespace MultiplayerARPG.MMO
                     }
                 }
                 if (!sentGmCommand)
+                {
                     ServerChatHandlers.OnChatMessage(message);
+                    ServerLogHandlers.LogEnterChat(message);
+                }
                 return;
             }
             // Chat messages for other chat channels will be sent to cluster server, then cluster server will pass it to other map-servers to send to clients
@@ -1171,6 +1174,7 @@ namespace MultiplayerARPG.MMO
             else
             {
                 ServerChatHandlers.OnChatMessage(message);
+                ServerLogHandlers.LogEnterChat(message);
             }
 #endif
         }
