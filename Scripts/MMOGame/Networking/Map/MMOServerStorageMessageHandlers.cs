@@ -220,6 +220,8 @@ namespace MultiplayerARPG.MMO
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             // Validate user and storage accessibility
             StorageId storageId = new StorageId(request.storageType, request.storageOwnerId);
+            int fromIndex = request.fromIndex;
+            int toIndex = request.toIndex;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
                 result.InvokeError(new ResponseSwapOrMergeStorageItemMessage()
@@ -243,50 +245,23 @@ namespace MultiplayerARPG.MMO
                 result.InvokeError(new ResponseSwapOrMergeStorageItemMessage());
                 return;
             }
+
+            // Get items from storage
             List<CharacterItem> storageItems = GameInstance.ServerStorageHandlers.GetStorageItems(storageId);
-            // Validate swap or merge indexes
-            if (request.fromIndex >= storageItems.Count ||
-                request.toIndex >= storageItems.Count)
-            {
-                result.InvokeError(new ResponseSwapOrMergeStorageItemMessage()
-                {
-                    message = UITextKeys.UI_ERROR_INVALID_ITEM_INDEX,
-                });
-                return;
-            }
-            // Perform swap or merge items
+
+            // Prepare storage data
             Storage storage = GameInstance.ServerStorageHandlers.GetStorage(storageId, out _);
             bool isLimitSlot = storage.slotLimit > 0;
             int slotLimit = storage.slotLimit;
-            // Prepare item data
-            CharacterItem fromItem = storageItems[request.fromIndex].Clone(true);
-            CharacterItem toItem = storageItems[request.toIndex].Clone(true);
-            if (fromItem.dataId == toItem.dataId && !fromItem.IsFull() && !toItem.IsFull() && fromItem.level == toItem.level)
+            if (!playerCharacter.SwapOrMergeStorageItem(storageId, isLimitSlot, slotLimit, storageItems, fromIndex, toIndex, out UITextKeys gameMessage))
             {
-                // Merge if same id and not full
-                int maxStack = toItem.GetMaxStack();
-                if (toItem.amount + fromItem.amount <= maxStack)
+                result.InvokeError(new ResponseSwapOrMergeStorageItemMessage()
                 {
-                    toItem.amount += fromItem.amount;
-                    storageItems[request.fromIndex] = CharacterItem.Empty;
-                    storageItems[request.toIndex] = toItem;
-                }
-                else
-                {
-                    int remains = toItem.amount + fromItem.amount - maxStack;
-                    toItem.amount = maxStack;
-                    fromItem.amount = remains;
-                    storageItems[request.fromIndex] = fromItem;
-                    storageItems[request.toIndex] = toItem;
-                }
+                    message = gameMessage,
+                });
+                return;
             }
-            else
-            {
-                // Swap
-                storageItems[request.fromIndex] = toItem;
-                storageItems[request.toIndex] = fromItem;
-            }
-            storageItems.FillEmptySlots(isLimitSlot, slotLimit);
+
             GameInstance.ServerStorageHandlers.SetStorageItems(storageId, storageItems);
             GameInstance.ServerStorageHandlers.NotifyStorageItemsUpdated(request.storageType, request.storageOwnerId);
             SetStorageSavePending(storageId, true);
