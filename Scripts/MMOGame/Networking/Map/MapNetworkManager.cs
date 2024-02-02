@@ -95,6 +95,9 @@ namespace MultiplayerARPG.MMO
         }
         private float _lastSaveTime;
         private float _terminatingTime;
+        private bool _isApplicationQuitted = false;
+        private bool _isDataSaveBeforeQuitRequested = false;
+        private bool _isDataSavedBeforeQuit = false;
         // Listing
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         private readonly ConcurrentDictionary<string, InstanceMapWarpingLocation> _locationsBeforeEnterInstance = new ConcurrentDictionary<string, InstanceMapWarpingLocation>();
@@ -117,6 +120,10 @@ namespace MultiplayerARPG.MMO
 
         protected override void Awake()
         {
+            Application.wantsToQuit += Application_wantsToQuit;
+            _isApplicationQuitted = false;
+            _isDataSaveBeforeQuitRequested = false;
+            _isDataSavedBeforeQuit = false;
             // Server Handlers
             ServerMailHandlers = gameObject.GetOrAddComponent<IServerMailHandlers, MMOServerMailHandlers>();
             ServerUserHandlers = gameObject.GetOrAddComponent<IServerUserHandlers, MMOServerUserHandlers>();
@@ -256,33 +263,54 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        protected async override void OnDestroy()
+        protected override void OnDestroy()
         {
+            Application.wantsToQuit -= Application_wantsToQuit;
             // Save immediately
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-            if (IsServer)
-            {
-                foreach (BasePlayerCharacterEntity playerCharacter in ServerUserHandlers.GetPlayerCharacters())
-                {
-                    if (playerCharacter == null) continue;
-                    await DbServiceClient.UpdateCharacterAsync(new UpdateCharacterReq()
-                    {
-                        CharacterData = playerCharacter.CloneTo(new PlayerCharacterData())
-                    });
-                }
-                foreach (BuildingEntity buildingEntity in ServerBuildingHandlers.GetBuildings())
-                {
-                    if (buildingEntity == null) continue;
-                    await DbServiceClient.UpdateBuildingAsync(new UpdateBuildingReq()
-                    {
-                        ChannelId = ChannelId,
-                        MapName = CurrentMapInfo.Id,
-                        BuildingData = buildingEntity.CloneTo(new BuildingSaveData())
-                    });
-                }
-            }
+            if (IsServer && !_isApplicationQuitted)
+                SaveDataBeforeQuit();
 #endif
             base.OnDestroy();
+        }
+
+        private async void SaveDataBeforeQuit()
+        {
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+            foreach (BasePlayerCharacterEntity playerCharacter in ServerUserHandlers.GetPlayerCharacters())
+            {
+                if (playerCharacter == null) continue;
+                await DbServiceClient.UpdateCharacterAsync(new UpdateCharacterReq()
+                {
+                    CharacterData = playerCharacter.CloneTo(new PlayerCharacterData())
+                });
+            }
+            foreach (BuildingEntity buildingEntity in ServerBuildingHandlers.GetBuildings())
+            {
+                if (buildingEntity == null) continue;
+                await DbServiceClient.UpdateBuildingAsync(new UpdateBuildingReq()
+                {
+                    ChannelId = ChannelId,
+                    MapName = CurrentMapInfo.Id,
+                    BuildingData = buildingEntity.CloneTo(new BuildingSaveData())
+                });
+            }
+            _isDataSavedBeforeQuit = true;
+#endif
+        }
+
+        private bool Application_wantsToQuit()
+        {
+            if (IsServer && !_isDataSavedBeforeQuit)
+            {
+                if (!_isDataSaveBeforeQuitRequested)
+                {
+                    SaveDataBeforeQuit();
+                    _isDataSaveBeforeQuitRequested = true;
+                }
+                return false;
+            }
+            return true;
         }
 
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
