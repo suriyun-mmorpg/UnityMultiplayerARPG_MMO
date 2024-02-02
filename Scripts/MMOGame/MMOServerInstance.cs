@@ -572,16 +572,20 @@ namespace MultiplayerARPG.MMO
 
         private bool Application_wantsToQuit()
         {
+#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             if (mapNetworkManager != null && mapNetworkManager.IsServer && !mapNetworkManager.ReadyToQuit)
             {
+                Logging.Log("[MapNetworkManager] still proceeding before quit.");
                 mapNetworkManager.ProceedBeforeQuit();
                 return false;
             }
             if (databaseNetworkManager != null && databaseNetworkManager.IsServer && !databaseNetworkManager.ReadyToQuit)
             {
+                Logging.Log("[DatabaseNetworkManager] still proceeding before quit.");
                 databaseNetworkManager.ProceedBeforeQuit();
                 return false;
             }
+#endif
             return true;
         }
 
