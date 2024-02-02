@@ -104,6 +104,7 @@ namespace MultiplayerARPG.MMO
             }
             DontDestroyOnLoad(gameObject);
             Singleton = this;
+            Application.wantsToQuit += Application_wantsToQuit;
 
             // Always accept SSL
             ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback((sender, certificate, chain, policyErrors) => { return true; });
@@ -562,6 +563,26 @@ namespace MultiplayerARPG.MMO
                 }
             }
 #endif
+        }
+
+        private void OnDestroy()
+        {
+            Application.wantsToQuit -= Application_wantsToQuit;
+        }
+
+        private bool Application_wantsToQuit()
+        {
+            if (mapNetworkManager != null && mapNetworkManager.IsServer && !mapNetworkManager.ReadyToQuit)
+            {
+                mapNetworkManager.ProceedBeforeQuit();
+                return false;
+            }
+            if (databaseNetworkManager != null && databaseNetworkManager.IsServer && !databaseNetworkManager.ReadyToQuit)
+            {
+                databaseNetworkManager.ProceedBeforeQuit();
+                return false;
+            }
+            return true;
         }
 
         public void EnableLogger(string fileName)
