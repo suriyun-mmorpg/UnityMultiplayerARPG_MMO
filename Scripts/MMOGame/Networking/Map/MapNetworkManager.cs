@@ -631,7 +631,7 @@ namespace MultiplayerARPG.MMO
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         private async UniTask<bool> ValidatePlayerConnection(long connectionId, string userId, string accessToken, string selectCharacterId)
         {
-            if (!IsReadyToInstantiateObjects())
+            if (!IsServerReadyToInstantiateObjects())
             {
                 if (LogError)
                     Logging.LogError(LogTag, "Not ready to spawn player: " + userId + ", user must see map server is not ready, how can this guy reach here? :P.");
