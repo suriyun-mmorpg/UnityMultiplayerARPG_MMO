@@ -6,6 +6,8 @@ namespace MultiplayerARPG.MMO
     {
         protected override void OnClickCreate()
         {
+            if (buttonCreate)
+                buttonCreate.interactable = false;
             PlayerCharacterData characterData = new PlayerCharacterData();
             characterData.Id = GenericUtils.GetUniqueId();
             characterData.SetNewPlayerCharacterData(uiInputCharacterName.text.Trim(), SelectedDataId, SelectedEntityId, SelectedFactionId);
@@ -17,6 +19,8 @@ namespace MultiplayerARPG.MMO
 
         private void OnRequestedCreateCharacter(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseCreateCharacterMessage response)
         {
+            if (buttonCreate)
+                buttonCreate.interactable = true;
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
             if (eventOnCreateCharacter != null)
                 eventOnCreateCharacter.Invoke();
