@@ -8,6 +8,10 @@ namespace MultiplayerARPG.MMO
     {
         protected override void LoadCharacters()
         {
+            if (buttonStart != null)
+                buttonStart.gameObject.SetActive(false);
+            if (buttonDelete != null)
+                buttonDelete.gameObject.SetActive(false);
             eventOnNotAbleToCreateCharacter.Invoke();
             MMOClientInstance.Singleton.RequestCharacters(OnRequestedCharacters);
         }
@@ -17,9 +21,6 @@ namespace MultiplayerARPG.MMO
             // Clear character list
             CharacterSelectionManager.Clear();
             CharacterList.HideAll();
-            // Unable buttons
-            buttonStart.gameObject.SetActive(false);
-            buttonDelete.gameObject.SetActive(false);
             // Remove all models
             characterModelContainer.RemoveChildren();
             _characterModelById.Clear();
