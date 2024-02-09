@@ -21,7 +21,6 @@ namespace MultiplayerARPG.MMO
         public async UniTaskVoid HandleRequestAcceptGuildInvitation(RequestHandlerData requestHandler, RequestAcceptGuildInvitationMessage request, RequestProceedResultDelegate<ResponseAcceptGuildInvitationMessage> result)
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-            await UniTask.Yield();
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out BasePlayerCharacterEntity playerCharacter))
             {
                 result.InvokeError(new ResponseAcceptGuildInvitationMessage()
@@ -76,17 +75,16 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid HandleRequestDeclineGuildInvitation(RequestHandlerData requestHandler, RequestDeclineGuildInvitationMessage request, RequestProceedResultDelegate<ResponseDeclineGuildInvitationMessage> result)
+        public UniTaskVoid HandleRequestDeclineGuildInvitation(RequestHandlerData requestHandler, RequestDeclineGuildInvitationMessage request, RequestProceedResultDelegate<ResponseDeclineGuildInvitationMessage> result)
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-            await UniTask.Yield();
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out BasePlayerCharacterEntity playerCharacter))
             {
                 result.InvokeError(new ResponseDeclineGuildInvitationMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
-                return;
+                return default;
             }
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanDeclineGuildInvitation(request.guildId, playerCharacter);
             if (!validateResult.IsSuccess)
@@ -95,7 +93,7 @@ namespace MultiplayerARPG.MMO
                 {
                     message = validateResult.GameMessage,
                 });
-                return;
+                return default;
             }
             GameInstance.ServerGuildHandlers.RemoveGuildInvitation(request.guildId, playerCharacter.Id);
             // Send message to inviter
@@ -106,19 +104,19 @@ namespace MultiplayerARPG.MMO
                 message = UITextKeys.UI_GUILD_INVITATION_DECLINED,
             });
 #endif
+            return default;
         }
 
-        public async UniTaskVoid HandleRequestSendGuildInvitation(RequestHandlerData requestHandler, RequestSendGuildInvitationMessage request, RequestProceedResultDelegate<ResponseSendGuildInvitationMessage> result)
+        public UniTaskVoid HandleRequestSendGuildInvitation(RequestHandlerData requestHandler, RequestSendGuildInvitationMessage request, RequestProceedResultDelegate<ResponseSendGuildInvitationMessage> result)
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-            await UniTask.Yield();
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out BasePlayerCharacterEntity playerCharacter))
             {
                 result.InvokeError(new ResponseSendGuildInvitationMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
-                return;
+                return default;
             }
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(request.inviteeId, out BasePlayerCharacterEntity inviteeCharacter))
             {
@@ -126,7 +124,7 @@ namespace MultiplayerARPG.MMO
                 {
                     message = UITextKeys.UI_ERROR_CHARACTER_NOT_FOUND,
                 });
-                return;
+                return default;
             }
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanSendGuildInvitation(playerCharacter, inviteeCharacter);
             if (!validateResult.IsSuccess)
@@ -135,7 +133,7 @@ namespace MultiplayerARPG.MMO
                 {
                     message = validateResult.GameMessage,
                 });
-                return;
+                return default;
             }
             GameInstance.ServerGuildHandlers.AppendGuildInvitation(playerCharacter.GuildId, request.inviteeId);
             GameInstance.ServerGameMessageHandlers.SendNotifyGuildInvitation(inviteeCharacter.ConnectionId, new GuildInvitationData()
@@ -149,12 +147,12 @@ namespace MultiplayerARPG.MMO
             });
             result.InvokeSuccess(new ResponseSendGuildInvitationMessage());
 #endif
+            return default;
         }
 
         public async UniTaskVoid HandleRequestCreateGuild(RequestHandlerData requestHandler, RequestCreateGuildMessage request, RequestProceedResultDelegate<ResponseCreateGuildMessage> result)
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-            await UniTask.Yield();
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
                 result.InvokeError(new ResponseCreateGuildMessage()
@@ -236,7 +234,6 @@ namespace MultiplayerARPG.MMO
         public async UniTaskVoid HandleRequestChangeGuildLeader(RequestHandlerData requestHandler, RequestChangeGuildLeaderMessage request, RequestProceedResultDelegate<ResponseChangeGuildLeaderMessage> result)
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-            await UniTask.Yield();
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
                 result.InvokeError(new ResponseChangeGuildLeaderMessage()
@@ -302,7 +299,6 @@ namespace MultiplayerARPG.MMO
         public async UniTaskVoid HandleRequestKickMemberFromGuild(RequestHandlerData requestHandler, RequestKickMemberFromGuildMessage request, RequestProceedResultDelegate<ResponseKickMemberFromGuildMessage> result)
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-            await UniTask.Yield();
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
                 result.InvokeError(new ResponseKickMemberFromGuildMessage()
@@ -355,7 +351,6 @@ namespace MultiplayerARPG.MMO
         public async UniTaskVoid HandleRequestLeaveGuild(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<ResponseLeaveGuildMessage> result)
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-            await UniTask.Yield();
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
                 result.InvokeError(new ResponseLeaveGuildMessage()
@@ -451,7 +446,6 @@ namespace MultiplayerARPG.MMO
         public async UniTaskVoid HandleRequestChangeGuildMessage(RequestHandlerData requestHandler, RequestChangeGuildMessageMessage request, RequestProceedResultDelegate<ResponseChangeGuildMessageMessage> result)
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-            await UniTask.Yield();
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
                 result.InvokeError(new ResponseChangeGuildMessageMessage()
@@ -499,7 +493,6 @@ namespace MultiplayerARPG.MMO
         public async UniTaskVoid HandleRequestChangeGuildMessage2(RequestHandlerData requestHandler, RequestChangeGuildMessageMessage request, RequestProceedResultDelegate<ResponseChangeGuildMessageMessage> result)
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-            await UniTask.Yield();
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
                 result.InvokeError(new ResponseChangeGuildMessageMessage()
@@ -547,7 +540,6 @@ namespace MultiplayerARPG.MMO
         public async UniTaskVoid HandleRequestChangeGuildOptions(RequestHandlerData requestHandler, RequestChangeGuildOptionsMessage request, RequestProceedResultDelegate<ResponseChangeGuildOptionsMessage> result)
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-            await UniTask.Yield();
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
                 result.InvokeError(new ResponseChangeGuildOptionsMessage()
@@ -595,7 +587,6 @@ namespace MultiplayerARPG.MMO
         public async UniTaskVoid HandleRequestChangeGuildAutoAcceptRequests(RequestHandlerData requestHandler, RequestChangeGuildAutoAcceptRequestsMessage request, RequestProceedResultDelegate<ResponseChangeGuildAutoAcceptRequestsMessage> result)
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-            await UniTask.Yield();
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
                 result.InvokeError(new ResponseChangeGuildAutoAcceptRequestsMessage()
@@ -643,7 +634,6 @@ namespace MultiplayerARPG.MMO
         public async UniTaskVoid HandleRequestChangeGuildRole(RequestHandlerData requestHandler, RequestChangeGuildRoleMessage request, RequestProceedResultDelegate<ResponseChangeGuildRoleMessage> result)
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-            await UniTask.Yield();
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
                 result.InvokeError(new ResponseChangeGuildRoleMessage()
@@ -704,7 +694,6 @@ namespace MultiplayerARPG.MMO
         public async UniTaskVoid HandleRequestChangeMemberGuildRole(RequestHandlerData requestHandler, RequestChangeMemberGuildRoleMessage request, RequestProceedResultDelegate<ResponseChangeMemberGuildRoleMessage> result)
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-            await UniTask.Yield();
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
                 result.InvokeError(new ResponseChangeMemberGuildRoleMessage()
@@ -758,7 +747,6 @@ namespace MultiplayerARPG.MMO
         public async UniTaskVoid HandleRequestIncreaseGuildSkillLevel(RequestHandlerData requestHandler, RequestIncreaseGuildSkillLevelMessage request, RequestProceedResultDelegate<ResponseIncreaseGuildSkillLevelMessage> result)
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-            await UniTask.Yield();
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
                 result.InvokeError(new ResponseIncreaseGuildSkillLevelMessage()
@@ -804,47 +792,47 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid HandleRequestSendGuildRequest(RequestHandlerData requestHandler, RequestSendGuildRequestMessage request, RequestProceedResultDelegate<ResponseSendGuildRequestMessage> result)
+        public UniTaskVoid HandleRequestSendGuildRequest(RequestHandlerData requestHandler, RequestSendGuildRequestMessage request, RequestProceedResultDelegate<ResponseSendGuildRequestMessage> result)
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             result.Invoke(AckResponseCode.Unimplemented, new ResponseSendGuildRequestMessage());
-            await UniTask.Yield();
 #endif
+            return default;
         }
 
-        public async UniTaskVoid HandleRequestAcceptGuildRequest(RequestHandlerData requestHandler, RequestAcceptGuildRequestMessage request, RequestProceedResultDelegate<ResponseAcceptGuildRequestMessage> result)
+        public UniTaskVoid HandleRequestAcceptGuildRequest(RequestHandlerData requestHandler, RequestAcceptGuildRequestMessage request, RequestProceedResultDelegate<ResponseAcceptGuildRequestMessage> result)
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             result.Invoke(AckResponseCode.Unimplemented, new ResponseAcceptGuildRequestMessage());
-            await UniTask.Yield();
 #endif
+            return default;
         }
 
-        public async UniTaskVoid HandleRequestDeclineGuildRequest(RequestHandlerData requestHandler, RequestDeclineGuildRequestMessage request, RequestProceedResultDelegate<ResponseDeclineGuildRequestMessage> result)
+        public UniTaskVoid HandleRequestDeclineGuildRequest(RequestHandlerData requestHandler, RequestDeclineGuildRequestMessage request, RequestProceedResultDelegate<ResponseDeclineGuildRequestMessage> result)
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             result.Invoke(AckResponseCode.Unimplemented, new ResponseDeclineGuildRequestMessage());
-            await UniTask.Yield();
 #endif
+            return default;
         }
 
-        public async UniTaskVoid HandleRequestGetGuildRequests(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<ResponseGetGuildRequestsMessage> result)
+        public UniTaskVoid HandleRequestGetGuildRequests(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<ResponseGetGuildRequestsMessage> result)
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             result.Invoke(AckResponseCode.Unimplemented, new ResponseGetGuildRequestsMessage());
-            await UniTask.Yield();
 #endif
+            return default;
         }
 
-        public async UniTaskVoid HandleRequestFindGuilds(RequestHandlerData requestHandler, RequestFindGuildsMessage request, RequestProceedResultDelegate<ResponseFindGuildsMessage> result)
+        public UniTaskVoid HandleRequestFindGuilds(RequestHandlerData requestHandler, RequestFindGuildsMessage request, RequestProceedResultDelegate<ResponseFindGuildsMessage> result)
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             result.Invoke(AckResponseCode.Unimplemented, new ResponseFindGuildsMessage());
-            await UniTask.Yield();
 #endif
+            return default;
         }
 
-        public async UniTaskVoid HandleRequestGetGuildInfo(RequestHandlerData requestHandler, RequestGetGuildInfoMessage request, RequestProceedResultDelegate<ResponseGetGuildInfoMessage> result)
+        public UniTaskVoid HandleRequestGetGuildInfo(RequestHandlerData requestHandler, RequestGetGuildInfoMessage request, RequestProceedResultDelegate<ResponseGetGuildInfoMessage> result)
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
@@ -853,7 +841,7 @@ namespace MultiplayerARPG.MMO
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
-                return;
+                return default;
             }
 
             if (!GameInstance.ServerGuildHandlers.TryGetGuild(request.guildId, out GuildData guild))
@@ -862,7 +850,7 @@ namespace MultiplayerARPG.MMO
                 {
                     message = UITextKeys.UI_ERROR_GUILD_NOT_FOUND,
                 });
-                return;
+                return default;
             }
 
             result.InvokeSuccess(new ResponseGetGuildInfoMessage()
@@ -876,16 +864,16 @@ namespace MultiplayerARPG.MMO
                     Options = guild.options,
                 }
             });
-            await UniTask.Yield();
 #endif
+            return default;
         }
 
-        public async UniTaskVoid HandleRequestGuildRequestNotification(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<ResponseGuildRequestNotificationMessage> result)
+        public UniTaskVoid HandleRequestGuildRequestNotification(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<ResponseGuildRequestNotificationMessage> result)
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             result.Invoke(AckResponseCode.Unimplemented, new ResponseGuildRequestNotificationMessage());
-            await UniTask.Yield();
 #endif
+            return default;
         }
     }
 }

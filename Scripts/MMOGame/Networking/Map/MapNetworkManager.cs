@@ -549,10 +549,10 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-        protected override async UniTask PostSpawnEntities()
+        protected override UniTask PostSpawnEntities()
         {
-            await UniTask.Yield();
             ClusterClient.OnAppStart();
+            return UniTask.CompletedTask;
         }
 #endif
 
@@ -1080,21 +1080,19 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        internal async UniTaskVoid HandleRequesRunMap(
+        internal UniTaskVoid HandleRequesRunMap(
             RequestHandlerData requestHandler,
             RequestSpawnMapMessage request,
             RequestProceedResultDelegate<ResponseSpawnMapMessage> result)
         {
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-            await UniTask.Yield();
-
             if (!IsAllocate)
             {
                 result.InvokeError(new ResponseSpawnMapMessage()
                 {
                     message = UITextKeys.UI_ERROR_APP_NOT_READY,
                 });
-                return;
+                return default;
             }
 
             if (CurrentMapInfo == null || !string.Equals(CurrentMapInfo.Id, request.mapName))
@@ -1103,7 +1101,7 @@ namespace MultiplayerARPG.MMO
                 {
                     message = UITextKeys.UI_ERROR_INVALID_DATA,
                 });
-                return;
+                return default;
             }
 
             IsAllocate = false;
@@ -1128,6 +1126,7 @@ namespace MultiplayerARPG.MMO
                 peerInfo = peerInfo,
             });
 #endif
+            return default;
         }
         #endregion
 

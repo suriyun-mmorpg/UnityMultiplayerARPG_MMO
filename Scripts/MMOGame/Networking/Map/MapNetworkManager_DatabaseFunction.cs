@@ -19,11 +19,7 @@ namespace MultiplayerARPG.MMO
         {
             if (_loadingStorageIds.Contains(storageId))
             {
-                do
-                {
-                    await UniTask.Yield();
-                }
-                while (_loadingStorageIds.Contains(storageId));
+                await UniTask.WaitUntil(() => !_loadingStorageIds.Contains(storageId));
                 return;
             }
             _loadingStorageIds.Add(storageId);
@@ -53,11 +49,7 @@ namespace MultiplayerARPG.MMO
                 return;
             if (_loadingPartyIds.Contains(id))
             {
-                do
-                {
-                    await UniTask.Yield();
-                }
-                while (_loadingPartyIds.Contains(id));
+                await UniTask.WaitUntil(() => !_loadingPartyIds.Contains(id));
                 return;
             }
             _loadingPartyIds.Add(id);
@@ -86,11 +78,7 @@ namespace MultiplayerARPG.MMO
                 return;
             if (_loadingGuildIds.Contains(id))
             {
-                do
-                {
-                    await UniTask.Yield();
-                }
-                while (_loadingGuildIds.Contains(id));
+                await UniTask.WaitUntil(() => !_loadingGuildIds.Contains(id));
                 return;
             }
             _loadingGuildIds.Add(id);

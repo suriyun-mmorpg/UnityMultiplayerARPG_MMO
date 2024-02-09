@@ -94,9 +94,8 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTask<List<CharacterItem>> ConvertStorageItems(StorageId storageId, List<StorageConvertItemsEntry> convertItems)
+        public UniTask<List<CharacterItem>> ConvertStorageItems(StorageId storageId, List<StorageConvertItemsEntry> convertItems)
         {
-            await UniTask.Yield();
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
             // Prepare storage data
             StorageType storageType = storageId.storageType;
@@ -137,9 +136,9 @@ namespace MultiplayerARPG.MMO
             SetStorageItems(storageId, storageItems);
             NotifyStorageItemsUpdated(storageId.storageType, storageId.storageOwnerId);
             SetStorageSavePending(storageId, true);
-            return droppingItems;
+            return UniTask.FromResult(droppingItems);
 #else
-            return null;
+            return UniTask.FromResult<List<CharacterItem>>(null);
 #endif
         }
 
