@@ -72,7 +72,7 @@ namespace MultiplayerARPG.MMO
             if (!_mapServerConnectionIdsBySceneName.TryGetValue(PeerInfoExtensions.GetPeerInfoKey(ChannelId, mapName), out CentralServerPeerInfo peerInfo))
                 return;
 
-            if (!GameInstance.MapInfos.TryGetValue(mapName, out BaseMapInfo mapInfo) || !mapInfo.IsSceneSet())
+            if (!GameInstance.MapInfos.TryGetValue(mapName, out BaseMapInfo mapInfo) || (!mapInfo.IsAddressableSceneValid() && !mapInfo.IsSceneValid()))
                 return;
 
             await SaveAndWarpCharacterByPeerInfo(playerCharacterEntity, peerInfo, true, mapName, position, overrideRotation, rotation);
