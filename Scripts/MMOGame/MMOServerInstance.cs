@@ -7,6 +7,7 @@ using LiteNetLibManager;
 using UnityEngine;
 using Newtonsoft.Json;
 using UnityEngine.Serialization;
+using Cysharp.Threading.Tasks;
 
 namespace MultiplayerARPG.MMO
 {
@@ -598,8 +599,9 @@ namespace MultiplayerARPG.MMO
         }
 
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-        private void OnGameDataLoaded()
+        private async void OnGameDataLoaded()
         {
+            await UniTask.NextFrame();
             databaseNetworkManager.DatabaseCache = new LocalDatabaseCache();
             DatabaseNetworkManager.GuildMemberRoles = GameInstance.Singleton.SocialSystemSetting.GuildMemberRoles;
             DatabaseNetworkManager.GuildExpTree = GameInstance.Singleton.SocialSystemSetting.GuildExpTree;
