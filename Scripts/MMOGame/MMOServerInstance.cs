@@ -599,9 +599,29 @@ namespace MultiplayerARPG.MMO
         }
 
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
-        private async void OnGameDataLoaded()
+        private void OnGameDataLoaded()
         {
+            GameInstance gameInstance = FindObjectOfType<GameInstance>();
+            gameInstance.LoadHomeScenePreventions[nameof(MMOServerInstance)] = false;
+
+            if (_startingCentralServer ||
+                _startingMapSpawnServer ||
+                _startingMapServer)
+            {
+                // Allow to test in editor, so still load home scene in editor
+                gameInstance.LoadHomeScenePreventions[nameof(MMOServerInstance)] = !Application.isEditor || _startingMapServer;
+            }
+
+            StartServers();
+        }
+#endif
+
+        private async void StartServers()
+        {
+            // Wait a frame to make sure it will prepare servers' transports properly
             await UniTask.NextFrame();
+
+            // Prepare guild data for guild database manager
             databaseNetworkManager.DatabaseCache = new LocalDatabaseCache();
             DatabaseNetworkManager.GuildMemberRoles = GameInstance.Singleton.SocialSystemSetting.GuildMemberRoles;
             DatabaseNetworkManager.GuildExpTree = GameInstance.Singleton.SocialSystemSetting.GuildExpTree;
@@ -660,20 +680,15 @@ namespace MultiplayerARPG.MMO
                 StartMapServer();
             }
 
-            GameInstance gameInstance = FindObjectOfType<GameInstance>();
-            gameInstance.LoadHomeScenePreventions[nameof(MMOServerInstance)] = false;
-
             if (_startingCentralServer ||
                 _startingMapSpawnServer ||
                 _startingMapServer)
             {
                 // Start database manager client, it will connect to database manager server
                 // To request database functions
-                gameInstance.LoadHomeScenePreventions[nameof(MMOServerInstance)] = !Application.isEditor || _startingMapServer;
                 StartDatabaseManagerClient();
             }
         }
-#endif
 
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
         #region Server functions
