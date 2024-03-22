@@ -126,7 +126,7 @@ namespace MultiplayerARPG.MMO
             for (int i = 0; i < playerCharacterData.Summons.Count; ++i)
             {
                 tempSummon = playerCharacterData.Summons[i];
-                if (tempSummon == null || tempSummon.CacheEntity == null || tempSummon.CacheEntity.Buffs == null || tempSummon.CacheEntity.Buffs.Count == 0) continue;
+                if (tempSummon.CacheEntity == null || tempSummon.CacheEntity.Buffs == null || tempSummon.CacheEntity.Buffs.Count == 0) continue;
                 for (int j = 0; j < tempSummon.CacheEntity.Buffs.Count; ++j)
                 {
                     tempBuff = tempSummon.CacheEntity.Buffs[j];
