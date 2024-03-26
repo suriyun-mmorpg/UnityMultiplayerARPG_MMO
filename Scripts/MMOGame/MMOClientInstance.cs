@@ -140,9 +140,12 @@ namespace MultiplayerARPG.MMO
             CentralNetworkManager.StopClient();
         }
 
-        public void StartMapClient(string sceneName, string address, int port)
+        public void StartMapClient(BaseMapInfo mapInfo, string address, int port)
         {
-            MapNetworkManager.Assets.onlineScene.SceneName = sceneName;
+            MapNetworkManager.Assets.addressableOnlineScene = mapInfo.AddressableScene;
+#if !LNLM_NO_PREFABS
+            MapNetworkManager.Assets.onlineScene = mapInfo.Scene;
+#endif
             MapNetworkManager.useWebSocket = UseWebSocket;
             MapNetworkManager.webSocketSecure = WebSocketSecure;
             MapNetworkManager.StartClient(address, port);
@@ -271,6 +274,6 @@ namespace MultiplayerARPG.MMO
             }
             return default;
         }
-        #endregion
+#endregion
     }
 }

@@ -868,9 +868,11 @@ namespace MultiplayerARPG.MMO
         protected override void HandleWarpAtClient(MessageHandlerData messageHandler)
         {
             MMOWarpMessage message = messageHandler.ReadMessage<MMOWarpMessage>();
-            Assets.offlineScene.SceneName = string.Empty;
+            bool tempLoadOfflineSceneOnClientStop = loadOfflineSceneWhenClientStopped;
+            loadOfflineSceneWhenClientStopped = true;
             StopClient();
             StartClient(message.networkAddress, message.networkPort);
+            loadOfflineSceneWhenClientStopped = tempLoadOfflineSceneOnClientStop;
         }
 
 #if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
@@ -1028,7 +1030,7 @@ namespace MultiplayerARPG.MMO
             await SaveAndDestroyDespawningPlayerCharacter(characterId);
         }
 #endif
-        #endregion
+#endregion
 
         #region Request from central server handlers
         internal async UniTaskVoid HandleRequestForceDespawnCharacter(

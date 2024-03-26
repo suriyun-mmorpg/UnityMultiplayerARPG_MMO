@@ -674,7 +674,10 @@ namespace MultiplayerARPG.MMO
                 BaseMapInfo tempMapInfo;
                 if (!string.IsNullOrEmpty(_startingMapId) && GameInstance.MapInfos.TryGetValue(_startingMapId, out tempMapInfo))
                 {
-                    mapNetworkManager.Assets.onlineScene.SceneName = tempMapInfo.Scene.SceneName;
+                    mapNetworkManager.Assets.addressableOnlineScene = tempMapInfo.AddressableScene;
+#if !LNLM_NO_PREFABS
+                    mapNetworkManager.Assets.onlineScene = tempMapInfo.Scene;
+#endif
                     mapNetworkManager.SetMapInfo(tempMapInfo);
                 }
                 StartMapServer();

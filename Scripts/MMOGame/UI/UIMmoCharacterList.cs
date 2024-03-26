@@ -111,7 +111,12 @@ namespace MultiplayerARPG.MMO
         private void OnRequestedSelectCharacter(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseSelectCharacterMessage response)
         {
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
-            MMOClientInstance.Singleton.StartMapClient(response.sceneName, response.networkAddress, response.networkPort);
+            if (!GameInstance.MapInfos.TryGetValue(response.mapName, out BaseMapInfo mapInfo))
+            {
+                responseCode.ShowUnhandledResponseMessageDialog(UITextKeys.UI_ERROR_INVALID_DATA);
+                return;
+            }
+            MMOClientInstance.Singleton.StartMapClient(mapInfo, response.networkAddress, response.networkPort);
         }
 
         public override void OnClickDelete()
