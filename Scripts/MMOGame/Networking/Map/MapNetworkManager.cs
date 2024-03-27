@@ -820,8 +820,14 @@ namespace MultiplayerARPG.MMO
             {
                 playerCharacterEntity.CallRpcOnRespawn();
                 // Summon saved mount entity
-                if (GameInstance.VehicleEntities.ContainsKey(playerCharacterData.MountDataId))
-                    playerCharacterEntity.Mount(GameInstance.VehicleEntities[playerCharacterData.MountDataId]);
+                if (GameInstance.AddressableVehicleEntities.TryGetValue(playerCharacterData.MountDataId, out AssetReferenceVehicleEntity addressablePrefab) && addressablePrefab.IsDataValid())
+                {
+                    playerCharacterEntity.Mount(null, addressablePrefab);
+                }
+                else if (GameInstance.VehicleEntities.TryGetValue(playerCharacterData.MountDataId, out VehicleEntity prefab))
+                {
+                    playerCharacterEntity.Mount(prefab, null);
+                }
                 // Summon monsters
                 for (int i = 0; i < playerCharacterEntity.Summons.Count; ++i)
                 {
