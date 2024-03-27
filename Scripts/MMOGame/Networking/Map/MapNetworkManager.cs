@@ -655,9 +655,8 @@ namespace MultiplayerARPG.MMO
                 KickClient(connectionId, UITextKeys.UI_ERROR_KICKED_FROM_SERVER);
                 return;
             }
-            BasePlayerCharacterEntity entityPrefab = playerCharacterData.GetEntityPrefab() as BasePlayerCharacterEntity;
             // If it is not allow this character data, kick the player
-            if (entityPrefab == null)
+            if (!playerCharacterData.TryGetEntityAddressablePrefab(out _) && playerCharacterData.TryGetEntityPrefab(out _))
             {
                 if (LogError)
                     Logging.LogError(LogTag, "Cannot find player character with entity Id: " + playerCharacterData.EntityId);
@@ -681,8 +680,9 @@ namespace MultiplayerARPG.MMO
             Quaternion characterRotation = Quaternion.identity;
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
                 characterRotation = Quaternion.Euler(playerCharacterData.CurrentRotation);
+            // NOTE: entity ID is a hash asset ID :)
             LiteNetLibIdentity spawnObj = Assets.GetObjectInstance(
-                entityPrefab.Identity.HashAssetId,
+                playerCharacterData.EntityId,
                 playerCharacterData.CurrentPosition,
                 characterRotation);
 
