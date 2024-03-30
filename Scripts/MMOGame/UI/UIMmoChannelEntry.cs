@@ -6,6 +6,14 @@ namespace MultiplayerARPG.MMO
         public TextWrapper textTitle;
         public UIGageValue gageConnections = new UIGageValue();
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            textId = null;
+            textTitle = null;
+            gageConnections = null;
+        }
+
         protected override void UpdateData()
         {
             if (textId != null)
