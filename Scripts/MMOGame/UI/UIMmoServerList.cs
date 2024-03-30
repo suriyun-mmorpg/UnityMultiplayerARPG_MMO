@@ -35,6 +35,15 @@ namespace MultiplayerARPG.MMO
             }
         }
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiServerEntryPrefab = null;
+            uiServerEntryContainer = null;
+            _list = null;
+            _selectionManager = null;
+        }
+
         public void OnClickConnect()
         {
             MmoNetworkSetting data = SelectionManager.SelectedUI.Data;

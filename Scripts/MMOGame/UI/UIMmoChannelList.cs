@@ -36,6 +36,15 @@ namespace MultiplayerARPG.MMO
             }
         }
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiChannelEntryPrefab = null;
+            uiChannelEntryContainer = null;
+            _list = null;
+            _selectionManager = null;
+        }
+
         private void OnEnable()
         {
             LoadChannels();

@@ -25,20 +25,20 @@ namespace MultiplayerARPG.MMO
         public Toggle toggleAutoLogin;
         public string keyUsername = "_USERNAME_";
         public string keyPassword = "_PASSWORD_";
-        public UnityEvent onLoginSuccess;
-        public UnityEvent onLoginFail;
+        public UnityEvent onLoginSuccess = new UnityEvent();
+        public UnityEvent onLoginFail = new UnityEvent();
 
-        private bool logginIn;
+        private bool _logginIn;
         public bool LoggingIn
         {
-            get { return logginIn; }
+            get { return _logginIn; }
             set
             {
-                logginIn = value;
+                _logginIn = value;
                 if (uiTextUsername != null)
-                    uiTextUsername.interactable = !logginIn;
+                    uiTextUsername.interactable = !_logginIn;
                 if (uiTextPassword != null)
-                    uiTextPassword.interactable = !logginIn;
+                    uiTextPassword.interactable = !_logginIn;
             }
         }
 
@@ -57,6 +57,19 @@ namespace MultiplayerARPG.MMO
         {
             base.Awake();
             MigrateInputComponent();
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiTextUsername = null;
+            uiTextPassword = null;
+            toggleRememberUsername = null;
+            toggleAutoLogin = null;
+            onLoginSuccess?.RemoveAllListeners();
+            onLoginSuccess = null;
+            onLoginFail?.RemoveAllListeners();
+            onLoginFail = null;
         }
 
 #if UNITY_EDITOR

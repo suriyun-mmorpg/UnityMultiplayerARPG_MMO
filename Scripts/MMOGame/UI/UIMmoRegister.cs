@@ -25,24 +25,24 @@ namespace MultiplayerARPG.MMO
         public InputFieldWrapper uiTextConfirmPassword;
         public InputFieldWrapper uiTextEmail;
 
-        public UnityEvent onRegisterSuccess;
-        public UnityEvent onRegisterFail;
+        public UnityEvent onRegisterSuccess = new UnityEvent();
+        public UnityEvent onRegisterFail = new UnityEvent();
 
-        private bool registering;
+        private bool _registering;
         public bool Registering
         {
-            get { return registering; }
+            get { return _registering; }
             set
             {
-                registering = value;
+                _registering = value;
                 if (uiTextUsername != null)
-                    uiTextUsername.interactable = !registering;
+                    uiTextUsername.interactable = !_registering;
                 if (uiTextPassword != null)
-                    uiTextPassword.interactable = !registering;
+                    uiTextPassword.interactable = !_registering;
                 if (uiTextConfirmPassword != null)
-                    uiTextConfirmPassword.interactable = !registering;
+                    uiTextConfirmPassword.interactable = !_registering;
                 if (uiTextEmail != null)
-                    uiTextEmail.interactable = !registering;
+                    uiTextEmail.interactable = !_registering;
             }
         }
 
@@ -71,6 +71,19 @@ namespace MultiplayerARPG.MMO
         {
             base.Awake();
             MigrateInputComponent();
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiTextUsername = null;
+            uiTextPassword = null;
+            uiTextConfirmPassword = null;
+            uiTextEmail = null;
+            onRegisterSuccess?.RemoveAllListeners();
+            onRegisterSuccess = null;
+            onRegisterFail?.RemoveAllListeners();
+            onRegisterFail = null;
         }
 
 #if UNITY_EDITOR
