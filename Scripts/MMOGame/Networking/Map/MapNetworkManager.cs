@@ -656,7 +656,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             // If it is not allow this character data, kick the player
-            if (!playerCharacterData.TryGetEntityAddressablePrefab(out _) && playerCharacterData.TryGetEntityPrefab(out _))
+            if (!playerCharacterData.TryGetEntityAddressablePrefab(out _) && !playerCharacterData.TryGetEntityPrefab(out _))
             {
                 if (LogError)
                     Logging.LogError(LogTag, "Cannot find player character with entity Id: " + playerCharacterData.EntityId);
