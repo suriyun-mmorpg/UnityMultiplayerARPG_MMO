@@ -143,7 +143,7 @@ namespace MultiplayerARPG.MMO
         public void StartMapClient(BaseMapInfo mapInfo, string address, int port)
         {
             MapNetworkManager.Assets.addressableOnlineScene = mapInfo.AddressableScene;
-#if !LNLM_NO_PREFABS
+#if !EXCLUDE_PREFAB_REFS
             MapNetworkManager.Assets.onlineScene = mapInfo.Scene;
 #endif
             MapNetworkManager.useWebSocket = UseWebSocket;

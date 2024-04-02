@@ -675,7 +675,7 @@ namespace MultiplayerARPG.MMO
                 if (!string.IsNullOrEmpty(_startingMapId) && GameInstance.MapInfos.TryGetValue(_startingMapId, out tempMapInfo))
                 {
                     mapNetworkManager.Assets.addressableOnlineScene = tempMapInfo.AddressableScene;
-#if !LNLM_NO_PREFABS
+#if !EXCLUDE_PREFAB_REFS
                     mapNetworkManager.Assets.onlineScene = tempMapInfo.Scene;
 #endif
                     mapNetworkManager.SetMapInfo(tempMapInfo);
