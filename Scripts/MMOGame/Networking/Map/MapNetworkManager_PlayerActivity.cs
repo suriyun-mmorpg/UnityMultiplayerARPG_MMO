@@ -10,7 +10,7 @@ namespace MultiplayerARPG.MMO
     {
         public override string GetCurrentMapId(BasePlayerCharacterEntity playerCharacterEntity)
         {
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             if (!IsInstanceMap())
                 return base.GetCurrentMapId(playerCharacterEntity);
             return _locationsBeforeEnterInstance[playerCharacterEntity.Id].mapName;
@@ -21,7 +21,7 @@ namespace MultiplayerARPG.MMO
 
         public override Vector3 GetCurrentPosition(BasePlayerCharacterEntity playerCharacterEntity)
         {
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             if (!IsInstanceMap())
                 return base.GetCurrentPosition(playerCharacterEntity);
             return _locationsBeforeEnterInstance[playerCharacterEntity.Id].position;
@@ -37,7 +37,7 @@ namespace MultiplayerARPG.MMO
 
         public override void WarpCharacter(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position, bool overrideRotation, Vector3 rotation)
         {
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             if (!CanWarpCharacter(playerCharacterEntity))
                 return;
 
@@ -54,7 +54,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         /// <summary>
         /// Warp to different map.
         /// </summary>
@@ -81,7 +81,7 @@ namespace MultiplayerARPG.MMO
 
         public override async void WarpCharacterToInstance(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position, bool overrideRotation, Vector3 rotation)
         {
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             if (!CanWarpCharacter(playerCharacterEntity))
                 return;
             // Prepare data for warp character later when instance map server registered to this map server
@@ -150,7 +150,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         private async UniTask SaveAndWarpCharacterByPeerInfo(BasePlayerCharacterEntity playerCharacterEntity, CentralServerPeerInfo peerInfo,
             bool changeMap = false, string mapName = "",
             Vector3 position = default, bool overrideRotation = false, Vector3 rotation = default)

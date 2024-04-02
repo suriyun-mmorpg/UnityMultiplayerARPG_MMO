@@ -10,7 +10,7 @@ namespace MultiplayerARPG.MMO
 {
     public partial class MMOServerCashShopMessageHandlers : MonoBehaviour, IServerCashShopMessageHandlers
     {
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         public IDatabaseClient DbServiceClient
         {
             get { return MMOServerInstance.Singleton.DatabaseClient; }
@@ -21,7 +21,7 @@ namespace MultiplayerARPG.MMO
             RequestHandlerData requestHandler, EmptyMessage request,
             RequestProceedResultDelegate<ResponseCashShopInfoMessage> result)
         {
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             if (!GameInstance.ServerUserHandlers.TryGetUserId(requestHandler.ConnectionId, out string userId))
             {
                 result.InvokeError(new ResponseCashShopInfoMessage()
@@ -56,7 +56,7 @@ namespace MultiplayerARPG.MMO
             RequestHandlerData requestHandler, RequestCashShopBuyMessage request,
             RequestProceedResultDelegate<ResponseCashShopBuyMessage> result)
         {
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
                 result.InvokeError(new ResponseCashShopBuyMessage()
@@ -235,7 +235,7 @@ namespace MultiplayerARPG.MMO
             RequestHandlerData requestHandler, EmptyMessage request,
             RequestProceedResultDelegate<ResponseCashPackageInfoMessage> result)
         {
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             if (!GameInstance.ServerUserHandlers.TryGetUserId(requestHandler.ConnectionId, out string userId))
             {
                 result.InvokeError(new ResponseCashPackageInfoMessage()
@@ -270,7 +270,7 @@ namespace MultiplayerARPG.MMO
             RequestHandlerData requestHandler, RequestCashPackageBuyValidationMessage request,
             RequestProceedResultDelegate<ResponseCashPackageBuyValidationMessage> result)
         {
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
                 result.InvokeError(new ResponseCashPackageBuyValidationMessage()

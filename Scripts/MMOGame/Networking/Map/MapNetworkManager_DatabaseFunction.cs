@@ -9,7 +9,7 @@ namespace MultiplayerARPG.MMO
 {
     public partial class MapNetworkManager
     {
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         /// <summary>
         /// Load data repeatedly until it loaded
         /// </summary>
@@ -37,7 +37,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         /// <summary>
         /// Load data repeatedly until it loaded
         /// </summary>
@@ -66,7 +66,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         /// <summary>
         /// Load data repeatedly until it loaded
         /// </summary>
@@ -95,7 +95,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         private async UniTask<bool> SaveCharacter(IPlayerCharacterData playerCharacterData,
             bool changeMap = false, string mapName = "",
             Vector3 position = default, bool overrideRotation = false, Vector3 rotation = default)
@@ -159,7 +159,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         private async UniTask WaitAndSaveCharacter(IPlayerCharacterData playerCharacterData, CancellationToken cancellationToken,
             bool changeMap = false, string mapName = "",
             Vector3 position = default, bool overrideRotation = false, Vector3 rotation = default)
@@ -171,7 +171,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         private async UniTask WaitAndSaveCharacter(IPlayerCharacterData playerCharacterData,
             bool changeMap = false, string mapName = "",
             Vector3 position = default, bool overrideRotation = false, Vector3 rotation = default)
@@ -183,7 +183,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         private async UniTaskVoid SaveAllCharacters()
         {
             if (savingCharacters.Count > 0)
@@ -202,7 +202,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         private async UniTask<bool> SaveBuilding(IBuildingSaveData buildingSaveData)
         {
             if (savingBuildings.Contains(buildingSaveData.Id))
@@ -235,7 +235,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         private async UniTask WaitAndSaveBuilding(IBuildingSaveData buildingSaveData, CancellationToken cancellationToken)
         {
             while (!await SaveBuilding(buildingSaveData))
@@ -245,7 +245,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         private async UniTask WaitAndSaveBuilding(IBuildingSaveData buildingSaveData)
         {
             while (!await SaveBuilding(buildingSaveData))
@@ -255,7 +255,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         private async UniTaskVoid SaveAllBuildings()
         {
             if (savingBuildings.Count == 0)
@@ -274,7 +274,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         public override BuildingEntity CreateBuildingEntity(BuildingSaveData saveData, bool initialize)
         {
             CreateBuildingEntityRoutine(saveData, initialize).Forget();
@@ -295,7 +295,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         public override void DestroyBuildingEntity(string id, bool isSceneObject)
         {
             base.DestroyBuildingEntity(id, isSceneObject);

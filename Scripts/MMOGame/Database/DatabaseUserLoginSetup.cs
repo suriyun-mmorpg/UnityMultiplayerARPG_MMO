@@ -5,7 +5,7 @@ namespace MultiplayerARPG.MMO
     [DisallowMultipleComponent]
     public class DatabaseUserLoginSetup : MonoBehaviour
     {
-#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE)
+#if NET || NETCOREAPP || ((UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
         public static readonly string LogTag = nameof(DatabaseUserLoginSetup);
 
         private class OldDatabaseUserLogin : IDatabaseUserLogin

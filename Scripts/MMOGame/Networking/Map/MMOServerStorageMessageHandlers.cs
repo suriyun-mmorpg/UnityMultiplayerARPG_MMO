@@ -7,7 +7,7 @@ namespace MultiplayerARPG.MMO
 {
     public partial class MMOServerStorageMessageHandlers : MonoBehaviour, IServerStorageMessageHandlers
     {
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         public IDatabaseClient DbServiceClient
         {
             get { return MMOServerInstance.Singleton.DatabaseClient; }
@@ -16,7 +16,7 @@ namespace MultiplayerARPG.MMO
 
         public UniTaskVoid HandleRequestOpenStorage(RequestHandlerData requestHandler, RequestOpenStorageMessage request, RequestProceedResultDelegate<ResponseOpenStorageMessage> result)
         {
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             if (request.storageType == StorageType.None ||
                 request.storageType == StorageType.Building)
             {
@@ -61,7 +61,7 @@ namespace MultiplayerARPG.MMO
 
         public UniTaskVoid HandleRequestCloseStorage(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<ResponseCloseStorageMessage> result)
         {
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
                 result.InvokeError(new ResponseCloseStorageMessage()
@@ -78,7 +78,7 @@ namespace MultiplayerARPG.MMO
 
         public UniTaskVoid HandleRequestMoveItemFromStorage(RequestHandlerData requestHandler, RequestMoveItemFromStorageMessage request, RequestProceedResultDelegate<ResponseMoveItemFromStorageMessage> result)
         {
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             // Validate user and storage accessibility
             StorageId storageId = new StorageId(request.storageType, request.storageOwnerId);
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
@@ -146,7 +146,7 @@ namespace MultiplayerARPG.MMO
 
         public UniTaskVoid HandleRequestMoveItemToStorage(RequestHandlerData requestHandler, RequestMoveItemToStorageMessage request, RequestProceedResultDelegate<ResponseMoveItemToStorageMessage> result)
         {
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             // Validate user and storage accessibility
             StorageId storageId = new StorageId(request.storageType, request.storageOwnerId);
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
@@ -216,7 +216,7 @@ namespace MultiplayerARPG.MMO
 
         public UniTaskVoid HandleRequestSwapOrMergeStorageItem(RequestHandlerData requestHandler, RequestSwapOrMergeStorageItemMessage request, RequestProceedResultDelegate<ResponseSwapOrMergeStorageItemMessage> result)
         {
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             // Validate user and storage accessibility
             StorageId storageId = new StorageId(request.storageType, request.storageOwnerId);
             int fromIndex = request.fromIndex;
@@ -271,7 +271,7 @@ namespace MultiplayerARPG.MMO
 
         private void SetStorageSavePending(StorageId storageId, bool isSavePending)
         {
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             if (storageId.storageType == StorageType.Guild)
                 return;
 

@@ -85,7 +85,7 @@ namespace MultiplayerARPG.MMO
         [FormerlySerializedAs("databaseDisableCacheReading")]
         public bool disableDatabaseCaching;
 
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         private List<string> _spawningMaps;
         private List<SpawnAllocateMapByNameData> _spawningAllocateMaps;
         private string _startingMapId;
@@ -116,7 +116,7 @@ namespace MultiplayerARPG.MMO
             _customDatabaseClient = customDatabaseClientSource.GetComponent<IDatabaseClient>();
 
             CacheLogGUI.enabled = false;
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             GameInstance gameInstance = FindObjectOfType<GameInstance>();
             gameInstance.onGameDataLoaded = OnGameDataLoaded;
 
@@ -573,7 +573,7 @@ namespace MultiplayerARPG.MMO
 
         private bool Application_wantsToQuit()
         {
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             if (mapNetworkManager != null && mapNetworkManager.IsServer && !mapNetworkManager.ReadyToQuit)
             {
                 Logging.Log("[MapNetworkManager] still proceeding before quit.");
@@ -592,13 +592,13 @@ namespace MultiplayerARPG.MMO
 
         public void EnableLogger(string fileName)
         {
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             CacheLogGUI.SetupLogger(fileName);
             CacheLogGUI.enabled = true;
 #endif
         }
 
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         private void OnGameDataLoaded()
         {
             GameInstance gameInstance = FindObjectOfType<GameInstance>();
@@ -693,7 +693,7 @@ namespace MultiplayerARPG.MMO
             }
         }
 
-#if (UNITY_EDITOR || UNITY_SERVER) && UNITY_STANDALONE
+#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         #region Server functions
         public void StartCentralServer()
         {
