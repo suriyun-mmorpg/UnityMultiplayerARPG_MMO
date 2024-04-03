@@ -1071,7 +1071,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
 
-            DatabaseApiResult<GuildsResp> findGuildResp = await DbServiceClient.FindGuildAsync(new FindGuildReq()
+            DatabaseApiResult<GuildsResp> findGuildResp = await DbServiceClient.FindGuildsAsync(new FindGuildsReq()
             {
                 GuildName = request.guildName,
                 FinderCharacterId = playerCharacter.Id,
