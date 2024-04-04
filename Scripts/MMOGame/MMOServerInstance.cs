@@ -236,11 +236,15 @@ namespace MultiplayerARPG.MMO
 
                 // Central network address
                 string centralNetworkAddress;
+                if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_CENTRAL_ADDRESS, out centralNetworkAddress, mapNetworkManager.clusterServerAddress) ||
+                    ConfigReader.ReadConfigs(Configs, ProcessArguments.CONFIG_CENTRAL_ADDRESS, out centralNetworkAddress, mapNetworkManager.clusterServerAddress))
+                {
+                    mapNetworkManager.clusterServerAddress = centralNetworkAddress;
+                }
                 if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_CENTRAL_ADDRESS, out centralNetworkAddress, mapSpawnNetworkManager.clusterServerAddress) ||
                     ConfigReader.ReadConfigs(Configs, ProcessArguments.CONFIG_CENTRAL_ADDRESS, out centralNetworkAddress, mapSpawnNetworkManager.clusterServerAddress))
                 {
                     mapSpawnNetworkManager.clusterServerAddress = centralNetworkAddress;
-                    mapNetworkManager.clusterServerAddress = centralNetworkAddress;
                 }
                 Configs[ProcessArguments.CONFIG_CENTRAL_ADDRESS] = centralNetworkAddress;
 
@@ -290,12 +294,20 @@ namespace MultiplayerARPG.MMO
 
                 // Central->Cluster network port
                 int clusterNetworkPort;
+                if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_CLUSTER_PORT, out clusterNetworkPort, mapNetworkManager.clusterServerPort) ||
+                    ConfigReader.ReadConfigs(Configs, ProcessArguments.CONFIG_CLUSTER_PORT, out clusterNetworkPort, mapNetworkManager.clusterServerPort))
+                {
+                    mapNetworkManager.clusterServerPort = clusterNetworkPort;
+                }
+                if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_CLUSTER_PORT, out clusterNetworkPort, mapSpawnNetworkManager.clusterServerPort) ||
+                    ConfigReader.ReadConfigs(Configs, ProcessArguments.CONFIG_CLUSTER_PORT, out clusterNetworkPort, mapSpawnNetworkManager.clusterServerPort))
+                {
+                    mapSpawnNetworkManager.clusterServerPort = clusterNetworkPort;
+                }
                 if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_CLUSTER_PORT, out clusterNetworkPort, centralNetworkManager.clusterServerPort) ||
                     ConfigReader.ReadConfigs(Configs, ProcessArguments.CONFIG_CLUSTER_PORT, out clusterNetworkPort, centralNetworkManager.clusterServerPort))
                 {
                     centralNetworkManager.clusterServerPort = clusterNetworkPort;
-                    mapSpawnNetworkManager.clusterServerPort = clusterNetworkPort;
-                    mapNetworkManager.clusterServerPort = clusterNetworkPort;
                 }
                 Configs[ProcessArguments.CONFIG_CLUSTER_PORT] = clusterNetworkPort;
 
@@ -305,6 +317,10 @@ namespace MultiplayerARPG.MMO
                     ConfigReader.ReadConfigs(Configs, ProcessArguments.CONFIG_MACHINE_ADDRESS, out machineNetworkAddress, mapSpawnNetworkManager.machineAddress))
                 {
                     mapSpawnNetworkManager.machineAddress = machineNetworkAddress;
+                }
+                if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_MACHINE_ADDRESS, out machineNetworkAddress, mapNetworkManager.machineAddress) ||
+                    ConfigReader.ReadConfigs(Configs, ProcessArguments.CONFIG_MACHINE_ADDRESS, out machineNetworkAddress, mapNetworkManager.machineAddress))
+                {
                     mapNetworkManager.machineAddress = machineNetworkAddress;
                 }
                 Configs[ProcessArguments.CONFIG_MACHINE_ADDRESS] = machineNetworkAddress;
