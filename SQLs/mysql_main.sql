@@ -422,6 +422,19 @@ CREATE TABLE `guild` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `guildrequest`
+--
+
+CREATE TABLE `guildrequest` (
+  `id` int(11) NOT NULL,
+  `guildId` int(11) NOT NULL,
+  `requesterId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `createAt` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `guildrole`
 --
 
@@ -785,6 +798,14 @@ ALTER TABLE `friend`
 ALTER TABLE `guild`
   ADD PRIMARY KEY (`id`),
   ADD KEY `leaderId` (`leaderId`);
+
+--
+-- Indexes for table `guildrequest`
+--
+ALTER TABLE `guildrequest`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `guildId` (`guildId`),
+  ADD KEY `requesterId` (`requesterId`);
 
 --
 -- Indexes for table `guildrole`
