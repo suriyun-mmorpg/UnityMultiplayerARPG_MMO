@@ -18,6 +18,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
+#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         public async UniTask<UITextKeys> CreateGuildMember(GuildData guild, SocialCharacterData playerCharacter, long notifyConnectionId = -1)
         {
             guild.AddMember(playerCharacter);
@@ -47,6 +48,7 @@ namespace MultiplayerARPG.MMO
             GameInstance.ServerGameMessageHandlers.SendAddGuildMemberToMembers(guild, playerCharacter);
             return UITextKeys.NONE;
         }
+#endif
 
         public async UniTaskVoid HandleRequestAcceptGuildInvitation(RequestHandlerData requestHandler, RequestAcceptGuildInvitationMessage request, RequestProceedResultDelegate<ResponseAcceptGuildInvitationMessage> result)
         {

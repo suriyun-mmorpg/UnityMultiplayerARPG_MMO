@@ -632,6 +632,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
+#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         private async void StartServers()
         {
             // Wait a frame to make sure it will prepare servers' transports properly
@@ -708,6 +709,7 @@ namespace MultiplayerARPG.MMO
                 StartDatabaseManagerClient();
             }
         }
+#endif
 
 #if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         #region Server functions
