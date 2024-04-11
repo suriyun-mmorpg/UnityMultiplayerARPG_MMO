@@ -56,10 +56,6 @@ namespace MultiplayerARPG.MMO
         public int playerCharacterDespawnMillisecondsDelay = 5000;
 
 #if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-        public UserServiceRestClient UserServiceRestClient
-        {
-            get { return MMOServerInstance.Singleton.UserServiceRestClient; }
-        }
         public IDatabaseClient DatabaseClient
         {
             get { return MMOServerInstance.Singleton.DatabaseClient; }
@@ -618,8 +614,13 @@ namespace MultiplayerARPG.MMO
                 return false;
             }
 
-            UserServiceRestClient.LoginResult loginResult = await UserServiceRestClient.ValidateAccessToken(userId, accessToken);
-            if (loginResult.error != UITextKeys.NONE)
+            DatabaseApiResult<ValidateAccessTokenResp> validateAccessTokenResp = await DatabaseClient.ValidateAccessTokenAsync(new ValidateAccessTokenReq()
+            {
+                UserId = userId,
+                AccessToken = accessToken,
+            });
+
+            if (!validateAccessTokenResp.IsSuccess || !validateAccessTokenResp.Response.IsPass)
             {
                 if (LogError)
                     Logging.LogError(LogTag, "Invalid access token for user: " + userId);
