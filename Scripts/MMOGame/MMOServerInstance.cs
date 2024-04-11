@@ -47,6 +47,7 @@ namespace MultiplayerARPG.MMO
         public CentralNetworkManager CentralNetworkManager { get { return centralNetworkManager; } }
         public MapSpawnNetworkManager MapSpawnNetworkManager { get { return mapSpawnNetworkManager; } }
         public MapNetworkManager MapNetworkManager { get { return mapNetworkManager; } }
+        public UserServiceRestClient UserServiceRestClient { get; private set; }
         public IDatabaseClient DatabaseClient
         {
             get
@@ -109,6 +110,9 @@ namespace MultiplayerARPG.MMO
 
             // Always accept SSL
             ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback((sender, certificate, chain, policyErrors) => { return true; });
+
+            // Setup user service rest client
+            UserServiceRestClient = gameObject.GetOrAddComponent<UserServiceRestClient>();
 
             // Setup custom database client
             if (customDatabaseClientSource == null)
@@ -719,8 +723,9 @@ namespace MultiplayerARPG.MMO
             CentralNetworkManager.webSocketSecure = WebSocketSecure;
             CentralNetworkManager.webSocketCertificateFilePath = WebSocketCertificateFilePath;
             CentralNetworkManager.webSocketCertificatePassword = WebSocketCertificatePassword;
-            centralNetworkManager.DatabaseClient = DatabaseClient;
-            centralNetworkManager.DataManager = new CentralServerDataManager();
+            CentralNetworkManager.UserServiceRestClient = UserServiceRestClient;
+            CentralNetworkManager.DatabaseClient = DatabaseClient;
+            CentralNetworkManager.DataManager = new CentralServerDataManager();
             CentralNetworkManager.StartServer();
         }
 

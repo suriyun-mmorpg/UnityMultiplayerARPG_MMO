@@ -56,15 +56,17 @@ namespace MultiplayerARPG.MMO
         public int playerCharacterDespawnMillisecondsDelay = 5000;
 
 #if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-        public IDatabaseClient DbServiceClient
+        public UserServiceRestClient UserServiceRestClient
+        {
+            get { return MMOServerInstance.Singleton.UserServiceRestClient; }
+        }
+        public IDatabaseClient DatabaseClient
         {
             get { return MMOServerInstance.Singleton.DatabaseClient; }
         }
-#endif
-
-#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         public ClusterClient ClusterClient { get; private set; }
 #endif
+
         public bool IsAllocate { get; set; } = false;
         public string ClusterServerAddress { get { return clusterServerAddress; } }
         public int ClusterServerPort { get { return clusterServerPort; } }
@@ -231,7 +233,7 @@ namespace MultiplayerARPG.MMO
             foreach (BasePlayerCharacterEntity playerCharacter in ServerUserHandlers.GetPlayerCharacters())
             {
                 if (playerCharacter == null) continue;
-                await DbServiceClient.UpdateCharacterAsync(new UpdateCharacterReq()
+                await DatabaseClient.UpdateCharacterAsync(new UpdateCharacterReq()
                 {
                     CharacterData = playerCharacter.CloneTo(new PlayerCharacterData())
                 });
@@ -239,7 +241,7 @@ namespace MultiplayerARPG.MMO
             foreach (BuildingEntity buildingEntity in ServerBuildingHandlers.GetBuildings())
             {
                 if (buildingEntity == null) continue;
-                await DbServiceClient.UpdateBuildingAsync(new UpdateBuildingReq()
+                await DatabaseClient.UpdateBuildingAsync(new UpdateBuildingReq()
                 {
                     ChannelId = ChannelId,
                     MapName = CurrentMapInfo.Id,
@@ -462,7 +464,7 @@ namespace MultiplayerARPG.MMO
                 DatabaseApiResult<BuildingsResp> buildingsResp;
                 do
                 {
-                    buildingsResp = await DbServiceClient.ReadBuildingsAsync(new ReadBuildingsReq()
+                    buildingsResp = await DatabaseClient.ReadBuildingsAsync(new ReadBuildingsReq()
                     {
                         ChannelId = ChannelId,
                         MapName = CurrentMapInfo.Id,
@@ -616,13 +618,8 @@ namespace MultiplayerARPG.MMO
                 return false;
             }
 
-            DatabaseApiResult<ValidateAccessTokenResp> validateAccessTokenResp = await DbServiceClient.ValidateAccessTokenAsync(new ValidateAccessTokenReq()
-            {
-                UserId = userId,
-                AccessToken = accessToken,
-            });
-
-            if (!validateAccessTokenResp.IsSuccess || !validateAccessTokenResp.Response.IsPass)
+            UserServiceRestClient.LoginResult loginResult = await UserServiceRestClient.ValidateAccessToken(userId, accessToken);
+            if (loginResult.error != UITextKeys.NONE)
             {
                 if (LogError)
                     Logging.LogError(LogTag, "Invalid access token for user: " + userId);
@@ -636,7 +633,7 @@ namespace MultiplayerARPG.MMO
 #if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         private async UniTaskVoid SetPlayerReadyRoutine(long connectionId, string userId, string accessToken, string selectCharacterId)
         {
-            DatabaseApiResult<CharacterResp> characterResp = await DbServiceClient.ReadCharacterAsync(new ReadCharacterReq()
+            DatabaseApiResult<CharacterResp> characterResp = await DatabaseClient.ReadCharacterAsync(new ReadCharacterReq()
             {
                 UserId = userId,
                 CharacterId = selectCharacterId
@@ -693,7 +690,7 @@ namespace MultiplayerARPG.MMO
 
             // Set currencies
             // Gold
-            DatabaseApiResult<GoldResp> getGoldResp = await DbServiceClient.GetGoldAsync(new GetGoldReq()
+            DatabaseApiResult<GoldResp> getGoldResp = await DatabaseClient.GetGoldAsync(new GetGoldReq()
             {
                 UserId = userId,
             });
@@ -705,7 +702,7 @@ namespace MultiplayerARPG.MMO
             }
             playerCharacterEntity.UserGold = getGoldResp.Response.Gold;
             // Cash
-            DatabaseApiResult<CashResp> getCashResp = await DbServiceClient.GetCashAsync(new GetCashReq()
+            DatabaseApiResult<CashResp> getCashResp = await DatabaseClient.GetCashAsync(new GetCashReq()
             {
                 UserId = userId,
             });
@@ -721,7 +718,7 @@ namespace MultiplayerARPG.MMO
             playerCharacterEntity.UserId = userId;
 
             // Load user level
-            DatabaseApiResult<GetUserLevelResp> getUserLevelResp = await DbServiceClient.GetUserLevelAsync(new GetUserLevelReq()
+            DatabaseApiResult<GetUserLevelResp> getUserLevelResp = await DatabaseClient.GetUserLevelAsync(new GetUserLevelReq()
             {
                 UserId = userId,
                 AccessToken = accessToken,
@@ -777,7 +774,7 @@ namespace MultiplayerARPG.MMO
             if (!playerCharacterEntity.IsDead())
             {
                 // Summon saved summons
-                DatabaseApiResult<GetSummonBuffsResp> summonBuffsResp = await DbServiceClient.GetSummonBuffsAsync(new GetSummonBuffsReq()
+                DatabaseApiResult<GetSummonBuffsResp> summonBuffsResp = await DatabaseClient.GetSummonBuffsAsync(new GetSummonBuffsReq()
                 {
                     CharacterId = playerCharacterEntity.Id,
                 });
@@ -1117,7 +1114,7 @@ namespace MultiplayerARPG.MMO
                 }
 
                 // Get user level from server to validate user level
-                DatabaseApiResult<GetUserLevelResp> resp = await DbServiceClient.GetUserLevelAsync(new GetUserLevelReq()
+                DatabaseApiResult<GetUserLevelResp> resp = await DatabaseClient.GetUserLevelAsync(new GetUserLevelReq()
                 {
                     UserId = messageHandler.Reader.GetString(),
                     AccessToken = messageHandler.Reader.GetString(),

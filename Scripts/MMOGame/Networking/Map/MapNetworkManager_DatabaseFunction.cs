@@ -26,7 +26,7 @@ namespace MultiplayerARPG.MMO
             DatabaseApiResult<ReadStorageItemsResp> resp;
             do
             {
-                resp = await DbServiceClient.ReadStorageItemsAsync(new ReadStorageItemsReq()
+                resp = await DatabaseClient.ReadStorageItemsAsync(new ReadStorageItemsReq()
                 {
                     StorageType = storageId.storageType,
                     StorageOwnerId = storageId.storageOwnerId,
@@ -56,7 +56,7 @@ namespace MultiplayerARPG.MMO
             DatabaseApiResult<PartyResp> resp;
             do
             {
-                resp = await DbServiceClient.ReadPartyAsync(new ReadPartyReq()
+                resp = await DatabaseClient.ReadPartyAsync(new ReadPartyReq()
                 {
                     PartyId = id,
                 });
@@ -85,7 +85,7 @@ namespace MultiplayerARPG.MMO
             DatabaseApiResult<GuildResp> resp;
             do
             {
-                resp = await DbServiceClient.ReadGuildAsync(new ReadGuildReq()
+                resp = await DatabaseClient.ReadGuildAsync(new ReadGuildReq()
                 {
                     GuildId = id,
                 });
@@ -142,7 +142,7 @@ namespace MultiplayerARPG.MMO
             }
             savingCharacters.Add(savingCharacterData.Id);
             // Update character
-            await DbServiceClient.UpdateCharacterAsync(new UpdateCharacterReq()
+            await DatabaseClient.UpdateCharacterAsync(new UpdateCharacterReq()
             {
                 CharacterData = savingCharacterData,
                 SummonBuffs = summonBuffs,
@@ -219,7 +219,7 @@ namespace MultiplayerARPG.MMO
             }
             savingBuildings.Add(savingBuildingData.Id);
             // Update building
-            await DbServiceClient.UpdateBuildingAsync(new UpdateBuildingReq()
+            await DatabaseClient.UpdateBuildingAsync(new UpdateBuildingReq()
             {
                 ChannelId = ChannelId,
                 MapName = CurrentMapInfo.Id,
@@ -285,7 +285,7 @@ namespace MultiplayerARPG.MMO
         {
             if (!initialize)
             {
-                await DbServiceClient.CreateBuildingAsync(new CreateBuildingReq()
+                await DatabaseClient.CreateBuildingAsync(new CreateBuildingReq()
                 {
                     ChannelId = ChannelId,
                     MapName = CurrentMapInfo.Id,
@@ -305,7 +305,7 @@ namespace MultiplayerARPG.MMO
 
         private async UniTask DestroyBuildingEntityRoutine(string id)
         {
-            await DbServiceClient.DeleteBuildingAsync(new DeleteBuildingReq()
+            await DatabaseClient.DeleteBuildingAsync(new DeleteBuildingReq()
             {
                 ChannelId = ChannelId,
                 MapName = CurrentMapInfo.Id,
