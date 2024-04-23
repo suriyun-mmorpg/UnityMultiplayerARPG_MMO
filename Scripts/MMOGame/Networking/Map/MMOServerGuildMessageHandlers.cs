@@ -21,6 +21,7 @@ namespace MultiplayerARPG.MMO
 #if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         public async UniTask<UITextKeys> CreateGuildMember(GuildData guild, SocialCharacterData playerCharacter, long notifyConnectionId = -1)
         {
+#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             guild.AddMember(playerCharacter);
             GameInstance.ServerGuildHandlers.SetGuild(guild.id, guild);
             GameInstance.ServerGuildHandlers.RemoveGuildInvitation(guild.id, playerCharacter.id);
@@ -46,6 +47,7 @@ namespace MultiplayerARPG.MMO
                 GameInstance.ServerGameMessageHandlers.SendAddGuildMembersToOne(notifyConnectionId, guild);
             }
             GameInstance.ServerGameMessageHandlers.SendAddGuildMemberToMembers(guild, playerCharacter);
+#endif
             return UITextKeys.NONE;
         }
 #endif
