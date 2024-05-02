@@ -69,5 +69,37 @@ namespace MultiplayerARPG.MMO
             }).Forget();
         }
 #endif
+
+#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+        public override async void ChangeUserGold(string userId, int gold)
+        {
+            if (!TryGetPlayerCharacterByUserId(userId, out IPlayerCharacterData playerCharacter))
+                return;
+            DatabaseApiResult<GoldResp> resp = await DbServiceClient.ChangeGoldAsync(new ChangeGoldReq()
+            {
+                UserId = userId,
+                ChangeAmount = gold,
+            });
+            if (resp.IsError)
+                return;
+            playerCharacter.UserGold.Increase(gold);
+        }
+#endif
+
+#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+        public override async void ChangeUserCash(string userId, int cash)
+        {
+            if (!TryGetPlayerCharacterByUserId(userId, out IPlayerCharacterData playerCharacter))
+                return;
+            DatabaseApiResult<CashResp> resp = await DbServiceClient.ChangeCashAsync(new ChangeCashReq()
+            {
+                UserId = userId,
+                ChangeAmount = cash,
+            });
+            if (resp.IsError)
+                return;
+            playerCharacter.UserCash.Increase(cash);
+        }
+#endif
     }
 }
