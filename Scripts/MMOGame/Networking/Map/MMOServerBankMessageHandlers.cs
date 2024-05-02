@@ -75,6 +75,14 @@ namespace MultiplayerARPG.MMO
         public async UniTaskVoid HandleRequestDepositUserGold(RequestHandlerData requestHandler, RequestDepositUserGoldMessage request, RequestProceedResultDelegate<ResponseDepositUserGoldMessage> result)
         {
 #if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+            if (GameInstance.Singleton.goldStoreMode == GoldStoreMode.UserGoldOnly)
+            {
+                result.InvokeError(new ResponseDepositUserGoldMessage()
+                {
+                    message = UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE,
+                });
+                return;
+            }
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
                 result.InvokeError(new ResponseDepositUserGoldMessage()
@@ -181,6 +189,14 @@ namespace MultiplayerARPG.MMO
         public async UniTaskVoid HandleRequestWithdrawUserGold(RequestHandlerData requestHandler, RequestWithdrawUserGoldMessage request, RequestProceedResultDelegate<ResponseWithdrawUserGoldMessage> result)
         {
 #if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+            if (GameInstance.Singleton.goldStoreMode == GoldStoreMode.UserGoldOnly)
+            {
+                result.InvokeError(new ResponseWithdrawUserGoldMessage()
+                {
+                    message = UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE,
+                });
+                return;
+            }
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
                 result.InvokeError(new ResponseWithdrawUserGoldMessage()
