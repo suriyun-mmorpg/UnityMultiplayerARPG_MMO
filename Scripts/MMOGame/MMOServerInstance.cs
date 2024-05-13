@@ -641,7 +641,7 @@ namespace MultiplayerARPG.MMO
             // Prepare guild data for guild database manager
             databaseNetworkManager.DatabaseCache = new LocalDatabaseCache();
             DatabaseNetworkManager.GuildMemberRoles = GameInstance.Singleton.SocialSystemSetting.GuildMemberRoles;
-            DatabaseNetworkManager.GuildExpTree = GameInstance.Singleton.SocialSystemSetting.GuildExpTree;
+            DatabaseNetworkManager.GuildExpTree = GameInstance.Singleton.SocialSystemSetting.GuildExpTable.expTree;
 
             if (_startingDatabaseServer)
             {
