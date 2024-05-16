@@ -20,7 +20,7 @@ namespace MultiplayerARPG.MMO
             {
                 Mail = mail,
             });
-            if (resp.IsSuccess && resp.Response.Error == UITextKeys.NONE)
+            if (resp.IsSuccess && !resp.Response.Error.IsError())
                 return true;
 #endif
             return false;

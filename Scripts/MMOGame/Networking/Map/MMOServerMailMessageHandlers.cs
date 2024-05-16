@@ -59,7 +59,7 @@ namespace MultiplayerARPG.MMO
                 }
                 UITextKeys message = resp.Response.Error;
                 result.Invoke(
-                    message == UITextKeys.NONE ? AckResponseCode.Success : AckResponseCode.Error,
+                    !message.IsError() ? AckResponseCode.Success : AckResponseCode.Error,
                     new ResponseReadMailMessage()
                     {
                         message = message,
@@ -154,7 +154,7 @@ namespace MultiplayerARPG.MMO
             busyMailBoxes.Add(request.id);
             UITextKeys message = await ClaimMailItems(request.id, playerCharacter);
             busyMailBoxes.TryRemove(request.id);
-            if (message != UITextKeys.NONE)
+            if (message.IsError())
             {
                 result.InvokeError(new ResponseClaimMailItemsMessage()
                 {
@@ -194,7 +194,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             UITextKeys message = await DeleteMail(request.id, userId);
-            if (message != UITextKeys.NONE)
+            if (message.IsError())
             {
                 result.InvokeError(new ResponseDeleteMailMessage()
                 {
@@ -277,7 +277,7 @@ namespace MultiplayerARPG.MMO
             }
             UITextKeys message = resp.Response.Error;
             result.Invoke(
-                message == UITextKeys.NONE ? AckResponseCode.Success : AckResponseCode.Error,
+                !message.IsError() ? AckResponseCode.Success : AckResponseCode.Error,
                 new ResponseSendMailMessage()
                 {
                     message = message,

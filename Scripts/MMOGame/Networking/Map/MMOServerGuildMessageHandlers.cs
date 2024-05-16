@@ -73,7 +73,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             UITextKeys createGuildMemberMessage = await CreateGuildMember(validateResult.Guild, SocialCharacterData.Create(playerCharacter), requestHandler.ConnectionId);
-            if (createGuildMemberMessage != UITextKeys.NONE)
+            if (createGuildMemberMessage.IsError())
             {
                 result.InvokeError(new ResponseAcceptGuildInvitationMessage()
                 {
@@ -864,7 +864,7 @@ namespace MultiplayerARPG.MMO
                 }
                 // Add guild member to database
                 UITextKeys createGuildMemberMessage = await CreateGuildMember(validateResult.Guild, SocialCharacterData.Create(playerCharacter), requestHandler.ConnectionId);
-                if (createGuildMemberMessage != UITextKeys.NONE)
+                if (createGuildMemberMessage.IsError())
                 {
                     result.Invoke(AckResponseCode.Error, new ResponseSendGuildRequestMessage()
                     {
@@ -970,7 +970,7 @@ namespace MultiplayerARPG.MMO
 
             // Add guild member
             UITextKeys createGuildMemberMessage = await CreateGuildMember(validateResult.Guild, requester, notifyConnectionId);
-            if (createGuildMemberMessage != UITextKeys.NONE)
+            if (createGuildMemberMessage.IsError())
             {
                 result.Invoke(AckResponseCode.Error, new ResponseAcceptGuildRequestMessage()
                 {
