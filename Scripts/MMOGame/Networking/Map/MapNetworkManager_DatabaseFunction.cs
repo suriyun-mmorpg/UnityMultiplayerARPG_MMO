@@ -19,7 +19,7 @@ namespace MultiplayerARPG.MMO
         {
             if (_loadingStorageIds.Contains(storageId))
             {
-                await UniTask.WaitUntil(() => !_loadingStorageIds.Contains(storageId));
+                do { await UniTask.Delay(100); } while (_loadingStorageIds.Contains(storageId));
                 return;
             }
             _loadingStorageIds.Add(storageId);
@@ -49,7 +49,7 @@ namespace MultiplayerARPG.MMO
                 return;
             if (_loadingPartyIds.Contains(id))
             {
-                await UniTask.WaitUntil(() => !_loadingPartyIds.Contains(id));
+                do { await UniTask.Delay(100); } while (_loadingPartyIds.Contains(id));
                 return;
             }
             _loadingPartyIds.Add(id);
@@ -78,7 +78,7 @@ namespace MultiplayerARPG.MMO
                 return;
             if (_loadingGuildIds.Contains(id))
             {
-                await UniTask.WaitUntil(() => !_loadingGuildIds.Contains(id));
+                do { await UniTask.Delay(100); } while (_loadingGuildIds.Contains(id));
                 return;
             }
             _loadingGuildIds.Add(id);
@@ -166,7 +166,7 @@ namespace MultiplayerARPG.MMO
         {
             while (!await SaveCharacter(playerCharacterData, changeMap, mapName, position, overrideRotation, rotation))
             {
-                await UniTask.Yield(cancellationToken);
+                await UniTask.Delay(100, cancellationToken: cancellationToken);
             }
         }
 #endif
@@ -178,7 +178,7 @@ namespace MultiplayerARPG.MMO
         {
             while (!await SaveCharacter(playerCharacterData, changeMap, mapName, position, overrideRotation, rotation))
             {
-                await UniTask.Yield();
+                await UniTask.Delay(100);
             }
         }
 #endif
@@ -240,7 +240,7 @@ namespace MultiplayerARPG.MMO
         {
             while (!await SaveBuilding(buildingSaveData))
             {
-                await UniTask.Yield(cancellationToken);
+                await UniTask.Delay(100, cancellationToken: cancellationToken);
             }
         }
 #endif
@@ -250,7 +250,7 @@ namespace MultiplayerARPG.MMO
         {
             while (!await SaveBuilding(buildingSaveData))
             {
-                await UniTask.Yield();
+                await UniTask.Delay(100);
             }
         }
 #endif
