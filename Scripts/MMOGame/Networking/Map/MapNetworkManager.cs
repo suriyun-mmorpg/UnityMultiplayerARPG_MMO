@@ -873,7 +873,7 @@ namespace MultiplayerARPG.MMO
         {
             MMOWarpMessage message = messageHandler.ReadMessage<MMOWarpMessage>();
             bool tempLoadOfflineSceneOnClientStop = loadOfflineSceneWhenClientStopped;
-            loadOfflineSceneWhenClientStopped = true;
+            loadOfflineSceneWhenClientStopped = false;
             StopClient();
             StartClient(message.networkAddress, message.networkPort);
             loadOfflineSceneWhenClientStopped = tempLoadOfflineSceneOnClientStop;
