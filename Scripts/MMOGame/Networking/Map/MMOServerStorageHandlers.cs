@@ -11,6 +11,8 @@ namespace MultiplayerARPG.MMO
         private readonly ConcurrentDictionary<StorageId, List<CharacterItem>> storageItems = new ConcurrentDictionary<StorageId, List<CharacterItem>>();
         private readonly ConcurrentDictionary<StorageId, HashSet<long>> usingStorageClients = new ConcurrentDictionary<StorageId, HashSet<long>>();
         private readonly ConcurrentDictionary<long, StorageId> usingStorageIds = new ConcurrentDictionary<long, StorageId>();
+        private readonly ConcurrentDictionary<long, IActivatableEntity> usingStorageEntities = new ConcurrentDictionary<long, IActivatableEntity>();
+        private float _lastUpdateTime = 0f;
 #endif
 
 #if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
@@ -20,9 +22,20 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-        public async UniTaskVoid OpenStorage(long connectionId, IPlayerCharacterData playerCharacter, StorageId storageId)
+        public async UniTaskVoid OpenStorage(long connectionId, IPlayerCharacterData playerCharacter, IActivatableEntity storageEntity, StorageId storageId)
         {
 #if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+            if (storageEntity.IsNull())
+            {
+                // TODO: May add an options or rules to allow to open storage without storage entity needed
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(connectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
+                return;
+            }
+            if (Vector3.Distance(playerCharacter.CurrentPosition, storageEntity.EntityTransform.position) > storageEntity.GetActivatableDistance())
+            {
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(connectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
+                return;
+            }
             if (!CanAccessStorage(playerCharacter, storageId))
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(connectionId, UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE);
@@ -49,6 +62,9 @@ namespace MultiplayerARPG.MMO
             usingStorageClients[storageId].Add(connectionId);
             usingStorageIds.TryRemove(connectionId, out _);
             usingStorageIds.TryAdd(connectionId, storageId);
+            usingStorageEntities.TryRemove(connectionId, out _);
+            if (storageEntity != null)
+                usingStorageEntities.TryAdd(connectionId, storageEntity);
             List<CharacterItem> storageItems = GetStorageItems(storageId);
             // Notify storage items to client
             Storage storage = GetStorage(storageId, out uint storageObjectId);
@@ -80,9 +96,40 @@ namespace MultiplayerARPG.MMO
             }
             usingStorageClients[storageId].Remove(connectionId);
             usingStorageIds.TryRemove(connectionId, out _);
+            usingStorageEntities.TryRemove(connectionId, out _);
             GameInstance.ServerGameMessageHandlers.NotifyStorageClosed(connectionId);
 #endif
         }
+
+#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+        private void Update()
+        {
+            float time = Time.unscaledTime;
+            // Update every seconds
+            if (time - _lastUpdateTime < 1f)
+                return;
+            _lastUpdateTime = time;
+            List<long> connectionIds = new List<long>(usingStorageEntities.Keys);
+            foreach (long connectionId in connectionIds)
+            {
+                if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(connectionId, out IPlayerCharacterData playerCharacter))
+                {
+                    CloseStorage(connectionId).Forget();
+                    continue;
+                }
+                if (!usingStorageEntities.TryGetValue(connectionId, out IActivatableEntity storageEntity) || storageEntity.IsNull())
+                {
+                    CloseStorage(connectionId).Forget();
+                    continue;
+                }
+                if (Vector3.Distance(playerCharacter.CurrentPosition, storageEntity.EntityTransform.position) > storageEntity.GetActivatableDistance())
+                {
+                    CloseStorage(connectionId).Forget();
+                    continue;
+                }
+            }
+        }
+#endif
 
         public bool TryGetOpenedStorageId(long connectionId, out StorageId storageId)
         {
@@ -219,6 +266,7 @@ namespace MultiplayerARPG.MMO
             storageItems.Clear();
             usingStorageClients.Clear();
             usingStorageIds.Clear();
+            usingStorageEntities.Clear();
 #endif
         }
 
