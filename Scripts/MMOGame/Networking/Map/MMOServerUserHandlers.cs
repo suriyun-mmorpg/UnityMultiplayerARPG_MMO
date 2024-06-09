@@ -7,7 +7,7 @@ namespace MultiplayerARPG.MMO
         public LiteNetLibManager.LiteNetLibManager Manager { get; private set; }
 
 #if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-        public IDatabaseClient DbServiceClient
+        public IDatabaseClient DatabaseClient
         {
             get { return MMOServerInstance.Singleton.DatabaseClient; }
         }
@@ -24,7 +24,7 @@ namespace MultiplayerARPG.MMO
             long time = System.DateTimeOffset.UtcNow.ToUnixTimeSeconds() + (60 * minutes);
             if (TryGetPlayerCharacterByName(characterName, out IPlayerCharacterData playerCharacter))
                 playerCharacter.UnmuteTime = time;
-            DbServiceClient.SetCharacterUnmuteTimeByNameAsync(new SetCharacterUnmuteTimeByNameReq()
+            DatabaseClient.SetCharacterUnmuteTimeByNameAsync(new SetCharacterUnmuteTimeByNameReq()
             {
                 CharacterName = characterName,
                 UnmuteTime = time,
@@ -37,7 +37,7 @@ namespace MultiplayerARPG.MMO
         {
             if (TryGetPlayerCharacterByName(characterName, out IPlayerCharacterData playerCharacter))
                 playerCharacter.UnmuteTime = 0;
-            DbServiceClient.SetCharacterUnmuteTimeByNameAsync(new SetCharacterUnmuteTimeByNameReq()
+            DatabaseClient.SetCharacterUnmuteTimeByNameAsync(new SetCharacterUnmuteTimeByNameReq()
             {
                 CharacterName = characterName,
                 UnmuteTime = 0,
@@ -51,7 +51,7 @@ namespace MultiplayerARPG.MMO
             long time = System.DateTimeOffset.UtcNow.ToUnixTimeSeconds() + (60 * 60 * 24 * days);
             if (TryGetPlayerCharacterByName(characterName, out IPlayerCharacterData playerCharacter) && TryGetConnectionId(playerCharacter.Id, out long connectionId))
                 Manager.ServerTransport.ServerDisconnect(connectionId);
-            DbServiceClient.SetUserUnbanTimeByCharacterNameAsync(new SetUserUnbanTimeByCharacterNameReq()
+            DatabaseClient.SetUserUnbanTimeByCharacterNameAsync(new SetUserUnbanTimeByCharacterNameReq()
             {
                 CharacterName = characterName,
                 UnbanTime = time,
@@ -62,7 +62,7 @@ namespace MultiplayerARPG.MMO
 #if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         public override void UnbanUserByCharacterName(string characterName)
         {
-            DbServiceClient.SetUserUnbanTimeByCharacterNameAsync(new SetUserUnbanTimeByCharacterNameReq()
+            DatabaseClient.SetUserUnbanTimeByCharacterNameAsync(new SetUserUnbanTimeByCharacterNameReq()
             {
                 CharacterName = characterName,
                 UnbanTime = 0,
@@ -75,7 +75,7 @@ namespace MultiplayerARPG.MMO
         {
             if (!TryGetPlayerCharacterByUserId(userId, out IPlayerCharacterData playerCharacter))
                 return;
-            DatabaseApiResult<GoldResp> resp = await DbServiceClient.ChangeGoldAsync(new ChangeGoldReq()
+            DatabaseApiResult<GoldResp> resp = await DatabaseClient.ChangeGoldAsync(new ChangeGoldReq()
             {
                 UserId = userId,
                 ChangeAmount = gold,
@@ -91,7 +91,7 @@ namespace MultiplayerARPG.MMO
         {
             if (!TryGetPlayerCharacterByUserId(userId, out IPlayerCharacterData playerCharacter))
                 return;
-            DatabaseApiResult<CashResp> resp = await DbServiceClient.ChangeCashAsync(new ChangeCashReq()
+            DatabaseApiResult<CashResp> resp = await DatabaseClient.ChangeCashAsync(new ChangeCashReq()
             {
                 UserId = userId,
                 ChangeAmount = cash,

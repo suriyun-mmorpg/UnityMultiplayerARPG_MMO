@@ -14,7 +14,7 @@ namespace MultiplayerARPG.MMO
         public static readonly ConcurrentHashSet<string> GuildInvitations = new ConcurrentHashSet<string>();
 
 #if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-        public IDatabaseClient DbServiceClient
+        public IDatabaseClient DatabaseClient
         {
             get { return MMOServerInstance.Singleton.DatabaseClient; }
         }
@@ -83,7 +83,7 @@ namespace MultiplayerARPG.MMO
             ValidateGuildRequestResult validateResult = this.CanIncreaseGuildExp(playerCharacter, exp);
             if (!validateResult.IsSuccess)
                 return;
-            DatabaseApiResult<GuildResp> resp = await DbServiceClient.IncreaseGuildExpAsync(new IncreaseGuildExpReq()
+            DatabaseApiResult<GuildResp> resp = await DatabaseClient.IncreaseGuildExpAsync(new IncreaseGuildExpReq()
             {
                 GuildId = validateResult.GuildId,
                 Exp = exp,

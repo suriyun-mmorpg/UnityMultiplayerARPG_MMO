@@ -8,7 +8,7 @@ namespace MultiplayerARPG.MMO
     public partial class MMOServerGachaMessageHandlers : MonoBehaviour, IServerGachaMessageHandlers
     {
 #if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-        public IDatabaseClient DbServiceClient
+        public IDatabaseClient DatabaseClient
         {
             get { return MMOServerInstance.Singleton.DatabaseClient; }
         }
@@ -33,7 +33,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
 
-            DatabaseApiResult<CashResp> getCashResp = await DbServiceClient.GetCashAsync(new GetCashReq()
+            DatabaseApiResult<CashResp> getCashResp = await DatabaseClient.GetCashAsync(new GetCashReq()
             {
                 UserId = userId
             });
@@ -77,7 +77,7 @@ namespace MultiplayerARPG.MMO
 
             int price = request.openMode == GachaOpenMode.Multiple ? gacha.MultipleModeOpenPrice : gacha.SingleModeOpenPrice;
             // Get user cash amount
-            DatabaseApiResult<CashResp> getCashResp = await DbServiceClient.GetCashAsync(new GetCashReq()
+            DatabaseApiResult<CashResp> getCashResp = await DatabaseClient.GetCashAsync(new GetCashReq()
             {
                 UserId = playerCharacter.UserId
             });
@@ -110,7 +110,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             // Decrease cash amount
-            DatabaseApiResult<CashResp> changeCashResp = await DbServiceClient.ChangeCashAsync(new ChangeCashReq()
+            DatabaseApiResult<CashResp> changeCashResp = await DatabaseClient.ChangeCashAsync(new ChangeCashReq()
             {
                 UserId = playerCharacter.UserId,
                 ChangeAmount = -price

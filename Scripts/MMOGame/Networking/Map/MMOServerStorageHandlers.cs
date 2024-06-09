@@ -16,7 +16,7 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-        public IDatabaseClient DbServiceClient
+        public IDatabaseClient DatabaseClient
         {
             get { return MMOServerInstance.Singleton.DatabaseClient; }
         }
@@ -43,7 +43,7 @@ namespace MultiplayerARPG.MMO
             }
             if (storageId.storageType == StorageType.Guild)
             {
-                DatabaseApiResult<ReadStorageItemsResp> storageItemsResult = await DbServiceClient.ReadStorageItemsAsync(new ReadStorageItemsReq()
+                DatabaseApiResult<ReadStorageItemsResp> storageItemsResult = await DatabaseClient.ReadStorageItemsAsync(new ReadStorageItemsReq()
                 {
                     StorageType = storageId.storageType,
                     StorageOwnerId = storageId.storageOwnerId,
@@ -81,7 +81,7 @@ namespace MultiplayerARPG.MMO
                 return;
             if (storageId.storageType == StorageType.Guild)
             {
-                DatabaseApiResult storageItemsResult = await DbServiceClient.UpdateStorageItemsAsync(new UpdateStorageItemsReq()
+                DatabaseApiResult storageItemsResult = await DatabaseClient.UpdateStorageItemsAsync(new UpdateStorageItemsReq()
                 {
                     StorageType = storageId.storageType,
                     StorageOwnerId = storageId.storageOwnerId,

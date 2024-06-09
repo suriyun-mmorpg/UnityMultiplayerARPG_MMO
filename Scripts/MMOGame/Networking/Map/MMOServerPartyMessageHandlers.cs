@@ -7,7 +7,7 @@ namespace MultiplayerARPG.MMO
     public partial class MMOServerPartyMessageHandlers : MonoBehaviour, IServerPartyMessageHandlers
     {
 #if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-        public IDatabaseClient DbServiceClient
+        public IDatabaseClient DatabaseClient
         {
             get { return MMOServerInstance.Singleton.DatabaseClient; }
         }
@@ -43,7 +43,7 @@ namespace MultiplayerARPG.MMO
             GameInstance.ServerPartyHandlers.SetParty(request.partyId, validateResult.Party);
             GameInstance.ServerPartyHandlers.RemovePartyInvitation(request.partyId, playerCharacter.Id);
             // Save to database
-            DatabaseApiResult<PartyResp> updateResp = await DbServiceClient.UpdateCharacterPartyAsync(new UpdateCharacterPartyReq()
+            DatabaseApiResult<PartyResp> updateResp = await DatabaseClient.UpdateCharacterPartyAsync(new UpdateCharacterPartyReq()
             {
                 SocialCharacterData = SocialCharacterData.Create(playerCharacter),
                 PartyId = request.partyId
@@ -169,7 +169,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            DatabaseApiResult<PartyResp> createPartyResp = await DbServiceClient.CreatePartyAsync(new CreatePartyReq()
+            DatabaseApiResult<PartyResp> createPartyResp = await DatabaseClient.CreatePartyAsync(new CreatePartyReq()
             {
                 LeaderCharacterId = playerCharacter.Id,
                 ShareExp = request.shareExp,
@@ -220,7 +220,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             // Save to database
-            DatabaseApiResult<PartyResp> updateResp = await DbServiceClient.UpdatePartyLeaderAsync(new UpdatePartyLeaderReq()
+            DatabaseApiResult<PartyResp> updateResp = await DatabaseClient.UpdatePartyLeaderAsync(new UpdatePartyLeaderReq()
             {
                 PartyId = validateResult.PartyId,
                 LeaderCharacterId = request.memberId,
@@ -267,7 +267,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             // Save to database
-            DatabaseApiResult<PartyResp> updateResp = await DbServiceClient.UpdatePartyAsync(new UpdatePartyReq()
+            DatabaseApiResult<PartyResp> updateResp = await DatabaseClient.UpdatePartyAsync(new UpdatePartyReq()
             {
                 PartyId = validateResult.PartyId,
                 ShareExp = request.shareExp,
@@ -315,7 +315,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             // Save to database
-            DatabaseApiResult updateResp = await DbServiceClient.ClearCharacterPartyAsync(new ClearCharacterPartyReq()
+            DatabaseApiResult updateResp = await DatabaseClient.ClearCharacterPartyAsync(new ClearCharacterPartyReq()
             {
                 CharacterId = request.memberId
             });
@@ -370,7 +370,7 @@ namespace MultiplayerARPG.MMO
             if (validateResult.Party.IsLeader(playerCharacter.Id))
             {
                 // Delete from database
-                DatabaseApiResult deleteResp = await DbServiceClient.DeletePartyAsync(new DeletePartyReq()
+                DatabaseApiResult deleteResp = await DatabaseClient.DeletePartyAsync(new DeletePartyReq()
                 {
                     PartyId = validateResult.PartyId
                 });
@@ -387,7 +387,7 @@ namespace MultiplayerARPG.MMO
                 foreach (string memberId in validateResult.Party.GetMemberIds())
                 {
                     // Save to database
-                    _ = DbServiceClient.ClearCharacterPartyAsync(new ClearCharacterPartyReq()
+                    _ = DatabaseClient.ClearCharacterPartyAsync(new ClearCharacterPartyReq()
                     {
                         CharacterId = memberId
                     });
@@ -414,7 +414,7 @@ namespace MultiplayerARPG.MMO
             else
             {
                 // Save to database
-                DatabaseApiResult updateResp = await DbServiceClient.ClearCharacterPartyAsync(new ClearCharacterPartyReq()
+                DatabaseApiResult updateResp = await DatabaseClient.ClearCharacterPartyAsync(new ClearCharacterPartyReq()
                 {
                     CharacterId = playerCharacter.Id
                 });

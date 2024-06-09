@@ -11,7 +11,7 @@ namespace MultiplayerARPG.MMO
     public partial class MMOServerCashShopMessageHandlers : MonoBehaviour, IServerCashShopMessageHandlers
     {
 #if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-        public IDatabaseClient DbServiceClient
+        public IDatabaseClient DatabaseClient
         {
             get { return MMOServerInstance.Singleton.DatabaseClient; }
         }
@@ -31,7 +31,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
 
-            DatabaseApiResult<CashResp> getCashResp = await DbServiceClient.GetCashAsync(new GetCashReq()
+            DatabaseApiResult<CashResp> getCashResp = await DatabaseClient.GetCashAsync(new GetCashReq()
             {
                 UserId = userId
             });
@@ -198,7 +198,7 @@ namespace MultiplayerARPG.MMO
             characterGold += changeCharacterGold;
             if (request.currencyType == CashShopItemCurrencyType.CASH)
             {
-                DatabaseApiResult<CashResp> changeCashResp = await DbServiceClient.ChangeCashAsync(new ChangeCashReq()
+                DatabaseApiResult<CashResp> changeCashResp = await DatabaseClient.ChangeCashAsync(new ChangeCashReq()
                 {
                     UserId = playerCharacter.UserId,
                     ChangeAmount = -priceCash
@@ -245,7 +245,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
 
-            DatabaseApiResult<CashResp> getCashResp = await DbServiceClient.GetCashAsync(new GetCashReq()
+            DatabaseApiResult<CashResp> getCashResp = await DatabaseClient.GetCashAsync(new GetCashReq()
             {
                 UserId = userId
             });
@@ -316,7 +316,7 @@ namespace MultiplayerARPG.MMO
             }
 
             int resultUserCash = 0;
-            DatabaseApiResult<CashResp> changeCashResp = await DbServiceClient.ChangeCashAsync(new ChangeCashReq()
+            DatabaseApiResult<CashResp> changeCashResp = await DatabaseClient.ChangeCashAsync(new ChangeCashReq()
             {
                 UserId = playerCharacter.UserId,
                 ChangeAmount = validateResult.ChangeCash,
