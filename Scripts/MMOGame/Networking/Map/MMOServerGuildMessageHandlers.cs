@@ -43,7 +43,7 @@ namespace MultiplayerARPG.MMO
             }
             if (notifyConnectionId >= 0)
             {
-                GameInstance.ServerGameMessageHandlers.SendSetGuildData(notifyConnectionId, guild);
+                GameInstance.ServerGameMessageHandlers.SendSetFullGuildData(notifyConnectionId, guild);
                 GameInstance.ServerGameMessageHandlers.SendAddGuildMembersToOne(notifyConnectionId, guild);
             }
             GameInstance.ServerGameMessageHandlers.SendAddGuildMemberToMembers(guild, playerCharacter);
@@ -72,6 +72,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
+            playerCharacter.GuildId = request.guildId;
             UITextKeys createGuildMemberMessage = await CreateGuildMember(validateResult.Guild, SocialCharacterData.Create(playerCharacter), requestHandler.ConnectionId);
             if (createGuildMemberMessage.IsError())
             {
@@ -81,9 +82,14 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            playerCharacter.GuildId = request.guildId;
             // Send message to inviter
             GameInstance.ServerGameMessageHandlers.SendGameMessageByCharacterId(request.inviterId, UITextKeys.UI_GUILD_INVITATION_ACCEPTED);
+            // Update member count
+            await DatabaseClient.UpdateGuildMemberCountAsync(new UpdateGuildMemberCountReq()
+            {
+                GuildId = validateResult.GuildId,
+                MaxGuildMember = validateResult.Guild.MaxMember(),
+            });
             // Response to invitee
             result.InvokeSuccess(new ResponseAcceptGuildInvitationMessage()
             {
@@ -244,6 +250,11 @@ namespace MultiplayerARPG.MMO
             }
             GameInstance.ServerGameMessageHandlers.SendSetGuildData(requestHandler.ConnectionId, guild);
             GameInstance.ServerGameMessageHandlers.SendAddGuildMembersToOne(requestHandler.ConnectionId, guild);
+            await DatabaseClient.UpdateGuildMemberCountAsync(new UpdateGuildMemberCountReq()
+            {
+                GuildId = guild.id,
+                MaxGuildMember = guild.MaxMember(),
+            });
             result.InvokeSuccess(new ResponseCreateGuildMessage());
 #endif
         }
@@ -361,6 +372,11 @@ namespace MultiplayerARPG.MMO
                 ClusterClient.SendRemoveSocialMember(MMOMessageTypes.UpdateGuildMember, validateResult.GuildId, request.memberId);
             }
             GameInstance.ServerGameMessageHandlers.SendRemoveGuildMemberToMembers(validateResult.Guild, request.memberId);
+            await DatabaseClient.UpdateGuildMemberCountAsync(new UpdateGuildMemberCountReq()
+            {
+                GuildId = validateResult.GuildId,
+                MaxGuildMember = validateResult.Guild.MaxMember(),
+            });
             result.InvokeSuccess(new ResponseKickMemberFromGuildMessage());
 #endif
         }
@@ -456,6 +472,11 @@ namespace MultiplayerARPG.MMO
                     ClusterClient.SendRemoveSocialMember(MMOMessageTypes.UpdateGuildMember, validateResult.GuildId, playerCharacter.Id);
                 }
             }
+            await DatabaseClient.UpdateGuildMemberCountAsync(new UpdateGuildMemberCountReq()
+            {
+                GuildId = validateResult.GuildId,
+                MaxGuildMember = validateResult.Guild.MaxMember(),
+            });
             result.InvokeSuccess(new ResponseLeaveGuildMessage());
 #endif
         }
@@ -863,6 +884,7 @@ namespace MultiplayerARPG.MMO
                     });
                 }
                 // Add guild member to database
+                playerCharacter.GuildId = request.guildId;
                 UITextKeys createGuildMemberMessage = await CreateGuildMember(validateResult.Guild, SocialCharacterData.Create(playerCharacter), requestHandler.ConnectionId);
                 if (createGuildMemberMessage.IsError())
                 {
@@ -870,14 +892,19 @@ namespace MultiplayerARPG.MMO
                     {
                         message = createGuildMemberMessage,
                     });
+                    return;
                 }
-                else
+
+                await DatabaseClient.UpdateGuildMemberCountAsync(new UpdateGuildMemberCountReq()
                 {
-                    result.Invoke(AckResponseCode.Success, new ResponseSendGuildRequestMessage()
-                    {
-                        message = UITextKeys.UI_GUILD_REQUEST_ACCEPTED,
-                    });
-                }
+                    GuildId = validateResult.GuildId,
+                    MaxGuildMember = validateResult.Guild.MaxMember(),
+                });
+
+                result.Invoke(AckResponseCode.Success, new ResponseSendGuildRequestMessage()
+                {
+                    message = UITextKeys.UI_GUILD_REQUEST_ACCEPTED,
+                });
                 return;
             }
 
@@ -930,9 +957,25 @@ namespace MultiplayerARPG.MMO
             if (!GameInstance.ServerUserHandlers.TryGetConnectionId(request.requesterId, out long notifyConnectionId))
                 notifyConnectionId = -1;
 
+            // Delete request from database
+            DatabaseApiResult deleteRequestResp = await DatabaseClient.DeleteGuildRequestAsync(new DeleteGuildRequestReq()
+            {
+                GuildId = validateResult.GuildId,
+                RequesterId = request.requesterId,
+            });
+            if (!deleteRequestResp.IsSuccess)
+            {
+                result.Invoke(AckResponseCode.Error, new ResponseAcceptGuildRequestMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                });
+                return;
+            }
+
             SocialCharacterData requester = default;
             if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(request.requesterId, out IPlayerCharacterData requesterCharacter))
             {
+                requesterCharacter.GuildId = validateResult.GuildId;
                 requester = SocialCharacterData.Create(requesterCharacter);
             }
             else
@@ -951,21 +994,7 @@ namespace MultiplayerARPG.MMO
                     return;
                 }
                 requester = readSocialCharacterResp.Response.SocialCharacterData;
-            }
-
-            // Delete request from database
-            DatabaseApiResult deleteRequestResp = await DbServiceClient.DeleteGuildRequestAsync(new DeleteGuildRequestReq()
-            {
-                GuildId = playerCharacter.GuildId,
-                RequesterId = request.requesterId,
-            });
-            if (!deleteRequestResp.IsSuccess)
-            {
-                result.Invoke(AckResponseCode.Error, new ResponseAcceptGuildRequestMessage()
-                {
-                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
-                });
-                return;
+                requester.guildId = validateResult.GuildId;
             }
 
             // Add guild member
@@ -978,6 +1007,12 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
+
+            await DatabaseClient.UpdateGuildMemberCountAsync(new UpdateGuildMemberCountReq()
+            {
+                GuildId = validateResult.GuildId,
+                MaxGuildMember = validateResult.Guild.MaxMember(),
+            });
 
             result.Invoke(AckResponseCode.Success, new ResponseAcceptGuildRequestMessage()
             {
@@ -1031,7 +1066,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid HandleRequestGetGuildRequests(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<ResponseGetGuildRequestsMessage> result)
+        public async UniTaskVoid HandleRequestGetGuildRequests(RequestHandlerData requestHandler, RequestGetGuildRequestsMessage request, RequestProceedResultDelegate<ResponseGetGuildRequestsMessage> result)
         {
 #if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
@@ -1046,6 +1081,8 @@ namespace MultiplayerARPG.MMO
             DatabaseApiResult<SocialCharactersResp> getRequestsResp = await DbServiceClient.GetGuildRequestsAsync(new GetGuildRequestsReq()
             {
                 GuildId = playerCharacter.GuildId,
+                Skip = request.skip,
+                Limit = request.limit,
             });
             if (!getRequestsResp.IsSuccess)
             {
