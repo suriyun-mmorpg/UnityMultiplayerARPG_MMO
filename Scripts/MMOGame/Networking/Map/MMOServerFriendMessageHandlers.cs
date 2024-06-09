@@ -28,8 +28,8 @@ namespace MultiplayerARPG.MMO
             {
                 FinderId = playerCharacter.Id,
                 CharacterName = request.characterName,
-                Skip = 0,
-                Limit = 50,
+                Skip = request.skip,
+                Limit = request.limit,
             });
             if (!resp.IsSuccess)
             {
@@ -46,7 +46,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid HandleRequestGetFriends(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<ResponseGetFriendsMessage> result)
+        public async UniTaskVoid HandleRequestGetFriends(RequestHandlerData requestHandler, RequestGetFriendsMessage request, RequestProceedResultDelegate<ResponseGetFriendsMessage> result)
         {
 #if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
@@ -244,7 +244,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid HandleRequestGetFriendRequests(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<ResponseGetFriendRequestsMessage> result)
+        public async UniTaskVoid HandleRequestGetFriendRequests(RequestHandlerData requestHandler, RequestGetFriendRequestsMessage request, RequestProceedResultDelegate<ResponseGetFriendRequestsMessage> result)
         {
 #if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
