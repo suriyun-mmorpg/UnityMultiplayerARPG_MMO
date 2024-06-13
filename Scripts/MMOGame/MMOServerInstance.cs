@@ -44,9 +44,39 @@ namespace MultiplayerARPG.MMO
         [SerializeField]
         private string webSocketCertPassword = string.Empty;
 
-        public CentralNetworkManager CentralNetworkManager { get { return centralNetworkManager; } }
-        public MapSpawnNetworkManager MapSpawnNetworkManager { get { return mapSpawnNetworkManager; } }
-        public MapNetworkManager MapNetworkManager { get { return mapNetworkManager; } }
+        public CentralNetworkManager CentralNetworkManager
+        {
+            get
+            {
+                if (centralNetworkManager == null)
+                    centralNetworkManager = GetComponentInChildren<CentralNetworkManager>();
+                if (centralNetworkManager == null)
+                    centralNetworkManager = FindObjectOfType<CentralNetworkManager>();
+                return centralNetworkManager;
+            }
+        }
+        public MapSpawnNetworkManager MapSpawnNetworkManager
+        {
+            get
+            {
+                if (mapSpawnNetworkManager == null)
+                    mapSpawnNetworkManager = GetComponentInChildren<MapSpawnNetworkManager>();
+                if (mapSpawnNetworkManager == null)
+                    mapSpawnNetworkManager = FindObjectOfType<MapSpawnNetworkManager>();
+                return mapSpawnNetworkManager;
+            }
+        }
+        public MapNetworkManager MapNetworkManager
+        {
+            get
+            {
+                if (mapNetworkManager == null)
+                    mapNetworkManager = GetComponentInChildren<MapNetworkManager>();
+                if (mapNetworkManager == null)
+                    mapNetworkManager = FindObjectOfType<MapNetworkManager>();
+                return mapNetworkManager;
+            }
+        }
         public IDatabaseClient DatabaseClient
         {
             get
@@ -105,7 +135,10 @@ namespace MultiplayerARPG.MMO
             }
             DontDestroyOnLoad(gameObject);
             Singleton = this;
+#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             Application.wantsToQuit += Application_wantsToQuit;
+            GameInstance.OnGameDataLoadedEvent += OnGameDataLoaded;
+#endif
 
             // Always accept SSL
             ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback((sender, certificate, chain, policyErrors) => { return true; });
@@ -117,9 +150,6 @@ namespace MultiplayerARPG.MMO
 
             CacheLogGUI.enabled = false;
 #if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-            GameInstance gameInstance = FindObjectOfType<GameInstance>();
-            gameInstance.onGameDataLoaded = OnGameDataLoaded;
-
             if (!Application.isEditor)
             {
                 // Json file read
@@ -236,151 +266,151 @@ namespace MultiplayerARPG.MMO
 
                 // Central network address
                 string centralNetworkAddress;
-                if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_CENTRAL_ADDRESS, out centralNetworkAddress, mapNetworkManager.clusterServerAddress) ||
-                    ConfigReader.ReadConfigs(Configs, ProcessArguments.CONFIG_CENTRAL_ADDRESS, out centralNetworkAddress, mapNetworkManager.clusterServerAddress))
+                if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_CENTRAL_ADDRESS, out centralNetworkAddress, MapNetworkManager.clusterServerAddress) ||
+                    ConfigReader.ReadConfigs(Configs, ProcessArguments.CONFIG_CENTRAL_ADDRESS, out centralNetworkAddress, MapNetworkManager.clusterServerAddress))
                 {
-                    mapNetworkManager.clusterServerAddress = centralNetworkAddress;
+                    MapNetworkManager.clusterServerAddress = centralNetworkAddress;
                 }
-                if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_CENTRAL_ADDRESS, out centralNetworkAddress, mapSpawnNetworkManager.clusterServerAddress) ||
-                    ConfigReader.ReadConfigs(Configs, ProcessArguments.CONFIG_CENTRAL_ADDRESS, out centralNetworkAddress, mapSpawnNetworkManager.clusterServerAddress))
+                if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_CENTRAL_ADDRESS, out centralNetworkAddress, MapSpawnNetworkManager.clusterServerAddress) ||
+                    ConfigReader.ReadConfigs(Configs, ProcessArguments.CONFIG_CENTRAL_ADDRESS, out centralNetworkAddress, MapSpawnNetworkManager.clusterServerAddress))
                 {
-                    mapSpawnNetworkManager.clusterServerAddress = centralNetworkAddress;
+                    MapSpawnNetworkManager.clusterServerAddress = centralNetworkAddress;
                 }
                 Configs[ProcessArguments.CONFIG_CENTRAL_ADDRESS] = centralNetworkAddress;
 
                 // Central network port
                 int centralNetworkPort;
-                if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_CENTRAL_PORT, out centralNetworkPort, centralNetworkManager.networkPort) ||
-                    ConfigReader.ReadConfigs(Configs, ProcessArguments.CONFIG_CENTRAL_PORT, out centralNetworkPort, centralNetworkManager.networkPort))
+                if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_CENTRAL_PORT, out centralNetworkPort, CentralNetworkManager.networkPort) ||
+                    ConfigReader.ReadConfigs(Configs, ProcessArguments.CONFIG_CENTRAL_PORT, out centralNetworkPort, CentralNetworkManager.networkPort))
                 {
-                    centralNetworkManager.networkPort = centralNetworkPort;
+                    CentralNetworkManager.networkPort = centralNetworkPort;
                 }
                 Configs[ProcessArguments.CONFIG_CENTRAL_PORT] = centralNetworkPort;
 
                 // Central max connections
                 int centralMaxConnections;
-                if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_CENTRAL_MAX_CONNECTIONS, out centralMaxConnections, centralNetworkManager.maxConnections) ||
-                    ConfigReader.ReadConfigs(Configs, ProcessArguments.CONFIG_CENTRAL_MAX_CONNECTIONS, out centralMaxConnections, centralNetworkManager.maxConnections))
+                if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_CENTRAL_MAX_CONNECTIONS, out centralMaxConnections, CentralNetworkManager.maxConnections) ||
+                    ConfigReader.ReadConfigs(Configs, ProcessArguments.CONFIG_CENTRAL_MAX_CONNECTIONS, out centralMaxConnections, CentralNetworkManager.maxConnections))
                 {
-                    centralNetworkManager.maxConnections = centralMaxConnections;
+                    CentralNetworkManager.maxConnections = centralMaxConnections;
                 }
                 Configs[ProcessArguments.CONFIG_CENTRAL_MAX_CONNECTIONS] = centralMaxConnections;
 
                 // Central map spawn timeout (milliseconds)
                 int mapSpawnMillisecondsTimeout;
-                if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_MAP_SPAWN_MILLISECONDS_TIMEOUT, out mapSpawnMillisecondsTimeout, centralNetworkManager.mapSpawnMillisecondsTimeout) ||
-                    ConfigReader.ReadConfigs(Configs, ProcessArguments.CONFIG_MAP_SPAWN_MILLISECONDS_TIMEOUT, out mapSpawnMillisecondsTimeout, centralNetworkManager.mapSpawnMillisecondsTimeout))
+                if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_MAP_SPAWN_MILLISECONDS_TIMEOUT, out mapSpawnMillisecondsTimeout, CentralNetworkManager.mapSpawnMillisecondsTimeout) ||
+                    ConfigReader.ReadConfigs(Configs, ProcessArguments.CONFIG_MAP_SPAWN_MILLISECONDS_TIMEOUT, out mapSpawnMillisecondsTimeout, CentralNetworkManager.mapSpawnMillisecondsTimeout))
                 {
-                    centralNetworkManager.mapSpawnMillisecondsTimeout = mapSpawnMillisecondsTimeout;
+                    CentralNetworkManager.mapSpawnMillisecondsTimeout = mapSpawnMillisecondsTimeout;
                 }
                 Configs[ProcessArguments.CONFIG_MAP_SPAWN_MILLISECONDS_TIMEOUT] = mapSpawnMillisecondsTimeout;
 
                 // Central - default channels max connections
                 int defaultChannelMaxConnections;
-                if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_DEFAULT_CHANNEL_MAX_CONNECTIONS, out defaultChannelMaxConnections, centralNetworkManager.defaultChannelMaxConnections) ||
-                    ConfigReader.ReadConfigs(Configs, ProcessArguments.CONFIG_DEFAULT_CHANNEL_MAX_CONNECTIONS, out defaultChannelMaxConnections, centralNetworkManager.defaultChannelMaxConnections))
+                if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_DEFAULT_CHANNEL_MAX_CONNECTIONS, out defaultChannelMaxConnections, CentralNetworkManager.defaultChannelMaxConnections) ||
+                    ConfigReader.ReadConfigs(Configs, ProcessArguments.CONFIG_DEFAULT_CHANNEL_MAX_CONNECTIONS, out defaultChannelMaxConnections, CentralNetworkManager.defaultChannelMaxConnections))
                 {
-                    centralNetworkManager.defaultChannelMaxConnections = defaultChannelMaxConnections;
+                    CentralNetworkManager.defaultChannelMaxConnections = defaultChannelMaxConnections;
                 }
                 Configs[ProcessArguments.CONFIG_DEFAULT_CHANNEL_MAX_CONNECTIONS] = defaultChannelMaxConnections;
 
                 // Central - channels
                 List<ChannelData> channels;
-                if (ConfigReader.ReadConfigs(Configs, ProcessArguments.CONFIG_CHANNELS, out channels, centralNetworkManager.channels))
+                if (ConfigReader.ReadConfigs(Configs, ProcessArguments.CONFIG_CHANNELS, out channels, CentralNetworkManager.channels))
                 {
-                    centralNetworkManager.channels = channels;
+                    CentralNetworkManager.channels = channels;
                 }
                 Configs[ProcessArguments.CONFIG_CHANNELS] = channels;
 
                 // Central->Cluster network port
                 int clusterNetworkPort;
-                if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_CLUSTER_PORT, out clusterNetworkPort, mapNetworkManager.clusterServerPort) ||
-                    ConfigReader.ReadConfigs(Configs, ProcessArguments.CONFIG_CLUSTER_PORT, out clusterNetworkPort, mapNetworkManager.clusterServerPort))
+                if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_CLUSTER_PORT, out clusterNetworkPort, MapNetworkManager.clusterServerPort) ||
+                    ConfigReader.ReadConfigs(Configs, ProcessArguments.CONFIG_CLUSTER_PORT, out clusterNetworkPort, MapNetworkManager.clusterServerPort))
                 {
-                    mapNetworkManager.clusterServerPort = clusterNetworkPort;
+                    MapNetworkManager.clusterServerPort = clusterNetworkPort;
                 }
-                if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_CLUSTER_PORT, out clusterNetworkPort, mapSpawnNetworkManager.clusterServerPort) ||
-                    ConfigReader.ReadConfigs(Configs, ProcessArguments.CONFIG_CLUSTER_PORT, out clusterNetworkPort, mapSpawnNetworkManager.clusterServerPort))
+                if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_CLUSTER_PORT, out clusterNetworkPort, MapSpawnNetworkManager.clusterServerPort) ||
+                    ConfigReader.ReadConfigs(Configs, ProcessArguments.CONFIG_CLUSTER_PORT, out clusterNetworkPort, MapSpawnNetworkManager.clusterServerPort))
                 {
-                    mapSpawnNetworkManager.clusterServerPort = clusterNetworkPort;
+                    MapSpawnNetworkManager.clusterServerPort = clusterNetworkPort;
                 }
-                if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_CLUSTER_PORT, out clusterNetworkPort, centralNetworkManager.clusterServerPort) ||
-                    ConfigReader.ReadConfigs(Configs, ProcessArguments.CONFIG_CLUSTER_PORT, out clusterNetworkPort, centralNetworkManager.clusterServerPort))
+                if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_CLUSTER_PORT, out clusterNetworkPort, CentralNetworkManager.clusterServerPort) ||
+                    ConfigReader.ReadConfigs(Configs, ProcessArguments.CONFIG_CLUSTER_PORT, out clusterNetworkPort, CentralNetworkManager.clusterServerPort))
                 {
-                    centralNetworkManager.clusterServerPort = clusterNetworkPort;
+                    CentralNetworkManager.clusterServerPort = clusterNetworkPort;
                 }
                 Configs[ProcessArguments.CONFIG_CLUSTER_PORT] = clusterNetworkPort;
 
                 // Machine network address, will be set to map spawn / map / chat
                 string machineNetworkAddress;
-                if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_MACHINE_ADDRESS, out machineNetworkAddress, mapSpawnNetworkManager.machineAddress) ||
-                    ConfigReader.ReadConfigs(Configs, ProcessArguments.CONFIG_MACHINE_ADDRESS, out machineNetworkAddress, mapSpawnNetworkManager.machineAddress))
+                if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_MACHINE_ADDRESS, out machineNetworkAddress, MapSpawnNetworkManager.machineAddress) ||
+                    ConfigReader.ReadConfigs(Configs, ProcessArguments.CONFIG_MACHINE_ADDRESS, out machineNetworkAddress, MapSpawnNetworkManager.machineAddress))
                 {
-                    mapSpawnNetworkManager.machineAddress = machineNetworkAddress;
+                    MapSpawnNetworkManager.machineAddress = machineNetworkAddress;
                 }
-                if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_MACHINE_ADDRESS, out machineNetworkAddress, mapNetworkManager.machineAddress) ||
-                    ConfigReader.ReadConfigs(Configs, ProcessArguments.CONFIG_MACHINE_ADDRESS, out machineNetworkAddress, mapNetworkManager.machineAddress))
+                if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_MACHINE_ADDRESS, out machineNetworkAddress, MapNetworkManager.machineAddress) ||
+                    ConfigReader.ReadConfigs(Configs, ProcessArguments.CONFIG_MACHINE_ADDRESS, out machineNetworkAddress, MapNetworkManager.machineAddress))
                 {
-                    mapNetworkManager.machineAddress = machineNetworkAddress;
+                    MapNetworkManager.machineAddress = machineNetworkAddress;
                 }
                 Configs[ProcessArguments.CONFIG_MACHINE_ADDRESS] = machineNetworkAddress;
 
                 // Map spawn network port
                 int mapSpawnNetworkPort;
-                if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_MAP_SPAWN_PORT, out mapSpawnNetworkPort, mapSpawnNetworkManager.networkPort) ||
-                    ConfigReader.ReadConfigs(Configs, ProcessArguments.CONFIG_MAP_SPAWN_PORT, out mapSpawnNetworkPort, mapSpawnNetworkManager.networkPort))
+                if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_MAP_SPAWN_PORT, out mapSpawnNetworkPort, MapSpawnNetworkManager.networkPort) ||
+                    ConfigReader.ReadConfigs(Configs, ProcessArguments.CONFIG_MAP_SPAWN_PORT, out mapSpawnNetworkPort, MapSpawnNetworkManager.networkPort))
                 {
-                    mapSpawnNetworkManager.networkPort = mapSpawnNetworkPort;
+                    MapSpawnNetworkManager.networkPort = mapSpawnNetworkPort;
                 }
                 Configs[ProcessArguments.CONFIG_MAP_SPAWN_PORT] = mapSpawnNetworkPort;
 
                 // Map spawn exe path
                 string spawnExePath;
-                if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_SPAWN_EXE_PATH, out spawnExePath, mapSpawnNetworkManager.exePath) ||
-                    ConfigReader.ReadConfigs(Configs, ProcessArguments.CONFIG_SPAWN_EXE_PATH, out spawnExePath, mapSpawnNetworkManager.exePath))
+                if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_SPAWN_EXE_PATH, out spawnExePath, MapSpawnNetworkManager.exePath) ||
+                    ConfigReader.ReadConfigs(Configs, ProcessArguments.CONFIG_SPAWN_EXE_PATH, out spawnExePath, MapSpawnNetworkManager.exePath))
                 {
-                    mapSpawnNetworkManager.exePath = spawnExePath;
+                    MapSpawnNetworkManager.exePath = spawnExePath;
                 }
                 if (!File.Exists(spawnExePath))
                 {
                     spawnExePath = System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName;
-                    mapSpawnNetworkManager.exePath = spawnExePath;
+                    MapSpawnNetworkManager.exePath = spawnExePath;
                 }
                 Configs[ProcessArguments.CONFIG_SPAWN_EXE_PATH] = spawnExePath;
 
                 // Map spawn in batch mode
-                bool notSpawnInBatchMode = mapSpawnNetworkManager.notSpawnInBatchMode = false;
-                if (ConfigReader.ReadConfigs(Configs, ProcessArguments.CONFIG_NOT_SPAWN_IN_BATCH_MODE, out notSpawnInBatchMode, mapSpawnNetworkManager.notSpawnInBatchMode))
+                bool notSpawnInBatchMode = MapSpawnNetworkManager.notSpawnInBatchMode = false;
+                if (ConfigReader.ReadConfigs(Configs, ProcessArguments.CONFIG_NOT_SPAWN_IN_BATCH_MODE, out notSpawnInBatchMode, MapSpawnNetworkManager.notSpawnInBatchMode))
                 {
-                    mapSpawnNetworkManager.notSpawnInBatchMode = notSpawnInBatchMode;
+                    MapSpawnNetworkManager.notSpawnInBatchMode = notSpawnInBatchMode;
                 }
                 else if (ConfigReader.IsArgsProvided(args, ProcessArguments.ARG_NOT_SPAWN_IN_BATCH_MODE))
                 {
-                    mapSpawnNetworkManager.notSpawnInBatchMode = true;
+                    MapSpawnNetworkManager.notSpawnInBatchMode = true;
                 }
                 Configs[ProcessArguments.CONFIG_NOT_SPAWN_IN_BATCH_MODE] = notSpawnInBatchMode;
 
                 // Map spawn start port
                 int spawnStartPort;
-                if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_SPAWN_START_PORT, out spawnStartPort, mapSpawnNetworkManager.startPort) ||
-                    ConfigReader.ReadConfigs(Configs, ProcessArguments.CONFIG_SPAWN_START_PORT, out spawnStartPort, mapSpawnNetworkManager.startPort))
+                if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_SPAWN_START_PORT, out spawnStartPort, MapSpawnNetworkManager.startPort) ||
+                    ConfigReader.ReadConfigs(Configs, ProcessArguments.CONFIG_SPAWN_START_PORT, out spawnStartPort, MapSpawnNetworkManager.startPort))
                 {
-                    mapSpawnNetworkManager.startPort = spawnStartPort;
+                    MapSpawnNetworkManager.startPort = spawnStartPort;
                 }
                 Configs[ProcessArguments.CONFIG_SPAWN_START_PORT] = spawnStartPort;
 
                 // Spawn channels
                 List<string> spawnChannels;
-                if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_SPAWN_CHANNELS, out spawnChannels, mapSpawnNetworkManager.spawningChannelIds) ||
-                    ConfigReader.ReadConfigs(Configs, ProcessArguments.CONFIG_SPAWN_CHANNELS, out spawnChannels, mapSpawnNetworkManager.spawningChannelIds))
+                if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_SPAWN_CHANNELS, out spawnChannels, MapSpawnNetworkManager.spawningChannelIds) ||
+                    ConfigReader.ReadConfigs(Configs, ProcessArguments.CONFIG_SPAWN_CHANNELS, out spawnChannels, MapSpawnNetworkManager.spawningChannelIds))
                 {
-                    mapSpawnNetworkManager.spawningChannelIds = spawnChannels;
+                    MapSpawnNetworkManager.spawningChannelIds = spawnChannels;
                 }
                 Configs[ProcessArguments.CONFIG_SPAWN_CHANNELS] = spawnChannels;
 
                 // Spawn maps
                 List<string> defaultSpawnMaps = new List<string>();
-                foreach (BaseMapInfo mapInfo in mapSpawnNetworkManager.spawningMaps)
+                foreach (BaseMapInfo mapInfo in MapSpawnNetworkManager.spawningMaps)
                 {
                     if (mapInfo != null)
                         defaultSpawnMaps.Add(mapInfo.Id);
@@ -395,7 +425,7 @@ namespace MultiplayerARPG.MMO
 
                 // Spawn allocate maps
                 List<SpawnAllocateMapByNameData> defaultSpawnAllocateMaps = new List<SpawnAllocateMapByNameData>();
-                foreach (SpawnAllocateMapData spawnAllocateMap in mapSpawnNetworkManager.spawningAllocateMaps)
+                foreach (SpawnAllocateMapData spawnAllocateMap in MapSpawnNetworkManager.spawningAllocateMaps)
                 {
                     if (spawnAllocateMap.mapInfo != null)
                     {
@@ -415,19 +445,19 @@ namespace MultiplayerARPG.MMO
 
                 // Map network port
                 int mapNetworkPort;
-                if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_MAP_PORT, out mapNetworkPort, mapNetworkManager.networkPort) ||
-                    ConfigReader.ReadConfigs(Configs, ProcessArguments.CONFIG_MAP_PORT, out mapNetworkPort, mapNetworkManager.networkPort))
+                if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_MAP_PORT, out mapNetworkPort, MapNetworkManager.networkPort) ||
+                    ConfigReader.ReadConfigs(Configs, ProcessArguments.CONFIG_MAP_PORT, out mapNetworkPort, MapNetworkManager.networkPort))
                 {
-                    mapNetworkManager.networkPort = mapNetworkPort;
+                    MapNetworkManager.networkPort = mapNetworkPort;
                 }
                 Configs[ProcessArguments.CONFIG_MAP_PORT] = mapNetworkPort;
 
                 // Map max connections
                 int mapMaxConnections;
-                if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_MAP_MAX_CONNECTIONS, out mapMaxConnections, mapNetworkManager.maxConnections) ||
-                    ConfigReader.ReadConfigs(Configs, ProcessArguments.CONFIG_MAP_MAX_CONNECTIONS, out mapMaxConnections, mapNetworkManager.maxConnections))
+                if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_MAP_MAX_CONNECTIONS, out mapMaxConnections, MapNetworkManager.maxConnections) ||
+                    ConfigReader.ReadConfigs(Configs, ProcessArguments.CONFIG_MAP_MAX_CONNECTIONS, out mapMaxConnections, MapNetworkManager.maxConnections))
                 {
-                    mapNetworkManager.maxConnections = mapMaxConnections;
+                    MapNetworkManager.maxConnections = mapMaxConnections;
                 }
                 Configs[ProcessArguments.CONFIG_MAP_MAX_CONNECTIONS] = mapMaxConnections;
 
@@ -442,14 +472,14 @@ namespace MultiplayerARPG.MMO
                 string channelId = string.Empty;
                 if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_CHANNEL_ID, out channelId, string.Empty))
                 {
-                    mapNetworkManager.ChannelId = channelId;
+                    MapNetworkManager.ChannelId = channelId;
                 }
 
                 // Instance Id
                 string instanceId = string.Empty;
                 if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_INSTANCE_ID, out instanceId, string.Empty))
                 {
-                    mapNetworkManager.MapInstanceId = instanceId;
+                    MapNetworkManager.MapInstanceId = instanceId;
                 }
 
                 // Instance Warp Position
@@ -458,25 +488,25 @@ namespace MultiplayerARPG.MMO
                     ConfigReader.ReadArgs(args, ProcessArguments.ARG_INSTANCE_POSITION_Y, out instancePosY, 0f) &&
                     ConfigReader.ReadArgs(args, ProcessArguments.ARG_INSTANCE_POSITION_Z, out instancePosZ, 0f))
                 {
-                    mapNetworkManager.MapInstanceWarpToPosition = new Vector3(instancePosX, instancePosY, instancePosZ);
+                    MapNetworkManager.MapInstanceWarpToPosition = new Vector3(instancePosX, instancePosY, instancePosZ);
                 }
 
                 // Instance Warp Override Rotation, Instance Warp Rotation
-                mapNetworkManager.MapInstanceWarpOverrideRotation = ConfigReader.IsArgsProvided(args, ProcessArguments.ARG_INSTANCE_OVERRIDE_ROTATION);
+                MapNetworkManager.MapInstanceWarpOverrideRotation = ConfigReader.IsArgsProvided(args, ProcessArguments.ARG_INSTANCE_OVERRIDE_ROTATION);
                 float instanceRotX, instanceRotY, instanceRotZ;
-                if (mapNetworkManager.MapInstanceWarpOverrideRotation &&
+                if (MapNetworkManager.MapInstanceWarpOverrideRotation &&
                     ConfigReader.ReadArgs(args, ProcessArguments.ARG_INSTANCE_ROTATION_X, out instanceRotX, 0f) &&
                     ConfigReader.ReadArgs(args, ProcessArguments.ARG_INSTANCE_ROTATION_Y, out instanceRotY, 0f) &&
                     ConfigReader.ReadArgs(args, ProcessArguments.ARG_INSTANCE_ROTATION_Z, out instanceRotZ, 0f))
                 {
-                    mapNetworkManager.MapInstanceWarpToRotation = new Vector3(instanceRotX, instanceRotY, instanceRotZ);
+                    MapNetworkManager.MapInstanceWarpToRotation = new Vector3(instanceRotX, instanceRotY, instanceRotZ);
                 }
 
                 // Allocate map server
                 bool isAllocate = false;
                 if (ConfigReader.IsArgsProvided(args, ProcessArguments.ARG_ALLOCATE))
                 {
-                    mapNetworkManager.IsAllocate = true;
+                    MapNetworkManager.IsAllocate = true;
                     isAllocate = true;
                 }
 
@@ -590,10 +620,10 @@ namespace MultiplayerARPG.MMO
         private bool Application_wantsToQuit()
         {
 #if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-            if (mapNetworkManager != null && mapNetworkManager.IsServer && !mapNetworkManager.ReadyToQuit)
+            if (MapNetworkManager != null && MapNetworkManager.IsServer && !MapNetworkManager.ReadyToQuit)
             {
                 Logging.Log("[MapNetworkManager] still proceeding before quit.");
-                mapNetworkManager.ProceedBeforeQuit();
+                MapNetworkManager.ProceedBeforeQuit();
                 return false;
             }
             if (databaseNetworkManager != null && databaseNetworkManager.IsServer && !databaseNetworkManager.ReadyToQuit)
@@ -617,15 +647,14 @@ namespace MultiplayerARPG.MMO
 #if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         private void OnGameDataLoaded()
         {
-            GameInstance gameInstance = FindObjectOfType<GameInstance>();
-            gameInstance.LoadHomeScenePreventions[nameof(MMOServerInstance)] = false;
+            GameInstance.LoadHomeScenePreventions[nameof(MMOServerInstance)] = false;
 
             if (_startingCentralServer ||
                 _startingMapSpawnServer ||
                 _startingMapServer)
             {
                 // Allow to test in editor, so still load home scene in editor
-                gameInstance.LoadHomeScenePreventions[nameof(MMOServerInstance)] = !Application.isEditor || _startingMapServer;
+                GameInstance.LoadHomeScenePreventions[nameof(MMOServerInstance)] = !Application.isEditor || _startingMapServer;
             }
 
             StartServers();
@@ -660,22 +689,22 @@ namespace MultiplayerARPG.MMO
                 // Start map spawn server
                 if (_spawningMaps != null && _spawningMaps.Count > 0)
                 {
-                    mapSpawnNetworkManager.spawningMaps = new List<BaseMapInfo>();
+                    MapSpawnNetworkManager.spawningMaps = new List<BaseMapInfo>();
                     foreach (string spawningMapId in _spawningMaps)
                     {
                         if (!GameInstance.MapInfos.TryGetValue(spawningMapId, out BaseMapInfo tempMapInfo))
                             continue;
-                        mapSpawnNetworkManager.spawningMaps.Add(tempMapInfo);
+                        MapSpawnNetworkManager.spawningMaps.Add(tempMapInfo);
                     }
                 }
                 if (_spawningAllocateMaps != null && _spawningAllocateMaps.Count > 0)
                 {
-                    mapSpawnNetworkManager.spawningAllocateMaps = new List<SpawnAllocateMapData>();
+                    MapSpawnNetworkManager.spawningAllocateMaps = new List<SpawnAllocateMapData>();
                     foreach (SpawnAllocateMapByNameData spawningMap in _spawningAllocateMaps)
                     {
                         if (!GameInstance.MapInfos.TryGetValue(spawningMap.mapName, out BaseMapInfo tempMapInfo))
                             continue;
-                        mapSpawnNetworkManager.spawningAllocateMaps.Add(new SpawnAllocateMapData()
+                        MapSpawnNetworkManager.spawningAllocateMaps.Add(new SpawnAllocateMapData()
                         {
                             mapInfo = tempMapInfo,
                             allocateAmount = spawningMap.allocateAmount,
@@ -691,11 +720,11 @@ namespace MultiplayerARPG.MMO
                 BaseMapInfo tempMapInfo;
                 if (!string.IsNullOrEmpty(_startingMapId) && GameInstance.MapInfos.TryGetValue(_startingMapId, out tempMapInfo))
                 {
-                    mapNetworkManager.Assets.addressableOnlineScene = tempMapInfo.AddressableScene;
+                    MapNetworkManager.Assets.addressableOnlineScene = tempMapInfo.AddressableScene;
 #if !EXCLUDE_PREFAB_REFS
-                    mapNetworkManager.Assets.onlineScene = tempMapInfo.Scene;
+                    MapNetworkManager.Assets.onlineScene = tempMapInfo.Scene;
 #endif
-                    mapNetworkManager.SetMapInfo(tempMapInfo);
+                    MapNetworkManager.SetMapInfo(tempMapInfo);
                 }
                 StartMapServer();
             }
@@ -726,7 +755,7 @@ namespace MultiplayerARPG.MMO
 
         public void StartMapSpawnServer()
         {
-            mapSpawnNetworkManager.StartServer();
+            MapSpawnNetworkManager.StartServer();
         }
 
         public void StartMapServer()

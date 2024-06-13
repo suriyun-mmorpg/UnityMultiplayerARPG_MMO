@@ -14,9 +14,9 @@ namespace MultiplayerARPG.MMO
 
         private void OnEnable()
         {
-            MMOClientInstance.Singleton.onCentralClientConnected += OnCentralServerConnected;
-            MMOClientInstance.Singleton.onCentralClientDisconnected += OnCentralServerDisconnected;
-            MMOClientInstance.Singleton.onCentralClientStopped += OnCentralClientStopped;
+            MMOClientInstance.OnCentralClientConnectedEvent += OnCentralServerConnected;
+            MMOClientInstance.OnCentralClientDisconnectedEvent += OnCentralServerDisconnected;
+            MMOClientInstance.OnCentralClientStoppedEvent += OnCentralClientStopped;
             if (MMOClientInstance.Singleton.IsConnectedToCentralServer())
                 OnCentralServerConnected();
             else if (!string.IsNullOrEmpty(MMOClientInstance.SelectedCentralAddress) && MMOClientInstance.SelectedCentralPort > 0)
@@ -25,9 +25,9 @@ namespace MultiplayerARPG.MMO
 
         private void OnDisable()
         {
-            MMOClientInstance.Singleton.onCentralClientConnected -= OnCentralServerConnected;
-            MMOClientInstance.Singleton.onCentralClientDisconnected -= OnCentralServerDisconnected;
-            MMOClientInstance.Singleton.onCentralClientStopped -= OnCentralClientStopped;
+            MMOClientInstance.OnCentralClientConnectedEvent -= OnCentralServerConnected;
+            MMOClientInstance.OnCentralClientDisconnectedEvent -= OnCentralServerDisconnected;
+            MMOClientInstance.OnCentralClientStoppedEvent -= OnCentralClientStopped;
         }
 
         public void OnCentralServerConnected()

@@ -31,20 +31,40 @@ namespace MultiplayerARPG.MMO
         [SerializeField]
         private MmoNetworkSetting[] networkSettings = new MmoNetworkSetting[0];
 
-        public CentralNetworkManager CentralNetworkManager { get { return centralNetworkManager; } }
-        public MapNetworkManager MapNetworkManager { get { return mapNetworkManager; } }
+        public CentralNetworkManager CentralNetworkManager
+        {
+            get
+            {
+                if (centralNetworkManager == null)
+                    centralNetworkManager = GetComponentInChildren<CentralNetworkManager>();
+                if (centralNetworkManager == null)
+                    centralNetworkManager = FindObjectOfType<CentralNetworkManager>();
+                return centralNetworkManager;
+            }
+        }
+        public MapNetworkManager MapNetworkManager
+        {
+            get
+            {
+                if (mapNetworkManager == null)
+                    mapNetworkManager = GetComponentInChildren<MapNetworkManager>();
+                if (mapNetworkManager == null)
+                    mapNetworkManager = FindObjectOfType<MapNetworkManager>();
+                return mapNetworkManager;
+            }
+        }
         public bool UseWebSocket { get { return useWebSocket; } }
         public bool WebSocketSecure { get { return webSocketSecure; } }
         public MmoNetworkSetting[] NetworkSettings { get { return networkSettings; } }
         public string SelectedChannelId { get; set; } = string.Empty;
 
-        public System.Action onCentralClientConnected;
-        public System.Action<DisconnectReason, SocketError, UITextKeys> onCentralClientDisconnected;
-        public System.Action onCentralClientStopped;
+        public static System.Action OnCentralClientConnectedEvent;
+        public static System.Action<DisconnectReason, SocketError, UITextKeys> OnCentralClientDisconnectedEvent;
+        public static System.Action OnCentralClientStoppedEvent;
 
-        public System.Action onMapClientConnected;
-        public System.Action<DisconnectReason, SocketError, UITextKeys> onMapClientDisconnected;
-        public System.Action onMapClientStopped;
+        public static System.Action OnMapClientConnectedEvent;
+        public static System.Action<DisconnectReason, SocketError, UITextKeys> OnMapClientDisconnectedEvent;
+        public static System.Action OnMapClientStoppedEvent;
 
         private void Awake()
         {
@@ -82,39 +102,39 @@ namespace MultiplayerARPG.MMO
 
         public void OnCentralConnected()
         {
-            if (onCentralClientConnected != null)
-                onCentralClientConnected.Invoke();
+            if (OnCentralClientConnectedEvent != null)
+                OnCentralClientConnectedEvent.Invoke();
         }
 
         public void OnCentralDisconnected(DisconnectReason reason, SocketError socketError, UITextKeys message)
         {
-            if (onCentralClientDisconnected != null)
-                onCentralClientDisconnected.Invoke(reason, socketError, message);
+            if (OnCentralClientDisconnectedEvent != null)
+                OnCentralClientDisconnectedEvent.Invoke(reason, socketError, message);
             ClearClientData();
         }
 
         public void OnCentralStopped()
         {
-            if (onCentralClientStopped != null)
-                onCentralClientStopped.Invoke();
+            if (OnCentralClientStoppedEvent != null)
+                OnCentralClientStoppedEvent.Invoke();
         }
 
         public void OnMapConnected()
         {
-            if (onMapClientConnected != null)
-                onMapClientConnected.Invoke();
+            if (OnMapClientConnectedEvent != null)
+                OnMapClientConnectedEvent.Invoke();
         }
 
         public void OnMapDisconnected(DisconnectReason reason, SocketError socketError, UITextKeys message)
         {
-            if (onMapClientDisconnected != null)
-                onMapClientDisconnected.Invoke(reason, socketError, message);
+            if (OnMapClientDisconnectedEvent != null)
+                OnMapClientDisconnectedEvent.Invoke(reason, socketError, message);
         }
 
         public void OnMapStopped()
         {
-            if (onMapClientStopped != null)
-                onMapClientStopped.Invoke();
+            if (OnMapClientStoppedEvent != null)
+                OnMapClientStoppedEvent.Invoke();
             // Restart central client after exit from map-server to login and go to character management scene
             if (!IsConnectedToCentralServer())
                 StartCentralClient();
