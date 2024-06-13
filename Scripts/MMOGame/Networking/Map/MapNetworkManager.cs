@@ -245,6 +245,7 @@ namespace MultiplayerARPG.MMO
                 });
             }
 #endif
+            await UniTask.Yield();
             ReadyToQuit = true;
             // Request to quit again
             Application.Quit();
