@@ -206,15 +206,7 @@ namespace MultiplayerARPG.MMO
 #if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             if (ClusterClient.IsNetworkActive && _usersByCharacterId.TryGetValue(playerCharacterEntity.Id, out SocialCharacterData tempUserData))
             {
-                tempUserData.dataId = playerCharacterEntity.DataId;
-                tempUserData.level = playerCharacterEntity.Level;
-                tempUserData.currentHp = playerCharacterEntity.CurrentHp;
-                tempUserData.maxHp = playerCharacterEntity.MaxHp;
-                tempUserData.currentMp = playerCharacterEntity.CurrentMp;
-                tempUserData.maxMp = playerCharacterEntity.MaxMp;
-                tempUserData.partyId = playerCharacterEntity.PartyId;
-                tempUserData.guildId = playerCharacterEntity.GuildId;
-                _usersByCharacterId[playerCharacterEntity.Id] = tempUserData;
+                _usersByCharacterId[playerCharacterEntity.Id] = tempUserData = SocialCharacterData.Create(playerCharacterEntity);
                 UpdateMapUser(ClusterClient, UpdateUserCharacterMessage.UpdateType.Online, tempUserData);
             }
 #endif
@@ -257,16 +249,7 @@ namespace MultiplayerARPG.MMO
             // Set user data to map server
             if (!_usersByCharacterId.ContainsKey(playerCharacterEntity.Id))
             {
-                SocialCharacterData userData = new SocialCharacterData();
-                userData.userId = playerCharacterEntity.UserId;
-                userData.id = playerCharacterEntity.Id;
-                userData.characterName = playerCharacterEntity.CharacterName;
-                userData.dataId = playerCharacterEntity.DataId;
-                userData.level = playerCharacterEntity.Level;
-                userData.currentHp = playerCharacterEntity.CurrentHp;
-                userData.maxHp = playerCharacterEntity.MaxHp;
-                userData.currentMp = playerCharacterEntity.CurrentMp;
-                userData.maxMp = playerCharacterEntity.MaxMp;
+                SocialCharacterData userData = SocialCharacterData.Create(playerCharacterEntity);
                 _usersByCharacterId.TryAdd(userData.id, userData);
                 // Add map user to cluster server
                 if (ClusterClient.IsNetworkActive)
