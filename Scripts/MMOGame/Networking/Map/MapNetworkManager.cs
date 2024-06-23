@@ -663,9 +663,6 @@ namespace MultiplayerARPG.MMO
             playerCharacterData.CurrentMapName = mapName;
             playerCharacterData.CurrentPosition = position;
             playerCharacterData.CurrentRotation = rotation;
-            playerCharacterData.CurrentChannel = ChannelId;
-
-            // TODO: Do something if map name is difference
 
             // Spawn character entity and set its data
             Quaternion characterRotation = Quaternion.identity;
