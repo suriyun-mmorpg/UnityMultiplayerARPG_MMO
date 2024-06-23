@@ -658,6 +658,15 @@ namespace MultiplayerARPG.MMO
                     playerCharacterData.CurrentRotation = MapInstanceWarpToRotation;
             }
 
+            // Set proper spawn position
+            CurrentMapInfo.GetEnterMapPoint(playerCharacterData, out string mapName, out Vector3 position, out Vector3 rotation);
+            playerCharacterData.CurrentMapName = mapName;
+            playerCharacterData.CurrentPosition = position;
+            playerCharacterData.CurrentRotation = rotation;
+            playerCharacterData.CurrentChannel = ChannelId;
+
+            // TODO: Do something if map name is difference
+
             // Spawn character entity and set its data
             Quaternion characterRotation = Quaternion.identity;
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
@@ -850,7 +859,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#endregion
+        #endregion
 
         #region Network message handlers
         protected override void HandleWarpAtClient(MessageHandlerData messageHandler)
