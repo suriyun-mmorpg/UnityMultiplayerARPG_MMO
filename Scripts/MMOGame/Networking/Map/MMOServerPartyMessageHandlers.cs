@@ -369,46 +369,109 @@ namespace MultiplayerARPG.MMO
             // If it is leader kick all members and terminate party
             if (validateResult.Party.IsLeader(playerCharacter.Id))
             {
-                // Delete from database
-                DatabaseApiResult deleteResp = await DatabaseClient.DeletePartyAsync(new DeletePartyReq()
-                {
-                    PartyId = validateResult.PartyId
-                });
-                if (!deleteResp.IsSuccess)
-                {
-                    result.InvokeError(new ResponseLeavePartyMessage()
-                    {
-                        message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
-                    });
-                    return;
-                }
-                IPlayerCharacterData memberCharacter;
-                long memberConnectionId;
+                // Find a new leader
+                string newLeaderId = playerCharacter.Id;
                 foreach (string memberId in validateResult.Party.GetMemberIds())
                 {
-                    // Save to database
-                    _ = DatabaseClient.ClearCharacterPartyAsync(new ClearCharacterPartyReq()
+                    if (string.Equals(playerCharacter.Id, memberId))
+                        continue;
+                    newLeaderId = memberId;
+                    break;
+                }
+
+                if (string.Equals(playerCharacter.Id, newLeaderId))
+                {
+                    // Delete from database
+                    DatabaseApiResult deleteResp = await DatabaseClient.DeletePartyAsync(new DeletePartyReq()
                     {
-                        CharacterId = memberId
+                        PartyId = validateResult.PartyId
                     });
-                    // Update cache
-                    if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(memberId, out memberCharacter) &&
-                        GameInstance.ServerUserHandlers.TryGetConnectionId(memberId, out memberConnectionId))
+                    if (!deleteResp.IsSuccess)
                     {
-                        memberCharacter.ClearParty();
-                        GameInstance.ServerGameMessageHandlers.SendClearPartyData(memberConnectionId, validateResult.PartyId);
+                        result.InvokeError(new ResponseLeavePartyMessage()
+                        {
+                            message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                        });
+                        return;
                     }
+                    IPlayerCharacterData memberCharacter;
+                    long memberConnectionId;
+                    foreach (string memberId in validateResult.Party.GetMemberIds())
+                    {
+                        // Save to database
+                        _ = DatabaseClient.ClearCharacterPartyAsync(new ClearCharacterPartyReq()
+                        {
+                            CharacterId = memberId
+                        });
+                        // Update cache
+                        if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(memberId, out memberCharacter) &&
+                            GameInstance.ServerUserHandlers.TryGetConnectionId(memberId, out memberConnectionId))
+                        {
+                            memberCharacter.ClearParty();
+                            GameInstance.ServerGameMessageHandlers.SendClearPartyData(memberConnectionId, validateResult.PartyId);
+                        }
+                        // Broadcast via chat server
+                        if (ClusterClient.IsNetworkActive)
+                        {
+                            ClusterClient.SendRemoveSocialMember(MMOMessageTypes.UpdatePartyMember, validateResult.PartyId, memberId);
+                        }
+                    }
+                    GameInstance.ServerPartyHandlers.RemoveParty(validateResult.PartyId);
                     // Broadcast via chat server
                     if (ClusterClient.IsNetworkActive)
                     {
-                        ClusterClient.SendRemoveSocialMember(MMOMessageTypes.UpdatePartyMember, validateResult.PartyId, memberId);
+                        ClusterClient.SendPartyTerminate(MMOMessageTypes.UpdateParty, validateResult.PartyId);
                     }
                 }
-                GameInstance.ServerPartyHandlers.RemoveParty(validateResult.PartyId);
-                // Broadcast via chat server
-                if (ClusterClient.IsNetworkActive)
+                else
                 {
-                    ClusterClient.SendPartyTerminate(MMOMessageTypes.UpdateParty, validateResult.PartyId);
+                    // Change party member
+                    DatabaseApiResult<PartyResp> updateLeaderResp = await DatabaseClient.UpdatePartyLeaderAsync(new UpdatePartyLeaderReq()
+                    {
+                        PartyId = validateResult.PartyId,
+                        LeaderCharacterId = newLeaderId,
+                    });
+                    if (!updateLeaderResp.IsSuccess)
+                    {
+                        result.InvokeError(new ResponseLeavePartyMessage()
+                        {
+                            message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                        });
+                        return;
+                    }
+                    // Update cache
+                    validateResult.Party.SetLeader(newLeaderId);
+                    GameInstance.ServerPartyHandlers.SetParty(validateResult.PartyId, validateResult.Party);
+                    // Broadcast via chat server
+                    if (ClusterClient.IsNetworkActive)
+                    {
+                        ClusterClient.SendChangePartyLeader(MMOMessageTypes.UpdateParty, validateResult.PartyId, newLeaderId);
+                    }
+                    GameInstance.ServerGameMessageHandlers.SendSetPartyLeaderToMembers(validateResult.Party);
+                    // Leave the party
+                    DatabaseApiResult clearResp = await DatabaseClient.ClearCharacterPartyAsync(new ClearCharacterPartyReq()
+                    {
+                        CharacterId = playerCharacter.Id
+                    });
+                    if (!clearResp.IsSuccess)
+                    {
+                        result.InvokeError(new ResponseLeavePartyMessage()
+                        {
+                            message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                        });
+                        return;
+                    }
+                    // Update cache
+                    playerCharacter.ClearParty();
+                    validateResult.Party.RemoveMember(playerCharacter.Id);
+                    GameInstance.ServerPartyHandlers.SetParty(validateResult.PartyId, validateResult.Party);
+                    GameInstance.ServerGameMessageHandlers.SendRemovePartyMemberToMembers(validateResult.Party, playerCharacter.Id);
+                    GameInstance.ServerGameMessageHandlers.SendClearPartyData(requestHandler.ConnectionId, validateResult.PartyId);
+                    // Broadcast via chat server
+                    if (ClusterClient.IsNetworkActive)
+                    {
+                        ClusterClient.SendRemoveSocialMember(MMOMessageTypes.UpdatePartyMember, validateResult.PartyId, playerCharacter.Id);
+                    }
                 }
             }
             else
