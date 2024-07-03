@@ -82,7 +82,7 @@ namespace MultiplayerARPG.MMO
             });
             if (resp.IsError)
                 return;
-            playerCharacter.UserGold.Increase(gold);
+            playerCharacter.UserGold = playerCharacter.UserGold.Increase(gold);
         }
 #endif
 
@@ -98,7 +98,7 @@ namespace MultiplayerARPG.MMO
             });
             if (resp.IsError)
                 return;
-            playerCharacter.UserCash.Increase(cash);
+            playerCharacter.UserCash = playerCharacter.UserCash.Increase(cash);
         }
 #endif
     }
