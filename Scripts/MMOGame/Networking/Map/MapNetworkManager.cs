@@ -444,7 +444,7 @@ namespace MultiplayerARPG.MMO
                 DatabaseApiResult<BuildingsResp> buildingsResp;
                 do
                 {
-                    buildingsResp = await DatabaseClient.ReadBuildingsAsync(new ReadBuildingsReq()
+                    buildingsResp = await DatabaseClient.GetBuildingsAsync(new GetBuildingsReq()
                     {
                         ChannelId = ChannelId,
                         MapName = CurrentMapInfo.Id,
@@ -618,7 +618,7 @@ namespace MultiplayerARPG.MMO
 #if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         private async UniTaskVoid SetPlayerReadyRoutine(long connectionId, string userId, string accessToken, string selectCharacterId)
         {
-            DatabaseApiResult<CharacterResp> characterResp = await DatabaseClient.ReadCharacterAsync(new ReadCharacterReq()
+            DatabaseApiResult<CharacterResp> characterResp = await DatabaseClient.GetCharacterAsync(new GetCharacterReq()
             {
                 UserId = userId,
                 CharacterId = selectCharacterId

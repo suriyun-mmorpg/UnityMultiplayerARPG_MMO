@@ -23,10 +23,10 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             _loadingStorageIds.Add(storageId);
-            DatabaseApiResult<ReadStorageItemsResp> resp;
+            DatabaseApiResult<GetStorageItemsResp> resp;
             do
             {
-                resp = await DatabaseClient.ReadStorageItemsAsync(new ReadStorageItemsReq()
+                resp = await DatabaseClient.GetStorageItemsAsync(new GetStorageItemsReq()
                 {
                     StorageType = storageId.storageType,
                     StorageOwnerId = storageId.storageOwnerId,
@@ -56,7 +56,7 @@ namespace MultiplayerARPG.MMO
             DatabaseApiResult<PartyResp> resp;
             do
             {
-                resp = await DatabaseClient.ReadPartyAsync(new ReadPartyReq()
+                resp = await DatabaseClient.GetPartyAsync(new GetPartyReq()
                 {
                     PartyId = id,
                 });
@@ -85,7 +85,7 @@ namespace MultiplayerARPG.MMO
             DatabaseApiResult<GuildResp> resp;
             do
             {
-                resp = await DatabaseClient.ReadGuildAsync(new ReadGuildReq()
+                resp = await DatabaseClient.GetGuildAsync(new GetGuildReq()
                 {
                     GuildId = id,
                 });

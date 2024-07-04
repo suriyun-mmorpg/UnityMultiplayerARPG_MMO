@@ -846,7 +846,7 @@ namespace MultiplayerARPG.MMO
             if (!GameInstance.ServerGuildHandlers.TryGetGuild(request.guildId, out GuildData guild))
             {
                 // No guild data is cached, try get it from database
-                DatabaseApiResult<GuildResp> readGuildResp = await DatabaseClient.ReadGuildAsync(new ReadGuildReq()
+                DatabaseApiResult<GuildResp> readGuildResp = await DatabaseClient.GetGuildAsync(new GetGuildReq()
                 {
                     GuildId = request.guildId,
                 });
@@ -981,7 +981,7 @@ namespace MultiplayerARPG.MMO
             else
             {
                 // No player character in cache, read social character from database
-                DatabaseApiResult<SocialCharacterResp> readSocialCharacterResp = await DatabaseClient.ReadSocialCharacterAsync(new ReadSocialCharacterReq()
+                DatabaseApiResult<SocialCharacterResp> readSocialCharacterResp = await DatabaseClient.GetSocialCharacterAsync(new GetSocialCharacterReq()
                 {
                     CharacterId = request.requesterId,
                 });

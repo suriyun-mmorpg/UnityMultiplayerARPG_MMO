@@ -590,7 +590,6 @@ namespace MultiplayerARPG.MMO
                 if (!useCustomDatabaseClient)
                 {
                     databaseNetworkManager.SetDatabaseByOptionIndex(databaseOptionIndex);
-                    databaseNetworkManager.DisableDatabaseCaching = disableDatabaseCaching;
                 }
 
                 if (startDatabaseOnAwake)

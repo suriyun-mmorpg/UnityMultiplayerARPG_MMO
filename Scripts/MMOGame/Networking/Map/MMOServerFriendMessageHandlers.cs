@@ -57,7 +57,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            DatabaseApiResult<SocialCharactersResp> resp = await DatabaseClient.ReadFriendsAsync(new ReadFriendsReq()
+            DatabaseApiResult<SocialCharactersResp> resp = await DatabaseClient.GetFriendsAsync(new GetFriendsReq()
             {
                 CharacterId = playerCharacter.Id,
                 ReadById2 = false,
@@ -255,7 +255,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            DatabaseApiResult<SocialCharactersResp> resp = await DatabaseClient.ReadFriendsAsync(new ReadFriendsReq()
+            DatabaseApiResult<SocialCharactersResp> resp = await DatabaseClient.GetFriendsAsync(new GetFriendsReq()
             {
                 CharacterId = playerCharacter.Id,
                 ReadById2 = true,

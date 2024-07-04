@@ -43,7 +43,7 @@ namespace MultiplayerARPG.MMO
             }
             if (storageId.storageType == StorageType.Guild)
             {
-                DatabaseApiResult<ReadStorageItemsResp> storageItemsResult = await DatabaseClient.ReadStorageItemsAsync(new ReadStorageItemsReq()
+                DatabaseApiResult<GetStorageItemsResp> storageItemsResult = await DatabaseClient.GetStorageItemsAsync(new GetStorageItemsReq()
                 {
                     StorageType = storageId.storageType,
                     StorageOwnerId = storageId.storageOwnerId,
