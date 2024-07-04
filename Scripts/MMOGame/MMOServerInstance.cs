@@ -588,9 +588,7 @@ namespace MultiplayerARPG.MMO
             else
             {
                 if (!useCustomDatabaseClient)
-                {
                     databaseNetworkManager.SetDatabaseByOptionIndex(databaseOptionIndex);
-                }
 
                 if (startDatabaseOnAwake)
                     _startingDatabaseServer = true;
@@ -667,7 +665,7 @@ namespace MultiplayerARPG.MMO
             await UniTask.NextFrame();
 
             // Prepare guild data for guild database manager
-            databaseNetworkManager.DatabaseCache = new LocalDatabaseCache();
+            databaseNetworkManager.DatabaseCache = disableDatabaseCaching ? new DisabledDatabaseCache() : new LocalDatabaseCache();
             DatabaseNetworkManager.GuildMemberRoles = GameInstance.Singleton.SocialSystemSetting.GuildMemberRoles;
             DatabaseNetworkManager.GuildExpTree = GameInstance.Singleton.SocialSystemSetting.GuildExpTable.expTree;
 
