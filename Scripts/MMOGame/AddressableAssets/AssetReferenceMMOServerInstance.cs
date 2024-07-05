@@ -1,3 +1,4 @@
+using Insthync.AddressableAssetTools;
 using LiteNetLibManager;
 
 namespace MultiplayerARPG.MMO
