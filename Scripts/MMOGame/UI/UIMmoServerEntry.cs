@@ -27,13 +27,7 @@ namespace MultiplayerARPG.MMO
             if (uiTextDescription != null)
                 uiTextDescription.text = Data.Description;
 
-            if (imageIcon != null)
-            {
-                Sprite iconSprite = Data == null ? null : Data.Icon;
-                imageIcon.gameObject.SetActive(iconSprite != null);
-                imageIcon.sprite = iconSprite;
-                imageIcon.preserveAspect = true;
-            }
+            imageIcon.SetImageGameDataIcon(Data);
         }
     }
 
