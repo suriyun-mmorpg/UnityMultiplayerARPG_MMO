@@ -131,9 +131,9 @@ namespace MultiplayerARPG.MMO
             ClusterClient.onResponseAppServerAddress = OnResponseAppServerAddress;
             ClusterClient.onPlayerCharacterRemoved = OnPlayerCharacterRemoved;
             ClusterClient.onKickUser = KickUser;
-            ClusterClient.RegisterResponseHandler<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.RequestSpawnMap);
-            ClusterClient.RegisterRequestHandler<RequestForceDespawnCharacterMessage, EmptyMessage>(MMORequestTypes.RequestForceDespawnCharacter, HandleRequestForceDespawnCharacter);
-            ClusterClient.RegisterRequestHandler<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.RequestRunMap, HandleRequestRunMap);
+            ClusterClient.RegisterResponseHandler<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.SpawnMap);
+            ClusterClient.RegisterRequestHandler<RequestForceDespawnCharacterMessage, EmptyMessage>(MMORequestTypes.ForceDespawnCharacter, HandleRequestForceDespawnCharacter);
+            ClusterClient.RegisterRequestHandler<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.RunMap, HandleRequestRunMap);
             ClusterClient.RegisterMessageHandler(MMOMessageTypes.Chat, HandleChat);
             ClusterClient.RegisterMessageHandler(MMOMessageTypes.UpdateMapUser, HandleUpdateMapUser);
             ClusterClient.RegisterMessageHandler(MMOMessageTypes.UpdatePartyMember, HandleUpdatePartyMember);

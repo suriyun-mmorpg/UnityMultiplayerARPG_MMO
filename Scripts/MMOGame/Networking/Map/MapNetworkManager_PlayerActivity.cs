@@ -116,7 +116,7 @@ namespace MultiplayerARPG.MMO
             }
 
             // Generate instance id
-            AsyncResponseData<ResponseSpawnMapMessage> result = await ClusterClient.SendRequestAsync<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.RequestSpawnMap, new RequestSpawnMapMessage()
+            AsyncResponseData<ResponseSpawnMapMessage> result = await ClusterClient.SendRequestAsync<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.SpawnMap, new RequestSpawnMapMessage()
             {
                 channelId = ChannelId,
                 mapName = mapName,
