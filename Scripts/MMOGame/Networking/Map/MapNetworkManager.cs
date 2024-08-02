@@ -5,7 +5,6 @@ using LiteNetLibManager;
 using Cysharp.Threading.Tasks;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Threading;
 using System.Net.Sockets;
 using ConcurrentCollections;
 
@@ -101,8 +100,6 @@ namespace MultiplayerARPG.MMO
         private readonly ConcurrentDictionary<string, CentralServerPeerInfo> _mapServerConnectionIdsBySceneName = new ConcurrentDictionary<string, CentralServerPeerInfo>();
         private readonly ConcurrentDictionary<string, CentralServerPeerInfo> _instanceMapServerConnectionIdsByInstanceId = new ConcurrentDictionary<string, CentralServerPeerInfo>();
         private readonly ConcurrentDictionary<string, SocialCharacterData> _usersByCharacterId = new ConcurrentDictionary<string, SocialCharacterData>();
-        private readonly ConcurrentDictionary<string, CancellationTokenSource> _despawningPlayerCharacterCancellations = new ConcurrentDictionary<string, CancellationTokenSource>();
-        private readonly ConcurrentDictionary<string, BasePlayerCharacterEntity> _despawningPlayerCharacterEntities = new ConcurrentDictionary<string, BasePlayerCharacterEntity>();
         private readonly ConcurrentDictionary<string, long> _connectionsByUserId = new ConcurrentDictionary<string, long>();
         private readonly ConcurrentDictionary<string, string> _accessTokensByUserId = new ConcurrentDictionary<string, string>();
         // Database operations
@@ -276,29 +273,6 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-        public async UniTask SaveAndDestroyDespawningPlayerCharacter(string characterId)
-        {
-            // Find despawning character
-            if (_despawningPlayerCharacterCancellations.TryGetValue(characterId, out CancellationTokenSource cancellationTokenSource) &&
-                _despawningPlayerCharacterEntities.TryGetValue(characterId, out BasePlayerCharacterEntity playerCharacterEntity) &&
-                !cancellationTokenSource.IsCancellationRequested)
-            {
-                // Cancel character despawning to despawning immediately
-                _despawningPlayerCharacterCancellations.TryRemove(characterId, out _);
-                _despawningPlayerCharacterEntities.TryRemove(characterId, out _);
-                cancellationTokenSource.Cancel();
-                cancellationTokenSource.Dispose();
-
-                // Save character before despawned
-                await WaitAndSaveCharacter(playerCharacterEntity);
-
-                // Despawn the character
-                playerCharacterEntity.NetworkDestroy();
-            }
-        }
-#endif
-
-#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         public override void RegisterUserId(long connectionId, string userId)
         {
             base.RegisterUserId(connectionId, userId);
@@ -341,81 +315,7 @@ namespace MultiplayerARPG.MMO
         public override async void OnPeerDisconnected(long connectionId, DisconnectReason reason, SocketError socketError)
         {
             base.OnPeerDisconnected(connectionId, reason, socketError);
-            // Save player character data
-            if (ServerUserHandlers.TryGetPlayerCharacter(connectionId, out BasePlayerCharacterEntity playerCharacterEntity))
-            {
-                cancellingReserveStorageCharacterIds.Add(playerCharacterEntity.Id);
-
-                // Clear character states
-                playerCharacterEntity.Dealing.StopDealing();
-                playerCharacterEntity.Vending.StopVending();
-                playerCharacterEntity.SetOwnerClient(-1);
-                playerCharacterEntity.StopMove();
-                MovementState movementState = playerCharacterEntity.MovementState;
-                movementState &= ~MovementState.Forward;
-                movementState &= ~MovementState.Backward;
-                movementState &= ~MovementState.Right;
-                movementState &= ~MovementState.Left;
-                playerCharacterEntity.KeyMovement(Vector3.zero, movementState);
-                string id = playerCharacterEntity.Id;
-                // Store despawning player character id, it will be used later if player not connect and continue playing the character
-                CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-                _despawningPlayerCharacterCancellations.TryAdd(id, cancellationTokenSource);
-                _despawningPlayerCharacterEntities.TryAdd(id, playerCharacterEntity);
-
-                // Unregister player character
-                UnregisterPlayerCharacter(connectionId);
-                UnregisterUserId(connectionId);
-
-                // Save character immediately when player disconnect
-                await WaitAndSaveCharacter(playerCharacterEntity);
-
-                try
-                {
-                    if (!IsInstanceMap())
-                        await UniTask.Delay(playerCharacterDespawnMillisecondsDelay, true, PlayerLoopTiming.Update, cancellationTokenSource.Token);
-
-                    // Save the characer
-                    await WaitAndSaveCharacter(playerCharacterEntity, cancellationTokenSource.Token);
-
-                    // Destroy character from server
-                    playerCharacterEntity.NetworkDestroy();
-                    _despawningPlayerCharacterEntities.TryRemove(id, out _);
-                }
-                catch (System.OperationCanceledException)
-                {
-                    // Catch the cancellation
-                }
-                catch (System.Exception ex)
-                {
-                    // Other errors
-                    Logging.LogException(LogTag, ex);
-                }
-                finally
-                {
-                    if (_despawningPlayerCharacterCancellations.TryRemove(id, out cancellationTokenSource))
-                    {
-                        try
-                        {
-                            cancellationTokenSource.Dispose();
-                        }
-                        catch (System.ObjectDisposedException)
-                        {
-                            // Already disposed
-                        }
-                        catch (System.Exception ex)
-                        {
-                            // Other errors
-                            Logging.LogException(LogTag, ex);
-                        }
-                    }
-                }
-            }
-            else
-            {
-                UnregisterPlayerCharacter(connectionId);
-                UnregisterUserId(connectionId);
-            }
+            await SaveAndDespawnPlayerCharacter(connectionId, false);
         }
 #endif
 
@@ -526,7 +426,7 @@ namespace MultiplayerARPG.MMO
                 return false;
             }
 
-            await SaveAndDestroyDespawningPlayerCharacter(selectCharacterId);
+            await SaveAndDespawnPendingPlayerCharacter(selectCharacterId);
             // Unregister player
             UnregisterPlayerCharacter(connectionId);
             UnregisterUserId(connectionId);
@@ -1021,7 +921,7 @@ namespace MultiplayerARPG.MMO
 #if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         private async void OnPlayerCharacterRemoved(string userId, string characterId)
         {
-            await SaveAndDestroyDespawningPlayerCharacter(characterId);
+            await SaveAndDespawnPendingPlayerCharacter(characterId);
         }
 #endif
 #endregion
@@ -1034,7 +934,7 @@ namespace MultiplayerARPG.MMO
         {
 #if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             if (!string.IsNullOrEmpty(request.characterId))
-                await SaveAndDestroyDespawningPlayerCharacter(request.characterId);
+                await SaveAndDespawnPendingPlayerCharacter(request.characterId);
             // Always success, because it is just despawning player character, if it not found then it still can be determined that it was despawned
             result.InvokeSuccess(EmptyMessage.Value);
 #endif
@@ -1402,6 +1302,16 @@ namespace MultiplayerARPG.MMO
 #if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             if (_connectionsByUserId.TryGetValue(userId, out long connectionId))
                 KickClient(connectionId, message);
+#endif
+        }
+
+        protected override async UniTaskVoid HandleRequestSafeDisconnect(
+            RequestHandlerData requestHandler, EmptyMessage request,
+            RequestProceedResultDelegate<EmptyMessage> result)
+        {
+#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+            await SaveAndDespawnPlayerCharacter(requestHandler.ConnectionId, true);
+            result.InvokeSuccess(EmptyMessage.Value);
 #endif
         }
     }
