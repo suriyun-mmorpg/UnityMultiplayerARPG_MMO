@@ -85,50 +85,59 @@ namespace MultiplayerARPG.MMO
                 UserId = playerCharacter.UserId,
             });
             if (!mailResp.IsSuccess)
+            {
                 return UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR;
+            }
             Mail mail = mailResp.Response.Mail;
             if (mail.IsClaim)
             {
                 return UITextKeys.UI_ERROR_MAIL_CLAIM_ALREADY_CLAIMED;
             }
-            else if (mail.IsDelete)
+            if (mail.IsDelete)
             {
                 return UITextKeys.UI_ERROR_MAIL_CLAIM_NOT_ALLOWED;
             }
-            else
+            // Validate data
+            if (mail.Items.Count > 0)
             {
-                if (mail.Items.Count > 0)
-                {
-                    if (playerCharacter.IncreasingItemsWillOverwhelming(mail.Items))
-                        return UITextKeys.UI_ERROR_WILL_OVERWHELMING;
-                    else
-                        playerCharacter.IncreaseItems(mail.Items);
-                }
-                if (mail.Currencies.Count > 0)
-                {
-                    playerCharacter.IncreaseCurrencies(mail.Currencies);
-                }
-                if (mail.Gold > 0)
-                {
-                    playerCharacter.Gold = playerCharacter.Gold.Increase(mail.Gold);
-                }
-                if (mail.Cash > 0)
-                {
-                    DatabaseApiResult<CashResp> changeCashResp = await DatabaseClient.ChangeCashAsync(new ChangeCashReq()
-                    {
-                        UserId = playerCharacter.UserId,
-                        ChangeAmount = mail.Cash
-                    });
-                    if (!changeCashResp.IsSuccess)
-                        return UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR;
-                    playerCharacter.UserCash = changeCashResp.Response.Cash;
-                }
+                if (playerCharacter.IncreasingItemsWillOverwhelming(mail.Items))
+                    return UITextKeys.UI_ERROR_WILL_OVERWHELMING;
             }
+            // Make sure that the cash is received
+            DatabaseApiResult<CashResp>? changeCashResp = null;
+            if (mail.Cash > 0)
+            {
+                changeCashResp = await DatabaseClient.ChangeCashAsync(new ChangeCashReq()
+                {
+                    UserId = playerCharacter.UserId,
+                    ChangeAmount = mail.Cash
+                });
+                if (!changeCashResp.Value.IsSuccess)
+                    return UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR;
+            }
+            // Claimed
             DatabaseApiResult<UpdateClaimMailItemsStateResp> resp = await DatabaseClient.UpdateClaimMailItemsStateAsync(new UpdateClaimMailItemsStateReq()
             {
                 MailId = mailId,
                 UserId = playerCharacter.UserId,
             });
+            // Give rewards
+            if (mail.Items.Count > 0)
+            {
+                playerCharacter.IncreaseItems(mail.Items);
+            }
+            if (mail.Currencies.Count > 0)
+            {
+                playerCharacter.IncreaseCurrencies(mail.Currencies);
+            }
+            if (mail.Gold > 0)
+            {
+                playerCharacter.Gold = playerCharacter.Gold.Increase(mail.Gold);
+            }
+            if (mail.Cash > 0 && changeCashResp.HasValue)
+            {
+                playerCharacter.UserCash = changeCashResp.Value.Response.Cash;
+            }
             return UITextKeys.NONE;
 #else
             return UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE;
@@ -219,10 +228,14 @@ namespace MultiplayerARPG.MMO
             }
             // Validate gold
             if (request.gold < 0)
-                request.gold = 0;
-            if (playerCharacter.Gold >= request.gold)
             {
-                playerCharacter.Gold -= request.gold;
+                request.gold = 0;
+            }
+            // Decrease gold
+            int playerGold = playerCharacter.Gold;
+            if (playerGold >= request.gold)
+            {
+                playerGold -= request.gold;
             }
             else
             {
@@ -254,6 +267,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
+            // Send the mail
             Mail mail = new Mail()
             {
                 SenderId = playerCharacter.UserId,
@@ -263,25 +277,19 @@ namespace MultiplayerARPG.MMO
                 Content = request.content,
                 Gold = request.gold,
             };
-            DatabaseApiResult<SendMailResp> resp = await DatabaseClient.SendMailAsync(new SendMailReq()
+            if (!await GameInstance.ServerMailHandlers.SendMail(mail))
             {
-                Mail = mail,
-            });
-            if (!resp.IsSuccess)
-            {
+                // Unable to send mail
                 result.InvokeError(new ResponseSendMailMessage()
                 {
                     message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
                 });
                 return;
             }
-            UITextKeys message = resp.Response.Error;
-            result.Invoke(
-                !message.IsError() ? AckResponseCode.Success : AckResponseCode.Error,
-                new ResponseSendMailMessage()
-                {
-                    message = message,
-                });
+            // Update player's items/currencies after mail sent
+            playerCharacter.Gold = playerGold;
+            // Response the client
+            result.InvokeSuccess(new ResponseSendMailMessage());
 #endif
         }
 
