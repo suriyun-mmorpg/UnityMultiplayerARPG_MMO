@@ -87,6 +87,7 @@ namespace MultiplayerARPG.MMO
                     return _customDatabaseClient;
             }
         }
+        public IChatProfanityDetector ChatProfanityDetector { get; private set; }
         public bool UseWebSocket { get { return useWebSocket; } }
         public bool WebSocketSecure { get { return webSocketSecure; } }
         public string WebSocketCertificateFilePath { get { return webSocketCertPath; } }
@@ -147,6 +148,9 @@ namespace MultiplayerARPG.MMO
             if (customDatabaseClientSource == null)
                 customDatabaseClientSource = gameObject;
             _customDatabaseClient = customDatabaseClientSource.GetComponent<IDatabaseClient>();
+            ChatProfanityDetector = GetComponentInChildren<IChatProfanityDetector>();
+            if (ChatProfanityDetector == null)
+                ChatProfanityDetector = gameObject.AddComponent<DisabledChatProfanityDetector>();
 
             CacheLogGUI.enabled = false;
 #if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE

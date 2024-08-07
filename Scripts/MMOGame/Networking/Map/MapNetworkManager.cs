@@ -59,6 +59,10 @@ namespace MultiplayerARPG.MMO
         {
             get { return MMOServerInstance.Singleton.DatabaseClient; }
         }
+        public IChatProfanityDetector ChatProfanityDetector
+        {
+            get { return MMOServerInstance.Singleton.ChatProfanityDetector; }
+        }
         public ClusterClient ClusterClient { get; private set; }
 #endif
 
@@ -769,7 +773,7 @@ namespace MultiplayerARPG.MMO
         }
 
 #if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-        protected override void HandleChatAtServer(MessageHandlerData messageHandler)
+        protected override async void HandleChatAtServer(MessageHandlerData messageHandler)
         {
             ChatMessage message = messageHandler.ReadMessage<ChatMessage>().FillChannelId();
             if (messageHandler.ConnectionId >= 0 && message.sendByServer)
@@ -789,6 +793,18 @@ namespace MultiplayerARPG.MMO
                 // Try to get character by sender name because this chat was sent by server, don't use connection ID to get character
                 // But still continue to enter chat if there is no character found (because it is server)
                 ServerUserHandlers.TryGetPlayerCharacterByName(message.senderName, out playerCharacter);
+            }
+            // Profanity detection
+            ProfanityDetectResult profanityDetectResult = await ChatProfanityDetector.Proceed(message.message);
+            if (profanityDetectResult.shouldMutePlayer)
+            {
+                GameInstance.ServerUserHandlers.MuteCharacterByName(message.senderName, profanityDetectResult.muteMinutes);
+                return;
+            }
+            if (profanityDetectResult.shouldKickPlayer)
+            {
+                KickUser(message.senderUserId, UITextKeys.UI_ERROR_KICKED_FROM_SERVER);
+                return;
             }
             // Setup some data if it can find a character
             if (playerCharacter != null)
