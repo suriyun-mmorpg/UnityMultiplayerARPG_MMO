@@ -772,8 +772,6 @@ namespace MultiplayerARPG.MMO
         protected override void HandleChatAtServer(MessageHandlerData messageHandler)
         {
             ChatMessage message = messageHandler.ReadMessage<ChatMessage>().FillChannelId();
-            string userId = string.Empty;
-            string accessToken = string.Empty;
             if (messageHandler.ConnectionId >= 0 && message.sendByServer)
             {
                 // This message should be sent by server but its connection >= 0, which means it is not a server ;)
@@ -798,10 +796,6 @@ namespace MultiplayerARPG.MMO
                 message.senderId = playerCharacter.Id;
                 message.senderUserId = playerCharacter.UserId;
                 message.senderName = playerCharacter.CharacterName;
-                // Set user ID and access token, they will be used by cluster server to validate player
-                userId = playerCharacter.UserId;
-                if (!_accessTokensByUserId.TryGetValue(userId, out accessToken))
-                    accessToken = string.Empty;
                 // Set guild data
                 if (ServerGuildHandlers.TryGetGuild(playerCharacter.GuildId, out GuildData guildData))
                 {
