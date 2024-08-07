@@ -612,7 +612,6 @@ namespace MultiplayerARPG.MMO
             DatabaseApiResult<GetUserLevelResp> getUserLevelResp = await DatabaseClient.GetUserLevelAsync(new GetUserLevelReq()
             {
                 UserId = userId,
-                AccessToken = accessToken,
             });
             if (!getUserLevelResp.IsSuccess)
             {
@@ -837,8 +836,6 @@ namespace MultiplayerARPG.MMO
                             ClusterClient.SendPacket(0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.Chat, (writer) =>
                             {
                                 writer.PutValue(message);
-                                writer.Put(userId);
-                                writer.Put(accessToken);
                             });
                         }
                         sentGmCommand = true;
@@ -861,8 +858,6 @@ namespace MultiplayerARPG.MMO
                         ClusterClient.SendPacket(0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.Chat, (writer) =>
                         {
                             writer.PutValue(message);
-                            writer.Put(userId);
-                            writer.Put(accessToken);
                         });
                     }
                 }
@@ -873,8 +868,6 @@ namespace MultiplayerARPG.MMO
                 ClusterClient.SendPacket(0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.Chat, (writer) =>
                 {
                     writer.PutValue(message);
-                    writer.Put(userId);
-                    writer.Put(accessToken);
                 });
             }
         }
@@ -1003,12 +996,10 @@ namespace MultiplayerARPG.MMO
                     // Handle only GM command, if it is not GM command then skip
                     return;
                 }
-
                 // Get user level from server to validate user level
                 DatabaseApiResult<GetUserLevelResp> resp = await DatabaseClient.GetUserLevelAsync(new GetUserLevelReq()
                 {
-                    UserId = messageHandler.Reader.GetString(),
-                    AccessToken = messageHandler.Reader.GetString(),
+                    UserId = message.senderUserId,
                 });
                 if (!resp.IsSuccess)
                 {
@@ -1022,7 +1013,9 @@ namespace MultiplayerARPG.MMO
                 }
                 // Response enter GM command message
                 if (!ServerUserHandlers.TryGetPlayerCharacterByName(message.senderName, out BasePlayerCharacterEntity playerCharacterEntity))
+                {
                     playerCharacterEntity = null;
+                }
                 string response = CurrentGameInstance.GMCommands.HandleGMCommand(message.senderName, playerCharacterEntity, message.message);
                 if (playerCharacterEntity != null && !string.IsNullOrEmpty(response))
                 {
