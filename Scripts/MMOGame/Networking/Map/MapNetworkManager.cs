@@ -7,6 +7,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MultiplayerARPG.MMO
 {
@@ -43,7 +44,8 @@ namespace MultiplayerARPG.MMO
         [Header("Central Network Connection")]
         public string clusterServerAddress = "127.0.0.1";
         public int clusterServerPort = 6010;
-        public string machineAddress = "127.0.0.1";
+        [FormerlySerializedAs("machineAddress")]
+        public string publicAddress = "127.0.0.1";
 
         [Header("Database")]
         public float autoSaveDuration = 2f;
@@ -69,7 +71,7 @@ namespace MultiplayerARPG.MMO
         public bool IsAllocate { get; set; } = false;
         public string ClusterServerAddress { get { return clusterServerAddress; } }
         public int ClusterServerPort { get { return clusterServerPort; } }
-        public string AppAddress { get { return machineAddress; } }
+        public string AppAddress { get { return publicAddress; } }
         public int AppPort { get { return networkPort; } }
         public string ChannelId { get; set; }
         public string RefId
