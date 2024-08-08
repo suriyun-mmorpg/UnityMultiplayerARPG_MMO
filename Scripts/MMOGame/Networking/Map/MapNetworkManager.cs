@@ -300,7 +300,7 @@ namespace MultiplayerARPG.MMO
         public override void OnClientDisconnected(DisconnectReason reason, SocketError socketError, byte[] data)
         {
             GameInstance.UserId = string.Empty;
-            GameInstance.UserToken = string.Empty;
+            GameInstance.AccessToken = string.Empty;
             base.OnClientDisconnected(reason, socketError, data);
         }
 #endif
@@ -412,7 +412,7 @@ namespace MultiplayerARPG.MMO
         public override void SerializeEnterGameData(NetDataWriter writer)
         {
             writer.Put(GameInstance.UserId);
-            writer.Put(GameInstance.UserToken);
+            writer.Put(GameInstance.AccessToken);
             writer.Put(GameInstance.SelectedCharacterId);
         }
 
@@ -454,7 +454,7 @@ namespace MultiplayerARPG.MMO
         public override void SerializeClientReadyData(NetDataWriter writer)
         {
             writer.Put(GameInstance.UserId);
-            writer.Put(GameInstance.UserToken);
+            writer.Put(GameInstance.AccessToken);
             writer.Put(GameInstance.SelectedCharacterId);
         }
 

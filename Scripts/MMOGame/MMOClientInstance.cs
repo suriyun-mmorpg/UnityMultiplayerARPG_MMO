@@ -186,7 +186,7 @@ namespace MultiplayerARPG.MMO
             SelectedCentralAddress = string.Empty;
             SelectedCentralPort = 0;
             GameInstance.UserId = string.Empty;
-            GameInstance.UserToken = string.Empty;
+            GameInstance.AccessToken = string.Empty;
             GameInstance.SelectedCharacterId = string.Empty;
         }
 
@@ -246,12 +246,12 @@ namespace MultiplayerARPG.MMO
                 callback.Invoke(responseHandler, responseCode, response);
 
             GameInstance.UserId = string.Empty;
-            GameInstance.UserToken = string.Empty;
+            GameInstance.AccessToken = string.Empty;
             GameInstance.SelectedCharacterId = string.Empty;
             if (responseCode == AckResponseCode.Success)
             {
                 GameInstance.UserId = response.userId;
-                GameInstance.UserToken = response.accessToken;
+                GameInstance.AccessToken = response.accessToken;
             }
             return default;
         }
@@ -262,7 +262,7 @@ namespace MultiplayerARPG.MMO
                 callback.Invoke(responseHandler, responseCode, response);
 
             GameInstance.UserId = string.Empty;
-            GameInstance.UserToken = string.Empty;
+            GameInstance.AccessToken = string.Empty;
             GameInstance.SelectedCharacterId = string.Empty;
             return default;
         }
@@ -273,11 +273,11 @@ namespace MultiplayerARPG.MMO
                 callback.Invoke(responseHandler, responseCode, response);
 
             GameInstance.UserId = string.Empty;
-            GameInstance.UserToken = string.Empty;
+            GameInstance.AccessToken = string.Empty;
             if (responseCode == AckResponseCode.Success)
             {
                 GameInstance.UserId = response.userId;
-                GameInstance.UserToken = response.accessToken;
+                GameInstance.AccessToken = response.accessToken;
             }
             return default;
         }

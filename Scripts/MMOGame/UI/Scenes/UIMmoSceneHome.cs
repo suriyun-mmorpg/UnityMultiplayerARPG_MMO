@@ -34,8 +34,8 @@ namespace MultiplayerARPG.MMO
         {
             ClearHistory();
             Next(uiLogin);
-            if (!string.IsNullOrEmpty(GameInstance.UserId) && !string.IsNullOrEmpty(GameInstance.UserToken))
-                MMOClientInstance.Singleton.RequestValidateAccessToken(GameInstance.UserId, GameInstance.UserToken, OnValidateAccessToken);
+            if (!string.IsNullOrEmpty(GameInstance.UserId) && !string.IsNullOrEmpty(GameInstance.AccessToken))
+                MMOClientInstance.Singleton.RequestValidateAccessToken(GameInstance.UserId, GameInstance.AccessToken, OnValidateAccessToken);
         }
 
         public void OnCentralServerDisconnected(DisconnectReason reason, SocketError socketError, UITextKeys message)
