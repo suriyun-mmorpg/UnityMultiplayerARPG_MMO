@@ -808,6 +808,7 @@ namespace MultiplayerARPG.MMO
                 KickUser(message.senderUserId, UITextKeys.UI_ERROR_KICKED_FROM_SERVER);
                 return;
             }
+            message.message = profanityDetectResult.message;
             // Setup some data if it can find a character
             if (playerCharacter != null)
             {
