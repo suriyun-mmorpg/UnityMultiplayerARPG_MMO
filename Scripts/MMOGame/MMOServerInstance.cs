@@ -669,7 +669,12 @@ namespace MultiplayerARPG.MMO
             await UniTask.NextFrame();
 
             // Prepare guild data for guild database manager
-            databaseNetworkManager.DatabaseCache = disableDatabaseCaching ? new DisabledDatabaseCache() : new LocalDatabaseCache();
+            IDatabaseCache currentDatabaseCache = databaseNetworkManager.GetComponentInChildren<IDatabaseCache>();
+            if (currentDatabaseCache == null)
+                currentDatabaseCache = databaseNetworkManager.gameObject.AddComponent<LocalDatabaseCache>();
+            if (disableDatabaseCaching)
+                currentDatabaseCache = databaseNetworkManager.gameObject.AddComponent<DisabledDatabaseCache>();
+            databaseNetworkManager.DatabaseCache = currentDatabaseCache;
             DatabaseNetworkManager.GuildMemberRoles = GameInstance.Singleton.SocialSystemSetting.GuildMemberRoles;
             DatabaseNetworkManager.GuildExpTree = GameInstance.Singleton.SocialSystemSetting.GuildExpTable.expTree;
 
