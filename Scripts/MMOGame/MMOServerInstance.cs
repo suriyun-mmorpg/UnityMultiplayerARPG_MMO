@@ -638,7 +638,7 @@ namespace MultiplayerARPG.MMO
                 {
                     if (!string.IsNullOrEmpty(LogFileName))
                         LogFileName += "_";
-                    LogFileName += $"Map({mapName})-Channel({channelId})-Allocate({isAllocate})-Instance({instanceId})";
+                    LogFileName += $"Map({mapName})-Ch({channelId})-Alloc({isAllocate})-Instance({instanceId})";
                     startLog = true;
                     _startingMapServer = true;
                 }
@@ -649,7 +649,9 @@ namespace MultiplayerARPG.MMO
                 }
 
                 if (startLog)
+                {
                     EnableLogger(LogFileName);
+                }
             }
             else
             {
