@@ -44,9 +44,25 @@ namespace MultiplayerARPG.MMO
             File.WriteAllText(configFilePath, JsonConvert.SerializeObject(_serverConfig, Formatting.Indented));
         }
 
+        public static bool HasClientConfig()
+        {
+            string configFilePath = Path.Combine(Application.streamingAssetsPath, "clientConfig.json");
+            return File.Exists(configFilePath);
+        }
+
         public static ClientConfig ReadClientConfig()
         {
-            return _clientConfig;
+            string configFilePath = Path.Combine(Application.streamingAssetsPath, "clientConfig.json");
+            Debug.Log($"Reading client config file from {configFilePath}");
+            if (File.Exists(configFilePath))
+            {
+                // Read config file
+                Debug.Log("Found client config file.");
+                string dataAsJson = File.ReadAllText(configFilePath);
+                _clientConfig = JsonConvert.DeserializeObject<ClientConfig>(dataAsJson);
+                return _clientConfig;
+            }
+            return new ClientConfig();
         }
     }
 }
