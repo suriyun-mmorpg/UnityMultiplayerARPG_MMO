@@ -38,7 +38,6 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -421,6 +420,7 @@ GameObject:
   m_Component:
   - component: {fileID: 694651799}
   - component: {fileID: 694651798}
+  - component: {fileID: 694651800}
   m_Layer: 0
   m_Name: Directional Light
   m_TagString: Untagged
@@ -505,6 +505,29 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+--- !u!114 &694651800
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 694651797}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Version: 3
+  m_UsePipelineSettings: 1
+  m_AdditionalLightsShadowResolutionTier: 2
+  m_LightLayerMask: 1
+  m_RenderingLayers: 1
+  m_CustomShadowLayers: 0
+  m_ShadowLayerMask: 1
+  m_ShadowRenderingLayers: 1
+  m_LightCookieSize: {x: 1, y: 1}
+  m_LightCookieOffset: {x: 0, y: 0}
+  m_SoftShadowQuality: 0
 --- !u!1 &1127565837
 GameObject:
   m_ObjectHideFlags: 0
@@ -549,16 +572,18 @@ MonoBehaviour:
   packetVersion: 1
   pingDuration: 1
   doNotEnterGameOnConnect: 0
+  doNotReadyOnSceneLoaded: 0
   doNotDestroyOnSceneChanges: 0
+  loadOfflineSceneWhenClientStopped: 1
   auctionHouseMessageTypes:
     createAuctionRequestType: 1300
     bidRequestType: 1301
     buyoutRequestType: 1302
     cancelAuctionRequestType: 1304
-    getClientConfigRequestType: 1303
   auctionHouseServiceUrl: http://localhost:9800
   auctionHouseServiceUrlForClient: http://localhost:9800
   auctionHouseSecretKey: secret
+  dailyRewardingServiceUrlForClient: http://localhost:9803
   hitToSomeoneNotifyMessageId: 2001
   hitToSomeoneNotifyDataChannel: 0
   hitToSomeoneNotifyDeliveryMethod: 4
@@ -568,6 +593,8 @@ MonoBehaviour:
   killNotifyMessageId: 2000
   killNotifyDataChannel: 0
   killNotifyDeliveryMethod: 1
+  getOnlineCharacterDataRequestType: 1500
+  getOnlineCharactersRequestType: 1501
   useUnityAutoPhysicSyncTransform: 1
   onSpawnEntitiesStart:
     m_PersistentCalls:
@@ -580,8 +607,7 @@ MonoBehaviour:
       m_Calls: []
   guildWarMessageTypes:
     statusMsgType: 1001
-    getClientConfigRequestType: 1400
-  recoverMonstersWhenRoundEnd: 1
+  recoverMonstersWhenGuildWarRoundEnd: 1
   guildWarMailSenderId: GUILDWAR
   guildWarMailSenderName: Guild War Manager
   guildWarServiceUrl: http://localhost:9801
@@ -589,7 +615,7 @@ MonoBehaviour:
   guildWarSecretKey: secret
   clusterServerAddress: 127.0.0.1
   clusterServerPort: 6010
-  machineAddress: 127.0.0.1
+  publicAddress: 127.0.0.1
   autoSaveDuration: 30
   mapSpawnMillisecondsTimeout: 0
   playerCharacterDespawnMillisecondsDelay: 5000
@@ -646,6 +672,25 @@ MonoBehaviour:
   onlineScene:
     sceneAsset: {fileID: 0}
     sceneName: 
+  addressablePlayerPrefab:
+    m_AssetGUID: 
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+    hashAssetId: 0
+  addressableSpawnablePrefabs: []
+  addressableOfflineScene:
+    m_AssetGUID: 
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+    sceneName: 
+  addressableOnlineScene:
+    m_AssetGUID: 
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+    sceneName: 
   onInitialize:
     m_PersistentCalls:
       m_Calls: []
@@ -694,12 +739,37 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  onSceneFileSizeRetrieving:
+    m_PersistentCalls:
+      m_Calls: []
+  onSceneFileSizeRetrieved:
+    m_PersistentCalls:
+      m_Calls: []
+  onSceneDepsDownloading:
+    m_PersistentCalls:
+      m_Calls: []
+  onSceneDepsFileDownloading:
+    m_PersistentCalls:
+      m_Calls: []
+  onSceneDepsDownloaded:
+    m_PersistentCalls:
+      m_Calls: []
+  onLoadAdditiveSceneStart:
+    m_PersistentCalls:
+      m_Calls: []
+  onLoadAdditiveSceneProgress:
+    m_PersistentCalls:
+      m_Calls: []
+  onLoadAdditiveSceneFinish:
+    m_PersistentCalls:
+      m_Calls: []
   onObjectSpawn:
     m_PersistentCalls:
       m_Calls: []
   onObjectDestroy:
     m_PersistentCalls:
       m_Calls: []
+  disablePooling: 0
 --- !u!1 &1232480984
 GameObject:
   m_ObjectHideFlags: 0
@@ -840,6 +910,7 @@ MonoBehaviour:
   messageManager: {fileID: 0}
   saveSystem: {fileID: 0}
   gameplayRule: {fileID: 11400000, guid: 3bfe680a81b27ce4ba9642ddff7baa17, type: 2}
+  inventoryManager: {fileID: 0}
   dayNightTimeUpdater: {fileID: 0}
   gmCommands: {fileID: 0}
   equipmentModelBonesSetupManager: {fileID: 0}
@@ -862,6 +933,68 @@ MonoBehaviour:
   uiSceneGameplayConsolePrefab: {fileID: 0}
   defaultControllerPrefab: {fileID: 114096437919969166, guid: 147be1283e4eb834d94ad1c905a031e7,
     type: 3}
+  addressableItemDropEntityPrefab:
+    m_AssetGUID: 
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+    hashAssetId: 0
+  addressableExpDropEntityPrefab:
+    m_AssetGUID: 
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+    hashAssetId: 0
+  addressableGoldDropEntityPrefab:
+    m_AssetGUID: 
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+    hashAssetId: 0
+  addressableCurrencyDropEntityPrefab:
+    m_AssetGUID: 
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+    hashAssetId: 0
+  addressableWarpPortalEntityPrefab:
+    m_AssetGUID: 
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+    hashAssetId: 0
+  addressablePlayerCorpsePrefab:
+    m_AssetGUID: 
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+    hashAssetId: 0
+  addressableMonsterCorpsePrefab:
+    m_AssetGUID: 
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+    hashAssetId: 0
+  addressableUiSceneGameplayPrefab:
+    m_AssetGUID: 
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+  addressableUiSceneGameplayMobilePrefab:
+    m_AssetGUID: 
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+  addressableUiSceneGameplayConsolePrefab:
+    m_AssetGUID: 
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+  addressableDefaultControllerPrefab:
+    m_AssetGUID: 
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
   serverCharacterPrefab: {fileID: 114427175623056218, guid: 5d1fef0b895ca2a43899fb0236936a59,
     type: 3}
   owningCharacterObjects:
@@ -890,12 +1023,18 @@ MonoBehaviour:
   npcUI: {fileID: 114537631033164756, guid: b75f7de46d27c284d913d9b2984ff84d, type: 3}
   npcQuestIndicator: {fileID: 114612624042908474, guid: 4acaa26309bf3094094eec89f99e2972,
     type: 3}
-  levelUpEffect: {fileID: 114843870614705530, guid: 6f6e255b4877f874c985ed9fb46293a1,
-    type: 3}
+  levelUpEffect: {fileID: 0}
+  levelUpEffects:
+  - {fileID: 114843870614705530, guid: 6f6e255b4877f874c985ed9fb46293a1, type: 3}
   stunEffects: []
   muteEffects: []
   freezeEffects: []
+  addressableLevelUpEffects: []
+  addressableStunEffects: []
+  addressableMuteEffects: []
+  addressableFreezeEffects: []
   expTree: 140000001e00000031000000490000006500000086000000aa000000d1000000fa000000270100005601000087010000bb010000f10100002902000064020000a0020000de0200001e0300005f030000a3030000e80300002f04000077040000c10400000d0500005a050000a9050000f90500004a0600009d060000f1060000470700009e070000f707000050080000ab0800000809000065090000c4090000240a0000850a0000e80a00004b0b0000b00b0000160c00007d0c0000e50c00004e0d0000b90d0000240e0000910e0000fe0e00006d0f0000dd0f00004d100000bf10000032110000a61100001b12000090120000071300007f130000f813000071140000ec14000068150000e415000062160000e01600005f170000e017000061180000e318000066190000ea1900006e1a0000f41a00007a1b0000021c00008a1c0000131d00009d1d0000281e0000b31e0000401f0000cd1f00005b200000ea200000792100000a2200009b2200002d230000c023000054240000e82400007e25000014260000aa26000042270000
+  expTable: {fileID: 0}
   gameDatabase: {fileID: 11400000, guid: 78362f3a31c322e4396aa7f42ea58f99, type: 2}
   npcDatabase: {fileID: 11400000, guid: dae14f7f7d125fc4096ba7ac1f68d581, type: 2}
   warpPortalDatabase: {fileID: 11400000, guid: 6a5e8bb8645bbb349a05709f9b37b5df, type: 2}
@@ -905,6 +1044,7 @@ MonoBehaviour:
   defaultDamageElement: {fileID: 0}
   defaultDamageHitEffects:
   - {fileID: 114984786077298016, guid: fa67f0b7f994d9548821d15fbf67531d, type: 3}
+  addressableDefaultDamageHitEffects: []
   playerTag:
     tag: PlayerTag
   monsterTag:
@@ -944,6 +1084,7 @@ MonoBehaviour:
   itemLootRandomPartyMember: 0
   canPickupItemsWhichDropsByPlayersImmediately: 0
   dealingRequestDuration: 5
+  dealingItemsLimit: 16
   disableDealing: 0
   vendingItemsLimit: 16
   disableVending: 0
@@ -972,6 +1113,7 @@ MonoBehaviour:
   mountDelay: 1
   useItemDelay: 0.25
   clearSkillCooldownOnDead: 1
+  goldStoreMode: 0
   dismantleFilter:
     includeJunk: 0
     includeArmor: 1
@@ -985,6 +1127,7 @@ MonoBehaviour:
     includeMount: 0
     includeSkill: 0
   canRefineItemByPlayer: 0
+  refineEnhancerItemsLimit: 16
   canDismantleItemByPlayer: 0
   canRepairItemByPlayer: 0
   inventorySystem: 1
@@ -1013,14 +1156,33 @@ MonoBehaviour:
     type: 2}
   startGold: 0
   startItems: []
+  testingNewCharacterSetting: {fileID: 0}
   homeScene:
     sceneAsset: {fileID: 102900000, guid: d529c814bb9fcd14289ac4141b27e951, type: 3}
     sceneName: 01Home_MMO
+  addressableHomeScene:
+    m_AssetGUID: 
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+    sceneName: 
   homeMobileScene:
     sceneAsset: {fileID: 0}
     sceneName: 
+  addressableHomeMobileScene:
+    m_AssetGUID: 
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+    sceneName: 
   homeConsoleScene:
     sceneAsset: {fileID: 0}
+    sceneName: 
+  addressableHomeConsoleScene:
+    m_AssetGUID: 
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
     sceneName: 
   updateAnimationAtServer: 1
   minCharacterNameLength: 2
@@ -1028,6 +1190,11 @@ MonoBehaviour:
   maxCharacterSaves: 5
   serverTargetFrameRate: 30
   testInEditorMode: 0
+  networkManagerForOfflineTesting:
+    m_AssetGUID: 
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
   exportSocialSystemSettingAsJson: 0
   exportMinimalItemsAsJson: 0
   exportCharacterCreationDataAsJson: 0
@@ -1088,6 +1255,8 @@ MonoBehaviour:
     keyCode: 106
   - keyName: RotateRight
     keyCode: 107
+  - keyName: Dash
+    keyCode: 61
   settingsSaveKeyPrefix: SETTING_KEY_BIND
   inputActionAsset: {fileID: -944628639613478452, guid: b7b0acfa1d32d3f4fb4dd990fef8568c,
     type: 3}
@@ -1236,1043 +1405,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   defaultLanguageKey: ENG
   playerPrefsKey: USER_LANG
-  languageList:
-  - languageKey: CAT
-    dataList:
-    - key: InvalidItemData
-      value: Invalid item data, MEOW~
-    - key: NotFoundCharacter
-      value: Character not found, MEOW~
-    - key: NotAbleToLoot
-      value: Cannot get this item, MEOW~
-    - key: NotEnoughGold
-      value: Have not enough gold, MEOW~
-    - key: NotEnoughItems
-      value: Have not enough items, MEOW~
-    - key: CannotCarryAnymore
-      value: Cannot carry anymore items, MEOW~
-    - key: RefineItemReachedMaxLevel
-      value: Item reached max level, MEOW~
-    - key: RefineSuccess
-      value: Item level up success, MEOW~
-    - key: RefineFail
-      value: Item level up fail, MEOW~
-    - key: CharacterIsInAnotherDeal
-      value: Character is in another deal, MEOW~
-    - key: CharacterIsTooFar
-      value: Character is too far, MEOW~
-    - key: CannotAcceptDealingRequest
-      value: Cannot accept dealing request, MEOW~
-    - key: DealingRequestDeclined
-      value: Dealing request declined, MEOW~
-    - key: InvalidDealingState
-      value: Invalid dealing state, MEOW~
-    - key: DealingCanceled
-      value: Dealing canceled, MEOW~
-    - key: PartyInvitationDeclined
-      value: Party invitation declined, MEOW~
-    - key: CannotSendPartyInvitation
-      value: Cannot send party invitation, MEOW~
-    - key: CannotKickPartyMember
-      value: Cannot kick party member, MEOW~
-    - key: CannotKickYourSelfFromParty
-      value: Cannot kick yourself from party, MEOW~
-    - key: CannotKickPartyLeader
-      value: Cannot kick party leader, MEOW~
-    - key: JoinedAnotherParty
-      value: Already joined another party, MEOW~
-    - key: NotJoinedParty
-      value: Not joined the party, MEOW~
-    - key: NotPartyLeader
-      value: Not a party member, MEOW~
-    - key: CharacterJoinedAnotherParty
-      value: Character already joined another party, MEOW~
-    - key: CharacterNotJoinedParty
-      value: Character not joined the party, MEOW~
-    - key: PartyMemberReachedLimit
-      value: Party member reached limit, MEOW~
-    - key: GuildInvitationDeclined
-      value: Guild invitation declined, MEOW~
-    - key: CannotSendGuildInvitation
-      value: Cannot send guild invitation, MEOW~
-    - key: CannotKickGuildMember
-      value: Cannot kick guild member, MEOW~
-    - key: CannotKickYourSelfFromGuild
-      value: Cannot kick yourself from guild, MEOW~
-    - key: CannotKickGuildLeader
-      value: Cannot kick guild leader, MEOW~
-    - key: CannotKickHigherGuildMember
-      value: Cannot kick higher guild member, MEOW~
-    - key: JoinedAnotherGuild
-      value: Already joined another guild, MEOW~
-    - key: NotJoinedGuild
-      value: Not joined the guild, MEOW~
-    - key: NotGuildLeader
-      value: Not a guild member, MEOW~
-    - key: CharacterJoinedAnotherGuild
-      value: Character already joined another guild, MEOW~
-    - key: CharacterNotJoinedGuild
-      value: Character not joined the guild, MEOW~
-    - key: GuildMemberReachedLimit
-      value: Guild member reached limit, MEOW~
-    - key: GuildRoleNotAvailable
-      value: Guild role is not available, MEOW~
-    - key: GuildSkillReachedMaxLevel
-      value: Guild skill is reached max level, MEOW~
-    - key: NoGuildSkillPoint
-      value: No guild skill point, MEOW~
-    - key: UnknowGameDataTitle
-      value: Unknow, MEOW~
-    - key: UnknowGameDataDescription
-      value: N/A, MEOW~
-    - key: NotEnoughGoldToDeposit
-      value: Not enough gold to deposit, MEOW~
-    - key: NotEnoughGoldToWithdraw
-      value: Not enough gold to withdraw, MEOW~
-    - key: CannotAccessStorage
-      value: Cannot access storage, MEOW~
-    - key: NoAmmo
-      value: No Ammo, MEOW~
-    - key: UI_LABEL_DISCONNECTED
-      value: Disconnected, MEOW~
-    - key: UI_LABEL_SUCCESS
-      value: Success, MEOW~
-    - key: UI_LABEL_ERROR
-      value: Error, MEOW~
-    - key: UI_LABEL_NONE
-      value: None, MEOW~
-    - key: UI_FORMAT_SIMPLE
-      value: '{0}, MEOW~'
-    - key: UI_FORMAT_SIMPLE_PERCENTAGE
-      value: '{0}%, MEOW~'
-    - key: UI_FORMAT_SIMPLE_MIN_TO_MAX
-      value: '{0}~{1}, MEOW~'
-    - key: UI_FORMAT_SIMPLE_MIN_BY_MAX
-      value: '{0}/{1}, MEOW~'
-    - key: UI_FORMAT_LEVEL
-      value: 'Lv: {0}, MEOW~'
-    - key: UI_FORMAT_CURRENT_EXP
-      value: 'Exp: {0}, MEOW~'
-    - key: UI_FORMAT_STAT_POINTS
-      value: 'Stat Points: {0}, MEOW~'
-    - key: UI_FORMAT_SKILL_POINTS
-      value: 'Skill Points: {0}, MEOW~'
-    - key: UI_FORMAT_CURRENT_HP
-      value: 'Hp: {0}/{1}, MEOW~'
-    - key: UI_FORMAT_CURRENT_MP
-      value: 'Mp: {0}/{1}, MEOW~'
-    - key: UI_FORMAT_CURRENT_STAMINA
-      value: 'Stamina: {0}/{1}, MEOW~'
-    - key: UI_FORMAT_CURRENT_FOOD
-      value: 'Food: {0}/{1}, MEOW~'
-    - key: UI_FORMAT_CURRENT_WATER
-      value: 'Water: {0}/{1}, MEOW~'
-    - key: UI_FORMAT_CURRENT_WEIGHT
-      value: 'Weight: {0}/{1}, MEOW~'
-    - key: UI_FORMAT_CURRENT_SLOT
-      value: 'Slot: {0}/{1}, MEOW~'
-    - key: UI_LABEL_UNLIMIT_WEIGHT
-      value: Unlimit Weight, MEOW~
-    - key: UI_LABEL_UNLIMIT_SLOT
-      value: Unlimit Slot, MEOW~
-    - key: UI_FORMAT_HP
-      value: 'Hp: {0}, MEOW~'
-    - key: UI_FORMAT_MP
-      value: 'Mp: {0}, MEOW~'
-    - key: UI_FORMAT_STAMINA
-      value: 'Stamina: {0}, MEOW~'
-    - key: UI_FORMAT_FOOD
-      value: 'Food: {0}, MEOW~'
-    - key: UI_FORMAT_WATER
-      value: 'Water: {0}, MEOW~'
-    - key: UI_FORMAT_ARMOR
-      value: 'Armor: {0}, MEOW~'
-    - key: UI_FORMAT_ACCURACY
-      value: 'Accuracy: {0}, MEOW~'
-    - key: UI_FORMAT_EVASION
-      value: 'Evasion: {0}, MEOW~'
-    - key: UI_FORMAT_CRITICAL_RATE
-      value: 'Cri. Rate: {0}%, MEOW~'
-    - key: UI_FORMAT_CRITICAL_DAMAGE_RATE
-      value: 'Cri. Damage: {0}%, MEOW~'
-    - key: UI_FORMAT_BLOCK_RATE
-      value: 'Block Rate: {0}%, MEOW~'
-    - key: UI_FORMAT_BLOCK_DAMAGE_RATE
-      value: 'Block Damage: {0}%, MEOW~'
-    - key: UI_FORMAT_MOVE_SPEED
-      value: 'Move Speed: {0}, MEOW~'
-    - key: UI_FORMAT_ATTACK_SPEED
-      value: 'Attack Speed: {0}, MEOW~'
-    - key: UI_FORMAT_WEIGHT
-      value: 'Weight: {0}, MEOW~'
-    - key: UI_FORMAT_SLOT
-      value: 'Slot: {0}, MEOW~'
-    - key: UI_FORMAT_GOLD
-      value: 'Gold: {0}, MEOW~'
-    - key: UI_FORMAT_CASH
-      value: 'Cash: {0}, MEOW~'
-    - key: UI_FORMAT_SELL_PRICE
-      value: 'Sell Price: {0}, MEOW~'
-    - key: UI_FORMAT_REQUIRE_LEVEL
-      value: 'Require Level: {0}, MEOW~'
-    - key: UI_FORMAT_REQUIRE_CLASS
-      value: 'Require Class: {0}, MEOW~'
-    - key: UI_FORMAT_AVAILABLE_WEAPONS
-      value: 'Available Weapons: {0}, MEOW~'
-    - key: UI_FORMAT_CONSUME_MP
-      value: 'Consume Mp: {0}, MEOW~'
-    - key: UI_FORMAT_SKILL_COOLDOWN_DURATION
-      value: 'Cooldown: {0}, MEOW~'
-    - key: UI_FORMAT_SKILL_TYPE
-      value: 'Skill Type: {0}, MEOW~'
-    - key: UI_SKILL_TYPE_ACTIVE
-      value: Active, MEOW~
-    - key: UI_SKILL_TYPE_PASSIVE
-      value: Passive, MEOW~
-    - key: UI_SKILL_TYPE_CRAFT_ITEM
-      value: Craft Item, MEOW~
-    - key: UI_FORMAT_BUFF_DURATION
-      value: 'Duration: {0}, MEOW~'
-    - key: UI_FORMAT_BUFF_RECOVERY_HP
-      value: 'Recovery Hp: {0}, MEOW~'
-    - key: UI_FORMAT_BUFF_RECOVERY_MP
-      value: 'Recovery Mp: {0}, MEOW~'
-    - key: UI_FORMAT_BUFF_RECOVERY_STAMINA
-      value: 'Recovery Stamina: {0}, MEOW~'
-    - key: UI_FORMAT_BUFF_RECOVERY_FOOD
-      value: 'Recovery Food: {0}, MEOW~'
-    - key: UI_FORMAT_BUFF_RECOVERY_WATER
-      value: 'Recovery Water: {0}, MEOW~'
-    - key: UI_FORMAT_ITEM_REFINE_LEVEL
-      value: +{0}, MEOW~
-    - key: UI_FORMAT_ITEM_TITLE_WITH_REFINE_LEVEL
-      value: '{0} +{1}, MEOW~'
-    - key: UI_FORMAT_ITEM_TYPE
-      value: 'Item Type: {0}, MEOW~'
-    - key: UI_ITEM_TYPE_JUNK
-      value: Junk, MEOW~
-    - key: UI_ITEM_TYPE_SHIELD
-      value: Shield, MEOW~
-    - key: UI_ITEM_TYPE_POTION
-      value: Potion, MEOW~
-    - key: UI_ITEM_TYPE_AMMO
-      value: Ammo, MEOW~
-    - key: UI_ITEM_TYPE_BUILDING
-      value: Building, MEOW~
-    - key: UI_ITEM_TYPE_PET
-      value: Pet, MEOW~
-    - key: UI_ITEM_TYPE_SOCKET_ENHANCER
-      value: Socket Enhancer, MEOW~
-    - key: UI_FORMAT_ITEM_RARITY
-      value: 'Rarity: {0}, MEOW~'
-    - key: UI_FORMAT_ITEM_STACK
-      value: '{0}/{1}, MEOW~'
-    - key: UI_FORMAT_ITEM_DURABILITY
-      value: 'Durability: {0}, MEOW~'
-    - key: UI_FORMAT_SOCIAL_LEADER
-      value: 'Leader: {0}, MEOW~'
-    - key: UI_FORMAT_SOCIAL_MEMBER_AMOUNT
-      value: 'Member: {0}/{1}, MEOW~'
-    - key: UI_FORMAT_SOCIAL_MEMBER_AMOUNT_NO_LIMIT
-      value: 'Member: {0}, MEOW~'
-    - key: UI_FORMAT_SHARE_EXP_PERCENTAGE
-      value: 'Share Exp: {0}%, MEOW~'
-    - key: UI_FORMAT_REWARD_EXP
-      value: 'Reward Exp: {0}, MEOW~'
-    - key: UI_FORMAT_REWARD_GOLD
-      value: 'Reward Gold: {0}, MEOW~'
-    - key: UI_FORMAT_REWARD_CASH
-      value: 'Reward Cash: {0}, MEOW~'
-    - key: UI_FORMAT_CURRENT_ATTRIBUTE
-      value: '{0}: {1}/{2}, MEOW~'
-    - key: UI_FORMAT_CURRENT_ATTRIBUTE_NOT_ENOUGH
-      value: '{0}: <color=red>{1}/{2}</color>, MEOW~'
-    - key: UI_FORMAT_ATTRIBUTE_AMOUNT
-      value: '{0}: {1}, MEOW~'
-    - key: UI_FORMAT_RESISTANCE_AMOUNT
-      value: '{0}: {1}, MEOW~'
-    - key: UI_FORMAT_CURRENT_SKILL
-      value: '{0}: {1}/{2}, MEOW~'
-    - key: UI_FORMAT_CURRENT_SKILL_NOT_ENOUGH
-      value: '{0}: <color=red>{1}/{2}</color>, MEOW~'
-    - key: UI_FORMAT_SKILL_LEVEL
-      value: '{0}: {1}, MEOW~'
-    - key: UI_FORMAT_CURRENT_ITEM
-      value: '{0}: {1}/{2}, MEOW~'
-    - key: UI_FORMAT_CURRENT_ITEM_NOT_ENOUGH
-      value: '{0}: <color=red>{1}/{2}</color>, MEOW~'
-    - key: UI_FORMAT_ITEM_AMOUNT
-      value: '{0}: {1}, MEOW~'
-    - key: UI_FORMAT_DAMAGE_AMOUNT
-      value: '{0}~{1}, MEOW~'
-    - key: UI_FORMAT_DAMAGE_WITH_ELEMENTAL
-      value: '{0}: {1}~{2}, MEOW~'
-    - key: UI_FORMAT_DAMAGE_INFLICTION
-      value: Inflict {0}% damage, MEOW~
-    - key: UI_FORMAT_DAMAGE_INFLICTION_AS_ELEMENTAL
-      value: Inflict {1}% as {0} damage, MEOW~
-    - key: UI_FORMAT_REQUIRE_GOLD
-      value: 'Gold: {0}/{1}, MEOW~'
-    - key: UI_FORMAT_REQUIRE_GOLD_NOT_ENOUGH
-      value: 'Gold: <color=red>{0}/{1}</color>, MEOW~'
-    - key: UI_FORMAT_EQUIPMENT_SET
-      value: '<color=#ffa500ff>{0}</color>
-
-        {1}, MEOW~'
-    - key: UI_FORMAT_EQUIPMENT_SET_APPLIED_EFFECT
-      value: <color=#ffa500ff>({0}) {1}</color>, MEOW~
-    - key: UI_FORMAT_EQUIPMENT_SET_UNAPPLIED_EFFECT
-      value: ({0}) {1}, MEOW~
-    - key: UI_FORMAT_EQUIPMENT_SOCKET_FILLED
-      value: '<color=#800080ff>({0}) - {1}
-
-        {2}</color>, MEOW~'
-    - key: UI_FORMAT_EQUIPMENT_SOCKET_EMPTY
-      value: <color=#800080ff>({0}) - Empty</color>, MEOW~
-    - key: UI_FORMAT_REFINE_SUCCESS_RATE
-      value: 'Success Rate: {0}%, MEOW~'
-    - key: UI_FORMAT_REFINING_LEVEL
-      value: 'Refining Level: +{0}, MEOW~'
-    - key: UI_FORMAT_INCREASE_MAX_MEMBER
-      value: Max Member +{0}, MEOW~
-    - key: UI_FORMAT_INCREASE_EXP_GAIN_PERCENTAGE
-      value: Exp Gain +{0}%, MEOW~
-    - key: UI_FORMAT_INCREASE_GOLD_GAIN_PERCENTAGE
-      value: Gold Gain +{0}%, MEOW~
-    - key: UI_FORMAT_INCREASE_SHARE_EXP_GAIN_PERCENTAGE
-      value: Party Share Exp +{0}%, MEOW~
-    - key: UI_FORMAT_INCREASE_SHARE_GOLD_GAIN_PERCENTAGE
-      value: Party Share Gold +{0}%, MEOW~
-    - key: UI_FORMAT_DECREASE_EXP_PENALTY_PERCENTAGE
-      value: Exp Penalty -{0}%, MEOW~
-    - key: UI_FORMAT_QUEST_TITLE_ON_GOING
-      value: '{0} (Ongoing), MEOW~'
-    - key: UI_FORMAT_QUEST_TITLE_TASKS_COMPLETE
-      value: '{0} (Task Completed), MEOW~'
-    - key: UI_FORMAT_QUEST_TITLE_COMPLETE
-      value: '{0} (Completed), MEOW~'
-    - key: UI_FORMAT_QUEST_TASK_KILL_MONSTER
-      value: 'Kills {0}: {1}/{2}, MEOW~'
-    - key: UI_FORMAT_QUEST_TASK_COLLECT_ITEM
-      value: 'Collects {0}: {1}/{2}, MEOW~'
-    - key: UI_FORMAT_QUEST_TASK_KILL_MONSTER_COMPLETE
-      value: 'Kills {0}: Complete, MEOW~'
-    - key: UI_FORMAT_QUEST_TASK_COLLECT_ITEM_COMPLETE
-      value: 'Collects {0}: Complete, MEOW~'
-    - key: UI_FORMAT_CHAT_LOCAL
-      value: '<color=white>(LOCAL) {0}: {1}</color>, MEOW~'
-    - key: UI_FORMAT_CHAT_GLOBAL
-      value: '<color=white>(GLOBAL) {0}: {1}</color>, MEOW~'
-    - key: UI_FORMAT_CHAT_WHISPER
-      value: '<color=green>(WHISPER) {0}: {1}</color>, MEOW~'
-    - key: UI_FORMAT_CHAT_PARTY
-      value: '<color=cyan>(PARTY) {0}: {1}</color>, MEOW~'
-    - key: UI_FORMAT_CHAT_GUILD
-      value: '<color=blue>(GUILD) {0}: {1}</color>, MEOW~'
-    - key: UI_ERROR_KICKED_FROM_SERVER
-      value: You have been kicked from server, MEOW~
-    - key: UI_ERROR_CONNECTION_FAILED
-      value: Cannot connect to the server, MEOW~
-    - key: UI_ERROR_CONNECTION_REJECTED
-      value: Connection rejected by server, MEOW~
-    - key: UI_ERROR_REMOTE_CONNECTION_CLOSE
-      value: Server has been closed, MEOW~
-    - key: UI_ERROR_INVALID_PROTOCOL
-      value: Invalid protocol, MEOW~
-    - key: UI_ERROR_HOST_UNREACHABLE
-      value: Host unreachable, MEOW~
-    - key: UI_ERROR_CONNECTION_TIMEOUT
-      value: Connection timeout, MEOW~
-    - key: UI_ERROR_USER_NOT_FOUND
-      value: User not found, MEOW~
-    - key: UI_ERROR_ITEM_NOT_FOUND
-      value: Item not found, MEOW~
-    - key: UI_ERROR_NOT_ENOUGH_GOLD
-      value: Not enough gold, MEOW~
-    - key: UI_ERROR_NOT_ENOUGH_CASH
-      value: Not enough cash, MEOW~
-    - key: UI_ERROR_INVALID_DATA
-      value: Invalid data, MEOW~
-    - key: UI_ERROR_INVALID_CHARACTER_DATA
-      value: Invalid character data, MEOW~
-    - key: UI_ERROR_USERNAME_IS_EMPTY
-      value: Username is empty, MEOW~
-    - key: UI_ERROR_PASSWORD_IS_EMPTY
-      value: Password is empty, MEOW~
-    - key: UI_ERROR_INVALID_USERNAME_OR_PASSWORD
-      value: Invalid username or password, MEOW~
-    - key: UI_ERROR_ALREADY_LOGGED_IN
-      value: User already logged in, MEOW~
-    - key: UI_ERROR_INVALID_CONFIRM_PASSWORD
-      value: Invalid confirm password, MEOW~
-    - key: UI_ERROR_USERNAME_TOO_SHORT
-      value: Username is too short, MEOW~
-    - key: UI_ERROR_USERNAME_TOO_LONG
-      value: Username is too long, MEOW~
-    - key: UI_ERROR_PASSWORD_TOO_SHORT
-      value: Password is too short, MEOW~
-    - key: UI_ERROR_USERNAME_EXISTED
-      value: Username is already existed, MEOW~
-    - key: UI_ERROR_NO_CHOSEN_CHARACTER_TO_START
-      value: Please choose character to start game, MEOW~
-    - key: UI_ERROR_NO_CHOSEN_CHARACTER_TO_DELETE
-      value: Please choose character to delete, MEOW~
-    - key: UI_ERROR_ALREADY_SELECT_CHARACTER
-      value: Already select character, MEOW~
-    - key: UI_ERROR_MAP_SERVER_NOT_READY
-      value: Map server is not ready, MEOW~
-    - key: UI_ERROR_CHARACTER_NAME_TOO_SHORT
-      value: Character name is too short, MEOW~
-    - key: UI_ERROR_CHARACTER_NAME_TOO_LONG
-      value: Character name is too long, MEOW~
-    - key: UI_ERROR_CHARACTER_NAME_EXISTED
-      value: Character name is already existed, MEOW~
-    - key: UI_ERROR_CANNOT_GET_CASH_PACKAGE_INFO
-      value: Cannot retrieve cash package info, MEOW~
-    - key: UI_ERROR_CANNOT_GET_CASH_SHOP_INFO
-      value: Cannot retrieve cash shop info, MEOW~
-    - key: UI_ERROR_GUILD_ROLE_NAME_IS_EMPTY
-      value: Role name must not empty, MEOW~
-    - key: UI_ERROR_GUILD_ROLE_SHARE_EXP_NOT_NUMBER
-      value: Share exp percentage must be number, MEOW~
-    - key: UI_ERROR_INVALID_GUILD_ROLE
-      value: Invalid role, MEOW~
-    - key: UI_SUCCESS_CASH_SHOP_BUY
-      value: Success, let's check your inventory, MEOW~
-    - key: UI_DROP_ITEM
-      value: Drop Item, MEOW~
-    - key: UI_DROP_ITEM_DESCRIPTION
-      value: Enter amount of item, MEOW~
-    - key: UI_SELL_ITEM
-      value: Sell Item, MEOW~
-    - key: UI_SELL_ITEM_DESCRIPTION
-      value: Enter amount of item, MEOW~
-    - key: UI_OFFER_ITEM
-      value: Offer Item, MEOW~
-    - key: UI_OFFER_ITEM_DESCRIPTION
-      value: Enter amount of item, MEOW~
-    - key: UI_MOVE_ITEM_TO_STORAGE
-      value: Move To Storage, MEOW~
-    - key: UI_MOVE_ITEM_TO_STORAGE_DESCRIPTION
-      value: Enter amount of item, MEOW~
-    - key: UI_MOVE_ITEM_FROM_STORAGE
-      value: Move From Storage, MEOW~
-    - key: UI_MOVE_ITEM_FROM_STORAGE_DESCRIPTION
-      value: Enter amount of item, MEOW~
-    - key: UI_BANK_DEPOSIT
-      value: Deposit, MEOW~
-    - key: UI_BANK_DEPOSIT_DESCRIPTION
-      value: Enter amount of gold, MEOW~
-    - key: UI_BANK_WITHDRAW
-      value: Withdraw, MEOW~
-    - key: UI_BANK_WITHDRAW_DESCRIPTION
-      value: Enter amount of gold, MEOW~
-    - key: UI_OFFER_GOLD
-      value: Offer Gold, MEOW~
-    - key: UI_OFFER_GOLD_DESCRIPTION
-      value: Enter amount of gold, MEOW~
-    - key: UI_BUY_ITEM
-      value: Buy Item, MEOW~
-    - key: UI_BUY_ITEM_DESCRIPTION
-      value: Enter amount of item, MEOW~
-    - key: UI_PARTY_CHANGE_LEADER
-      value: Change Leader, MEOW~
-    - key: UI_PARTY_CHANGE_LEADER_DESCRIPTION
-      value: You sure you want to promote {0} to party leader?, MEOW~
-    - key: UI_PARTY_KICK_MEMBER
-      value: Kick Member, MEOW~
-    - key: UI_PARTY_KICK_MEMBER_DESCRIPTION
-      value: You sure you want to kick {0} from party?, MEOW~
-    - key: UI_PARTY_LEAVE
-      value: Leave Party, MEOW~
-    - key: UI_PARTY_LEAVE_DESCRIPTION
-      value: You sure you want to leave party?, MEOW~
-    - key: UI_GUILD_CHANGE_LEADER
-      value: Change Leader, MEOW~
-    - key: UI_GUILD_CHANGE_LEADER_DESCRIPTION
-      value: You sure you want to promote {0} to guild leader?, MEOW~
-    - key: UI_GUILD_KICK_MEMBER
-      value: Kick Member, MEOW~
-    - key: UI_GUILD_KICK_MEMBER_DESCRIPTION
-      value: You sure you want to kick {0} from guild?, MEOW~
-    - key: UI_GUILD_LEAVE
-      value: Leave Guild, MEOW~
-    - key: UI_GUILD_LEAVE_DESCRIPTION
-      value: You sure you want to leave guild?, MEOW~
-    - key: UI_GUILD_ROLE_CAN_INVITE
-      value: Can invite, MEOW~
-    - key: UI_GUILD_ROLE_CANNOT_INVITE
-      value: Cannot invite, MEOW~
-    - key: UI_GUILD_ROLE_CAN_KICK
-      value: Can kick, MEOW~
-    - key: UI_GUILD_ROLE_CANNOT_KICK
-      value: Cannot kick, MEOW~
-  - languageKey: ENG
-    dataList:
-    - key: ServiceNotAvailable
-      value: Service not available
-    - key: InvalidItemData
-      value: Invalid item data
-    - key: NotFoundCharacter
-      value: Character not found
-    - key: NotAbleToLoot
-      value: Cannot get this item
-    - key: NotEnoughGold
-      value: Have not enough gold
-    - key: NotEnoughItems
-      value: Have not enough items
-    - key: CannotCarryAnymore
-      value: Cannot carry anymore items
-    - key: RefineItemReachedMaxLevel
-      value: Item reached max level
-    - key: RefineSuccess
-      value: Item level up success
-    - key: RefineFail
-      value: Item level up fail
-    - key: CharacterIsInAnotherDeal
-      value: Character is in another deal
-    - key: CharacterIsTooFar
-      value: Character is too far
-    - key: CannotAcceptDealingRequest
-      value: Cannot accept dealing request
-    - key: DealingRequestDeclined
-      value: Dealing request declined
-    - key: InvalidDealingState
-      value: Invalid dealing state
-    - key: DealingCanceled
-      value: Dealing canceled
-    - key: AnotherCharacterCannotCarryAnymore
-      value: Another character cannot carry anymore items
-    - key: PartyInvitationDeclined
-      value: Party invitation declined
-    - key: CannotSendPartyInvitation
-      value: Cannot send party invitation
-    - key: CannotKickPartyMember
-      value: Cannot kick party member
-    - key: CannotKickYourSelfFromParty
-      value: Cannot kick yourself from party
-    - key: CannotKickPartyLeader
-      value: Cannot kick party leader
-    - key: JoinedAnotherParty
-      value: Already joined another party
-    - key: NotJoinedParty
-      value: Not joined the party
-    - key: NotPartyLeader
-      value: Not a party member
-    - key: CharacterJoinedAnotherParty
-      value: Character already joined another party
-    - key: CharacterNotJoinedParty
-      value: Character not joined the party
-    - key: PartyMemberReachedLimit
-      value: Party member reached limit
-    - key: GuildInvitationDeclined
-      value: Guild invitation declined
-    - key: CannotSendGuildInvitation
-      value: Cannot send guild invitation
-    - key: CannotKickGuildMember
-      value: Cannot kick guild member
-    - key: CannotKickYourSelfFromGuild
-      value: Cannot kick yourself from guild
-    - key: CannotKickGuildLeader
-      value: Cannot kick guild leader
-    - key: CannotKickHigherGuildMember
-      value: Cannot kick higher guild member
-    - key: JoinedAnotherGuild
-      value: Already joined another guild
-    - key: NotJoinedGuild
-      value: Not joined the guild
-    - key: NotGuildLeader
-      value: Not a guild member
-    - key: CharacterJoinedAnotherGuild
-      value: Character already joined another guild
-    - key: CharacterNotJoinedGuild
-      value: Character not joined the guild
-    - key: GuildMemberReachedLimit
-      value: Guild member reached limit
-    - key: GuildRoleNotAvailable
-      value: Guild role is not available
-    - key: GuildSkillReachedMaxLevel
-      value: Guild skill is reached max level
-    - key: NoGuildSkillPoint
-      value: No guild skill point
-    - key: UnknowGameDataTitle
-      value: Unknow
-    - key: UnknowGameDataDescription
-      value: N/A
-    - key: NotEnoughGoldToDeposit
-      value: Not enough gold to deposit
-    - key: NotEnoughGoldToWithdraw
-      value: Not enough gold to withdraw
-    - key: CannotAccessStorage
-      value: Cannot access storage
-    - key: NoAmmo
-      value: No Ammo
-    - key: NotEnoughMp
-      value: Have not enough Mp
-    - key: TooShortGuildName
-      value: Guild name is too short
-    - key: TooLongGuildName
-      value: Guild name is too long
-    - key: ExistedGuildName
-      value: Guild name is already existed
-    - key: TooShortGuildRoleName
-      value: Guild role name is too short
-    - key: TooLongGuildRoleName
-      value: Guild role name is too long
-    - key: TooLongGuildMessage
-      value: Guild message is too long
-    - key: SkillLevelIsZero
-      value: Skill not trained yet
-    - key: CannotUseSkillByCurrentWeapon
-      value: Cannot use skill by current weapon
-    - key: SkillIsCoolingDown
-      value: Skill is cooling down
-    - key: SkillIsNotLearned
-      value: Skill is not learned
-    - key: NotEnoughLevel
-      value: Not enough level
-    - key: NotMatchCharacterClass
-      value: Not match character class
-    - key: NotEnoughAttributeAmounts
-      value: Not enough attribute amounts
-    - key: NotEnoughSkillLevels
-      value: Not enough skill levels
-    - key: NotEnoughStatPoint
-      value: Not enough stat point
-    - key: NotEnoughSkillPoint
-      value: Not enough skill point
-    - key: AttributeReachedMaxAmount
-      value: Attribute reached max amount
-    - key: SkillReachedMaxLevel
-      value: Skill reached max level
-    - key: UI_LABEL_DISCONNECTED
-      value: Disconnected
-    - key: UI_LABEL_SUCCESS
-      value: Success
-    - key: UI_LABEL_ERROR
-      value: Error
-    - key: UI_LABEL_NONE
-      value: None
-    - key: UI_FORMAT_SIMPLE
-      value: '{0}'
-    - key: UI_FORMAT_SIMPLE_PERCENTAGE
-      value: '{0}%'
-    - key: UI_FORMAT_SIMPLE_MIN_TO_MAX
-      value: '{0}~{1}'
-    - key: UI_FORMAT_SIMPLE_MIN_BY_MAX
-      value: '{0}/{1}'
-    - key: UI_FORMAT_LEVEL
-      value: 'Lv: {0}'
-    - key: UI_FORMAT_CURRENT_EXP
-      value: 'Exp: {0}'
-    - key: UI_FORMAT_STAT_POINTS
-      value: 'Stat Points: {0}'
-    - key: UI_FORMAT_SKILL_POINTS
-      value: 'Skill Points: {0}'
-    - key: UI_FORMAT_CURRENT_HP
-      value: 'Hp: {0}/{1}'
-    - key: UI_FORMAT_CURRENT_MP
-      value: 'Mp: {0}/{1}'
-    - key: UI_FORMAT_CURRENT_STAMINA
-      value: 'Stamina: {0}/{1}'
-    - key: UI_FORMAT_CURRENT_FOOD
-      value: 'Food: {0}/{1}'
-    - key: UI_FORMAT_CURRENT_WATER
-      value: 'Water: {0}/{1}'
-    - key: UI_FORMAT_CURRENT_WEIGHT
-      value: 'Weight: {0}/{1}'
-    - key: UI_FORMAT_CURRENT_SLOT
-      value: 'Slot: {0}/{1}'
-    - key: UI_LABEL_UNLIMIT_WEIGHT
-      value: Unlimit Weight
-    - key: UI_LABEL_UNLIMIT_SLOT
-      value: Unlimit Slot
-    - key: UI_FORMAT_HP
-      value: 'Hp: {0}'
-    - key: UI_FORMAT_MP
-      value: 'Mp: {0}'
-    - key: UI_FORMAT_STAMINA
-      value: 'Stamina: {0}'
-    - key: UI_FORMAT_FOOD
-      value: 'Food: {0}'
-    - key: UI_FORMAT_WATER
-      value: 'Water: {0}'
-    - key: UI_FORMAT_ACCURACY
-      value: 'Accuracy: {0}'
-    - key: UI_FORMAT_EVASION
-      value: 'Evasion: {0}'
-    - key: UI_FORMAT_CRITICAL_RATE
-      value: 'Cri. Rate: {0}%'
-    - key: UI_FORMAT_CRITICAL_DAMAGE_RATE
-      value: 'Cri. Damage: {0}%'
-    - key: UI_FORMAT_BLOCK_RATE
-      value: 'Block Rate: {0}%'
-    - key: UI_FORMAT_BLOCK_DAMAGE_RATE
-      value: 'Block Damage: {0}%'
-    - key: UI_FORMAT_MOVE_SPEED
-      value: 'Move Speed: {0}'
-    - key: UI_FORMAT_ATTACK_SPEED
-      value: 'Attack Speed: {0}'
-    - key: UI_FORMAT_WEIGHT
-      value: 'Weight: {0}'
-    - key: UI_FORMAT_SLOT
-      value: 'Slot: {0}'
-    - key: UI_FORMAT_GOLD
-      value: 'Gold: {0}'
-    - key: UI_FORMAT_CASH
-      value: 'Cash: {0}'
-    - key: UI_FORMAT_SELL_PRICE
-      value: 'Sell Price: {0}'
-    - key: UI_FORMAT_REQUIRE_LEVEL
-      value: 'Require Level: {0}'
-    - key: UI_FORMAT_REQUIRE_CLASS
-      value: 'Require Class: {0}'
-    - key: UI_FORMAT_AVAILABLE_WEAPONS
-      value: 'Available Weapons: {0}'
-    - key: UI_FORMAT_CONSUME_MP
-      value: 'Consume Mp: {0}'
-    - key: UI_FORMAT_SKILL_COOLDOWN_DURATION
-      value: 'Cooldown: {0}'
-    - key: UI_FORMAT_SKILL_TYPE
-      value: 'Skill Type: {0}'
-    - key: UI_SKILL_TYPE_ACTIVE
-      value: Active
-    - key: UI_SKILL_TYPE_PASSIVE
-      value: Passive
-    - key: UI_SKILL_TYPE_CRAFT_ITEM
-      value: Craft Item
-    - key: UI_FORMAT_BUFF_DURATION
-      value: 'Duration: {0}'
-    - key: UI_FORMAT_BUFF_RECOVERY_HP
-      value: 'Recovery Hp: {0}'
-    - key: UI_FORMAT_BUFF_RECOVERY_MP
-      value: 'Recovery Mp: {0}'
-    - key: UI_FORMAT_BUFF_RECOVERY_STAMINA
-      value: 'Recovery Stamina: {0}'
-    - key: UI_FORMAT_BUFF_RECOVERY_FOOD
-      value: 'Recovery Food: {0}'
-    - key: UI_FORMAT_BUFF_RECOVERY_WATER
-      value: 'Recovery Water: {0}'
-    - key: UI_FORMAT_ITEM_REFINE_LEVEL
-      value: +{0}
-    - key: UI_FORMAT_ITEM_TITLE_WITH_REFINE_LEVEL
-      value: '{0} +{1}'
-    - key: UI_FORMAT_ITEM_TYPE
-      value: 'Item Type: {0}'
-    - key: UI_ITEM_TYPE_JUNK
-      value: Junk
-    - key: UI_ITEM_TYPE_SHIELD
-      value: Shield
-    - key: UI_ITEM_TYPE_POTION
-      value: Potion
-    - key: UI_ITEM_TYPE_AMMO
-      value: Ammo
-    - key: UI_ITEM_TYPE_BUILDING
-      value: Building
-    - key: UI_ITEM_TYPE_PET
-      value: Pet
-    - key: UI_ITEM_TYPE_SOCKET_ENHANCER
-      value: Socket Enhancer
-    - key: UI_ITEM_TYPE_MOUNT
-      value: Mount
-    - key: UI_ITEM_TYPE_SKILL
-      value: Skill
-    - key: UI_FORMAT_ITEM_RARITY
-      value: 'Rarity: {0}'
-    - key: UI_FORMAT_ITEM_STACK
-      value: '{0}/{1}'
-    - key: UI_FORMAT_ITEM_DURABILITY
-      value: 'Durability: {0}'
-    - key: UI_FORMAT_SOCIAL_LEADER
-      value: 'Leader: {0}'
-    - key: UI_FORMAT_SOCIAL_MEMBER_AMOUNT
-      value: 'Member: {0}/{1}'
-    - key: UI_FORMAT_SOCIAL_MEMBER_AMOUNT_NO_LIMIT
-      value: 'Member: {0}'
-    - key: UI_FORMAT_SHARE_EXP_PERCENTAGE
-      value: 'Share Exp: {0}%'
-    - key: UI_FORMAT_REWARD_EXP
-      value: 'Reward Exp: {0}'
-    - key: UI_FORMAT_REWARD_GOLD
-      value: 'Reward Gold: {0}'
-    - key: UI_FORMAT_REWARD_CASH
-      value: 'Reward Cash: {0}'
-    - key: UI_FORMAT_CURRENT_ATTRIBUTE
-      value: '{0}: {1}/{2}'
-    - key: UI_FORMAT_CURRENT_ATTRIBUTE_NOT_ENOUGH
-      value: '{0}: <color=red>{1}/{2}</color>'
-    - key: UI_FORMAT_ATTRIBUTE_AMOUNT
-      value: '{0}: {1}'
-    - key: UI_FORMAT_RESISTANCE_AMOUNT
-      value: '{0} Resistance: {1}%'
-    - key: UI_FORMAT_ARMOR_AMOUNT
-      value: '{0} Armor: {1}'
-    - key: UI_FORMAT_CURRENT_SKILL
-      value: '{0}: {1}/{2}'
-    - key: UI_FORMAT_CURRENT_SKILL_NOT_ENOUGH
-      value: '{0}: <color=red>{1}/{2}</color>'
-    - key: UI_FORMAT_SKILL_LEVEL
-      value: '{0}: {1}'
-    - key: UI_FORMAT_CURRENT_ITEM
-      value: '{0}: {1}/{2}'
-    - key: UI_FORMAT_CURRENT_ITEM_NOT_ENOUGH
-      value: '{0}: <color=red>{1}/{2}</color>'
-    - key: UI_FORMAT_ITEM_AMOUNT
-      value: '{0}: {1}'
-    - key: UI_FORMAT_DAMAGE_AMOUNT
-      value: '{0}~{1}'
-    - key: UI_FORMAT_DAMAGE_WITH_ELEMENTAL
-      value: '{0} Damage: {1}~{2}'
-    - key: UI_FORMAT_DAMAGE_INFLICTION
-      value: Inflict {0}% damage
-    - key: UI_FORMAT_DAMAGE_INFLICTION_AS_ELEMENTAL
-      value: Inflict {1}% as {0} damage
-    - key: UI_FORMAT_REQUIRE_GOLD
-      value: 'Gold: {0}/{1}'
-    - key: UI_FORMAT_REQUIRE_GOLD_NOT_ENOUGH
-      value: 'Gold: <color=red>{0}/{1}</color>'
-    - key: UI_FORMAT_EQUIPMENT_SET
-      value: '<color=#ffa500ff>{0}</color>
-
-        {1}'
-    - key: UI_FORMAT_EQUIPMENT_SET_APPLIED_EFFECT
-      value: <color=#ffa500ff>({0}) {1}</color>
-    - key: UI_FORMAT_EQUIPMENT_SET_UNAPPLIED_EFFECT
-      value: ({0}) {1}
-    - key: UI_FORMAT_EQUIPMENT_SOCKET_FILLED
-      value: '<color=#800080ff>({0}) - {1}
-
-        {2}</color>'
-    - key: UI_FORMAT_EQUIPMENT_SOCKET_EMPTY
-      value: <color=#800080ff>({0}) - Empty</color>
-    - key: UI_FORMAT_REFINE_SUCCESS_RATE
-      value: 'Success Rate: {0}%'
-    - key: UI_FORMAT_REFINING_LEVEL
-      value: 'Refining Level: +{0}'
-    - key: UI_FORMAT_INCREASE_MAX_MEMBER
-      value: Max Member +{0}
-    - key: UI_FORMAT_INCREASE_EXP_GAIN_PERCENTAGE
-      value: Exp Gain +{0}%
-    - key: UI_FORMAT_INCREASE_GOLD_GAIN_PERCENTAGE
-      value: Gold Gain +{0}%
-    - key: UI_FORMAT_INCREASE_SHARE_EXP_GAIN_PERCENTAGE
-      value: Party Share Exp +{0}%
-    - key: UI_FORMAT_INCREASE_SHARE_GOLD_GAIN_PERCENTAGE
-      value: Party Share Gold +{0}%
-    - key: UI_FORMAT_DECREASE_EXP_PENALTY_PERCENTAGE
-      value: Exp Penalty -{0}%
-    - key: UI_FORMAT_QUEST_TITLE_ON_GOING
-      value: '{0} (Ongoing)'
-    - key: UI_FORMAT_QUEST_TITLE_TASKS_COMPLETE
-      value: '{0} (Task Completed)'
-    - key: UI_FORMAT_QUEST_TITLE_COMPLETE
-      value: '{0} (Completed)'
-    - key: UI_FORMAT_QUEST_TASK_KILL_MONSTER
-      value: 'Kills {0}: {1}/{2}'
-    - key: UI_FORMAT_QUEST_TASK_COLLECT_ITEM
-      value: 'Collects {0}: {1}/{2}'
-    - key: UI_FORMAT_QUEST_TASK_KILL_MONSTER_COMPLETE
-      value: 'Kills {0}: Complete'
-    - key: UI_FORMAT_QUEST_TASK_COLLECT_ITEM_COMPLETE
-      value: 'Collects {0}: Complete'
-    - key: UI_FORMAT_CHAT_LOCAL
-      value: '<color=white>(LOCAL) {0}: {1}</color>'
-    - key: UI_FORMAT_CHAT_GLOBAL
-      value: '<color=white>(GLOBAL) {0}: {1}</color>'
-    - key: UI_FORMAT_CHAT_WHISPER
-      value: '<color=green>(WHISPER) {0}: {1}</color>'
-    - key: UI_FORMAT_CHAT_PARTY
-      value: '<color=cyan>(PARTY) {0}: {1}</color>'
-    - key: UI_FORMAT_CHAT_GUILD
-      value: '<color=blue>(GUILD) {0}: {1}</color>'
-    - key: UI_ERROR_KICKED_FROM_SERVER
-      value: You have been kicked from server
-    - key: UI_ERROR_CONNECTION_FAILED
-      value: Cannot connect to the server
-    - key: UI_ERROR_CONNECTION_REJECTED
-      value: Connection rejected by server
-    - key: UI_ERROR_REMOTE_CONNECTION_CLOSE
-      value: Server has been closed
-    - key: UI_ERROR_INVALID_PROTOCOL
-      value: Invalid protocol
-    - key: UI_ERROR_HOST_UNREACHABLE
-      value: Host unreachable
-    - key: UI_ERROR_CONNECTION_TIMEOUT
-      value: Connection timeout
-    - key: UI_ERROR_USER_NOT_FOUND
-      value: User not found
-    - key: UI_ERROR_ITEM_NOT_FOUND
-      value: Item not found
-    - key: UI_ERROR_NOT_ENOUGH_GOLD
-      value: Not enough gold
-    - key: UI_ERROR_NOT_ENOUGH_CASH
-      value: Not enough cash
-    - key: UI_ERROR_INVALID_DATA
-      value: Invalid data
-    - key: UI_ERROR_INVALID_CHARACTER_DATA
-      value: Invalid character data
-    - key: UI_ERROR_USERNAME_IS_EMPTY
-      value: Username is empty
-    - key: UI_ERROR_PASSWORD_IS_EMPTY
-      value: Password is empty
-    - key: UI_ERROR_CANNOT_CARRY_ALL_REWARDS
-      value: Cannot carry all rewards
-    - key: UI_ERROR_INVALID_USERNAME_OR_PASSWORD
-      value: Invalid username or password
-    - key: UI_ERROR_ALREADY_LOGGED_IN
-      value: User already logged in
-    - key: UI_ERROR_INVALID_CONFIRM_PASSWORD
-      value: Invalid confirm password
-    - key: UI_ERROR_USERNAME_TOO_SHORT
-      value: Username is too short
-    - key: UI_ERROR_USERNAME_TOO_LONG
-      value: Username is too long
-    - key: UI_ERROR_PASSWORD_TOO_SHORT
-      value: Password is too short
-    - key: UI_ERROR_USERNAME_EXISTED
-      value: Username is already existed
-    - key: UI_ERROR_NO_CHOSEN_CHARACTER_TO_START
-      value: Please choose character to start game
-    - key: UI_ERROR_NO_CHOSEN_CHARACTER_TO_DELETE
-      value: Please choose character to delete
-    - key: UI_ERROR_ALREADY_SELECT_CHARACTER
-      value: Already select character
-    - key: UI_ERROR_MAP_SERVER_NOT_READY
-      value: Map server is not ready
-    - key: UI_ERROR_CHARACTER_NAME_TOO_SHORT
-      value: Character name is too short
-    - key: UI_ERROR_CHARACTER_NAME_TOO_LONG
-      value: Character name is too long
-    - key: UI_ERROR_CHARACTER_NAME_EXISTED
-      value: Character name is already existed
-    - key: UI_ERROR_CANNOT_GET_CASH_PACKAGE_INFO
-      value: Cannot retrieve cash package info
-    - key: UI_ERROR_CANNOT_GET_CASH_SHOP_INFO
-      value: Cannot retrieve cash shop info
-    - key: UI_ERROR_GUILD_ROLE_NAME_IS_EMPTY
-      value: Role name must not empty
-    - key: UI_ERROR_GUILD_ROLE_SHARE_EXP_NOT_NUMBER
-      value: Share exp percentage must be number
-    - key: UI_ERROR_INVALID_GUILD_ROLE
-      value: Invalid role
-    - key: UI_SUCCESS_CASH_SHOP_BUY
-      value: Success, let's check your inventory
-    - key: UI_DROP_ITEM
-      value: Drop Item
-    - key: UI_DROP_ITEM_DESCRIPTION
-      value: Enter amount of item
-    - key: UI_SELL_ITEM
-      value: Sell Item
-    - key: UI_SELL_ITEM_DESCRIPTION
-      value: Enter amount of item
-    - key: UI_OFFER_ITEM
-      value: Offer Item
-    - key: UI_OFFER_ITEM_DESCRIPTION
-      value: Enter amount of item
-    - key: UI_MOVE_ITEM_TO_STORAGE
-      value: Move To Storage
-    - key: UI_MOVE_ITEM_TO_STORAGE_DESCRIPTION
-      value: Enter amount of item
-    - key: UI_MOVE_ITEM_FROM_STORAGE
-      value: Move From Storage
-    - key: UI_MOVE_ITEM_FROM_STORAGE_DESCRIPTION
-      value: Enter amount of item
-    - key: UI_BANK_DEPOSIT
-      value: Deposit
-    - key: UI_BANK_DEPOSIT_DESCRIPTION
-      value: Enter amount of gold
-    - key: UI_BANK_WITHDRAW
-      value: Withdraw
-    - key: UI_BANK_WITHDRAW_DESCRIPTION
-      value: Enter amount of gold
-    - key: UI_OFFER_GOLD
-      value: Offer Gold
-    - key: UI_OFFER_GOLD_DESCRIPTION
-      value: Enter amount of gold
-    - key: UI_BUY_ITEM
-      value: Buy Item
-    - key: UI_BUY_ITEM_DESCRIPTION
-      value: Enter amount of item
-    - key: UI_PARTY_CHANGE_LEADER
-      value: Change Leader
-    - key: UI_PARTY_CHANGE_LEADER_DESCRIPTION
-      value: You sure you want to promote {0} to party leader?
-    - key: UI_PARTY_KICK_MEMBER
-      value: Kick Member
-    - key: UI_PARTY_KICK_MEMBER_DESCRIPTION
-      value: You sure you want to kick {0} from party?
-    - key: UI_PARTY_LEAVE
-      value: Leave Party
-    - key: UI_PARTY_LEAVE_DESCRIPTION
-      value: You sure you want to leave party?
-    - key: UI_GUILD_CHANGE_LEADER
-      value: Change Leader
-    - key: UI_GUILD_CHANGE_LEADER_DESCRIPTION
-      value: You sure you want to promote {0} to guild leader?
-    - key: UI_GUILD_KICK_MEMBER
-      value: Kick Member
-    - key: UI_GUILD_KICK_MEMBER_DESCRIPTION
-      value: You sure you want to kick {0} from guild?
-    - key: UI_GUILD_LEAVE
-      value: Leave Guild
-    - key: UI_GUILD_LEAVE_DESCRIPTION
-      value: You sure you want to leave guild?
-    - key: UI_GUILD_ROLE_CAN_INVITE
-      value: Can invite
-    - key: UI_GUILD_ROLE_CANNOT_INVITE
-      value: Cannot invite
-    - key: UI_GUILD_ROLE_CAN_KICK
-      value: Can kick
-    - key: UI_GUILD_ROLE_CANNOT_KICK
-      value: Cannot kick
-    - key: UI_FRIEND_ADD
-      value: Add Friend
-    - key: UI_FRIEND_ADD_DESCRIPTION
-      value: You want to add {0} to friend list?
-    - key: UI_FRIEND_REMOVE
-      value: Remove Friend
-    - key: UI_FRIEND_REMOVE_DESCRIPTION
-      value: You want to remove {0} from friend list?
-    - key: UI_FORMAT_HP_RATE
-      value: 'Hp: {0}%'
-    - key: UI_FORMAT_MP_RATE
-      value: 'Mp: {0}%'
-    - key: UI_FORMAT_STAMINA_RATE
-      value: 'Stamina: {0}%'
-    - key: UI_FORMAT_FOOD_RATE
-      value: 'Food: {0}%'
-    - key: UI_FORMAT_WATER_RATE
-      value: 'Water: {0}%'
-    - key: UI_FORMAT_ACCURACY_RATE
-      value: 'Accuracy: {0}%'
-    - key: UI_FORMAT_EVASION_RATE
-      value: 'Evasion: {0}%'
-    - key: UI_FORMAT_CRITICAL_RATE_RATE
-      value: '% of Cri. Rate: {0}%'
-    - key: UI_FORMAT_CRITICAL_DAMAGE_RATE_RATE
-      value: '% of Cri. Damage: {0}%'
-    - key: UI_FORMAT_BLOCK_RATE_RATE
-      value: '% of Block Rate: {0}%'
-    - key: UI_FORMAT_BLOCK_DAMAGE_RATE_RATE
-      value: '% of Block Damage: {0}%'
-    - key: UI_FORMAT_MOVE_SPEED_RATE
-      value: 'Move Speed: {0}%'
-    - key: UI_FORMAT_ATTACK_SPEED_RATE
-      value: 'Attack Speed: {0}%'
-    - key: UI_FORMAT_ATTRIBUTE_RATE
-      value: '{0}: {1}%'
-    - key: UI_FORMAT_ITEM_BUILDING
-      value: Build {0}
-    - key: UI_FORMAT_ITEM_PET
-      value: Summon {0}
-    - key: UI_FORMAT_ITEM_MOUNT
-      value: Mount {0}
-    - key: UI_FORMAT_ITEM_SKILL
-      value: Use Skill {0} Lv. {1}
-    - key: UI_FORMAT_SKILL_SUMMON
-      value: 'Summon {0} Lv. {1} x {2} (Max: {3}), {4} Secs.'
-    - key: UI_FORMAT_SKILL_MOUNT
-      value: Mount {0}
+  languageList: []
   newLanguageKey: ENG
   addNewLanguage: 0
   migrateOldGameMessage: 0
