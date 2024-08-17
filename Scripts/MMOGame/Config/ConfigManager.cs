@@ -41,7 +41,7 @@ namespace MultiplayerARPG.MMO
             Debug.Log("Not found server config file, creating a new one.");
             if (!Directory.Exists(configFolder))
                 Directory.CreateDirectory(configFolder);
-            File.WriteAllText(configFilePath, JsonConvert.SerializeObject(_serverConfig, Formatting.Indented));
+            File.WriteAllText(configFilePath, JsonConvert.SerializeObject(writingConfig, Formatting.Indented));
         }
 
         public static bool HasClientConfig()
