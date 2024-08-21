@@ -70,7 +70,7 @@ namespace MultiplayerARPG.MMO
             Storage storage = GetStorage(storageId, out uint storageObjectId);
             GameInstance.ServerGameMessageHandlers.NotifyStorageOpened(connectionId, storageId.storageType, storageId.storageOwnerId, storageObjectId, storage.weightLimit, storage.slotLimit);
             storageItems.FillEmptySlots(storage.slotLimit > 0, storage.slotLimit);
-            GameInstance.ServerGameMessageHandlers.NotifyStorageItems(connectionId, storageItems);
+            GameInstance.ServerGameMessageHandlers.NotifyStorageItems(connectionId, storageId.storageType, storageId.storageOwnerId, storageItems);
 #endif
         }
 
@@ -97,7 +97,7 @@ namespace MultiplayerARPG.MMO
             usingStorageClients[storageId].Remove(connectionId);
             usingStorageIds.TryRemove(connectionId, out _);
             usingStorageEntities.TryRemove(connectionId, out _);
-            GameInstance.ServerGameMessageHandlers.NotifyStorageClosed(connectionId);
+            GameInstance.ServerGameMessageHandlers.NotifyStorageClosed(connectionId, storageId.storageType, storageId.storageOwnerId);
 #endif
         }
 
@@ -274,7 +274,7 @@ namespace MultiplayerARPG.MMO
         {
 #if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             StorageId storageId = new StorageId(storageType, storageOwnerId);
-            GameInstance.ServerGameMessageHandlers.NotifyStorageItemsToClients(usingStorageClients[storageId], GetStorageItems(storageId));
+            GameInstance.ServerGameMessageHandlers.NotifyStorageItemsToClients(usingStorageClients[storageId], storageId.storageType, storageId.storageOwnerId, GetStorageItems(storageId));
 #endif
         }
 
