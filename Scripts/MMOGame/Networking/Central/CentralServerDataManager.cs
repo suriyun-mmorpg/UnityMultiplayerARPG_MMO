@@ -25,7 +25,9 @@ namespace MultiplayerARPG.MMO
                 return false;
             }
 
-            if (!GameInstance.PlayerCharacterEntities.ContainsKey(entityId) && !GameInstance.AddressablePlayerCharacterEntities.ContainsKey(entityId))
+            if (!GameInstance.PlayerCharacterEntities.ContainsKey(entityId) &&
+                !GameInstance.AddressablePlayerCharacterEntities.ContainsKey(entityId) &&
+                !GameInstance.PlayerCharacterEntityMetaDataList.ContainsKey(entityId))
             {
                 // No player character entity
                 errorMessage = UITextKeys.UI_ERROR_INVALID_CHARACTER_ENTITY;

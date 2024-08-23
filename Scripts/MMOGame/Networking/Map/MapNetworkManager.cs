@@ -575,8 +575,9 @@ namespace MultiplayerARPG.MMO
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
                 characterRotation = Quaternion.Euler(playerCharacterData.CurrentRotation);
             // NOTE: entity ID is a hash asset ID :)
+            int? metaDataId;
             LiteNetLibIdentity spawnObj = Assets.GetObjectInstance(
-                GameInstance.Singleton.GetCharacterEntityHashAssetId(playerCharacterData.EntityId),
+                GameInstance.Singleton.GetCharacterEntityHashAssetId(playerCharacterData.EntityId, out metaDataId),
                 playerCharacterData.CurrentPosition,
                 characterRotation);
 
@@ -584,6 +585,8 @@ namespace MultiplayerARPG.MMO
             BasePlayerCharacterEntity playerCharacterEntity = spawnObj.GetComponent<BasePlayerCharacterEntity>();
             SetLocationBeforeEnterInstance(playerCharacterData.Id, savingCurrentMapName, savingCurrentPosition, savingCurrentRotation);
             playerCharacterData.CloneTo(playerCharacterEntity);
+            if (metaDataId.HasValue)
+                playerCharacterEntity.MetaDataId = metaDataId;
 
             // Set currencies
             // Gold

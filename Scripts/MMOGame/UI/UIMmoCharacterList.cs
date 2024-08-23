@@ -36,12 +36,25 @@ namespace MultiplayerARPG.MMO
             for (int i = selectableCharacters.Count - 1; i >= 0; --i)
             {
                 PlayerCharacterData selectableCharacter = selectableCharacters[i];
-                if (selectableCharacter == null ||
-                    (!GameInstance.PlayerCharacterEntities.ContainsKey(selectableCharacter.EntityId) && !GameInstance.AddressablePlayerCharacterEntities.ContainsKey(selectableCharacter.EntityId)) ||
-                    !GameInstance.PlayerCharacters.ContainsKey(selectableCharacter.DataId))
+                if (selectableCharacter == null)
                 {
-                    // If invalid entity id or data id, remove from selectable character list
+                    // Null data
                     selectableCharacters.RemoveAt(i);
+                    continue;
+                }
+                if (!GameInstance.PlayerCharacterEntities.ContainsKey(selectableCharacter.EntityId) && 
+                    !GameInstance.AddressablePlayerCharacterEntities.ContainsKey(selectableCharacter.EntityId) &&
+                    !GameInstance.PlayerCharacterEntityMetaDataList.ContainsKey(selectableCharacter.EntityId))
+                {
+                    // Invalid entity data
+                    selectableCharacters.RemoveAt(i);
+                    continue;
+                }
+                if (!GameInstance.PlayerCharacters.ContainsKey(selectableCharacter.DataId))
+                {
+                    // Invalid character data
+                    selectableCharacters.RemoveAt(i);
+                    continue;
                 }
             }
 
