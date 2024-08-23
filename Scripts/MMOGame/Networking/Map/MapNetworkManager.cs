@@ -576,7 +576,7 @@ namespace MultiplayerARPG.MMO
                 characterRotation = Quaternion.Euler(playerCharacterData.CurrentRotation);
             // NOTE: entity ID is a hash asset ID :)
             LiteNetLibIdentity spawnObj = Assets.GetObjectInstance(
-                playerCharacterData.EntityId,
+                GameInstance.Singleton.GetCharacterEntityHashAssetId(playerCharacterData.EntityId),
                 playerCharacterData.CurrentPosition,
                 characterRotation);
 
