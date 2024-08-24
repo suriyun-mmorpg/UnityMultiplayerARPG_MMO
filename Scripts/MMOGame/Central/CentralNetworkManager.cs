@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG.MMO
 {
-    public partial class CentralNetworkManager
+    public partial class CentralNetworkManager : MonoBehaviour
     {
         private void Awake()
         {
