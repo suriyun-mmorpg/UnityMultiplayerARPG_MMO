@@ -7,15 +7,11 @@ namespace MultiplayerARPG.MMO
     {
         private void Awake()
         {
-            if (_userLoginManager == null)
+            UserLoginManager = GetComponentInChildren<IDatabaseUserLogin>();
+            if (UserLoginManager == null)
             {
-                Debug.Log("`_userLoginManager` not setup yet, Get it in children to setup...");
-                _userLoginManager = GetComponentInChildren<IDatabaseUserLogin>();
-            }
-            if (_userLoginManager == null)
-            {
-                Debug.Log("`_userLoginManager` not setup yet, Use default one...");
-                _userLoginManager = new DefaultDatabaseUserLogin(new DefaultDatabaseUserLoginConfig()
+                Debug.Log("`UserLoginManager` not setup yet, Use default one...");
+                UserLoginManager = new DefaultDatabaseUserLogin(new DefaultDatabaseUserLoginConfig()
                 {
                     PasswordSaltPrefix = string.Empty,
                     PasswordSaltPostfix = string.Empty,
