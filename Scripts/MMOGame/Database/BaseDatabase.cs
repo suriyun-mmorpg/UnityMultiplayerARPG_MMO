@@ -11,6 +11,7 @@ namespace MultiplayerARPG.MMO
             if (UserLoginManager == null)
             {
                 Debug.Log("`UserLoginManager` not setup yet, Use default one...");
+                // TODO: Setup by files/environment settings
                 UserLoginManager = new DefaultDatabaseUserLogin(new DefaultDatabaseUserLoginConfig()
                 {
                     PasswordSaltPrefix = string.Empty,
