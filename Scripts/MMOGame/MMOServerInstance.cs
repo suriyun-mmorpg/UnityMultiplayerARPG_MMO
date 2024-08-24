@@ -86,6 +86,7 @@ namespace MultiplayerARPG.MMO
                     return _customDatabaseClient;
             }
         }
+        public ICentralServerDataManager CentralServerDataManager { get; private set; }
         public IChatProfanityDetector ChatProfanityDetector { get; private set; }
         public bool UseWebSocket { get { return useWebSocket; } }
         public bool WebSocketSecure { get { return webSocketSecure; } }
@@ -147,6 +148,9 @@ namespace MultiplayerARPG.MMO
             if (customDatabaseClientSource == null)
                 customDatabaseClientSource = gameObject;
             _customDatabaseClient = customDatabaseClientSource.GetComponent<IDatabaseClient>();
+            CentralServerDataManager = GetComponentInChildren<ICentralServerDataManager>();
+            if (CentralServerDataManager == null)
+                CentralServerDataManager = gameObject.AddComponent<DefaultCentralServerDataManager>();
             ChatProfanityDetector = GetComponentInChildren<IChatProfanityDetector>();
             if (ChatProfanityDetector == null)
                 ChatProfanityDetector = gameObject.AddComponent<DisabledChatProfanityDetector>();
@@ -819,7 +823,7 @@ namespace MultiplayerARPG.MMO
             CentralNetworkManager.webSocketCertificateFilePath = WebSocketCertificateFilePath;
             CentralNetworkManager.webSocketCertificatePassword = WebSocketCertificatePassword;
             CentralNetworkManager.DatabaseClient = DatabaseClient;
-            CentralNetworkManager.DataManager = new CentralServerDataManager();
+            CentralNetworkManager.DataManager = CentralServerDataManager;
             CentralNetworkManager.StartServer();
         }
 
