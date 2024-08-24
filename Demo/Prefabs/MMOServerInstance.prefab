@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4765183370109292}
   - component: {fileID: 114414512406587944}
-  - component: {fileID: 541648980431647223}
   m_Layer: 0
   m_Name: MySQLDatabase
   m_TagString: Untagged
@@ -25,12 +24,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1136011111669194}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4009622383931608}
-  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &114414512406587944
 MonoBehaviour:
@@ -50,18 +50,6 @@ MonoBehaviour:
   password: password
   dbName: mmorpg_kit
   connectionString: 
---- !u!114 &541648980431647223
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1136011111669194}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2c73f22159ea9274c9d7a7f3f149bd59, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1250662783992638
 GameObject:
   m_ObjectHideFlags: 0
@@ -86,12 +74,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1250662783992638}
+  serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 3}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4009622383931608}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &114543387092495668
 MonoBehaviour:
@@ -146,7 +135,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4889244740642296}
   - component: {fileID: 114715813743394434}
-  - component: {fileID: 2981249621759927023}
   m_Layer: 0
   m_Name: SQLiteDatabase
   m_TagString: Untagged
@@ -161,12 +149,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1454126604845530}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4009622383931608}
-  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &114715813743394434
 MonoBehaviour:
@@ -182,18 +171,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dbPath: ./mmorpgtemplate.sqlite3
   editorDbPath: C:\Users\ITTIPON\Desktop\UnityBuilds\MultiplayerARPG\mmorpgtemplate.sqlite3
---- !u!114 &2981249621759927023
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1454126604845530}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2c73f22159ea9274c9d7a7f3f149bd59, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1650234716345238
 GameObject:
   m_ObjectHideFlags: 0
@@ -219,9 +196,11 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1650234716345238}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4689870637795574}
   - {fileID: 4281435147628774}
@@ -230,7 +209,6 @@ Transform:
   - {fileID: 4049227467700674}
   - {fileID: 869722981334508554}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &114227780437250376
 MonoBehaviour:
@@ -276,7 +254,7 @@ MonoBehaviour:
   startMapOnAwake: 0
   startingMap: {fileID: 11400000, guid: de8b0e4099f8d444692e88f92309e90d, type: 2}
   databaseOptionIndex: 0
-  databaseDisableCacheReading: 0
+  disableDatabaseCaching: 0
 --- !u!1 &1773992668051484
 GameObject:
   m_ObjectHideFlags: 0
@@ -301,12 +279,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1773992668051484}
+  serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 3}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4009622383931608}
-  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &114788248445432888
 MonoBehaviour:
@@ -332,8 +311,8 @@ MonoBehaviour:
   transportFactory: {fileID: 0}
   clusterServerAddress: 127.0.0.1
   clusterServerPort: 6010
-  machineAddress: 127.0.0.1
-  exePath: ./Build.exe
+  publicAddress: 127.0.0.1
+  spawnExePath: ./Build.exe
   notSpawnInBatchMode: 0
   startPort: 8000
   batchModeArguments: -batchmode -nographics
@@ -346,9 +325,9 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 7d05446271b4d8f459650ee3e2489a34, type: 2}
   spawningAllocateMaps:
   - mapInfo: {fileID: 11400000, guid: de8b0e4099f8d444692e88f92309e90d, type: 2}
-    allocatingAmount: 5
+    allocateAmount: 0
   - mapInfo: {fileID: 11400000, guid: fbe2a93dfafee544cbeaf175d3491e33, type: 2}
-    allocatingAmount: 5
+    allocateAmount: 0
   isOverrideExePath: 1
   overrideExePath: C:\Users\Ittipon\Desktop\UnityBuilds\MMORPG_KIT\UnityMultiplayerARPG.exe
   editorNotSpawnInBatchMode: 1
@@ -376,12 +355,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1834896065226248}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4009622383931608}
-  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &114035231915985668
 MonoBehaviour:
@@ -409,7 +389,6 @@ MonoBehaviour:
   databaseOptions:
   - {fileID: 114715813743394434}
   - {fileID: 114414512406587944}
-  disableCacheReading: 0
 --- !u!1 &9006753358993515565
 GameObject:
   m_ObjectHideFlags: 0
@@ -434,12 +413,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9006753358993515565}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4009622383931608}
-  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &346102967232166504
 MonoBehaviour:
