@@ -585,8 +585,7 @@ namespace MultiplayerARPG.MMO
             BasePlayerCharacterEntity playerCharacterEntity = spawnObj.GetComponent<BasePlayerCharacterEntity>();
             SetLocationBeforeEnterInstance(playerCharacterData.Id, savingCurrentMapName, savingCurrentPosition, savingCurrentRotation);
             playerCharacterData.CloneTo(playerCharacterEntity);
-            if (metaDataId.HasValue)
-                playerCharacterEntity.MetaDataId = metaDataId;
+            playerCharacterEntity.MetaDataId = metaDataId;
 
             // Set currencies
             // Gold
