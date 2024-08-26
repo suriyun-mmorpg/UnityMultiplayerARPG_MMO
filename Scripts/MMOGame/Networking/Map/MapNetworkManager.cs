@@ -577,12 +577,13 @@ namespace MultiplayerARPG.MMO
             // NOTE: entity ID is a hash asset ID :)
             int? metaDataId;
             LiteNetLibIdentity spawnObj = Assets.GetObjectInstance(
-                GameInstance.Singleton.GetCharacterEntityHashAssetId(playerCharacterData.EntityId, out metaDataId),
+                GameInstance.GetCharacterEntityHashAssetId(playerCharacterData.EntityId, out metaDataId),
                 playerCharacterData.CurrentPosition,
                 characterRotation);
 
             // Set current character data
             BasePlayerCharacterEntity playerCharacterEntity = spawnObj.GetComponent<BasePlayerCharacterEntity>();
+            GameInstance.SetupByMetaData(playerCharacterEntity, metaDataId);
             SetLocationBeforeEnterInstance(playerCharacterData.Id, savingCurrentMapName, savingCurrentPosition, savingCurrentRotation);
             playerCharacterData.CloneTo(playerCharacterEntity);
             playerCharacterEntity.MetaDataId = metaDataId;
