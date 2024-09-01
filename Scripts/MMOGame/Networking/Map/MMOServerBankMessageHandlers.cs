@@ -6,7 +6,7 @@ namespace MultiplayerARPG.MMO
 {
     public partial class MMOServerBankMessageHandlers : MonoBehaviour, IServerBankMessageHandlers
     {
-#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         public IDatabaseClient DatabaseClient
         {
             get { return MMOServerInstance.Singleton.DatabaseClient; }
@@ -20,7 +20,7 @@ namespace MultiplayerARPG.MMO
 
         public async UniTaskVoid HandleRequestDepositGuildGold(RequestHandlerData requestHandler, RequestDepositGuildGoldMessage request, RequestProceedResultDelegate<ResponseDepositGuildGoldMessage> result)
         {
-#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
                 result.InvokeError(new ResponseDepositGuildGoldMessage()
@@ -74,7 +74,7 @@ namespace MultiplayerARPG.MMO
 
         public async UniTaskVoid HandleRequestDepositUserGold(RequestHandlerData requestHandler, RequestDepositUserGoldMessage request, RequestProceedResultDelegate<ResponseDepositUserGoldMessage> result)
         {
-#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             if (GameInstance.Singleton.goldStoreMode == GoldStoreMode.UserGoldOnly)
             {
                 result.InvokeError(new ResponseDepositUserGoldMessage()
@@ -121,7 +121,7 @@ namespace MultiplayerARPG.MMO
 
         public async UniTaskVoid HandleRequestWithdrawGuildGold(RequestHandlerData requestHandler, RequestWithdrawGuildGoldMessage request, RequestProceedResultDelegate<ResponseWithdrawGuildGoldMessage> result)
         {
-#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
                 result.InvokeError(new ResponseWithdrawGuildGoldMessage()
@@ -188,7 +188,7 @@ namespace MultiplayerARPG.MMO
 
         public async UniTaskVoid HandleRequestWithdrawUserGold(RequestHandlerData requestHandler, RequestWithdrawUserGoldMessage request, RequestProceedResultDelegate<ResponseWithdrawUserGoldMessage> result)
         {
-#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             if (GameInstance.Singleton.goldStoreMode == GoldStoreMode.UserGoldOnly)
             {
                 result.InvokeError(new ResponseWithdrawUserGoldMessage()

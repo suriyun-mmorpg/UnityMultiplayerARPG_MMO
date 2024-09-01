@@ -6,7 +6,7 @@ namespace MultiplayerARPG.MMO
     {
         public LiteNetLibManager.LiteNetLibManager Manager { get; private set; }
 
-#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         public IDatabaseClient DatabaseClient
         {
             get { return MMOServerInstance.Singleton.DatabaseClient; }
@@ -18,7 +18,7 @@ namespace MultiplayerARPG.MMO
             Manager = GetComponent<LiteNetLibManager.LiteNetLibManager>();
         }
 
-#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         public override void MuteCharacterByName(string characterName, int minutes)
         {
             long time = System.DateTimeOffset.UtcNow.ToUnixTimeSeconds() + (60 * minutes);
@@ -32,7 +32,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         public override void UnmuteCharacterByName(string characterName)
         {
             if (TryGetPlayerCharacterByName(characterName, out IPlayerCharacterData playerCharacter))
@@ -45,7 +45,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         public override void BanUserByCharacterName(string characterName, int days)
         {
             long time = System.DateTimeOffset.UtcNow.ToUnixTimeSeconds() + (60 * 60 * 24 * days);
@@ -59,7 +59,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         public override void UnbanUserByCharacterName(string characterName)
         {
             DatabaseClient.SetUserUnbanTimeByCharacterNameAsync(new SetUserUnbanTimeByCharacterNameReq()
@@ -70,7 +70,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         public override async void ChangeUserGold(string userId, int gold)
         {
             if (!TryGetPlayerCharacterByUserId(userId, out IPlayerCharacterData playerCharacter))
@@ -86,7 +86,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         public override async void ChangeUserCash(string userId, int cash)
         {
             if (!TryGetPlayerCharacterByUserId(userId, out IPlayerCharacterData playerCharacter))

@@ -115,7 +115,7 @@ namespace MultiplayerARPG.MMO
         [FormerlySerializedAs("databaseDisableCacheReading")]
         public bool disableDatabaseCaching;
 
-#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         private List<string> _spawningMaps;
         private List<SpawnAllocateMapByNameData> _spawningAllocateMaps;
         private string _startingMapId;
@@ -135,7 +135,7 @@ namespace MultiplayerARPG.MMO
             }
             DontDestroyOnLoad(gameObject);
             Singleton = this;
-#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             Application.wantsToQuit += Application_wantsToQuit;
             GameInstance.OnGameDataLoadedEvent += OnGameDataLoaded;
 #endif
@@ -152,7 +152,7 @@ namespace MultiplayerARPG.MMO
                 ChatProfanityDetector = gameObject.AddComponent<DisabledChatProfanityDetector>();
 
             CacheLogGUI.enabled = false;
-#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             if (!Application.isEditor)
             {
                 // Prepare data
@@ -684,7 +684,7 @@ namespace MultiplayerARPG.MMO
 
         private bool Application_wantsToQuit()
         {
-#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             if (MapNetworkManager != null && MapNetworkManager.IsServer && !MapNetworkManager.ReadyToQuit)
             {
                 Logging.Log("[MapNetworkManager] still proceeding before quit.");
@@ -703,13 +703,13 @@ namespace MultiplayerARPG.MMO
 
         public void EnableLogger(string fileName)
         {
-#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             CacheLogGUI.SetupLogger(fileName);
             CacheLogGUI.enabled = true;
 #endif
         }
 
-#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         private void OnGameDataLoaded()
         {
             GameInstance.LoadHomeScenePreventions[nameof(MMOServerInstance)] = false;
@@ -726,7 +726,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         private async void StartServers()
         {
             // Wait a frame to make sure it will prepare servers' transports properly
@@ -810,7 +810,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         #region Server functions
         public void StartCentralServer()
         {

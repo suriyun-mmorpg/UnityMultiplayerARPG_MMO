@@ -5,6 +5,7 @@ namespace MultiplayerARPG.MMO
 {
     public partial class BaseDatabase : MonoBehaviour
     {
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
         private void Awake()
         {
             UserLoginManager = GetComponentInChildren<IDatabaseUserLogin>();
@@ -19,6 +20,7 @@ namespace MultiplayerARPG.MMO
                 });
             }
         }
+#endif
 
         public void LogInformation(string tag, string msg)
         {

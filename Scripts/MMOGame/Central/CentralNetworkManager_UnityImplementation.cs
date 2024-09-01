@@ -4,6 +4,7 @@ namespace MultiplayerARPG.MMO
 {
     public partial class CentralNetworkManager
     {
+#if NET || NETCOREAPP || ((UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE)
         private void Awake()
         {
             DataManager = GetComponentInChildren<ICentralServerDataManager>();
@@ -13,5 +14,6 @@ namespace MultiplayerARPG.MMO
                 DataManager = new DefaultCentralServerDataManager();
             }
         }
+#endif
     }
 }

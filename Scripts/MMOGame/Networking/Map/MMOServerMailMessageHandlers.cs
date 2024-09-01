@@ -8,7 +8,7 @@ namespace MultiplayerARPG.MMO
 {
     public partial class MMOServerMailMessageHandlers : MonoBehaviour, IServerMailMessageHandlers
     {
-#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         public IDatabaseClient DatabaseClient
         {
             get { return MMOServerInstance.Singleton.DatabaseClient; }
@@ -19,7 +19,7 @@ namespace MultiplayerARPG.MMO
 
         public async UniTaskVoid HandleRequestMailList(RequestHandlerData requestHandler, RequestMailListMessage request, RequestProceedResultDelegate<ResponseMailListMessage> result)
         {
-#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             List<MailListEntry> mails = new List<MailListEntry>();
             if (GameInstance.ServerUserHandlers.TryGetUserId(requestHandler.ConnectionId, out string userId))
             {
@@ -41,7 +41,7 @@ namespace MultiplayerARPG.MMO
 
         public async UniTaskVoid HandleRequestReadMail(RequestHandlerData requestHandler, RequestReadMailMessage request, RequestProceedResultDelegate<ResponseReadMailMessage> result)
         {
-#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             if (GameInstance.ServerUserHandlers.TryGetUserId(requestHandler.ConnectionId, out string userId))
             {
                 DatabaseApiResult<UpdateReadMailStateResp> resp = await DatabaseClient.UpdateReadMailStateAsync(new UpdateReadMailStateReq()
@@ -78,7 +78,7 @@ namespace MultiplayerARPG.MMO
 
         private async UniTask<UITextKeys> ClaimMailItems(string mailId, IPlayerCharacterData playerCharacter)
         {
-#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             DatabaseApiResult<GetMailResp> mailResp = await DatabaseClient.GetMailAsync(new GetMailReq()
             {
                 MailId = mailId,
@@ -146,7 +146,7 @@ namespace MultiplayerARPG.MMO
 
         public async UniTaskVoid HandleRequestClaimMailItems(RequestHandlerData requestHandler, RequestClaimMailItemsMessage request, RequestProceedResultDelegate<ResponseClaimMailItemsMessage> result)
         {
-#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             if (busyMailBoxes.Contains(request.id))
             {
                 result.InvokeError(new ResponseClaimMailItemsMessage());
@@ -177,7 +177,7 @@ namespace MultiplayerARPG.MMO
 
         private async UniTask<UITextKeys> DeleteMail(string mailId, string userId)
         {
-#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             DatabaseApiResult<UpdateDeleteMailStateResp> resp = await DatabaseClient.UpdateDeleteMailStateAsync(new UpdateDeleteMailStateReq()
             {
                 MailId = mailId,
@@ -193,7 +193,7 @@ namespace MultiplayerARPG.MMO
 
         public async UniTaskVoid HandleRequestDeleteMail(RequestHandlerData requestHandler, RequestDeleteMailMessage request, RequestProceedResultDelegate<ResponseDeleteMailMessage> result)
         {
-#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             if (!GameInstance.ServerUserHandlers.TryGetUserId(requestHandler.ConnectionId, out string userId))
             {
                 result.InvokeError(new ResponseDeleteMailMessage()
@@ -217,7 +217,7 @@ namespace MultiplayerARPG.MMO
 
         public async UniTaskVoid HandleRequestSendMail(RequestHandlerData requestHandler, RequestSendMailMessage request, RequestProceedResultDelegate<ResponseSendMailMessage> result)
         {
-#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
                 result.InvokeError(new ResponseSendMailMessage()
@@ -295,7 +295,7 @@ namespace MultiplayerARPG.MMO
 
         public async UniTaskVoid HandleRequestMailNotification(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<ResponseMailNotificationMessage> result)
         {
-#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             int notificationCount = 0;
             if (GameInstance.ServerUserHandlers.TryGetUserId(requestHandler.ConnectionId, out string userId))
             {
@@ -315,7 +315,7 @@ namespace MultiplayerARPG.MMO
 
         public async UniTaskVoid HandleRequestClaimAllMailsItems(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<ResponseClaimAllMailsItemsMessage> result)
         {
-#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
                 result.InvokeError(new ResponseClaimAllMailsItemsMessage()
@@ -351,7 +351,7 @@ namespace MultiplayerARPG.MMO
 
         public async UniTaskVoid HandleRequestDeleteAllMails(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<ResponseDeleteAllMailsMessage> result)
         {
-#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             if (!GameInstance.ServerUserHandlers.TryGetUserId(requestHandler.ConnectionId, out string userId))
             {
                 result.InvokeError(new ResponseDeleteAllMailsMessage()

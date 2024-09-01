@@ -8,13 +8,13 @@ namespace MultiplayerARPG.MMO
 {
     public partial class MapNetworkManager
     {
-#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         private readonly ConcurrentDictionary<string, CancellationTokenSource> _despawningPlayerCharacterCancellations = new ConcurrentDictionary<string, CancellationTokenSource>();
         private readonly ConcurrentDictionary<string, BasePlayerCharacterEntity> _despawningPlayerCharacterEntities = new ConcurrentDictionary<string, BasePlayerCharacterEntity>();
 #endif
 
 
-#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         public async UniTask SaveAndDespawnPlayerCharacter(long connectionId, bool despawnImmediately)
         {
             // Save player character data
@@ -95,7 +95,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if (UNITY_EDITOR || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         public async UniTask SaveAndDespawnPendingPlayerCharacter(string characterId)
         {
             // Find despawning character
