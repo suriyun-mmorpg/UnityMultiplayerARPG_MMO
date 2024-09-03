@@ -26,7 +26,10 @@ namespace MultiplayerARPG.MMO
                 return false;
             }
 
-            if (!GameInstance.PlayerCharacterEntities.ContainsKey(entityId) &&
+            if (
+#if !EXCLUDE_PREFAB_REFS
+                !GameInstance.PlayerCharacterEntities.ContainsKey(entityId) &&
+#endif
                 !GameInstance.AddressablePlayerCharacterEntities.ContainsKey(entityId) &&
                 !GameInstance.PlayerCharacterEntityMetaDataList.ContainsKey(entityId))
             {

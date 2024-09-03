@@ -720,10 +720,12 @@ namespace MultiplayerARPG.MMO
                 {
                     playerCharacterEntity.Mount(null, addressablePrefab);
                 }
+#if !EXCLUDE_PREFAB_REFS
                 else if (GameInstance.VehicleEntities.TryGetValue(playerCharacterData.MountDataId, out VehicleEntity prefab))
                 {
                     playerCharacterEntity.Mount(prefab, null);
                 }
+#endif
                 // Summon monsters
                 for (int i = 0; i < playerCharacterEntity.Summons.Count; ++i)
                 {
@@ -749,7 +751,7 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-        public void SetLocationBeforeEnterInstance(string id, string currentMapName, Vector3 currentPosition, Vector3 currentRotation)
+                public void SetLocationBeforeEnterInstance(string id, string currentMapName, Vector3 currentPosition, Vector3 currentRotation)
         {
             if (!IsInstanceMap())
                 return;

@@ -42,7 +42,10 @@ namespace MultiplayerARPG.MMO
                     selectableCharacters.RemoveAt(i);
                     continue;
                 }
-                if (!GameInstance.PlayerCharacterEntities.ContainsKey(selectableCharacter.EntityId) && 
+                if (
+#if !EXCLUDE_PREFAB_REFS
+                    !GameInstance.PlayerCharacterEntities.ContainsKey(selectableCharacter.EntityId) && 
+#endif
                     !GameInstance.AddressablePlayerCharacterEntities.ContainsKey(selectableCharacter.EntityId) &&
                     !GameInstance.PlayerCharacterEntityMetaDataList.ContainsKey(selectableCharacter.EntityId))
                 {
