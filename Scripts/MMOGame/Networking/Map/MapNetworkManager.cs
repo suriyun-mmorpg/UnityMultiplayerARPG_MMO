@@ -577,7 +577,7 @@ namespace MultiplayerARPG.MMO
             // NOTE: entity ID is a hash asset ID :)
             int? metaDataId;
             LiteNetLibIdentity spawnObj = Assets.GetObjectInstance(
-                GameInstance.GetCharacterEntityHashAssetId(playerCharacterData.EntityId, out metaDataId),
+                GameInstance.GetPlayerCharacterEntityHashAssetId(playerCharacterData.EntityId, out metaDataId),
                 playerCharacterData.CurrentPosition,
                 characterRotation);
 
@@ -716,7 +716,7 @@ namespace MultiplayerARPG.MMO
             {
                 playerCharacterEntity.CallRpcOnRespawn();
                 // Summon saved mount entity
-                if (GameInstance.AddressableVehicleEntities.TryGetValue(playerCharacterData.MountDataId, out AssetReferenceVehicleEntity addressablePrefab))
+                if (GameInstance.AddressableVehicleEntities.TryGetValue(playerCharacterData.MountDataId, out AssetReferenceLiteNetLibBehaviour<VehicleEntity> addressablePrefab))
                 {
                     playerCharacterEntity.Mount(null, addressablePrefab);
                 }
