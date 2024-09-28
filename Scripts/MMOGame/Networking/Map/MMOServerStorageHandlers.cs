@@ -10,8 +10,7 @@ namespace MultiplayerARPG.MMO
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         private readonly ConcurrentDictionary<StorageId, List<CharacterItem>> storageItems = new ConcurrentDictionary<StorageId, List<CharacterItem>>();
         private readonly ConcurrentDictionary<StorageId, HashSet<long>> usingStorageClients = new ConcurrentDictionary<StorageId, HashSet<long>>();
-        private readonly ConcurrentDictionary<long, StorageId> usingStorageIds = new ConcurrentDictionary<long, StorageId>();
-        private readonly ConcurrentDictionary<long, IActivatableEntity> usingStorageEntities = new ConcurrentDictionary<long, IActivatableEntity>();
+        private readonly ConcurrentDictionary<long, List<UserUsingStorageData>> userUsingStorages = new ConcurrentDictionary<long, List<UserUsingStorageData>>();
         private float _lastUpdateTime = 0f;
 #endif
 
@@ -60,11 +59,20 @@ namespace MultiplayerARPG.MMO
             if (!usingStorageClients.ContainsKey(storageId))
                 usingStorageClients.TryAdd(storageId, new HashSet<long>());
             usingStorageClients[storageId].Add(connectionId);
-            usingStorageIds.TryRemove(connectionId, out _);
-            usingStorageIds.TryAdd(connectionId, storageId);
-            usingStorageEntities.TryRemove(connectionId, out _);
-            if (storageEntity != null)
-                usingStorageEntities.TryAdd(connectionId, storageEntity);
+            // Using storage data
+            if (!userUsingStorages.TryGetValue(connectionId, out List<UserUsingStorageData> oneUserUsingStorages))
+            {
+                oneUserUsingStorages = new List<UserUsingStorageData>();
+                userUsingStorages.TryAdd(connectionId, oneUserUsingStorages);
+            }
+            UserUsingStorageData usingStorage = new UserUsingStorageData()
+            {
+                Id = storageId,
+                RequireEntity = !storageEntity.IsNull(),
+                Entity = storageEntity,
+            };
+            if (!oneUserUsingStorages.Contains(usingStorage))
+                oneUserUsingStorages.Add(usingStorage);
             List<CharacterItem> storageItems = GetStorageItems(storageId);
             // Notify storage items to client
             Storage storage = GetStorage(storageId, out uint storageObjectId);
@@ -74,10 +82,10 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        public async UniTaskVoid CloseStorage(long connectionId)
+        public async UniTaskVoid CloseStorage(long connectionId, StorageId storageId)
         {
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-            if (!usingStorageIds.TryGetValue(connectionId, out StorageId storageId) || !usingStorageClients.ContainsKey(storageId))
+            if (!usingStorageClients.ContainsKey(storageId))
                 return;
             if (storageId.storageType == StorageType.Guild)
             {
@@ -95,9 +103,31 @@ namespace MultiplayerARPG.MMO
                 }
             }
             usingStorageClients[storageId].Remove(connectionId);
-            usingStorageIds.TryRemove(connectionId, out _);
-            usingStorageEntities.TryRemove(connectionId, out _);
+            if (userUsingStorages.TryGetValue(connectionId, out List<UserUsingStorageData> oneUserUsingStorages))
+            {
+                for (int i = oneUserUsingStorages.Count - 1; i >= 0; --i)
+                {
+                    if (oneUserUsingStorages[i].Id.Equals(storageId))
+                    {
+                        oneUserUsingStorages.RemoveAt(i);
+                        break;
+                    }
+                }
+            }
             GameInstance.ServerGameMessageHandlers.NotifyStorageClosed(connectionId, storageId.storageType, storageId.storageOwnerId);
+#endif
+        }
+
+        public async UniTaskVoid CloseAllStorages(long connectionId)
+        {
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+            if (!userUsingStorages.TryGetValue(connectionId, out List<UserUsingStorageData> oneUserUsingStorages))
+                return;
+            for (int i = oneUserUsingStorages.Count - 1; i >= 0; --i)
+            {
+                CloseStorage(connectionId, oneUserUsingStorages[i].Id).Forget();
+            }
+            await UniTask.Yield();
 #endif
         }
 
@@ -109,37 +139,29 @@ namespace MultiplayerARPG.MMO
             if (time - _lastUpdateTime < 1f)
                 return;
             _lastUpdateTime = time;
-            List<long> connectionIds = new List<long>(usingStorageEntities.Keys);
+            List<long> connectionIds = new List<long>(userUsingStorages.Keys);
             foreach (long connectionId in connectionIds)
             {
                 if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(connectionId, out IPlayerCharacterData playerCharacter))
                 {
-                    CloseStorage(connectionId).Forget();
+                    CloseAllStorages(connectionId).Forget();
                     continue;
                 }
-                if (!usingStorageEntities.TryGetValue(connectionId, out IActivatableEntity storageEntity) || storageEntity.IsNull())
+                if (!userUsingStorages.TryGetValue(connectionId, out List<UserUsingStorageData> oneUserUsingStorages))
                 {
-                    CloseStorage(connectionId).Forget();
-                    continue;
-                }
-                if (Vector3.Distance(playerCharacter.CurrentPosition, storageEntity.EntityTransform.position) > storageEntity.GetActivatableDistance())
-                {
-                    CloseStorage(connectionId).Forget();
-                    continue;
+                    // Looking for far entities and close the storage
+                    for (int i = oneUserUsingStorages.Count - 1; i >= 0; --i)
+                    {
+                        UserUsingStorageData oneUserUsingStorage = oneUserUsingStorages[i];
+                        if (!oneUserUsingStorage.RequireEntity)
+                            continue;
+                        if (oneUserUsingStorage.Entity.IsNull() || Vector3.Distance(playerCharacter.CurrentPosition, oneUserUsingStorage.Entity.EntityTransform.position) > oneUserUsingStorage.Entity.GetActivatableDistance())
+                            CloseStorage(connectionId, oneUserUsingStorage.Id).Forget();
+                    }
                 }
             }
         }
 #endif
-
-        public bool TryGetOpenedStorageId(long connectionId, out StorageId storageId)
-        {
-#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-            return usingStorageIds.TryGetValue(connectionId, out storageId);
-#else
-            storageId = default;
-            return false;
-#endif
-        }
 
         public UniTask<List<CharacterItem>> ConvertStorageItems(StorageId storageId, List<StorageConvertItemsEntry> convertItems)
         {
@@ -263,10 +285,23 @@ namespace MultiplayerARPG.MMO
         public void ClearStorage()
         {
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+            foreach (var collection in storageItems.Values)
+            {
+                collection.Clear();
+            }
             storageItems.Clear();
+
+            foreach (var collection in usingStorageClients.Values)
+            {
+                collection.Clear();
+            }
             usingStorageClients.Clear();
-            usingStorageIds.Clear();
-            usingStorageEntities.Clear();
+
+            foreach (var collection in userUsingStorages.Values)
+            {
+                collection.Clear();
+            }
+            userUsingStorages.Clear();
 #endif
         }
 

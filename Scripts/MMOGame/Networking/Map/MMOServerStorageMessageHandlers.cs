@@ -7,13 +7,6 @@ namespace MultiplayerARPG.MMO
 {
     public partial class MMOServerStorageMessageHandlers : MonoBehaviour, IServerStorageMessageHandlers
     {
-#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-        public IDatabaseClient DatabaseClient
-        {
-            get { return MMOServerInstance.Singleton.DatabaseClient; }
-        }
-#endif
-
         public UniTaskVoid HandleRequestOpenStorage(RequestHandlerData requestHandler, RequestOpenStorageMessage request, RequestProceedResultDelegate<ResponseOpenStorageMessage> result)
         {
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
@@ -70,7 +63,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return default;
             }
-            GameInstance.ServerStorageHandlers.CloseStorage(requestHandler.ConnectionId);
+            GameInstance.ServerStorageHandlers.CloseAllStorages(requestHandler.ConnectionId);
             result.InvokeSuccess(new ResponseCloseStorageMessage());
 #endif
             return default;
