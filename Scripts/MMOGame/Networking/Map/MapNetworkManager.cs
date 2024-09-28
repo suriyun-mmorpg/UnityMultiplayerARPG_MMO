@@ -575,7 +575,7 @@ namespace MultiplayerARPG.MMO
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
                 characterRotation = Quaternion.Euler(playerCharacterData.CurrentRotation);
             // NOTE: entity ID is a hash asset ID :)
-            int? metaDataId;
+            int metaDataId;
             LiteNetLibIdentity spawnObj = Assets.GetObjectInstance(
                 GameInstance.GetPlayerCharacterEntityHashAssetId(playerCharacterData.EntityId, out metaDataId),
                 playerCharacterData.CurrentPosition,
@@ -1316,7 +1316,7 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
-        protected override async UniTaskVoid HandleRequestSafeDisconnect(
+        protected override async UniTaskVoid HandleSafeDisconnectRequest(
             RequestHandlerData requestHandler, EmptyMessage request,
             RequestProceedResultDelegate<EmptyMessage> result)
         {
