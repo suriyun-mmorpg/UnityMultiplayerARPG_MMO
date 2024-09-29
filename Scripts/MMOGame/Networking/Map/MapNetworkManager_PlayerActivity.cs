@@ -8,28 +8,6 @@ namespace MultiplayerARPG.MMO
 {
     public partial class MapNetworkManager
     {
-        public override string GetCurrentMapId(BasePlayerCharacterEntity playerCharacterEntity)
-        {
-#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-            if (!IsInstanceMap())
-                return base.GetCurrentMapId(playerCharacterEntity);
-            return _locationsBeforeEnterInstance[playerCharacterEntity.Id].mapName;
-#else
-            return string.Empty;
-#endif
-        }
-
-        public override Vector3 GetCurrentPosition(BasePlayerCharacterEntity playerCharacterEntity)
-        {
-#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-            if (!IsInstanceMap())
-                return base.GetCurrentPosition(playerCharacterEntity);
-            return _locationsBeforeEnterInstance[playerCharacterEntity.Id].position;
-#else
-            return Vector3.zero;
-#endif
-        }
-
         protected override bool IsInstanceMap()
         {
             return !IsAllocate && !string.IsNullOrEmpty(MapInstanceId);

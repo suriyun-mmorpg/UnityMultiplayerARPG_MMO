@@ -24,14 +24,6 @@ namespace MultiplayerARPG.MMO
             public string selectCharacterId;
         }
 
-        public struct InstanceMapWarpingLocation
-        {
-            public string mapName;
-            public Vector3 position;
-            public bool overrideRotation;
-            public Vector3 rotation;
-        }
-
         /// <summary>
         /// If this is not empty it mean this is temporary instance map
         /// So it won't have to save current map, current position to database
@@ -102,7 +94,6 @@ namespace MultiplayerARPG.MMO
         private float _terminatingTime;
         // Listing
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-        private readonly ConcurrentDictionary<string, InstanceMapWarpingLocation> _locationsBeforeEnterInstance = new ConcurrentDictionary<string, InstanceMapWarpingLocation>();
         private readonly ConcurrentDictionary<string, CentralServerPeerInfo> _mapServerConnectionIdsBySceneName = new ConcurrentDictionary<string, CentralServerPeerInfo>();
         private readonly ConcurrentDictionary<string, CentralServerPeerInfo> _instanceMapServerConnectionIdsByInstanceId = new ConcurrentDictionary<string, CentralServerPeerInfo>();
         private readonly ConcurrentDictionary<string, SocialCharacterData> _usersByCharacterId = new ConcurrentDictionary<string, SocialCharacterData>();
@@ -189,7 +180,6 @@ namespace MultiplayerARPG.MMO
         {
             base.Clean();
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-            _locationsBeforeEnterInstance.Clear();
             _mapServerConnectionIdsBySceneName.Clear();
             _instanceMapServerConnectionIdsByInstanceId.Clear();
             _usersByCharacterId.Clear();
@@ -552,10 +542,13 @@ namespace MultiplayerARPG.MMO
                 return;
             }
 
-            // Prepare saving location for this character
-            string savingCurrentMapName = playerCharacterData.CurrentMapName;
-            Vector3 savingCurrentPosition = playerCharacterData.CurrentPosition;
-            Vector3 savingCurrentRotation = playerCharacterData.CurrentRotation;
+            // Store location when enter game
+            _characterLocationsWhenEnterGame[playerCharacterData.Id] = new EnterGameCharacterLocation()
+            {
+                mapName = playerCharacterData.CurrentMapName,
+                position = playerCharacterData.CurrentPosition,
+                rotation = playerCharacterData.CurrentRotation,
+            };
 
             if (IsInstanceMap())
             {
@@ -584,9 +577,7 @@ namespace MultiplayerARPG.MMO
             // Set current character data
             BasePlayerCharacterEntity playerCharacterEntity = spawnObj.GetComponent<BasePlayerCharacterEntity>();
             GameInstance.SetupByMetaData(playerCharacterEntity, metaDataId);
-            SetLocationBeforeEnterInstance(playerCharacterData.Id, savingCurrentMapName, savingCurrentPosition, savingCurrentRotation);
             playerCharacterData.CloneTo(playerCharacterEntity);
-            playerCharacterEntity.MetaDataId = metaDataId;
 
             // Set currencies
             // Gold
@@ -749,23 +740,6 @@ namespace MultiplayerARPG.MMO
             }
         }
 #endif
-
-#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-                public void SetLocationBeforeEnterInstance(string id, string currentMapName, Vector3 currentPosition, Vector3 currentRotation)
-        {
-            if (!IsInstanceMap())
-                return;
-            _locationsBeforeEnterInstance.TryRemove(id, out _);
-            _locationsBeforeEnterInstance.TryAdd(id, new InstanceMapWarpingLocation()
-            {
-                mapName = currentMapName,
-                position = currentPosition,
-                overrideRotation = true,
-                rotation = currentRotation,
-            });
-        }
-#endif
-
         #endregion
 
         #region Network message handlers
@@ -935,7 +909,7 @@ namespace MultiplayerARPG.MMO
             await SaveAndDespawnPendingPlayerCharacter(characterId);
         }
 #endif
-#endregion
+        #endregion
 
         #region Request from central server handlers
         internal async UniTaskVoid HandleRequestForceDespawnCharacter(
