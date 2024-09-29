@@ -706,13 +706,14 @@ namespace MultiplayerARPG.MMO
             if (!playerCharacterEntity.IsDead())
             {
                 playerCharacterEntity.CallRpcOnRespawn();
+                int mountEntityId = 0;
                 // Summon saved mount entity
-                if (GameInstance.AddressableVehicleEntities.TryGetValue(playerCharacterData.MountDataId, out AssetReferenceLiteNetLibBehaviour<VehicleEntity> addressablePrefab))
+                if (GameInstance.AddressableVehicleEntities.TryGetValue(mountEntityId, out AssetReferenceLiteNetLibBehaviour<VehicleEntity> addressablePrefab))
                 {
                     playerCharacterEntity.Mount(null, addressablePrefab);
                 }
 #if !EXCLUDE_PREFAB_REFS
-                else if (GameInstance.VehicleEntities.TryGetValue(playerCharacterData.MountDataId, out VehicleEntity prefab))
+                else if (GameInstance.VehicleEntities.TryGetValue(mountEntityId, out VehicleEntity prefab))
                 {
                     playerCharacterEntity.Mount(prefab, null);
                 }
