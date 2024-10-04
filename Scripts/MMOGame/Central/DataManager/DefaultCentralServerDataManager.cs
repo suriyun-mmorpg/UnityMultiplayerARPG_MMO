@@ -72,9 +72,11 @@ namespace MultiplayerARPG.MMO
         public void SetNewPlayerCharacterData(PlayerCharacterData playerCharacterData, string characterName, int dataId, int entityId, int factionId, IList<CharacterDataBoolean> publicBools, IList<CharacterDataInt32> publicInts, IList<CharacterDataFloat32> publicFloats)
         {
             playerCharacterData.SetNewPlayerCharacterData(characterName, dataId, entityId, factionId);
+#if !DISABLE_CUSTOM_CHARACTER_DATA
             playerCharacterData.PublicBools = publicBools;
             playerCharacterData.PublicInts = publicInts;
             playerCharacterData.PublicFloats = publicFloats;
+#endif
         }
 
         public string GenerateAccessToken(string userId)
