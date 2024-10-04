@@ -86,12 +86,7 @@ namespace MultiplayerARPG.MMO
                     if (characterModel != null)
                     {
                         _characterModelById[characterData.Id] = characterModel;
-                        PlayerCharacterBodyPartComponent[] comps = characterModel.transform.root.GetComponentsInChildren<PlayerCharacterBodyPartComponent>();
-                        for (int i = 0; i < comps.Length; ++i)
-                        {
-                            comps[i].SetupCharacterModelEvents(characterModel);
-                            comps[i].ApplyModelAndColorBySavedData(characterData.PublicInts);
-                        }
+                        characterModel.SetupModelBodyParts(characterData);
                         characterModel.SetEquipItems(characterData.EquipItems, characterData.SelectableWeaponSets, characterData.EquipWeaponSet, false);
                         characterModel.gameObject.SetActive(false);
                         CharacterSelectionManager.Add(uiCharacter);
