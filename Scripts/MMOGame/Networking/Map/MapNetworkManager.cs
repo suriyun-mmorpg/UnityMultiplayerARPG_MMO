@@ -708,7 +708,7 @@ namespace MultiplayerARPG.MMO
                 // Summon mount
                 playerCharacterEntity.SpawnMount(
                     playerCharacterEntity.Mount.type,
-                    playerCharacterEntity.Mount.dataId,
+                    playerCharacterEntity.Mount.sourceId,
                     playerCharacterEntity.Mount.mountRemainsDuration,
                     playerCharacterEntity.Mount.level,
                     playerCharacterEntity.Mount.currentHp);
