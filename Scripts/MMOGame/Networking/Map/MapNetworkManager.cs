@@ -846,6 +846,7 @@ namespace MultiplayerARPG.MMO
                         {
                             writer.PutValue(message);
                         });
+                        ServerLogHandlers.LogEnterChat(message);
                     }
                 }
                 return;
@@ -856,6 +857,7 @@ namespace MultiplayerARPG.MMO
                 {
                     writer.PutValue(message);
                 });
+                ServerLogHandlers.LogEnterChat(message);
             }
         }
 #endif
@@ -1016,7 +1018,6 @@ namespace MultiplayerARPG.MMO
             else
             {
                 ServerChatHandlers.OnChatMessage(message);
-                ServerLogHandlers.LogEnterChat(message);
             }
 #endif
         }
