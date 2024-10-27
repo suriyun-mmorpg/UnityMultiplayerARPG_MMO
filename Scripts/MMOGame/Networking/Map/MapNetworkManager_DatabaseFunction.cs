@@ -258,8 +258,6 @@ namespace MultiplayerARPG.MMO
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         private async UniTaskVoid SaveAllBuildings()
         {
-            if (savingBuildings.Count == 0)
-                return;
             int i = 0;
             List<UniTask> tasks = new List<UniTask>();
             foreach (BuildingEntity buildingEntity in ServerBuildingHandlers.GetBuildings())
