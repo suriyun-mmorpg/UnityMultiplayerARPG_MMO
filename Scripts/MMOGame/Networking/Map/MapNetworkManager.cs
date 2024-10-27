@@ -733,6 +733,10 @@ namespace MultiplayerARPG.MMO
             {
                 playerCharacterEntity.CallRpcOnDead();
             }
+
+            // Add updater if it is not existed
+            if (!playerCharacterEntity.TryGetComponent<PlayerCharacterTransactionalUpdater>(out _))
+                playerCharacterEntity.gameObject.AddComponent<PlayerCharacterTransactionalUpdater>();
         }
 #endif
         #endregion
