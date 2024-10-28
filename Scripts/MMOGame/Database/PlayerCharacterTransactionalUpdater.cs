@@ -23,6 +23,8 @@ namespace MultiplayerARPG.MMO
         // Respawn location state
         private string _dirtyRespawnMapName;
         private Vector3 _dirtyRespawnPosition;
+        // Dead state
+        private long _dirtyLastDeadTime;
         // Accessibility state
         private long _dirtyUnmuteTime;
 
@@ -178,97 +180,97 @@ namespace MultiplayerARPG.MMO
 
         private void _entity_onLevelChange(int obj)
         {
-            _updateState |= TransactionUpdateCharacterState.LevelAndExp;
+            _updateState |= TransactionUpdateCharacterState.Character;
         }
 
         private void _entity_onExpChange(int obj)
         {
-            _updateState |= TransactionUpdateCharacterState.LevelAndExp;
+            _updateState |= TransactionUpdateCharacterState.Character;
         }
 
         private void _entity_onCurrentHpChange(int obj)
         {
-            _updateState |= TransactionUpdateCharacterState.GenericStats;
+            _updateState |= TransactionUpdateCharacterState.Character;
         }
 
         private void _entity_onCurrentMpChange(int obj)
         {
-            _updateState |= TransactionUpdateCharacterState.GenericStats;
+            _updateState |= TransactionUpdateCharacterState.Character;
         }
 
         private void _entity_onCurrentStaminaChange(int obj)
         {
-            _updateState |= TransactionUpdateCharacterState.GenericStats;
+            _updateState |= TransactionUpdateCharacterState.Character;
         }
 
         private void _entity_onCurrentFoodChange(int obj)
         {
-            _updateState |= TransactionUpdateCharacterState.GenericStats;
+            _updateState |= TransactionUpdateCharacterState.Character;
         }
 
         private void _entity_onCurrentWaterChange(int obj)
         {
-            _updateState |= TransactionUpdateCharacterState.GenericStats;
+            _updateState |= TransactionUpdateCharacterState.Character;
         }
 
         private void _entity_onReputationChange(int obj)
         {
-            _updateState |= TransactionUpdateCharacterState.GenericPoints;
+            _updateState |= TransactionUpdateCharacterState.Character;
         }
 
         private void _entity_onStatPointChange(float obj)
         {
-            _updateState |= TransactionUpdateCharacterState.GenericPoints;
+            _updateState |= TransactionUpdateCharacterState.Character;
         }
 
         private void _entity_onSkillPointChange(float obj)
         {
-            _updateState |= TransactionUpdateCharacterState.GenericPoints;
+            _updateState |= TransactionUpdateCharacterState.Character;
         }
 
         private void _entity_onGoldChange(int obj)
         {
-            _updateState |= TransactionUpdateCharacterState.BuiltInCharacterCurrncies;
+            _updateState |= TransactionUpdateCharacterState.Character;
         }
 
         private void _entity_onUserGoldChange(int obj)
         {
-            _updateState |= TransactionUpdateCharacterState.BuiltInUserCurrencies;
+            _updateState |= TransactionUpdateCharacterState.Character;
         }
 
         private void _entity_onUserCashChange(int obj)
         {
-            _updateState |= TransactionUpdateCharacterState.BuiltInUserCurrencies;
+            _updateState |= TransactionUpdateCharacterState.Character;
         }
 
         private void _entity_onIconDataIdChange(int obj)
         {
-            _updateState |= TransactionUpdateCharacterState.Social;
+            _updateState |= TransactionUpdateCharacterState.Character;
         }
 
         private void _entity_onFrameDataIdChange(int obj)
         {
-            _updateState |= TransactionUpdateCharacterState.Social;
+            _updateState |= TransactionUpdateCharacterState.Character;
         }
 
         private void _entity_onTitleDataIdChange(int obj)
         {
-            _updateState |= TransactionUpdateCharacterState.Social;
+            _updateState |= TransactionUpdateCharacterState.Character;
         }
 
         private void _entity_onFactionIdChange(int obj)
         {
-            _updateState |= TransactionUpdateCharacterState.Social;
+            _updateState |= TransactionUpdateCharacterState.Character;
         }
 
         private void _entity_onPartyIdChange(int obj)
         {
-            _updateState |= TransactionUpdateCharacterState.Social;
+            _updateState |= TransactionUpdateCharacterState.Character;
         }
 
         private void _entity_onGuildIdChange(int obj)
         {
-            _updateState |= TransactionUpdateCharacterState.Social;
+            _updateState |= TransactionUpdateCharacterState.Character;
         }
 
         private void _entity_onIsPkOnChange(bool obj)
@@ -288,17 +290,12 @@ namespace MultiplayerARPG.MMO
 
         private void _entity_onEquipWeaponSetChange(byte obj)
         {
-            _updateState |= TransactionUpdateCharacterState.EquipWeapons;
+            _updateState |= TransactionUpdateCharacterState.Character;
         }
 
         private void _entity_onIsWeaponsSheathedChange(bool obj)
         {
-            _updateState |= TransactionUpdateCharacterState.EquipWeapons;
-        }
-
-        private void _entity_onSelectableWeaponSetsOperation(LiteNetLibManager.LiteNetLibSyncList.Operation arg1, int arg2)
-        {
-            _updateState |= TransactionUpdateCharacterState.EquipWeapons;
+            _updateState |= TransactionUpdateCharacterState.Character;
         }
 
         private void _entity_onAttributesOperation(LiteNetLibManager.LiteNetLibSyncList.Operation arg1, int arg2)
@@ -323,12 +320,17 @@ namespace MultiplayerARPG.MMO
 
         private void _entity_onEquipItemsOperation(LiteNetLibManager.LiteNetLibSyncList.Operation arg1, int arg2)
         {
-            _updateState |= TransactionUpdateCharacterState.EquipItems;
+            _updateState |= TransactionUpdateCharacterState.Items;
         }
 
         private void _entity_onNonEquipItemsOperation(LiteNetLibManager.LiteNetLibSyncList.Operation arg1, int arg2)
         {
-            _updateState |= TransactionUpdateCharacterState.NonEquipItems;
+            _updateState |= TransactionUpdateCharacterState.Items;
+        }
+
+        private void _entity_onSelectableWeaponSetsOperation(LiteNetLibManager.LiteNetLibSyncList.Operation arg1, int arg2)
+        {
+            _updateState |= TransactionUpdateCharacterState.Items;
         }
 
         private void _entity_onSummonsOperation(LiteNetLibManager.LiteNetLibSyncList.Operation arg1, int arg2)
@@ -406,43 +408,49 @@ namespace MultiplayerARPG.MMO
             if (_dirtyGuildRole != _entity.GuildRole)
             {
                 _dirtyGuildRole = _entity.GuildRole;
-                _updateState |= TransactionUpdateCharacterState.Social;
+                _updateState |= TransactionUpdateCharacterState.Character;
             }
 
             if (!string.Equals(_dirtyCurrentChannel, _entity.CurrentChannel))
             {
                 _dirtyCurrentChannel = _entity.CurrentChannel;
-                _updateState |= TransactionUpdateCharacterState.CurrentLocation;
+                _updateState |= TransactionUpdateCharacterState.Character;
             }
 
             if (!string.Equals(_dirtyCurrentMapName, _entity.CurrentMapName))
             {
                 _dirtyCurrentMapName = _entity.CurrentMapName;
-                _updateState |= TransactionUpdateCharacterState.CurrentLocation;
+                _updateState |= TransactionUpdateCharacterState.Character;
             }
 
             if (Vector3.Distance(_dirtyCurrentPosition, _entity.CurrentPosition) > POSITION_CHANGE_THRESHOLD)
             {
                 _dirtyCurrentPosition = _entity.CurrentPosition;
-                _updateState |= TransactionUpdateCharacterState.CurrentLocation;
+                _updateState |= TransactionUpdateCharacterState.Character;
             }
 
             if (!string.Equals(_dirtyRespawnMapName, _entity.RespawnMapName))
             {
                 _dirtyRespawnMapName = _entity.RespawnMapName;
-                _updateState |= TransactionUpdateCharacterState.RespawnLocation;
+                _updateState |= TransactionUpdateCharacterState.Character;
             }
 
             if (Vector3.Distance(_dirtyRespawnPosition, _entity.RespawnPosition) > POSITION_CHANGE_THRESHOLD)
             {
                 _dirtyRespawnPosition = _entity.RespawnPosition;
-                _updateState |= TransactionUpdateCharacterState.RespawnLocation;
+                _updateState |= TransactionUpdateCharacterState.Character;
+            }
+
+            if (_dirtyLastDeadTime != _entity.LastDeadTime)
+            {
+                _dirtyLastDeadTime = _entity.LastDeadTime;
+                _updateState |= TransactionUpdateCharacterState.Character;
             }
 
             if (_dirtyUnmuteTime != _entity.UnmuteTime)
             {
                 _dirtyUnmuteTime = _entity.UnmuteTime;
-                _updateState |= TransactionUpdateCharacterState.Accessibility;
+                _updateState |= TransactionUpdateCharacterState.Character;
             }
 
             if (_updateState != TransactionUpdateCharacterState.None &&
