@@ -15,6 +15,7 @@ namespace MultiplayerARPG.MMO
     public partial class MapNetworkManager : BaseGameNetworkManager, IAppServer
     {
         public const float TERMINATE_INSTANCE_DELAY = 30f;  // Close instance when no clients connected within 30 seconds
+        public const float UPDATE_USER_COUNT_DELAY = 5f;  // Update user count every 5 seconds
 
         public struct PendingSpawnPlayerCharacter
         {
@@ -88,6 +89,7 @@ namespace MultiplayerARPG.MMO
         public bool ProceedingBeforeQuit { get; private set; } = false;
         public bool ReadyToQuit { get; private set; } = false;
         private float _terminatingTime;
+        private float _lastUpdateUserCountTime;
         // Listing
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         private readonly ConcurrentDictionary<string, CentralServerPeerInfo> _mapServerConnectionIdsBySceneName = new ConcurrentDictionary<string, CentralServerPeerInfo>();
@@ -127,6 +129,7 @@ namespace MultiplayerARPG.MMO
             ClusterClient.RegisterResponseHandler<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.SpawnMap);
             ClusterClient.RegisterRequestHandler<RequestForceDespawnCharacterMessage, EmptyMessage>(MMORequestTypes.ForceDespawnCharacter, HandleRequestForceDespawnCharacter);
             ClusterClient.RegisterRequestHandler<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.RunMap, HandleRequestRunMap);
+            ClusterClient.RegisterRequestHandler<RequestFindOnlineUserMessage, ResponseFindOnlineUserMessage>(MMORequestTypes.FindOnlineUser, HandleFindOnlineUser);
             ClusterClient.RegisterMessageHandler(MMOMessageTypes.Chat, HandleChat);
             ClusterClient.RegisterMessageHandler(MMOMessageTypes.UpdateMapUser, HandleUpdateMapUser);
             ClusterClient.RegisterMessageHandler(MMOMessageTypes.UpdatePartyMember, HandleUpdatePartyMember);
@@ -152,7 +155,7 @@ namespace MultiplayerARPG.MMO
                     return;
                 }
 
-                // Updating
+                // Data Updating
                 DataUpdater.ProceedUpdating();
 
                 if (IsInstanceMap())
@@ -162,6 +165,16 @@ namespace MultiplayerARPG.MMO
                         _terminatingTime = tempTime;
                     else if (tempTime - _terminatingTime >= TERMINATE_INSTANCE_DELAY)
                         Application.Quit();
+                }
+
+                if (tempTime - _lastUpdateUserCountTime >= UPDATE_USER_COUNT_DELAY)
+                {
+                    _lastUpdateUserCountTime = tempTime;
+                    ClusterClient.SendPacket(0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.UpdateUserCount, (writer) => writer.Put(new UpdateUserCountMessage()
+                    {
+                        currentUsers = ServerUserHandlers.PlayerCharactersCount,
+                        maxUsers = maxConnections,
+                    }));
                 }
             }
 #endif
@@ -957,11 +970,43 @@ namespace MultiplayerARPG.MMO
                 networkPort = AppPort,
                 channelId = ChannelId,
                 refId = RefId,
+                currentUsers = 0,
+                maxUsers = maxConnections,
             };
             ClusterClient.RequestAppServerRegister(peerInfo);
             result.InvokeSuccess(new ResponseSpawnMapMessage()
             {
                 peerInfo = peerInfo,
+            });
+#endif
+            return default;
+        }
+
+        internal UniTaskVoid HandleFindOnlineUser(
+            RequestHandlerData requestHandler,
+            RequestFindOnlineUserMessage request,
+            RequestProceedResultDelegate<ResponseFindOnlineUserMessage> result)
+        {
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+            if (!string.IsNullOrEmpty(request.userId))
+            {
+                foreach (string userId in ServerUserHandlers.GetUserIds())
+                {
+                    if (string.Equals(request.userId, userId))
+                    {
+                        result.InvokeSuccess(new ResponseFindOnlineUserMessage()
+                        {
+                            userId = request.userId,
+                            isFound = true,
+                        });
+                        return default;
+                    }
+                }
+            }
+            result.InvokeSuccess(new ResponseFindOnlineUserMessage()
+            {
+                userId = request.userId,
+                isFound = false,
             });
 #endif
             return default;
