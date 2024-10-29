@@ -39,9 +39,6 @@ namespace MultiplayerARPG.MMO
         [FormerlySerializedAs("machineAddress")]
         public string publicAddress = "127.0.0.1";
 
-        [Header("Database")]
-        public float autoSaveDuration = 2f;
-
         [Header("Map Spawn")]
         public int mapSpawnMillisecondsTimeout = 0;
 
@@ -58,6 +55,7 @@ namespace MultiplayerARPG.MMO
             get { return MMOServerInstance.Singleton.ChatProfanityDetector; }
         }
         public ClusterClient ClusterClient { get; private set; }
+        public MapNetworkManagerDataUpdater DataUpdater { get; private set; }
 #endif
 
         public bool IsAllocate { get; set; } = false;
@@ -89,7 +87,6 @@ namespace MultiplayerARPG.MMO
         }
         public bool ProceedingBeforeQuit { get; private set; } = false;
         public bool ReadyToQuit { get; private set; } = false;
-        private float _lastSaveTime;
         private float _terminatingTime;
         // Listing
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
@@ -111,6 +108,9 @@ namespace MultiplayerARPG.MMO
         protected override void Awake()
         {
             PrepareMapHandlers();
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+            DataUpdater = gameObject.GetOrAddComponent<MapNetworkManagerDataUpdater>();
+#endif
             base.Awake();
         }
 
@@ -152,16 +152,8 @@ namespace MultiplayerARPG.MMO
                     return;
                 }
 
-                if (tempTime - _lastSaveTime > autoSaveDuration)
-                {
-                    _lastSaveTime = tempTime;
-                    SaveAllCharacters().Forget();
-                    if (!IsInstanceMap())
-                    {
-                        // Don't save building if it's instance map
-                        SaveAllBuildings().Forget();
-                    }
-                }
+                // Updating
+                DataUpdater.ProceedUpdating();
 
                 if (IsInstanceMap())
                 {
