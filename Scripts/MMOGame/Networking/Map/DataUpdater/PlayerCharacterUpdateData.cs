@@ -19,12 +19,15 @@ namespace MultiplayerARPG.MMO
         public async UniTask<bool> ProceedSave(MapNetworkManagerDataUpdater updater)
         {
             if (_playerCharacterData == null || _updateState == TransactionUpdateCharacterState.None)
+            {
+                updater.PlayerCharacterDataSaved(_playerCharacterData.Id);
                 return true;
+            }
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             if (await updater.Manager.SaveCharacter(_updateState, _playerCharacterData))
             {
-                _updateState = TransactionUpdateCharacterState.None;
                 updater.PlayerCharacterDataSaved(_playerCharacterData.Id);
+                _updateState = TransactionUpdateCharacterState.None;
                 _playerCharacterData = null;
                 return true;
             }

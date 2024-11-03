@@ -112,6 +112,7 @@ namespace MultiplayerARPG.MMO
             PrepareMapHandlers();
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             DataUpdater = gameObject.GetOrAddComponent<MapNetworkManagerDataUpdater>();
+            DataUpdater.Manager = this;
 #endif
             base.Awake();
         }

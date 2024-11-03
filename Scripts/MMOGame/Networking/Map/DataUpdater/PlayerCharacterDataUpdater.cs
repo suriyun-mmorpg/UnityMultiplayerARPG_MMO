@@ -261,7 +261,6 @@ namespace MultiplayerARPG.MMO
                 Time.unscaledTime - _lastSavedTime > SAVE_DELAY)
             {
                 _lastSavedTime = Time.unscaledTime;
-                _updateState = TransactionUpdateCharacterState.None;
                 EnqueueSave();
             }
         }
@@ -308,7 +307,10 @@ namespace MultiplayerARPG.MMO
         public void EnqueueSave()
         {
             if (BaseGameNetworkManager.Singleton.TryGetComponent(out MapNetworkManagerDataUpdater updater))
+            {
                 updater.EnqueuePlayerCharacterSave(_updateState, _entity);
+                _updateState = TransactionUpdateCharacterState.None;
+            }
         }
     }
 }
