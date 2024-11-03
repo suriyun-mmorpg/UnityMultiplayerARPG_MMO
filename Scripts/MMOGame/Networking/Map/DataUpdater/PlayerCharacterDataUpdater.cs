@@ -6,63 +6,29 @@ namespace MultiplayerARPG.MMO
 {
     [DefaultExecutionOrder(int.MinValue)]
     [RequireComponent(typeof(BasePlayerCharacterEntity))]
-    public class PlayerCharacterTransactionalUpdater : MonoBehaviour
+    [DisallowMultipleComponent]
+    public class PlayerCharacterDataUpdater : MonoBehaviour
     {
         public const float POSITION_CHANGE_THRESHOLD = 0.5f;
-        public const int FRAMES_BEFORE_SAVE = 30;
+        public const int SAVE_DELAY = 1;
 
-        private int _lastSavedFrame;
+        private float _lastSavedTime;
         private BasePlayerCharacterEntity _entity;
         private TransactionUpdateCharacterState _updateState;
-        // Social state
-        private byte _dirtyGuildRole;
+        // Combined hash
+        private int _dirtyCombinedHash;
         // Current location state
-        private string _dirtyCurrentChannel;
-        private string _dirtyCurrentMapName;
         private Vector3 _dirtyCurrentPosition;
         // Respawn location state
-        private string _dirtyRespawnMapName;
         private Vector3 _dirtyRespawnPosition;
-        // Dead state
-        private long _dirtyLastDeadTime;
-        // Accessibility state
-        private long _dirtyUnmuteTime;
 
         private void Awake()
         {
             _entity = GetComponent<BasePlayerCharacterEntity>();
-            // Level and Exp
-            _entity.onLevelChange += _entity_onLevelChange;
-            _entity.onExpChange += _entity_onExpChange;
-            // Generic Stats
-            _entity.onCurrentHpChange += _entity_onCurrentHpChange;
-            _entity.onCurrentMpChange += _entity_onCurrentMpChange;
-            _entity.onCurrentStaminaChange += _entity_onCurrentStaminaChange;
-            _entity.onCurrentFoodChange += _entity_onCurrentFoodChange;
-            _entity.onCurrentWaterChange += _entity_onCurrentWaterChange;
-            // Generic Points
-            _entity.onStatPointChange += _entity_onStatPointChange;
-            _entity.onSkillPointChange += _entity_onSkillPointChange;
-            _entity.onReputationChange += _entity_onReputationChange;
-            // Built-In Character Currncies
-            _entity.onGoldChange += _entity_onGoldChange;
-            // Built-In User Currncies
-            _entity.onUserGoldChange += _entity_onUserGoldChange;
-            _entity.onUserCashChange += _entity_onUserCashChange;
-            // Social
-            _entity.onIconDataIdChange += _entity_onIconDataIdChange;
-            _entity.onFrameDataIdChange += _entity_onFrameDataIdChange;
-            _entity.onTitleDataIdChange += _entity_onTitleDataIdChange;
-            _entity.onFactionIdChange += _entity_onFactionIdChange;
-            _entity.onPartyIdChange += _entity_onPartyIdChange;
-            _entity.onGuildIdChange += _entity_onGuildIdChange;
             // Pk
             _entity.onIsPkOnChange += _entity_onIsPkOnChange;
             _entity.onPkPointChange += _entity_onPkPointChange;
             _entity.onConsecutivePkKillsChange += _entity_onConsecutivePkKillsChange;
-            // Equip Weapons
-            _entity.onEquipWeaponSetChange += _entity_onEquipWeaponSetChange;
-            _entity.onIsWeaponsSheathedChange += _entity_onIsWeaponsSheathedChange;
             // Selectable Weapon Sets
             _entity.onSelectableWeaponSetsOperation += _entity_onSelectableWeaponSetsOperation;
             // Attributes
@@ -103,43 +69,15 @@ namespace MultiplayerARPG.MMO
 
         private void Start()
         {
-            _lastSavedFrame = Time.frameCount;
+            _lastSavedTime = Time.unscaledTime;
         }
 
         private void OnDestroy()
         {
-            // Level and Exp
-            _entity.onLevelChange -= _entity_onLevelChange;
-            _entity.onExpChange -= _entity_onExpChange;
-            // Generic Stats
-            _entity.onCurrentHpChange -= _entity_onCurrentHpChange;
-            _entity.onCurrentMpChange -= _entity_onCurrentMpChange;
-            _entity.onCurrentStaminaChange -= _entity_onCurrentStaminaChange;
-            _entity.onCurrentFoodChange -= _entity_onCurrentFoodChange;
-            _entity.onCurrentWaterChange -= _entity_onCurrentWaterChange;
-            // Generic Points
-            _entity.onStatPointChange -= _entity_onStatPointChange;
-            _entity.onSkillPointChange -= _entity_onSkillPointChange;
-            _entity.onReputationChange -= _entity_onReputationChange;
-            // Built-In Character Currncies
-            _entity.onGoldChange -= _entity_onGoldChange;
-            // Built-In User Currncies
-            _entity.onUserGoldChange -= _entity_onUserGoldChange;
-            _entity.onUserCashChange -= _entity_onUserCashChange;
-            // Social
-            _entity.onIconDataIdChange -= _entity_onIconDataIdChange;
-            _entity.onFrameDataIdChange -= _entity_onFrameDataIdChange;
-            _entity.onTitleDataIdChange -= _entity_onTitleDataIdChange;
-            _entity.onFactionIdChange -= _entity_onFactionIdChange;
-            _entity.onPartyIdChange -= _entity_onPartyIdChange;
-            _entity.onGuildIdChange -= _entity_onGuildIdChange;
             // Pk
             _entity.onIsPkOnChange -= _entity_onIsPkOnChange;
             _entity.onPkPointChange -= _entity_onPkPointChange;
             _entity.onConsecutivePkKillsChange -= _entity_onConsecutivePkKillsChange;
-            // Equip Weapons
-            _entity.onEquipWeaponSetChange -= _entity_onEquipWeaponSetChange;
-            _entity.onIsWeaponsSheathedChange -= _entity_onIsWeaponsSheathedChange;
             // Selectable Weapon Sets
             _entity.onSelectableWeaponSetsOperation -= _entity_onSelectableWeaponSetsOperation;
             // Attributes
@@ -178,101 +116,6 @@ namespace MultiplayerARPG.MMO
             _entity.onMountChange -= _entity_onMountChange;
         }
 
-        private void _entity_onLevelChange(int obj)
-        {
-            _updateState |= TransactionUpdateCharacterState.Character;
-        }
-
-        private void _entity_onExpChange(int obj)
-        {
-            _updateState |= TransactionUpdateCharacterState.Character;
-        }
-
-        private void _entity_onCurrentHpChange(int obj)
-        {
-            _updateState |= TransactionUpdateCharacterState.Character;
-        }
-
-        private void _entity_onCurrentMpChange(int obj)
-        {
-            _updateState |= TransactionUpdateCharacterState.Character;
-        }
-
-        private void _entity_onCurrentStaminaChange(int obj)
-        {
-            _updateState |= TransactionUpdateCharacterState.Character;
-        }
-
-        private void _entity_onCurrentFoodChange(int obj)
-        {
-            _updateState |= TransactionUpdateCharacterState.Character;
-        }
-
-        private void _entity_onCurrentWaterChange(int obj)
-        {
-            _updateState |= TransactionUpdateCharacterState.Character;
-        }
-
-        private void _entity_onReputationChange(int obj)
-        {
-            _updateState |= TransactionUpdateCharacterState.Character;
-        }
-
-        private void _entity_onStatPointChange(float obj)
-        {
-            _updateState |= TransactionUpdateCharacterState.Character;
-        }
-
-        private void _entity_onSkillPointChange(float obj)
-        {
-            _updateState |= TransactionUpdateCharacterState.Character;
-        }
-
-        private void _entity_onGoldChange(int obj)
-        {
-            _updateState |= TransactionUpdateCharacterState.Character;
-        }
-
-        private void _entity_onUserGoldChange(int obj)
-        {
-            _updateState |= TransactionUpdateCharacterState.Character;
-        }
-
-        private void _entity_onUserCashChange(int obj)
-        {
-            _updateState |= TransactionUpdateCharacterState.Character;
-        }
-
-        private void _entity_onIconDataIdChange(int obj)
-        {
-            _updateState |= TransactionUpdateCharacterState.Character;
-        }
-
-        private void _entity_onFrameDataIdChange(int obj)
-        {
-            _updateState |= TransactionUpdateCharacterState.Character;
-        }
-
-        private void _entity_onTitleDataIdChange(int obj)
-        {
-            _updateState |= TransactionUpdateCharacterState.Character;
-        }
-
-        private void _entity_onFactionIdChange(int obj)
-        {
-            _updateState |= TransactionUpdateCharacterState.Character;
-        }
-
-        private void _entity_onPartyIdChange(int obj)
-        {
-            _updateState |= TransactionUpdateCharacterState.Character;
-        }
-
-        private void _entity_onGuildIdChange(int obj)
-        {
-            _updateState |= TransactionUpdateCharacterState.Character;
-        }
-
         private void _entity_onIsPkOnChange(bool obj)
         {
             _updateState |= TransactionUpdateCharacterState.Pk;
@@ -286,16 +129,6 @@ namespace MultiplayerARPG.MMO
         private void _entity_onConsecutivePkKillsChange(int obj)
         {
             _updateState |= TransactionUpdateCharacterState.Pk;
-        }
-
-        private void _entity_onEquipWeaponSetChange(byte obj)
-        {
-            _updateState |= TransactionUpdateCharacterState.Character;
-        }
-
-        private void _entity_onIsWeaponsSheathedChange(bool obj)
-        {
-            _updateState |= TransactionUpdateCharacterState.Character;
         }
 
         private void _entity_onAttributesOperation(LiteNetLibManager.LiteNetLibSyncList.Operation arg1, int arg2)
@@ -405,21 +238,10 @@ namespace MultiplayerARPG.MMO
 
         private void Update()
         {
-            if (_dirtyGuildRole != _entity.GuildRole)
+            int combinedHash = GetCombinedHashCode();
+            if (_dirtyCombinedHash != combinedHash)
             {
-                _dirtyGuildRole = _entity.GuildRole;
-                _updateState |= TransactionUpdateCharacterState.Character;
-            }
-
-            if (!string.Equals(_dirtyCurrentChannel, _entity.CurrentChannel))
-            {
-                _dirtyCurrentChannel = _entity.CurrentChannel;
-                _updateState |= TransactionUpdateCharacterState.Character;
-            }
-
-            if (!string.Equals(_dirtyCurrentMapName, _entity.CurrentMapName))
-            {
-                _dirtyCurrentMapName = _entity.CurrentMapName;
+                _dirtyCombinedHash = combinedHash;
                 _updateState |= TransactionUpdateCharacterState.Character;
             }
 
@@ -429,41 +251,64 @@ namespace MultiplayerARPG.MMO
                 _updateState |= TransactionUpdateCharacterState.Character;
             }
 
-            if (!string.Equals(_dirtyRespawnMapName, _entity.RespawnMapName))
-            {
-                _dirtyRespawnMapName = _entity.RespawnMapName;
-                _updateState |= TransactionUpdateCharacterState.Character;
-            }
-
             if (Vector3.Distance(_dirtyRespawnPosition, _entity.RespawnPosition) > POSITION_CHANGE_THRESHOLD)
             {
                 _dirtyRespawnPosition = _entity.RespawnPosition;
                 _updateState |= TransactionUpdateCharacterState.Character;
             }
 
-            if (_dirtyLastDeadTime != _entity.LastDeadTime)
-            {
-                _dirtyLastDeadTime = _entity.LastDeadTime;
-                _updateState |= TransactionUpdateCharacterState.Character;
-            }
-
-            if (_dirtyUnmuteTime != _entity.UnmuteTime)
-            {
-                _dirtyUnmuteTime = _entity.UnmuteTime;
-                _updateState |= TransactionUpdateCharacterState.Character;
-            }
-
             if (_updateState != TransactionUpdateCharacterState.None &&
-                Time.frameCount - _lastSavedFrame > FRAMES_BEFORE_SAVE)
+                Time.unscaledTime - _lastSavedTime > SAVE_DELAY)
             {
-                _lastSavedFrame = Time.frameCount;
+                _lastSavedTime = Time.unscaledTime;
                 _updateState = TransactionUpdateCharacterState.None;
                 EnqueueSave();
             }
         }
 
-        public async void EnqueueSave()
+        public int GetCombinedHashCode()
         {
+            int hash = _entity.Id.GetHashCode();
+            hash = System.HashCode.Combine(hash, _entity.DataId);
+            hash = System.HashCode.Combine(hash, _entity.EntityId);
+            hash = System.HashCode.Combine(hash, _entity.UserId);
+            hash = System.HashCode.Combine(hash, _entity.FactionId);
+            hash = System.HashCode.Combine(hash, _entity.CharacterName);
+            hash = System.HashCode.Combine(hash, _entity.Level);
+            hash = System.HashCode.Combine(hash, _entity.Exp);
+            hash = System.HashCode.Combine(hash, _entity.CurrentHp);
+            hash = System.HashCode.Combine(hash, _entity.CurrentMp);
+            hash = System.HashCode.Combine(hash, _entity.CurrentStamina);
+            hash = System.HashCode.Combine(hash, _entity.CurrentFood);
+            hash = System.HashCode.Combine(hash, _entity.CurrentWater);
+            hash = System.HashCode.Combine(hash, _entity.StatPoint);
+            hash = System.HashCode.Combine(hash, _entity.SkillPoint);
+            hash = System.HashCode.Combine(hash, _entity.Gold);
+            hash = System.HashCode.Combine(hash, _entity.PartyId);
+            hash = System.HashCode.Combine(hash, _entity.GuildId);
+            hash = System.HashCode.Combine(hash, _entity.GuildRole);
+            hash = System.HashCode.Combine(hash, _entity.SharedGuildExp);
+            hash = System.HashCode.Combine(hash, _entity.EquipWeaponSet);
+            hash = System.HashCode.Combine(hash, _entity.CurrentChannel);
+            hash = System.HashCode.Combine(hash, _entity.CurrentMapName);
+            hash = System.HashCode.Combine(hash, _entity.CurrentSafeArea);
+#if !DISABLE_DIFFER_MAP_RESPAWNING
+            hash = System.HashCode.Combine(hash, _entity.RespawnMapName);
+#endif
+            hash = System.HashCode.Combine(hash, _entity.IconDataId);
+            hash = System.HashCode.Combine(hash, _entity.FrameDataId);
+            hash = System.HashCode.Combine(hash, _entity.TitleDataId);
+            hash = System.HashCode.Combine(hash, _entity.LastDeadTime);
+            hash = System.HashCode.Combine(hash, _entity.UnmuteTime);
+            hash = System.HashCode.Combine(hash, _entity.LastUpdate);
+            hash = System.HashCode.Combine(hash, _entity.Reputation);
+            return hash;
+        }
+
+        public void EnqueueSave()
+        {
+            if (BaseGameNetworkManager.Singleton.TryGetComponent(out MapNetworkManagerDataUpdater updater))
+                updater.EnqueuePlayerCharacterSave(_updateState, _entity);
         }
     }
 }

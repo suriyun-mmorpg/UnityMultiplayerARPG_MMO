@@ -156,7 +156,7 @@ namespace MultiplayerARPG.MMO
                 }
 
                 // Data Updating
-                DataUpdater.ProceedUpdating();
+                DataUpdater.ProceedSaving();
 
                 if (IsInstanceMap())
                 {
@@ -194,6 +194,7 @@ namespace MultiplayerARPG.MMO
             savingBuildings.Clear();
             _connectionsByUserId.Clear();
             _accessTokensByUserId.Clear();
+            DataUpdater.Clean();
 #endif
         }
 
@@ -740,8 +741,8 @@ namespace MultiplayerARPG.MMO
             }
 
             // Add updater if it is not existed
-            if (!playerCharacterEntity.TryGetComponent<PlayerCharacterTransactionalUpdater>(out _))
-                playerCharacterEntity.gameObject.AddComponent<PlayerCharacterTransactionalUpdater>();
+            if (!playerCharacterEntity.TryGetComponent<PlayerCharacterDataUpdater>(out _))
+                playerCharacterEntity.gameObject.AddComponent<PlayerCharacterDataUpdater>();
         }
 #endif
         #endregion

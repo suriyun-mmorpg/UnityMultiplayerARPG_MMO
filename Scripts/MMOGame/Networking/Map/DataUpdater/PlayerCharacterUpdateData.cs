@@ -1,0 +1,35 @@
+using Cysharp.Threading.Tasks;
+
+namespace MultiplayerARPG.MMO
+{
+    public class PlayerCharacterUpdateData
+    {
+        public TransactionUpdateCharacterState _updateState;
+        public PlayerCharacterData _playerCharacterData;
+
+        public void Update(TransactionUpdateCharacterState appendState, IPlayerCharacterData playerCharacterData)
+        {
+            _playerCharacterData = null;
+            if (playerCharacterData == null)
+                return;
+            _updateState |= appendState;
+            _playerCharacterData = playerCharacterData.CloneTo(new PlayerCharacterData());
+        }
+
+        public async UniTask<bool> ProceedSave(MapNetworkManagerDataUpdater updater)
+        {
+            if (_playerCharacterData == null || _updateState == TransactionUpdateCharacterState.None)
+                return true;
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+            if (await updater.Manager.SaveCharacter(_updateState, _playerCharacterData))
+            {
+                _updateState = TransactionUpdateCharacterState.None;
+                updater.PlayerCharacterDataSaved(_playerCharacterData.Id);
+                _playerCharacterData = null;
+                return true;
+            }
+#endif
+            return false;
+        }
+    }
+}

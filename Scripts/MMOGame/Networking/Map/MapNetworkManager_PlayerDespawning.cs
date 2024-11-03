@@ -43,16 +43,15 @@ namespace MultiplayerARPG.MMO
                 UnregisterPlayerCharacter(connectionId);
                 UnregisterUserId(connectionId);
 
-                // Save character immediately when player disconnect
-                await WaitAndSaveCharacter(playerCharacterEntity);
-
                 try
                 {
                     if (!IsInstanceMap() || !despawnImmediately)
                         await UniTask.Delay(playerCharacterDespawnMillisecondsDelay, true, PlayerLoopTiming.Update, cancellationTokenSource.Token);
 
                     // Save the characer
-                    await WaitAndSaveCharacter(playerCharacterEntity, cancellationTokenSource.Token);
+                    if (playerCharacterEntity.TryGetComponent(out PlayerCharacterDataUpdater updater))
+                        DestroyImmediate(updater);
+                    await WaitAndSaveCharacter(TransactionUpdateCharacterState.All, playerCharacterEntity.CloneTo(new PlayerCharacterData()), cancellationTokenSource.Token);
 
                     // Destroy character from server
                     playerCharacterEntity.NetworkDestroy();
@@ -114,7 +113,9 @@ namespace MultiplayerARPG.MMO
             cancellationTokenSource.Dispose();
 
             // Save character before despawned
-            await WaitAndSaveCharacter(playerCharacterEntity);
+            if (playerCharacterEntity.TryGetComponent(out PlayerCharacterDataUpdater updater))
+                DestroyImmediate(updater);
+            await WaitAndSaveCharacter(TransactionUpdateCharacterState.All, playerCharacterEntity.CloneTo(new PlayerCharacterData()));
 
             // Despawn the character
             playerCharacterEntity.NetworkDestroy();

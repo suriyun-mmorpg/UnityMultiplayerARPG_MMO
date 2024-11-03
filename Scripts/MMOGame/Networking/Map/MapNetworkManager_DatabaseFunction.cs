@@ -15,7 +15,7 @@ namespace MultiplayerARPG.MMO
         /// </summary>
         /// <param name="storageId"></param>
         /// <returns></returns>
-        private async UniTask LoadStorageRoutine(StorageId storageId)
+        internal async UniTask LoadStorageRoutine(StorageId storageId)
         {
             if (_loadingStorageIds.Contains(storageId))
             {
@@ -43,7 +43,7 @@ namespace MultiplayerARPG.MMO
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        private async UniTask LoadPartyRoutine(int id)
+        internal async UniTask LoadPartyRoutine(int id)
         {
             if (id <= 0)
                 return;
@@ -72,7 +72,7 @@ namespace MultiplayerARPG.MMO
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        private async UniTask LoadGuildRoutine(int id)
+        internal async UniTask LoadGuildRoutine(int id)
         {
             if (id <= 0)
                 return;
@@ -96,14 +96,13 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-        private async UniTask<bool> SaveCharacter(IPlayerCharacterData playerCharacterData,
+        internal async UniTask<bool> SaveCharacter(TransactionUpdateCharacterState state, PlayerCharacterData savingCharacterData,
             bool changeMap = false, string mapName = "",
             Vector3 position = default, bool overrideRotation = false, Vector3 rotation = default)
         {
-            if (savingCharacters.Contains(playerCharacterData.Id))
+            if (savingCharacters.Contains(savingCharacterData.Id))
                 return false;
             // Prepare player character data
-            PlayerCharacterData savingCharacterData = playerCharacterData.CloneTo(new PlayerCharacterData());
             if (changeMap)
             {
                 savingCharacterData.CurrentMapName = mapName;
@@ -121,29 +120,34 @@ namespace MultiplayerARPG.MMO
             }
             // Prepare summon buffs
             List<CharacterBuff> summonBuffs = new List<CharacterBuff>();
-            CharacterSummon tempSummon;
-            CharacterBuff tempBuff;
-            for (int i = 0; i < playerCharacterData.Summons.Count; ++i)
+            if (state.Has(TransactionUpdateCharacterState.Summons))
             {
-                tempSummon = playerCharacterData.Summons[i];
-                if (tempSummon.CacheEntity == null || tempSummon.CacheEntity.Buffs == null || tempSummon.CacheEntity.Buffs.Count == 0) continue;
-                for (int j = 0; j < tempSummon.CacheEntity.Buffs.Count; ++j)
+                CharacterSummon tempSummon;
+                CharacterBuff tempBuff;
+                for (int i = 0; i < savingCharacterData.Summons.Count; ++i)
                 {
-                    tempBuff = tempSummon.CacheEntity.Buffs[j];
-                    summonBuffs.Add(new CharacterBuff()
+                    tempSummon = savingCharacterData.Summons[i];
+                    if (tempSummon.CacheEntity == null || tempSummon.CacheEntity.Buffs == null || tempSummon.CacheEntity.Buffs.Count == 0) continue;
+                    for (int j = 0; j < tempSummon.CacheEntity.Buffs.Count; ++j)
                     {
-                        id = ZString.Concat(savingCharacterData.Id, '_', i, '_', j),
-                        type = tempBuff.type,
-                        dataId = tempBuff.dataId,
-                        level = tempBuff.level,
-                        buffRemainsDuration = tempBuff.buffRemainsDuration,
-                    });
+                        tempBuff = tempSummon.CacheEntity.Buffs[j];
+                        summonBuffs.Add(new CharacterBuff()
+                        {
+                            id = ZString.Concat(savingCharacterData.Id, '_', i, '_', j),
+                            type = tempBuff.type,
+                            dataId = tempBuff.dataId,
+                            level = tempBuff.level,
+                            buffRemainsDuration = tempBuff.buffRemainsDuration,
+                        });
+                    }
                 }
             }
             savingCharacters.Add(savingCharacterData.Id);
+            Debug.LogError(savingCharacterData.Id + " Update " + state);
             // Update character
             await DatabaseClient.UpdateCharacterAsync(new UpdateCharacterReq()
             {
+                State = state,
                 CharacterData = savingCharacterData,
                 SummonBuffs = summonBuffs,
                 StorageItems = storageItems,
@@ -160,11 +164,11 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-        private async UniTask WaitAndSaveCharacter(IPlayerCharacterData playerCharacterData, CancellationToken cancellationToken,
+        internal async UniTask WaitAndSaveCharacter(TransactionUpdateCharacterState state, PlayerCharacterData savingCharacterData, CancellationToken cancellationToken,
             bool changeMap = false, string mapName = "",
             Vector3 position = default, bool overrideRotation = false, Vector3 rotation = default)
         {
-            while (!await SaveCharacter(playerCharacterData, changeMap, mapName, position, overrideRotation, rotation))
+            while (!await SaveCharacter(state, savingCharacterData, changeMap, mapName, position, overrideRotation, rotation))
             {
                 await UniTask.Delay(100, cancellationToken: cancellationToken);
             }
@@ -172,11 +176,11 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-        private async UniTask WaitAndSaveCharacter(IPlayerCharacterData playerCharacterData,
+        internal async UniTask WaitAndSaveCharacter(TransactionUpdateCharacterState state, PlayerCharacterData savingCharacterData,
             bool changeMap = false, string mapName = "",
             Vector3 position = default, bool overrideRotation = false, Vector3 rotation = default)
         {
-            while (!await SaveCharacter(playerCharacterData, changeMap, mapName, position, overrideRotation, rotation))
+            while (!await SaveCharacter(state, savingCharacterData, changeMap, mapName, position, overrideRotation, rotation))
             {
                 await UniTask.Delay(100);
             }
@@ -184,31 +188,10 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-        private async UniTaskVoid SaveAllCharacters()
+        internal async UniTask<bool> SaveBuilding(TransactionUpdateBuildingState state, BuildingSaveData savingBuildingData)
         {
-            if (savingCharacters.Count > 0)
-                return;
-            int i = 0;
-            List<UniTask> tasks = new List<UniTask>();
-            foreach (BasePlayerCharacterEntity playerCharacterEntity in ServerUserHandlers.GetPlayerCharacters())
-            {
-                if (playerCharacterEntity == null) continue;
-                tasks.Add(WaitAndSaveCharacter(playerCharacterEntity));
-                ++i;
-            }
-            await UniTask.WhenAll(tasks);
-            if (LogDebug)
-                Logging.Log(LogTag, "Saved " + i + " character(s)");
-        }
-#endif
-
-#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-        private async UniTask<bool> SaveBuilding(IBuildingSaveData buildingSaveData)
-        {
-            if (savingBuildings.Contains(buildingSaveData.Id))
+            if (savingBuildings.Contains(savingBuildingData.Id))
                 return false;
-            // Prepare building data
-            BuildingSaveData savingBuildingData = buildingSaveData.CloneTo(new BuildingSaveData());
             // Prepare storage items
             StorageId storageId = new StorageId(StorageType.Building, savingBuildingData.Id);
             List<CharacterItem> storageItems = null;
@@ -221,6 +204,7 @@ namespace MultiplayerARPG.MMO
             // Update building
             await DatabaseClient.UpdateBuildingAsync(new UpdateBuildingReq()
             {
+                State = state,
                 ChannelId = ChannelId,
                 MapName = CurrentMapInfo.Id,
                 BuildingData = savingBuildingData,
@@ -236,9 +220,9 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-        private async UniTask WaitAndSaveBuilding(IBuildingSaveData buildingSaveData, CancellationToken cancellationToken)
+        internal async UniTask WaitAndSaveBuilding(TransactionUpdateBuildingState state, BuildingSaveData savingBuildingData, CancellationToken cancellationToken)
         {
-            while (!await SaveBuilding(buildingSaveData))
+            while (!await SaveBuilding(state, savingBuildingData))
             {
                 await UniTask.Delay(100, cancellationToken: cancellationToken);
             }
@@ -246,29 +230,12 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-        private async UniTask WaitAndSaveBuilding(IBuildingSaveData buildingSaveData)
+        internal async UniTask WaitAndSaveBuilding(TransactionUpdateBuildingState state, BuildingSaveData savingBuildingData)
         {
-            while (!await SaveBuilding(buildingSaveData))
+            while (!await SaveBuilding(state, savingBuildingData))
             {
                 await UniTask.Delay(100);
             }
-        }
-#endif
-
-#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-        private async UniTaskVoid SaveAllBuildings()
-        {
-            int i = 0;
-            List<UniTask> tasks = new List<UniTask>();
-            foreach (BuildingEntity buildingEntity in ServerBuildingHandlers.GetBuildings())
-            {
-                if (buildingEntity == null) continue;
-                tasks.Add(WaitAndSaveBuilding(buildingEntity));
-                ++i;
-            }
-            await UniTask.WhenAll(tasks);
-            if (LogDebug)
-                Logging.Log(LogTag, "Saved " + i + " building(s)");
         }
 #endif
 
@@ -283,7 +250,7 @@ namespace MultiplayerARPG.MMO
             return entity;
         }
 
-        private async UniTask CreateBuildingEntityRoutine(BuildingSaveData saveData, bool initialize)
+        internal async UniTask CreateBuildingEntityRoutine(BuildingSaveData saveData, bool initialize)
         {
             if (!initialize)
             {
@@ -298,14 +265,14 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-        public override void DestroyBuildingEntity(string id, bool isSceneObject)
+        public override async UniTask DestroyBuildingEntity(string id, bool isSceneObject)
         {
-            base.DestroyBuildingEntity(id, isSceneObject);
             if (!isSceneObject)
-                DestroyBuildingEntityRoutine(id).Forget();
+                await DestroyBuildingEntityRoutine(id);
+            await base.DestroyBuildingEntity(id, isSceneObject);
         }
 
-        private async UniTask DestroyBuildingEntityRoutine(string id)
+        internal async UniTask DestroyBuildingEntityRoutine(string id)
         {
             await DatabaseClient.DeleteBuildingAsync(new DeleteBuildingReq()
             {
