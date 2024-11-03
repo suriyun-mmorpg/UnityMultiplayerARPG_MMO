@@ -143,7 +143,6 @@ namespace MultiplayerARPG.MMO
                 }
             }
             savingCharacters.Add(savingCharacterData.Id);
-            Debug.LogError(savingCharacterData.Id + " Update " + state);
             // Update character
             await DatabaseClient.UpdateCharacterAsync(new UpdateCharacterReq()
             {
