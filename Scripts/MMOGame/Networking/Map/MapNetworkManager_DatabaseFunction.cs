@@ -273,10 +273,14 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-        public override BuildingEntity CreateBuildingEntity(BuildingSaveData saveData, bool initialize)
+        public override async UniTask<BuildingEntity> CreateBuildingEntity(BuildingSaveData saveData, bool initialize)
         {
-            CreateBuildingEntityRoutine(saveData, initialize).Forget();
-            return base.CreateBuildingEntity(saveData, initialize);
+            await CreateBuildingEntityRoutine(saveData, initialize);
+            BuildingEntity entity = await base.CreateBuildingEntity(saveData, initialize);
+            // Add updater if it is not existed
+            if (!entity.TryGetComponent<PlayerCharacterDataUpdater>(out _))
+                entity.gameObject.AddComponent<PlayerCharacterDataUpdater>();
+            return entity;
         }
 
         private async UniTask CreateBuildingEntityRoutine(BuildingSaveData saveData, bool initialize)

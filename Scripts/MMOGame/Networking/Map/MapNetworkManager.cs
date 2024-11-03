@@ -371,7 +371,7 @@ namespace MultiplayerARPG.MMO
                     }
                     else
                     {
-                        BuildingEntity buildingEntity = CreateBuildingEntity(building, true);
+                        BuildingEntity buildingEntity = await CreateBuildingEntity(building, true);
                         if (buildingEntity is StorageEntity)
                             storageIds.Add(new StorageId(StorageType.Building, buildingEntity.Id));
                     }
