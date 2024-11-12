@@ -50,7 +50,7 @@ namespace MultiplayerARPG.MMO
 
                     // Save the characer
                     if (playerCharacterEntity.TryGetComponent(out PlayerCharacterDataUpdater updater))
-                        DestroyImmediate(updater);
+                        Destroy(updater);
                     await WaitAndSaveCharacter(TransactionUpdateCharacterState.All, playerCharacterEntity.CloneTo(new PlayerCharacterData()), cancellationTokenSource.Token);
 
                     // Destroy character from server
@@ -114,7 +114,7 @@ namespace MultiplayerARPG.MMO
 
             // Save character before despawned
             if (playerCharacterEntity.TryGetComponent(out PlayerCharacterDataUpdater updater))
-                DestroyImmediate(updater);
+                Destroy(updater);
             await WaitAndSaveCharacter(TransactionUpdateCharacterState.All, playerCharacterEntity.CloneTo(new PlayerCharacterData()));
 
             // Despawn the character
