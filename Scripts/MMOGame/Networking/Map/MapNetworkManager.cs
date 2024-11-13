@@ -818,23 +818,20 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             // Send GM command
-            if (message.sendByServer || playerCharacter != null)
+            if (message.sendByServer || (playerCharacter is BasePlayerCharacterEntity playerCharacterEntity &&
+                CurrentGameInstance.GMCommands.IsGMCommand(message.message, out string gmCommand) &&
+                CurrentGameInstance.GMCommands.CanUseGMCommand(playerCharacterEntity.UserLevel, gmCommand)))
             {
-                if (message.sendByServer || (playerCharacter is BasePlayerCharacterEntity playerCharacterEntity &&
-                    CurrentGameInstance.GMCommands.IsGMCommand(message.message, out string gmCommand) &&
-                    CurrentGameInstance.GMCommands.CanUseGMCommand(playerCharacterEntity.UserLevel, gmCommand)))
+                // If it's GM command and senderName's user level > 0, handle gm commands
+                // Send GM command to cluster server to broadcast to other servers later
+                if (ClusterClient.IsNetworkActive)
                 {
-                    // If it's GM command and senderName's user level > 0, handle gm commands
-                    // Send GM command to cluster server to broadcast to other servers later
-                    if (ClusterClient.IsNetworkActive)
+                    ClusterClient.SendPacket(0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.Chat, (writer) =>
                     {
-                        ClusterClient.SendPacket(0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.Chat, (writer) =>
-                        {
-                            writer.PutValue(message);
-                        });
-                    }
-                    return;
+                        writer.PutValue(message);
+                    });
                 }
+                return;
             }
             // Local chat will processes immediately, not have to be sent to cluster server except some GM commands
             if (message.channel == ChatChannel.Local)
@@ -859,6 +856,7 @@ namespace MultiplayerARPG.MMO
                 }
                 return;
             }
+            // Broadcasting to other servers
             if (ClusterClient.IsNetworkActive)
             {
                 ClusterClient.SendPacket(0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.Chat, (writer) =>
@@ -1025,20 +1023,24 @@ namespace MultiplayerARPG.MMO
                     ServerChatHandlers.OnChatMessage(message);
                 return;
             }
-            // Get user level from server to validate user level
-            DatabaseApiResult<GetUserLevelResp> resp = await DatabaseClient.GetUserLevelAsync(new GetUserLevelReq()
+            if (!message.sendByServer)
             {
-                UserId = message.senderUserId,
-            });
-            if (!resp.IsSuccess)
-            {
-                // Error occuring when retreiving user level
-                return;
-            }
-            if (!CurrentGameInstance.GMCommands.CanUseGMCommand(resp.Response.UserLevel, gmCommand))
-            {
-                // User not able to use this command
-                return;
+                // Validate user if message doesn't send by server
+                // Get user level from server to validate user level
+                DatabaseApiResult<GetUserLevelResp> resp = await DatabaseClient.GetUserLevelAsync(new GetUserLevelReq()
+                {
+                    UserId = message.senderUserId,
+                });
+                if (!resp.IsSuccess)
+                {
+                    // Error occuring when retreiving user level
+                    return;
+                }
+                if (!CurrentGameInstance.GMCommands.CanUseGMCommand(resp.Response.UserLevel, gmCommand))
+                {
+                    // User not able to use this command
+                    return;
+                }
             }
             // Response enter GM command message
             if (!ServerUserHandlers.TryGetPlayerCharacterByName(message.senderName, out BasePlayerCharacterEntity playerCharacterEntity))
