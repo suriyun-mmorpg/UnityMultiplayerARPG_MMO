@@ -817,33 +817,30 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
+            // Send GM command
+            if (message.sendByServer || playerCharacter != null)
+            {
+                if (message.sendByServer || (playerCharacter is BasePlayerCharacterEntity playerCharacterEntity &&
+                    CurrentGameInstance.GMCommands.IsGMCommand(message.message, out string gmCommand) &&
+                    CurrentGameInstance.GMCommands.CanUseGMCommand(playerCharacterEntity.UserLevel, gmCommand)))
+                {
+                    // If it's GM command and senderName's user level > 0, handle gm commands
+                    // Send GM command to cluster server to broadcast to other servers later
+                    if (ClusterClient.IsNetworkActive)
+                    {
+                        ClusterClient.SendPacket(0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.Chat, (writer) =>
+                        {
+                            writer.PutValue(message);
+                        });
+                    }
+                    return;
+                }
+            }
             // Local chat will processes immediately, not have to be sent to cluster server except some GM commands
             if (message.channel == ChatChannel.Local)
             {
-                bool sentGmCommand = false;
-                if (message.sendByServer || playerCharacter != null)
-                {
-                    if (message.sendByServer || (playerCharacter is BasePlayerCharacterEntity playerCharacterEntity &&
-                        CurrentGameInstance.GMCommands.IsGMCommand(message.message, out string gmCommand) &&
-                        CurrentGameInstance.GMCommands.CanUseGMCommand(playerCharacterEntity.UserLevel, gmCommand)))
-                    {
-                        // If it's GM command and senderName's user level > 0, handle gm commands
-                        // Send GM command to cluster server to broadcast to other servers later
-                        if (ClusterClient.IsNetworkActive)
-                        {
-                            ClusterClient.SendPacket(0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.Chat, (writer) =>
-                            {
-                                writer.PutValue(message);
-                            });
-                        }
-                        sentGmCommand = true;
-                    }
-                }
-                if (!sentGmCommand)
-                {
-                    ServerChatHandlers.OnChatMessage(message);
-                    ServerLogHandlers.LogEnterChat(message);
-                }
+                ServerChatHandlers.OnChatMessage(message);
+                ServerLogHandlers.LogEnterChat(message);
                 return;
             }
             // Chat messages for other chat channels will be sent to cluster server, then cluster server will pass it to other map-servers to send to clients
@@ -1020,47 +1017,42 @@ namespace MultiplayerARPG.MMO
         {
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             ChatMessage message = messageHandler.ReadMessage<ChatMessage>();
-            if (message.channel == ChatChannel.Local)
+            // Handle GM command here, only GM command will be broadcasted as local channel
+            if (!CurrentGameInstance.GMCommands.IsGMCommand(message.message, out string gmCommand))
             {
-                // Handle GM command here, only GM command will be broadcasted as local channel
-                if (!CurrentGameInstance.GMCommands.IsGMCommand(message.message, out string gmCommand))
-                {
-                    // Handle only GM command, if it is not GM command then skip
-                    return;
-                }
-                // Get user level from server to validate user level
-                DatabaseApiResult<GetUserLevelResp> resp = await DatabaseClient.GetUserLevelAsync(new GetUserLevelReq()
-                {
-                    UserId = message.senderUserId,
-                });
-                if (!resp.IsSuccess)
-                {
-                    // Error occuring when retreiving user level
-                    return;
-                }
-                if (!CurrentGameInstance.GMCommands.CanUseGMCommand(resp.Response.UserLevel, gmCommand))
-                {
-                    // User not able to use this command
-                    return;
-                }
-                // Response enter GM command message
-                if (!ServerUserHandlers.TryGetPlayerCharacterByName(message.senderName, out BasePlayerCharacterEntity playerCharacterEntity))
-                {
-                    playerCharacterEntity = null;
-                }
-                string response = CurrentGameInstance.GMCommands.HandleGMCommand(message.senderName, playerCharacterEntity, message.message);
-                if (playerCharacterEntity != null && !string.IsNullOrEmpty(response))
-                {
-                    ServerSendPacket(playerCharacterEntity.ConnectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, new ChatMessage()
-                    {
-                        channel = ChatChannel.System,
-                        message = response,
-                    });
-                }
+                // Handle only GM command, if it is not GM command then skip
+                if (message.channel != ChatChannel.Local)
+                    ServerChatHandlers.OnChatMessage(message);
+                return;
             }
-            else
+            // Get user level from server to validate user level
+            DatabaseApiResult<GetUserLevelResp> resp = await DatabaseClient.GetUserLevelAsync(new GetUserLevelReq()
             {
-                ServerChatHandlers.OnChatMessage(message);
+                UserId = message.senderUserId,
+            });
+            if (!resp.IsSuccess)
+            {
+                // Error occuring when retreiving user level
+                return;
+            }
+            if (!CurrentGameInstance.GMCommands.CanUseGMCommand(resp.Response.UserLevel, gmCommand))
+            {
+                // User not able to use this command
+                return;
+            }
+            // Response enter GM command message
+            if (!ServerUserHandlers.TryGetPlayerCharacterByName(message.senderName, out BasePlayerCharacterEntity playerCharacterEntity))
+            {
+                playerCharacterEntity = null;
+            }
+            string response = CurrentGameInstance.GMCommands.HandleGMCommand(message.senderName, playerCharacterEntity, message.message);
+            if (playerCharacterEntity != null && !string.IsNullOrEmpty(response))
+            {
+                ServerSendPacket(playerCharacterEntity.ConnectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, new ChatMessage()
+                {
+                    channel = ChatChannel.System,
+                    message = response,
+                });
             }
 #endif
         }
