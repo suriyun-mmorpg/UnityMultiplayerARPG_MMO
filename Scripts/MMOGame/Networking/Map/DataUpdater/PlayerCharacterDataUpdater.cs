@@ -284,7 +284,6 @@ namespace MultiplayerARPG.MMO
             hash = System.HashCode.Combine(hash, _entity.PartyId);
             hash = System.HashCode.Combine(hash, _entity.GuildId);
             hash = System.HashCode.Combine(hash, _entity.GuildRole);
-            hash = System.HashCode.Combine(hash, _entity.SharedGuildExp);
             hash = System.HashCode.Combine(hash, _entity.EquipWeaponSet);
             hash = System.HashCode.Combine(hash, _entity.CurrentChannel);
             hash = System.HashCode.Combine(hash, _entity.CurrentMapName);

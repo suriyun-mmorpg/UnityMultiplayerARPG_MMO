@@ -241,7 +241,6 @@ namespace MultiplayerARPG.MMO
             GameInstance.ServerGuildHandlers.SetGuild(guild.id, guild);
             playerCharacter.GuildId = guild.id;
             playerCharacter.GuildRole = guild.GetMemberRole(playerCharacter.Id);
-            playerCharacter.SharedGuildExp = 0;
             // Broadcast via chat server
             if (ClusterClient.IsNetworkActive)
             {
@@ -709,16 +708,6 @@ namespace MultiplayerARPG.MMO
             // Update cache
             validateResult.Guild.SetRole(request.guildRole, request.guildRoleData);
             GameInstance.ServerGuildHandlers.SetGuild(validateResult.GuildId, validateResult.Guild);
-            // Change characters guild role
-            IPlayerCharacterData memberCharacter;
-            foreach (string memberId in validateResult.Guild.GetMemberIds())
-            {
-                if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(memberId, out memberCharacter))
-                {
-                    if (validateResult.Guild.GetMemberRole(memberCharacter.Id) == request.guildRole)
-                        memberCharacter.SharedGuildExp = request.guildRoleData.shareExpPercentage;
-                }
-            }
             // Broadcast via chat server
             if (ClusterClient.IsNetworkActive)
             {
@@ -770,7 +759,6 @@ namespace MultiplayerARPG.MMO
             if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(request.memberId, out IPlayerCharacterData memberCharacter))
             {
                 memberCharacter.GuildRole = request.guildRole;
-                memberCharacter.SharedGuildExp = validateResult.Guild.GetRole(request.guildRole).shareExpPercentage;
             }
             // Broadcast via chat server
             if (ClusterClient.IsNetworkActive)
