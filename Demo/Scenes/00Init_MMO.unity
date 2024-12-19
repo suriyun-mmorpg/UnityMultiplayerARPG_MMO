@@ -616,7 +616,6 @@ MonoBehaviour:
   clusterServerAddress: 127.0.0.1
   clusterServerPort: 6010
   publicAddress: 127.0.0.1
-  autoSaveDuration: 30
   mapSpawnMillisecondsTimeout: 0
   playerCharacterDespawnMillisecondsDelay: 5000
 --- !u!114 &1127565839
@@ -882,7 +881,6 @@ GameObject:
   - component: {fileID: 1379718503}
   - component: {fileID: 1379718502}
   - component: {fileID: 1379718505}
-  - component: {fileID: 1379718506}
   - component: {fileID: 1379718507}
   - component: {fileID: 1379718504}
   - component: {fileID: 1379718508}
@@ -1157,6 +1155,21 @@ MonoBehaviour:
   startGold: 0
   startItems: []
   testingNewCharacterSetting: {fileID: 0}
+  updateAnimationAtServer: 1
+  minCharacterNameLength: 2
+  maxCharacterNameLength: 16
+  maxCharacterSaves: 5
+  serverTargetFrameRate: 30
+  testInEditorMode: 0
+  networkManagerForOfflineTesting:
+    m_AssetGUID: 
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+  exportSocialSystemSettingAsJson: 0
+  exportMinimalItemsAsJson: 0
+  exportCharacterCreationDataAsJson: 0
+  cashShopDatabase: {fileID: 11400000, guid: 677c37c598e6c1045b66de68f1f546f6, type: 2}
   homeScene:
     sceneAsset: {fileID: 102900000, guid: d529c814bb9fcd14289ac4141b27e951, type: 3}
     sceneName: 01Home_MMO
@@ -1184,21 +1197,6 @@ MonoBehaviour:
     m_SubObjectType: 
     m_EditorAssetChanged: 0
     sceneName: 
-  updateAnimationAtServer: 1
-  minCharacterNameLength: 2
-  maxCharacterNameLength: 16
-  maxCharacterSaves: 5
-  serverTargetFrameRate: 30
-  testInEditorMode: 0
-  networkManagerForOfflineTesting:
-    m_AssetGUID: 
-    m_SubObjectName: 
-    m_SubObjectType: 
-    m_EditorAssetChanged: 0
-  exportSocialSystemSettingAsJson: 0
-  exportMinimalItemsAsJson: 0
-  exportCharacterCreationDataAsJson: 0
-  cashShopDatabase: {fileID: 11400000, guid: 677c37c598e6c1045b66de68f1f546f6, type: 2}
 --- !u!4 &1379718503
 Transform:
   m_ObjectHideFlags: 0
@@ -1348,24 +1346,6 @@ MonoBehaviour:
     layer2:
       layerIndex: 9
     ignore: 1
---- !u!114 &1379718506
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1379718501}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b22368900ab60ae4882d09d2b5bf7ec0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxLevel: 100
-  expCalculator:
-    minValue: 20
-    maxValue: 10050
-    growth: 1.5
-  calculateExp: 0
 --- !u!114 &1379718507
 MonoBehaviour:
   m_ObjectHideFlags: 0
