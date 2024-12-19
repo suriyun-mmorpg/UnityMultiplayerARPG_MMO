@@ -7,6 +7,7 @@ namespace MultiplayerARPG.MMO
     [DisallowMultipleComponent]
     public class BuildingDataUpdater : MonoBehaviour
     {
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         public const float POSITION_CHANGE_THRESHOLD = 0.5f;
         public const int SAVE_DELAY = 1;
 
@@ -30,6 +31,10 @@ namespace MultiplayerARPG.MMO
 
         private void Update()
         {
+            MapNetworkManager mapNetworkManager = BaseGameNetworkManager.Singleton as MapNetworkManager;
+            if (!mapNetworkManager)
+                return;
+
             int combinedHash = GetCombinedHashCode();
             if (_dirtyCombinedHash != combinedHash)
             {
@@ -43,11 +48,19 @@ namespace MultiplayerARPG.MMO
                 _updateState |= TransactionUpdateBuildingState.Building;
             }
 
+            StorageId storageId;
+            storageId = new StorageId(StorageType.Building, _entity.Id);
+            if (mapNetworkManager.pendingSaveStorageIds.Contains(storageId))
+            {
+                mapNetworkManager.pendingSaveStorageIds.TryRemove(storageId);
+                _updateState |= TransactionUpdateBuildingState.StorageItems;
+            }
+
             if (_updateState != TransactionUpdateBuildingState.None &&
                 Time.unscaledTime - _lastSavedTime > SAVE_DELAY)
             {
                 _lastSavedTime = Time.unscaledTime;
-                EnqueueSave();
+                EnqueueSave(mapNetworkManager);
             }
         }
 
@@ -68,13 +81,11 @@ namespace MultiplayerARPG.MMO
             return hash;
         }
 
-        public void EnqueueSave()
+        public void EnqueueSave(MapNetworkManager mapNetworkManager)
         {
-            if (BaseGameNetworkManager.Singleton.TryGetComponent(out MapNetworkManagerDataUpdater updater))
-            {
-                updater.EnqueueBuildingSave(_updateState, _entity);
-                _updateState = TransactionUpdateBuildingState.None;
-            }
+            mapNetworkManager.DataUpdater.EnqueueBuildingSave(_updateState, _entity);
+            _updateState = TransactionUpdateBuildingState.None;
         }
+#endif
     }
 }

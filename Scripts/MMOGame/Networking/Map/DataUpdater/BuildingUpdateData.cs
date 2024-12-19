@@ -5,7 +5,9 @@ namespace MultiplayerARPG.MMO
     public class BuildingUpdateData
     {
         private TransactionUpdateBuildingState _updateState;
+        public TransactionUpdateBuildingState UpdateState => _updateState;
         private BuildingSaveData _buildingSaveData;
+        public BuildingSaveData BuildingSaveData => _buildingSaveData;
 
         public void Update(TransactionUpdateBuildingState appendState, IBuildingSaveData buildingSaveData)
         {

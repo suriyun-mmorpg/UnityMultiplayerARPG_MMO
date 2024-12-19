@@ -111,19 +111,19 @@ namespace MultiplayerARPG.MMO
                     savingCharacterData.CurrentRotation = rotation;
             }
             // Prepare storage items
-            StorageId playerStorageId = new StorageId(StorageType.Player, savingCharacterData.UserId);
             List<CharacterItem> playerStorageItems = null;
-            if (pendingSaveStorageIds.Contains(playerStorageId))
+            if (state.Has(TransactionUpdateCharacterState.PlayerStorageItems))
             {
-                playerStorageItems = new List<CharacterItem>();
-                playerStorageItems.AddRange(ServerStorageHandlers.GetStorageItems(playerStorageId));
+                playerStorageItems = new List<CharacterItem>(
+                    ServerStorageHandlers.GetStorageItems(
+                        new StorageId(StorageType.Player, savingCharacterData.UserId)));
             }
-            StorageId protectedStorageId = new StorageId(StorageType.Protected, savingCharacterData.UserId);
             List<CharacterItem> protectedStorageItems = null;
-            if (pendingSaveStorageIds.Contains(protectedStorageId))
+            if (state.Has(TransactionUpdateCharacterState.ProtectedStorageItems))
             {
-                protectedStorageItems = new List<CharacterItem>();
-                protectedStorageItems.AddRange(ServerStorageHandlers.GetStorageItems(protectedStorageId));
+                playerStorageItems = new List<CharacterItem>(
+                    ServerStorageHandlers.GetStorageItems(
+                        new StorageId(StorageType.Protected, savingCharacterData.UserId)));
             }
             // Prepare summon buffs
             List<CharacterBuff> summonBuffs = new List<CharacterBuff>();
@@ -151,7 +151,7 @@ namespace MultiplayerARPG.MMO
             }
             savingCharacters.Add(savingCharacterData.Id);
             // Update character
-            await DatabaseClient.UpdateCharacterAsync(new UpdateCharacterReq()
+            var updateResult = await DatabaseClient.UpdateCharacterAsync(new UpdateCharacterReq()
             {
                 State = state,
                 CharacterData = savingCharacterData,
@@ -160,14 +160,11 @@ namespace MultiplayerARPG.MMO
                 ProtectedStorageItems = protectedStorageItems,
                 DeleteStorageReservation = cancellingReserveStorageCharacterIds.Contains(savingCharacterData.Id),
             });
-            // Update done, clear pending status data
-            pendingSaveStorageIds.TryRemove(playerStorageId);
-            pendingSaveStorageIds.TryRemove(protectedStorageId);
             cancellingReserveStorageCharacterIds.TryRemove(savingCharacterData.Id);
             savingCharacters.TryRemove(savingCharacterData.Id);
             if (LogDebug)
-                Logging.Log(LogTag, "Character [" + savingCharacterData.Id + "] Saved");
-            return true;
+                Logging.Log(LogTag, $"Character [{savingCharacterData.Id}] Saved, Success? {updateResult.IsSuccess}");
+            return updateResult.IsSuccess;
         }
 #endif
 
@@ -201,16 +198,16 @@ namespace MultiplayerARPG.MMO
             if (savingBuildings.Contains(savingBuildingData.Id))
                 return false;
             // Prepare storage items
-            StorageId storageId = new StorageId(StorageType.Building, savingBuildingData.Id);
             List<CharacterItem> storageItems = null;
-            if (pendingSaveStorageIds.Contains(storageId))
+            if (state.Has(TransactionUpdateBuildingState.StorageItems))
             {
-                storageItems = new List<CharacterItem>();
-                storageItems.AddRange(ServerStorageHandlers.GetStorageItems(storageId));
+                storageItems = new List<CharacterItem>(
+                    ServerStorageHandlers.GetStorageItems(
+                        new StorageId(StorageType.Protected, savingBuildingData.Id)));
             }
             savingBuildings.Add(savingBuildingData.Id);
             // Update building
-            await DatabaseClient.UpdateBuildingAsync(new UpdateBuildingReq()
+            var updateResult = await DatabaseClient.UpdateBuildingAsync(new UpdateBuildingReq()
             {
                 State = state,
                 ChannelId = ChannelId,
@@ -219,11 +216,10 @@ namespace MultiplayerARPG.MMO
                 StorageItems = storageItems,
             });
             // Update done, clear pending status data
-            pendingSaveStorageIds.TryRemove(storageId);
             savingBuildings.TryRemove(savingBuildingData.Id);
             if (LogDebug)
-                Logging.Log(LogTag, "Building [" + savingBuildingData.Id + "] Saved");
-            return true;
+                Logging.Log(LogTag, $"Building [{savingBuildingData.Id}] Saved, Success? {updateResult.IsSuccess}");
+            return updateResult.IsSuccess;
         }
 #endif
 

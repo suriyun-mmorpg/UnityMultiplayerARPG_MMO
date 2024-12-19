@@ -7,6 +7,7 @@ namespace MultiplayerARPG.MMO
     [DisallowMultipleComponent]
     public class PlayerCharacterDataUpdater : MonoBehaviour
     {
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         public const float POSITION_CHANGE_THRESHOLD = 0.5f;
         public const int SAVE_DELAY = 1;
 
@@ -248,6 +249,10 @@ namespace MultiplayerARPG.MMO
 
         private void Update()
         {
+            MapNetworkManager mapNetworkManager = BaseGameNetworkManager.Singleton as MapNetworkManager;
+            if (!mapNetworkManager)
+                return;
+
             int combinedHash = GetCombinedHashCode();
             if (_dirtyCombinedHash != combinedHash)
             {
@@ -269,11 +274,26 @@ namespace MultiplayerARPG.MMO
             }
 #endif
 
+            StorageId storageId;
+            storageId = new StorageId(StorageType.Player, _entity.UserId);
+            if (mapNetworkManager.pendingSaveStorageIds.Contains(storageId))
+            {
+                mapNetworkManager.pendingSaveStorageIds.TryRemove(storageId);
+                _updateState |= TransactionUpdateCharacterState.PlayerStorageItems;
+            }
+
+            storageId = new StorageId(StorageType.Protected, _entity.UserId);
+            if (mapNetworkManager.pendingSaveStorageIds.Contains(storageId))
+            {
+                mapNetworkManager.pendingSaveStorageIds.TryRemove(storageId);
+                _updateState |= TransactionUpdateCharacterState.ProtectedStorageItems;
+            }
+
             if (_updateState != TransactionUpdateCharacterState.None &&
                 Time.unscaledTime - _lastSavedTime > SAVE_DELAY)
             {
                 _lastSavedTime = Time.unscaledTime;
-                EnqueueSave();
+                EnqueueSave(mapNetworkManager);
             }
         }
 
@@ -316,13 +336,11 @@ namespace MultiplayerARPG.MMO
             return hash;
         }
 
-        public void EnqueueSave()
+        public void EnqueueSave(MapNetworkManager mapNetworkManager)
         {
-            if (BaseGameNetworkManager.Singleton.TryGetComponent(out MapNetworkManagerDataUpdater updater))
-            {
-                updater.EnqueuePlayerCharacterSave(_updateState, _entity);
-                _updateState = TransactionUpdateCharacterState.None;
-            }
+            mapNetworkManager.DataUpdater.EnqueuePlayerCharacterSave(_updateState, _entity);
+            _updateState = TransactionUpdateCharacterState.None;
         }
+#endif
     }
 }
