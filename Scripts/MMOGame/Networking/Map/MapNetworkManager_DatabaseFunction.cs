@@ -111,12 +111,19 @@ namespace MultiplayerARPG.MMO
                     savingCharacterData.CurrentRotation = rotation;
             }
             // Prepare storage items
-            StorageId storageId = new StorageId(StorageType.Player, savingCharacterData.UserId);
-            List<CharacterItem> storageItems = null;
-            if (pendingSaveStorageIds.Contains(storageId))
+            StorageId playerStorageId = new StorageId(StorageType.Player, savingCharacterData.UserId);
+            List<CharacterItem> playerStorageItems = null;
+            if (pendingSaveStorageIds.Contains(playerStorageId))
             {
-                storageItems = new List<CharacterItem>();
-                storageItems.AddRange(ServerStorageHandlers.GetStorageItems(storageId));
+                playerStorageItems = new List<CharacterItem>();
+                playerStorageItems.AddRange(ServerStorageHandlers.GetStorageItems(playerStorageId));
+            }
+            StorageId protectedStorageId = new StorageId(StorageType.Protected, savingCharacterData.UserId);
+            List<CharacterItem> protectedStorageItems = null;
+            if (pendingSaveStorageIds.Contains(protectedStorageId))
+            {
+                protectedStorageItems = new List<CharacterItem>();
+                protectedStorageItems.AddRange(ServerStorageHandlers.GetStorageItems(protectedStorageId));
             }
             // Prepare summon buffs
             List<CharacterBuff> summonBuffs = new List<CharacterBuff>();
@@ -149,11 +156,13 @@ namespace MultiplayerARPG.MMO
                 State = state,
                 CharacterData = savingCharacterData,
                 SummonBuffs = summonBuffs,
-                StorageItems = storageItems,
+                StorageItems = playerStorageItems,
+                ProtectedStorageItems = protectedStorageItems,
                 DeleteStorageReservation = cancellingReserveStorageCharacterIds.Contains(savingCharacterData.Id),
             });
             // Update done, clear pending status data
-            pendingSaveStorageIds.TryRemove(storageId);
+            pendingSaveStorageIds.TryRemove(playerStorageId);
+            pendingSaveStorageIds.TryRemove(protectedStorageId);
             cancellingReserveStorageCharacterIds.TryRemove(savingCharacterData.Id);
             savingCharacters.TryRemove(savingCharacterData.Id);
             if (LogDebug)
