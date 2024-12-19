@@ -203,7 +203,7 @@ namespace MultiplayerARPG.MMO
             {
                 storageItems = new List<CharacterItem>(
                     ServerStorageHandlers.GetStorageItems(
-                        new StorageId(StorageType.Protected, savingBuildingData.Id)));
+                        new StorageId(StorageType.Building, savingBuildingData.Id)));
             }
             savingBuildings.Add(savingBuildingData.Id);
             // Update building
