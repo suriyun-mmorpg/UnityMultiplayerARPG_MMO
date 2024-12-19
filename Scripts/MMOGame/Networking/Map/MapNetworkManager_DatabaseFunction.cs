@@ -156,7 +156,7 @@ namespace MultiplayerARPG.MMO
                 State = state,
                 CharacterData = savingCharacterData,
                 SummonBuffs = summonBuffs,
-                StorageItems = playerStorageItems,
+                PlayerStorageItems = playerStorageItems,
                 ProtectedStorageItems = protectedStorageItems,
                 DeleteStorageReservation = cancellingReserveStorageCharacterIds.Contains(savingCharacterData.Id),
             });
