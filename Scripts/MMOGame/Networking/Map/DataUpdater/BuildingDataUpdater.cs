@@ -53,17 +53,18 @@ namespace MultiplayerARPG.MMO
 
         public int GetCombinedHashCode()
         {
-            int hash = _entity.Id.GetHashCode();
-            hash = System.HashCode.Combine(hash, _entity.ParentId.GetHashCode());
-            hash = System.HashCode.Combine(hash, _entity.EntityId.GetHashCode());
-            hash = System.HashCode.Combine(hash, _entity.CurrentHp.GetHashCode());
-            hash = System.HashCode.Combine(hash, _entity.RemainsLifeTime.GetHashCode());
-            hash = System.HashCode.Combine(hash, _entity.IsLocked.GetHashCode());
-            hash = System.HashCode.Combine(hash, _entity.LockPassword.GetHashCode());
-            hash = System.HashCode.Combine(hash, _entity.CreatorId.GetHashCode());
-            hash = System.HashCode.Combine(hash, _entity.CreatorName.GetHashCode());
-            hash = System.HashCode.Combine(hash, _entity.ExtraData.GetHashCode());
-            hash = System.HashCode.Combine(hash, _entity.IsSceneObject.GetHashCode());
+            int hash = 0;
+            hash = System.HashCode.Combine(hash, _entity.Id);
+            hash = System.HashCode.Combine(hash, _entity.ParentId);
+            hash = System.HashCode.Combine(hash, _entity.EntityId);
+            hash = System.HashCode.Combine(hash, _entity.CurrentHp);
+            hash = System.HashCode.Combine(hash, _entity.RemainsLifeTime);
+            hash = System.HashCode.Combine(hash, _entity.IsLocked);
+            hash = System.HashCode.Combine(hash, _entity.LockPassword);
+            hash = System.HashCode.Combine(hash, _entity.CreatorId);
+            hash = System.HashCode.Combine(hash, _entity.CreatorName);
+            hash = System.HashCode.Combine(hash, _entity.ExtraData);
+            hash = System.HashCode.Combine(hash, _entity.IsSceneObject);
             return hash;
         }
 

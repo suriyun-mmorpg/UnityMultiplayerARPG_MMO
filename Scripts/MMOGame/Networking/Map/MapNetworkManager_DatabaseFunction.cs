@@ -260,15 +260,14 @@ namespace MultiplayerARPG.MMO
 
         internal async UniTask CreateBuildingEntityRoutine(BuildingSaveData saveData, bool initialize)
         {
-            if (!initialize)
+            if (initialize)
+                return;
+            await DatabaseClient.CreateBuildingAsync(new CreateBuildingReq()
             {
-                await DatabaseClient.CreateBuildingAsync(new CreateBuildingReq()
-                {
-                    ChannelId = ChannelId,
-                    MapName = CurrentMapInfo.Id,
-                    BuildingData = saveData,
-                });
-            }
+                ChannelId = ChannelId,
+                MapName = CurrentMapInfo.Id,
+                BuildingData = saveData,
+            });
         }
 #endif
 

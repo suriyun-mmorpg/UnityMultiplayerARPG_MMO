@@ -279,7 +279,8 @@ namespace MultiplayerARPG.MMO
 
         public int GetCombinedHashCode()
         {
-            int hash = _entity.Id.GetHashCode();
+            int hash = 0;
+            hash = System.HashCode.Combine(hash, _entity.Id);
             hash = System.HashCode.Combine(hash, _entity.DataId);
             hash = System.HashCode.Combine(hash, _entity.EntityId);
             hash = System.HashCode.Combine(hash, _entity.UserId);

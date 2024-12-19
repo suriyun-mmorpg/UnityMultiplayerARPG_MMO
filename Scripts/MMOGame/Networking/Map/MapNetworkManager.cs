@@ -336,11 +336,16 @@ namespace MultiplayerARPG.MMO
             if (!IsAllocate && !IsInstanceMap())
             {
                 // Load buildings
+                BuildingEntity tempBuildingEntity;
                 BuildingEntity[] inSceneBuildings = FindObjectsByType<BuildingEntity>(FindObjectsSortMode.None);
                 Dictionary<string, BuildingEntity> inSceneBuildingDicts = new Dictionary<string, BuildingEntity>();
                 for (int i = 0; i < inSceneBuildings.Length; ++i)
                 {
-                    inSceneBuildingDicts.Add(inSceneBuildings[i].Id, inSceneBuildings[i]);
+                    tempBuildingEntity = inSceneBuildings[i];
+                    // Add updater if it is not existed
+                    if (!tempBuildingEntity.TryGetComponent<BuildingDataUpdater>(out _))
+                        tempBuildingEntity.gameObject.AddComponent<BuildingDataUpdater>();
+                    inSceneBuildingDicts.Add(tempBuildingEntity.Id, tempBuildingEntity);
                 }
                 // Don't load buildings if it's instance map
                 DatabaseApiResult<BuildingsResp> buildingsResp;
