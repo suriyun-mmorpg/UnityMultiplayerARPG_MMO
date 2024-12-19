@@ -244,8 +244,8 @@ namespace MultiplayerARPG.MMO
             await CreateBuildingEntityRoutine(saveData, initialize);
             BuildingEntity entity = await base.CreateBuildingEntity(saveData, initialize);
             // Add updater if it is not existed
-            if (!entity.TryGetComponent<PlayerCharacterDataUpdater>(out _))
-                entity.gameObject.AddComponent<PlayerCharacterDataUpdater>();
+            if (!entity.TryGetComponent<BuildingDataUpdater>(out _))
+                entity.gameObject.AddComponent<BuildingDataUpdater>();
             return entity;
         }
 
