@@ -23,10 +23,12 @@ namespace MultiplayerARPG.MMO
         private void Awake()
         {
             _entity = GetComponent<BasePlayerCharacterEntity>();
+#if !DISABLE_CLASSIC_PK
             // Pk
             _entity.onIsPkOnChange += _entity_onIsPkOnChange;
             _entity.onPkPointChange += _entity_onPkPointChange;
             _entity.onConsecutivePkKillsChange += _entity_onConsecutivePkKillsChange;
+#endif
             // Selectable Weapon Sets
             _entity.onSelectableWeaponSetsOperation += _entity_onSelectableWeaponSetsOperation;
             // Attributes
@@ -47,8 +49,11 @@ namespace MultiplayerARPG.MMO
             _entity.onHotkeysOperation += _entity_onHotkeysOperation;
             // Quests
             _entity.onQuestsOperation += _entity_onQuestsOperation;
+#if !DISABLE_CUSTOM_CHARACTER_CURRENCIES
             // Currencies
             _entity.onCurrenciesOperation += _entity_onCurrenciesOperation;
+#endif
+#if !DISABLE_CUSTOM_CHARACTER_DATA
             // Server Bools
             _entity.onServerBoolsOperation += _entity_onServerBoolsOperation;
             _entity.onServerIntsOperation += _entity_onServerIntsOperation;
@@ -61,6 +66,7 @@ namespace MultiplayerARPG.MMO
             _entity.onPublicBoolsOperation += _entity_onPublicBoolsOperation;
             _entity.onPublicIntsOperation += _entity_onPublicIntsOperation;
             _entity.onPublicFloatsOperation += _entity_onPublicFloatsOperation;
+#endif
             // Mount
             _entity.onMountChange += _entity_onMountChange;
         }
@@ -72,10 +78,12 @@ namespace MultiplayerARPG.MMO
 
         private void OnDestroy()
         {
+#if !DISABLE_CLASSIC_PK
             // Pk
             _entity.onIsPkOnChange -= _entity_onIsPkOnChange;
             _entity.onPkPointChange -= _entity_onPkPointChange;
             _entity.onConsecutivePkKillsChange -= _entity_onConsecutivePkKillsChange;
+#endif
             // Selectable Weapon Sets
             _entity.onSelectableWeaponSetsOperation -= _entity_onSelectableWeaponSetsOperation;
             // Attributes
@@ -96,8 +104,11 @@ namespace MultiplayerARPG.MMO
             _entity.onHotkeysOperation -= _entity_onHotkeysOperation;
             // Quests
             _entity.onQuestsOperation -= _entity_onQuestsOperation;
+#if !DISABLE_CUSTOM_CHARACTER_CURRENCIES
             // Currencies
             _entity.onCurrenciesOperation -= _entity_onCurrenciesOperation;
+#endif
+#if !DISABLE_CUSTOM_CHARACTER_DATA
             // Server Bools
             _entity.onServerBoolsOperation -= _entity_onServerBoolsOperation;
             _entity.onServerIntsOperation -= _entity_onServerIntsOperation;
@@ -110,6 +121,7 @@ namespace MultiplayerARPG.MMO
             _entity.onPublicBoolsOperation -= _entity_onPublicBoolsOperation;
             _entity.onPublicIntsOperation -= _entity_onPublicIntsOperation;
             _entity.onPublicFloatsOperation -= _entity_onPublicFloatsOperation;
+#endif
             // Mount
             _entity.onMountChange -= _entity_onMountChange;
         }
@@ -249,11 +261,13 @@ namespace MultiplayerARPG.MMO
                 _updateState |= TransactionUpdateCharacterState.Character;
             }
 
+#if !DISABLE_DIFFER_MAP_RESPAWNING
             if (Vector3.Distance(_dirtyRespawnPosition, _entity.RespawnPosition) > POSITION_CHANGE_THRESHOLD)
             {
                 _dirtyRespawnPosition = _entity.RespawnPosition;
                 _updateState |= TransactionUpdateCharacterState.Character;
             }
+#endif
 
             if (_updateState != TransactionUpdateCharacterState.None &&
                 Time.unscaledTime - _lastSavedTime > SAVE_DELAY)
