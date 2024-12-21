@@ -191,6 +191,7 @@ namespace MultiplayerARPG.MMO
             _loadingStorageIds.Clear();
             _loadingPartyIds.Clear();
             _loadingGuildIds.Clear();
+            savingStorageIds.Clear();
             savingCharacters.Clear();
             savingBuildings.Clear();
             _connectionsByUserId.Clear();
