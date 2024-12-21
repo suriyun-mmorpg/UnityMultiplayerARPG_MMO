@@ -121,7 +121,7 @@ namespace MultiplayerARPG.MMO
             List<CharacterItem> protectedStorageItems = null;
             if (state.Has(TransactionUpdateCharacterState.ProtectedStorageItems))
             {
-                playerStorageItems = new List<CharacterItem>(
+                protectedStorageItems = new List<CharacterItem>(
                     ServerStorageHandlers.GetStorageItems(
                         new StorageId(StorageType.Protected, savingCharacterData.UserId)));
             }
