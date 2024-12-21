@@ -11,8 +11,9 @@ namespace MultiplayerARPG.MMO
         public void Update(StorageId storageId, IList<CharacterItem> storageItems)
         {
             _storageId = storageId;
+            _storageItems?.Clear();
             _storageItems = null;
-            if (_storageItems == null)
+            if (storageItems == null)
                 return;
             _storageItems = new List<CharacterItem>(storageItems);
         }
