@@ -104,7 +104,6 @@ namespace MultiplayerARPG.MMO
         internal readonly ConcurrentHashSet<StorageId> savingStorageIds = new ConcurrentHashSet<StorageId>();
         internal readonly ConcurrentHashSet<string> savingCharacters = new ConcurrentHashSet<string>();
         internal readonly ConcurrentHashSet<string> savingBuildings = new ConcurrentHashSet<string>();
-        internal readonly ConcurrentHashSet<StorageId> pendingSaveStorageIds = new ConcurrentHashSet<StorageId>();
         internal readonly ConcurrentHashSet<string> cancellingReserveStorageCharacterIds = new ConcurrentHashSet<string>();
 #endif
 

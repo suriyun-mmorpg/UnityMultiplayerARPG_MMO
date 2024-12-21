@@ -48,14 +48,6 @@ namespace MultiplayerARPG.MMO
                 _updateState |= TransactionUpdateBuildingState.Building;
             }
 
-            StorageId storageId;
-            storageId = new StorageId(StorageType.Building, _entity.Id);
-            if (mapNetworkManager.pendingSaveStorageIds.Contains(storageId))
-            {
-                mapNetworkManager.pendingSaveStorageIds.TryRemove(storageId);
-                mapNetworkManager.DataUpdater.EnqueueStorageItemsSave(storageId, GameInstance.ServerStorageHandlers.GetStorageItems(storageId));
-            }
-
             if (_updateState != TransactionUpdateBuildingState.None &&
                 Time.unscaledTime - _lastSavedTime > SAVE_DELAY)
             {

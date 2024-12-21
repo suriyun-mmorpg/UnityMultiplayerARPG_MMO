@@ -131,7 +131,6 @@ namespace MultiplayerARPG.MMO
             playerCharacter.SelectableWeaponSets = applyingPlayerCharacter.SelectableWeaponSets;
             GameInstance.ServerStorageHandlers.SetStorageItems(storageId, storageItems);
             GameInstance.ServerStorageHandlers.NotifyStorageItemsUpdated(request.storageType, request.storageOwnerId);
-            SetStorageSavePending(storageId, true);
             result.InvokeSuccess(new ResponseMoveItemFromStorageMessage());
 #endif
             return default;
@@ -201,7 +200,6 @@ namespace MultiplayerARPG.MMO
             playerCharacter.SelectableWeaponSets = applyingPlayerCharacter.SelectableWeaponSets;
             GameInstance.ServerStorageHandlers.SetStorageItems(storageId, storageItems);
             GameInstance.ServerStorageHandlers.NotifyStorageItemsUpdated(request.storageType, request.storageOwnerId);
-            SetStorageSavePending(storageId, true);
             result.InvokeSuccess(new ResponseMoveItemToStorageMessage());
 #endif
             return default;
@@ -256,23 +254,9 @@ namespace MultiplayerARPG.MMO
 
             GameInstance.ServerStorageHandlers.SetStorageItems(storageId, storageItems);
             GameInstance.ServerStorageHandlers.NotifyStorageItemsUpdated(request.storageType, request.storageOwnerId);
-            SetStorageSavePending(storageId, true);
             result.InvokeSuccess(new ResponseSwapOrMergeStorageItemMessage());
 #endif
             return default;
-        }
-
-        private void SetStorageSavePending(StorageId storageId, bool isSavePending)
-        {
-#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-            if (storageId.storageType == StorageType.Guild)
-                return;
-
-            if (isSavePending)
-                MMOServerInstance.Singleton.MapNetworkManager.pendingSaveStorageIds.Add(storageId);
-            else
-                MMOServerInstance.Singleton.MapNetworkManager.pendingSaveStorageIds.TryRemove(storageId);
-#endif
         }
     }
 }

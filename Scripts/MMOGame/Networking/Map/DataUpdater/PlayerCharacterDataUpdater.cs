@@ -274,21 +274,6 @@ namespace MultiplayerARPG.MMO
             }
 #endif
 
-            StorageId storageId;
-            storageId = new StorageId(StorageType.Player, _entity.UserId);
-            if (mapNetworkManager.pendingSaveStorageIds.Contains(storageId))
-            {
-                mapNetworkManager.pendingSaveStorageIds.TryRemove(storageId);
-                mapNetworkManager.DataUpdater.EnqueueStorageItemsSave(storageId, GameInstance.ServerStorageHandlers.GetStorageItems(storageId));
-            }
-
-            storageId = new StorageId(StorageType.Protected, _entity.Id);
-            if (mapNetworkManager.pendingSaveStorageIds.Contains(storageId))
-            {
-                mapNetworkManager.pendingSaveStorageIds.TryRemove(storageId);
-                mapNetworkManager.DataUpdater.EnqueueStorageItemsSave(storageId, GameInstance.ServerStorageHandlers.GetStorageItems(storageId));
-            }
-
             if (_updateState != TransactionUpdateCharacterState.None &&
                 Time.unscaledTime - _lastSavedTime > SAVE_DELAY)
             {
