@@ -282,7 +282,7 @@ namespace MultiplayerARPG.MMO
                 _updateState |= TransactionUpdateCharacterState.PlayerStorageItems;
             }
 
-            storageId = new StorageId(StorageType.Protected, _entity.UserId);
+            storageId = new StorageId(StorageType.Protected, _entity.Id);
             if (mapNetworkManager.pendingSaveStorageIds.Contains(storageId))
             {
                 mapNetworkManager.pendingSaveStorageIds.TryRemove(storageId);

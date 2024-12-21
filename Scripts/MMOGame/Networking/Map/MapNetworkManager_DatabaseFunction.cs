@@ -123,7 +123,7 @@ namespace MultiplayerARPG.MMO
             {
                 protectedStorageItems = new List<CharacterItem>(
                     ServerStorageHandlers.GetStorageItems(
-                        new StorageId(StorageType.Protected, savingCharacterData.UserId)));
+                        new StorageId(StorageType.Protected, savingCharacterData.Id)));
             }
             // Prepare summon buffs
             List<CharacterBuff> summonBuffs = new List<CharacterBuff>();
