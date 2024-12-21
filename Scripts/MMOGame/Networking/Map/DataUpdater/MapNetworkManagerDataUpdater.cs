@@ -7,11 +7,20 @@ namespace MultiplayerARPG.MMO
 {
     public class MapNetworkManagerDataUpdater : MonoBehaviour
     {
+        internal static readonly HashSet<BuildingDataUpdater> BuildingDataUpdaters = new HashSet<BuildingDataUpdater>();
+        internal static readonly HashSet<PlayerCharacterDataUpdater> PlayerCharacterDataUpdaters = new HashSet<PlayerCharacterDataUpdater>();
         private ConcurrentDictionary<StorageId, StorageItemsUpdateData> _storageItemsUpdateDict = new ConcurrentDictionary<StorageId, StorageItemsUpdateData>();
         private ConcurrentDictionary<string, BuildingUpdateData> _buildingUpdateDataDict = new ConcurrentDictionary<string, BuildingUpdateData>();
         private ConcurrentDictionary<string, PlayerCharacterUpdateData> _playerCharacterUpdateDataDict = new ConcurrentDictionary<string, PlayerCharacterUpdateData>();
-        public MapNetworkManager Manager { get; set; }
+        public MapNetworkManager Manager { get; internal set; }
+        [SerializeField]
+        private float buildingSaveInterval = 5f;
+        [SerializeField]
+        private float playerCharacterSaveInterval = 1f;
+
         private bool _updating = false;
+        private float _lastBuildingUpdateTime;
+        private float _lastPlayerCharacterUpdateTime;
 
         public void Clean()
         {
@@ -63,6 +72,26 @@ namespace MultiplayerARPG.MMO
             if (_updating)
                 return;
             _updating = true;
+
+            float currentTime = Time.unscaledTime;
+            if (currentTime - _lastBuildingUpdateTime > buildingSaveInterval)
+            {
+                _lastBuildingUpdateTime = currentTime;
+                foreach (var updater in BuildingDataUpdaters)
+                {
+                    updater.EnqueueBuildingSave(this);
+                }
+            }
+
+            if (currentTime - _lastPlayerCharacterUpdateTime > playerCharacterSaveInterval)
+            {
+                _lastPlayerCharacterUpdateTime = currentTime;
+                foreach (var updater in PlayerCharacterDataUpdaters)
+                {
+                    updater.EnqueuePlayerCharacterSave(this);
+                }
+            }
+
             List<UniTask<bool>> tasks = new List<UniTask<bool>>();
             foreach (var storageItemsUpdaterData in _storageItemsUpdateDict.Values)
             {

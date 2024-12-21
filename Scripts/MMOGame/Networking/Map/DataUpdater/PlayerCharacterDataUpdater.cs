@@ -9,9 +9,7 @@ namespace MultiplayerARPG.MMO
     {
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         public const float POSITION_CHANGE_THRESHOLD = 0.5f;
-        public const int SAVE_DELAY = 1;
 
-        private float _lastSavedTime;
         private BasePlayerCharacterEntity _entity;
         private TransactionUpdateCharacterState _updateState;
         // Combined hash
@@ -70,11 +68,8 @@ namespace MultiplayerARPG.MMO
 #endif
             // Mount
             _entity.onMountChange += _entity_onMountChange;
-        }
-
-        private void Start()
-        {
-            _lastSavedTime = Time.unscaledTime;
+            // Register the updater to call for update later
+            MapNetworkManagerDataUpdater.PlayerCharacterDataUpdaters.Add(this);
         }
 
         private void OnDestroy()
@@ -125,6 +120,8 @@ namespace MultiplayerARPG.MMO
 #endif
             // Mount
             _entity.onMountChange -= _entity_onMountChange;
+            // Register the updater to call for update later
+            MapNetworkManagerDataUpdater.PlayerCharacterDataUpdaters.Remove(this);
         }
 
         private void _entity_onIsPkOnChange(bool obj)
@@ -247,12 +244,8 @@ namespace MultiplayerARPG.MMO
             _updateState |= TransactionUpdateCharacterState.Mount;
         }
 
-        private void Update()
+        internal void EnqueuePlayerCharacterSave(MapNetworkManagerDataUpdater updater)
         {
-            MapNetworkManager mapNetworkManager = BaseGameNetworkManager.Singleton as MapNetworkManager;
-            if (!mapNetworkManager)
-                return;
-
             int combinedHash = GetCombinedHashCode();
             if (_dirtyCombinedHash != combinedHash)
             {
@@ -274,11 +267,9 @@ namespace MultiplayerARPG.MMO
             }
 #endif
 
-            if (_updateState != TransactionUpdateCharacterState.None &&
-                Time.unscaledTime - _lastSavedTime > SAVE_DELAY)
+            if (_updateState != TransactionUpdateCharacterState.None)
             {
-                _lastSavedTime = Time.unscaledTime;
-                mapNetworkManager.DataUpdater.EnqueuePlayerCharacterSave(_updateState, _entity);
+                updater.EnqueuePlayerCharacterSave(_updateState, _entity);
                 _updateState = TransactionUpdateCharacterState.None;
             }
         }

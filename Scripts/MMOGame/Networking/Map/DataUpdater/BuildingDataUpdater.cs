@@ -9,9 +9,7 @@ namespace MultiplayerARPG.MMO
     {
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         public const float POSITION_CHANGE_THRESHOLD = 0.5f;
-        public const int SAVE_DELAY = 1;
 
-        private float _lastSavedTime;
         private BuildingEntity _entity;
         private TransactionUpdateBuildingState _updateState;
         // Combined hash
@@ -22,19 +20,16 @@ namespace MultiplayerARPG.MMO
         private void Awake()
         {
             _entity = GetComponent<BuildingEntity>();
+            MapNetworkManagerDataUpdater.BuildingDataUpdaters.Add(this);
         }
 
-        private void Start()
+        private void OnDestroy()
         {
-            _lastSavedTime = Time.unscaledTime;
+            MapNetworkManagerDataUpdater.BuildingDataUpdaters.Remove(this);
         }
 
-        private void Update()
+        internal void EnqueueBuildingSave(MapNetworkManagerDataUpdater updater)
         {
-            MapNetworkManager mapNetworkManager = BaseGameNetworkManager.Singleton as MapNetworkManager;
-            if (!mapNetworkManager)
-                return;
-
             int combinedHash = GetCombinedHashCode();
             if (_dirtyCombinedHash != combinedHash)
             {
@@ -48,11 +43,9 @@ namespace MultiplayerARPG.MMO
                 _updateState |= TransactionUpdateBuildingState.Building;
             }
 
-            if (_updateState != TransactionUpdateBuildingState.None &&
-                Time.unscaledTime - _lastSavedTime > SAVE_DELAY)
+            if (_updateState != TransactionUpdateBuildingState.None)
             {
-                _lastSavedTime = Time.unscaledTime;
-                mapNetworkManager.DataUpdater.EnqueueBuildingSave(_updateState, _entity);
+                updater.EnqueueBuildingSave(_updateState, _entity);
                 _updateState = TransactionUpdateBuildingState.None;
             }
         }
