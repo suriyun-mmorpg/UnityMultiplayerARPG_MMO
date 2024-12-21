@@ -205,9 +205,10 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-        internal async UniTask<bool> WaitAndSaveCharacter(TransactionUpdateCharacterState state, PlayerCharacterData savingCharacterData, CancellationToken cancellationToken, byte retireAttempts = 30, int retireDelayMs = 100,
+        internal async UniTask<bool> WaitAndSaveCharacter(TransactionUpdateCharacterState state, PlayerCharacterData savingCharacterData, CancellationToken cancellationToken,
             bool changeMap = false, string mapName = "",
-            Vector3 position = default, bool overrideRotation = false, Vector3 rotation = default)
+            Vector3 position = default, bool overrideRotation = false, Vector3 rotation = default,
+            byte retireAttempts = 30, int retireDelayMs = 100)
         {
             int count = 0;
             while (!await SaveCharacter(state, savingCharacterData, changeMap, mapName, position, overrideRotation, rotation))
@@ -222,9 +223,10 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-        internal async UniTask<bool> WaitAndSaveCharacter(TransactionUpdateCharacterState state, PlayerCharacterData savingCharacterData, byte retireAttempts = 30, int retireDelayMs = 100,
+        internal async UniTask<bool> WaitAndSaveCharacter(TransactionUpdateCharacterState state, PlayerCharacterData savingCharacterData,
             bool changeMap = false, string mapName = "",
-            Vector3 position = default, bool overrideRotation = false, Vector3 rotation = default)
+            Vector3 position = default, bool overrideRotation = false, Vector3 rotation = default,
+            byte retireAttempts = 30, int retireDelayMs = 100)
         {
             int count = 0;
             while (!await SaveCharacter(state, savingCharacterData, changeMap, mapName, position, overrideRotation, rotation))
