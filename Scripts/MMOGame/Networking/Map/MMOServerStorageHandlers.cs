@@ -19,6 +19,11 @@ namespace MultiplayerARPG.MMO
         {
             get { return MMOServerInstance.Singleton.DatabaseClient; }
         }
+
+        public MapNetworkManager MapNetworkManager
+        {
+            get { return BaseGameNetworkManager.Singleton as MapNetworkManager; }
+        }
 #endif
 
         public async UniTaskVoid OpenStorage(long connectionId, IPlayerCharacterData playerCharacter, IActivatableEntity storageEntity, StorageId storageId)
@@ -89,14 +94,7 @@ namespace MultiplayerARPG.MMO
                 return;
             if (storageId.storageType == StorageType.Guild)
             {
-                DatabaseApiResult storageItemsResult = await DatabaseClient.UpdateStorageItemsAsync(new UpdateStorageItemsReq()
-                {
-                    StorageType = storageId.storageType,
-                    StorageOwnerId = storageId.storageOwnerId,
-                    StorageItems = GetStorageItems(storageId),
-                    DeleteStorageReservation = true,
-                });
-                if (!storageItemsResult.IsSuccess)
+                if (!await MapNetworkManager.WaitAndSaveStorage(storageId, GetStorageItems(storageId), true))
                 {
                     GameInstance.ServerGameMessageHandlers.SendGameMessage(connectionId, UITextKeys.UI_ERROR_CANNOT_UPDATE_STORAGE_ITEMS);
                     return;

@@ -279,21 +279,22 @@ namespace MultiplayerARPG.MMO
             if (mapNetworkManager.pendingSaveStorageIds.Contains(storageId))
             {
                 mapNetworkManager.pendingSaveStorageIds.TryRemove(storageId);
-                _updateState |= TransactionUpdateCharacterState.PlayerStorageItems;
+                mapNetworkManager.DataUpdater.EnqueueStorageItemsSave(storageId, GameInstance.ServerStorageHandlers.GetStorageItems(storageId));
             }
 
             storageId = new StorageId(StorageType.Protected, _entity.Id);
             if (mapNetworkManager.pendingSaveStorageIds.Contains(storageId))
             {
                 mapNetworkManager.pendingSaveStorageIds.TryRemove(storageId);
-                _updateState |= TransactionUpdateCharacterState.ProtectedStorageItems;
+                mapNetworkManager.DataUpdater.EnqueueStorageItemsSave(storageId, GameInstance.ServerStorageHandlers.GetStorageItems(storageId));
             }
 
             if (_updateState != TransactionUpdateCharacterState.None &&
                 Time.unscaledTime - _lastSavedTime > SAVE_DELAY)
             {
                 _lastSavedTime = Time.unscaledTime;
-                EnqueueSave(mapNetworkManager);
+                mapNetworkManager.DataUpdater.EnqueuePlayerCharacterSave(_updateState, _entity);
+                _updateState = TransactionUpdateCharacterState.None;
             }
         }
 
@@ -334,12 +335,6 @@ namespace MultiplayerARPG.MMO
             hash = System.HashCode.Combine(hash, _entity.LastUpdate);
             hash = System.HashCode.Combine(hash, _entity.Reputation);
             return hash;
-        }
-
-        public void EnqueueSave(MapNetworkManager mapNetworkManager)
-        {
-            mapNetworkManager.DataUpdater.EnqueuePlayerCharacterSave(_updateState, _entity);
-            _updateState = TransactionUpdateCharacterState.None;
         }
 #endif
     }

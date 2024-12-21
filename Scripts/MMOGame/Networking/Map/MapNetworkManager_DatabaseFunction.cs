@@ -95,6 +95,59 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
+
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+        internal async UniTask<bool> SaveStorage(StorageId storageId, List<CharacterItem> storageItems, bool deleteStorageReservation)
+        {
+            if (savingStorageIds.Contains(storageId))
+                return false;
+            savingStorageIds.Add(storageId);
+            // Update building
+            var updateResult = await DatabaseClient.UpdateStorageItemsAsync(new UpdateStorageItemsReq()
+            {
+                StorageType = storageId.storageType,
+                StorageOwnerId = storageId.storageOwnerId,
+                StorageItems = storageItems,
+                DeleteStorageReservation = deleteStorageReservation,
+            });
+            // Update done, clear pending status data
+            savingStorageIds.TryRemove(storageId);
+            if (LogDebug)
+                Logging.Log(LogTag, $"Storage [{storageId}] Saved, Success? {updateResult.IsSuccess}");
+            return updateResult.IsSuccess;
+        }
+#endif
+
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+        internal async UniTask<bool> WaitAndSaveStorage(StorageId storageId, List<CharacterItem> storageItems, bool deleteStorageReservation, CancellationToken cancellationToken, byte retireAttempts = 30, int retireDelayMs = 100)
+        {
+            int count = 0;
+            while (!await SaveStorage(storageId, storageItems, deleteStorageReservation))
+            {
+                count++;
+                if (count > retireAttempts)
+                    return false;
+                await UniTask.Delay(retireDelayMs, cancellationToken: cancellationToken);
+            }
+            return true;
+        }
+#endif
+
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+        internal async UniTask<bool> WaitAndSaveStorage(StorageId storageId, List<CharacterItem> storageItems, bool deleteStorageReservation, byte retireAttempts = 30, int retireDelayMs = 100)
+        {
+            int count = 0;
+            while (!await SaveStorage(storageId, storageItems, deleteStorageReservation))
+            {
+                count++;
+                if (count > retireAttempts)
+                    return false;
+                await UniTask.Delay(retireDelayMs);
+            }
+            return true;
+        }
+#endif
+
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         internal async UniTask<bool> SaveCharacter(TransactionUpdateCharacterState state, PlayerCharacterData savingCharacterData,
             bool changeMap = false, string mapName = "",
@@ -109,21 +162,6 @@ namespace MultiplayerARPG.MMO
                 savingCharacterData.CurrentPosition = position;
                 if (overrideRotation)
                     savingCharacterData.CurrentRotation = rotation;
-            }
-            // Prepare storage items
-            List<CharacterItem> playerStorageItems = null;
-            if (state.Has(TransactionUpdateCharacterState.PlayerStorageItems))
-            {
-                playerStorageItems = new List<CharacterItem>(
-                    ServerStorageHandlers.GetStorageItems(
-                        new StorageId(StorageType.Player, savingCharacterData.UserId)));
-            }
-            List<CharacterItem> protectedStorageItems = null;
-            if (state.Has(TransactionUpdateCharacterState.ProtectedStorageItems))
-            {
-                protectedStorageItems = new List<CharacterItem>(
-                    ServerStorageHandlers.GetStorageItems(
-                        new StorageId(StorageType.Protected, savingCharacterData.Id)));
             }
             // Prepare summon buffs
             List<CharacterBuff> summonBuffs = new List<CharacterBuff>();
@@ -156,8 +194,6 @@ namespace MultiplayerARPG.MMO
                 State = state,
                 CharacterData = savingCharacterData,
                 SummonBuffs = summonBuffs,
-                PlayerStorageItems = playerStorageItems,
-                ProtectedStorageItems = protectedStorageItems,
                 DeleteStorageReservation = cancellingReserveStorageCharacterIds.Contains(savingCharacterData.Id),
             });
             cancellingReserveStorageCharacterIds.TryRemove(savingCharacterData.Id);
@@ -169,26 +205,36 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-        internal async UniTask WaitAndSaveCharacter(TransactionUpdateCharacterState state, PlayerCharacterData savingCharacterData, CancellationToken cancellationToken,
+        internal async UniTask<bool> WaitAndSaveCharacter(TransactionUpdateCharacterState state, PlayerCharacterData savingCharacterData, CancellationToken cancellationToken, byte retireAttempts = 30, int retireDelayMs = 100,
             bool changeMap = false, string mapName = "",
             Vector3 position = default, bool overrideRotation = false, Vector3 rotation = default)
         {
+            int count = 0;
             while (!await SaveCharacter(state, savingCharacterData, changeMap, mapName, position, overrideRotation, rotation))
             {
-                await UniTask.Delay(100, cancellationToken: cancellationToken);
+                count++;
+                if (count > retireAttempts)
+                    return false;
+                await UniTask.Delay(retireDelayMs, cancellationToken: cancellationToken);
             }
+            return true;
         }
 #endif
 
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-        internal async UniTask WaitAndSaveCharacter(TransactionUpdateCharacterState state, PlayerCharacterData savingCharacterData,
+        internal async UniTask<bool> WaitAndSaveCharacter(TransactionUpdateCharacterState state, PlayerCharacterData savingCharacterData, byte retireAttempts = 30, int retireDelayMs = 100,
             bool changeMap = false, string mapName = "",
             Vector3 position = default, bool overrideRotation = false, Vector3 rotation = default)
         {
+            int count = 0;
             while (!await SaveCharacter(state, savingCharacterData, changeMap, mapName, position, overrideRotation, rotation))
             {
-                await UniTask.Delay(100);
+                count++;
+                if (count > retireAttempts)
+                    return false;
+                await UniTask.Delay(retireDelayMs);
             }
+            return true;
         }
 #endif
 
@@ -197,14 +243,6 @@ namespace MultiplayerARPG.MMO
         {
             if (savingBuildings.Contains(savingBuildingData.Id))
                 return false;
-            // Prepare storage items
-            List<CharacterItem> storageItems = null;
-            if (state.Has(TransactionUpdateBuildingState.StorageItems))
-            {
-                storageItems = new List<CharacterItem>(
-                    ServerStorageHandlers.GetStorageItems(
-                        new StorageId(StorageType.Building, savingBuildingData.Id)));
-            }
             savingBuildings.Add(savingBuildingData.Id);
             // Update building
             var updateResult = await DatabaseClient.UpdateBuildingAsync(new UpdateBuildingReq()
@@ -213,7 +251,6 @@ namespace MultiplayerARPG.MMO
                 ChannelId = ChannelId,
                 MapName = CurrentMapInfo.Id,
                 BuildingData = savingBuildingData,
-                StorageItems = storageItems,
             });
             // Update done, clear pending status data
             savingBuildings.TryRemove(savingBuildingData.Id);
@@ -224,22 +261,32 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-        internal async UniTask WaitAndSaveBuilding(TransactionUpdateBuildingState state, BuildingSaveData savingBuildingData, CancellationToken cancellationToken)
+        internal async UniTask<bool> WaitAndSaveBuilding(TransactionUpdateBuildingState state, BuildingSaveData savingBuildingData, CancellationToken cancellationToken, byte retireAttempts = 30, int retireDelayMs = 100)
         {
+            int count = 0;
             while (!await SaveBuilding(state, savingBuildingData))
             {
-                await UniTask.Delay(100, cancellationToken: cancellationToken);
+                count++;
+                if (count > retireAttempts)
+                    return false;
+                await UniTask.Delay(retireDelayMs, cancellationToken: cancellationToken);
             }
+            return true;
         }
 #endif
 
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-        internal async UniTask WaitAndSaveBuilding(TransactionUpdateBuildingState state, BuildingSaveData savingBuildingData)
+        internal async UniTask<bool> WaitAndSaveBuilding(TransactionUpdateBuildingState state, BuildingSaveData savingBuildingData, byte retireAttempts = 30, int retireDelayMs = 100)
         {
+            int count = 0;
             while (!await SaveBuilding(state, savingBuildingData))
             {
-                await UniTask.Delay(100);
+                count++;
+                if (count > retireAttempts)
+                    return false;
+                await UniTask.Delay(retireDelayMs);
             }
+            return true;
         }
 #endif
 
