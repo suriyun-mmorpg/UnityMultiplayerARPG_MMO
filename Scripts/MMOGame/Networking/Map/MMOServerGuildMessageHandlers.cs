@@ -870,6 +870,7 @@ namespace MultiplayerARPG.MMO
                     {
                         message = UITextKeys.UI_ERROR_GUILD_MEMBER_REACHED_LIMIT,
                     });
+                    return;
                 }
                 // Add guild member to database
                 playerCharacter.GuildId = request.guildId;
