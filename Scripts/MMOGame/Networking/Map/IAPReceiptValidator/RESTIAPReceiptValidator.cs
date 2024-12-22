@@ -1,11 +1,10 @@
 using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
-using UnityEngine;
 using UnityRestClient;
 
 namespace MultiplayerARPG.MMO
 {
-    public class RESTIAPReceiptValidator : MonoBehaviour, IIAPReceiptValidator
+    public class RESTIAPReceiptValidator : RestClient, IIAPReceiptValidator
     {
         public string apiUrl = "http://localhost:9802";
         public string secretKey = "secret";
@@ -19,7 +18,7 @@ namespace MultiplayerARPG.MMO
                 { "receipt", receipt },
                 { "packageId", cashPackage.Id },
             };
-            RestClient.Result result = await RestClient.Post(RestClient.GetUrl(apiUrl, "/internal/iap-validate"), form, secretKey);
+            Result result = await Post(GetUrl(apiUrl, "/internal/iap-validate"), form, secretKey, ApiKeyAuthHeaderSettings);
             return new IAPReceiptValidateResult()
             {
                 IsSuccess = !result.IsError(),
