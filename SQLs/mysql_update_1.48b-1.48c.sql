@@ -1,6 +1,0 @@
-START TRANSACTION;
-
-ALTER TABLE `characteritem` ADD `equipSlotIndex` TINYINT UNSIGNED NOT NULL DEFAULT '0' AFTER `amount`;
-ALTER TABLE `characters` ADD `equipWeaponSet` TINYINT UNSIGNED NOT NULL DEFAULT '0' AFTER `currentWater`;
-
-COMMIT;

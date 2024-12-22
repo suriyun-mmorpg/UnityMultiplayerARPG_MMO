@@ -1,1 +1,0 @@
-ALTER TABLE `characteritem` ADD `durability` FLOAT NOT NULL AFTER `amount`;
