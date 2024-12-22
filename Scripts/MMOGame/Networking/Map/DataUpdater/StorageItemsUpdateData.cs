@@ -5,6 +5,7 @@ namespace MultiplayerARPG.MMO
 {
     public class StorageItemsUpdateData
     {
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         private StorageId _storageId;
         private List<CharacterItem> _storageItems;
 
@@ -25,15 +26,14 @@ namespace MultiplayerARPG.MMO
                 updater.StorageItemsDateSaved(_storageId);
                 return true;
             }
-#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             if (await updater.Manager.SaveStorage(_storageId, _storageItems, false))
             {
                 updater.StorageItemsDateSaved(_storageId);
                 _storageItems = null;
                 return true;
             }
-#endif
             return false;
         }
+#endif
     }
 }

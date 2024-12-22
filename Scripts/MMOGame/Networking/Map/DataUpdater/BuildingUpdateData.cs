@@ -4,6 +4,7 @@ namespace MultiplayerARPG.MMO
 {
     public class BuildingUpdateData
     {
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         private TransactionUpdateBuildingState _updateState;
         public TransactionUpdateBuildingState UpdateState => _updateState;
         private BuildingSaveData _buildingSaveData;
@@ -25,7 +26,6 @@ namespace MultiplayerARPG.MMO
                 updater.BuildingDataSaved(_buildingSaveData.Id);
                 return true;
             }
-#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             if (await updater.Manager.SaveBuilding(_updateState, _buildingSaveData))
             {
                 updater.BuildingDataSaved(_buildingSaveData.Id);
@@ -33,8 +33,8 @@ namespace MultiplayerARPG.MMO
                 _buildingSaveData = null;
                 return true;
             }
-#endif
             return false;
         }
+#endif
     }
 }

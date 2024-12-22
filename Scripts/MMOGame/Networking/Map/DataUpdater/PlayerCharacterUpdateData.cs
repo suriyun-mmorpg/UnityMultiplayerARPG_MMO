@@ -4,6 +4,7 @@ namespace MultiplayerARPG.MMO
 {
     public class PlayerCharacterUpdateData
     {
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         public TransactionUpdateCharacterState _updateState;
         public PlayerCharacterData _playerCharacterData;
 
@@ -23,7 +24,6 @@ namespace MultiplayerARPG.MMO
                 updater.PlayerCharacterDataSaved(_playerCharacterData.Id);
                 return true;
             }
-#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             if (await updater.Manager.SaveCharacter(_updateState, _playerCharacterData))
             {
                 updater.PlayerCharacterDataSaved(_playerCharacterData.Id);
@@ -31,8 +31,8 @@ namespace MultiplayerARPG.MMO
                 _playerCharacterData = null;
                 return true;
             }
-#endif
             return false;
         }
+#endif
     }
 }

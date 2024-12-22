@@ -7,16 +7,18 @@ namespace MultiplayerARPG.MMO
 {
     public class MapNetworkManagerDataUpdater : MonoBehaviour
     {
+        [SerializeField]
+        private float buildingSaveInterval = 5f;
+        [SerializeField]
+        private float playerCharacterSaveInterval = 1f;
+
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         internal static readonly HashSet<BuildingDataUpdater> BuildingDataUpdaters = new HashSet<BuildingDataUpdater>();
         internal static readonly HashSet<PlayerCharacterDataUpdater> PlayerCharacterDataUpdaters = new HashSet<PlayerCharacterDataUpdater>();
         private ConcurrentDictionary<StorageId, StorageItemsUpdateData> _storageItemsUpdateDict = new ConcurrentDictionary<StorageId, StorageItemsUpdateData>();
         private ConcurrentDictionary<string, BuildingUpdateData> _buildingUpdateDataDict = new ConcurrentDictionary<string, BuildingUpdateData>();
         private ConcurrentDictionary<string, PlayerCharacterUpdateData> _playerCharacterUpdateDataDict = new ConcurrentDictionary<string, PlayerCharacterUpdateData>();
         public MapNetworkManager Manager { get; internal set; }
-        [SerializeField]
-        private float buildingSaveInterval = 5f;
-        [SerializeField]
-        private float playerCharacterSaveInterval = 1f;
 
         private bool _updating = false;
         private float _lastBuildingUpdateTime;
@@ -126,5 +128,6 @@ namespace MultiplayerARPG.MMO
         {
             _playerCharacterUpdateDataDict.TryRemove(id, out _);
         }
+#endif
     }
 }
