@@ -129,6 +129,22 @@ CREATE TABLE `characteritem` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `charactermount`
+--
+
+CREATE TABLE `charactermount` (
+  `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `type` tinyint(3) UNSIGNED NOT NULL DEFAULT 0,
+  `sourceId` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `mountRemainsDuration` float NOT NULL DEFAULT 0,
+  `level` int(11) NOT NULL DEFAULT 0,
+  `currentHp` int(11) NOT NULL DEFAULT 0,
+  `updateAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `characterquest`
 --
 
@@ -173,7 +189,7 @@ CREATE TABLE `characters` (
   `partyId` int(11) NOT NULL DEFAULT 0,
   `guildId` int(11) NOT NULL DEFAULT 0,
   `guildRole` int(11) NOT NULL DEFAULT 0,
-  `sharedGuildExp` int(11) NOT NULL DEFAULT 0,
+  `currentChannel` varchar(50) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
   `currentMapName` varchar(50) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
   `currentPositionX` float NOT NULL DEFAULT 0,
   `currentPositionY` float NOT NULL DEFAULT 0,
@@ -181,14 +197,15 @@ CREATE TABLE `characters` (
   `currentRotationX` float NOT NULL DEFAULT 0,
   `currentRotationY` float NOT NULL DEFAULT 0,
   `currentRotationZ` float NOT NULL DEFAULT 0,
+  `currentSafeArea` varchar(50) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
   `respawnMapName` varchar(50) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
   `respawnPositionX` float NOT NULL DEFAULT 0,
   `respawnPositionY` float NOT NULL DEFAULT 0,
   `respawnPositionZ` float NOT NULL DEFAULT 0,
-  `mountDataId` int(11) NOT NULL DEFAULT 0,
   `iconDataId` int(11) NOT NULL DEFAULT 0,
   `frameDataId` int(11) NOT NULL DEFAULT 0,
   `titleDataId` int(11) NOT NULL DEFAULT 0,
+  `reputation` int(11) NOT NULL DEFAULT 0,
   `lastDeadTime` bigint(20) NOT NULL DEFAULT 0,
   `unmuteTime` bigint(20) NOT NULL DEFAULT 0,
   `createAt` timestamp NOT NULL DEFAULT current_timestamp(),
@@ -237,6 +254,7 @@ CREATE TABLE `charactersummon` (
   `id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `characterId` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `type` tinyint(3) UNSIGNED NOT NULL DEFAULT 0,
+  `sourceId` varchar(50) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
   `dataId` int(11) NOT NULL DEFAULT 0,
   `summonRemainsDuration` float NOT NULL DEFAULT 0,
   `level` int(11) NOT NULL DEFAULT 0,
@@ -582,7 +600,7 @@ CREATE TABLE `userlogin` (
   `email` varchar(50) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
   `isEmailVerified` tinyint(1) NOT NULL DEFAULT 0,
   `authType` tinyint(3) UNSIGNED NOT NULL DEFAULT 1,
-  `accessToken` varchar(36) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  `accessToken` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
   `userLevel` tinyint(3) UNSIGNED NOT NULL DEFAULT 0,
   `unbanTime` bigint(20) NOT NULL DEFAULT 0,
   `createAt` timestamp NOT NULL DEFAULT current_timestamp(),
@@ -628,7 +646,10 @@ INSERT INTO `__migrations` (`migrationId`) VALUES
 ('1.82'),
 ('1.84'),
 ('1.85'),
-('1.88');
+('1.88'),
+('1.90'),
+('1.90b'),
+('1.91');
 
 --
 -- Indexes for dumped tables
@@ -677,6 +698,12 @@ ALTER TABLE `characteritem`
   ADD KEY `idx` (`idx`),
   ADD KEY `inventoryType` (`inventoryType`),
   ADD KEY `characterId` (`characterId`);
+
+--
+-- Indexes for table `charactermount`
+--
+ALTER TABLE `charactermount`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `characterquest`
