@@ -50,9 +50,12 @@ namespace MultiplayerARPG.MMO
                 if (IsInstanceMap() || despawnImmediately)
                 {
                     // Destroy character from server
-                    if (playerCharacterEntity.TryGetComponent(out PlayerCharacterDataUpdater updater))
-                        Destroy(updater);
-                    playerCharacterEntity.NetworkDestroy();
+                    if (playerCharacterEntity != null)
+                    {
+                        if (playerCharacterEntity.TryGetComponent(out PlayerCharacterDataUpdater updater))
+                            Destroy(updater);
+                        playerCharacterEntity.NetworkDestroy();
+                    }
                     _despawningPlayerCharacterEntities.TryRemove(id, out _);
 
                     RemoveDespawningCancellation(id);
@@ -63,14 +66,14 @@ namespace MultiplayerARPG.MMO
                 try
                 {
                     await UniTask.Delay(playerCharacterDespawnMillisecondsDelay, true, PlayerLoopTiming.Update, cancellationTokenSource.Token);
-
-                    // Save the characer
-                    if (playerCharacterEntity.TryGetComponent(out PlayerCharacterDataUpdater updater))
-                        Destroy(updater);
-                    await WaitAndSaveCharacter(TransactionUpdateCharacterState.All, playerCharacterEntity.CloneTo(new PlayerCharacterData()), cancellationTokenSource.Token);
-
                     // Destroy character from server
-                    playerCharacterEntity.NetworkDestroy();
+                    if (playerCharacterEntity != null)
+                    {
+                        if (playerCharacterEntity.TryGetComponent(out PlayerCharacterDataUpdater updater))
+                            Destroy(updater);
+                        await WaitAndSaveCharacter(TransactionUpdateCharacterState.All, playerCharacterEntity.CloneTo(new PlayerCharacterData()), cancellationTokenSource.Token);
+                        playerCharacterEntity.NetworkDestroy();
+                    }
                     _despawningPlayerCharacterEntities.TryRemove(id, out _);
                 }
                 catch (System.OperationCanceledException)
