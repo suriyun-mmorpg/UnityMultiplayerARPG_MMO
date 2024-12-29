@@ -1,4 +1,5 @@
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using System.IO;
 using UnityEngine;
 
@@ -41,7 +42,15 @@ namespace MultiplayerARPG.MMO
             Debug.Log("Not found server config file, creating a new one.");
             if (!Directory.Exists(configFolder))
                 Directory.CreateDirectory(configFolder);
-            File.WriteAllText(configFilePath, JsonConvert.SerializeObject(writingConfig, Formatting.Indented));
+            try
+            {
+                File.WriteAllText(configFilePath, JsonConvert.SerializeObject(writingConfig, Formatting.Indented));
+                Debug.Log($"Server config file written to {configFilePath}");
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogError($"Unable to create a new config file, {ex}");
+            }
         }
 
         public static bool HasClientConfig()
