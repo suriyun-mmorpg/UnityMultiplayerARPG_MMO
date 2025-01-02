@@ -814,14 +814,21 @@ namespace MultiplayerARPG.MMO
                 }
             }
             // Character muted?
-            if (!message.sendByServer && playerCharacter != null && playerCharacter.IsMuting())
+            if (!message.sendByServer && playerCharacter != null)
             {
-                ServerSendPacket(messageHandler.ConnectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, new ChatMessage()
+                if (playerCharacter.IsMuting())
                 {
-                    channel = ChatChannel.System,
-                    message = "You have been muted.",
-                });
-                return;
+                    if (ServerUserHandlers.TryGetConnectionId(playerCharacter.Id, out long connectionId))
+                        ServerGameMessageHandlers.SendGameMessage(connectionId, UITextKeys.UI_ERROR_CHAT_MUTED);
+                    return;
+                }
+                if (ServerChatHandlers.ChatTooFast(playerCharacter.Id))
+                {
+                    ServerChatHandlers.ChatFlooded(playerCharacter.Id);
+                    if (ServerUserHandlers.TryGetConnectionId(playerCharacter.Id, out long connectionId))
+                        ServerGameMessageHandlers.SendGameMessage(connectionId, UITextKeys.UI_ERROR_CHAT_ENTER_TOO_FAST);
+                    return;
+                }
             }
             // Send GM command
             if (message.sendByServer || (playerCharacter is BasePlayerCharacterEntity playerCharacterEntity &&
