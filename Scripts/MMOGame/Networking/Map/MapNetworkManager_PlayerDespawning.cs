@@ -54,6 +54,7 @@ namespace MultiplayerARPG.MMO
                     {
                         if (playerCharacterEntity.TryGetComponent(out PlayerCharacterDataUpdater updater))
                             Destroy(updater);
+                        DataUpdater.PlayerCharacterDataSaved(playerCharacterEntity.Id);
                         playerCharacterEntity.NetworkDestroy();
                     }
                     _despawningPlayerCharacterEntities.TryRemove(id, out _);
@@ -71,6 +72,7 @@ namespace MultiplayerARPG.MMO
                     {
                         if (playerCharacterEntity.TryGetComponent(out PlayerCharacterDataUpdater updater))
                             Destroy(updater);
+                        DataUpdater.PlayerCharacterDataSaved(playerCharacterEntity.Id);
                         await WaitAndSaveCharacter(TransactionUpdateCharacterState.All, playerCharacterEntity.CloneTo(new PlayerCharacterData()), cancellationTokenSource.Token);
                         playerCharacterEntity.NetworkDestroy();
                     }
@@ -141,6 +143,7 @@ namespace MultiplayerARPG.MMO
             // Save character before despawned
             if (playerCharacterEntity.TryGetComponent(out PlayerCharacterDataUpdater updater))
                 Destroy(updater);
+            DataUpdater.PlayerCharacterDataSaved(playerCharacterEntity.Id);
             await WaitAndSaveCharacter(TransactionUpdateCharacterState.All, playerCharacterEntity.CloneTo(new PlayerCharacterData()));
 
             // Despawn the character
