@@ -143,7 +143,9 @@ namespace MultiplayerARPG.MMO
                     StorageOwnerId = storageId.storageOwnerId,
                     StorageItems = storageItems,
                     CharacterId = applyingPlayerCharacter.Id,
-                    CharacterItems = new List<CharacterItem>(applyingPlayerCharacter.NonEquipItems),
+                    SelectableWeaponSets = new List<EquipWeapons>(applyingPlayerCharacter.SelectableWeaponSets),
+                    EquipItems = new List<CharacterItem>(applyingPlayerCharacter.EquipItems),
+                    NonEquipItems = new List<CharacterItem>(applyingPlayerCharacter.NonEquipItems),
                 });
                 if (updateResponse.IsError)
                 {
@@ -239,7 +241,9 @@ namespace MultiplayerARPG.MMO
                     StorageOwnerId = storageId.storageOwnerId,
                     StorageItems = storageItems,
                     CharacterId = applyingPlayerCharacter.Id,
-                    CharacterItems = new List<CharacterItem>(applyingPlayerCharacter.NonEquipItems),
+                    SelectableWeaponSets = new List<EquipWeapons>(applyingPlayerCharacter.SelectableWeaponSets),
+                    EquipItems = new List<CharacterItem>(applyingPlayerCharacter.EquipItems),
+                    NonEquipItems = new List<CharacterItem>(applyingPlayerCharacter.NonEquipItems),
                 });
                 if (updateResponse.IsError)
                 {
