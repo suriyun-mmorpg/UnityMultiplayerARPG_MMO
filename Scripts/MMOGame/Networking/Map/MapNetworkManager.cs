@@ -656,6 +656,10 @@ namespace MultiplayerARPG.MMO
                 if (ServerGuildHandlers.TryGetGuild(playerCharacterEntity.GuildId, out GuildData guild))
                 {
                     playerCharacterEntity.GuildRole = guild.GetMemberRole(playerCharacterEntity.Id);
+                    foreach (KeyValuePair<int, int> kv in guild.skillLevels)
+                    {
+                        playerCharacterEntity.GuildSkills.Add(CharacterSkill.Create(kv.Key, kv.Value));
+                    }
                     ServerGameMessageHandlers.SendSetFullGuildData(connectionId, guild);
                 }
                 else
