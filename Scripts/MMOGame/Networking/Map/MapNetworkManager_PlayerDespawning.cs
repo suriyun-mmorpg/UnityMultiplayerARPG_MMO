@@ -33,12 +33,12 @@ namespace MultiplayerARPG.MMO
                 movementState &= ~MovementState.Right;
                 movementState &= ~MovementState.Left;
                 playerCharacterEntity.KeyMovement(Vector3.zero, movementState);
-                string id = playerCharacterEntity.Id;
-                // Store despawning player character id, it will be used later if player not connect and continue playing the character
-                RemoveDespawningCancellation(id);
+                string userId = playerCharacterEntity.UserId;
+                // Store despawnin user id, it will be used later if player not connect and continue playing the character
+                RemoveDespawningCancellation(userId);
                 CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-                _despawningPlayerCharacterCancellations.TryAdd(id, cancellationTokenSource);
-                _despawningPlayerCharacterEntities.TryAdd(id, playerCharacterEntity);
+                _despawningPlayerCharacterCancellations.TryAdd(userId, cancellationTokenSource);
+                _despawningPlayerCharacterEntities.TryAdd(userId, playerCharacterEntity);
 
                 // Unregister player character
                 UnregisterPlayerCharacter(connectionId);
@@ -57,9 +57,9 @@ namespace MultiplayerARPG.MMO
                         DataUpdater.PlayerCharacterDataSaved(playerCharacterEntity.Id);
                         playerCharacterEntity.NetworkDestroy();
                     }
-                    _despawningPlayerCharacterEntities.TryRemove(id, out _);
+                    _despawningPlayerCharacterEntities.TryRemove(userId, out _);
 
-                    RemoveDespawningCancellation(id);
+                    RemoveDespawningCancellation(userId);
                     return;
                 }
 
@@ -67,7 +67,8 @@ namespace MultiplayerARPG.MMO
                 try
                 {
                     await UniTask.Delay(playerCharacterDespawnMillisecondsDelay, true, PlayerLoopTiming.Update, cancellationTokenSource.Token);
-                    // Destroy character from server
+
+                    // Save the characer
                     if (playerCharacterEntity != null)
                     {
                         if (playerCharacterEntity.TryGetComponent(out PlayerCharacterDataUpdater updater))
@@ -76,7 +77,7 @@ namespace MultiplayerARPG.MMO
                         await WaitAndSaveCharacter(TransactionUpdateCharacterState.All, playerCharacterEntity.CloneTo(new PlayerCharacterData()), cancellationTokenSource.Token);
                         playerCharacterEntity.NetworkDestroy();
                     }
-                    _despawningPlayerCharacterEntities.TryRemove(id, out _);
+                    _despawningPlayerCharacterEntities.TryRemove(userId, out _);
                 }
                 catch (System.OperationCanceledException)
                 {
@@ -89,7 +90,7 @@ namespace MultiplayerARPG.MMO
                 }
                 finally
                 {
-                    RemoveDespawningCancellation(id);
+                    RemoveDespawningCancellation(userId);
                 }
             }
             else
@@ -101,9 +102,9 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-        private void RemoveDespawningCancellation(string id)
+        private void RemoveDespawningCancellation(string userId)
         {
-            if (_despawningPlayerCharacterCancellations.TryRemove(id, out var cancellationTokenSource))
+            if (_despawningPlayerCharacterCancellations.TryRemove(userId, out var cancellationTokenSource))
             {
                 try
                 {
@@ -123,11 +124,11 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-        public async UniTask SaveAndDespawnPendingPlayerCharacter(string characterId)
+        public async UniTask SaveAndDespawnPendingPlayerCharacter(string userId)
         {
             // Find despawning character
-            if (!_despawningPlayerCharacterCancellations.TryGetValue(characterId, out CancellationTokenSource cancellationTokenSource) ||
-                !_despawningPlayerCharacterEntities.TryGetValue(characterId, out BasePlayerCharacterEntity playerCharacterEntity) ||
+            if (!_despawningPlayerCharacterCancellations.TryGetValue(userId, out CancellationTokenSource cancellationTokenSource) ||
+                !_despawningPlayerCharacterEntities.TryGetValue(userId, out BasePlayerCharacterEntity playerCharacterEntity) ||
                 cancellationTokenSource.IsCancellationRequested)
             {
                 // No despawning character
@@ -135,8 +136,8 @@ namespace MultiplayerARPG.MMO
             }
 
             // Cancel character despawning to despawning immediately
-            _despawningPlayerCharacterCancellations.TryRemove(characterId, out _);
-            _despawningPlayerCharacterEntities.TryRemove(characterId, out _);
+            _despawningPlayerCharacterCancellations.TryRemove(userId, out _);
+            _despawningPlayerCharacterEntities.TryRemove(userId, out _);
             cancellationTokenSource.Cancel();
             cancellationTokenSource.Dispose();
 
@@ -145,8 +146,6 @@ namespace MultiplayerARPG.MMO
                 Destroy(updater);
             DataUpdater.PlayerCharacterDataSaved(playerCharacterEntity.Id);
             await WaitAndSaveCharacter(TransactionUpdateCharacterState.All, playerCharacterEntity.CloneTo(new PlayerCharacterData()));
-
-            // Despawn the character
             playerCharacterEntity.NetworkDestroy();
         }
 #endif

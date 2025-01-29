@@ -434,7 +434,7 @@ namespace MultiplayerARPG.MMO
                 return false;
             }
 
-            await SaveAndDespawnPendingPlayerCharacter(selectCharacterId);
+            await SaveAndDespawnPendingPlayerCharacter(userId);
             // Unregister player
             UnregisterPlayerCharacter(connectionId);
             UnregisterUserId(connectionId);
@@ -926,7 +926,7 @@ namespace MultiplayerARPG.MMO
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         private async void OnPlayerCharacterRemoved(string userId, string characterId)
         {
-            await SaveAndDespawnPendingPlayerCharacter(characterId);
+            await SaveAndDespawnPendingPlayerCharacter(userId);
         }
 #endif
         #endregion
@@ -938,8 +938,8 @@ namespace MultiplayerARPG.MMO
             RequestProceedResultDelegate<EmptyMessage> result)
         {
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-            if (!string.IsNullOrEmpty(request.characterId))
-                await SaveAndDespawnPendingPlayerCharacter(request.characterId);
+            if (!string.IsNullOrEmpty(request.userId))
+                await SaveAndDespawnPendingPlayerCharacter(request.userId);
             // Always success, because it is just despawning player character, if it not found then it still can be determined that it was despawned
             result.InvokeSuccess(EmptyMessage.Value);
 #endif
