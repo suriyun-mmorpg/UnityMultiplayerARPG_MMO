@@ -101,5 +101,24 @@ namespace MultiplayerARPG.MMO
             playerCharacter.UserCash = playerCharacter.UserCash.Increase(cash);
         }
 #endif
+
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+        public override async UniTask<UITextKeys> DetectCharacterNameExistance(string characterName)
+        {
+            DatabaseApiResult<FindCharacterNameResp> findCharacterNameResp = await DatabaseClient.FindCharacterNameAsync(new FindCharacterNameReq()
+            {
+                CharacterName = characterName
+            });
+            if (!findCharacterNameResp.IsSuccess)
+            {
+                return UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR;
+            }
+            if (findCharacterNameResp.Response.FoundAmount > 0)
+            {
+                return UITextKeys.UI_ERROR_CHARACTER_NAME_EXISTED;
+            }
+            return UITextKeys.NONE;
+        }
+#endif
     }
 }
