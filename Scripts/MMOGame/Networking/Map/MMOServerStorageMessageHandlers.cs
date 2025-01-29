@@ -119,7 +119,9 @@ namespace MultiplayerARPG.MMO
 
             // Prepare storage data
             Storage storage = GameInstance.ServerStorageHandlers.GetStorage(storageId, out _);
+            bool isLimitWeight = storage.weightLimit > 0;
             bool isLimitSlot = storage.slotLimit > 0;
+            int weightLimit = storage.weightLimit;
             int slotLimit = storage.slotLimit;
             // Don't apply data to player character immediately, it should be saved properly before apply the data
             PlayerCharacterData applyingPlayerCharacter = new PlayerCharacterData();
@@ -129,7 +131,7 @@ namespace MultiplayerARPG.MMO
                 false, false, false, false, false);
             try
             {
-                if (!applyingPlayerCharacter.MoveItemFromStorage(storageId, isLimitSlot, slotLimit, storageItems, request.storageItemIndex, request.storageItemAmount, request.inventoryType, request.inventoryItemIndex, request.equipSlotIndexOrWeaponSet, out UITextKeys gameMessage))
+                if (!applyingPlayerCharacter.MoveItemFromStorage(storageId, isLimitWeight, weightLimit, isLimitSlot, slotLimit, storageItems, request.storageItemIndex, request.storageItemAmount, request.inventoryType, request.inventoryItemIndex, request.equipSlotIndexOrWeaponSet, out UITextKeys gameMessage))
                 {
                     result.InvokeError(new ResponseMoveItemFromStorageMessage()
                     {
