@@ -33,7 +33,7 @@ namespace MultiplayerARPG.MMO
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             if (!CanAccessStorage(playerCharacter, storageEntity, storageId, out UITextKeys errorMessage))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(connectionId, UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(connectionId, errorMessage);
                 return;
             }
             // Store storage usage states
@@ -208,7 +208,6 @@ namespace MultiplayerARPG.MMO
             if (!storageItems.ContainsKey(storageId))
                 storageItems.TryAdd(storageId, new List<CharacterItem>());
             storageItems[storageId] = items;
-            MapNetworkManager.DataUpdater.EnqueueStorageItemsSave(storageId, items);
 #endif
         }
 
