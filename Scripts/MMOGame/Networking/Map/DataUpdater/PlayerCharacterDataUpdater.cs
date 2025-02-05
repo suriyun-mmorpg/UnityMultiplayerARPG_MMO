@@ -1,3 +1,4 @@
+using LiteNetLibManager;
 using UnityEngine;
 
 namespace MultiplayerARPG.MMO
@@ -139,102 +140,102 @@ namespace MultiplayerARPG.MMO
             _updateState |= TransactionUpdateCharacterState.Pk;
         }
 
-        private void _entity_onAttributesOperation(LiteNetLibManager.LiteNetLibSyncList.Operation arg1, int arg2)
+        private void _entity_onAttributesOperation(LiteNetLibSyncListOp operation, int index, CharacterAttribute oldItem, CharacterAttribute newItem)
         {
             _updateState |= TransactionUpdateCharacterState.Attributes;
         }
 
-        private void _entity_onSkillsOperation(LiteNetLibManager.LiteNetLibSyncList.Operation arg1, int arg2)
+        private void _entity_onSkillsOperation(LiteNetLibSyncListOp operation, int index, CharacterSkill oldItem, CharacterSkill newItem)
         {
             _updateState |= TransactionUpdateCharacterState.Skills;
         }
 
-        private void _entity_onSkillUsagesOperation(LiteNetLibManager.LiteNetLibSyncList.Operation arg1, int arg2)
+        private void _entity_onSkillUsagesOperation(LiteNetLibSyncListOp operation, int index, CharacterSkillUsage oldItem, CharacterSkillUsage newItem)
         {
             _updateState |= TransactionUpdateCharacterState.SkillUsages;
         }
 
-        private void _entity_onBuffsOperation(LiteNetLibManager.LiteNetLibSyncList.Operation arg1, int arg2)
+        private void _entity_onBuffsOperation(LiteNetLibSyncListOp operation, int index, CharacterBuff oldItem, CharacterBuff newItem)
         {
             _updateState |= TransactionUpdateCharacterState.Buffs;
         }
 
-        private void _entity_onEquipItemsOperation(LiteNetLibManager.LiteNetLibSyncList.Operation arg1, int arg2)
+        private void _entity_onEquipItemsOperation(LiteNetLibSyncListOp operation, int index, CharacterItem oldItem, CharacterItem newItem)
         {
             _updateState |= TransactionUpdateCharacterState.Items;
         }
 
-        private void _entity_onNonEquipItemsOperation(LiteNetLibManager.LiteNetLibSyncList.Operation arg1, int arg2)
+        private void _entity_onNonEquipItemsOperation(LiteNetLibSyncListOp operation, int index, CharacterItem oldItem, CharacterItem newItem)
         {
             _updateState |= TransactionUpdateCharacterState.Items;
         }
 
-        private void _entity_onSelectableWeaponSetsOperation(LiteNetLibManager.LiteNetLibSyncList.Operation arg1, int arg2)
+        private void _entity_onSelectableWeaponSetsOperation(LiteNetLibSyncListOp operation, int index, EquipWeapons oldItem, EquipWeapons newItem)
         {
             _updateState |= TransactionUpdateCharacterState.Items;
         }
 
-        private void _entity_onSummonsOperation(LiteNetLibManager.LiteNetLibSyncList.Operation arg1, int arg2)
+        private void _entity_onSummonsOperation(LiteNetLibSyncListOp operation, int index, CharacterSummon oldItem, CharacterSummon newItem)
         {
             _updateState |= TransactionUpdateCharacterState.Summons;
         }
 
-        private void _entity_onHotkeysOperation(LiteNetLibManager.LiteNetLibSyncList.Operation arg1, int arg2)
+        private void _entity_onHotkeysOperation(LiteNetLibSyncListOp operation, int index, CharacterHotkey oldItem, CharacterHotkey newItem)
         {
             _updateState |= TransactionUpdateCharacterState.Hotkeys;
         }
 
-        private void _entity_onQuestsOperation(LiteNetLibManager.LiteNetLibSyncList.Operation arg1, int arg2)
+        private void _entity_onQuestsOperation(LiteNetLibSyncListOp operation, int index, CharacterQuest oldItem, CharacterQuest newItem)
         {
             _updateState |= TransactionUpdateCharacterState.Quests;
         }
 
-        private void _entity_onCurrenciesOperation(LiteNetLibManager.LiteNetLibSyncList.Operation arg1, int arg2)
+        private void _entity_onCurrenciesOperation(LiteNetLibSyncListOp operation, int index, CharacterCurrency oldItem, CharacterCurrency newItem)
         {
             _updateState |= TransactionUpdateCharacterState.Currencies;
         }
 
-        private void _entity_onServerBoolsOperation(NotifiableCollection.NotifiableListAction arg1, int arg2)
+        private void _entity_onServerBoolsOperation(NotifiableCollection.NotifiableListAction operation, int index, CharacterDataBoolean oldItem, CharacterDataBoolean newItem)
         {
             _updateState |= TransactionUpdateCharacterState.ServerCustomData;
         }
 
-        private void _entity_onServerIntsOperation(NotifiableCollection.NotifiableListAction arg1, int arg2)
+        private void _entity_onServerIntsOperation(NotifiableCollection.NotifiableListAction operation, int index, CharacterDataInt32 oldItem, CharacterDataInt32 newItem)
         {
             _updateState |= TransactionUpdateCharacterState.ServerCustomData;
         }
 
-        private void _entity_onServerFloatsOperation(NotifiableCollection.NotifiableListAction arg1, int arg2)
+        private void _entity_onServerFloatsOperation(NotifiableCollection.NotifiableListAction operation, int index, CharacterDataFloat32 oldItem, CharacterDataFloat32 newItem)
         {
             _updateState |= TransactionUpdateCharacterState.ServerCustomData;
         }
 
-        private void _entity_onPrivateBoolsOperation(LiteNetLibManager.LiteNetLibSyncList.Operation arg1, int arg2)
+        private void _entity_onPrivateBoolsOperation(LiteNetLibSyncListOp operation, int index, CharacterDataBoolean oldItem, CharacterDataBoolean newItem)
         {
             _updateState |= TransactionUpdateCharacterState.PrivateCustomData;
         }
 
-        private void _entity_onPrivateIntsOperation(LiteNetLibManager.LiteNetLibSyncList.Operation arg1, int arg2)
+        private void _entity_onPrivateIntsOperation(LiteNetLibSyncListOp operation, int index, CharacterDataInt32 oldItem, CharacterDataInt32 newItem)
         {
             _updateState |= TransactionUpdateCharacterState.PrivateCustomData;
         }
 
-        private void _entity_onPrivateFloatsOperation(LiteNetLibManager.LiteNetLibSyncList.Operation arg1, int arg2)
+        private void _entity_onPrivateFloatsOperation(LiteNetLibSyncListOp operation, int index, CharacterDataFloat32 oldItem, CharacterDataFloat32 newItem)
         {
             _updateState |= TransactionUpdateCharacterState.PrivateCustomData;
         }
 
-        private void _entity_onPublicBoolsOperation(LiteNetLibManager.LiteNetLibSyncList.Operation arg1, int arg2)
+        private void _entity_onPublicBoolsOperation(LiteNetLibSyncListOp operation, int index, CharacterDataBoolean oldItem, CharacterDataBoolean newItem)
         {
             _updateState |= TransactionUpdateCharacterState.PublicCustomData;
         }
 
-        private void _entity_onPublicIntsOperation(LiteNetLibManager.LiteNetLibSyncList.Operation arg1, int arg2)
+        private void _entity_onPublicIntsOperation(LiteNetLibSyncListOp operation, int index, CharacterDataInt32 oldItem, CharacterDataInt32 newItem)
         {
             _updateState |= TransactionUpdateCharacterState.PublicCustomData;
         }
 
-        private void _entity_onPublicFloatsOperation(LiteNetLibManager.LiteNetLibSyncList.Operation arg1, int arg2)
+        private void _entity_onPublicFloatsOperation(LiteNetLibSyncListOp operation, int index, CharacterDataFloat32 oldItem, CharacterDataFloat32 newItem)
         {
             _updateState |= TransactionUpdateCharacterState.PublicCustomData;
         }
