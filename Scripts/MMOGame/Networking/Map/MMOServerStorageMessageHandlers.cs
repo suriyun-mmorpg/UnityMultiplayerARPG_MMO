@@ -1,7 +1,8 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using ConcurrentCollections;
+using Cysharp.Threading.Tasks;
 using LiteNetLibManager;
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace MultiplayerARPG.MMO
 {
@@ -83,8 +84,6 @@ namespace MultiplayerARPG.MMO
         public async UniTaskVoid HandleRequestMoveItemFromStorage(RequestHandlerData requestHandler, RequestMoveItemFromStorageMessage request, RequestProceedResultDelegate<ResponseMoveItemFromStorageMessage> result)
         {
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-            // Validate user and storage accessibility
-            StorageId storageId = new StorageId(request.storageType, request.storageOwnerId);
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
                 result.InvokeError(new ResponseMoveItemFromStorageMessage()
@@ -93,6 +92,10 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
+
+            string userId = playerCharacter.UserId;
+            StorageId storageId = new StorageId(request.storageType, request.storageOwnerId);
+
             if (!playerCharacter.CanAccessStorage(storageId))
             {
                 result.InvokeError(new ResponseMoveItemFromStorageMessage()
@@ -106,9 +109,22 @@ namespace MultiplayerARPG.MMO
             BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
             if (playerCharacterEntity != null && !playerCharacterEntity.CanMoveItem())
             {
-                result.InvokeError(new ResponseMoveItemFromStorageMessage());
+                result.InvokeError(new ResponseMoveItemFromStorageMessage()
+                {
+                    message = UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE,
+                });
                 return;
             }
+
+            if (HasStorageUser(userId, storageId))
+            {
+                result.InvokeError(new ResponseMoveItemFromStorageMessage()
+                {
+                    message = UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE,
+                });
+                return;
+            }
+            AddStorageUser(userId, storageId);
 
             // Get items from storage
             if (storageId.storageType == StorageType.Guild)
@@ -133,6 +149,7 @@ namespace MultiplayerARPG.MMO
             {
                 if (!applyingPlayerCharacter.MoveItemFromStorage(storageId, isLimitWeight, weightLimit, isLimitSlot, slotLimit, storageItems, request.storageItemIndex, request.storageItemAmount, request.inventoryType, request.inventoryItemIndex, request.equipSlotIndexOrWeaponSet, out UITextKeys gameMessage))
                 {
+                    RemoveStorageUser(userId, storageId);
                     result.InvokeError(new ResponseMoveItemFromStorageMessage()
                     {
                         message = gameMessage,
@@ -151,6 +168,7 @@ namespace MultiplayerARPG.MMO
                 });
                 if (updateResponse.IsError)
                 {
+                    RemoveStorageUser(userId, storageId);
                     result.InvokeError(new ResponseMoveItemFromStorageMessage()
                     {
                         message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
@@ -160,7 +178,9 @@ namespace MultiplayerARPG.MMO
             }
             catch (System.Exception ex)
             {
-                Logging.LogError("Unable to move item from storage: " + ex.StackTrace);
+                Debug.LogError("Unable to move item from storage");
+                Debug.LogException(ex);
+                RemoveStorageUser(userId, storageId);
                 result.InvokeError(new ResponseMoveItemFromStorageMessage()
                 {
                     message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
@@ -173,6 +193,7 @@ namespace MultiplayerARPG.MMO
             playerCharacter.SelectableWeaponSets = applyingPlayerCharacter.SelectableWeaponSets;
             GameInstance.ServerStorageHandlers.SetStorageItems(storageId, storageItems);
             GameInstance.ServerStorageHandlers.NotifyStorageItemsUpdated(request.storageType, request.storageOwnerId);
+            RemoveStorageUser(userId, storageId);
             result.InvokeSuccess(new ResponseMoveItemFromStorageMessage());
 #endif
             return;
@@ -181,8 +202,6 @@ namespace MultiplayerARPG.MMO
         public async UniTaskVoid HandleRequestMoveItemToStorage(RequestHandlerData requestHandler, RequestMoveItemToStorageMessage request, RequestProceedResultDelegate<ResponseMoveItemToStorageMessage> result)
         {
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-            // Validate user and storage accessibility
-            StorageId storageId = new StorageId(request.storageType, request.storageOwnerId);
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
                 result.InvokeError(new ResponseMoveItemToStorageMessage()
@@ -191,6 +210,10 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
+
+            string userId = playerCharacter.UserId;
+            StorageId storageId = new StorageId(request.storageType, request.storageOwnerId);
+
             if (!playerCharacter.CanAccessStorage(storageId))
             {
                 result.InvokeError(new ResponseMoveItemToStorageMessage()
@@ -204,9 +227,22 @@ namespace MultiplayerARPG.MMO
             BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
             if (playerCharacterEntity != null && !playerCharacterEntity.CanMoveItem())
             {
-                result.InvokeError(new ResponseMoveItemToStorageMessage());
+                result.InvokeError(new ResponseMoveItemToStorageMessage()
+                {
+                    message = UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE,
+                });
                 return;
             }
+
+            if (HasStorageUser(userId, storageId))
+            {
+                result.InvokeError(new ResponseMoveItemToStorageMessage()
+                {
+                    message = UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE,
+                });
+                return;
+            }
+            AddStorageUser(userId, storageId);
 
             // Get items from storage
             if (storageId.storageType == StorageType.Guild)
@@ -231,6 +267,7 @@ namespace MultiplayerARPG.MMO
             {
                 if (!applyingPlayerCharacter.MoveItemToStorage(storageId, isLimitWeight, weightLimit, isLimitSlot, slotLimit, storageItems, request.storageItemIndex, request.inventoryType, request.inventoryItemIndex, request.inventoryItemAmount, request.equipSlotIndexOrWeaponSet, out UITextKeys gameMessage))
                 {
+                    RemoveStorageUser(userId, storageId);
                     result.InvokeError(new ResponseMoveItemToStorageMessage()
                     {
                         message = gameMessage,
@@ -249,6 +286,7 @@ namespace MultiplayerARPG.MMO
                 });
                 if (updateResponse.IsError)
                 {
+                    RemoveStorageUser(userId, storageId);
                     result.InvokeError(new ResponseMoveItemToStorageMessage()
                     {
                         message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
@@ -258,7 +296,9 @@ namespace MultiplayerARPG.MMO
             }
             catch (System.Exception ex)
             {
-                Logging.LogError("Unable to move item to storage: " + ex.StackTrace);
+                Debug.LogError("Unable to move item to storage");
+                Debug.LogException(ex);
+                RemoveStorageUser(userId, storageId);
                 result.InvokeError(new ResponseMoveItemToStorageMessage()
                 {
                     message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
@@ -271,6 +311,7 @@ namespace MultiplayerARPG.MMO
             playerCharacter.SelectableWeaponSets = applyingPlayerCharacter.SelectableWeaponSets;
             GameInstance.ServerStorageHandlers.SetStorageItems(storageId, storageItems);
             GameInstance.ServerStorageHandlers.NotifyStorageItemsUpdated(request.storageType, request.storageOwnerId);
+            RemoveStorageUser(userId, storageId);
             result.InvokeSuccess(new ResponseMoveItemToStorageMessage());
 #endif
         }
@@ -278,8 +319,6 @@ namespace MultiplayerARPG.MMO
         public async UniTaskVoid HandleRequestSwapOrMergeStorageItem(RequestHandlerData requestHandler, RequestSwapOrMergeStorageItemMessage request, RequestProceedResultDelegate<ResponseSwapOrMergeStorageItemMessage> result)
         {
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-            // Validate user and storage accessibility
-            StorageId storageId = new StorageId(request.storageType, request.storageOwnerId);
             int fromIndex = request.fromIndex;
             int toIndex = request.toIndex;
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
@@ -290,6 +329,10 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
+
+            string userId = playerCharacter.UserId;
+            StorageId storageId = new StorageId(request.storageType, request.storageOwnerId);
+
             if (!playerCharacter.CanAccessStorage(storageId))
             {
                 result.InvokeError(new ResponseSwapOrMergeStorageItemMessage()
@@ -302,9 +345,22 @@ namespace MultiplayerARPG.MMO
             BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
             if (playerCharacterEntity != null && !playerCharacterEntity.CanMoveItem())
             {
-                result.InvokeError(new ResponseSwapOrMergeStorageItemMessage());
+                result.InvokeError(new ResponseSwapOrMergeStorageItemMessage()
+                {
+                    message = UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE,
+                });
                 return;
             }
+
+            if (HasStorageUser(userId, storageId))
+            {
+                result.InvokeError(new ResponseSwapOrMergeStorageItemMessage()
+                {
+                    message = UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE,
+                });
+                return;
+            }
+            AddStorageUser(userId, storageId);
 
             // Get items from storage
             if (storageId.storageType == StorageType.Guild)
@@ -321,6 +377,7 @@ namespace MultiplayerARPG.MMO
             {
                 if (!playerCharacter.SwapOrMergeStorageItem(storageId, isLimitSlot, slotLimit, storageItems, fromIndex, toIndex, out UITextKeys gameMessage))
                 {
+                    RemoveStorageUser(userId, storageId);
                     result.InvokeError(new ResponseSwapOrMergeStorageItemMessage()
                     {
                         message = gameMessage,
@@ -335,6 +392,7 @@ namespace MultiplayerARPG.MMO
                 });
                 if (updateResponse.IsError)
                 {
+                    RemoveStorageUser(userId, storageId);
                     result.InvokeError(new ResponseSwapOrMergeStorageItemMessage()
                     {
                         message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
@@ -344,7 +402,9 @@ namespace MultiplayerARPG.MMO
             }
             catch (System.Exception ex)
             {
-                Logging.LogError("Unable to move item to storage: " + ex.StackTrace);
+                Debug.LogError("Unable to move item to storage");
+                Debug.LogException(ex);
+                RemoveStorageUser(userId, storageId);
                 result.InvokeError(new ResponseSwapOrMergeStorageItemMessage()
                 {
                     message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
@@ -353,9 +413,36 @@ namespace MultiplayerARPG.MMO
             }
             GameInstance.ServerStorageHandlers.SetStorageItems(storageId, storageItems);
             GameInstance.ServerStorageHandlers.NotifyStorageItemsUpdated(request.storageType, request.storageOwnerId);
+            RemoveStorageUser(userId, storageId);
             result.InvokeSuccess(new ResponseSwapOrMergeStorageItemMessage());
 #endif
             return;
         }
+
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+        private bool AddStorageUser(string userId, StorageId storageId)
+        {
+            if (!MapNetworkManager.storageUsers.TryGetValue(userId, out ConcurrentHashSet<StorageId> storageIds))
+            {
+                storageIds = new ConcurrentHashSet<StorageId>();
+                MapNetworkManager.storageUsers.TryAdd(userId, storageIds);
+            }
+            return storageIds.Add(storageId);
+        }
+
+        private bool RemoveStorageUser(string userId, StorageId storageId)
+        {
+            if (!MapNetworkManager.storageUsers.TryGetValue(userId, out ConcurrentHashSet<StorageId> storageIds))
+            {
+                return false;
+            }
+            return storageIds.TryRemove(storageId);
+        }
+
+        private bool HasStorageUser(string userId, StorageId storageId)
+        {
+            return MapNetworkManager.storageUsers.TryGetValue(userId, out ConcurrentHashSet<StorageId> storageIds) && storageIds.Contains(storageId);
+        }
+#endif
     }
 }

@@ -105,6 +105,10 @@ namespace MultiplayerARPG.MMO
         internal readonly ConcurrentHashSet<string> savingCharacters = new ConcurrentHashSet<string>();
         internal readonly ConcurrentHashSet<string> savingBuildings = new ConcurrentHashSet<string>();
         internal readonly ConcurrentHashSet<string> cancellingReserveStorageCharacterIds = new ConcurrentHashSet<string>();
+        internal readonly ConcurrentDictionary<string, ConcurrentHashSet<StorageId>> storageUsers = new ConcurrentDictionary<string, ConcurrentHashSet<StorageId>>();
+        internal readonly ConcurrentHashSet<string> proceedingUserIds = new ConcurrentHashSet<string>();
+        internal readonly ConcurrentHashSet<int> proceedingGuildIds = new ConcurrentHashSet<int>();
+        internal readonly ConcurrentHashSet<int> proceedingPartyIds = new ConcurrentHashSet<int>();
 #endif
 
         protected override void Awake()
@@ -194,6 +198,11 @@ namespace MultiplayerARPG.MMO
             savingStorageIds.Clear();
             savingCharacters.Clear();
             savingBuildings.Clear();
+            cancellingReserveStorageCharacterIds.Clear();
+            storageUsers.Clear();
+            proceedingUserIds.Clear();
+            proceedingGuildIds.Clear();
+            proceedingPartyIds.Clear();
             _connectionsByUserId.Clear();
             _accessTokensByUserId.Clear();
             DataUpdater.Clean();
@@ -309,6 +318,8 @@ namespace MultiplayerARPG.MMO
             {
                 _connectionsByUserId.TryRemove(userId, out _);
                 _accessTokensByUserId.TryRemove(userId, out _);
+                storageUsers.TryRemove(userId, out _);
+                proceedingUserIds.TryRemove(userId);
             }
             base.UnregisterUserId(connectionId);
         }

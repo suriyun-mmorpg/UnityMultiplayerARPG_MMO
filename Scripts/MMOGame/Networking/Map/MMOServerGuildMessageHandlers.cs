@@ -12,6 +12,11 @@ namespace MultiplayerARPG.MMO
             get { return MMOServerInstance.Singleton.DatabaseClient; }
         }
 
+        public MapNetworkManager MapNetworkManager
+        {
+            get { return BaseGameNetworkManager.Singleton as MapNetworkManager; }
+        }
+
         public ClusterClient ClusterClient
         {
             get { return (BaseGameNetworkManager.Singleton as MapNetworkManager).ClusterClient; }
@@ -781,15 +786,29 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
+
+            int guildId = playerCharacter.GuildId;
+            if (MapNetworkManager.proceedingGuildIds.Contains(guildId))
+            {
+                result.InvokeError(new ResponseIncreaseGuildSkillLevelMessage()
+                {
+                    message = UITextKeys.UI_ERROR_TOO_FAST_ACTION,
+                });
+                return;
+            }
+            MapNetworkManager.proceedingGuildIds.Add(guildId);
+
             ValidateGuildRequestResult validateResult = GameInstance.ServerGuildHandlers.CanIncreaseGuildSkillLevel(playerCharacter, request.dataId);
             if (!validateResult.IsSuccess)
             {
+                MapNetworkManager.proceedingGuildIds.TryRemove(guildId);
                 result.InvokeError(new ResponseIncreaseGuildSkillLevelMessage()
                 {
                     message = validateResult.GameMessage,
                 });
                 return;
             }
+
             // Save to database
             DatabaseApiResult<GuildResp> updateResp = await DatabaseClient.AddGuildSkillAsync(new AddGuildSkillReq()
             {
@@ -798,12 +817,14 @@ namespace MultiplayerARPG.MMO
             });
             if (!updateResp.IsSuccess)
             {
+                MapNetworkManager.proceedingGuildIds.TryRemove(guildId);
                 result.InvokeError(new ResponseIncreaseGuildSkillLevelMessage()
                 {
                     message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
                 });
                 return;
             }
+
             GuildData guild = updateResp.Response.GuildData;
             GameInstance.ServerGuildHandlers.SetGuild(validateResult.GuildId, guild);
             // Broadcast via chat server
@@ -814,6 +835,7 @@ namespace MultiplayerARPG.MMO
             }
             GameInstance.ServerGameMessageHandlers.SendSetGuildSkillLevelToMembers(guild, request.dataId);
             GameInstance.ServerGameMessageHandlers.SendSetGuildLevelExpSkillPointToMembers(guild);
+            MapNetworkManager.proceedingGuildIds.TryRemove(guildId);
             result.InvokeSuccess(new ResponseIncreaseGuildSkillLevelMessage());
 #endif
         }
