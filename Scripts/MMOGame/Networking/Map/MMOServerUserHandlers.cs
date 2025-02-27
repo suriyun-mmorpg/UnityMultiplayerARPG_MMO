@@ -4,19 +4,22 @@ namespace MultiplayerARPG.MMO
 {
     public partial class MMOServerUserHandlers : DefaultServerUserHandlers
     {
-        public LiteNetLibManager.LiteNetLibManager Manager { get; private set; }
-
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         public IDatabaseClient DatabaseClient
         {
             get { return MMOServerInstance.Singleton.DatabaseClient; }
         }
-#endif
 
-        private void Awake()
+        public CentralNetworkManager CentralNetworkManager
         {
-            Manager = GetComponent<LiteNetLibManager.LiteNetLibManager>();
+            get { return MMOServerInstance.Singleton.CentralNetworkManager; }
         }
+
+        public MapNetworkManager MapNetworkManager
+        {
+            get { return BaseGameNetworkManager.Singleton as MapNetworkManager; }
+        }
+#endif
 
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         public override void MuteCharacterByName(string characterName, int minutes)
@@ -50,7 +53,7 @@ namespace MultiplayerARPG.MMO
         {
             long time = System.DateTimeOffset.UtcNow.ToUnixTimeSeconds() + (60 * 60 * 24 * days);
             if (TryGetPlayerCharacterByName(characterName, out IPlayerCharacterData playerCharacter) && TryGetConnectionId(playerCharacter.Id, out long connectionId))
-                Manager.ServerTransport.ServerDisconnect(connectionId);
+                MapNetworkManager.ServerTransport.ServerDisconnect(connectionId);
             DatabaseClient.SetUserUnbanTimeByCharacterNameAsync(new SetUserUnbanTimeByCharacterNameReq()
             {
                 CharacterName = characterName,
@@ -103,8 +106,25 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-        public override async UniTask<UITextKeys> DetectCharacterNameExistance(string characterName)
+        public override async UniTask<UITextKeys> ValidateCharacterName(string characterName)
         {
+            ProfanityDetectResult profanityDetectResult = await MapNetworkManager.ChatProfanityDetector.Proceed(characterName);
+            if (profanityDetectResult.shouldMutePlayer || profanityDetectResult.shouldKickPlayer || !string.Equals(profanityDetectResult.message, characterName))
+            {
+                return UITextKeys.UI_ERROR_INVALID_CHARACTER_NAME;
+            }
+            if (!NameExtensions.IsValidCharacterName(characterName))
+            {
+                return UITextKeys.UI_ERROR_INVALID_CHARACTER_NAME;
+            }
+            if (characterName.Length < CentralNetworkManager.minCharacterNameLength)
+            {
+                return UITextKeys.UI_ERROR_CHARACTER_NAME_TOO_SHORT;
+            }
+            if (characterName.Length > CentralNetworkManager.maxCharacterNameLength)
+            {
+                return UITextKeys.UI_ERROR_CHARACTER_NAME_TOO_LONG;
+            }
             DatabaseApiResult<FindCharacterNameResp> findCharacterNameResp = await DatabaseClient.FindCharacterNameAsync(new FindCharacterNameReq()
             {
                 CharacterName = characterName
