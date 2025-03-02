@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: f1d0269427124534bb799e3d2388d2b8
+guid: 7c4ea60e1c2925149b71b276bd62f9d0
 PluginImporter:
   externalObjects: {}
   serializedVersion: 2
@@ -12,24 +12,24 @@ PluginImporter:
   validateReferences: 1
   platformData:
   - first:
-      '': Any
+      : Any
     second:
       enabled: 0
       settings:
         Exclude Android: 1
         Exclude Editor: 0
-        Exclude Linux: 0
         Exclude Linux64: 0
-        Exclude LinuxUniversal: 0
         Exclude OSXUniversal: 0
         Exclude WebGL: 1
-        Exclude Win: 1
+        Exclude Win: 0
         Exclude Win64: 0
+        Exclude iOS: 1
   - first:
       Android: Android
     second:
       enabled: 0
       settings:
+        AndroidSharedLibraryType: Executable
         CPU: ARMv7
   - first:
       Any: 
@@ -41,35 +41,11 @@ PluginImporter:
     second:
       enabled: 1
       settings:
-        CPU: x86_64
+        CPU: AnyCPU
         DefaultValueInitialized: true
         OS: AnyOS
   - first:
-      Facebook: Win
-    second:
-      enabled: 0
-      settings:
-        CPU: None
-  - first:
-      Facebook: Win64
-    second:
-      enabled: 0
-      settings:
-        CPU: AnyCPU
-  - first:
-      Standalone: Linux
-    second:
-      enabled: 1
-      settings:
-        CPU: x86
-  - first:
       Standalone: Linux64
-    second:
-      enabled: 1
-      settings:
-        CPU: AnyCPU
-  - first:
-      Standalone: LinuxUniversal
     second:
       enabled: 1
       settings:
@@ -83,9 +59,9 @@ PluginImporter:
   - first:
       Standalone: Win
     second:
-      enabled: 0
+      enabled: 1
       settings:
-        CPU: None
+        CPU: AnyCPU
   - first:
       Standalone: Win64
     second:
@@ -93,10 +69,20 @@ PluginImporter:
       settings:
         CPU: AnyCPU
   - first:
-      WebGL: WebGL
+      Windows Store Apps: WindowsStoreApps
     second:
       enabled: 0
-      settings: {}
+      settings:
+        CPU: AnyCPU
+  - first:
+      iPhone: iOS
+    second:
+      enabled: 0
+      settings:
+        AddToEmbeddedBinaries: false
+        CPU: AnyCPU
+        CompileFlags: 
+        FrameworkDependencies: 
   userData: 
   assetBundleName: 
   assetBundleVariant: 
