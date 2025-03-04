@@ -763,7 +763,6 @@ GameObject:
   - component: {fileID: 1379718503}
   - component: {fileID: 1379718502}
   - component: {fileID: 1379718505}
-  - component: {fileID: 1379718506}
   - component: {fileID: 1379718507}
   - component: {fileID: 1379718504}
   - component: {fileID: 1379718508}
@@ -1224,24 +1223,6 @@ MonoBehaviour:
     layer2:
       layerIndex: 9
     ignore: 1
---- !u!114 &1379718506
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1379718501}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b22368900ab60ae4882d09d2b5bf7ec0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxLevel: 100
-  expCalculator:
-    minValue: 20
-    maxValue: 10050
-    growth: 1.5
-  calculateExp: 0
 --- !u!114 &1379718507
 MonoBehaviour:
   m_ObjectHideFlags: 0
