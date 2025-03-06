@@ -150,6 +150,7 @@ namespace MultiplayerARPG.MMO
             // Save the characer
             if (playerCharacterEntity.TryGetComponent(out PlayerCharacterDataUpdater updater))
                 Destroy(updater);
+            DataUpdater.PlayerCharacterDataSaved(playerCharacterEntity.Id);
             await WaitAndSaveCharacter(TransactionUpdateCharacterState.All, playerCharacterEntity.CloneTo(new PlayerCharacterData()), changeMap, mapName, position, overrideRotation, rotation);
 
             // Remove this character from warping list
