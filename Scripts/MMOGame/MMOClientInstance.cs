@@ -178,7 +178,7 @@ namespace MultiplayerARPG.MMO
 
         public bool IsConnectedToCentralServer()
         {
-            return CentralNetworkManager.IsClientConnected;
+            return CentralNetworkManager != null && CentralNetworkManager.IsClientConnected;
         }
 
         public void ClearClientData()
