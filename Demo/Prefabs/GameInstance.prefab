@@ -1,0 +1,538 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &6325369373293676653
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 987338275038060923}
+  - component: {fileID: 205807986548817939}
+  - component: {fileID: 7663703190769800443}
+  - component: {fileID: 8554082820615621917}
+  - component: {fileID: 4898899125313883396}
+  - component: {fileID: 5555039954835809266}
+  - component: {fileID: 1575641527122854988}
+  m_Layer: 0
+  m_Name: GameInstance
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &987338275038060923
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6325369373293676653}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 3}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &205807986548817939
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6325369373293676653}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca66ed5b09dc41447ad7cf901faa5e46, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  morphings: []
+  dimensionType: 0
+  messageManager: {fileID: 0}
+  saveSystem: {fileID: 0}
+  gameplayRule: {fileID: 11400000, guid: 3bfe680a81b27ce4ba9642ddff7baa17, type: 2}
+  inventoryManager: {fileID: 0}
+  dayNightTimeUpdater: {fileID: 0}
+  gmCommands: {fileID: 0}
+  equipmentModelBonesSetupManager: {fileID: 0}
+  networkSetting: {fileID: 11400000, guid: c0825e8ee894749459ab4c8dda26dfe6, type: 2}
+  itemDropEntityPrefab: {fileID: 114247390284341630, guid: 611b907cf80c87a4eb9e0d5d4a8688f5,
+    type: 3}
+  expDropEntityPrefab: {fileID: 0}
+  goldDropEntityPrefab: {fileID: 0}
+  currencyDropEntityPrefab: {fileID: 0}
+  warpPortalEntityPrefab: {fileID: 114731892942428866, guid: 5773ff22c96e3ab4bb12d8202ec86244,
+    type: 3}
+  playerCorpsePrefab: {fileID: 9036829038788336466, guid: d98696903f1afa34fba36b435c7fb329,
+    type: 3}
+  monsterCorpsePrefab: {fileID: 9036829038788336466, guid: d98696903f1afa34fba36b435c7fb329,
+    type: 3}
+  uiSceneGameplayPrefab: {fileID: 114088817493988554, guid: 4af36d4bdf0cf07409f4412130b793ec,
+    type: 3}
+  uiSceneGameplayMobilePrefab: {fileID: 114630585920460692, guid: 70474cf4f9f686c45b0305621722205f,
+    type: 3}
+  uiSceneGameplayConsolePrefab: {fileID: 0}
+  defaultControllerPrefab: {fileID: 114096437919969166, guid: 147be1283e4eb834d94ad1c905a031e7,
+    type: 3}
+  addressableItemDropEntityPrefab:
+    m_AssetGUID: 
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+    hashAssetId: 0
+  addressableExpDropEntityPrefab:
+    m_AssetGUID: 
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+    hashAssetId: 0
+  addressableGoldDropEntityPrefab:
+    m_AssetGUID: 
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+    hashAssetId: 0
+  addressableCurrencyDropEntityPrefab:
+    m_AssetGUID: 
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+    hashAssetId: 0
+  addressableWarpPortalEntityPrefab:
+    m_AssetGUID: 
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+    hashAssetId: 0
+  addressablePlayerCorpsePrefab:
+    m_AssetGUID: 
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+    hashAssetId: 0
+  addressableMonsterCorpsePrefab:
+    m_AssetGUID: 
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+    hashAssetId: 0
+  addressableUiSceneGameplayPrefab:
+    m_AssetGUID: 
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+  addressableUiSceneGameplayMobilePrefab:
+    m_AssetGUID: 
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+  addressableUiSceneGameplayConsolePrefab:
+    m_AssetGUID: 
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+  addressableDefaultControllerPrefab:
+    m_AssetGUID: 
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+  serverCharacterPrefab: {fileID: 114427175623056218, guid: 5d1fef0b895ca2a43899fb0236936a59,
+    type: 3}
+  owningCharacterObjects:
+  - {fileID: 1555851488130254, guid: 90f99869b96e2df4bae83e1f870b68ec, type: 3}
+  - {fileID: 5914040168613522836, guid: a854feb116427e540a5620c7d0d13661, type: 3}
+  - {fileID: 2870411455910755895, guid: 4bfdd12dbc214a64097d9b5117044be8, type: 3}
+  owningCharacterMiniMapObjects:
+  - {fileID: 1620662158371272, guid: f94b43a3f251a6a41849b19fe0aa4fa5, type: 3}
+  nonOwningCharacterObjects:
+  - {fileID: 5914040168613522836, guid: a854feb116427e540a5620c7d0d13661, type: 3}
+  - {fileID: 2870411455910755895, guid: 4bfdd12dbc214a64097d9b5117044be8, type: 3}
+  nonOwningCharacterMiniMapObjects:
+  - {fileID: 1338488141702386, guid: ce40a263e27c9034fa4ef0fc9e069eaf, type: 3}
+  monsterCharacterObjects: []
+  monsterCharacterMiniMapObjects:
+  - {fileID: 1237499379163380, guid: 2d0368f81f8351144a6b29dc200981b4, type: 3}
+  npcObjects: []
+  npcMiniMapObjects:
+  - {fileID: 1971649022222436, guid: 3ad746095a8b209429a1b9e27fab61aa, type: 3}
+  owningCharacterUI: {fileID: 114899762762614018, guid: 8447ca51d1886764e99f26df8033c4c5,
+    type: 3}
+  nonOwningCharacterUI: {fileID: 114899762762614018, guid: cf8cfe06d3da49e4ab083bd040961dd5,
+    type: 3}
+  monsterCharacterUI: {fileID: 114127719814556812, guid: 3570a7d7c31a7704f92f9ffd3242ff3c,
+    type: 3}
+  npcUI: {fileID: 114537631033164756, guid: b75f7de46d27c284d913d9b2984ff84d, type: 3}
+  npcQuestIndicator: {fileID: 114612624042908474, guid: 4acaa26309bf3094094eec89f99e2972,
+    type: 3}
+  levelUpEffect: {fileID: 0}
+  levelUpEffects:
+  - {fileID: 114843870614705530, guid: 6f6e255b4877f874c985ed9fb46293a1, type: 3}
+  stunEffects: []
+  muteEffects: []
+  freezeEffects: []
+  addressableLevelUpEffects: []
+  addressableStunEffects: []
+  addressableMuteEffects: []
+  addressableFreezeEffects: []
+  expTree: 140000001e00000031000000490000006500000086000000aa000000d1000000fa000000270100005601000087010000bb010000f10100002902000064020000a0020000de0200001e0300005f030000a3030000e80300002f04000077040000c10400000d0500005a050000a9050000f90500004a0600009d060000f1060000470700009e070000f707000050080000ab0800000809000065090000c4090000240a0000850a0000e80a00004b0b0000b00b0000160c00007d0c0000e50c00004e0d0000b90d0000240e0000910e0000fe0e00006d0f0000dd0f00004d100000bf10000032110000a61100001b12000090120000071300007f130000f813000071140000ec14000068150000e415000062160000e01600005f170000e017000061180000e318000066190000ea1900006e1a0000f41a00007a1b0000021c00008a1c0000131d00009d1d0000281e0000b31e0000401f0000cd1f00005b200000ea200000792100000a2200009b2200002d230000c023000054240000e82400007e25000014260000aa26000042270000
+  expTable: {fileID: 0}
+  gameDatabase: {fileID: 11400000, guid: 78362f3a31c322e4396aa7f42ea58f99, type: 2}
+  npcDatabase: {fileID: 11400000, guid: dae14f7f7d125fc4096ba7ac1f68d581, type: 2}
+  warpPortalDatabase: {fileID: 11400000, guid: 6a5e8bb8645bbb349a05709f9b37b5df, type: 2}
+  socialSystemSetting: {fileID: 11400000, guid: afad462dae207414f91b207f6882dad2,
+    type: 2}
+  defaultWeaponItem: {fileID: 11400000, guid: 7a97cfad0e4b1ee49ba6f735b4b1b0d9, type: 2}
+  defaultDamageElement: {fileID: 0}
+  defaultDamageHitEffects:
+  - {fileID: 114984786077298016, guid: fa67f0b7f994d9548821d15fbf67531d, type: 3}
+  addressableDefaultDamageHitEffects: []
+  playerTag:
+    tag: PlayerTag
+  monsterTag:
+    tag: MonsterTag
+  npcTag:
+    tag: NpcTag
+  vehicleTag:
+    tag: VehicleTag
+  itemDropTag:
+    tag: ItemDropTag
+  buildingTag:
+    tag: BuildingTag
+  harvestableTag:
+    tag: HarvestableTag
+  playerLayer:
+    layerIndex: 17
+  playingLayer:
+    layerIndex: 17
+  monsterLayer:
+    layerIndex: 18
+  npcLayer:
+    layerIndex: 19
+  vehicleLayer:
+    layerIndex: 20
+  itemDropLayer:
+    layerIndex: 9
+  buildingLayer:
+    layerIndex: 13
+  harvestableLayer:
+    layerIndex: 14
+  attackObstacleLayers:
+  - layerIndex: 0
+  ignoreRaycastLayers:
+  - layerIndex: 11
+  itemAppearDuration: 60
+  itemLootLockDuration: 5
+  itemLootRandomPartyMember: 0
+  canPickupItemsWhichDropsByPlayersImmediately: 0
+  dealingRequestDuration: 5
+  dealingItemsLimit: 16
+  disableDealing: 0
+  vendingItemsLimit: 16
+  disableVending: 0
+  duelingRequestDuration: 5
+  duelingCountDownDuration: 3
+  duelingDuration: 180
+  disableDueling: 0
+  pickUpItemDistance: 2
+  dropDistance: 1
+  conversationDistance: 3
+  localChatDistance: 10
+  combatTextDistance: 20
+  partyShareExpDistance: 0
+  partyShareItemDistance: 0
+  maxEquipWeaponSet: 2
+  currentPositionSaveMode: 0
+  playerDropItemMode: 0
+  playerDeadDropItemMode: 0
+  playerCorpseAppearDuration: 60
+  monsterDeadDropItemMode: 0
+  monsterExpRewardingMode: 0
+  monsterGoldRewardingMode: 0
+  monsterCurrencyRewardingMode: 0
+  monsterCorpseAppearDuration: 60
+  returnMoveSpeedDelayAfterAction: 0.1
+  mountDelay: 1
+  useItemDelay: 0.25
+  clearSkillCooldownOnDead: 1
+  goldStoreMode: 0
+  dismantleFilter:
+    includeJunk: 0
+    includeArmor: 1
+    includeWeapon: 1
+    includeShield: 1
+    includePotion: 0
+    includeAmmo: 0
+    includeBuilding: 0
+    includePet: 0
+    includeSocketEnhancer: 0
+    includeMount: 0
+    includeSkill: 0
+  canRefineItemByPlayer: 0
+  refineEnhancerItemsLimit: 16
+  canDismantleItemByPlayer: 0
+  canRepairItemByPlayer: 0
+  inventorySystem: 1
+  noInventoryWeightLimit: 0
+  doNotFillEmptySlots: 0
+  baseSlotLimit: 60
+  playerStorage:
+    weightLimit: 0
+    slotLimit: 40
+  guildStorage:
+    weightLimit: 0
+    slotLimit: 40
+  enhancerRemoval:
+    returnEnhancerItem: 0
+    requireItems: []
+    requireCurrencies: []
+    requireGold: 0
+  minSummonDistance: 2
+  maxSummonDistance: 3
+  minFollowSummonerDistance: 5
+  maxFollowSummonerDistance: 10
+  petDeadLockDuration: 60
+  petUnSummonLockDuration: 30
+  joinInstanceMapDistance: 20
+  newCharacterSetting: {fileID: 11400000, guid: 96c4888e481bfee4887f1537d72da080,
+    type: 2}
+  startGold: 0
+  startItems: []
+  testingNewCharacterSetting: {fileID: 0}
+  updateAnimationAtServer: 1
+  minCharacterNameLength: 2
+  maxCharacterNameLength: 16
+  maxCharacterSaves: 5
+  serverTargetFrameRate: 30
+  testInEditorMode: 0
+  networkManagerForOfflineTesting:
+    m_AssetGUID: 
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+  exportSocialSystemSettingAsJson: 0
+  exportMinimalItemsAsJson: 0
+  exportCharacterCreationDataAsJson: 0
+  cashShopDatabase: {fileID: 11400000, guid: 677c37c598e6c1045b66de68f1f546f6, type: 2}
+  homeScene:
+    sceneAsset: {fileID: 102900000, guid: d529c814bb9fcd14289ac4141b27e951, type: 3}
+    sceneName: 01Home_MMO
+  addressableHomeScene:
+    m_AssetGUID: 
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+    sceneName: 
+  homeMobileScene:
+    sceneAsset: {fileID: 0}
+    sceneName: 
+  addressableHomeMobileScene:
+    m_AssetGUID: 
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+    sceneName: 
+  homeConsoleScene:
+    sceneAsset: {fileID: 0}
+    sceneName: 
+  addressableHomeConsoleScene:
+    m_AssetGUID: 
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+    sceneName: 
+--- !u!114 &7663703190769800443
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6325369373293676653}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a90b827307b978428d769206bed615f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ignoreOptions:
+  - layer1:
+      layerIndex: 17
+    layer2:
+      layerIndex: 17
+    ignore: 1
+  - layer1:
+      layerIndex: 17
+    layer2:
+      layerIndex: 18
+    ignore: 1
+  - layer1:
+      layerIndex: 17
+    layer2:
+      layerIndex: 19
+    ignore: 1
+  - layer1:
+      layerIndex: 17
+    layer2:
+      layerIndex: 20
+    ignore: 1
+  - layer1:
+      layerIndex: 17
+    layer2:
+      layerIndex: 9
+    ignore: 1
+  - layer1:
+      layerIndex: 18
+    layer2:
+      layerIndex: 18
+    ignore: 1
+  - layer1:
+      layerIndex: 18
+    layer2:
+      layerIndex: 19
+    ignore: 1
+  - layer1:
+      layerIndex: 18
+    layer2:
+      layerIndex: 20
+    ignore: 1
+  - layer1:
+      layerIndex: 18
+    layer2:
+      layerIndex: 9
+    ignore: 1
+  - layer1:
+      layerIndex: 19
+    layer2:
+      layerIndex: 19
+    ignore: 1
+  - layer1:
+      layerIndex: 19
+    layer2:
+      layerIndex: 20
+    ignore: 1
+  - layer1:
+      layerIndex: 19
+    layer2:
+      layerIndex: 9
+    ignore: 1
+  - layer1:
+      layerIndex: 20
+    layer2:
+      layerIndex: 20
+    ignore: 1
+  - layer1:
+      layerIndex: 20
+    layer2:
+      layerIndex: 9
+    ignore: 1
+  - layer1:
+      layerIndex: 9
+    layer2:
+      layerIndex: 9
+    ignore: 1
+--- !u!114 &8554082820615621917
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6325369373293676653}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1add7909b79222e4e9d31c0dcf226fdd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  masterVolumeSetting:
+    id: MASTER
+    volumeScale: 1
+  bgmVolumeSetting:
+    id: BGM
+    volumeScale: 1
+  sfxVolumeSetting:
+    id: SFX
+    volumeScale: 1
+  ambientVolumeSetting:
+    id: AMBIENT
+    volumeScale: 1
+  otherVolumeSettings: []
+--- !u!114 &4898899125313883396
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6325369373293676653}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ed2cb86d2cba09b418e9204894872c72, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  settings:
+  - keyName: Activate
+    keyCode: 101
+  - keyName: PickUpItem
+    keyCode: 102
+  - keyName: CameraRotate
+    keyCode: 324
+  - keyName: Attack
+    keyCode: 118
+  - keyName: Jump
+    keyCode: 32
+  - keyName: FindEnemy
+    keyCode: 9
+  - keyName: Reload
+    keyCode: 114
+  - keyName: ExitVehicle
+    keyCode: 120
+  - keyName: SwitchEquipWeaponSet
+    keyCode: 96
+  - keyName: Sprint
+    keyCode: 304
+  - keyName: Crouch
+    keyCode: 306
+  - keyName: Crawl
+    keyCode: 122
+  - keyName: RotateLeft
+    keyCode: 106
+  - keyName: RotateRight
+    keyCode: 107
+  - keyName: Dash
+    keyCode: 61
+  settingsSaveKeyPrefix: SETTING_KEY_BIND
+  inputActionAsset: {fileID: -944628639613478452, guid: b7b0acfa1d32d3f4fb4dd990fef8568c,
+    type: 3}
+--- !u!114 &5555039954835809266
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6325369373293676653}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b9ef831daeddb154bb8b802d43566208, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  defaultLanguageKey: ENG
+  playerPrefsKey: USER_LANG
+  languageList: []
+  newLanguageKey: ENG
+  addNewLanguage: 0
+  migrateOldGameMessage: 0
+  setMessageLanguageKey: 
+  setMessageKey: 
+  setMessageValue: 
+  setMessage: 0
+--- !u!114 &1575641527122854988
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6325369373293676653}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c89ff02ae1303546aaa8e11bad1aa42, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
