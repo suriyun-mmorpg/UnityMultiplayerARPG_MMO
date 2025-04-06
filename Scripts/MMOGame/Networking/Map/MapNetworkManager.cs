@@ -406,11 +406,22 @@ namespace MultiplayerARPG.MMO
                     }
                 }
                 // Initialize remaining in-scene buildings
+                List<UniTask<DatabaseApiResult<BuildingResp>>> createBuildingTasks = new List<UniTask<DatabaseApiResult<BuildingResp>>>();
                 foreach (BuildingEntity initializingBuilding in initializingBuildingDicts.Values)
                 {
                     initializingBuilding.InitSceneObject();
                     GameInstance.ServerBuildingHandlers.AddBuilding(initializingBuilding.Id, initializingBuilding);
+                    if (!IsInstanceMap())
+                    {
+                        createBuildingTasks.Add(DatabaseClient.CreateBuildingAsync(new CreateBuildingReq()
+                        {
+                            ChannelId = ChannelId,
+                            MapName = CurrentMapInfo.Id,
+                            BuildingData = initializingBuilding.CloneTo(new BuildingSaveData()),
+                        }));
+                    }
                 }
+                await UniTask.WhenAll(createBuildingTasks);
             }
         }
 #endif
