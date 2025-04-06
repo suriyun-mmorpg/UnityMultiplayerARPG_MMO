@@ -8,7 +8,7 @@ namespace MultiplayerARPG.MMO
 {
     public partial class MapNetworkManager
     {
-        protected override bool IsInstanceMap()
+        public override bool IsInstanceMap()
         {
             return !IsAllocate && !string.IsNullOrEmpty(MapInstanceId);
         }

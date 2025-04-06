@@ -156,24 +156,27 @@ namespace MultiplayerARPG.MMO
                     });
                     return;
                 }
-                DatabaseApiResult updateResponse = await DatabaseClient.UpdateStorageAndCharacterItemsAsync(new UpdateStorageAndCharacterItemsReq()
+                if (GameInstance.ServerStorageHandlers.WillProceedStorageSaving(storageId.storageType, storageId.storageOwnerId))
                 {
-                    StorageType = storageId.storageType,
-                    StorageOwnerId = storageId.storageOwnerId,
-                    StorageItems = storageItems,
-                    CharacterId = applyingPlayerCharacter.Id,
-                    SelectableWeaponSets = new List<EquipWeapons>(applyingPlayerCharacter.SelectableWeaponSets),
-                    EquipItems = new List<CharacterItem>(applyingPlayerCharacter.EquipItems),
-                    NonEquipItems = new List<CharacterItem>(applyingPlayerCharacter.NonEquipItems),
-                });
-                if (updateResponse.IsError)
-                {
-                    RemoveStorageUser(userId, storageId);
-                    result.InvokeError(new ResponseMoveItemFromStorageMessage()
+                    DatabaseApiResult updateResponse = await DatabaseClient.UpdateStorageAndCharacterItemsAsync(new UpdateStorageAndCharacterItemsReq()
                     {
-                        message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                        StorageType = storageId.storageType,
+                        StorageOwnerId = storageId.storageOwnerId,
+                        StorageItems = storageItems,
+                        CharacterId = applyingPlayerCharacter.Id,
+                        SelectableWeaponSets = new List<EquipWeapons>(applyingPlayerCharacter.SelectableWeaponSets),
+                        EquipItems = new List<CharacterItem>(applyingPlayerCharacter.EquipItems),
+                        NonEquipItems = new List<CharacterItem>(applyingPlayerCharacter.NonEquipItems),
                     });
-                    return;
+                    if (updateResponse.IsError)
+                    {
+                        RemoveStorageUser(userId, storageId);
+                        result.InvokeError(new ResponseMoveItemFromStorageMessage()
+                        {
+                            message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                        });
+                        return;
+                    }
                 }
             }
             catch (System.Exception ex)
@@ -274,24 +277,27 @@ namespace MultiplayerARPG.MMO
                     });
                     return;
                 }
-                DatabaseApiResult updateResponse = await DatabaseClient.UpdateStorageAndCharacterItemsAsync(new UpdateStorageAndCharacterItemsReq()
+                if (GameInstance.ServerStorageHandlers.WillProceedStorageSaving(storageId.storageType, storageId.storageOwnerId))
                 {
-                    StorageType = storageId.storageType,
-                    StorageOwnerId = storageId.storageOwnerId,
-                    StorageItems = storageItems,
-                    CharacterId = applyingPlayerCharacter.Id,
-                    SelectableWeaponSets = new List<EquipWeapons>(applyingPlayerCharacter.SelectableWeaponSets),
-                    EquipItems = new List<CharacterItem>(applyingPlayerCharacter.EquipItems),
-                    NonEquipItems = new List<CharacterItem>(applyingPlayerCharacter.NonEquipItems),
-                });
-                if (updateResponse.IsError)
-                {
-                    RemoveStorageUser(userId, storageId);
-                    result.InvokeError(new ResponseMoveItemToStorageMessage()
+                    DatabaseApiResult updateResponse = await DatabaseClient.UpdateStorageAndCharacterItemsAsync(new UpdateStorageAndCharacterItemsReq()
                     {
-                        message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                        StorageType = storageId.storageType,
+                        StorageOwnerId = storageId.storageOwnerId,
+                        StorageItems = storageItems,
+                        CharacterId = applyingPlayerCharacter.Id,
+                        SelectableWeaponSets = new List<EquipWeapons>(applyingPlayerCharacter.SelectableWeaponSets),
+                        EquipItems = new List<CharacterItem>(applyingPlayerCharacter.EquipItems),
+                        NonEquipItems = new List<CharacterItem>(applyingPlayerCharacter.NonEquipItems),
                     });
-                    return;
+                    if (updateResponse.IsError)
+                    {
+                        RemoveStorageUser(userId, storageId);
+                        result.InvokeError(new ResponseMoveItemToStorageMessage()
+                        {
+                            message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                        });
+                        return;
+                    }
                 }
             }
             catch (System.Exception ex)
@@ -384,20 +390,23 @@ namespace MultiplayerARPG.MMO
                     });
                     return;
                 }
-                DatabaseApiResult updateResponse = await DatabaseClient.UpdateStorageItemsAsync(new UpdateStorageItemsReq()
+                if (GameInstance.ServerStorageHandlers.WillProceedStorageSaving(storageId.storageType, storageId.storageOwnerId))
                 {
-                    StorageType = storageId.storageType,
-                    StorageOwnerId = storageId.storageOwnerId,
-                    StorageItems = storageItems,
-                });
-                if (updateResponse.IsError)
-                {
-                    RemoveStorageUser(userId, storageId);
-                    result.InvokeError(new ResponseSwapOrMergeStorageItemMessage()
+                    DatabaseApiResult updateResponse = await DatabaseClient.UpdateStorageItemsAsync(new UpdateStorageItemsReq()
                     {
-                        message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                        StorageType = storageId.storageType,
+                        StorageOwnerId = storageId.storageOwnerId,
+                        StorageItems = storageItems,
                     });
-                    return;
+                    if (updateResponse.IsError)
+                    {
+                        RemoveStorageUser(userId, storageId);
+                        result.InvokeError(new ResponseSwapOrMergeStorageItemMessage()
+                        {
+                            message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                        });
+                        return;
+                    }
                 }
             }
             catch (System.Exception ex)

@@ -173,17 +173,21 @@ namespace MultiplayerARPG.MMO
                 }
             }
             // Update storage items
-            DatabaseApiResult updateResponse = await DatabaseClient.UpdateStorageItemsAsync(new UpdateStorageItemsReq()
+            if (WillProceedStorageSaving(storageId.storageType, storageId.storageOwnerId))
             {
-                StorageType = storageId.storageType,
-                StorageOwnerId = storageId.storageOwnerId,
-                StorageItems = storageItems,
-            });
-            convertingStorages.TryRemove(storageId);
-            if (updateResponse.IsError)
-            {
-                return false;
+                DatabaseApiResult updateResponse = await DatabaseClient.UpdateStorageItemsAsync(new UpdateStorageItemsReq()
+                {
+                    StorageType = storageId.storageType,
+                    StorageOwnerId = storageId.storageOwnerId,
+                    StorageItems = storageItems,
+                });
+                if (updateResponse.IsError)
+                {
+                    convertingStorages.TryRemove(storageId);
+                    return false;
+                }
             }
+            convertingStorages.TryRemove(storageId);
             // Update slots
             storageItems.FillEmptySlots(isLimitSlot, slotLimit);
             SetStorageItems(storageId, storageItems);
@@ -325,6 +329,17 @@ namespace MultiplayerARPG.MMO
             return storageItems;
 #else
             return new ConcurrentDictionary<StorageId, List<CharacterItem>>();
+#endif
+        }
+
+        public bool WillProceedStorageSaving(StorageType storageType, string storageOwnerId)
+        {
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+            if (storageType == StorageType.Building && BaseGameNetworkManager.Singleton.IsInstanceMap())
+                return false;
+            return true;
+#else
+            return false;
 #endif
         }
     }
