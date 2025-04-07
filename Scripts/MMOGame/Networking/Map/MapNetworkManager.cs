@@ -406,22 +406,31 @@ namespace MultiplayerARPG.MMO
                     }
                 }
                 // Initialize remaining in-scene buildings
-                List<UniTask<DatabaseApiResult<BuildingResp>>> createBuildingTasks = new List<UniTask<DatabaseApiResult<BuildingResp>>>();
+                List<UniTask> initialBuildingTasks = new List<UniTask>();
                 foreach (BuildingEntity initializingBuilding in initializingBuildingDicts.Values)
                 {
                     initializingBuilding.InitSceneObject();
                     GameInstance.ServerBuildingHandlers.AddBuilding(initializingBuilding.Id, initializingBuilding);
-                    if (!IsInstanceMap())
+                    if (IsInstanceMap())
+                        continue;
+                    initialBuildingTasks.Add(DatabaseClient.CreateBuildingAsync(new CreateBuildingReq()
                     {
-                        createBuildingTasks.Add(DatabaseClient.CreateBuildingAsync(new CreateBuildingReq()
+                        ChannelId = ChannelId,
+                        MapName = CurrentMapInfo.Id,
+                        BuildingData = initializingBuilding.CloneTo(new BuildingSaveData()),
+                    }));
+                    if (initializingBuilding is StorageEntity)
+                    {
+                        StorageId storageId = new StorageId(StorageType.Building, initializingBuilding.Id);
+                        initialBuildingTasks.Add(DatabaseClient.UpdateStorageItemsAsync(new UpdateStorageItemsReq()
                         {
-                            ChannelId = ChannelId,
-                            MapName = CurrentMapInfo.Id,
-                            BuildingData = initializingBuilding.CloneTo(new BuildingSaveData()),
+                            StorageType = storageId.storageType,
+                            StorageOwnerId = storageId.storageOwnerId,
+                            StorageItems = ServerStorageHandlers.GetStorageItems(storageId),
                         }));
                     }
                 }
-                await UniTask.WhenAll(createBuildingTasks);
+                await UniTask.WhenAll(initialBuildingTasks);
             }
         }
 #endif
