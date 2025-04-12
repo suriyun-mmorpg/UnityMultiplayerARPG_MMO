@@ -23,8 +23,10 @@ namespace MultiplayerARPG.MMO
                 cancellingReserveStorageCharacterIds.Add(playerCharacterEntity.Id);
 
                 // Clear character states
-                playerCharacterEntity.Dealing.StopDealing();
-                playerCharacterEntity.Vending.StopVending();
+                if (playerCharacterEntity.DealingComponent != null)
+                    playerCharacterEntity.DealingComponent.StopDealing();
+                if (playerCharacterEntity.VendingComponent != null)
+                    playerCharacterEntity.VendingComponent.StopVending();
                 playerCharacterEntity.SetOwnerClient(-1);
                 playerCharacterEntity.StopMove();
                 MovementState movementState = playerCharacterEntity.MovementState;
