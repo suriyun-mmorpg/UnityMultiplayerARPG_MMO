@@ -47,7 +47,10 @@ namespace MultiplayerARPG.MMO
                 Directory.CreateDirectory(configFolder);
             try
             {
-                File.WriteAllText(configFilePath, JsonConvert.SerializeObject(writingConfig, Formatting.Indented));
+                File.WriteAllText(configFilePath, JsonConvert.SerializeObject(writingConfig, Formatting.Indented, new JsonSerializerSettings
+                {
+                    NullValueHandling = NullValueHandling.Ignore
+                }));
                 Debug.Log($"Server config file written to {configFilePath}");
             }
             catch (System.Exception ex)
