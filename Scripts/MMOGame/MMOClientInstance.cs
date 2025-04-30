@@ -6,7 +6,6 @@ using Cysharp.Threading.Tasks;
 using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
-using System.Collections.Generic;
 
 namespace MultiplayerARPG.MMO
 {
@@ -79,10 +78,6 @@ namespace MultiplayerARPG.MMO
 
             // Always accept SSL
             ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback((sender, certificate, chain, policyErrors) => { return true; });
-
-            List<MmoNetworkSetting> servers = ConfigManager.ReadServerList();
-            if (servers != null && servers.Count > 0)
-                networkSettings = servers.ToArray();
         }
 
         private void OnEnable()

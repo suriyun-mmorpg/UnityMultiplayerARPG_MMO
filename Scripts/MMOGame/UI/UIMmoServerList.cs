@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace MultiplayerARPG.MMO
 {
@@ -54,8 +55,15 @@ namespace MultiplayerARPG.MMO
         {
             SelectionManager.DeselectSelectedUI();
             SelectionManager.Clear();
+            RefreshServerList();
+        }
 
+        public async void RefreshServerList()
+        {
             MmoNetworkSetting[] networkSettings = MMOClientInstance.Singleton.NetworkSettings;
+            List<MmoNetworkSetting> servers = await ConfigManager.ReadServerList();
+            if (servers != null && servers.Count > 0)
+                networkSettings = servers.ToArray();
             List.Generate(networkSettings, (index, networkSetting, ui) =>
             {
                 UIMmoServerEntry uiServerEntry = ui.GetComponent<UIMmoServerEntry>();

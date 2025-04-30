@@ -59,18 +59,18 @@ namespace MultiplayerARPG.MMO
             }
         }
 
-        public static bool HasClientConfig()
+        public static async UniTask<bool> HasClientConfig()
         {
-            return HasTextFileInStreamingAssets("clientConfig.json");
+            return await HasTextFileInStreamingAssets("clientConfig.json");
         }
 
-        public static ClientConfig ReadClientConfig(bool reRead = false)
+        public static async UniTask<ClientConfig> ReadClientConfig(bool reRead = false)
         {
             if (_clientConfig != null && !reRead)
                 return _clientConfig;
             try
             {
-                return _clientConfig = JsonConvert.DeserializeObject<ClientConfig>(ReadTextFromStreamingAssets("clientConfig.json"));
+                return _clientConfig = JsonConvert.DeserializeObject<ClientConfig>(await ReadTextFromStreamingAssets("clientConfig.json"));
             }
             catch
             {
@@ -79,10 +79,10 @@ namespace MultiplayerARPG.MMO
             }
         }
 
-        public static List<MmoNetworkSetting> ReadServerList()
+        public static async UniTask<List<MmoNetworkSetting>> ReadServerList()
         {
             List<MmoNetworkSetting> result = new List<MmoNetworkSetting>();
-            string text = ReadTextFromStreamingAssets("serverList.txt");
+            string text = await ReadTextFromStreamingAssets("serverList.txt");
             if (string.IsNullOrWhiteSpace(text))
                 return result;
             string[] lines = text.Split(new[] { "\r\n", "\n", "\r" }, System.StringSplitOptions.None);
@@ -110,12 +110,12 @@ namespace MultiplayerARPG.MMO
             return result;
         }
 
-        public static bool HasTextFileInStreamingAssets(string fileName)
+        public static async UniTask<bool> HasTextFileInStreamingAssets(string fileName)
         {
             if (ShouldReadConfigByWebRequest())
             {
                 // NOTE: Find better way to implement this one
-                return ReadTextFromStreamingAssets(fileName) != null;
+                return await ReadTextFromStreamingAssets(fileName) != null;
             }
             else
             {
@@ -123,7 +123,7 @@ namespace MultiplayerARPG.MMO
             }
         }
 
-        public static string ReadTextFromStreamingAssets(string fileName)
+        public static async UniTask<string> ReadTextFromStreamingAssets(string fileName)
         {
             string filePath = Path.Combine(Application.streamingAssetsPath, fileName);
             Debug.Log($"[ConfigManager] Reading text from streaming assets {filePath}");
@@ -134,7 +134,7 @@ namespace MultiplayerARPG.MMO
                     UnityWebRequestAsyncOperation operation = request.SendWebRequest();
                     do
                     {
-                        // NOTE: Actually should be async
+                        await UniTask.Yield();
                     } while (!operation.isDone);
                     if (request.result == UnityWebRequest.Result.Success)
                     {
