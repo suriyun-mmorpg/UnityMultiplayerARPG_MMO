@@ -1,7 +1,10 @@
+using Cysharp.Threading.Tasks;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
+using System.Collections.Generic;
 using System.IO;
+using System.Text.RegularExpressions;
 using UnityEngine;
+using UnityEngine.Networking;
 
 namespace MultiplayerARPG.MMO
 {
@@ -55,23 +58,104 @@ namespace MultiplayerARPG.MMO
 
         public static bool HasClientConfig()
         {
-            string configFilePath = Path.Combine(Application.streamingAssetsPath, "clientConfig.json");
-            return File.Exists(configFilePath);
+            return HasTextFileInStreamingAssets("clientConfig.json");
         }
 
-        public static ClientConfig ReadClientConfig()
+        public static ClientConfig ReadClientConfig(bool reRead = false)
         {
-            string configFilePath = Path.Combine(Application.streamingAssetsPath, "clientConfig.json");
-            Debug.Log($"Reading client config file from {configFilePath}");
-            if (File.Exists(configFilePath))
-            {
-                // Read config file
-                Debug.Log("Found client config file.");
-                string dataAsJson = File.ReadAllText(configFilePath);
-                _clientConfig = JsonConvert.DeserializeObject<ClientConfig>(dataAsJson);
+            if (_clientConfig != null && !reRead)
                 return _clientConfig;
+            try
+            {
+                return _clientConfig = JsonConvert.DeserializeObject<ClientConfig>(ReadTextFromStreamingAssets("clientConfig.json"));
             }
-            return new ClientConfig();
+            catch
+            {
+                Debug.LogError("[ConfigManager] Unable to read client config");
+                return new ClientConfig();
+            }
+        }
+
+        public static List<MmoNetworkSetting> ReadServerList()
+        {
+            List<MmoNetworkSetting> result = new List<MmoNetworkSetting>();
+            string text = ReadTextFromStreamingAssets("serverList.txt");
+            if (string.IsNullOrWhiteSpace(text))
+                return result;
+            string[] lines = text.Split(new[] { "\r\n", "\n", "\r" }, System.StringSplitOptions.None);
+            for (int i = 0; i < lines.Length; ++i)
+            {
+                // Split by any whitespace (space, tab, etc.)
+                string[] parts = lines[i].Trim().Split(',');
+                if (parts.Length < 2)
+                    continue;
+                string title = parts[0];
+                string address = parts[1];
+                string[] addressParts = address.Trim().Split(':');
+                if (addressParts.Length < 2)
+                    continue;
+                string ip = addressParts[0];
+                if (!int.TryParse(addressParts[1], out int port))
+                    continue;
+                MmoNetworkSetting setting = ScriptableObject.CreateInstance<MmoNetworkSetting>();
+                setting.name = $"FromFile_{i}";
+                setting.DefaultTitle = title;
+                setting.networkAddress = ip;
+                setting.networkPort = port;
+                result.Add(setting);
+            }
+            return result;
+        }
+
+        public static bool HasTextFileInStreamingAssets(string fileName)
+        {
+            if (ShouldReadConfigByWebRequest())
+            {
+                // NOTE: Find better way to implement this one
+                return ReadTextFromStreamingAssets(fileName) != null;
+            }
+            else
+            {
+                return File.Exists(fileName);
+            }
+        }
+
+        public static string ReadTextFromStreamingAssets(string fileName)
+        {
+            string filePath = Path.Combine(Application.streamingAssetsPath, fileName);
+            Debug.Log($"[ConfigManager] Reading text from streaming assets {filePath}");
+            if (ShouldReadConfigByWebRequest())
+            {
+                using (UnityWebRequest request = UnityWebRequest.Get(filePath))
+                {
+                    UnityWebRequestAsyncOperation operation = request.SendWebRequest();
+                    do
+                    {
+                        // NOTE: Actually should be async
+                    } while (!operation.isDone);
+                    if (request.result == UnityWebRequest.Result.Success)
+                    {
+                        string content = request.downloadHandler.text;
+                        Debug.Log($"[ConfigManager] {filePath} Content:\n{content}");
+                        return content;
+                    }
+                }
+            }
+            else
+            {
+                if (File.Exists(filePath))
+                {
+                    string content = File.ReadAllText(filePath);
+                    Debug.Log($"[ConfigManager] {filePath} Content:\n{content}");
+                    return content;
+                }
+            }
+            return null;
+        }
+
+        public static bool ShouldReadConfigByWebRequest()
+        {
+            return !Application.isEditor && (Application.platform == RuntimePlatform.WebGLPlayer || Application.platform == RuntimePlatform.Android);
         }
     }
 }
