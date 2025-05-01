@@ -53,8 +53,16 @@ namespace MultiplayerARPG.MMO
                 return mapNetworkManager;
             }
         }
-        public bool UseWebSocket { get { return useWebSocket; } }
-        public bool WebSocketSecure { get { return webSocketSecure; } }
+        public bool UseWebSocket
+        {
+            get => useWebSocket;
+            set => useWebSocket = value;
+        }
+        public bool WebSocketSecure
+        {
+            get => webSocketSecure;
+            set => webSocketSecure = value;
+        }
         public MmoNetworkSetting[] NetworkSettings { get { return networkSettings; } }
         public string SelectedChannelId { get; set; } = string.Empty;
 

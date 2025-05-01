@@ -85,10 +85,26 @@ namespace MultiplayerARPG.MMO
             }
         }
         public IChatProfanityDetector ChatProfanityDetector { get; private set; }
-        public bool UseWebSocket { get { return useWebSocket; } }
-        public bool WebSocketSecure { get { return webSocketSecure; } }
-        public string WebSocketCertificateFilePath { get { return webSocketCertPath; } }
-        public string WebSocketCertificatePassword { get { return webSocketCertPassword; } }
+        public bool UseWebSocket
+        {
+            get => useWebSocket;
+            set => useWebSocket = value;
+        }
+        public bool WebSocketSecure
+        {
+            get => webSocketSecure;
+            set => webSocketSecure = value;
+        }
+        public string WebSocketCertificateFilePath
+        {
+            get => webSocketCertPath;
+            set => webSocketCertPath = value;
+        }
+        public string WebSocketCertificatePassword
+        {
+            get => webSocketCertPassword;
+            set => webSocketCertPassword = value;
+        }
 
         private LogGUI _cacheLogGUI;
         public LogGUI CacheLogGUI
