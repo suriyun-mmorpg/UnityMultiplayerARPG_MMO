@@ -48,6 +48,7 @@ namespace MultiplayerARPG.MMO
         public void OnClickConnect()
         {
             MmoNetworkSetting data = SelectionManager.SelectedUI.Data;
+            MMOClientInstance.Singleton.WebSocketSecure = data.webSocketSecure;
             MMOClientInstance.Singleton.StartCentralClient(data.networkAddress, data.networkPort);
         }
 

@@ -8,6 +8,7 @@ namespace MultiplayerARPG.MMO
     {
         public string networkAddress = "127.0.0.1";
         public int networkPort = 6000;
+        public bool webSocketSecure = false;
     }
 
     [System.Serializable]

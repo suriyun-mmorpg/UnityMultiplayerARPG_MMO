@@ -92,6 +92,9 @@ namespace MultiplayerARPG.MMO
                 string[] parts = lines[i].Trim().Split(',');
                 if (parts.Length < 2)
                     continue;
+                bool webSocketSecure = false;
+                if (parts.Length > 2)
+                    bool.TryParse(parts[2], out webSocketSecure);
                 string title = parts[0];
                 string address = parts[1];
                 string[] addressParts = address.Trim().Split(':');
@@ -105,6 +108,7 @@ namespace MultiplayerARPG.MMO
                 setting.DefaultTitle = title;
                 setting.networkAddress = ip;
                 setting.networkPort = port;
+                setting.webSocketSecure = webSocketSecure;
                 result.Add(setting);
             }
             return result;
