@@ -123,7 +123,8 @@ namespace MultiplayerARPG.MMO
             }
             else
             {
-                return File.Exists(fileName);
+                string filePath = Path.Combine(Application.streamingAssetsPath, fileName);
+                return File.Exists(filePath);
             }
         }
 
