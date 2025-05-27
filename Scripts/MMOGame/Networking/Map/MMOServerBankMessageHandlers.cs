@@ -45,7 +45,8 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            if (playerCharacter.Gold - request.gold < 0)
+            int requiredGold = GameInstance.Singleton.GameplayRule.GetGuildBankDepositFee(request.gold) + request.gold;
+            if (playerCharacter.Gold < requiredGold)
             {
                 result.InvokeError(new ResponseDepositGuildGoldMessage()
                 {
@@ -57,7 +58,7 @@ namespace MultiplayerARPG.MMO
             DatabaseApiResult<GuildGoldResp> changeGoldResp = await DatabaseClient.ChangeGuildGoldAsync(new ChangeGuildGoldReq()
             {
                 GuildId = playerCharacter.GuildId,
-                ChangeAmount = request.gold
+                ChangeAmount = request.gold,
             });
             if (!changeGoldResp.IsSuccess)
             {
@@ -68,7 +69,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             guild.gold = changeGoldResp.Response.GuildGold;
-            playerCharacter.Gold -= request.gold;
+            playerCharacter.Gold -= requiredGold;
             GameInstance.ServerGuildHandlers.SetGuild(playerCharacter.GuildId, guild);
             // Broadcast via chat server
             if (ClusterClient.IsNetworkActive)
@@ -107,7 +108,8 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            if (playerCharacter.Gold - request.gold < 0)
+            int requiredGold = GameInstance.Singleton.GameplayRule.GetUserBankDepositFee(request.gold) + request.gold;
+            if (playerCharacter.Gold < requiredGold)
             {
                 result.InvokeError(new ResponseDepositUserGoldMessage()
                 {
@@ -130,7 +132,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             playerCharacter.UserGold = changeGoldResp.Response.Gold;
-            playerCharacter.Gold -= request.gold;
+            playerCharacter.Gold -= requiredGold;
             result.InvokeSuccess(new ResponseDepositUserGoldMessage());
 #endif
         }
@@ -175,7 +177,8 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            if (goldResp.Response.GuildGold - request.gold < 0)
+            int requiredGold = GameInstance.Singleton.GameplayRule.GetGuildBankWithdrawFee(request.gold) + request.gold;
+            if (goldResp.Response.GuildGold < requiredGold)
             {
                 result.InvokeError(new ResponseWithdrawGuildGoldMessage()
                 {
@@ -187,7 +190,7 @@ namespace MultiplayerARPG.MMO
             DatabaseApiResult<GuildGoldResp> changeGoldResp = await DatabaseClient.ChangeGuildGoldAsync(new ChangeGuildGoldReq()
             {
                 GuildId = playerCharacter.GuildId,
-                ChangeAmount = -request.gold
+                ChangeAmount = -requiredGold,
             });
             if (!changeGoldResp.IsSuccess)
             {
@@ -250,7 +253,8 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            if (goldResp.Response.Gold - request.gold < 0)
+            int requiredGold = GameInstance.Singleton.GameplayRule.GetUserBankWithdrawFee(request.gold) + request.gold;
+            if (goldResp.Response.Gold < request.gold)
             {
                 result.InvokeError(new ResponseWithdrawUserGoldMessage()
                 {
@@ -262,7 +266,7 @@ namespace MultiplayerARPG.MMO
             DatabaseApiResult<GoldResp> changeGoldResp = await DatabaseClient.ChangeGoldAsync(new ChangeGoldReq()
             {
                 UserId = playerCharacter.UserId,
-                ChangeAmount = -request.gold
+                ChangeAmount = -requiredGold,
             });
             if (!changeGoldResp.IsSuccess)
             {
