@@ -434,7 +434,7 @@ namespace MultiplayerARPG.MMO
 
                 // Map spawn exe path
                 string spawnExePath;
-                if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_PUBLIC_ADDRESS, out spawnExePath, MapSpawnNetworkManager.spawnExePath))
+                if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_SPAWN_EXE_PATH, out spawnExePath, MapSpawnNetworkManager.spawnExePath))
                 {
                     MapSpawnNetworkManager.spawnExePath = spawnExePath;
                 }
