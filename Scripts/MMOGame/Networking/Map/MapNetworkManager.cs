@@ -232,7 +232,9 @@ namespace MultiplayerARPG.MMO
                 if (playerCharacter == null) continue;
                 await DatabaseClient.UpdateCharacterAsync(new UpdateCharacterReq()
                 {
-                    CharacterData = playerCharacter.CloneTo(new PlayerCharacterData())
+                    State = TransactionUpdateCharacterState.All,
+                    CharacterData = playerCharacter.CloneTo(new PlayerCharacterData()),
+                    DeleteStorageReservation = true,
                 });
             }
             foreach (BuildingEntity buildingEntity in ServerBuildingHandlers.GetBuildings())
