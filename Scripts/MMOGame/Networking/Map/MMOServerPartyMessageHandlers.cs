@@ -329,7 +329,7 @@ namespace MultiplayerARPG.MMO
             }
             // Delete from cache
             if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(request.memberId, out IPlayerCharacterData memberCharacter) &&
-                GameInstance.ServerUserHandlers.TryGetConnectionId(request.memberId, out long memberConnectionId))
+                GameInstance.ServerUserHandlers.TryGetConnectionIdById(request.memberId, out long memberConnectionId))
             {
                 memberCharacter.ClearParty();
                 GameInstance.ServerGameMessageHandlers.SendClearPartyData(memberConnectionId, validateResult.PartyId);
@@ -405,7 +405,7 @@ namespace MultiplayerARPG.MMO
                         });
                         // Update cache
                         if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(memberId, out memberCharacter) &&
-                            GameInstance.ServerUserHandlers.TryGetConnectionId(memberId, out memberConnectionId))
+                            GameInstance.ServerUserHandlers.TryGetConnectionIdById(memberId, out memberConnectionId))
                         {
                             memberCharacter.ClearParty();
                             GameInstance.ServerGameMessageHandlers.SendClearPartyData(memberConnectionId, validateResult.PartyId);

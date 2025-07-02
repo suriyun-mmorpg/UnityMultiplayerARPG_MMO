@@ -363,7 +363,7 @@ namespace MultiplayerARPG.MMO
             }
             // Delete from cache
             if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(request.memberId, out IPlayerCharacterData memberCharacter) &&
-                GameInstance.ServerUserHandlers.TryGetConnectionId(request.memberId, out long memberConnectionId))
+                GameInstance.ServerUserHandlers.TryGetConnectionIdById(request.memberId, out long memberConnectionId))
             {
                 memberCharacter.ClearGuild();
                 GameInstance.ServerGameMessageHandlers.SendClearGuildData(memberConnectionId, validateResult.GuildId);
@@ -431,7 +431,7 @@ namespace MultiplayerARPG.MMO
                     });
                     // Update cache
                     if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(memberId, out memberCharacter) &&
-                        GameInstance.ServerUserHandlers.TryGetConnectionId(memberId, out memberConnectionId))
+                        GameInstance.ServerUserHandlers.TryGetConnectionIdById(memberId, out memberConnectionId))
                     {
                         memberCharacter.ClearGuild();
                         GameInstance.ServerGameMessageHandlers.SendClearGuildData(memberConnectionId, validateResult.GuildId);
@@ -965,7 +965,7 @@ namespace MultiplayerARPG.MMO
             }
 
             // Add guild member to database
-            if (!GameInstance.ServerUserHandlers.TryGetConnectionId(request.requesterId, out long notifyConnectionId))
+            if (!GameInstance.ServerUserHandlers.TryGetConnectionIdById(request.requesterId, out long notifyConnectionId))
                 notifyConnectionId = -1;
 
             // Delete request from database

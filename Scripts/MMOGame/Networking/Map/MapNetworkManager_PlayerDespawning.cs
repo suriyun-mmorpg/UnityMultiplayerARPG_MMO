@@ -44,7 +44,7 @@ namespace MultiplayerARPG.MMO
 
                 // Unregister player character
                 UnregisterPlayerCharacter(connectionId);
-                UnregisterUserId(connectionId);
+                UnregisterUserIdAndAccessToken(connectionId);
 
                 // Save character immediately when player disconnect
                 await WaitAndSaveCharacter(TransactionUpdateCharacterState.All, playerCharacterEntity.CloneTo(new PlayerCharacterData()));
@@ -98,7 +98,7 @@ namespace MultiplayerARPG.MMO
             else
             {
                 UnregisterPlayerCharacter(connectionId);
-                UnregisterUserId(connectionId);
+                UnregisterUserIdAndAccessToken(connectionId);
             }
         }
 #endif

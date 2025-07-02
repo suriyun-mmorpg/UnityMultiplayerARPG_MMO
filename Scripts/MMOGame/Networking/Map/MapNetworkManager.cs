@@ -95,8 +95,7 @@ namespace MultiplayerARPG.MMO
         private readonly ConcurrentDictionary<string, CentralServerPeerInfo> _mapServerConnectionIdsBySceneName = new ConcurrentDictionary<string, CentralServerPeerInfo>();
         private readonly ConcurrentDictionary<string, CentralServerPeerInfo> _instanceMapServerConnectionIdsByInstanceId = new ConcurrentDictionary<string, CentralServerPeerInfo>();
         private readonly ConcurrentDictionary<string, SocialCharacterData> _usersByCharacterId = new ConcurrentDictionary<string, SocialCharacterData>();
-        private readonly ConcurrentDictionary<string, long> _connectionsByUserId = new ConcurrentDictionary<string, long>();
-        private readonly ConcurrentDictionary<string, string> _accessTokensByUserId = new ConcurrentDictionary<string, string>();
+        private readonly ConcurrentDictionary<long, PlayerCharacterData> _pendingSpawnPlayerCharacters = new ConcurrentDictionary<long, PlayerCharacterData>();
         // Database operations
         private readonly ConcurrentHashSet<StorageId> _loadingStorageIds = new ConcurrentHashSet<StorageId>();
         private readonly ConcurrentHashSet<int> _loadingPartyIds = new ConcurrentHashSet<int>();
@@ -192,6 +191,7 @@ namespace MultiplayerARPG.MMO
             _mapServerConnectionIdsBySceneName.Clear();
             _instanceMapServerConnectionIdsByInstanceId.Clear();
             _usersByCharacterId.Clear();
+            _pendingSpawnPlayerCharacters.Clear();
             _loadingStorageIds.Clear();
             _loadingPartyIds.Clear();
             _loadingGuildIds.Clear();
@@ -203,8 +203,6 @@ namespace MultiplayerARPG.MMO
             proceedingUserIds.Clear();
             proceedingGuildIds.Clear();
             proceedingPartyIds.Clear();
-            _connectionsByUserId.Clear();
-            _accessTokensByUserId.Clear();
             DataUpdater.Clean();
 #endif
         }
@@ -287,24 +285,6 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-        public override void RegisterUserId(long connectionId, string userId)
-        {
-            base.RegisterUserId(connectionId, userId);
-            _connectionsByUserId.TryRemove(userId, out _);
-            _connectionsByUserId.TryAdd(userId, connectionId);
-        }
-#endif
-
-#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-        public void RegisterUserIdAndAccessToken(long connectionId, string userId, string accessToken)
-        {
-            RegisterUserId(connectionId, userId);
-            _accessTokensByUserId.TryRemove(userId, out _);
-            _accessTokensByUserId.TryAdd(userId, accessToken);
-        }
-#endif
-
-#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         public override void OnClientDisconnected(DisconnectReason reason, SocketError socketError, byte[] data)
         {
             GameInstance.UserId = string.Empty;
@@ -314,16 +294,14 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-        public override void UnregisterUserId(long connectionId)
+        public override void UnregisterUserIdAndAccessToken(long connectionId)
         {
             if (ServerUserHandlers.TryGetUserId(connectionId, out string userId))
             {
-                _connectionsByUserId.TryRemove(userId, out _);
-                _accessTokensByUserId.TryRemove(userId, out _);
                 storageUsers.TryRemove(userId, out _);
                 proceedingUserIds.TryRemove(userId);
             }
-            base.UnregisterUserId(connectionId);
+            base.UnregisterUserIdAndAccessToken(connectionId);
         }
 #endif
 
@@ -472,95 +450,11 @@ namespace MultiplayerARPG.MMO
             await SaveAndDespawnPendingPlayerCharacter(userId);
             // Unregister player
             UnregisterPlayerCharacter(connectionId);
-            UnregisterUserId(connectionId);
-
-            return true;
-        }
-#endif
-
-        protected override void HandleEnterGameResponse(ResponseHandlerData responseHandler, AckResponseCode responseCode, EnterGameResponseMessage response)
-        {
-            base.HandleEnterGameResponse(responseHandler, responseCode, response);
-            if (responseCode == AckResponseCode.Success)
-            {
-                // Disconnect from central server when accepted by map server
-                MMOClientInstance.Singleton.StopCentralClient();
-            }
-        }
-
-        public override void SerializeClientReadyData(NetDataWriter writer)
-        {
-            writer.Put(GameInstance.UserId);
-            writer.Put(GameInstance.AccessToken);
-            writer.Put(GameInstance.SelectedCharacterId);
-        }
-
-#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-        public override async UniTask<bool> DeserializeClientReadyData(LiteNetLibIdentity playerIdentity, long connectionId, NetDataReader reader)
-        {
-            if (IsAllocate)
-            {
-                return false;
-            }
-
-            string userId = reader.GetString();
-            string accessToken = reader.GetString();
-            string selectCharacterId = reader.GetString();
-            if (!await ValidatePlayerConnection(connectionId, userId, accessToken, selectCharacterId))
-            {
-                return false;
-            }
-
+            UnregisterUserIdAndAccessToken(connectionId);
+            // Register player access
             RegisterUserIdAndAccessToken(connectionId, userId, accessToken);
-            SetPlayerReadyRoutine(connectionId, userId, accessToken, selectCharacterId).Forget();
-            return true;
-        }
-#endif
 
-#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-        private async UniTask<bool> ValidatePlayerConnection(long connectionId, string userId, string accessToken, string selectCharacterId)
-        {
-            if (!IsServerReadyToInstantiateObjects())
-            {
-                if (LogError)
-                    Logging.LogError(LogTag, "Not ready to spawn player: " + userId + ", user must see map server is not ready, how can this guy reach here? :P.");
-                return false;
-            }
-
-            if (_connectionsByUserId.ContainsKey(userId))
-            {
-                if (LogError)
-                    Logging.LogError(LogTag, "User trying to hack?: " + userId + ", connection already registered.");
-                return false;
-            }
-
-            if (ServerUserHandlers.TryGetPlayerCharacter(connectionId, out _))
-            {
-                if (LogError)
-                    Logging.LogError(LogTag, "User trying to hack?: " + userId + ", character already registered.");
-                return false;
-            }
-
-            DatabaseApiResult<ValidateAccessTokenResp> validateAccessTokenResp = await DatabaseClient.ValidateAccessTokenAsync(new ValidateAccessTokenReq()
-            {
-                UserId = userId,
-                AccessToken = accessToken,
-            });
-
-            if (!validateAccessTokenResp.IsSuccess || !validateAccessTokenResp.Response.IsPass)
-            {
-                if (LogError)
-                    Logging.LogError(LogTag, "Invalid access token for user: " + userId);
-                return false;
-            }
-
-            return true;
-        }
-#endif
-
-#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-        private async UniTaskVoid SetPlayerReadyRoutine(long connectionId, string userId, string accessToken, string selectCharacterId)
-        {
+            // Prepare player character data
             DatabaseApiResult<CharacterResp> characterResp = await DatabaseClient.GetCharacterAsync(new GetCharacterReq()
             {
                 UserId = userId,
@@ -568,26 +462,9 @@ namespace MultiplayerARPG.MMO
             });
             if (!characterResp.IsSuccess)
             {
-                KickClient(connectionId, UITextKeys.UI_ERROR_KICKED_FROM_SERVER);
-                return;
+                return false;
             }
             PlayerCharacterData playerCharacterData = characterResp.Response.CharacterData;
-            // If data is empty / cannot find character, kick the player
-            if (playerCharacterData == null)
-            {
-                if (LogError)
-                    Logging.LogError(LogTag, "Cannot find select character: " + selectCharacterId + " for user: " + userId);
-                KickClient(connectionId, UITextKeys.UI_ERROR_KICKED_FROM_SERVER);
-                return;
-            }
-            // If it is not allow this character data, kick the player
-            if (!playerCharacterData.TryGetEntityAddressablePrefab(out _, out _) && !playerCharacterData.TryGetEntityPrefab(out _, out _))
-            {
-                if (LogError)
-                    Logging.LogError(LogTag, "Cannot find player character with entity Id: " + playerCharacterData.EntityId);
-                KickClient(connectionId, UITextKeys.UI_ERROR_KICKED_FROM_SERVER);
-                return;
-            }
 
             // Store location when enter game
             _characterLocationsWhenEnterGame[playerCharacterData.Id] = new EnterGameCharacterLocation()
@@ -595,6 +472,7 @@ namespace MultiplayerARPG.MMO
                 mapName = playerCharacterData.CurrentMapName,
                 position = playerCharacterData.CurrentPosition,
                 rotation = playerCharacterData.CurrentRotation,
+                safeArea = playerCharacterData.CurrentSafeArea,
             };
 
             if (IsInstanceMap())
@@ -609,6 +487,101 @@ namespace MultiplayerARPG.MMO
             playerCharacterData.CurrentMapName = mapName;
             playerCharacterData.CurrentPosition = position;
             playerCharacterData.CurrentRotation = rotation;
+
+            _pendingSpawnPlayerCharacters[connectionId] = playerCharacterData;
+            return true;
+        }
+#endif
+
+        protected override void HandleEnterGameResponse(ResponseHandlerData responseHandler, AckResponseCode responseCode, EnterGameResponseMessage response)
+        {
+            base.HandleEnterGameResponse(responseHandler, responseCode, response);
+            if (responseCode == AckResponseCode.Success)
+            {
+                // Disconnect from central server when accepted by map server
+                MMOClientInstance.Singleton.StopCentralClient();
+            }
+        }
+
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+        public override UniTask<bool> DeserializeClientReadyData(LiteNetLibIdentity playerIdentity, long connectionId, NetDataReader reader)
+        {
+            if (IsAllocate)
+            {
+                return UniTask.FromResult(false);
+            }
+            if (!ServerUserHandlers.TryGetUserId(connectionId, out string userId) ||
+                !ServerUserHandlers.TryGetAccessToken(connectionId, out string accessToken) ||
+                !_pendingSpawnPlayerCharacters.TryGetValue(connectionId, out PlayerCharacterData data))
+            {
+                return UniTask.FromResult(false);
+            }
+            SetPlayerReadyRoutine(connectionId, userId, accessToken, data).Forget();
+            return UniTask.FromResult(true);
+        }
+#endif
+
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+        private async UniTask<bool> ValidatePlayerConnection(long connectionId, string userId, string accessToken, string selectCharacterId)
+        {
+            if (!IsServerReadyToInstantiateObjects())
+            {
+                if (LogError)
+                    Logging.LogError(LogTag, $"Not ready to spawn player: {userId}, user must see map server is not ready, how can this guy reach here? :P.");
+                return false;
+            }
+
+            if (ServerUserHandlers.TryGetConnectionIdByUserId(userId, out _))
+            {
+                if (LogError)
+                    Logging.LogError(LogTag, $"User trying to hack?: {userId}, connection already registered.");
+                return false;
+            }
+
+            if (ServerUserHandlers.TryGetPlayerCharacter(connectionId, out _))
+            {
+                if (LogError)
+                    Logging.LogError(LogTag, $"User trying to hack?: {userId}, character already registered.");
+                return false;
+            }
+
+            DatabaseApiResult<ValidateAccessTokenResp> validateAccessTokenResp = await DatabaseClient.ValidateAccessTokenAsync(new ValidateAccessTokenReq()
+            {
+                UserId = userId,
+                AccessToken = accessToken,
+            });
+
+            if (!validateAccessTokenResp.IsSuccess || !validateAccessTokenResp.Response.IsPass)
+            {
+                if (LogError)
+                    Logging.LogError(LogTag, $"Invalid access token for user: {userId}");
+                return false;
+            }
+
+            return true;
+        }
+#endif
+
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+        private async UniTaskVoid SetPlayerReadyRoutine(long connectionId, string userId, string accessToken, PlayerCharacterData playerCharacterData)
+        {
+            // If data is empty / no selected character, kick the player
+            if (playerCharacterData == null)
+            {
+                if (LogError)
+                    Logging.LogError(LogTag, $"No selected character for user: {userId}");
+                KickClient(connectionId, UITextKeys.UI_ERROR_KICKED_FROM_SERVER);
+                return;
+            }
+
+            // If it is not allow this character data, kick the player
+            if (!playerCharacterData.TryGetEntityAddressablePrefab(out _, out _) && !playerCharacterData.TryGetEntityPrefab(out _, out _))
+            {
+                if (LogError)
+                    Logging.LogError(LogTag, $"Cannot find player character with entity Id: {playerCharacterData.EntityId}");
+                KickClient(connectionId, UITextKeys.UI_ERROR_KICKED_FROM_SERVER);
+                return;
+            }
 
             // Spawn character entity and set its data
             Quaternion characterRotation = Quaternion.identity;
@@ -857,14 +830,14 @@ namespace MultiplayerARPG.MMO
             {
                 if (playerCharacter.IsMuting())
                 {
-                    if (ServerUserHandlers.TryGetConnectionId(playerCharacter.Id, out long connectionId))
+                    if (ServerUserHandlers.TryGetConnectionIdById(playerCharacter.Id, out long connectionId))
                         ServerGameMessageHandlers.SendGameMessage(connectionId, UITextKeys.UI_ERROR_CHAT_MUTED);
                     return;
                 }
                 if (ServerChatHandlers.ChatTooFast(playerCharacter.Id))
                 {
                     ServerChatHandlers.ChatFlooded(playerCharacter.Id);
-                    if (ServerUserHandlers.TryGetConnectionId(playerCharacter.Id, out long connectionId))
+                    if (ServerUserHandlers.TryGetConnectionIdById(playerCharacter.Id, out long connectionId))
                         ServerGameMessageHandlers.SendGameMessage(connectionId, UITextKeys.UI_ERROR_CHAT_ENTER_TOO_FAST);
                     return;
                 }
@@ -1370,7 +1343,7 @@ namespace MultiplayerARPG.MMO
         public void KickUser(string userId, UITextKeys message)
         {
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-            if (_connectionsByUserId.TryGetValue(userId, out long connectionId))
+            if (ServerUserHandlers.TryGetConnectionIdByUserId(userId, out long connectionId))
                 KickClient(connectionId, message);
 #endif
         }

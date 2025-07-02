@@ -13,6 +13,23 @@ namespace MultiplayerARPG.MMO
             return !IsAllocate && !string.IsNullOrEmpty(MapInstanceId);
         }
 
+        public override UniTask<ResponsePlayerCharacterTransformMessage> RequestPlayerCharacterTransform(long connectionId)
+        {
+            if (_pendingSpawnPlayerCharacters.TryGetValue(connectionId, out PlayerCharacterData playerCharacterData))
+            {
+                return UniTask.FromResult(new ResponsePlayerCharacterTransformMessage()
+                {
+                    message = UITextKeys.NONE,
+                    position = playerCharacterData.CurrentPosition,
+                    rotation = playerCharacterData.CurrentRotation,
+                });
+            }
+            return UniTask.FromResult(new ResponsePlayerCharacterTransformMessage()
+            {
+                message = UITextKeys.UI_ERROR_CHARACTER_NOT_FOUND,
+            });
+        }
+
         public override void WarpCharacter(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position, bool overrideRotation, Vector3 rotation)
         {
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE

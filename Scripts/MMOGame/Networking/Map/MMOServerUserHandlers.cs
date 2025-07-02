@@ -52,7 +52,7 @@ namespace MultiplayerARPG.MMO
         public override void BanUserByCharacterName(string characterName, int days)
         {
             long time = System.DateTimeOffset.UtcNow.ToUnixTimeSeconds() + (60 * 60 * 24 * days);
-            if (TryGetPlayerCharacterByName(characterName, out IPlayerCharacterData playerCharacter) && TryGetConnectionId(playerCharacter.Id, out long connectionId))
+            if (TryGetPlayerCharacterByName(characterName, out IPlayerCharacterData playerCharacter) && TryGetConnectionIdById(playerCharacter.Id, out long connectionId))
                 MapNetworkManager.ServerTransport.ServerDisconnect(connectionId);
             DatabaseClient.SetUserUnbanTimeByCharacterNameAsync(new SetUserUnbanTimeByCharacterNameReq()
             {
