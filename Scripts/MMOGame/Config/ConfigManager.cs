@@ -1,8 +1,8 @@
 using Cysharp.Threading.Tasks;
+using Insthync.UnityRestClient;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
-using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -10,6 +10,11 @@ namespace MultiplayerARPG.MMO
 {
     public static class ConfigManager
     {
+        public static string ClientConfigRemoteUrl { get; set; } = string.Empty;
+        public static string ClientConfigRemoteDevUrl { get; set; } = string.Empty;
+        private static bool s_IsLoadingClientConfig = false;
+        private static readonly string CachedClientConfigFileName = "cachedClientConfig.json";
+        private static string CachedClientConfigPath => Path.Combine(Application.persistentDataPath, CachedClientConfigFileName);
         private static ServerConfig _serverConfig;
         private static ClientConfig _clientConfig;
 
@@ -68,15 +73,111 @@ namespace MultiplayerARPG.MMO
         {
             if (_clientConfig != null && !reRead)
                 return _clientConfig;
+
+            if (s_IsLoadingClientConfig)
+            {
+                do
+                {
+                    await UniTask.Delay(1000);
+                } while (s_IsLoadingClientConfig);
+                if (_clientConfig != null)
+                    return _clientConfig;
+            }
+
+            // Get config file URLs
+            string[] args = System.Environment.GetCommandLineArgs();
+            string configRemoteUrl = string.Empty;
+            if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_CLIENT_CONFIG_URL, out configRemoteUrl, string.Empty))
+            {
+                ClientConfigRemoteUrl = ClientConfigRemoteDevUrl = configRemoteUrl;
+            }
+            else if (ConfigReader.ReadEnv(ProcessArguments.CONFIG_CLIENT_CONFIG_URL, out configRemoteUrl, string.Empty))
+            {
+                ClientConfigRemoteUrl = ClientConfigRemoteDevUrl = configRemoteUrl;
+            }
+            Debug.Log($"Reading remote client config from: \"{ClientConfigRemoteUrl}\", dev: \"{ClientConfigRemoteDevUrl}\"");
+
+            string remoteConfigUrl = null;
+            if (!Debug.isDebugBuild && !string.IsNullOrWhiteSpace(ClientConfigRemoteUrl))
+                remoteConfigUrl = ClientConfigRemoteUrl;
+
+            if (Debug.isDebugBuild && !string.IsNullOrWhiteSpace(ClientConfigRemoteDevUrl))
+                remoteConfigUrl = ClientConfigRemoteDevUrl;
+
+            // Read config file remotely
+            if (!string.IsNullOrEmpty(remoteConfigUrl))
+            {
+                Debug.Log($"Read config file from {remoteConfigUrl}");
+                if (!remoteConfigUrl.Contains("?"))
+                    remoteConfigUrl += "?";
+                else
+                    remoteConfigUrl += "&";
+
+                remoteConfigUrl += $"time={System.DateTime.Now.Ticks / System.TimeSpan.TicksPerMillisecond}";
+                remoteConfigUrl += $"&platform={Application.platform}";
+                remoteConfigUrl += $"&version={Application.version}";
+                remoteConfigUrl += $"&unity_version={Application.unityVersion}";
+
+                s_IsLoadingClientConfig = true;
+                RestClient.Result<ClientConfig> readConfigResult = await RestClient.Get<ClientConfig>(remoteConfigUrl);
+                s_IsLoadingClientConfig = false;
+                if (!readConfigResult.IsError())
+                {
+                    _clientConfig = readConfigResult.Content;
+
+                    // Save config file to local path (must works for Android, iOS too)
+                    try
+                    {
+                        Debug.Log($"Client config cached to: {CachedClientConfigPath}");
+                        File.WriteAllText(CachedClientConfigPath, JsonConvert.SerializeObject(_clientConfig));
+                    }
+                    catch (System.Exception ex)
+                    {
+                        Debug.LogWarning($"Failed to cache client config: {ex.Message}\n{ex.StackTrace}");
+                    }
+
+                    return _clientConfig;
+                }
+                else
+                {
+                    Debug.LogError($"Unable to read remote client config from: \"{remoteConfigUrl}\"");
+                }
+            }
+
+            // Read saved config file
+            if (!Application.isEditor)
+            {
+                if (File.Exists(CachedClientConfigPath))
+                {
+                    try
+                    {
+                        Debug.Log($"Read config file from persistent cache {CachedClientConfigPath}.");
+                        string cachedJson = File.ReadAllText(CachedClientConfigPath);
+                        return _clientConfig = JsonConvert.DeserializeObject<ClientConfig>(cachedJson);
+                    }
+                    catch (System.Exception ex)
+                    {
+                        Debug.LogWarning($"Failed to read cached config: {ex.Message}\n{ex.StackTrace}");
+                    }
+                }
+            }
+
+            // Read from streaming assets
+            string configFileName = "editorClientConfig.json";
+            if (!await HasTextFileInStreamingAssets(configFileName))
+                configFileName = "clientConfig.json";
+
             try
             {
-                return _clientConfig = JsonConvert.DeserializeObject<ClientConfig>(await ReadTextFromStreamingAssets("clientConfig.json"));
+                Debug.Log($"Read config file from `StreamingAssets`");
+                return _clientConfig = JsonConvert.DeserializeObject<ClientConfig>(await ReadTextFromStreamingAssets(configFileName));
             }
-            catch
+            catch (System.Exception ex)
             {
-                Debug.LogError("[ConfigManager] Unable to read client config");
-                return new ClientConfig();
+                Debug.LogError($"[ConfigManager] Failed to read client config from `StreamingAssets` {ex.Message}\n{ex.StackTrace}");
             }
+
+            return new ClientConfig();
         }
 
         public static async UniTask<List<MmoNetworkSetting>> ReadServerList()
