@@ -30,7 +30,7 @@ namespace MultiplayerARPG.MMO
             });
         }
 
-        public override void WarpCharacter(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position, bool overrideRotation, Vector3 rotation)
+        public override async UniTask WarpCharacter(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position, bool overrideRotation, Vector3 rotation)
         {
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             if (!CanWarpCharacter(playerCharacterEntity))
@@ -42,6 +42,7 @@ namespace MultiplayerARPG.MMO
                 if (overrideRotation)
                     playerCharacterEntity.CurrentRotation = rotation;
                 playerCharacterEntity.Teleport(position, Quaternion.Euler(playerCharacterEntity.CurrentRotation), false);
+                await playerCharacterEntity.WaitClientTeleportConfirm();
                 return;
             }
 
@@ -74,7 +75,7 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-        public override async void WarpCharacterToInstance(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position, bool overrideRotation, Vector3 rotation)
+        public override async UniTask WarpCharacterToInstance(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position, bool overrideRotation, Vector3 rotation)
         {
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             if (!CanWarpCharacter(playerCharacterEntity))
