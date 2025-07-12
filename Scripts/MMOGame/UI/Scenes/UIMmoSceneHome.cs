@@ -40,7 +40,7 @@ namespace MultiplayerARPG.MMO
 
         public void OnCentralServerDisconnected(DisconnectReason reason, SocketError socketError, UITextKeys message)
         {
-            UISceneGlobal.Singleton.ShowDisconnectDialog(reason, socketError, message);
+            UISceneGlobal.Singleton.ShowDisconnectDialog(reason, socketError, message, "CentralClient");
             ClearHistory();
         }
 
