@@ -432,18 +432,28 @@ namespace MultiplayerARPG.MMO
         }
 
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-        public override async UniTask<bool> DeserializeEnterGameData(long connectionId, NetDataReader reader)
+        public override async UniTask<bool> DeserializeEnterGameData(uint requestId, long connectionId, EnterGameRequestMessage request, NetDataReader reader)
         {
             if (IsAllocate)
             {
+                _enterGameRequestResponseMessages[requestId] = UITextKeys.UI_ERROR_APP_NOT_READY;
+                return false;
+            }
+
+            if (request.packetVersion != PacketVersion())
+            {
+                _enterGameRequestResponseMessages[requestId] = UITextKeys.UI_ERROR_INVALID_PACKET_VERSION;
                 return false;
             }
 
             string userId = reader.GetString();
             string accessToken = reader.GetString();
             string selectCharacterId = reader.GetString();
-            if (!await ValidatePlayerConnection(connectionId, userId, accessToken, selectCharacterId))
+
+            UITextKeys validatePlayerMessage = await ValidatePlayerConnection(connectionId, userId, accessToken, selectCharacterId);
+            if (validatePlayerMessage != UITextKeys.NONE)
             {
+                _enterGameRequestResponseMessages[requestId] = validatePlayerMessage;
                 return false;
             }
 
@@ -462,9 +472,19 @@ namespace MultiplayerARPG.MMO
             });
             if (!characterResp.IsSuccess)
             {
+                _enterGameRequestResponseMessages[requestId] = UITextKeys.UI_ERROR_CHARACTER_NOT_FOUND;
                 return false;
             }
             PlayerCharacterData playerCharacterData = characterResp.Response.CharacterData;
+
+            // If it is not allow this character data, kick the player
+            if (!playerCharacterData.TryGetEntityAddressablePrefab(out _, out _) && !playerCharacterData.TryGetEntityPrefab(out _, out _))
+            {
+                if (LogError)
+                    Logging.LogError(LogTag, $"Cannot find player character with entity Id: {playerCharacterData.EntityId}");
+                _enterGameRequestResponseMessages[requestId] = UITextKeys.UI_ERROR_INVALID_CHARACTER_ENTITY;
+                return false;
+            }
 
             // Store location when enter game
             _characterLocationsWhenEnterGame[playerCharacterData.Id] = new EnterGameCharacterLocation()
@@ -504,16 +524,26 @@ namespace MultiplayerARPG.MMO
         }
 
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-        public override UniTask<bool> DeserializeClientReadyData(LiteNetLibIdentity playerIdentity, long connectionId, NetDataReader reader)
+        public override UniTask<bool> DeserializeClientReadyData(uint requestId, long connectionId, NetDataReader reader, LiteNetLibIdentity playerIdentity)
         {
             if (IsAllocate)
             {
+                _clientReadyRequestResponseMessages[requestId] = UITextKeys.UI_ERROR_APP_NOT_READY;
                 return UniTask.FromResult(false);
             }
-            if (!ServerUserHandlers.TryGetUserId(connectionId, out string userId) ||
-                !ServerUserHandlers.TryGetAccessToken(connectionId, out string accessToken) ||
-                !_pendingSpawnPlayerCharacters.TryGetValue(connectionId, out PlayerCharacterData data))
+            if (!ServerUserHandlers.TryGetUserId(connectionId, out string userId))
             {
+                _clientReadyRequestResponseMessages[requestId] = UITextKeys.UI_ERROR_USER_NOT_FOUND;
+                return UniTask.FromResult(false);
+            }
+            if (!ServerUserHandlers.TryGetAccessToken(connectionId, out string accessToken))
+            {
+                _clientReadyRequestResponseMessages[requestId] = UITextKeys.UI_ERROR_INVALID_USER_TOKEN;
+                return UniTask.FromResult(false);
+            }
+            if (!_pendingSpawnPlayerCharacters.TryGetValue(connectionId, out PlayerCharacterData data))
+            {
+                _clientReadyRequestResponseMessages[requestId] = UITextKeys.UI_ERROR_CHARACTER_NOT_FOUND;
                 return UniTask.FromResult(false);
             }
             SetPlayerReadyRoutine(connectionId, userId, accessToken, data).Forget();
@@ -522,27 +552,13 @@ namespace MultiplayerARPG.MMO
 #endif
 
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-        private async UniTask<bool> ValidatePlayerConnection(long connectionId, string userId, string accessToken, string selectCharacterId)
+        private async UniTask<UITextKeys> ValidatePlayerConnection(long connectionId, string userId, string accessToken, string selectCharacterId)
         {
             if (!IsServerReadyToInstantiateObjects())
             {
                 if (LogError)
                     Logging.LogError(LogTag, $"Not ready to spawn player: {userId}, user must see map server is not ready, how can this guy reach here? :P.");
-                return false;
-            }
-
-            if (ServerUserHandlers.TryGetConnectionIdByUserId(userId, out _))
-            {
-                if (LogError)
-                    Logging.LogError(LogTag, $"User trying to hack?: {userId}, connection already registered.");
-                return false;
-            }
-
-            if (ServerUserHandlers.TryGetPlayerCharacter(connectionId, out _))
-            {
-                if (LogError)
-                    Logging.LogError(LogTag, $"User trying to hack?: {userId}, character already registered.");
-                return false;
+                return UITextKeys.UI_ERROR_APP_NOT_READY;
             }
 
             DatabaseApiResult<ValidateAccessTokenResp> validateAccessTokenResp = await DatabaseClient.ValidateAccessTokenAsync(new ValidateAccessTokenReq()
@@ -555,10 +571,24 @@ namespace MultiplayerARPG.MMO
             {
                 if (LogError)
                     Logging.LogError(LogTag, $"Invalid access token for user: {userId}");
-                return false;
+                return UITextKeys.UI_ERROR_INVALID_USER_TOKEN;
             }
 
-            return true;
+            if (ServerUserHandlers.TryGetConnectionIdByUserId(userId, out _))
+            {
+                if (LogError)
+                    Logging.LogError(LogTag, $"User trying to hack?: {userId}, connection already registered.");
+                return UITextKeys.UI_ERROR_USER_IS_ALREADY_ONLINE;
+            }
+
+            if (ServerUserHandlers.TryGetPlayerCharacter(connectionId, out _))
+            {
+                if (LogError)
+                    Logging.LogError(LogTag, $"User trying to hack?: {userId}, character already registered.");
+                return UITextKeys.UI_ERROR_CHARACTER_IS_ALREADY_ONLINE;
+            }
+
+            return UITextKeys.NONE;
         }
 #endif
 
@@ -570,15 +600,6 @@ namespace MultiplayerARPG.MMO
             {
                 if (LogError)
                     Logging.LogError(LogTag, $"No selected character for user: {userId}");
-                KickClient(connectionId, UITextKeys.UI_ERROR_KICKED_FROM_SERVER);
-                return;
-            }
-
-            // If it is not allow this character data, kick the player
-            if (!playerCharacterData.TryGetEntityAddressablePrefab(out _, out _) && !playerCharacterData.TryGetEntityPrefab(out _, out _))
-            {
-                if (LogError)
-                    Logging.LogError(LogTag, $"Cannot find player character with entity Id: {playerCharacterData.EntityId}");
                 KickClient(connectionId, UITextKeys.UI_ERROR_KICKED_FROM_SERVER);
                 return;
             }
