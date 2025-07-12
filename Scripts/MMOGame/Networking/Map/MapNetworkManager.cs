@@ -1093,7 +1093,7 @@ namespace MultiplayerARPG.MMO
             {
                 playerCharacterEntity = null;
             }
-            string response = CurrentGameInstance.GMCommands.HandleGMCommand(message.senderName, playerCharacterEntity, message.message);
+            string response = await CurrentGameInstance.GMCommands.HandleGMCommand(message.senderName, playerCharacterEntity, message.message);
             if (playerCharacterEntity != null && !string.IsNullOrEmpty(response))
             {
                 ServerSendPacket(playerCharacterEntity.ConnectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, new ChatMessage()
