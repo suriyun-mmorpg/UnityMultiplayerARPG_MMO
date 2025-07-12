@@ -15,6 +15,7 @@ namespace MultiplayerARPG.MMO
 
         public override UniTask<ResponsePlayerCharacterTransformMessage> RequestPlayerCharacterTransform(long connectionId)
         {
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             if (_pendingSpawnPlayerCharacters.TryGetValue(connectionId, out PlayerCharacterData playerCharacterData))
             {
                 return UniTask.FromResult(new ResponsePlayerCharacterTransformMessage()
@@ -24,6 +25,7 @@ namespace MultiplayerARPG.MMO
                     rotation = playerCharacterData.CurrentRotation,
                 });
             }
+#endif
             return UniTask.FromResult(new ResponsePlayerCharacterTransformMessage()
             {
                 message = UITextKeys.UI_ERROR_CHARACTER_NOT_FOUND,
