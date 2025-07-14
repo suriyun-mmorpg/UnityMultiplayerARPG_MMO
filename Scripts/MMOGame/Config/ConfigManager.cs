@@ -167,14 +167,20 @@ namespace MultiplayerARPG.MMO
             if (!await HasTextFileInStreamingAssets(configFileName))
                 configFileName = "clientConfig.json";
 
-            try
+            if (await HasTextFileInStreamingAssets(configFileName))
             {
-                Debug.Log($"Read config file from `StreamingAssets`");
-                return _clientConfig = JsonConvert.DeserializeObject<ClientConfig>(await ReadTextFromStreamingAssets(configFileName));
-            }
-            catch (System.Exception ex)
+                try
+                {
+                    Debug.Log($"Read config file from `StreamingAssets`");
+                    return _clientConfig = JsonConvert.DeserializeObject<ClientConfig>(await ReadTextFromStreamingAssets(configFileName));
+                }
+                catch (System.Exception ex)
+                {
+                    Debug.LogError($"[ConfigManager] Failed to read client config from `StreamingAssets` {ex.Message}\n{ex.StackTrace}");
+                }
+            } else
             {
-                Debug.LogError($"[ConfigManager] Failed to read client config from `StreamingAssets` {ex.Message}\n{ex.StackTrace}");
+                Debug.LogWarning($"[ConfigManager] Unable to read {configFileName}, so it will use default config");
             }
 
             return new ClientConfig();
