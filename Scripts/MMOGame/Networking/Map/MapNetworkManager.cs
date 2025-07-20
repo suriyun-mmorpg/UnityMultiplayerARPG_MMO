@@ -174,7 +174,7 @@ namespace MultiplayerARPG.MMO
                 if (tempTime - _lastUpdateUserCountTime >= UPDATE_USER_COUNT_DELAY)
                 {
                     _lastUpdateUserCountTime = tempTime;
-                    ClusterClient.SendPacket(0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.UpdateUserCount, (writer) => writer.Put(new UpdateUserCountMessage()
+                    ClusterClient.SendPacket(0, DeliveryMethod.ReliableUnordered, MMOMessageTypes.UpdateUserCount, (writer) => writer.Put(new UpdateUserCountMessage()
                     {
                         currentUsers = ServerUserHandlers.PlayerCharactersCount,
                         maxUsers = maxConnections,
@@ -872,7 +872,7 @@ namespace MultiplayerARPG.MMO
                 // Send GM command to cluster server to broadcast to other servers later
                 if (ClusterClient.IsNetworkActive)
                 {
-                    ClusterClient.SendPacket(0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.Chat, (writer) =>
+                    ClusterClient.SendPacket(0, DeliveryMethod.ReliableUnordered, MMOMessageTypes.Chat, (writer) =>
                     {
                         writer.PutValue(message);
                     });
@@ -893,7 +893,7 @@ namespace MultiplayerARPG.MMO
                 {
                     if (ClusterClient.IsNetworkActive)
                     {
-                        ClusterClient.SendPacket(0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.Chat, (writer) =>
+                        ClusterClient.SendPacket(0, DeliveryMethod.ReliableUnordered, MMOMessageTypes.Chat, (writer) =>
                         {
                             writer.PutValue(message);
                         });
@@ -905,7 +905,7 @@ namespace MultiplayerARPG.MMO
             // Broadcasting to other servers
             if (ClusterClient.IsNetworkActive)
             {
-                ClusterClient.SendPacket(0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.Chat, (writer) =>
+                ClusterClient.SendPacket(0, DeliveryMethod.ReliableUnordered, MMOMessageTypes.Chat, (writer) =>
                 {
                     writer.PutValue(message);
                 });
@@ -1096,7 +1096,7 @@ namespace MultiplayerARPG.MMO
             string response = await CurrentGameInstance.GMCommands.HandleGMCommand(message.senderName, playerCharacterEntity, message.message);
             if (playerCharacterEntity != null && !string.IsNullOrEmpty(response))
             {
-                ServerSendPacket(playerCharacterEntity.ConnectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, new ChatMessage()
+                ServerSendPacket(playerCharacterEntity.ConnectionId, 0, DeliveryMethod.ReliableUnordered, GameNetworkingConsts.Chat, new ChatMessage()
                 {
                     channel = ChatChannel.System,
                     message = response,
