@@ -105,9 +105,6 @@ namespace MultiplayerARPG.MMO
         internal readonly ConcurrentHashSet<string> savingBuildings = new ConcurrentHashSet<string>();
         internal readonly ConcurrentHashSet<string> cancellingReserveStorageCharacterIds = new ConcurrentHashSet<string>();
         internal readonly ConcurrentDictionary<string, ConcurrentHashSet<StorageId>> storageUsers = new ConcurrentDictionary<string, ConcurrentHashSet<StorageId>>();
-        internal readonly ConcurrentHashSet<int> proceedingGuildIds = new ConcurrentHashSet<int>();
-        internal readonly ConcurrentHashSet<int> proceedingPartyIds = new ConcurrentHashSet<int>();
-        internal readonly ConcurrentHashSet<long> proceedingConnectionIds = new ConcurrentHashSet<long>();
 #endif
 
         protected override void Awake()
@@ -200,9 +197,6 @@ namespace MultiplayerARPG.MMO
             savingBuildings.Clear();
             cancellingReserveStorageCharacterIds.Clear();
             storageUsers.Clear();
-            proceedingGuildIds.Clear();
-            proceedingPartyIds.Clear();
-            proceedingConnectionIds.Clear();
             DataUpdater.Clean();
 #endif
         }
