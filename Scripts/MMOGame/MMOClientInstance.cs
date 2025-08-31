@@ -38,7 +38,7 @@ namespace MultiplayerARPG.MMO
                 if (centralNetworkManager == null)
                     centralNetworkManager = GetComponentInChildren<CentralNetworkManager>();
                 if (centralNetworkManager == null)
-                    centralNetworkManager = FindObjectOfType<CentralNetworkManager>();
+                    centralNetworkManager = FindFirstObjectByType<CentralNetworkManager>();
                 return centralNetworkManager;
             }
         }
@@ -49,7 +49,7 @@ namespace MultiplayerARPG.MMO
                 if (mapNetworkManager == null)
                     mapNetworkManager = GetComponentInChildren<MapNetworkManager>();
                 if (mapNetworkManager == null)
-                    mapNetworkManager = FindObjectOfType<MapNetworkManager>();
+                    mapNetworkManager = FindFirstObjectByType<MapNetworkManager>();
                 return mapNetworkManager;
             }
         }
