@@ -43,7 +43,7 @@ namespace MultiplayerARPG.MMO
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        internal async UniTask LoadPartyRoutine(int id)
+        internal async UniTask LoadPartyRoutine(int id, bool clearCache = false)
         {
             if (id <= 0)
                 return;
@@ -53,14 +53,17 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             _loadingPartyIds.Add(id);
+            _loadedPartyTimes.TryRemove(id, out _);
             DatabaseApiResult<PartyResp> resp;
             do
             {
                 resp = await DatabaseClient.GetPartyAsync(new GetPartyReq()
                 {
                     PartyId = id,
+                    ForceClearCache = clearCache,
                 });
             } while (!resp.IsSuccess);
+            _loadedPartyTimes[id] = Time.unscaledTime;
             ServerPartyHandlers.SetParty(id, resp.Response.PartyData);
             _loadingPartyIds.TryRemove(id);
         }
@@ -72,7 +75,7 @@ namespace MultiplayerARPG.MMO
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        internal async UniTask LoadGuildRoutine(int id)
+        internal async UniTask LoadGuildRoutine(int id, bool clearCache = false)
         {
             if (id <= 0)
                 return;
@@ -82,14 +85,17 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             _loadingGuildIds.Add(id);
+            _loadedGuildTimes.TryRemove(id, out _);
             DatabaseApiResult<GuildResp> resp;
             do
             {
                 resp = await DatabaseClient.GetGuildAsync(new GetGuildReq()
                 {
                     GuildId = id,
+                    ForceClearCache = clearCache,
                 });
             } while (!resp.IsSuccess);
+            _loadedGuildTimes[id] = Time.unscaledTime;
             ServerGuildHandlers.SetGuild(id, resp.Response.GuildData);
             _loadingGuildIds.TryRemove(id);
         }

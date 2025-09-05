@@ -15,6 +15,8 @@ namespace MultiplayerARPG.MMO
     public partial class MapNetworkManager : BaseGameNetworkManager, IAppServer
     {
         public const float TERMINATE_INSTANCE_DELAY = 30f;  // Close instance when no clients connected within 30 seconds
+        public const float PARTY_CACHE_EXPIRING = 60 * 6f; // Every 6 mintues, it will reload party data from database to update local cache
+        public const float GUILD_CACHE_EXPIRING = 60 * 3f; // Every 3 mintues, it will reload guild data from database to update local cache
         public const float UPDATE_USER_COUNT_DELAY = 5f;  // Update user count every 5 seconds
 
         public struct PendingSpawnPlayerCharacter
@@ -99,7 +101,9 @@ namespace MultiplayerARPG.MMO
         // Database operations
         private readonly ConcurrentHashSet<StorageId> _loadingStorageIds = new ConcurrentHashSet<StorageId>();
         private readonly ConcurrentHashSet<int> _loadingPartyIds = new ConcurrentHashSet<int>();
+        private readonly ConcurrentDictionary<int, float> _loadedPartyTimes = new ConcurrentDictionary<int, float>();
         private readonly ConcurrentHashSet<int> _loadingGuildIds = new ConcurrentHashSet<int>();
+        private readonly ConcurrentDictionary<int, float> _loadedGuildTimes = new ConcurrentDictionary<int, float>();
         internal readonly ConcurrentHashSet<StorageId> savingStorageIds = new ConcurrentHashSet<StorageId>();
         internal readonly ConcurrentHashSet<string> savingCharacters = new ConcurrentHashSet<string>();
         internal readonly ConcurrentHashSet<string> savingBuildings = new ConcurrentHashSet<string>();
@@ -145,7 +149,7 @@ namespace MultiplayerARPG.MMO
             base.Update();
 
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-            float tempTime = Time.unscaledTime;
+            float currentTime = Time.unscaledTime;
             if (IsServer)
             {
                 ClusterClient.Update();
@@ -163,19 +167,35 @@ namespace MultiplayerARPG.MMO
                 {
                     // Quitting application when no players
                     if (Players.Count > 0)
-                        _terminatingTime = tempTime;
-                    else if (tempTime - _terminatingTime >= TERMINATE_INSTANCE_DELAY)
+                        _terminatingTime = currentTime;
+                    else if (currentTime - _terminatingTime >= TERMINATE_INSTANCE_DELAY)
                         Application.Quit();
                 }
 
-                if (tempTime - _lastUpdateUserCountTime >= UPDATE_USER_COUNT_DELAY)
+                if (currentTime - _lastUpdateUserCountTime >= UPDATE_USER_COUNT_DELAY)
                 {
-                    _lastUpdateUserCountTime = tempTime;
+                    _lastUpdateUserCountTime = currentTime;
                     ClusterClient.SendPacket(0, DeliveryMethod.ReliableUnordered, MMOMessageTypes.UpdateUserCount, (writer) => writer.Put(new UpdateUserCountMessage()
                     {
                         currentUsers = ServerUserHandlers.PlayerCharactersCount,
                         maxUsers = maxConnections,
                     }));
+                }
+
+                // Reload cached parties/guilds
+                foreach (var kv in _loadedPartyTimes)
+                {
+                    if (currentTime - kv.Value > PARTY_CACHE_EXPIRING && !_loadingPartyIds.Contains(kv.Key))
+                    {
+                        LoadPartyRoutine(kv.Key).Forget();
+                    }
+                }
+                foreach (var kv in _loadedGuildTimes)
+                {
+                    if (currentTime - kv.Value > GUILD_CACHE_EXPIRING && !_loadingGuildIds.Contains(kv.Key))
+                    {
+                        LoadGuildRoutine(kv.Key).Forget();
+                    }
                 }
             }
 #endif
@@ -191,7 +211,9 @@ namespace MultiplayerARPG.MMO
             _pendingSpawnPlayerCharacters.Clear();
             _loadingStorageIds.Clear();
             _loadingPartyIds.Clear();
+            _loadedPartyTimes.Clear();
             _loadingGuildIds.Clear();
+            _loadedGuildTimes.Clear();
             savingStorageIds.Clear();
             savingCharacters.Clear();
             savingBuildings.Clear();
@@ -278,14 +300,12 @@ namespace MultiplayerARPG.MMO
         }
 #endif
 
-#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         public override void OnClientDisconnected(DisconnectReason reason, SocketError socketError, byte[] data)
         {
             GameInstance.UserId = string.Empty;
             GameInstance.AccessToken = string.Empty;
             base.OnClientDisconnected(reason, socketError, data);
         }
-#endif
 
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         public override void UnregisterUserIdAndAccessToken(long connectionId)
