@@ -27,6 +27,7 @@ namespace MultiplayerARPG.MMO
                     playerCharacterEntity.DealingComponent.StopDealing();
                 if (playerCharacterEntity.VendingComponent != null)
                     playerCharacterEntity.VendingComponent.StopVending();
+                ExtraMovementState extraMovementState = playerCharacterEntity.ExtraMovementState;
                 playerCharacterEntity.SetOwnerClient(-1);
                 playerCharacterEntity.StopMove();
                 MovementState movementState = playerCharacterEntity.MovementState;
@@ -34,7 +35,10 @@ namespace MultiplayerARPG.MMO
                 movementState &= ~MovementState.Backward;
                 movementState &= ~MovementState.Right;
                 movementState &= ~MovementState.Left;
+                movementState &= ~MovementState.Up;
+                movementState &= ~MovementState.Down;
                 playerCharacterEntity.KeyMovement(Vector3.zero, movementState);
+                playerCharacterEntity.SetExtraMovementState(extraMovementState);
                 string userId = playerCharacterEntity.UserId;
                 // Store despawnin user id, it will be used later if player not connect and continue playing the character
                 RemoveDespawningCancellation(userId);
