@@ -500,13 +500,6 @@ namespace MultiplayerARPG.MMO
                 return false;
             }
 
-            if (IsInstanceMap())
-            {
-                playerCharacterData.CurrentPosition = MapInstanceWarpToPosition;
-                if (MapInstanceWarpOverrideRotation)
-                    playerCharacterData.CurrentRotation = MapInstanceWarpToRotation;
-            }
-
             // Set proper spawn position
             if (!IsInstanceMap())
             {
@@ -613,14 +606,23 @@ namespace MultiplayerARPG.MMO
             }
 
             // Spawn character entity and set its data
-            Quaternion characterRotation = Quaternion.identity;
-            if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
-                characterRotation = Quaternion.Euler(playerCharacterData.CurrentRotation);
+            Vector3 characterPosition = playerCharacterData.CurrentPosition;
+            Quaternion characterRotation = Quaternion.Euler(playerCharacterData.CurrentRotation);
+            if (IsInstanceMap())
+            {
+                characterPosition = MapInstanceWarpToPosition;
+                if (MapInstanceWarpOverrideRotation)
+                    characterRotation = Quaternion.Euler(MapInstanceWarpToRotation);
+            }
+
+            if (GameInstance.Singleton.DimensionType == DimensionType.Dimension2D)
+                characterRotation = Quaternion.identity;
+
             // NOTE: entity ID is a hash asset ID :)
             int metaDataId;
             LiteNetLibIdentity spawnObj = Assets.GetObjectInstance(
                 GameInstance.GetPlayerCharacterEntityHashAssetId(playerCharacterData.EntityId, out metaDataId),
-                playerCharacterData.CurrentPosition,
+                characterPosition,
                 characterRotation);
 
             // Set current character data
