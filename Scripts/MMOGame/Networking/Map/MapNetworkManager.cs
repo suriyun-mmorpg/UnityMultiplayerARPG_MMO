@@ -500,15 +500,6 @@ namespace MultiplayerARPG.MMO
                 return false;
             }
 
-            // Store location when enter game
-            _characterLocationsWhenEnterGame[playerCharacterData.Id] = new EnterGameCharacterLocation()
-            {
-                mapName = playerCharacterData.CurrentMapName,
-                position = playerCharacterData.CurrentPosition,
-                rotation = playerCharacterData.CurrentRotation,
-                safeArea = playerCharacterData.CurrentSafeArea,
-            };
-
             if (IsInstanceMap())
             {
                 playerCharacterData.CurrentPosition = MapInstanceWarpToPosition;
@@ -517,10 +508,13 @@ namespace MultiplayerARPG.MMO
             }
 
             // Set proper spawn position
-            CurrentMapInfo.GetEnterMapPoint(playerCharacterData, out string mapName, out Vector3 position, out Vector3 rotation);
-            playerCharacterData.CurrentMapName = mapName;
-            playerCharacterData.CurrentPosition = position;
-            playerCharacterData.CurrentRotation = rotation;
+            if (!IsInstanceMap())
+            {
+                CurrentMapInfo.GetEnterMapPoint(playerCharacterData, out string mapName, out Vector3 position, out Vector3 rotation);
+                playerCharacterData.CurrentMapName = mapName;
+                playerCharacterData.CurrentPosition = position;
+                playerCharacterData.CurrentRotation = rotation;
+            }
 
             _pendingSpawnPlayerCharacters[connectionId] = playerCharacterData;
             return true;
