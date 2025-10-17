@@ -88,11 +88,13 @@ namespace MultiplayerARPG.MMO
                 catch (System.OperationCanceledException)
                 {
                     // Catch the cancellation
+                    _despawningPlayerCharacterEntities.TryRemove(userId, out _);
                 }
                 catch (System.Exception ex)
                 {
                     // Other errors
-                    Logging.LogException(LogTag, ex);
+                    _despawningPlayerCharacterEntities.TryRemove(userId, out _);
+                    Logging.LogError(LogTag, $"Error occuring while save and despawn player character entity\n{ex.Message}\n{ex.StackTrace}");
                 }
                 finally
                 {
@@ -123,7 +125,7 @@ namespace MultiplayerARPG.MMO
                 catch (System.Exception ex)
                 {
                     // Other errors
-                    Logging.LogException(LogTag, ex);
+                    Logging.LogError(LogTag, $"Error occuring while remove despawning cancellation\n{ex.Message}\n{ex.StackTrace}");
                 }
             }
         }
