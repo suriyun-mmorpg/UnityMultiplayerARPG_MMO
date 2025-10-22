@@ -204,6 +204,7 @@ CREATE TABLE `characters` (
   `respawnPositionZ` float NOT NULL DEFAULT 0,
   `iconDataId` int(11) NOT NULL DEFAULT 0,
   `frameDataId` int(11) NOT NULL DEFAULT 0,
+  `backgroundDataId` int(11) NOT NULL DEFAULT 0,
   `titleDataId` int(11) NOT NULL DEFAULT 0,
   `reputation` int(11) NOT NULL DEFAULT 0,
   `lastDeadTime` bigint(20) NOT NULL DEFAULT 0,
