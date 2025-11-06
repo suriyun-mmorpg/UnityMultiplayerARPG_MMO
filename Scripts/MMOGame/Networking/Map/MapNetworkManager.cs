@@ -472,6 +472,8 @@ namespace MultiplayerARPG.MMO
             }
 
             await SaveAndDespawnPendingPlayerCharacter(userId);
+            UnregisterPlayerCharacterByUserId(userId);
+            UnregisterUserIdAndAccessTokenByUserId(userId);
             // Unregister player
             UnregisterPlayerCharacter(connectionId);
             UnregisterUserIdAndAccessToken(connectionId);
@@ -1371,11 +1373,19 @@ namespace MultiplayerARPG.MMO
         }
         #endregion
 
-        public void KickUser(string userId, UITextKeys message)
+        public async void KickUser(string userId, UITextKeys message)
         {
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             if (ServerUserHandlers.TryGetConnectionIdByUserId(userId, out long connectionId))
+            {
                 KickClient(connectionId, message);
+            }
+            else
+            {
+                await SaveAndDespawnPendingPlayerCharacter(userId);
+                UnregisterPlayerCharacterByUserId(userId);
+                UnregisterUserIdAndAccessTokenByUserId(userId);
+            }
 #endif
         }
 
