@@ -14,6 +14,7 @@ namespace MultiplayerARPG.MMO
             ServerPartyHandlers = gameObject.GetOrAddComponent<IServerPartyHandlers, DefaultServerPartyHandlers>();
             ServerGuildHandlers = gameObject.GetOrAddComponent<IServerGuildHandlers, MMOServerGuildHandlers>();
             ServerChatHandlers = gameObject.GetOrAddComponent<IServerChatHandlers, DefaultServerChatHandlers>();
+            ServerUserContentHandlers = gameObject.GetOrAddComponent<IServerUserContentHandlers, MMOServerUserContentHandlers>();
             ServerLogHandlers = gameObject.GetOrAddComponent<IServerLogHandlers, DefaultServerLogHandlers>();
             // Server Message Handlers
             ServerCashShopMessageHandlers = gameObject.GetOrAddComponent<IServerCashShopMessageHandlers, MMOServerCashShopMessageHandlers>();
@@ -26,6 +27,7 @@ namespace MultiplayerARPG.MMO
             ServerGachaMessageHandlers = gameObject.GetOrAddComponent<IServerGachaMessageHandlers, MMOServerGachaMessageHandlers>();
             ServerFriendMessageHandlers = gameObject.GetOrAddComponent<IServerFriendMessageHandlers, MMOServerFriendMessageHandlers>();
             ServerBankMessageHandlers = gameObject.GetOrAddComponent<IServerBankMessageHandlers, MMOServerBankMessageHandlers>();
+            ServerUserContentMessageHandlers = gameObject.GetOrAddComponent<IServerUserContentMessageHandlers, MMOServerUserContentMessageHandlers>();
             // Client handlers
             ClientCashShopHandlers = gameObject.GetOrAddComponent<IClientCashShopHandlers, DefaultClientCashShopHandlers>();
             ClientMailHandlers = gameObject.GetOrAddComponent<IClientMailHandlers, DefaultClientMailHandlers>();
