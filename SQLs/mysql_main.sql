@@ -650,7 +650,8 @@ INSERT INTO `__migrations` (`migrationId`) VALUES
 ('1.88'),
 ('1.90'),
 ('1.90b'),
-('1.91');
+('1.91'),
+('1.96');
 
 --
 -- Indexes for dumped tables
