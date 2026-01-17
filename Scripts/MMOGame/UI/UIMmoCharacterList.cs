@@ -22,7 +22,7 @@ namespace MultiplayerARPG.MMO
             CharacterSelectionManager.Clear();
             CharacterList.HideAll();
             // Remove all models
-            characterModelContainer.RemoveChildren();
+            characterModelContainer.DestroyChildren();
             _characterModelById.Clear();
             // Remove all cached data
             _playerCharacterDataById.Clear();
