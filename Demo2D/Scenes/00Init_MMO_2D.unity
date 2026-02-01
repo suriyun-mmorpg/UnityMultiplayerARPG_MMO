@@ -169,6 +169,7 @@ MonoBehaviour:
   doNotReadyOnSceneLoaded: 0
   doNotDestroyOnSceneChanges: 0
   loadOfflineSceneWhenClientStopped: 1
+  safeGameStatePacket: 0
   auctionHouseMessageTypes:
     createAuctionRequestType: 1300
     bidRequestType: 1301
@@ -245,13 +246,11 @@ MonoBehaviour:
     m_SubObjectName: 
     m_SubObjectType: 
     m_EditorAssetChanged: 0
-    sceneName: 
   addressableOnlineScene:
     m_AssetGUID: 
     m_SubObjectName: 
     m_SubObjectType: 
     m_EditorAssetChanged: 0
-    sceneName: 
   onInitialize:
     m_PersistentCalls:
       m_Calls: []
@@ -796,6 +795,9 @@ MonoBehaviour:
   gmCommands: {fileID: 0}
   equipmentModelBonesSetupManager: {fileID: 0}
   networkSetting: {fileID: 11400000, guid: c0825e8ee894749459ab4c8dda26dfe6, type: 2}
+  expDropRepresentItem: {fileID: 0}
+  goldDropRepresentItem: {fileID: 0}
+  currencyDropRepresentItems: []
   itemDropEntityPrefab: {fileID: 114136267996948458, guid: 9c6362fe52a2dfa40b90aba5530a6fda,
     type: 3}
   expDropEntityPrefab: {fileID: 0}
@@ -889,6 +891,14 @@ MonoBehaviour:
   npcObjects: []
   npcMiniMapObjects:
   - {fileID: 1971649022222436, guid: 3ad746095a8b209429a1b9e27fab61aa, type: 3}
+  addressableOwningCharacterObjects: []
+  addressableOwningCharacterMiniMapObjects: []
+  addressableNonOwningCharacterObjects: []
+  addressableNonOwningCharacterMiniMapObjects: []
+  addressableMonsterCharacterObjects: []
+  addressableMonsterCharacterMiniMapObjects: []
+  addressableNpcObjects: []
+  addressableNpcMiniMapObjects: []
   owningCharacterUI: {fileID: 114899762762614018, guid: 8447ca51d1886764e99f26df8033c4c5,
     type: 3}
   nonOwningCharacterUI: {fileID: 114899762762614018, guid: cf8cfe06d3da49e4ab083bd040961dd5,
@@ -898,6 +908,31 @@ MonoBehaviour:
   npcUI: {fileID: 114537631033164756, guid: b75f7de46d27c284d913d9b2984ff84d, type: 3}
   npcQuestIndicator: {fileID: 114612624042908474, guid: 4acaa26309bf3094094eec89f99e2972,
     type: 3}
+  addressableOwningCharacterUI:
+    m_AssetGUID: 
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+  addressableNonOwningCharacterUI:
+    m_AssetGUID: 
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+  addressableMonsterCharacterUI:
+    m_AssetGUID: 
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+  addressableNpcUI:
+    m_AssetGUID: 
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+  addressableNpcQuestIndicator:
+    m_AssetGUID: 
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
   levelUpEffect: {fileID: 0}
   levelUpEffects:
   - {fileID: 114843870614705530, guid: 6f6e255b4877f874c985ed9fb46293a1, type: 3}
@@ -911,6 +946,7 @@ MonoBehaviour:
   expTree: 140000001e00000031000000490000006500000086000000aa000000d1000000fa000000270100005601000087010000bb010000f10100002902000064020000a0020000de0200001e0300005f030000a3030000e80300002f04000077040000c10400000d0500005a050000a9050000f90500004a0600009d060000f1060000470700009e070000f707000050080000ab0800000809000065090000c4090000240a0000850a0000e80a00004b0b0000b00b0000160c00007d0c0000e50c00004e0d0000b90d0000240e0000910e0000fe0e00006d0f0000dd0f00004d100000bf10000032110000a61100001b12000090120000071300007f130000f813000071140000ec14000068150000e415000062160000e01600005f170000e017000061180000e318000066190000ea1900006e1a0000f41a00007a1b0000021c00008a1c0000131d00009d1d0000281e0000b31e0000401f0000cd1f00005b200000ea200000792100000a2200009b2200002d230000c023000054240000e82400007e25000014260000aa26000042270000
   expTable: {fileID: 0}
   gameDatabase: {fileID: 11400000, guid: 18c9127ba9fe0794791ee6aa5a44ee10, type: 2}
+  entitySetting: {fileID: 0}
   npcDatabase: {fileID: 0}
   warpPortalDatabase: {fileID: 0}
   socialSystemSetting: {fileID: 11400000, guid: afad462dae207414f91b207f6882dad2,
@@ -1055,7 +1091,6 @@ MonoBehaviour:
     m_SubObjectName: 
     m_SubObjectType: 
     m_EditorAssetChanged: 0
-    sceneName: 
   homeMobileScene:
     sceneAsset: {fileID: 0}
     sceneName: 
@@ -1064,7 +1099,6 @@ MonoBehaviour:
     m_SubObjectName: 
     m_SubObjectType: 
     m_EditorAssetChanged: 0
-    sceneName: 
   homeConsoleScene:
     sceneAsset: {fileID: 0}
     sceneName: 
@@ -1073,7 +1107,6 @@ MonoBehaviour:
     m_SubObjectName: 
     m_SubObjectType: 
     m_EditorAssetChanged: 0
-    sceneName: 
 --- !u!4 &1379718503
 Transform:
   m_ObjectHideFlags: 0
@@ -1248,6 +1281,9 @@ MonoBehaviour:
     id: AMBIENT
     volumeScale: 1
   otherVolumeSettings: []
+  onSetVolumeLevel:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &1379718508
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1380,6 +1416,41 @@ PrefabInstance:
       propertyPath: m_LocalRotation.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 114788248445432888, guid: d2c274d504629844ba9d4993edf72817,
+        type: 3}
+      propertyPath: spawningMaps.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114788248445432888, guid: d2c274d504629844ba9d4993edf72817,
+        type: 3}
+      propertyPath: spawningMaps.Array.data[0]
+      value: 
+      objectReference: {fileID: 11400000, guid: 904437e0c8f12224daf6ba1f6dad1911,
+        type: 2}
+    - target: {fileID: 114788248445432888, guid: d2c274d504629844ba9d4993edf72817,
+        type: 3}
+      propertyPath: spawningMaps.Array.data[1]
+      value: 
+      objectReference: {fileID: 11400000, guid: 9b9d07cb5b6f35b42a9507f397bdc7fc,
+        type: 2}
+    - target: {fileID: 114788248445432888, guid: d2c274d504629844ba9d4993edf72817,
+        type: 3}
+      propertyPath: spawningAllocateMaps.Array.data[0].mapInfo
+      value: 
+      objectReference: {fileID: 11400000, guid: 904437e0c8f12224daf6ba1f6dad1911,
+        type: 2}
+    - target: {fileID: 114788248445432888, guid: d2c274d504629844ba9d4993edf72817,
+        type: 3}
+      propertyPath: spawningAllocateMaps.Array.data[1].mapInfo
+      value: 
+      objectReference: {fileID: 11400000, guid: 9b9d07cb5b6f35b42a9507f397bdc7fc,
+        type: 2}
+    - target: {fileID: 114946005600446132, guid: d2c274d504629844ba9d4993edf72817,
+        type: 3}
+      propertyPath: startingMap
+      value: 
+      objectReference: {fileID: 11400000, guid: 904437e0c8f12224daf6ba1f6dad1911,
+        type: 2}
     - target: {fileID: 114946005600446132, guid: d2c274d504629844ba9d4993edf72817,
         type: 3}
       propertyPath: mapNetworkManager
