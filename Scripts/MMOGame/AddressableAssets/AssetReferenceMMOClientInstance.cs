@@ -1,3 +1,4 @@
+#if !DISABLE_ADDRESSABLES
 using Insthync.AddressableAssetTools;
 
 namespace MultiplayerARPG.MMO
@@ -10,3 +11,4 @@ namespace MultiplayerARPG.MMO
         }
     }
 }
+#endif

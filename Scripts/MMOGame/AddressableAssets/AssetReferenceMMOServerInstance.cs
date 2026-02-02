@@ -1,5 +1,5 @@
+#if !DISABLE_ADDRESSABLES
 using Insthync.AddressableAssetTools;
-using LiteNetLibManager;
 
 namespace MultiplayerARPG.MMO
 {
@@ -11,3 +11,4 @@ namespace MultiplayerARPG.MMO
         }
     }
 }
+#endif

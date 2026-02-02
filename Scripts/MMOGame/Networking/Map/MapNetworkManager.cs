@@ -494,7 +494,11 @@ namespace MultiplayerARPG.MMO
             PlayerCharacterData playerCharacterData = characterResp.Response.CharacterData;
 
             // If it is not allow this character data, kick the player
-            if (!playerCharacterData.TryGetEntityAddressablePrefab(out _, out _) && !playerCharacterData.TryGetEntityPrefab(out _, out _))
+            if (!playerCharacterData.TryGetEntityPrefab(out _, out _)
+#if !DISABLE_ADDRESSABLES
+                && !playerCharacterData.TryGetEntityAddressablePrefab(out _, out _)
+#endif
+                )
             {
                 if (LogError)
                     Logging.LogError(LogTag, $"Cannot find player character with entity Id: {playerCharacterData.EntityId}");

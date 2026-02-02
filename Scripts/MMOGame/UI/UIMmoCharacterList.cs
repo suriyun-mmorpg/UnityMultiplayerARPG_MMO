@@ -43,10 +43,12 @@ namespace MultiplayerARPG.MMO
                     continue;
                 }
                 if (
-#if !EXCLUDE_PREFAB_REFS
-                    !GameInstance.PlayerCharacterEntities.ContainsKey(selectableCharacter.EntityId) && 
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
+                    !GameInstance.PlayerCharacterEntities.ContainsKey(selectableCharacter.EntityId) &&
 #endif
+#if !DISABLE_ADDRESSABLES
                     !GameInstance.AddressablePlayerCharacterEntities.ContainsKey(selectableCharacter.EntityId) &&
+#endif
                     !GameInstance.PlayerCharacterEntityMetaDataList.ContainsKey(selectableCharacter.EntityId))
                 {
                     // Invalid entity data

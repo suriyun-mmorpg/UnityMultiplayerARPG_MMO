@@ -27,10 +27,12 @@ namespace MultiplayerARPG.MMO
             }
 
             if (
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 !GameInstance.PlayerCharacterEntities.ContainsKey(entityId) &&
 #endif
+#if !DISABLE_ADDRESSABLES
                 !GameInstance.AddressablePlayerCharacterEntities.ContainsKey(entityId) &&
+#endif
                 !GameInstance.PlayerCharacterEntityMetaDataList.ContainsKey(entityId))
             {
                 // No player character entity
