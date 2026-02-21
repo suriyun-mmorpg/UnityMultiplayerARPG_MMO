@@ -109,10 +109,21 @@ namespace MultiplayerARPG.MMO
         {
             string username = PlayerPrefs.GetString(keyUsername, string.Empty);
             string password = PlayerPrefs.GetString(keyPassword, string.Empty);
+
             if (!string.IsNullOrEmpty(username))
+            {
                 Username = username;
+                if (toggleRememberUsername != null)
+                    toggleRememberUsername.isOn = true;
+            }
+
             if (!string.IsNullOrEmpty(password))
+            {
                 Password = password;
+                if (toggleAutoLogin != null)
+                    toggleAutoLogin.isOn = true;
+            }
+
             if (!string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password))
                 OnClickLogin();
         }
