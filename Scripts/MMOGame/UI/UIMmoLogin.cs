@@ -1,4 +1,4 @@
-﻿using UnityEngine.Events;
+using UnityEngine.Events;
 using UnityEngine.UI;
 using LiteNetLibManager;
 using UnityEngine;
@@ -25,6 +25,8 @@ namespace MultiplayerARPG.MMO
         public Toggle toggleAutoLogin;
         public string keyUsername = "_USERNAME_";
         public string keyPassword = "_PASSWORD_";
+        private string keyRememberUsernameToggle = "_REMEMBER_USERNAME_TOGGLE_";
+        private string keyAutoLoginToggle = "_AUTO_LOGIN_TOGGLE_";
         public UnityEvent onLoginSuccess = new UnityEvent();
         public UnityEvent onLoginFail = new UnityEvent();
 
@@ -110,23 +112,25 @@ namespace MultiplayerARPG.MMO
             string username = PlayerPrefs.GetString(keyUsername, string.Empty);
             string password = PlayerPrefs.GetString(keyPassword, string.Empty);
 
-            if (!string.IsNullOrEmpty(username))
-            {
+            bool rememberUsername = PlayerPrefs.GetInt(keyRememberUsernameToggle, 0) == 1;
+            bool autoLogin = PlayerPrefs.GetInt(keyAutoLoginToggle, 0) == 1;
+
+            if (toggleRememberUsername != null)
+                toggleRememberUsername.isOn = rememberUsername;
+
+            if (toggleAutoLogin != null)
+                toggleAutoLogin.isOn = autoLogin;
+
+            if (rememberUsername && !string.IsNullOrEmpty(username))
                 Username = username;
-                if (toggleRememberUsername != null)
-                    toggleRememberUsername.isOn = true;
-            }
 
-            if (!string.IsNullOrEmpty(password))
-            {
+            if (autoLogin && !string.IsNullOrEmpty(password))
                 Password = password;
-                if (toggleAutoLogin != null)
-                    toggleAutoLogin.isOn = true;
-            }
 
-            if (!string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password))
+            if (autoLogin && !string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password))
                 OnClickLogin();
         }
+
 
         public void OnClickLogin()
         {
@@ -151,6 +155,12 @@ namespace MultiplayerARPG.MMO
                 uiSceneGlobal.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_PASSWORD_IS_EMPTY.ToString()));
                 return;
             }
+
+            if (toggleRememberUsername != null)
+                PlayerPrefs.SetInt(keyRememberUsernameToggle, toggleRememberUsername.isOn ? 1 : 0);
+
+            if (toggleAutoLogin != null)
+                PlayerPrefs.SetInt(keyAutoLoginToggle, toggleAutoLogin.isOn ? 1 : 0);
 
             if ((toggleRememberUsername != null && toggleRememberUsername.isOn) ||
                 (toggleAutoLogin != null && toggleAutoLogin.isOn))
