@@ -116,10 +116,10 @@ namespace MultiplayerARPG.MMO
             bool autoLogin = PlayerPrefs.GetInt(keyAutoLoginToggle, 0) == 1;
 
             if (toggleRememberUsername != null)
-                toggleRememberUsername.isOn = rememberUsername;
+                toggleRememberUsername.SetIsOnWithoutNotify(rememberUsername);
 
             if (toggleAutoLogin != null)
-                toggleAutoLogin.isOn = autoLogin;
+                toggleAutoLogin.SetIsOnWithoutNotify(autoLogin);
 
             if (rememberUsername && !string.IsNullOrEmpty(username))
                 Username = username;
