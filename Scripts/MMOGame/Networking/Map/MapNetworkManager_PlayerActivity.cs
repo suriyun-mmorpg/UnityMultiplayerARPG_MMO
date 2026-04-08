@@ -3,6 +3,7 @@ using LiteNetLib;
 using LiteNetLibManager;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Pool;
 
 namespace MultiplayerARPG.MMO
 {
@@ -89,13 +90,16 @@ namespace MultiplayerARPG.MMO
                 // If character is party leader, will bring party member to join instance
                 if (party.IsLeader(playerCharacterEntity.Id))
                 {
-                    List<BasePlayerCharacterEntity> aliveAllies = playerCharacterEntity.FindAliveEntities<BasePlayerCharacterEntity>(CurrentGameInstance.joinInstanceMapDistance, true, false, false, CurrentGameInstance.playerLayer.Mask | CurrentGameInstance.playingLayer.Mask);
-                    foreach (BasePlayerCharacterEntity aliveAlly in aliveAllies)
+                    using (CollectionPool<List<BasePlayerCharacterEntity>, BasePlayerCharacterEntity>.Get(out List<BasePlayerCharacterEntity> aliveAllies))
                     {
-                        if (!party.IsMember(aliveAlly.Id))
-                            continue;
-                        instanceMapWarpingCharacters.Add(aliveAlly);
-                        aliveAlly.IsWarping = true;
+                        playerCharacterEntity.FindAliveEntities(aliveAllies, CurrentGameInstance.joinInstanceMapDistance, true, false, false, CurrentGameInstance.playerLayer.Mask | CurrentGameInstance.playingLayer.Mask);
+                        foreach (BasePlayerCharacterEntity aliveAlly in aliveAllies)
+                        {
+                            if (!party.IsMember(aliveAlly.Id))
+                                continue;
+                            instanceMapWarpingCharacters.Add(aliveAlly);
+                            aliveAlly.IsWarping = true;
+                        }
                     }
                     instanceMapWarpingCharacters.Add(playerCharacterEntity);
                     playerCharacterEntity.IsWarping = true;
