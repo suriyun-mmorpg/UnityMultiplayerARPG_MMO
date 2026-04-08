@@ -125,17 +125,17 @@ namespace MultiplayerARPG.MMO
             MapNetworkManagerDataUpdater.PlayerCharacterDataUpdaters.Remove(this);
         }
 
-        private void _entity_onIsPkOnChange(bool obj)
+        private void _entity_onIsPkOnChange(BaseCharacterEntity target, bool oldVal, bool newVal)
         {
             _updateState |= TransactionUpdateCharacterState.Pk;
         }
 
-        private void _entity_onPkPointChange(int obj)
+        private void _entity_onPkPointChange(BaseCharacterEntity target, int oldVal, int newVal)
         {
             _updateState |= TransactionUpdateCharacterState.Pk;
         }
 
-        private void _entity_onConsecutivePkKillsChange(int obj)
+        private void _entity_onConsecutivePkKillsChange(BaseCharacterEntity target, int oldVal, int newVal)
         {
             _updateState |= TransactionUpdateCharacterState.Pk;
         }
@@ -240,7 +240,7 @@ namespace MultiplayerARPG.MMO
             _updateState |= TransactionUpdateCharacterState.PublicCustomData;
         }
 
-        private void _entity_onMountChange(CharacterMount obj)
+        private void _entity_onMountChange(BaseCharacterEntity target, CharacterMount oldVal, CharacterMount newVal)
         {
             _updateState |= TransactionUpdateCharacterState.Mount;
         }
