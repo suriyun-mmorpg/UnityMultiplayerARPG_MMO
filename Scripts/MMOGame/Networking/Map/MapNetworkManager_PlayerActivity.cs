@@ -17,7 +17,7 @@ namespace MultiplayerARPG.MMO
         public override UniTask<ResponsePlayerCharacterTransformMessage> RequestPlayerCharacterTransform(long connectionId)
         {
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-            if (_pendingSpawnPlayerCharacters.TryGetValue(connectionId, out PlayerCharacterData playerCharacterData))
+            if (_pendingSpawnPlayerCharacters.TryGetValue(connectionId, out IPlayerCharacterData playerCharacterData))
             {
                 return UniTask.FromResult(new ResponsePlayerCharacterTransformMessage()
                 {

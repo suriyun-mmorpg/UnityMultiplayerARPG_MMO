@@ -1,7 +1,6 @@
 using Cysharp.Threading.Tasks;
 using LiteNetLibManager;
 using System.Collections.Concurrent;
-using System.Threading;
 using UnityEngine;
 
 namespace MultiplayerARPG.MMO
@@ -9,8 +8,7 @@ namespace MultiplayerARPG.MMO
     public partial class MapNetworkManager
     {
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-        private readonly ConcurrentDictionary<string, CancellationTokenSource> _despawningPlayerCharacterCancellations = new ConcurrentDictionary<string, CancellationTokenSource>();
-        private readonly ConcurrentDictionary<string, BasePlayerCharacterEntity> _despawningPlayerCharacterEntities = new ConcurrentDictionary<string, BasePlayerCharacterEntity>();
+        private readonly ConcurrentDictionary<string, GameEntityCancellationTokenSource<BasePlayerCharacterEntity>> _despawningPlayerCharacterCancellations = new ConcurrentDictionary<string, GameEntityCancellationTokenSource<BasePlayerCharacterEntity>>();
 #endif
 
 
@@ -42,9 +40,8 @@ namespace MultiplayerARPG.MMO
                 string userId = playerCharacterEntity.UserId;
                 // Store despawnin user id, it will be used later if player not connect and continue playing the character
                 RemoveDespawningCancellation(userId);
-                CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+                var cancellationTokenSource = new GameEntityCancellationTokenSource<BasePlayerCharacterEntity>(playerCharacterEntity);
                 _despawningPlayerCharacterCancellations.TryAdd(userId, cancellationTokenSource);
-                _despawningPlayerCharacterEntities.TryAdd(userId, playerCharacterEntity);
 
                 // Unregister player character
                 UnregisterPlayerCharacter(connectionId);
@@ -63,7 +60,6 @@ namespace MultiplayerARPG.MMO
                         DataUpdater.PlayerCharacterDataSaved(playerCharacterEntity.Id);
                         playerCharacterEntity.NetworkDestroy();
                     }
-                    _despawningPlayerCharacterEntities.TryRemove(userId, out _);
 
                     RemoveDespawningCancellation(userId);
                     return;
@@ -83,17 +79,14 @@ namespace MultiplayerARPG.MMO
                         await WaitAndSaveCharacter(TransactionUpdateCharacterState.All, playerCharacterEntity.CloneTo(new PlayerCharacterData()), cancellationTokenSource.Token);
                         playerCharacterEntity.NetworkDestroy();
                     }
-                    _despawningPlayerCharacterEntities.TryRemove(userId, out _);
                 }
                 catch (System.OperationCanceledException)
                 {
                     // Catch the cancellation
-                    _despawningPlayerCharacterEntities.TryRemove(userId, out _);
                 }
                 catch (System.Exception ex)
                 {
                     // Other errors
-                    _despawningPlayerCharacterEntities.TryRemove(userId, out _);
                     Logging.LogError(LogTag, $"Error occuring while save and despawn player character entity\n{ex.Message}\n{ex.StackTrace}");
                 }
                 finally
@@ -135,26 +128,23 @@ namespace MultiplayerARPG.MMO
         public async UniTask SaveAndDespawnPendingPlayerCharacter(string userId)
         {
             // Find despawning character
-            if (!_despawningPlayerCharacterCancellations.TryGetValue(userId, out CancellationTokenSource cancellationTokenSource) ||
-                !_despawningPlayerCharacterEntities.TryGetValue(userId, out BasePlayerCharacterEntity playerCharacterEntity) ||
-                cancellationTokenSource.IsCancellationRequested)
-            {
-                // No despawning character
+            if (!_despawningPlayerCharacterCancellations.TryRemove(userId, out GameEntityCancellationTokenSource<BasePlayerCharacterEntity> cancellationTokenSource))
                 return;
-            }
+
+            if (cancellationTokenSource.IsCancellationRequested)
+                return;
 
             // Cancel character despawning to despawning immediately
-            _despawningPlayerCharacterCancellations.TryRemove(userId, out _);
-            _despawningPlayerCharacterEntities.TryRemove(userId, out _);
+            BasePlayerCharacterEntity entity = cancellationTokenSource.Entity;
             cancellationTokenSource.Cancel();
             cancellationTokenSource.Dispose();
 
             // Save character before despawned
-            if (playerCharacterEntity.TryGetComponent(out PlayerCharacterDataUpdater updater))
+            if (entity.TryGetComponent(out PlayerCharacterDataUpdater updater))
                 Destroy(updater);
-            DataUpdater.PlayerCharacterDataSaved(playerCharacterEntity.Id);
-            await WaitAndSaveCharacter(TransactionUpdateCharacterState.All, playerCharacterEntity.CloneTo(new PlayerCharacterData()));
-            playerCharacterEntity.NetworkDestroy();
+            DataUpdater.PlayerCharacterDataSaved(entity.Id);
+            await WaitAndSaveCharacter(TransactionUpdateCharacterState.All, entity.CloneTo(new PlayerCharacterData()));
+            entity.NetworkDestroy();
         }
 #endif
     }
