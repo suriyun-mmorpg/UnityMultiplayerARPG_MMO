@@ -474,10 +474,10 @@ namespace MultiplayerARPG.MMO
 
             //await SaveAndDespawnPendingPlayerCharacter(userId);
             BasePlayerCharacterEntity spawnedCharacterEntity = null;
-            if (_despawningPlayerCharacterCancellations.TryRemove(userId, out GameEntityCancellationTokenSource<BasePlayerCharacterEntity> cancellationTokenSource))
+            if (_despawningPlayerCharacterCancellations.TryRemove(userId, out ObjectWithCancellationTokenSource<BasePlayerCharacterEntity> cancellationTokenSource))
             {
                 // No despawning character
-                spawnedCharacterEntity = cancellationTokenSource.Entity;
+                spawnedCharacterEntity = cancellationTokenSource.Object;
                 if (!cancellationTokenSource.IsCancellationRequested)
                 {
                     cancellationTokenSource.Cancel();
@@ -1030,8 +1030,8 @@ namespace MultiplayerARPG.MMO
         {
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
             bool despawning = !string.Equals(request.channelId, ChannelId, System.StringComparison.OrdinalIgnoreCase) || IsInstanceMap();
-            if (!despawning && _despawningPlayerCharacterCancellations.TryGetValue(request.userId, out GameEntityCancellationTokenSource<BasePlayerCharacterEntity> cancellation) && 
-                !cancellation.IsCancellationRequested && cancellation.Entity != null && !string.Equals(request.characterId, cancellation.Entity.Id))
+            if (!despawning && _despawningPlayerCharacterCancellations.TryGetValue(request.userId, out ObjectWithCancellationTokenSource<BasePlayerCharacterEntity> cancellation) && 
+                !cancellation.IsCancellationRequested && cancellation.Object != null && !string.Equals(request.characterId, cancellation.Object.Id))
                 despawning = true;
             if (despawning)
                 await SaveAndDespawnPendingPlayerCharacter(request.userId);

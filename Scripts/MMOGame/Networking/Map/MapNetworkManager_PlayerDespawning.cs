@@ -8,7 +8,7 @@ namespace MultiplayerARPG.MMO
     public partial class MapNetworkManager
     {
 #if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-        private readonly ConcurrentDictionary<string, GameEntityCancellationTokenSource<BasePlayerCharacterEntity>> _despawningPlayerCharacterCancellations = new ConcurrentDictionary<string, GameEntityCancellationTokenSource<BasePlayerCharacterEntity>>();
+        private readonly ConcurrentDictionary<string, ObjectWithCancellationTokenSource<BasePlayerCharacterEntity>> _despawningPlayerCharacterCancellations = new ConcurrentDictionary<string, ObjectWithCancellationTokenSource<BasePlayerCharacterEntity>>();
 #endif
 
 
@@ -40,7 +40,7 @@ namespace MultiplayerARPG.MMO
                 string userId = playerCharacterEntity.UserId;
                 // Store despawnin user id, it will be used later if player not connect and continue playing the character
                 RemoveDespawningCancellation(userId);
-                var cancellationTokenSource = new GameEntityCancellationTokenSource<BasePlayerCharacterEntity>(playerCharacterEntity);
+                var cancellationTokenSource = new ObjectWithCancellationTokenSource<BasePlayerCharacterEntity>(playerCharacterEntity);
                 _despawningPlayerCharacterCancellations.TryAdd(userId, cancellationTokenSource);
 
                 // Unregister player character
@@ -128,14 +128,14 @@ namespace MultiplayerARPG.MMO
         public async UniTask SaveAndDespawnPendingPlayerCharacter(string userId)
         {
             // Find despawning character
-            if (!_despawningPlayerCharacterCancellations.TryRemove(userId, out GameEntityCancellationTokenSource<BasePlayerCharacterEntity> cancellationTokenSource))
+            if (!_despawningPlayerCharacterCancellations.TryRemove(userId, out ObjectWithCancellationTokenSource<BasePlayerCharacterEntity> cancellationTokenSource))
                 return;
 
             if (cancellationTokenSource.IsCancellationRequested)
                 return;
 
             // Cancel character despawning to despawning immediately
-            BasePlayerCharacterEntity entity = cancellationTokenSource.Entity;
+            BasePlayerCharacterEntity entity = cancellationTokenSource.Object;
             cancellationTokenSource.Cancel();
             cancellationTokenSource.Dispose();
 
