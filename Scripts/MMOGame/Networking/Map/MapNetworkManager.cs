@@ -472,7 +472,6 @@ namespace MultiplayerARPG.MMO
                 return false;
             }
 
-            //await SaveAndDespawnPendingPlayerCharacter(userId);
             BasePlayerCharacterEntity spawnedCharacterEntity = null;
             if (_despawningPlayerCharacterCancellations.TryRemove(userId, out ObjectWithCancellationTokenSource<BasePlayerCharacterEntity> cancellationTokenSource))
             {
@@ -634,7 +633,7 @@ namespace MultiplayerARPG.MMO
             if (playerCharacterData is BasePlayerCharacterEntity playerCharacterEntity)
             {
                 // NOTE: This may not required, but to make sure the data is updated, reload its relates data
-                await LoadPlayerCharacterEntityRelatesData(connectionId, userId, playerCharacterEntity);
+                await LoadPlayerCharacterEntityRelatesData(connectionId, playerCharacterEntity, userId, accessToken);
 
                 // Switch owner
                 playerCharacterEntity.SetOwnerClient(connectionId);
@@ -676,7 +675,7 @@ namespace MultiplayerARPG.MMO
                 GameInstance.SetupByMetaData(playerCharacterEntity, metaDataId);
                 playerCharacterData.CloneTo(playerCharacterEntity);
 
-                await LoadPlayerCharacterEntityRelatesData(connectionId, userId, playerCharacterEntity);
+                await LoadPlayerCharacterEntityRelatesData(connectionId, playerCharacterEntity, userId, accessToken);
 
                 // Force make caches, to calculate current stats to fill empty slots items
                 playerCharacterEntity.ForceMakeCaches();
@@ -763,7 +762,7 @@ namespace MultiplayerARPG.MMO
                 playerCharacterEntity.gameObject.AddComponent<PlayerCharacterDataUpdater>();
         }
 
-        private async UniTask LoadPlayerCharacterEntityRelatesData(long connectionId, string userId, BasePlayerCharacterEntity playerCharacterEntity)
+        protected virtual async UniTask LoadPlayerCharacterEntityRelatesData(long connectionId, BasePlayerCharacterEntity playerCharacterEntity, string userId, string accessToken)
         {
             // Set currencies
             // Gold
