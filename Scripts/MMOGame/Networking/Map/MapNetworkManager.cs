@@ -313,9 +313,9 @@ namespace MultiplayerARPG.MMO
         {
             if (ServerUserHandlers.TryGetUserId(connectionId, out string userId))
             {
+                _pendingSpawnPlayerCharactersByUserId.TryRemove(userId, out _);
                 storageUsers.TryRemove(userId, out _);
             }
-            _pendingSpawnPlayerCharactersByUserId.TryRemove(userId, out _);
             base.UnregisterUserIdAndAccessToken(connectionId);
         }
 #endif
