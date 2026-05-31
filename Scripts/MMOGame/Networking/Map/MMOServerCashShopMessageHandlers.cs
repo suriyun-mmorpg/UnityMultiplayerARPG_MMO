@@ -291,20 +291,10 @@ namespace MultiplayerARPG.MMO
             }
             playerCharacterEntity.IsUpdatingItems = true;
 
-            if (!GameInstance.CashPackages.TryGetValue(request.dataId, out CashPackage cashPackage))
-            {
-                playerCharacterEntity.IsUpdatingItems = false;
-                result.InvokeError(new ResponseCashPackageBuyValidationMessage()
-                {
-                    message = UITextKeys.UI_ERROR_CASH_PACKAGE_NOT_FOUND,
-                });
-                return;
-            }
-
             IIAPReceiptValidator receiptValidator = GetComponentInChildren<IIAPReceiptValidator>();
             if (receiptValidator == null)
                 receiptValidator = gameObject.AddComponent<DefaultIAPReceiptValidator>();
-            IAPReceiptValidateResult validateResult = await receiptValidator.ValidateIAPReceipt(cashPackage, playerCharacterEntity.UserId, playerCharacterEntity.Id, request.receipt);
+            IAPReceiptValidateResult validateResult = await receiptValidator.ValidateIAPReceipt(request, playerCharacterEntity.UserId, playerCharacterEntity.Id);
             if (!validateResult.IsSuccess)
             {
                 playerCharacterEntity.IsUpdatingItems = false;
@@ -340,7 +330,8 @@ namespace MultiplayerARPG.MMO
             playerCharacterEntity.IsUpdatingItems = false;
             result.InvokeSuccess(new ResponseCashPackageBuyValidationMessage()
             {
-                dataId = request.dataId,
+                items = request.items,
+                transactionID = request.transactionID,
                 cash = resultUserCash,
             });
 #endif

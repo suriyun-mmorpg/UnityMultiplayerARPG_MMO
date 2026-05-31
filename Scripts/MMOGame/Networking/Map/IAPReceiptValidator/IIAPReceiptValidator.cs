@@ -4,6 +4,6 @@ namespace MultiplayerARPG.MMO
 {
     public interface IIAPReceiptValidator
     {
-        UniTask<IAPReceiptValidateResult> ValidateIAPReceipt(CashPackage cashPackage, string userId, string characterId, string receipt);
+        UniTask<IAPReceiptValidateResult> ValidateIAPReceipt(RequestCashPackageBuyValidationMessage request, string userId, string characterId);
     }
 }
