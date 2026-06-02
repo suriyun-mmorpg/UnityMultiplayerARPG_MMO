@@ -10,13 +10,41 @@ namespace MultiplayerARPG.MMO
 {
     public static class ConfigManager
     {
-        public static string ClientConfigRemoteUrl { get; set; } = string.Empty;
+        public static string ClientConfigRemoteProdUrl { get; set; } = string.Empty;
+        public static ClientConfigData ProdClientConfig { get; set; } = null;
         public static string ClientConfigRemoteDevUrl { get; set; } = string.Empty;
+        public static ClientConfigData DevClientConfig { get; set; } = null;
+        public static bool ForceUseDevClientConfig { get; set; } = false;
+        public static string ClientConfigRemoteStagingUrl { get; set; } = string.Empty;
+        public static ClientConfigData StagingClientConfig { get; set; } = null;
+        public static bool ForceUseStagingClientConfig { get; set; } = false;
+
+        private static ServerConfig _serverConfig = null;
+        private static ClientConfig _clientConfig = null;
+
         private static bool s_IsLoadingClientConfig = false;
         private static readonly string CachedClientConfigFileName = "cachedClientConfig.json";
+        private static readonly string StreamingEditorClientConfigFileName = "editorClientConfig.json";
+        private static readonly string StreamingClientConfigFileName = "clientConfig.json";
         private static string CachedClientConfigPath => Path.Combine(Application.persistentDataPath, CachedClientConfigFileName);
-        private static ServerConfig _serverConfig;
-        private static ClientConfig _clientConfig;
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        public static void Initialize()
+        {
+            ClientConfigRemoteProdUrl = string.Empty;
+            ProdClientConfig = null;
+            ClientConfigRemoteDevUrl = string.Empty;
+            DevClientConfig = null;
+            ForceUseDevClientConfig = false;
+            ClientConfigRemoteStagingUrl = string.Empty;
+            StagingClientConfig = null;
+            ForceUseStagingClientConfig = false;
+
+            _serverConfig = null;
+            _clientConfig = null;
+
+            s_IsLoadingClientConfig = false;
+        }
 
         public static bool HasServerConfig()
         {
@@ -25,10 +53,11 @@ namespace MultiplayerARPG.MMO
             return File.Exists(configFilePath);
         }
 
-        public static ServerConfig ReadServerConfig()
+        public static ServerConfig ReadServerConfig(bool reRead = false)
         {
-            if (_serverConfig != null)
+            if (_serverConfig != null && !reRead)
                 return _serverConfig;
+
             string configFolder = "./Config";
             string configFilePath = configFolder + "/serverConfig.json";
             Debug.Log($"Reading server config file from {configFilePath}");
@@ -40,6 +69,7 @@ namespace MultiplayerARPG.MMO
                 _serverConfig = JsonConvert.DeserializeObject<ServerConfig>(dataAsJson);
                 return _serverConfig;
             }
+
             return new ServerConfig();
         }
 
@@ -47,26 +77,12 @@ namespace MultiplayerARPG.MMO
         {
             string configFolder = "./Config";
             string configFilePath = configFolder + "/serverConfig.json";
-            Debug.Log("Not found server config file, creating a new one.");
             if (!Directory.Exists(configFolder))
+            {
+                Debug.Log($"Not found server config file, creating a new one.\n{writingConfig}");
                 Directory.CreateDirectory(configFolder);
-            try
-            {
-                File.WriteAllText(configFilePath, JsonConvert.SerializeObject(writingConfig, Formatting.Indented, new JsonSerializerSettings
-                {
-                    NullValueHandling = NullValueHandling.Ignore
-                }));
-                Debug.Log($"Server config file written to {configFilePath}");
             }
-            catch (System.Exception ex)
-            {
-                Debug.LogError($"Unable to create a new config file, {ex}");
-            }
-        }
-
-        public static async UniTask<bool> HasClientConfig()
-        {
-            return await HasTextFileInStreamingAssets("clientConfig.json");
+            File.WriteAllText(configFilePath, JsonConvert.SerializeObject(writingConfig, Formatting.Indented));
         }
 
         public static async UniTask<ClientConfig> ReadClientConfig(bool reRead = false)
@@ -89,20 +105,24 @@ namespace MultiplayerARPG.MMO
             string configRemoteUrl = string.Empty;
             if (ConfigReader.ReadArgs(args, ProcessArguments.ARG_CLIENT_CONFIG_URL, out configRemoteUrl, string.Empty))
             {
-                ClientConfigRemoteUrl = ClientConfigRemoteDevUrl = configRemoteUrl;
+                ClientConfigRemoteProdUrl = ClientConfigRemoteDevUrl = ClientConfigRemoteStagingUrl = configRemoteUrl;
             }
             else if (ConfigReader.ReadEnv(ProcessArguments.CONFIG_CLIENT_CONFIG_URL, out configRemoteUrl, string.Empty))
             {
-                ClientConfigRemoteUrl = ClientConfigRemoteDevUrl = configRemoteUrl;
+                ClientConfigRemoteProdUrl = ClientConfigRemoteDevUrl = ClientConfigRemoteStagingUrl = configRemoteUrl;
             }
-            Debug.Log($"Reading remote client config from: \"{ClientConfigRemoteUrl}\", dev: \"{ClientConfigRemoteDevUrl}\"");
+            Debug.Log($"Reading remote client config from: \"{ClientConfigRemoteProdUrl}\", develop: \"{ClientConfigRemoteDevUrl}\", staging: \"{ClientConfigRemoteStagingUrl}\", version: \"{Application.version}\"");
 
+            bool isDevelopVersion = Application.version.ToLower().Contains("develop");
+            bool isStagingVersion = Application.version.ToLower().Contains("staging");
             string remoteConfigUrl = null;
-            if (!Debug.isDebugBuild && !string.IsNullOrWhiteSpace(ClientConfigRemoteUrl))
-                remoteConfigUrl = ClientConfigRemoteUrl;
 
-            if (Debug.isDebugBuild && !string.IsNullOrWhiteSpace(ClientConfigRemoteDevUrl))
+            if ((ForceUseDevClientConfig || isDevelopVersion) && !string.IsNullOrWhiteSpace(ClientConfigRemoteDevUrl))
                 remoteConfigUrl = ClientConfigRemoteDevUrl;
+            else if ((ForceUseStagingClientConfig || isStagingVersion) && !string.IsNullOrWhiteSpace(ClientConfigRemoteStagingUrl))
+                remoteConfigUrl = ClientConfigRemoteStagingUrl;
+            else if (!isDevelopVersion && !isStagingVersion && !string.IsNullOrWhiteSpace(ClientConfigRemoteProdUrl))
+                remoteConfigUrl = ClientConfigRemoteProdUrl;
 
             // Read config file remotely
             if (!string.IsNullOrEmpty(remoteConfigUrl))
@@ -136,7 +156,8 @@ namespace MultiplayerARPG.MMO
                         Debug.LogWarning($"Failed to cache client config: {ex.Message}\n{ex.StackTrace}");
                     }
 
-                    return _clientConfig;
+                    if (!Application.isEditor)
+                        return _clientConfig;
                 }
                 else
                 {
@@ -145,7 +166,7 @@ namespace MultiplayerARPG.MMO
             }
 
             // Read saved config file
-            if (!Application.isEditor)
+            if (!isDevelopVersion && !isStagingVersion && !Application.isEditor)
             {
                 if (File.Exists(CachedClientConfigPath))
                 {
@@ -162,10 +183,26 @@ namespace MultiplayerARPG.MMO
                 }
             }
 
+            if ((ForceUseDevClientConfig || isDevelopVersion) && DevClientConfig != null)
+            {
+                _clientConfig = DevClientConfig.config;
+                return _clientConfig;
+            }
+            else if ((ForceUseStagingClientConfig || isStagingVersion) && StagingClientConfig != null)
+            {
+                _clientConfig = StagingClientConfig.config;
+                return _clientConfig;
+            }
+            else if (ProdClientConfig != null)
+            {
+                _clientConfig = ProdClientConfig.config;
+                return _clientConfig;
+            }
+
             // Read from streaming assets
-            string configFileName = "editorClientConfig.json";
+            string configFileName = StreamingEditorClientConfigFileName;
             if (!await HasTextFileInStreamingAssets(configFileName))
-                configFileName = "clientConfig.json";
+                configFileName = StreamingClientConfigFileName;
 
             if (await HasTextFileInStreamingAssets(configFileName))
             {
@@ -178,7 +215,8 @@ namespace MultiplayerARPG.MMO
                 {
                     Debug.LogError($"[ConfigManager] Failed to read client config from `StreamingAssets` {ex.Message}\n{ex.StackTrace}");
                 }
-            } else
+            }
+            else
             {
                 Debug.LogWarning($"[ConfigManager] Unable to read {configFileName}, so it will use default config");
             }
@@ -237,33 +275,25 @@ namespace MultiplayerARPG.MMO
 
         public static async UniTask<string> ReadTextFromStreamingAssets(string fileName)
         {
-            string filePath = Path.Combine(Application.streamingAssetsPath, fileName);
-            Debug.Log($"[ConfigManager] Reading text from streaming assets {filePath}");
+            string configFilePath = Path.Combine(Application.streamingAssetsPath, fileName);
+            Debug.Log($"[ConfigManager] Reading text from streaming assets {configFilePath}");
             if (ShouldReadConfigByWebRequest())
             {
-                using (UnityWebRequest request = UnityWebRequest.Get(filePath))
+                using (UnityWebRequest request = UnityWebRequest.Get(configFilePath))
                 {
                     UnityWebRequestAsyncOperation operation = request.SendWebRequest();
                     do
                     {
-                        await UniTask.Yield();
+                        await UniTask.Delay(1000);
                     } while (!operation.isDone);
                     if (request.result == UnityWebRequest.Result.Success)
-                    {
-                        string content = request.downloadHandler.text;
-                        Debug.Log($"[ConfigManager] {filePath} Content:\n{content}");
-                        return content;
-                    }
+                        return request.downloadHandler.text;
                 }
             }
             else
             {
-                if (File.Exists(filePath))
-                {
-                    string content = File.ReadAllText(filePath);
-                    Debug.Log($"[ConfigManager] {filePath} Content:\n{content}");
-                    return content;
-                }
+                if (File.Exists(configFilePath))
+                    return File.ReadAllText(configFilePath);
             }
             return null;
         }
