@@ -165,6 +165,28 @@ namespace MultiplayerARPG.MMO
                 }
             }
 
+            // Read from streaming assets
+            string configFileName = StreamingEditorClientConfigFileName;
+            if (!await HasTextFileInStreamingAssets(configFileName))
+                configFileName = StreamingClientConfigFileName;
+
+            if (await HasTextFileInStreamingAssets(configFileName))
+            {
+                try
+                {
+                    Debug.Log($"Read config file from `StreamingAssets`");
+                    return _clientConfig = JsonConvert.DeserializeObject<ClientConfig>(await ReadTextFromStreamingAssets(configFileName));
+                }
+                catch (System.Exception ex)
+                {
+                    Debug.LogError($"[ConfigManager] Failed to read client config from `StreamingAssets` {ex.Message}\n{ex.StackTrace}");
+                }
+            }
+            else
+            {
+                Debug.LogWarning($"[ConfigManager] Unable to read {configFileName}, so it will use default config");
+            }
+
             // Read saved config file
             if (!isDevelopVersion && !isStagingVersion && !Application.isEditor)
             {
@@ -197,28 +219,6 @@ namespace MultiplayerARPG.MMO
             {
                 _clientConfig = ProdClientConfig.config;
                 return _clientConfig;
-            }
-
-            // Read from streaming assets
-            string configFileName = StreamingEditorClientConfigFileName;
-            if (!await HasTextFileInStreamingAssets(configFileName))
-                configFileName = StreamingClientConfigFileName;
-
-            if (await HasTextFileInStreamingAssets(configFileName))
-            {
-                try
-                {
-                    Debug.Log($"Read config file from `StreamingAssets`");
-                    return _clientConfig = JsonConvert.DeserializeObject<ClientConfig>(await ReadTextFromStreamingAssets(configFileName));
-                }
-                catch (System.Exception ex)
-                {
-                    Debug.LogError($"[ConfigManager] Failed to read client config from `StreamingAssets` {ex.Message}\n{ex.StackTrace}");
-                }
-            }
-            else
-            {
-                Debug.LogWarning($"[ConfigManager] Unable to read {configFileName}, so it will use default config");
             }
 
             return new ClientConfig();
