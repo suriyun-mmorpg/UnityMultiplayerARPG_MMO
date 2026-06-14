@@ -93,9 +93,6 @@ namespace MultiplayerARPG.MMO
             CentralNetworkManager.onClientConnected += OnCentralConnected;
             CentralNetworkManager.onClientDisconnected += OnCentralDisconnected;
             CentralNetworkManager.onClientStopped += OnCentralStopped;
-            ClientGenericActions.onClientConnected += OnMapConnected;
-            ClientGenericActions.onClientDisconnected += OnMapDisconnected;
-            ClientGenericActions.onClientStopped += OnMapStopped;
         }
 
         private void OnDisable()
@@ -103,15 +100,14 @@ namespace MultiplayerARPG.MMO
             CentralNetworkManager.onClientConnected -= OnCentralConnected;
             CentralNetworkManager.onClientDisconnected -= OnCentralDisconnected;
             CentralNetworkManager.onClientStopped -= OnCentralStopped;
-            ClientGenericActions.onClientConnected -= OnMapConnected;
-            ClientGenericActions.onClientDisconnected -= OnMapDisconnected;
-            ClientGenericActions.onClientStopped -= OnMapStopped;
+            ClearMapClientEvents();
         }
 
         public void OnCentralConnected()
         {
             if (OnCentralClientConnectedEvent != null)
                 OnCentralClientConnectedEvent.Invoke();
+            SetMapClientEvents();
         }
 
         public void OnCentralDisconnected(DisconnectReason reason, SocketError socketError, UITextKeys message)
@@ -119,6 +115,7 @@ namespace MultiplayerARPG.MMO
             if (OnCentralClientDisconnectedEvent != null)
                 OnCentralClientDisconnectedEvent.Invoke(reason, socketError, message);
             ClearClientData();
+            ClearMapClientEvents();
         }
 
         public void OnCentralStopped()
@@ -149,6 +146,21 @@ namespace MultiplayerARPG.MMO
         }
 
         #region Client functions
+        private void SetMapClientEvents()
+        {
+            ClearMapClientEvents();
+            ClientGenericActions.onClientConnected += OnMapConnected;
+            ClientGenericActions.onClientDisconnected += OnMapDisconnected;
+            ClientGenericActions.onClientStopped += OnMapStopped;
+        }
+
+        private void ClearMapClientEvents()
+        {
+            ClientGenericActions.onClientConnected -= OnMapConnected;
+            ClientGenericActions.onClientDisconnected -= OnMapDisconnected;
+            ClientGenericActions.onClientStopped -= OnMapStopped;
+        }
+
         public void StartCentralClient()
         {
             CentralNetworkManager.useWebSocket = UseWebSocket;
