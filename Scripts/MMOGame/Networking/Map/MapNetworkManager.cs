@@ -692,7 +692,7 @@ namespace MultiplayerARPG.MMO
                     });
                     if (!summonBuffsResp.IsSuccess)
                     {
-                        Destroy(spawnObj.gameObject);
+                        Assets.DestroyObjectInstance(spawnObj);
                         KickClient(connectionId, UITextKeys.UI_ERROR_KICKED_FROM_SERVER);
                         return;
                     }
@@ -702,7 +702,7 @@ namespace MultiplayerARPG.MMO
                 // Make sure that player does not exit before character data loaded
                 if (!ContainsConnectionId(connectionId))
                 {
-                    Destroy(spawnObj.gameObject);
+                    Assets.DestroyObjectInstance(spawnObj);
                     KickClient(connectionId, UITextKeys.UI_ERROR_KICKED_FROM_SERVER);
                     return;
                 }
@@ -710,7 +710,7 @@ namespace MultiplayerARPG.MMO
                 // Make sure that there is no another player, enter the game with the character yet (prevent nested login)
                 if (_usersByCharacterId.ContainsKey(playerCharacterEntity.Id))
                 {
-                    Destroy(spawnObj.gameObject);
+                    Assets.DestroyObjectInstance(spawnObj);
                     KickClient(connectionId, UITextKeys.UI_ERROR_KICKED_FROM_SERVER);
                     return;
                 }
