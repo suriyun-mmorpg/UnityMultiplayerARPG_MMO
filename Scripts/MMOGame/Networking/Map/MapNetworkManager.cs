@@ -224,17 +224,18 @@ namespace MultiplayerARPG.MMO
 #endif
         }
 
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
         protected override void UpdateOnlineCharacter(BasePlayerCharacterEntity playerCharacterEntity)
         {
+            // Set user data to map server
+            SocialCharacterData userData = SocialCharacterData.Create(playerCharacterEntity);
+            _socialCharactersByUserId[userData.userId] = userData;
+            // Add map user to cluster server
+            if (ClusterClient.IsNetworkActive)
+                UpdateMapUser(ClusterClient, UpdateUserCharacterMessage.UpdateType.Online, userData);
             base.UpdateOnlineCharacter(playerCharacterEntity);
-#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
-            if (ClusterClient.IsNetworkActive && _socialCharactersByUserId.TryGetValue(playerCharacterEntity.UserId, out SocialCharacterData tempUserData))
-            {
-                _socialCharactersByUserId[playerCharacterEntity.UserId] = tempUserData = SocialCharacterData.Create(playerCharacterEntity);
-                UpdateMapUser(ClusterClient, UpdateUserCharacterMessage.UpdateType.Online, tempUserData);
-            }
-#endif
         }
+#endif
 
         public async void ProceedBeforeQuit()
         {
