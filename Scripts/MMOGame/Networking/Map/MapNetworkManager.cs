@@ -273,14 +273,11 @@ namespace MultiplayerARPG.MMO
         public override void RegisterPlayerCharacter(long connectionId, BasePlayerCharacterEntity playerCharacterEntity)
         {
             // Set user data to map server
-            if (!_socialCharactersByUserId.ContainsKey(playerCharacterEntity.UserId))
-            {
-                SocialCharacterData userData = SocialCharacterData.Create(playerCharacterEntity);
-                _socialCharactersByUserId[userData.userId] = userData;
-                // Add map user to cluster server
-                if (ClusterClient.IsNetworkActive)
-                    UpdateMapUser(ClusterClient, UpdateUserCharacterMessage.UpdateType.Add, userData);
-            }
+            SocialCharacterData userData = SocialCharacterData.Create(playerCharacterEntity);
+            _socialCharactersByUserId[userData.userId] = userData;
+            // Add map user to cluster server
+            if (ClusterClient.IsNetworkActive)
+                UpdateMapUser(ClusterClient, UpdateUserCharacterMessage.UpdateType.Add, userData);
             base.RegisterPlayerCharacter(connectionId, playerCharacterEntity);
         }
 #endif
