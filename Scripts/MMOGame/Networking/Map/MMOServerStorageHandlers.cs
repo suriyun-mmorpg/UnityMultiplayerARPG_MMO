@@ -112,18 +112,18 @@ namespace MultiplayerARPG.MMO
                     CloseAllStorages(connectionId);
                     continue;
                 }
-                Vector3 currentPosition = playerCharacter.CurrentPosition;
-                if (playerCharacter is BasePlayerCharacterEntity entity)
-                    currentPosition = entity.EntityTransform.position;
                 if (userUsingStorages.TryGetValue(connectionId, out List<UserUsingStorageData> oneUserUsingStorages))
                 {
+                    Vector3 currentPosition = playerCharacter.CurrentPosition;
+                    if (playerCharacter is BasePlayerCharacterEntity entity)
+                        currentPosition = entity.EntityTransform.position;
                     // Looking for far entities and close the storage
                     for (int i = oneUserUsingStorages.Count - 1; i >= 0; --i)
                     {
                         UserUsingStorageData oneUserUsingStorage = oneUserUsingStorages[i];
                         if (!oneUserUsingStorage.RequireEntity)
                             continue;
-                        if (oneUserUsingStorage.Entity.IsNull() || Vector3.Distance(currentPosition, oneUserUsingStorage.Entity.EntityTransform.position) > oneUserUsingStorage.Entity.GetActivatableDistance())
+                        if (oneUserUsingStorage.Entity.IsNull() || !GameplayUtils.IsTargetInDistance(currentPosition, oneUserUsingStorage.Entity.EntityTransform, oneUserUsingStorage.Entity.GetActivatableDistance()))
                             CloseStorage(connectionId, oneUserUsingStorage.Id);
                     }
                 }
@@ -259,7 +259,7 @@ namespace MultiplayerARPG.MMO
             Vector3 currentPosition = playerCharacter.CurrentPosition;
             if (playerCharacter is BasePlayerCharacterEntity entity)
                 currentPosition = entity.EntityTransform.position;
-            if (Vector3.Distance(currentPosition, storageEntity.EntityTransform.position) > storageEntity.GetActivatableDistance())
+            if (!GameplayUtils.IsTargetInDistance(currentPosition, storageEntity.EntityTransform, storageEntity.GetActivatableDistance()))
             {
                 uiTextKeys = UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR;
                 return false;
