@@ -1,10 +1,6 @@
 ﻿using UnityEngine;
 using LiteNetLibManager;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using System.Collections.Concurrent;
-using System.Threading.Tasks;
-using ZLogger;
 
 namespace MultiplayerARPG.MMO
 {
@@ -16,46 +12,24 @@ namespace MultiplayerARPG.MMO
             public Color logColor;
         }
 
-        public string logFolder = "log";
-        public string logExtension = "log";
         [Tooltip("Height of log area")]
         public int logAreaHeight = 100;
         [Tooltip("Amount of logs to show")]
         public int showLogSize = 20;
 
 #if !UNITY_SERVER || DEVELOPMENT_BUILD
-        private Vector2 scrollPosition;
-        private readonly ConcurrentQueue<LogData> PrintingLogs = new ConcurrentQueue<LogData>();
-        private bool logScrollingToBottom;
-        private bool loggingEnabled = false;
+        private Vector2 _scrollPosition;
+        private readonly ConcurrentQueue<LogData> _printingLogs = new ConcurrentQueue<LogData>();
+        private bool _logScrollingToBottom;
+        private bool _loggingEnabled = false;
 #endif
 
         public void SetupLogger(string fileName)
         {
-            LogManager.DefaultLoggerManager = CreateLoggerManager($"{fileName}.info");
-            LogManager.ErrorLoggerManager = CreateLoggerManager($"{fileName}.err");
-            LogManager.WarningLoggerManager = CreateLoggerManager($"{fileName}.warn");
+            LogManager.LoggerManager = new LoggerManager(new DefaultLoggerFactory($"Logs/{fileName}"));
 #if !UNITY_SERVER || DEVELOPMENT_BUILD
-            loggingEnabled = true;
+            _loggingEnabled = true;
 #endif
-        }
-
-        private LoggerManager CreateLoggerManager(string fileName)
-        {
-            return new LoggerManager(UnityLoggerFactory.Create(builder =>
-            {
-                builder.SetMinimumLevel(LogLevel.Trace);
-#if !UNITY_SERVER || DEVELOPMENT_BUILD
-                builder.AddZLoggerUnityDebug(options =>
-                {
-                    options.PrefixFormatter = LogManager.PrefixFormatterConfigure;
-                });
-#endif
-                builder.AddZLoggerFile($"{logFolder}/{fileName}.{logExtension}", options =>
-                {
-                    options.PrefixFormatter = LogManager.PrefixFormatterConfigure;
-                });
-            }));
         }
 
         private void OnEnable()
@@ -71,7 +45,7 @@ namespace MultiplayerARPG.MMO
         private void HandleLog(LogType type, string logString)
         {
 #if !UNITY_SERVER || DEVELOPMENT_BUILD
-            if (!loggingEnabled)
+            if (!_loggingEnabled)
                 return;
             Color color = Color.white;
             switch (type)
@@ -86,14 +60,14 @@ namespace MultiplayerARPG.MMO
                     color = Color.magenta;
                     break;
             }
-            PrintingLogs.Enqueue(new LogData()
+            _printingLogs.Enqueue(new LogData()
             {
                 logText = logString,
                 logColor = color,
             });
-            if (PrintingLogs.Count > showLogSize)
-                PrintingLogs.TryDequeue(out _);
-            logScrollingToBottom = true;
+            if (_printingLogs.Count > showLogSize)
+                _printingLogs.TryDequeue(out _);
+            _logScrollingToBottom = true;
 #endif
         }
 
@@ -102,21 +76,16 @@ namespace MultiplayerARPG.MMO
             HandleLog(type, condition);
             switch (type)
             {
+                case LogType.Assert:
                 case LogType.Log:
-                    if (!LogManager.IsLoggerDisposed)
-                        Logging.Log(condition);
+                    Logging.Log(condition);
                     break;
                 case LogType.Exception:
-                    if (!LogManager.IsErrorLoggerDisposed)
-                        Logging.LogError(condition + "\n" + stackTrace);
-                    break;
                 case LogType.Error:
-                    if (!LogManager.IsErrorLoggerDisposed)
-                        Logging.LogError(condition + "\n" + stackTrace);
+                    Logging.LogError("{0}\n{1}", condition, stackTrace);
                     break;
                 case LogType.Warning:
-                    if (!LogManager.IsWarningLoggerDisposed)
-                        Logging.LogWarning(condition);
+                    Logging.LogWarning(condition);
                     break;
             }
         }
@@ -124,13 +93,13 @@ namespace MultiplayerARPG.MMO
 #if !UNITY_SERVER || DEVELOPMENT_BUILD
         void OnGUI()
         {
-            if (logScrollingToBottom)
+            if (_logScrollingToBottom)
             {
-                scrollPosition.y = Mathf.Infinity;
-                logScrollingToBottom = false;
+                _scrollPosition.y = Mathf.Infinity;
+                _logScrollingToBottom = false;
             }
-            scrollPosition = GUILayout.BeginScrollView(scrollPosition, GUILayout.Width(Screen.width), GUILayout.Height(logAreaHeight));
-            foreach (LogData logData in PrintingLogs)
+            _scrollPosition = GUILayout.BeginScrollView(_scrollPosition, GUILayout.Width(Screen.width), GUILayout.Height(logAreaHeight));
+            foreach (LogData logData in _printingLogs)
             {
                 GUI.color = logData.logColor;
                 GUILayout.Label(logData.logText);
@@ -138,79 +107,5 @@ namespace MultiplayerARPG.MMO
             GUILayout.EndScrollView();
         }
 #endif
-
-        private class LogGUIProvider : ILoggerProvider
-        {
-            LogGUIProcessor logProcessor;
-
-            public LogGUIProvider(LogGUI logGUI, IOptions<ZLoggerOptions> options)
-            {
-                logProcessor = new LogGUIProcessor(logGUI, options.Value);
-            }
-
-            public Microsoft.Extensions.Logging.ILogger CreateLogger(string categoryName)
-            {
-                return new AsyncProcessZLogger(categoryName, logProcessor);
-            }
-
-            public void Dispose()
-            {
-            }
-        }
-
-        private class LogGUIProcessor : IAsyncLogProcessor
-        {
-            readonly LogGUI logGUI;
-            readonly ZLoggerOptions options;
-
-            public LogGUIProcessor(LogGUI logGUI, ZLoggerOptions options)
-            {
-                this.logGUI = logGUI;
-                this.options = options;
-            }
-
-            public ValueTask DisposeAsync()
-            {
-                return default;
-            }
-
-            public void Post(IZLoggerEntry log)
-            {
-                try
-                {
-                    string msg = log.FormatToString(options, null);
-                    switch (log.LogInfo.LogLevel)
-                    {
-                        case LogLevel.Trace:
-                        case LogLevel.Debug:
-                        case LogLevel.Information:
-                            logGUI.HandleLog(LogType.Log, msg);
-                            break;
-                        case LogLevel.Warning:
-                        case LogLevel.Critical:
-                            logGUI.HandleLog(LogType.Warning, msg);
-                            break;
-                        case LogLevel.Error:
-                            if (log.LogInfo.Exception != null)
-                            {
-                                logGUI.HandleLog(LogType.Exception, msg);
-                            }
-                            else
-                            {
-                                logGUI.HandleLog(LogType.Error, msg);
-                            }
-                            break;
-                        case LogLevel.None:
-                            break;
-                        default:
-                            break;
-                    }
-                }
-                finally
-                {
-                    log.Return();
-                }
-            }
-        }
     }
 }
