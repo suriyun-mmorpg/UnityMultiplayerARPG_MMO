@@ -112,6 +112,40 @@ namespace MultiplayerARPG.MMO
         internal readonly ConcurrentDictionary<string, ConcurrentHashSet<StorageId>> storageUsers = new ConcurrentDictionary<string, ConcurrentHashSet<StorageId>>();
 #endif
 
+#if (UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES) && UNITY_STANDALONE
+        protected override string ValidateGameDataPatchReload()
+        {
+            string error = base.ValidateGameDataPatchReload();
+            if (!string.IsNullOrEmpty(error))
+                return error;
+            if (ClusterClient == null || !ClusterClient.IsNetworkActive || !ClusterClient.IsAppRegistered)
+                return "Cluster is disconnected; reconnect before broadcasting a patch reload.";
+            return string.Empty;
+        }
+
+        protected override UniTask BroadcastGameDataPatchReload(string requestId, string databaseId, string releaseId, string payloadHash)
+        {
+            if (ClusterClient == null || !ClusterClient.IsNetworkActive || !ClusterClient.IsAppRegistered)
+                throw new System.InvalidOperationException("Cluster is disconnected; patch reload was not broadcast to other servers.");
+            var request = new DataPatchReloadMessage
+            {
+                requestId = requestId,
+                databaseId = databaseId,
+                releaseId = releaseId,
+                payloadHash = payloadHash,
+            };
+            ClusterClient.SendPacket(0, DeliveryMethod.ReliableOrdered, MMOMessageTypes.DataPatchReload, writer => writer.PutValue(request));
+            return UniTask.CompletedTask;
+        }
+
+        private void HandleDataPatchReload(MessageHandlerData handler)
+        {
+            DataPatchReloadMessage request = handler.ReadMessage<DataPatchReloadMessage>();
+            if (request.IsValid)
+                QueueGameDataPatchReload(request.requestId, request.databaseId, request.releaseId, request.payloadHash);
+        }
+#endif
+
         protected override void Awake()
         {
             PrepareMapHandlers();
@@ -137,6 +171,7 @@ namespace MultiplayerARPG.MMO
             ClusterClient.RegisterRequestHandler<RequestSpawnMapMessage, ResponseSpawnMapMessage>(MMORequestTypes.RunMap, HandleRequestRunMap);
             ClusterClient.RegisterRequestHandler<RequestFindOnlineUserMessage, ResponseFindOnlineUserMessage>(MMORequestTypes.FindOnlineUser, HandleFindOnlineUser);
             ClusterClient.RegisterMessageHandler(MMOMessageTypes.Chat, HandleChat);
+            ClusterClient.RegisterMessageHandler(MMOMessageTypes.DataPatchReload, HandleDataPatchReload);
             ClusterClient.RegisterMessageHandler(MMOMessageTypes.UpdateMapUser, HandleUpdateMapUser);
             ClusterClient.RegisterMessageHandler(MMOMessageTypes.UpdatePartyMember, HandleUpdatePartyMember);
             ClusterClient.RegisterMessageHandler(MMOMessageTypes.UpdateParty, HandleUpdateParty);
