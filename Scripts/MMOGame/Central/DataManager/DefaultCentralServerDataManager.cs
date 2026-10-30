@@ -83,7 +83,11 @@ namespace MultiplayerARPG.MMO
 
         public string GenerateAccessToken(string userId)
         {
-            string str = $"{userId}_{System.DateTime.Now.ToLongDateString()}";
+            // A random secret, so knowing a user id (other players see it) is not enough to make the token
+            byte[] secret = new byte[32];
+            using (System.Security.Cryptography.RandomNumberGenerator rng = System.Security.Cryptography.RandomNumberGenerator.Create())
+                rng.GetBytes(secret);
+            string str = $"{userId}_{System.Convert.ToBase64String(secret)}";
             return System.Convert.ToBase64String(Encoding.ASCII.GetBytes(str));
         }
 
