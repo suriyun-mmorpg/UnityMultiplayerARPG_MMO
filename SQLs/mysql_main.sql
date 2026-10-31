@@ -654,7 +654,7 @@ INSERT INTO `__migrations` (`migrationId`) VALUES
 ('1.90b'),
 ('1.91'),
 ('1.96'),
-('openmmorpg-item-ammo-data-id');
+('2026-10-31_fix-missing-ammo-data-id');
 
 --
 -- Indexes for dumped tables
