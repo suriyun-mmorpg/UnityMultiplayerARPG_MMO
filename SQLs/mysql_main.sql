@@ -122,6 +122,7 @@ CREATE TABLE `characteritem` (
   `ammo` int(11) NOT NULL DEFAULT 0,
   `sockets` text COLLATE utf8_unicode_ci NOT NULL,
   `version` tinyint(3) UNSIGNED NOT NULL DEFAULT 0,
+  `ammoDataId` int(11) NOT NULL DEFAULT 0,
   `createAt` timestamp NOT NULL DEFAULT current_timestamp(),
   `updateAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -552,6 +553,7 @@ CREATE TABLE `storageitem` (
   `ammo` int(11) NOT NULL DEFAULT 0,
   `sockets` text COLLATE utf8_unicode_ci NOT NULL,
   `version` tinyint(3) UNSIGNED NOT NULL DEFAULT 0,
+  `ammoDataId` int(11) NOT NULL DEFAULT 0,
   `createAt` timestamp NOT NULL DEFAULT current_timestamp(),
   `updateAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -651,7 +653,8 @@ INSERT INTO `__migrations` (`migrationId`) VALUES
 ('1.90'),
 ('1.90b'),
 ('1.91'),
-('1.96');
+('1.96'),
+('2026-10-31_fix-missing-ammo-data-id');
 
 --
 -- Indexes for dumped tables
