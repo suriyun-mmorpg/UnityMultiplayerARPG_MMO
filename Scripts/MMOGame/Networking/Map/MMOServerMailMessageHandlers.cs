@@ -122,7 +122,11 @@ namespace MultiplayerARPG.MMO
                     ChangeAmount = mail.Cash
                 });
                 if (!changeCashResp.Value.IsSuccess)
+                {
+                    // Mail is already marked claimed, log it so the lost reward can be restored manually
+                    Debug.LogError($"[Mail] Claim cash failed after mail was marked claimed. mailId={mailId} userId={playerCharacter.UserId} cash={mail.Cash}");
                     return UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR;
+                }
             }
             // Give rewards
             if (mail.Items.Count > 0)

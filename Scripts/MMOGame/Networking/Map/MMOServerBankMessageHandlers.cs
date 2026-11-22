@@ -45,7 +45,15 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            int requiredGold = GameInstance.Singleton.GameplayRule.GetGuildBankDepositFee(request.gold) + request.gold;
+            int requiredGold;
+            try
+            {
+                requiredGold = checked(GameInstance.Singleton.GameplayRule.GetGuildBankDepositFee(request.gold) + request.gold);
+            }
+            catch (System.OverflowException)
+            {
+                requiredGold = int.MaxValue;
+            }
             if (playerCharacter.Gold < requiredGold)
             {
                 result.InvokeError(new ResponseDepositGuildGoldMessage()
@@ -166,8 +174,32 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            int requiredGold = GameInstance.Singleton.GameplayRule.GetGuildBankWithdrawFee(request.gold) + request.gold;
-            // Update gold
+            int requiredGold;
+            try
+            {
+                requiredGold = checked(GameInstance.Singleton.GameplayRule.GetGuildBankWithdrawFee(request.gold) + request.gold);
+            }
+            catch (System.OverflowException)
+            {
+                requiredGold = 0;
+            }
+            if (requiredGold <= 0)
+            {
+                result.InvokeError(new ResponseWithdrawGuildGoldMessage()
+                {
+                    message = UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD,
+                });
+                return;
+            }
+            if (guild.gold < requiredGold)
+            {
+                result.InvokeError(new ResponseWithdrawGuildGoldMessage()
+                {
+                    message = UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD_TO_WITHDRAW,
+                });
+                return;
+            }
+            // Update gold (the database stays the authority, it rejects an overdraw with a negative result)
             DatabaseApiResult<GuildGoldResp> changeGoldResp = await DatabaseClient.ChangeGuildGoldAsync(new ChangeGuildGoldReq()
             {
                 GuildId = playerCharacter.GuildId,

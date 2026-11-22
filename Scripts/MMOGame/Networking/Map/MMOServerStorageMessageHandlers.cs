@@ -116,7 +116,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
 
-            if (HasStorageUser(userId, storageId))
+            if (!AddStorageUser(userId, storageId))
             {
                 result.InvokeError(new ResponseMoveItemFromStorageMessage()
                 {
@@ -124,31 +124,35 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            AddStorageUser(userId, storageId);
             if (playerCharacterEntity != null)
                 playerCharacterEntity.IsUpdatingItems = true;
 
-            // Get items from storage
-            if (storageId.storageType == StorageType.Guild)
-            {
-                await MapNetworkManager.LoadStorageRoutine(storageId);
-            }
-            List<CharacterItem> storageItems = GameInstance.ServerStorageHandlers.GetStorageItems(storageId);
-
-            // Prepare storage data
-            Storage storage = GameInstance.ServerStorageHandlers.GetStorage(storageId, out _);
-            bool isLimitWeight = storage.weightLimit > 0;
-            bool isLimitSlot = storage.slotLimit > 0;
-            int weightLimit = storage.weightLimit;
-            int slotLimit = storage.slotLimit;
-            // Don't apply data to player character immediately, it should be saved properly before apply the data
+            List<CharacterItem> storageItems;
+            bool isLimitWeight;
+            bool isLimitSlot;
+            int weightLimit;
+            int slotLimit;
             PlayerCharacterData applyingPlayerCharacter = new PlayerCharacterData();
-            applyingPlayerCharacter = playerCharacter.CloneTo(
-                applyingPlayerCharacter, true, false, false,
-                false, false, true, true, false, false, false,
-                false, false, false, false, false);
             try
             {
+                // Get items from storage
+                if (storageId.storageType == StorageType.Guild)
+                {
+                    await MapNetworkManager.LoadStorageRoutine(storageId);
+                }
+                storageItems = GameInstance.ServerStorageHandlers.GetStorageItems(storageId);
+
+                // Prepare storage data
+                Storage storage = GameInstance.ServerStorageHandlers.GetStorage(storageId, out _);
+                isLimitWeight = storage.weightLimit > 0;
+                isLimitSlot = storage.slotLimit > 0;
+                weightLimit = storage.weightLimit;
+                slotLimit = storage.slotLimit;
+                // Don't apply data to player character immediately, it should be saved properly before apply the data
+                applyingPlayerCharacter = playerCharacter.CloneTo(
+                    applyingPlayerCharacter, true, false, false,
+                    false, false, true, true, false, false, false,
+                    false, false, false, false, false);
                 if (!applyingPlayerCharacter.MoveItemFromStorage(storageId, isLimitWeight, weightLimit, isLimitSlot, slotLimit, storageItems, request.storageItemIndex, request.storageItemAmount, request.inventoryType, request.inventoryItemIndex, request.equipSlotIndexOrWeaponSet, out UITextKeys gameMessage))
                 {
                     RemoveStorageUser(userId, storageId, playerCharacterEntity);
@@ -239,7 +243,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
 
-            if (HasStorageUser(userId, storageId))
+            if (!AddStorageUser(userId, storageId))
             {
                 result.InvokeError(new ResponseMoveItemToStorageMessage()
                 {
@@ -247,31 +251,35 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            AddStorageUser(userId, storageId);
             if (playerCharacterEntity != null)
                 playerCharacterEntity.IsUpdatingItems = true;
 
-            // Get items from storage
-            if (storageId.storageType == StorageType.Guild)
-            {
-                await MapNetworkManager.LoadStorageRoutine(storageId);
-            }
-            List<CharacterItem> storageItems = GameInstance.ServerStorageHandlers.GetStorageItems(storageId);
-
-            // Prepare storage data
-            Storage storage = GameInstance.ServerStorageHandlers.GetStorage(storageId, out _);
-            bool isLimitWeight = storage.weightLimit > 0;
-            bool isLimitSlot = storage.slotLimit > 0;
-            int weightLimit = storage.weightLimit;
-            int slotLimit = storage.slotLimit;
-            // Don't apply data to player character immediately, it should be saved properly before apply the data
+            List<CharacterItem> storageItems;
+            bool isLimitWeight;
+            bool isLimitSlot;
+            int weightLimit;
+            int slotLimit;
             PlayerCharacterData applyingPlayerCharacter = new PlayerCharacterData();
-            applyingPlayerCharacter = playerCharacter.CloneTo(
-                applyingPlayerCharacter, true, false, false,
-                false, false, true, true, false, false, false,
-                false, false, false, false, false);
             try
             {
+                // Get items from storage
+                if (storageId.storageType == StorageType.Guild)
+                {
+                    await MapNetworkManager.LoadStorageRoutine(storageId);
+                }
+                storageItems = GameInstance.ServerStorageHandlers.GetStorageItems(storageId);
+
+                // Prepare storage data
+                Storage storage = GameInstance.ServerStorageHandlers.GetStorage(storageId, out _);
+                isLimitWeight = storage.weightLimit > 0;
+                isLimitSlot = storage.slotLimit > 0;
+                weightLimit = storage.weightLimit;
+                slotLimit = storage.slotLimit;
+                // Don't apply data to player character immediately, it should be saved properly before apply the data
+                applyingPlayerCharacter = playerCharacter.CloneTo(
+                    applyingPlayerCharacter, true, false, false,
+                    false, false, true, true, false, false, false,
+                    false, false, false, false, false);
                 if (!applyingPlayerCharacter.MoveItemToStorage(storageId, isLimitWeight, weightLimit, isLimitSlot, slotLimit, storageItems, request.storageItemIndex, request.inventoryType, request.inventoryItemIndex, request.inventoryItemAmount, request.equipSlotIndexOrWeaponSet, out UITextKeys gameMessage))
                 {
                     RemoveStorageUser(userId, storageId, playerCharacterEntity);
@@ -362,7 +370,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
 
-            if (HasStorageUser(userId, storageId))
+            if (!AddStorageUser(userId, storageId))
             {
                 result.InvokeError(new ResponseSwapOrMergeStorageItemMessage()
                 {
@@ -370,21 +378,23 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            AddStorageUser(userId, storageId);
 
-            // Get items from storage
-            if (storageId.storageType == StorageType.Guild)
-            {
-                await MapNetworkManager.LoadStorageRoutine(storageId);
-            }
-            List<CharacterItem> storageItems = GameInstance.ServerStorageHandlers.GetStorageItems(storageId);
-
-            // Prepare storage data
-            Storage storage = GameInstance.ServerStorageHandlers.GetStorage(storageId, out _);
-            bool isLimitSlot = storage.slotLimit > 0;
-            int slotLimit = storage.slotLimit;
+            List<CharacterItem> storageItems;
+            bool isLimitSlot;
+            int slotLimit;
             try
             {
+                // Get items from storage
+                if (storageId.storageType == StorageType.Guild)
+                {
+                    await MapNetworkManager.LoadStorageRoutine(storageId);
+                }
+                storageItems = GameInstance.ServerStorageHandlers.GetStorageItems(storageId);
+
+                // Prepare storage data
+                Storage storage = GameInstance.ServerStorageHandlers.GetStorage(storageId, out _);
+                isLimitSlot = storage.slotLimit > 0;
+                slotLimit = storage.slotLimit;
                 if (!playerCharacter.SwapOrMergeStorageItem(storageId, isLimitSlot, slotLimit, storageItems, fromIndex, toIndex, out UITextKeys gameMessage))
                 {
                     RemoveStorageUser(userId, storageId);
@@ -437,8 +447,7 @@ namespace MultiplayerARPG.MMO
         {
             if (!MapNetworkManager.storageUsers.TryGetValue(userId, out ConcurrentHashSet<StorageId> storageIds))
             {
-                storageIds = new ConcurrentHashSet<StorageId>();
-                MapNetworkManager.storageUsers.TryAdd(userId, storageIds);
+                storageIds = MapNetworkManager.storageUsers.GetOrAdd(userId, _ => new ConcurrentHashSet<StorageId>());
             }
             return storageIds.Add(storageId);
         }
