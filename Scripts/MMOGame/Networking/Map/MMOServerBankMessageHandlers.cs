@@ -54,14 +54,16 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
+            playerCharacter.Gold -= requiredGold;
             // Update gold
             DatabaseApiResult<GuildGoldResp> changeGoldResp = await DatabaseClient.ChangeGuildGoldAsync(new ChangeGuildGoldReq()
             {
                 GuildId = playerCharacter.GuildId,
                 ChangeAmount = request.gold,
             });
-            if (!changeGoldResp.IsSuccess)
+            if (!changeGoldResp.IsSuccess || changeGoldResp.Response.GuildGold < 0)
             {
+                playerCharacter.Gold += requiredGold;
                 result.InvokeError(new ResponseDepositGuildGoldMessage()
                 {
                     message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
@@ -69,7 +71,6 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             guild.gold = changeGoldResp.Response.GuildGold;
-            playerCharacter.Gold -= requiredGold;
             GameInstance.ServerGuildHandlers.SetGuild(playerCharacter.GuildId, guild);
             // Broadcast via chat server
             if (ClusterClient.IsNetworkActive)
@@ -117,14 +118,16 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
+            playerCharacter.Gold -= requiredGold;
             // Update gold
             DatabaseApiResult<GoldResp> changeGoldResp = await DatabaseClient.ChangeGoldAsync(new ChangeGoldReq()
             {
                 UserId = playerCharacter.UserId,
                 ChangeAmount = request.gold
             });
-            if (!changeGoldResp.IsSuccess)
+            if (!changeGoldResp.IsSuccess || changeGoldResp.Response.Gold < 0)
             {
+                playerCharacter.Gold += requiredGold;
                 result.InvokeError(new ResponseDepositUserGoldMessage()
                 {
                     message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
@@ -132,7 +135,6 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             playerCharacter.UserGold = changeGoldResp.Response.Gold;
-            playerCharacter.Gold -= requiredGold;
             result.InvokeSuccess(new ResponseDepositUserGoldMessage());
 #endif
         }
@@ -164,28 +166,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            // Get gold
-            DatabaseApiResult<GuildGoldResp> goldResp = await DatabaseClient.GetGuildGoldAsync(new GetGuildGoldReq()
-            {
-                GuildId = playerCharacter.GuildId
-            });
-            if (!goldResp.IsSuccess)
-            {
-                result.InvokeError(new ResponseWithdrawGuildGoldMessage()
-                {
-                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
-                });
-                return;
-            }
             int requiredGold = GameInstance.Singleton.GameplayRule.GetGuildBankWithdrawFee(request.gold) + request.gold;
-            if (goldResp.Response.GuildGold < requiredGold)
-            {
-                result.InvokeError(new ResponseWithdrawGuildGoldMessage()
-                {
-                    message = UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD_TO_WITHDRAW,
-                });
-                return;
-            }
             // Update gold
             DatabaseApiResult<GuildGoldResp> changeGoldResp = await DatabaseClient.ChangeGuildGoldAsync(new ChangeGuildGoldReq()
             {
@@ -197,6 +178,14 @@ namespace MultiplayerARPG.MMO
                 result.InvokeError(new ResponseWithdrawGuildGoldMessage()
                 {
                     message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                });
+                return;
+            }
+            if (changeGoldResp.Response.GuildGold < 0)
+            {
+                result.InvokeError(new ResponseWithdrawGuildGoldMessage()
+                {
+                    message = UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD_TO_WITHDRAW,
                 });
                 return;
             }
@@ -240,28 +229,7 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            // Get gold
-            DatabaseApiResult<GoldResp> goldResp = await DatabaseClient.GetGoldAsync(new GetGoldReq()
-            {
-                UserId = playerCharacter.UserId
-            });
-            if (!goldResp.IsSuccess)
-            {
-                result.InvokeError(new ResponseWithdrawUserGoldMessage()
-                {
-                    message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
-                });
-                return;
-            }
             int requiredGold = GameInstance.Singleton.GameplayRule.GetPlayerBankWithdrawFee(request.gold) + request.gold;
-            if (goldResp.Response.Gold < request.gold)
-            {
-                result.InvokeError(new ResponseWithdrawUserGoldMessage()
-                {
-                    message = UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD_TO_WITHDRAW,
-                });
-                return;
-            }
             // Update gold
             DatabaseApiResult<GoldResp> changeGoldResp = await DatabaseClient.ChangeGoldAsync(new ChangeGoldReq()
             {
@@ -273,6 +241,14 @@ namespace MultiplayerARPG.MMO
                 result.InvokeError(new ResponseWithdrawUserGoldMessage()
                 {
                     message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
+                });
+                return;
+            }
+            if (changeGoldResp.Response.Gold < 0)
+            {
+                result.InvokeError(new ResponseWithdrawUserGoldMessage()
+                {
+                    message = UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD_TO_WITHDRAW,
                 });
                 return;
             }
