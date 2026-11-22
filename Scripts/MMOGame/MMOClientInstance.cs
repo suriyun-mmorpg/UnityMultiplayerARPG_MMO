@@ -84,8 +84,9 @@ namespace MultiplayerARPG.MMO
             DontDestroyOnLoad(gameObject);
             Singleton = this;
 
-            // Always accept SSL
+#if UNITY_EDITOR
             ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback((sender, certificate, chain, policyErrors) => { return true; });
+#endif
         }
 
         private void OnEnable()

@@ -154,8 +154,9 @@ namespace MultiplayerARPG.MMO
             GameInstance.OnGameDataLoadedEvent += OnGameDataLoaded;
 #endif
 
-            // Always accept SSL
+#if UNITY_EDITOR
             ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback((sender, certificate, chain, policyErrors) => { return true; });
+#endif
 
             // Setup custom database client
             if (customDatabaseClientSource == null)
