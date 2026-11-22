@@ -103,7 +103,16 @@ namespace MultiplayerARPG.MMO
                 if (playerCharacter.IncreasingItemsWillOverwhelming(mail.Items))
                     return UITextKeys.UI_ERROR_WILL_OVERWHELMING;
             }
-            // Make sure that the cash is received
+            // Atomic gate (UPDATE ... WHERE isClaim=0): only one caller wins, so payout below happens once
+            DatabaseApiResult<UpdateClaimMailItemsStateResp> resp = await DatabaseClient.UpdateClaimMailItemsStateAsync(new UpdateClaimMailItemsStateReq()
+            {
+                MailId = mailId,
+                UserId = playerCharacter.UserId,
+            });
+            if (!resp.IsSuccess)
+                return UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR;
+            if (resp.Response.Error.IsError())
+                return resp.Response.Error;
             DatabaseApiResult<CashResp>? changeCashResp = null;
             if (mail.Cash > 0)
             {
@@ -115,12 +124,6 @@ namespace MultiplayerARPG.MMO
                 if (!changeCashResp.Value.IsSuccess)
                     return UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR;
             }
-            // Claimed
-            DatabaseApiResult<UpdateClaimMailItemsStateResp> resp = await DatabaseClient.UpdateClaimMailItemsStateAsync(new UpdateClaimMailItemsStateReq()
-            {
-                MailId = mailId,
-                UserId = playerCharacter.UserId,
-            });
             // Give rewards
             if (mail.Items.Count > 0)
             {
@@ -161,8 +164,15 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             busyMailBoxes.Add(request.id);
-            UITextKeys message = await ClaimMailItems(request.id, playerCharacter);
-            busyMailBoxes.TryRemove(request.id);
+            UITextKeys message;
+            try
+            {
+                message = await ClaimMailItems(request.id, playerCharacter);
+            }
+            finally
+            {
+                busyMailBoxes.TryRemove(request.id);
+            }
             if (message.IsError())
             {
                 result.InvokeError(new ResponseClaimMailItemsMessage()
@@ -227,17 +237,7 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             // Validate gold
-            if (request.gold < 0)
-            {
-                request.gold = 0;
-            }
-            // Decrease gold
-            int playerGold = playerCharacter.Gold;
-            if (playerGold >= request.gold)
-            {
-                playerGold -= request.gold;
-            }
-            else
+            if (request.gold < 0 || playerCharacter.Gold < request.gold)
             {
                 result.InvokeError(new ResponseSendMailMessage()
                 {
@@ -245,6 +245,8 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
+            // Deduct before any await so concurrent sends cannot reuse the same gold; refund on failure
+            playerCharacter.Gold -= request.gold;
             // Find receiver
             DatabaseApiResult<GetUserIdByCharacterNameResp> userIdResp = await DatabaseClient.GetUserIdByCharacterNameAsync(new GetUserIdByCharacterNameReq()
             {
@@ -252,6 +254,7 @@ namespace MultiplayerARPG.MMO
             });
             if (!userIdResp.IsSuccess)
             {
+                playerCharacter.Gold += request.gold;
                 result.InvokeError(new ResponseSendMailMessage()
                 {
                     message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
@@ -261,6 +264,7 @@ namespace MultiplayerARPG.MMO
             string receiverId = userIdResp.Response.UserId;
             if (string.IsNullOrEmpty(receiverId))
             {
+                playerCharacter.Gold += request.gold;
                 result.InvokeError(new ResponseSendMailMessage()
                 {
                     message = UITextKeys.UI_ERROR_MAIL_SEND_NO_RECEIVER,
@@ -280,14 +284,13 @@ namespace MultiplayerARPG.MMO
             if (!await GameInstance.ServerMailHandlers.SendMail(mail))
             {
                 // Unable to send mail
+                playerCharacter.Gold += request.gold;
                 result.InvokeError(new ResponseSendMailMessage()
                 {
                     message = UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR,
                 });
                 return;
             }
-            // Update player's items/currencies after mail sent
-            playerCharacter.Gold = playerGold;
             // Response the client
             result.InvokeSuccess(new ResponseSendMailMessage());
 #endif
