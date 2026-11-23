@@ -902,17 +902,31 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             // Get character
-            IPlayerCharacterData playerCharacter;
-            if (!message.sendByServer && !ServerUserHandlers.TryGetPlayerCharacter(messageHandler.ConnectionId, out playerCharacter))
+            IPlayerCharacterData playerCharacter = null;
+            if (message.sendByServer)
             {
-                // Not allow to enter chat
-                return;
-            }
-            else
-            {
-                // Try to get character by sender name because this chat was sent by server, don't use connection ID to get character
+                // Chat sent by server, don't use connection ID to get character, use sender name instead
                 // But still continue to enter chat if there is no character found (because it is server)
                 ServerUserHandlers.TryGetPlayerCharacterByName(message.senderName, out playerCharacter);
+            }
+            else if (!ServerUserHandlers.TryGetPlayerCharacter(messageHandler.ConnectionId, out playerCharacter) ||
+                !SanitizeClientChatMessage(ref message, playerCharacter))
+            {
+                // Not allow to enter chat. Sender is resolved by connection, never by client-sent name
+                return;
+            }
+            // Setup some data if it can find a character (before profanity, so mute/kick hit the real sender)
+            if (playerCharacter != null)
+            {
+                message.senderId = playerCharacter.Id;
+                message.senderUserId = playerCharacter.UserId;
+                message.senderName = playerCharacter.CharacterName;
+                // Set guild data
+                if (ServerGuildHandlers.TryGetGuild(playerCharacter.GuildId, out GuildData guildData))
+                {
+                    message.guildId = playerCharacter.GuildId;
+                    message.guildName = guildData.guildName;
+                }
             }
             // Profanity detection
             ProfanityDetectResult profanityDetectResult = await ChatProfanityDetector.Proceed(message.message);
@@ -927,19 +941,6 @@ namespace MultiplayerARPG.MMO
                 return;
             }
             message.message = profanityDetectResult.message;
-            // Setup some data if it can find a character
-            if (playerCharacter != null)
-            {
-                message.senderId = playerCharacter.Id;
-                message.senderUserId = playerCharacter.UserId;
-                message.senderName = playerCharacter.CharacterName;
-                // Set guild data
-                if (ServerGuildHandlers.TryGetGuild(playerCharacter.GuildId, out GuildData guildData))
-                {
-                    message.guildId = playerCharacter.GuildId;
-                    message.guildName = guildData.guildName;
-                }
-            }
             // Character muted?
             if (!message.sendByServer && playerCharacter != null)
             {

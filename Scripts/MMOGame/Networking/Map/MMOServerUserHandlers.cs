@@ -83,7 +83,7 @@ namespace MultiplayerARPG.MMO
                 UserId = userId,
                 ChangeAmount = gold,
             });
-            if (resp.IsError)
+            if (resp.IsError || resp.Response.Gold < 0)
                 return;
             playerCharacter.UserGold = playerCharacter.UserGold.Increase(gold);
         }
