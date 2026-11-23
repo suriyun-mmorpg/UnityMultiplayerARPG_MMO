@@ -109,10 +109,10 @@ namespace MultiplayerARPG.MMO
                 MailId = mailId,
                 UserId = playerCharacter.UserId,
             });
-            if (!resp.IsSuccess)
-                return UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR;
             if (resp.Response.Error.IsError())
                 return resp.Response.Error;
+            if (!resp.IsSuccess)
+                return UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR;
             DatabaseApiResult<CashResp>? changeCashResp = null;
             if (mail.Cash > 0)
             {
@@ -123,9 +123,9 @@ namespace MultiplayerARPG.MMO
                 });
                 if (!changeCashResp.Value.IsSuccess)
                 {
-                    // Mail is already marked claimed, log it so the lost reward can be restored manually
+                    // Mail is already marked claimed: still grant the rest, log the cash as owed for manual restore
                     Debug.LogError($"[Mail] Claim cash failed after mail was marked claimed. mailId={mailId} userId={playerCharacter.UserId} cash={mail.Cash}");
-                    return UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR;
+                    changeCashResp = null;
                 }
             }
             // Give rewards
@@ -252,10 +252,18 @@ namespace MultiplayerARPG.MMO
             // Deduct before any await so concurrent sends cannot reuse the same gold; refund on failure
             playerCharacter.Gold -= request.gold;
             // Find receiver
-            DatabaseApiResult<GetUserIdByCharacterNameResp> userIdResp = await DatabaseClient.GetUserIdByCharacterNameAsync(new GetUserIdByCharacterNameReq()
+            DatabaseApiResult<GetUserIdByCharacterNameResp> userIdResp = default;
+            try
             {
-                CharacterName = request.receiverName,
-            });
+                userIdResp = await DatabaseClient.GetUserIdByCharacterNameAsync(new GetUserIdByCharacterNameReq()
+                {
+                    CharacterName = request.receiverName,
+                });
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogException(ex);
+            }
             if (!userIdResp.IsSuccess)
             {
                 playerCharacter.Gold += request.gold;
@@ -285,7 +293,16 @@ namespace MultiplayerARPG.MMO
                 Content = request.content,
                 Gold = request.gold,
             };
-            if (!await GameInstance.ServerMailHandlers.SendMail(mail))
+            bool sent = false;
+            try
+            {
+                sent = await GameInstance.ServerMailHandlers.SendMail(mail);
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogException(ex);
+            }
+            if (!sent)
             {
                 // Unable to send mail
                 playerCharacter.Gold += request.gold;

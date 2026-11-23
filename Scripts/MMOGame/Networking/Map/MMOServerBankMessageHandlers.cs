@@ -64,11 +64,20 @@ namespace MultiplayerARPG.MMO
             }
             playerCharacter.Gold -= requiredGold;
             // Update gold
-            DatabaseApiResult<GuildGoldResp> changeGoldResp = await DatabaseClient.ChangeGuildGoldAsync(new ChangeGuildGoldReq()
+            DatabaseApiResult<GuildGoldResp> changeGoldResp = default;
+            try
             {
-                GuildId = playerCharacter.GuildId,
-                ChangeAmount = request.gold,
-            });
+                changeGoldResp = await DatabaseClient.ChangeGuildGoldAsync(new ChangeGuildGoldReq()
+                {
+                    GuildId = playerCharacter.GuildId,
+                    ChangeAmount = request.gold,
+                });
+            }
+            catch (System.Exception ex)
+            {
+                // Falls through to the refund below
+                UnityEngine.Debug.LogException(ex);
+            }
             if (!changeGoldResp.IsSuccess || changeGoldResp.Response.GuildGold < 0)
             {
                 playerCharacter.Gold += requiredGold;
@@ -117,7 +126,15 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            int requiredGold = GameInstance.Singleton.GameplayRule.GetPlayerBankDepositFee(request.gold) + request.gold;
+            int requiredGold;
+            try
+            {
+                requiredGold = checked(GameInstance.Singleton.GameplayRule.GetPlayerBankDepositFee(request.gold) + request.gold);
+            }
+            catch (System.OverflowException)
+            {
+                requiredGold = int.MaxValue;
+            }
             if (playerCharacter.Gold < requiredGold)
             {
                 result.InvokeError(new ResponseDepositUserGoldMessage()
@@ -128,11 +145,20 @@ namespace MultiplayerARPG.MMO
             }
             playerCharacter.Gold -= requiredGold;
             // Update gold
-            DatabaseApiResult<GoldResp> changeGoldResp = await DatabaseClient.ChangeGoldAsync(new ChangeGoldReq()
+            DatabaseApiResult<GoldResp> changeGoldResp = default;
+            try
             {
-                UserId = playerCharacter.UserId,
-                ChangeAmount = request.gold
-            });
+                changeGoldResp = await DatabaseClient.ChangeGoldAsync(new ChangeGoldReq()
+                {
+                    UserId = playerCharacter.UserId,
+                    ChangeAmount = request.gold
+                });
+            }
+            catch (System.Exception ex)
+            {
+                // Falls through to the refund below
+                UnityEngine.Debug.LogException(ex);
+            }
             if (!changeGoldResp.IsSuccess || changeGoldResp.Response.Gold < 0)
             {
                 playerCharacter.Gold += requiredGold;
@@ -261,7 +287,23 @@ namespace MultiplayerARPG.MMO
                 });
                 return;
             }
-            int requiredGold = GameInstance.Singleton.GameplayRule.GetPlayerBankWithdrawFee(request.gold) + request.gold;
+            int requiredGold;
+            try
+            {
+                requiredGold = checked(GameInstance.Singleton.GameplayRule.GetPlayerBankWithdrawFee(request.gold) + request.gold);
+            }
+            catch (System.OverflowException)
+            {
+                requiredGold = 0;
+            }
+            if (requiredGold <= 0)
+            {
+                result.InvokeError(new ResponseWithdrawUserGoldMessage()
+                {
+                    message = UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD,
+                });
+                return;
+            }
             // Update gold
             DatabaseApiResult<GoldResp> changeGoldResp = await DatabaseClient.ChangeGoldAsync(new ChangeGoldReq()
             {
